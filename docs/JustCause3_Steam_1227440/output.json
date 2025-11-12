@@ -5619,7 +5619,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "camera_context": {
           "doc": null,
@@ -5631,7 +5632,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "camera_manager": {
           "doc": null,
@@ -5640,7 +5642,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "game_camera_manager": {
           "doc": null,
@@ -5649,11 +5652,13 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "character": {
       "doc": null,
@@ -5680,25 +5685,29 @@
               "address": 5418185473
             }
           ],
-          "functions": []
+          "functions": [],
+          "backends": {}
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "clock": {
       "doc": null,
       "items": [],
       "submodules": {},
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "game": {
       "doc": null,
       "items": [],
       "submodules": {},
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "graphics_engine": {
       "doc": null,
@@ -5717,7 +5726,15 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use windows::Win32::{Graphics::{Direct3D11::{ID3D11Device, ID3D11DeviceContext}, Dxgi::{IDXGISwapChain, IDXGIOutput}}, System::Threading::CRITICAL_SECTION};",
+                "epilogue": null
+              }
+            ]
+          }
         },
         "graphics_engine": {
           "doc": null,
@@ -5740,7 +5757,15 @@
               "address": 5416134736
             }
           ],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use windows::Win32::{Foundation::HWND, UI::WindowsAndMessaging::HICON};",
+                "epilogue": null
+              }
+            ]
+          }
         },
         "render_engine": {
           "doc": null,
@@ -5749,7 +5774,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "texture": {
           "doc": null,
@@ -5762,18 +5788,28 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use windows::Win32::Graphics::Direct3D11::{ID3D11Resource, ID3D11ShaderResourceView, ID3D11RenderTargetView, ID3D11DepthStencilView};",
+                "epilogue": null
+              }
+            ]
+          }
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "hash": {
       "doc": null,
       "items": [],
       "submodules": {},
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "input": {
       "doc": null,
@@ -5787,11 +5823,13 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "root": {
       "doc": null,
@@ -5813,7 +5851,8 @@
       ],
       "submodules": {},
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "types": {
       "doc": null,
@@ -5831,7 +5870,31 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": null,
+                "epilogue": "impl From<glam::Mat3> for Matrix3 {\n        fn from(m: glam::Mat3) -> Self {\n            Self {\n                data: m.to_cols_array(),\n            }\n        }\n    }\n    impl From<Matrix3> for glam::Mat3 {\n        fn from(m: Matrix3) -> Self {\n            glam::Mat3::from_cols_array(&m.data)\n        }\n    }\n    impl Matrix3 {\n        pub fn as_ptr(&self) -> *const f32 {\n            self.data.as_ptr()\n        }\n\n        pub fn as_mut_ptr(&mut self) -> *mut f32 {\n            self.data.as_mut_ptr()\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "impl From<glam::Mat4> for Matrix4 {\n        fn from(m: glam::Mat4) -> Self {\n            Self {\n                data: m.to_cols_array(),\n            }\n        }\n    }\n    impl From<Matrix4> for glam::Mat4 {\n        fn from(m: Matrix4) -> Self {\n            glam::Mat4::from_cols_array(&m.data)\n        }\n    }\n    impl Matrix4 {\n        pub fn as_ptr(&self) -> *const f32 {\n            self.data.as_ptr()\n        }\n\n        pub fn as_mut_ptr(&mut self) -> *mut f32 {\n            self.data.as_mut_ptr()\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "impl From<glam::Vec2> for Vector2 {\n        fn from(v: glam::Vec2) -> Self {\n            Self {\n                data: [v.x, v.y],\n            }\n        }\n    }\n    impl From<Vector2> for glam::Vec2 {\n        fn from(v: Vector2) -> Self {\n            glam::Vec2::new(v.data[0], v.data[1])\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "impl From<glam::Vec3> for Vector3 {\n        fn from(v: glam::Vec3) -> Self {\n            Self {\n                data: [v.x, v.y, v.z],\n            }\n        }\n    }\n    impl From<Vector3> for glam::Vec3 {\n        fn from(v: Vector3) -> Self {\n            glam::Vec3::new(v.data[0], v.data[1], v.data[2])\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "impl From<glam::Vec4> for Vector4 {\n        fn from(v: glam::Vec4) -> Self {\n            Self {\n                data: [v.x, v.y, v.z, v.w],\n            }\n        }\n    }\n    impl From<Vector4> for glam::Vec4 {\n        fn from(v: Vector4) -> Self {\n            glam::Vec4::new(v.data[0], v.data[1], v.data[2], v.data[3])\n        }\n    }"
+              }
+            ]
+          }
         },
         "vector_math": {
           "doc": null,
@@ -5841,11 +5904,13 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     }
   }
 }

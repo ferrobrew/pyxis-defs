@@ -45497,7 +45497,15 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": null,
+                "epilogue": "impl Camera {\n        pub unsafe fn new() -> Camera {\n            unsafe {\n                let mut instance = std::mem::MaybeUninit::<Self>::uninit();\n                (*instance.as_mut_ptr()).constructor();\n                instance.assume_init()\n            }\n        }\n    }"
+              }
+            ]
+          }
         },
         "camera_manager": {
           "doc": null,
@@ -45506,11 +45514,13 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "game": {
       "doc": null,
@@ -45524,7 +45534,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "game": {
           "doc": null,
@@ -45533,11 +45544,13 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "game_objects": {
       "doc": null,
@@ -45550,7 +45563,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "airplane": {
           "doc": null,
@@ -45559,7 +45573,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "avatar": {
           "doc": null,
@@ -45571,7 +45586,15 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use crate::{game_objects::Character, shared_ptr::*};",
+                "epilogue": null
+              }
+            ]
+          }
         },
         "boat": {
           "doc": null,
@@ -45580,7 +45603,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "car": {
           "doc": null,
@@ -45589,7 +45613,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "character": {
           "doc": null,
@@ -45603,7 +45628,15 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use crate::{shared_ptr::*, Vehicle, Vector3};",
+                "epilogue": null
+              }
+            ]
+          }
         },
         "character_manager": {
           "doc": null,
@@ -45615,7 +45648,15 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use crate::{character::*, player::*, shared_ptr::*};",
+                "epilogue": null
+              }
+            ]
+          }
         },
         "damageable": {
           "doc": null,
@@ -45625,7 +45666,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "game_object": {
           "doc": null,
@@ -45639,7 +45681,19 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use crate::{math::Matrix4, shared_ptr::*};",
+                "epilogue": null
+              },
+              {
+                "prologue": null,
+                "epilogue": "pub trait GameObjectExt {\n        unsafe fn get_matrix(&self) -> Option<Matrix4>;\n    }\n    pub trait GameObjectMutExt {\n        unsafe fn set_matrix(&mut self, matrix: &Matrix4);\n    }\n    impl<T: std::convert::AsRef<crate::game_object::GameObject>> GameObjectExt for T {\n        unsafe fn get_matrix(&self) -> Option<Matrix4> {\n            let mut out = Matrix4::default();\n            let set = unsafe { self.as_ref().get_matrix_raw(out.as_mut_ptr()) };\n            set.then_some(out)\n        }\n    }\n    impl<T: std::convert::AsMut<crate::game_object::GameObject>> GameObjectMutExt for T {\n        unsafe fn set_matrix(&mut self, matrix: &Matrix4) {\n            unsafe { self.as_mut().set_matrix_raw(matrix.as_ptr()); }\n        }\n    }"
+              }
+            ]
+          }
         },
         "helicopter": {
           "doc": null,
@@ -45648,7 +45702,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "land_vehicle": {
           "doc": null,
@@ -45657,7 +45712,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "motorbike": {
           "doc": null,
@@ -45666,7 +45722,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "physics_game_object": {
           "doc": null,
@@ -45678,7 +45735,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "player": {
           "doc": null,
@@ -45687,7 +45745,19 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use crate::game_objects::Character;",
+                "epilogue": null
+              },
+              {
+                "prologue": null,
+                "epilogue": "pub trait PlayerExt {\n        unsafe fn get_character(&self) -> Option<&Character>;\n    }\n    impl<T: std::convert::AsRef<crate::game_objects::player::Player>> PlayerExt for T {\n        unsafe fn get_character(&self) -> Option<&Character> {\n            unsafe { self.as_ref().avatar.character.as_ref() }\n        }\n    }\n    pub trait PlayerMutExt {\n        unsafe fn get_character(&mut self) -> Option<&mut Character>;\n    }\n    impl<T: std::convert::AsMut<crate::game_objects::player::Player>> PlayerMutExt for T {\n        unsafe fn get_character(&mut self) -> Option<&mut Character> {\n            unsafe { self.as_mut().avatar.character.as_mut() }\n        }\n    }"
+              }
+            ]
+          }
         },
         "sea_vehicle": {
           "doc": null,
@@ -45696,7 +45766,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "smart_object": {
           "doc": null,
@@ -45711,7 +45782,15 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use crate::{CharacterBase, SharedPtr, WeakPtr};",
+                "epilogue": null
+              }
+            ]
+          }
         },
         "vehicle": {
           "doc": null,
@@ -45725,11 +45804,24 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use crate::{GameObject, SharedPtr, SmartObject, WeakPtr, PfxVehicle};",
+                "epilogue": null
+              },
+              {
+                "prologue": null,
+                "epilogue": "pub trait VehicleMutExt {\n        unsafe fn get_pfx_vehicle(&mut self) -> SharedPtr<PfxVehicle>;\n    }\n    impl<T: std::convert::AsMut<Vehicle>> VehicleMutExt for T {\n        unsafe fn get_pfx_vehicle(&mut self) -> SharedPtr<PfxVehicle> {\n            unsafe { (*self.as_mut().get_pfx_instance()).instance.clone().static_pointer_cast::<PfxVehicle>() }\n        }\n    }"
+              }
+            ]
+          }
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "input": {
       "doc": null,
@@ -45742,7 +45834,15 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": null,
+                "epilogue": "impl InputAction {\n    pub fn is_gui(&self) -> bool {\n        use InputAction::*;\n        matches!(\n            *self,\n            GuiOk | GuiCancel | GuiUp | GuiDown | GuiLeft | GuiRight |\n            GuiNext | GuiBack | GuiPdaZoomOut | GuiPause | GuiLoad |\n            GuiSave | GuiCreate | GuiDelete | GuiDefault | GuiPda |\n            GuiPdaToggleAOI | GuiPdaZoomIn | GuiPdaExtraction | GuiIconLegend |\n            GuiDatabase | GuiAnalogUp | GuiAnalogDown | GuiAnalogLeft | GuiAnalogRight\n        )\n    }\n}"
+              }
+            ]
+          }
         },
         "input_device_manager": {
           "doc": null,
@@ -45751,11 +45851,13 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "physics": {
       "doc": null,
@@ -45773,7 +45875,23 @@
               ],
               "submodules": {},
               "extern_values": [],
-              "functions": []
+              "functions": [],
+              "backends": {
+                "rust": [
+                  {
+                    "prologue": "#[cfg(feature = \"glam\")]\n    use glam::{Mat3, Vec3, Vec4};",
+                    "epilogue": null
+                  },
+                  {
+                    "prologue": null,
+                    "epilogue": "#[cfg(feature = \"glam\")]\n    impl From<Mat3> for HkMatrix3 {\n        fn from(m: Mat3) -> Self {\n            Self {\n                data: [\n                    m.col(0).into(),\n                    m.col(1).into(),\n                    m.col(2).into(),\n                ],\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<HkMatrix3> for Mat3 {\n        fn from(m: HkMatrix3) -> Self {\n            Mat3::from_cols(m.data[0].into(), m.data[1].into(), m.data[2].into())\n        }\n    }"
+                  },
+                  {
+                    "prologue": null,
+                    "epilogue": "#[cfg(feature = \"glam\")]\n    impl From<Vec3> for HkVector4 {\n        fn from(v: Vec3) -> Self {\n            Self {\n                data: [v.x, v.y, v.z, 0.0],\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<HkVector4> for Vec3 {\n        fn from(v: HkVector4) -> Self {\n            Vec3::new(v.data[0], v.data[1], v.data[2])\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Vec4> for HkVector4 {\n        fn from(v: Vec4) -> Self {\n            Self {\n                data: [v.x, v.y, v.z, v.w],\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<HkVector4> for Vec4 {\n        fn from(v: HkVector4) -> Self {\n            Vec4::new(v.data[0], v.data[1], v.data[2], v.data[3])\n        }\n    }"
+                  }
+                ]
+              }
             },
             "memory": {
               "doc": null,
@@ -45793,7 +45911,8 @@
                   "address": 20985688
                 }
               ],
-              "functions": []
+              "functions": [],
+              "backends": {}
             },
             "referenced_object": {
               "doc": null,
@@ -45802,7 +45921,23 @@
               ],
               "submodules": {},
               "extern_values": [],
-              "functions": []
+              "functions": [],
+              "backends": {
+                "rust": [
+                  {
+                    "prologue": "use crate::havok::memory::{get_hk_thread_memory_tls_index, HkThreadMemory, HkMemoryClass};",
+                    "epilogue": null
+                  },
+                  {
+                    "prologue": "use windows::Win32::System::Threading::TlsGetValue;",
+                    "epilogue": null
+                  },
+                  {
+                    "prologue": null,
+                    "epilogue": "impl HkReferencedObject {\n        pub unsafe fn allocation_size(&self) -> u32 {\n            (self.mem_size_and_flags & 0x7FFF) as u32\n        }\n        pub unsafe fn reference_count(&self) -> u16 {\n            self.reference_count\n        }\n        pub unsafe fn add_reference(&mut self) {\n            self.reference_count += 1;\n        }\n        pub unsafe fn remove_reference(&mut self) {\n            self.reference_count -= 1;\n        }\n    }\n    pub unsafe trait HkReferencedObjectInstance {\n        type ConstructorArgs;\n        fn allocation_size() -> u32;\n        fn memory_class() -> HkMemoryClass;\n        fn as_referenced_object(&self) -> &HkReferencedObject;\n        fn as_referenced_object_mut(&mut self) -> &mut HkReferencedObject;\n        fn construct(&mut self, args: Self::ConstructorArgs);\n        fn free(&mut self);\n    }\n    pub struct HkRefCounted<T: HkReferencedObjectInstance>(*mut T);\n    impl<T: HkReferencedObjectInstance> HkRefCounted<T> {\n        pub unsafe fn new(args: T::ConstructorArgs) -> Self {\n            unsafe {\n                let thread_memory = &mut *(TlsGetValue(*get_hk_thread_memory_tls_index()) as *mut HkThreadMemory);\n                let instance = std::mem::transmute::<*mut std::ffi::c_void, *mut T>(\n                    thread_memory.allocate_chunk(\n                        T::allocation_size(),\n                        T::memory_class(),\n                    )\n                );\n                (*instance).construct(args);\n                (*instance).as_referenced_object_mut().mem_size_and_flags = T::allocation_size() as u16;\n                Self(instance)\n            }\n        }\n        pub unsafe fn as_ptr(&self) -> *const T {\n            self.0\n        }\n        pub unsafe fn as_mut_ptr(&mut self) -> *mut T {\n            self.0\n        }\n        pub unsafe fn as_ref(&self) -> &T {\n            unsafe { &(*self.0) }\n        }\n        pub unsafe fn as_mut_ref(&mut self) -> &mut T {\n            unsafe { &mut (*self.0) }\n        }\n    }\n    impl<T: HkReferencedObjectInstance> Clone for HkRefCounted<T> {\n        fn clone(&self) -> Self {\n            unsafe {\n                let reference = &mut (*self.0);\n                let object = reference.as_referenced_object_mut();\n                object.add_reference();\n                Self(self.0)\n            }\n        }\n    }\n    impl<T: HkReferencedObjectInstance> Drop for HkRefCounted<T> {\n        fn drop(&mut self) {\n            unsafe {\n                let reference = &mut (*self.0);\n                let object = reference.as_referenced_object_mut();\n                object.remove_reference();\n                if object.reference_count() == 0 {\n                    reference.free();\n                }\n            }\n        }\n    }"
+                  }
+                ]
+              }
             },
             "reflection": {
               "doc": null,
@@ -45849,7 +45984,15 @@
                   "address": 15883440
                 }
               ],
-              "functions": []
+              "functions": [],
+              "backends": {
+                "rust": [
+                  {
+                    "prologue": "use std::{ffi::c_void, os::raw::c_char};",
+                    "epilogue": null
+                  }
+                ]
+              }
             },
             "rigid_body": {
               "doc": null,
@@ -45864,11 +46007,48 @@
               ],
               "submodules": {},
               "extern_values": [],
-              "functions": []
+              "functions": [],
+              "backends": {
+                "rust": [
+                  {
+                    "prologue": "use crate::havok::memory::HkMemoryClass;",
+                    "epilogue": null
+                  },
+                  {
+                    "prologue": "use crate::havok::referenced_object::{HkReferencedObject, HkReferencedObjectInstance};",
+                    "epilogue": null
+                  },
+                  {
+                    "prologue": null,
+                    "epilogue": "impl HkpRigidBodyCInfo {\n        pub unsafe fn new() -> Self {\n            unsafe {\n                let mut instance = std::mem::MaybeUninit::<Self>::uninit();\n                (*instance.as_mut_ptr()).constructor();\n                instance.assume_init()\n            }\n        }\n    }"
+                  },
+                  {
+                    "prologue": null,
+                    "epilogue": "unsafe impl HkReferencedObjectInstance for HkpRigidBody {\n        type ConstructorArgs = *mut HkpRigidBodyCInfo;\n        fn allocation_size() -> u32 {\n            std::mem::size_of::<Self>() as u32\n        }\n        fn memory_class() -> HkMemoryClass {\n            HkMemoryClass::Entity\n        }\n        fn as_referenced_object(&self) -> &HkReferencedObject {\n            &self.referenced_object\n        }\n        fn as_referenced_object_mut(&mut self) -> &mut HkReferencedObject {\n            &mut self.referenced_object\n        }\n        #[allow(clippy::not_unsafe_ptr_arg_deref)]\n        fn construct(&mut self, args: Self::ConstructorArgs) {\n            unsafe {\n                self.constructor(args);\n            }\n        }\n        fn free(&mut self) {\n            unsafe {\n                self.destructor(true);\n            }\n        }\n    }"
+                  },
+                  {
+                    "prologue": null,
+                    "epilogue": "unsafe impl HkReferencedObjectInstance for HkpBoxShape {\n        type ConstructorArgs = (*const crate::havok::math::HkVector4, f32);\n        fn allocation_size() -> u32 {\n            std::mem::size_of::<Self>() as u32\n        }\n        fn memory_class() -> HkMemoryClass {\n            HkMemoryClass::CdInfo\n        }\n        fn as_referenced_object(&self) -> &HkReferencedObject {\n            &self.shape.referenced_object\n        }\n        fn as_referenced_object_mut(&mut self) -> &mut HkReferencedObject {\n            &mut self.shape.referenced_object\n        }\n        fn construct(&mut self, args: Self::ConstructorArgs) {\n            unsafe {\n                let (half_extents, padding) = args;\n                self.constructor(half_extents, padding);\n            }\n        }\n        fn free(&mut self) {\n            unsafe {\n                self.destructor(true);\n            }\n        }\n    }"
+                  },
+                  {
+                    "prologue": null,
+                    "epilogue": "unsafe impl HkReferencedObjectInstance for HkpSphereShape {\n        type ConstructorArgs = f32;\n        fn allocation_size() -> u32 {\n            std::mem::size_of::<Self>() as u32\n        }\n        fn memory_class() -> HkMemoryClass {\n            HkMemoryClass::CdInfo\n        }\n        fn as_referenced_object(&self) -> &HkReferencedObject {\n            &self.shape.referenced_object\n        }\n        fn as_referenced_object_mut(&mut self) -> &mut HkReferencedObject {\n            &mut self.shape.referenced_object\n        }\n        fn construct(&mut self, args: Self::ConstructorArgs) {\n            unsafe {\n                self.constructor(args);\n            }\n        }\n        fn free(&mut self) {\n            unsafe {\n                self.destructor(true);\n            }\n        }\n    }"
+                  },
+                  {
+                    "prologue": null,
+                    "epilogue": "unsafe impl HkReferencedObjectInstance for HkpCapsule {\n        type ConstructorArgs = (*const crate::havok::math::HkVector4, *const crate::havok::math::HkVector4, f32);\n        fn allocation_size() -> u32 {\n            std::mem::size_of::<Self>() as u32\n        }\n        fn memory_class() -> HkMemoryClass {\n            HkMemoryClass::CdInfo\n        }\n        fn as_referenced_object(&self) -> &HkReferencedObject {\n            &self.shape.referenced_object\n        }\n        fn as_referenced_object_mut(&mut self) -> &mut HkReferencedObject {\n            &mut self.shape.referenced_object\n        }\n        fn construct(&mut self, args: Self::ConstructorArgs) {\n            unsafe {\n                let (start, end, radius) = args;\n                self.constructor(start, end, radius);\n            }\n        }\n        fn free(&mut self) {\n            unsafe {\n                self.destructor(true);\n            }\n        }\n    }"
+                  },
+                  {
+                    "prologue": null,
+                    "epilogue": "unsafe impl HkReferencedObjectInstance for HkpCylinderShape {\n        type ConstructorArgs = (*const crate::havok::math::HkVector4, *const crate::havok::math::HkVector4, f32, f32);\n        fn allocation_size() -> u32 {\n            std::mem::size_of::<Self>() as u32\n        }\n        fn memory_class() -> HkMemoryClass {\n            HkMemoryClass::CdInfo\n        }\n        fn as_referenced_object(&self) -> &HkReferencedObject {\n            &self.shape.referenced_object\n        }\n        fn as_referenced_object_mut(&mut self) -> &mut HkReferencedObject {\n            &mut self.shape.referenced_object\n        }\n        fn construct(&mut self, args: Self::ConstructorArgs) {\n            unsafe {\n                let (start, end, radius, padding) = args;\n                self.constructor(start, end, radius, padding);\n            }\n        }\n        fn free(&mut self) {\n            unsafe {\n                self.destructor(true);\n            }\n        }\n    }"
+                  }
+                ]
+              }
             }
           },
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "pfx_airplane": {
           "doc": null,
@@ -45878,7 +46058,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "pfx_boat": {
           "doc": null,
@@ -45888,7 +46069,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "pfx_breakable": {
           "doc": null,
@@ -45898,7 +46080,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "pfx_car": {
           "doc": null,
@@ -45908,7 +46091,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "pfx_character": {
           "doc": null,
@@ -45919,7 +46103,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "pfx_helicopter": {
           "doc": null,
@@ -45929,7 +46114,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "pfx_instance": {
           "doc": null,
@@ -45942,7 +46128,15 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use crate::SharedPtr;",
+                "epilogue": null
+              }
+            ]
+          }
         },
         "pfx_motorbike": {
           "doc": null,
@@ -45952,7 +46146,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "pfx_rigid_body": {
           "doc": null,
@@ -45964,7 +46159,19 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use crate::shared_ptr::*;",
+                "epilogue": null
+              },
+              {
+                "prologue": null,
+                "epilogue": "impl PfxRigidBody {\n        pub unsafe fn new(rigid_body: *mut crate::havok::rigid_body::HkpRigidBody) -> std::pin::Pin<std::boxed::Box<Self>> {\n            unsafe {\n                let mut instance = std::boxed::Box::pin(std::mem::zeroed::<Self>());\n                instance.constructor(rigid_body, &SharedPtr::<u32>::new(), false, 0);\n                instance\n            }\n        }\n    }\n    impl std::ops::Drop for PfxRigidBody {\n        fn drop(&mut self) {\n            unsafe { self.destructor(false); }\n        }\n    }"
+              }
+            ]
+          }
         },
         "pfx_vehicle": {
           "doc": null,
@@ -45974,7 +46181,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "physics_system": {
           "doc": null,
@@ -45986,11 +46194,28 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": null,
+                "epilogue": "impl AIRayCastFilter {\n        pub unsafe fn new() -> Self {\n            unsafe {\n                let mut instance = std::mem::MaybeUninit::<Self>::uninit();\n                (*instance.as_mut_ptr()).constructor();\n                instance.assume_init()\n            }\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "impl RayCastResult {\n        pub unsafe fn new() -> RayCastResult {\n            unsafe {\n                let mut instance: RayCastResult = std::mem::zeroed();\n                instance.normal = crate::math::Vector3 { data: [1., 0., 0.] };\n                instance.distance = 1.;\n                instance.unknown = [u32::MAX; 4];\n                instance\n            }\n        }\n    }\n    impl Default for RayCastResult {\n        fn default() -> Self {\n            unsafe { Self::new() }\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "impl PhysicsSystem {\n        pub fn ray_cast(&mut self, ray: &crate::math::Ray, start: f32, end: f32, ignored_pfx_types: u32) -> Option<RayCastResult> {\n            unsafe {\n                let mut result = RayCastResult::default();\n                let mut filter = AIRayCastFilter::new();\n                filter.ignored_pfx_types = ignored_pfx_types;\n                self.ray_cast_internal(ray, start, end, &mut result, &mut filter.ray_cast_filter, false, true, 0).then(|| {\n                    result.distance *= end - start;\n                    result\n                })\n            }\n        }\n    }"
+              }
+            ]
+          }
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "rendering": {
       "doc": null,
@@ -46069,7 +46294,19 @@
               "address": 18423492
             }
           ],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use windows::{\n    core::InterfaceRef,\n    Win32::{\n        Foundation::HWND,\n        UI::WindowsAndMessaging::HCURSOR,    \n        Graphics::{Direct3D10::ID3D10Device, Dxgi::IDXGISwapChain}\n    }\n};",
+                "epilogue": null
+              },
+              {
+                "prologue": null,
+                "epilogue": "pub unsafe fn get_d3d10_device() -> Option<InterfaceRef<'static, ID3D10Device>> {\n    unsafe {\n        let raw = std::ptr::NonNull::new(*get_raw_d3d10_device() as *mut std::os::raw::c_void)?;\n        Some(InterfaceRef::from_raw(raw))\n    }\n}\npub unsafe fn get_dxgi_swapchain() -> Option<InterfaceRef<'static, IDXGISwapChain>> {\n    unsafe {\n        let raw = std::ptr::NonNull::new(*get_raw_dxgi_swapchain() as *mut std::os::raw::c_void)?;\n        Some(InterfaceRef::from_raw(raw))\n    }\n}"
+              }
+            ]
+          }
         },
         "model_instance_manager": {
           "doc": null,
@@ -46078,7 +46315,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "render_block": {
           "doc": null,
@@ -46114,7 +46352,35 @@
               "address": 20844192
             }
           ],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use crate::shared_ptr::*;\n    use std::mem::ManuallyDrop;",
+                "epilogue": null
+              },
+              {
+                "prologue": null,
+                "epilogue": "impl GenericRenderBlock {\n        pub unsafe fn new() -> GenericRenderBlock {\n            unsafe {\n                let mut instance = std::mem::MaybeUninit::<Self>::uninit();\n                (*instance.as_mut_ptr()).constructor();\n                instance.assume_init()\n            }\n        }\n    }\n    impl std::ops::Drop for GenericRenderBlock {\n        fn drop(&mut self) {\n            unsafe {\n                self.destructor();\n            }\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "impl RenderBlockLine {\n        pub unsafe fn new() -> RenderBlockLine {\n            unsafe {\n                let mut instance = std::mem::MaybeUninit::<Self>::uninit();\n                (*instance.as_mut_ptr()).constructor();\n                instance.assume_init()\n            }\n        }\n    }\n    impl std::ops::Drop for RenderBlockLine {\n        fn drop(&mut self) {\n            unsafe { self.destructor(false); }\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "impl RenderBlockTriangle {\n        pub unsafe fn new() -> RenderBlockTriangle {\n            unsafe {\n                let mut instance = std::mem::MaybeUninit::<Self>::uninit();\n                (*instance.as_mut_ptr()).constructor();\n                instance.assume_init()\n            }\n        }\n    }\n    impl std::ops::Drop for RenderBlockTriangle {\n        fn drop(&mut self) {\n            unsafe { self.destructor(false); }\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "impl RenderBlockGeneral {\n        pub unsafe fn new() -> RenderBlockGeneral {\n            unsafe {\n                let mut instance = std::mem::MaybeUninit::<Self>::uninit();\n                (*instance.as_mut_ptr()).constructor();\n                instance.assume_init()\n            }\n        }\n    }\n    impl std::ops::Drop for RenderBlockGeneral {\n        fn drop(&mut self) {\n            unsafe { self.destructor(false); }\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "impl RenderBlock3DText {\n        pub unsafe fn new() -> RenderBlock3DText {\n            unsafe {\n                let mut instance: RenderBlock3DText = std::mem::zeroed();\n                instance.render_block.vftable = 0xF23584 as *const _;\n                instance.text_hash = u32::MAX;\n                instance.font_hash = u32::MAX;\n                instance.render_style = 2;\n                instance.font_size = 16;\n                instance\n            }\n        }\n    }\n    impl std::ops::Drop for RenderBlock3DText {\n        fn drop(&mut self) {\n            unsafe {\n                self.destructor(false);\n            }\n        }\n    }"
+              }
+            ]
+          }
         },
         "render_engine": {
           "doc": null,
@@ -46139,7 +46405,19 @@
               "address": 17354048
             }
           ],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use windows::Win32::Foundation::HANDLE;",
+                "epilogue": null
+              },
+              {
+                "prologue": null,
+                "epilogue": "impl RenderBlockInstanceInfo {\n        pub unsafe fn new() -> RenderBlockInstanceInfo {\n            unsafe {\n                let mut instance: RenderBlockInstanceInfo = std::mem::zeroed();\n                instance.colors[0] = 0xFFFFFFFF;\n                instance.colors[1] = 0xFFFFFFFF;\n                instance\n            }\n        }\n    }"
+              }
+            ]
+          }
         },
         "shadow_manager": {
           "doc": null,
@@ -46148,7 +46426,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "texture_manager": {
           "doc": null,
@@ -46159,11 +46438,20 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use crate::shared_ptr::*;",
+                "epilogue": null
+              }
+            ]
+          }
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "root": {
       "doc": null,
@@ -46185,7 +46473,8 @@
       ],
       "submodules": {},
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "types": {
       "doc": null,
@@ -46204,7 +46493,43 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "#[cfg(feature = \"glam\")]\n    use glam::{Mat3, Mat4, Vec2, Vec3, Vec4};\n    #[cfg(feature = \"bevy_math\")]\n    use bevy_math::{bounding::Aabb3d, Ray3d};",
+                "epilogue": null
+              },
+              {
+                "prologue": null,
+                "epilogue": "#[cfg(feature = \"bevy_math\")]\n    impl From<Aabb3d> for Aabb {\n        fn from(aabb: Aabb3d) -> Self {\n            Self {\n                min: Vector3 {\n                    data: aabb.min.to_array(),\n                },\n                max: Vector3 {\n                    data: aabb.max.to_array(),\n                },\n            }\n        }\n    }\n    #[cfg(feature = \"bevy_math\")]\n    impl From<Aabb> for Aabb3d {\n        fn from(aabb: Aabb) -> Self {\n            Aabb3d {\n                min: bevy_math::Vec3A::from_array(aabb.min.data),\n                max: bevy_math::Vec3A::from_array(aabb.max.data),\n            }\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "#[cfg(feature = \"glam\")]\n    impl From<Mat3> for Matrix3 {\n        fn from(m: Mat3) -> Self {\n            Self {\n                data: m.to_cols_array(),\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Matrix3> for Mat3 {\n        fn from(m: Matrix3) -> Self {\n            Mat3::from_cols_array(&m.data)\n        }\n    }\n    impl Matrix3 {\n        pub fn as_ptr(&self) -> *const f32 {\n            self.data.as_ptr()\n        }\n\n        pub fn as_mut_ptr(&mut self) -> *mut f32 {\n            self.data.as_mut_ptr()\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "#[cfg(feature = \"glam\")]\n    impl From<Mat4> for Matrix4 {\n        fn from(m: Mat4) -> Self {\n            Self {\n                data: m.to_cols_array(),\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Matrix4> for Mat4 {\n        fn from(m: Matrix4) -> Self {\n            Mat4::from_cols_array(&m.data)\n        }\n    }\n    impl Matrix4 {\n        pub fn as_ptr(&self) -> *const f32 {\n            self.data.as_ptr()\n        }\n\n        pub fn as_mut_ptr(&mut self) -> *mut f32 {\n            self.data.as_mut_ptr()\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "#[cfg(feature = \"bevy_math\")]\n    impl From<Ray> for Ray3d {\n        fn from(r: Ray) -> Self {\n            Self::new(r.origin.into(), r.direction.into())\n        }\n    }\n    #[cfg(feature = \"bevy_math\")]\n    impl From<Ray3d> for Ray {\n        fn from(r: Ray3d) -> Self {\n            Self::new(r.origin.into(), Vec3::from(r.direction).into())\n        }\n    }\n    impl Ray {\n        fn new(origin: Vector3, direction: Vector3) -> Self {\n            Self {\n                origin,\n                direction,\n            }\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "#[cfg(feature = \"glam\")]\n    impl From<Vec2> for Vector2 {\n        fn from(v: Vec2) -> Self {\n            Self {\n                data: [v.x, v.y],\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Vector2> for Vec2 {\n        fn from(v: Vector2) -> Self {\n            Vec2::new(v.data[0], v.data[1])\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "#[cfg(feature = \"glam\")]\n    impl From<Vec3> for Vector3 {\n        fn from(v: Vec3) -> Self {\n            Self {\n                data: [v.x, v.y, v.z],\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Vector3> for Vec3 {\n        fn from(v: Vector3) -> Self {\n            Vec3::new(v.data[0], v.data[1], v.data[2])\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "#[cfg(feature = \"glam\")]\n    impl From<Vec4> for Vector4 {\n        fn from(v: Vec4) -> Self {\n            Self {\n                data: [v.x, v.y, v.z, v.w],\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Vector4> for Vec4 {\n        fn from(v: Vector4) -> Self {\n            Vec4::new(v.data[0], v.data[1], v.data[2], v.data[3])\n        }\n    }"
+              }
+            ]
+          }
         },
         "rtti": {
           "doc": null,
@@ -46214,7 +46539,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "shared_ptr": {
           "doc": null,
@@ -46227,7 +46553,35 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use std::{\n        clone::Clone,\n        ptr,\n        sync::atomic::{AtomicI32, Ordering},\n    };",
+                "epilogue": null
+              },
+              {
+                "prologue": null,
+                "epilogue": "// SharedCountImpl\n    impl SharedCountImpl {\n        fn release(&mut self) {\n            let use_count = self.use_count.load(Ordering::SeqCst) - 1;\n            self.use_count.store(use_count, Ordering::SeqCst);\n            if use_count == 0 {\n                unsafe {\n                    self.dispose();\n                }\n                self.weak_release();\n            }\n        }\n\n        fn weak_release(&mut self) {\n            let weak_count = self.weak_count.load(Ordering::SeqCst) - 1;\n            self.weak_count.store(weak_count, Ordering::SeqCst);\n            if weak_count == 0 {\n                unsafe {\n                    self.destroy();\n                }\n            }\n        }\n\n        fn add_ref_copy(&mut self) {\n            let use_count = self.use_count.load(Ordering::SeqCst) + 1;\n            self.use_count.store(use_count, Ordering::SeqCst);\n        }\n\n        fn weak_add_ref(&mut self) {\n            let weak_count = self.weak_count.load(Ordering::SeqCst) + 1;\n            self.weak_count.store(weak_count, Ordering::SeqCst);\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "// SharedCount\n    #[allow(dead_code)]\n    impl SharedCount {\n        fn swap(&mut self, rhs: &mut SharedCount) {\n            let lhs = self;\n            unsafe {\n                swap_unaligned(\n                    &raw mut lhs.count_impl,\n                    &raw mut rhs.count_impl,\n                );\n            }\n        }\n    }\n    impl Drop for SharedCount {\n        fn drop(&mut self) {\n            if !self.count_impl.is_null() {\n                unsafe {\n                    (*self.count_impl).release();\n                }\n            }\n        }\n    }\n    impl Clone for SharedCount {\n        fn clone(&self) -> SharedCount {\n            unsafe {\n                (*self.count_impl).add_ref_copy();\n            }\n            SharedCount {\n                count_impl: self.count_impl,\n            }\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "// WeakCount\n    impl WeakCount {\n        fn new_from_shared(shared: &SharedCount) -> WeakCount {\n            unsafe {\n                (*shared.count_impl).weak_add_ref();\n            }\n            WeakCount {\n                count_impl: shared.count_impl,\n            }\n        }\n    }\n    impl Drop for WeakCount {\n        fn drop(&mut self) {\n            if !self.count_impl.is_null() {\n                unsafe {\n                    (*self.count_impl).weak_release();\n                }\n            }\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "// SharedPtr\n    #[repr(C)]\n    pub struct SharedPtr<T> {\n        px: *mut T,\n        pn: SharedCount,\n    }\n    #[allow(dead_code)]\n    impl<T> SharedPtr<T> {\n        pub fn new() -> SharedPtr<T> {\n            SharedPtr {\n                px: ptr::null_mut(),\n                pn: SharedCount {\n                    count_impl: ptr::null_mut(),\n                },\n            }\n        }\n\n        pub unsafe fn as_ref(&self) -> Option<&T> {\n            self.exists().then(|| unsafe { &*self.px })\n        }\n\n        pub unsafe fn as_mut(&mut self) -> Option<&mut T> {\n            self.exists().then(|| unsafe { &mut *self.px })\n        }\n\n        pub fn exists(&self) -> bool {\n            !self.px.is_null()\n        }\n\n        pub fn refcount(&self) -> i32 {\n            unsafe { (*self.pn.count_impl).use_count.load(Ordering::SeqCst) }\n        }\n\n        pub fn is_only_owner(&self) -> bool {\n            self.refcount() == 1\n        }\n\n        pub unsafe fn swap(&mut self, rhs: &mut SharedPtr<T>) {\n            unsafe {\n                swap_unaligned(&raw mut self.px, &raw mut rhs.px);\n            }\n            self.pn.swap(&mut rhs.pn);\n        }\n\n        pub unsafe fn reset_with_empty(&mut self) {\n            unsafe { self.swap(&mut SharedPtr::new()) };\n        }\n\n        /// Absolutely no verification on this - make sure that T can be casted to Y!\n        pub unsafe fn static_pointer_cast<Y>(self) -> SharedPtr<Y> {\n            SharedPtr {\n                px: self.px as *mut Y,\n                pn: self.pn,\n            }\n        }\n\n        /// Given a `SharedPtr<T>`, returns a `SharedPtr<Y>` if `T: AsMut<Y>`.\n        /// Pyxis defines `AsMut` conversions for inheritance, so this can be used\n        /// to convert a `SharedPtr<Derived>` to a `SharedPtr<Base>`.\n        ///\n        /// That being said, it's still somewhat unsafe, so use with caution.\n        pub unsafe fn as_mut_cast<Y>(self) -> SharedPtr<Y>\n        where\n            T: AsMut<Y>,\n        {\n            SharedPtr {\n                px: unsafe { (*self.px).as_mut() as *mut Y },\n                pn: self.pn,\n            }\n        }\n    }\n    impl<T> Clone for SharedPtr<T> {\n        fn clone(&self) -> SharedPtr<T> {\n            SharedPtr {\n                px: self.px,\n                pn: self.pn.clone(),\n            }\n        }\n    }\n    impl<T> Default for SharedPtr<T> {\n        fn default() -> SharedPtr<T> {\n            SharedPtr::new()\n        }\n    }\n    impl<T> PartialEq for SharedPtr<T> {\n        fn eq(&self, other: &SharedPtr<T>) -> bool {\n            self.px == other.px\n        }\n    }\n    impl<T> Eq for SharedPtr<T> {}"
+              },
+              {
+                "prologue": null,
+                "epilogue": "// WeakPtr\n    #[allow(dead_code)]\n    #[repr(C)]\n    pub struct WeakPtr<T> {\n        px: *mut T,\n        pn: WeakCount,\n    }\n    impl<T> WeakPtr<T> {\n        pub unsafe fn new_from_shared(shared: SharedPtr<T>) -> WeakPtr<T> {\n            WeakPtr {\n                px: shared.px,\n                pn: WeakCount::new_from_shared(&shared.pn),\n            }\n        }\n    }\n\n    unsafe fn swap_unaligned<T>(p1: *mut T, p2: *mut T) {\n        unsafe {\n            let p1_val = ptr::read_unaligned(p1);\n            let p2_val = ptr::read_unaligned(p2);\n\n            ptr::write_unaligned(p1, p2_val);\n            ptr::write_unaligned(p2, p1_val);\n        }\n    }"
+              }
+            ]
+          }
         },
         "std_string": {
           "doc": null,
@@ -46236,11 +46590,24 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use std::{ffi::c_void, os::raw::c_char, sync::OnceLock};\n    use windows::Win32::System::LibraryLoader::{GetModuleHandleA, GetProcAddress};\n\n    use crate::util::pcstr;",
+                "epilogue": null
+              },
+              {
+                "prologue": null,
+                "epilogue": "struct StringFunctions {\n        ctor_default: extern \"thiscall\" fn(*mut StdString) -> *mut c_void,\n        ctor_cstr: extern \"thiscall\" fn(*mut StdString, *const c_char) -> *mut c_void,\n        dtor: extern \"thiscall\" fn(*mut StdString) -> *mut c_void,\n        copy: extern \"thiscall\" fn(*mut StdString, *const StdString) -> *mut c_void,\n    }\n    impl StringFunctions {\n        const CTOR_DEFAULT: &'static std::ffi::CStr =\n            c\"??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@XZ\";\n        const CTOR_CSTR: &'static std::ffi::CStr =\n            c\"??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@PBD@Z\";\n        const DTOR: &'static std::ffi::CStr =\n            c\"??1?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@XZ\";\n        const COPY: &'static std::ffi::CStr =\n            c\"??4?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAEAAV01@ABV01@@Z\";\n\n        pub fn get() -> &'static Self {\n            static STRING_FUNCTIONS: OnceLock<StringFunctions> = OnceLock::new();\n            #[allow(clippy::missing_transmute_annotations)]\n            STRING_FUNCTIONS.get_or_init(|| unsafe {\n                use std::mem::transmute;\n                let module = GetModuleHandleA(pcstr(c\"MSVCP80\")).unwrap();\n                StringFunctions {\n                    ctor_default: transmute(GetProcAddress(module, pcstr(Self::CTOR_DEFAULT))),\n                    ctor_cstr: transmute(GetProcAddress(module, pcstr(Self::CTOR_CSTR))),\n                    dtor: transmute(GetProcAddress(module, pcstr(Self::DTOR))),\n                    copy: transmute(GetProcAddress(module, pcstr(Self::COPY))),\n                }\n            })\n        }\n    }\n\n    #[allow(dead_code)]\n    impl StdString {\n        pub fn new() -> StdString {\n            let mut ret = StdString::default();\n            (StringFunctions::get().ctor_default)(&mut ret);\n            ret\n        }\n\n        pub fn new_from_str(s: &str) -> Result<Self, std::ffi::NulError> {\n            let tmp = std::ffi::CString::new(s)?;\n            Ok(unsafe { Self::new_from_c_str(tmp.as_c_str().as_ptr()) })\n        }\n\n        pub unsafe fn new_from_c_str(s: *const c_char) -> StdString {\n            let mut ret = StdString::default();\n            (StringFunctions::get().ctor_cstr)(&mut ret, s);\n            ret\n        }\n\n        pub unsafe fn copy_from(&mut self, s: *mut StdString) {\n            (StringFunctions::get().copy)(self, s);\n        }\n    }\n\n    impl Drop for StdString {\n        fn drop(&mut self) {\n            (StringFunctions::get().dtor)(self);\n        }\n    }"
+              }
+            ]
+          }
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "ui": {
       "doc": null,
@@ -46255,11 +46622,20 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": null,
+                "epilogue": "impl AnarkState {\n    pub fn in_game(&self) -> bool {\n        matches!(\n            *self,\n            AnarkState::None | AnarkState::Hud | AnarkState::BenchmarkHud\n        )\n    }\n}"
+              }
+            ]
+          }
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "world": {
       "doc": null,
@@ -46272,7 +46648,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "game_world": {
           "doc": null,
@@ -46283,7 +46660,15 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use crate::{GameObject, WeakPtr};",
+                "epilogue": null
+              }
+            ]
+          }
         },
         "landscape_manager": {
           "doc": null,
@@ -46292,7 +46677,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "spawn_manager": {
           "doc": null,
@@ -46304,7 +46690,19 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use crate::{SharedPtr, Vehicle};",
+                "epilogue": null
+              },
+              {
+                "prologue": null,
+                "epilogue": "impl SpawnManager {\n        pub unsafe fn is_vehicle_loaded(&self, id: u32) -> bool {\n            (0..self.vehicle_types.hash_edacd65b_likely_max_models).any(|i| unsafe {\n                let model = self.vehicle_types.loaded_models.offset(i as isize);\n                let model_id = (&raw const (*model).model_id).read();\n                let load_state = (&raw const (*model).load_state).read();\n                model_id == id && load_state == 2\n            })\n        }\n    }"
+              }
+            ]
+          }
         },
         "weather": {
           "doc": null,
@@ -46313,7 +46711,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "world_sim": {
           "doc": null,
@@ -46322,7 +46721,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "world_time": {
           "doc": null,
@@ -46332,11 +46732,13 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     }
   }
 }

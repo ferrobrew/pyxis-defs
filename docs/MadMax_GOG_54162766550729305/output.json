@@ -18777,7 +18777,23 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use crate::HashString;",
+                "epilogue": null
+              },
+              {
+                "prologue": null,
+                "epilogue": "impl EventID {\n        pub fn new(hash: HashString, namespace: HashString) -> Self {\n            Self {\n                hash,\n                namespace\n            }\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "#[repr(C, align(8))]\n    pub struct EventData<\n        Arg1: EventArgument,\n        Arg2: EventArgument,\n        Arg3: EventArgument,\n        Arg4: EventArgument,\n        Arg5: EventArgument,\n    > {\n        pub type_id: u64,\n        pub arg1: <Arg1 as EventArgument>::Type,\n        pub arg2: <Arg2 as EventArgument>::Type,\n        pub arg3: <Arg3 as EventArgument>::Type,\n        pub arg4: <Arg4 as EventArgument>::Type,\n        pub arg5: <Arg5 as EventArgument>::Type,\n    }\n\n    impl<\n            Arg1: EventArgument,\n            Arg2: EventArgument,\n            Arg3: EventArgument,\n            Arg4: EventArgument,\n            Arg5: EventArgument,\n        > EventData<Arg1, Arg2, Arg3, Arg4, Arg5>\n    where\n        (Arg1, Arg2, Arg3, Arg4, Arg5): EventPayload<Arg1, Arg2, Arg3, Arg4, Arg5>,\n    {\n        pub fn new<\n            AsArg1: AsEventArgument<Arg1>,\n            AsArg2: AsEventArgument<Arg2>,\n            AsArg3: AsEventArgument<Arg3>,\n            AsArg4: AsEventArgument<Arg4>,\n            AsArg5: AsEventArgument<Arg5>,\n        >(\n            arg1: AsArg1,\n            arg2: AsArg2,\n            arg3: AsArg3,\n            arg4: AsArg4,\n            arg5: AsArg5,\n        ) -> Self {\n            Self {\n                type_id: <(Arg1, Arg2, Arg3, Arg4, Arg5) as EventPayload<\n                    Arg1,\n                    Arg2,\n                    Arg3,\n                    Arg4,\n                    Arg5,\n                >>::TYPE_ID,\n                arg1: <AsArg1 as AsEventArgument<Arg1>>::as_arg(arg1),\n                arg2: <AsArg2 as AsEventArgument<Arg2>>::as_arg(arg2),\n                arg3: <AsArg3 as AsEventArgument<Arg3>>::as_arg(arg3),\n                arg4: <AsArg4 as AsEventArgument<Arg4>>::as_arg(arg4),\n                arg5: <AsArg5 as AsEventArgument<Arg5>>::as_arg(arg5),\n            }\n        }\n    }\n\n    impl<T: EventArgument<Type = *const T>> AsEventArgument<T> for &T {\n        fn as_arg(arg: Self) -> <T as EventArgument>::Type {\n            arg as *const T\n        }\n    }\n\n    impl<T: EventArgument<Type = *const T>> AsEventArgument<T> for *const T {\n        fn as_arg(arg: Self) -> <T as EventArgument>::Type {\n            arg as *const T\n        }\n    }\n\n    impl<T: EventArgument<Type = *const *mut T>> AsEventArgument<T> for &*mut T {\n        fn as_arg(arg: Self) -> <T as EventArgument>::Type {\n            arg as *const *mut T\n        }\n    }\n\n    impl<T: EventArgument<Type = *const T>> AsEventArgument<Option<T>> for Option<&T> {\n        fn as_arg(arg: Self) -> <Option<T> as EventArgument>::Type {\n            if let Some(arg) = arg {\n                arg as *const T\n            } else {\n                std::ptr::null()\n            }\n        }\n    }\n\n    impl<T: EventArgument<Type = *const T>> AsEventArgument<Option<T>> for Option<*const T> {\n        fn as_arg(arg: Self) -> <Option<T> as EventArgument>::Type {\n            if let Some(arg) = arg {\n                arg as *const T\n            } else {\n                std::ptr::null()\n            }\n        }\n    }\n\n    impl<T: EventArgument<Type = *const *mut T>> AsEventArgument<Option<T>> for Option<&*mut T> {\n        fn as_arg(arg: Self) -> <Option<T> as EventArgument>::Type {\n            if let Some(arg) = arg {\n                arg as *const *mut T\n            } else {\n                std::ptr::null()\n            }\n        }\n    }\n\n    pub trait EventArgument {\n        type Type;\n        const TYPE_ID: u64;\n    }\n\n    impl EventArgument for () {\n        type Type = *const std::ffi::c_void;\n        const TYPE_ID: u64 = 0xFF;\n    }\n\n    impl EventArgument for i32 {\n        type Type = *const i32;\n        const TYPE_ID: u64 = 0x01;\n    }\n\n    impl EventArgument for f32 {\n        type Type = *const f32;\n        const TYPE_ID: u64 = 0x02;\n    }\n\n    impl EventArgument for std::ffi::CString {\n        type Type = *const i8;\n        const TYPE_ID: u64 = 0x03;\n    }\n\n    impl EventArgument for crate::types::math::Matrix4 {\n        type Type = *const crate::types::math::Matrix4;\n        const TYPE_ID: u64 = 0x04;\n    }\n\n    impl EventArgument for u32 {\n        type Type = *const u32;\n        const TYPE_ID: u64 = 0x05;\n    }\n\n    impl EventArgument for crate::game_objects::Character {\n        type Type = *const *mut crate::game_objects::Character;\n        const TYPE_ID: u64 = 0x0C;\n    }\n\n    impl EventArgument for crate::game_objects::GameObject {\n        type Type = *const *mut crate::game_objects::GameObject;\n        const TYPE_ID: u64 = 0x0B;\n    }\n\n    impl<T: EventArgument> EventArgument for Option<T> {\n        type Type = <T as EventArgument>::Type;\n        const TYPE_ID: u64 = <T as EventArgument>::TYPE_ID | 0x80;\n    }\n\n    pub trait EventPayload<\n        Arg1: EventArgument,\n        Arg2: EventArgument,\n        Arg3: EventArgument,\n        Arg4: EventArgument,\n        Arg5: EventArgument,\n    >\n    {\n        const TYPE_ID: u64 = Arg1::TYPE_ID\n            | (Arg2::TYPE_ID << 8)\n            | (Arg3::TYPE_ID << 16)\n            | (Arg4::TYPE_ID << 24)\n            | (Arg5::TYPE_ID << 32);\n    }\n\n    impl<\n            Arg1: EventArgument,\n            Arg2: EventArgument,\n            Arg3: EventArgument,\n            Arg4: EventArgument,\n            Arg5: EventArgument,\n        > EventPayload<Arg1, Arg2, Arg3, Arg4, Arg5> for (Arg1, Arg2, Arg3, Arg4, Arg5)\n    {\n    }\n\n    pub trait AsEventArgument<Arg: EventArgument + ?Sized> {\n        fn as_arg(arg: Self) -> <Arg as EventArgument>::Type;\n    }\n\n    impl AsEventArgument<()> for () {\n        fn as_arg(_arg: Self) -> *const std::ffi::c_void {\n            std::ptr::null()\n        }\n    }\n\n    impl AsEventArgument<std::ffi::CString> for &std::ffi::CStr {\n        fn as_arg(arg: Self) -> *const i8 {\n            arg.as_ptr()\n        }\n    }\n\n    impl AsEventArgument<std::ffi::CString> for &std::ffi::CString {\n        fn as_arg(arg: Self) -> *const i8 {\n            arg.as_ptr()\n        }\n    }\n\n    impl AsEventArgument<std::ffi::CString> for *const i8 {\n        fn as_arg(arg: Self) -> *const i8 {\n            arg\n        }\n    }\n\n    pub unsafe fn send_event(event_hash: crate::hash_string::HashString) {\n        if let Some(es) = unsafe { EventSystem::get() } {\n            let event_id = EventID::new(event_hash, crate::hash_string::HashString { hash: 0u32 });\n            let data = EventData::new((), (), (), (), ());\n\n            unsafe {\n                es.send_event(&event_id as _, 1, &data as *const _ as *const u8);\n            }\n        }\n    }\n\n    pub unsafe fn send_event_with_arg<Arg1: EventArgument, AsArg1: AsEventArgument<Arg1>>(\n        event_hash: crate::hash_string::HashString,\n        arg1: AsArg1,\n    ) {\n        unsafe {\n            send_event_with_args(event_hash, arg1, (), (), (), ());\n        }\n    }\n\n    pub unsafe fn send_event_with_args<\n        Arg1: EventArgument,\n        Arg2: EventArgument,\n        Arg3: EventArgument,\n        Arg4: EventArgument,\n        Arg5: EventArgument,\n        AsArg1: AsEventArgument<Arg1>,\n        AsArg2: AsEventArgument<Arg2>,\n        AsArg3: AsEventArgument<Arg3>,\n        AsArg4: AsEventArgument<Arg4>,\n        AsArg5: AsEventArgument<Arg5>,\n    >(\n        event_hash: crate::hash_string::HashString,\n        arg1: AsArg1,\n        arg2: AsArg2,\n        arg3: AsArg3,\n        arg4: AsArg4,\n        arg5: AsArg5,\n    ) {\n        if let Some(es) = unsafe { EventSystem::get() } {\n            let event_id = EventID::new(event_hash, crate::hash_string::HashString { hash: 0u32 });\n            let data = EventData::new(arg1, arg2, arg3, arg4, arg5);\n\n            unsafe {\n                es.send_event(&event_id as _, 1, &data as *const _ as *const u8);\n            }\n        }\n    }"
+              }
+            ]
+          }
         },
         "game": {
           "doc": null,
@@ -18814,7 +18830,8 @@
               "address": 5392600804
             }
           ],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "save_manager": {
           "doc": null,
@@ -18828,7 +18845,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "video_manager": {
           "doc": null,
@@ -18837,11 +18855,13 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "game_objects": {
       "doc": null,
@@ -18856,7 +18876,15 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use crate::{math::Matrix4, shared_ptr::*};",
+                "epilogue": null
+              }
+            ]
+          }
         },
         "character": {
           "doc": null,
@@ -18868,7 +18896,15 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use crate::{game_objects::vehicle::Vehicle, shared_ptr::*};",
+                "epilogue": null
+              }
+            ]
+          }
         },
         "character_manager": {
           "doc": null,
@@ -18879,7 +18915,15 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use crate::{character::*, player::*, shared_ptr::*};",
+                "epilogue": null
+              }
+            ]
+          }
         },
         "damageable": {
           "doc": null,
@@ -18888,7 +18932,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "game_object": {
           "doc": null,
@@ -18900,7 +18945,19 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use crate::{math::Matrix4, shared_ptr::*};",
+                "epilogue": null
+              },
+              {
+                "prologue": null,
+                "epilogue": "pub trait GameObjectExt {\n        unsafe fn get_matrix(&self) -> Option<Matrix4>;\n    }\n    pub trait GameObjectMutExt {\n        unsafe fn set_matrix(&mut self, matrix: &Matrix4);\n    }\n    impl<T: std::convert::AsRef<crate::game_object::GameObject>> GameObjectExt for T {\n        unsafe fn get_matrix(&self) -> Option<Matrix4> {\n            let mut out = Matrix4::default();\n            let set = unsafe { self.as_ref().get_matrix_raw(out.as_mut_ptr()) };\n            set.then_some(out)\n        }\n    }\n    impl<T: std::convert::AsMut<crate::game_object::GameObject>> GameObjectMutExt for T {\n        unsafe fn set_matrix(&mut self, matrix: &Matrix4) {\n            unsafe { self.as_mut().set_matrix_raw(matrix.as_ptr()); }\n        }\n    }"
+              }
+            ]
+          }
         },
         "physics_game_object": {
           "doc": null,
@@ -18909,7 +18966,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "player": {
           "doc": null,
@@ -18918,7 +18976,19 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use crate::game_objects::Character;",
+                "epilogue": null
+              },
+              {
+                "prologue": null,
+                "epilogue": "pub trait PlayerExt {\n        unsafe fn get_character(&self) -> Option<&Character>;\n    }\n    impl<T: std::convert::AsRef<crate::game_objects::player::Player>> PlayerExt for T {\n        unsafe fn get_character(&self) -> Option<&Character> {\n            unsafe { self.as_ref().avatar.character.as_ref() }\n        }\n    }\n    pub trait PlayerMutExt {\n        unsafe fn get_character(&mut self) -> Option<&mut Character>;\n    }\n    impl<T: std::convert::AsMut<crate::game_objects::player::Player>> PlayerMutExt for T {\n        unsafe fn get_character(&mut self) -> Option<&mut Character> {\n            unsafe { self.as_mut().avatar.character.as_mut() }\n        }\n    }"
+              }
+            ]
+          }
         },
         "vehicle": {
           "doc": null,
@@ -18928,11 +18998,13 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "input": {
       "doc": null,
@@ -18945,7 +19017,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "input_action_map": {
           "doc": null,
@@ -18956,7 +19029,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "input_device": {
           "doc": null,
@@ -18973,7 +19047,15 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": null,
+                "epilogue": "macro_rules! impl_try_from_input_device {\n        ($target:ty, $device_type:expr, $dualshock:expr) => {\n            macro_rules! impl_try_from {\n                ($target_ref:ty, $device_ref:ty) => {\n                    impl std::convert::TryFrom<$device_ref> for $target_ref {\n                        type Error = ();\n                        fn try_from(device: $device_ref) -> Result<Self, Self::Error> {\n                            if device.info.device_type == ($device_type as u8) && device.info.is_dualshock == $dualshock {\n                                #[allow(clippy::missing_transmute_annotations)]\n                                Ok(unsafe { std::mem::transmute(device) })\n                            } else {\n                                Err(())\n                            }\n                        }\n                    }\n                }\n            }\n\n            impl_try_from!(&$target, &InputDevice);\n            impl_try_from!(&mut $target, &mut InputDevice);\n        };\n    }\n\n    impl_try_from_input_device!(Keyboard, DeviceType::Keyboard, false);\n    impl_try_from_input_device!(Mouse, DeviceType::Mouse, false);\n    impl_try_from_input_device!(Gamepad, DeviceType::Gamepad, false);\n    impl_try_from_input_device!(GamepadDualshock4, DeviceType::Gamepad, true);"
+              }
+            ]
+          }
         },
         "input_device_manager": {
           "doc": null,
@@ -18982,11 +19064,13 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "physics": {
       "doc": null,
@@ -19001,7 +19085,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "pfx_game_object": {
           "doc": null,
@@ -19011,7 +19096,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "pfx_instance": {
           "doc": null,
@@ -19024,7 +19110,15 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use crate::shared_ptr::*;",
+                "epilogue": null
+              }
+            ]
+          }
         },
         "pfx_rigid_body": {
           "doc": null,
@@ -19033,7 +19127,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "pfx_vehicle": {
           "doc": null,
@@ -19042,11 +19137,13 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "rendering": {
       "doc": null,
@@ -19076,11 +19173,24 @@
               "address": 5392752048
             }
           ],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use windows::{\n    core::InterfaceRef,\n    Win32::{\n        Foundation::HWND,\n        UI::WindowsAndMessaging::HCURSOR,    \n        Graphics::{Direct3D11::ID3D11Device, Direct3D11::ID3D11DeviceContext, Dxgi::IDXGISwapChain},\n        System::Threading::CRITICAL_SECTION\n    }\n};",
+                "epilogue": null
+              },
+              {
+                "prologue": null,
+                "epilogue": "pub unsafe fn get_d3d11_device() -> Option<InterfaceRef<'static, ID3D11Device>> {\n    unsafe {\n        GraphicsEngine::get()\n            .and_then(|ge| ge.graphics_device.as_ref())\n            .and_then(|d| {\n                let raw = std::ptr::NonNull::new(\n                    d.device as *mut std::os::raw::c_void\n                )?;\n                Some(InterfaceRef::from_raw(raw))\n            })\n    }\n}\npub unsafe fn get_d3d11_device_context() -> Option<InterfaceRef<'static, ID3D11DeviceContext>> {\n    unsafe {\n        GraphicsEngine::get()\n            .and_then(|ge| ge.graphics_device.as_ref())\n            .and_then(|d| d.context.as_ref())\n            .and_then(|c| {\n                let raw = std::ptr::NonNull::new(\n                    c.context as *mut std::os::raw::c_void\n                )?;\n                Some(InterfaceRef::from_raw(raw))\n            })\n    }\n}\npub unsafe fn get_dxgi_swapchain() -> Option<InterfaceRef<'static, IDXGISwapChain>> {\n    unsafe {\n        GraphicsEngine::get().and_then(|ge| ge.graphics_device.as_ref()).and_then(|d| {\n            let raw = std::ptr::NonNull::new(\n                d.swap_chain as *mut std::os::raw::c_void\n            )?;\n            Some(InterfaceRef::from_raw(raw))\n        })\n    }\n}"
+              }
+            ]
+          }
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "root": {
       "doc": null,
@@ -19102,7 +19212,8 @@
       ],
       "submodules": {},
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "types": {
       "doc": null,
@@ -19115,7 +19226,15 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": null,
+                "epilogue": "impl HashString {\n        pub unsafe fn from_cstr(str: impl AsRef<std::ffi::CStr>) -> Self {\n            unsafe {\n                let mut instance = std::mem::MaybeUninit::<Self>::uninit();\n                (*instance.as_mut_ptr()).constructor(str.as_ref().as_ptr());\n                instance.assume_init()\n            }\n        }\n\n        pub const fn from_u32(hash: u32) -> Self {\n            Self { hash }\n        }\n    }\n\n    impl From<u32> for HashString {\n        fn from(hash: u32) -> Self {\n            Self { hash }\n        }\n    }"
+              }
+            ]
+          }
         },
         "math": {
           "doc": null,
@@ -19130,7 +19249,43 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "#[cfg(feature = \"glam\")]\n    use glam::{Mat3, Mat4, Vec2, Vec3, Vec4};\n    #[cfg(feature = \"bevy_math\")]\n    use bevy_math::{bounding::Aabb3d, Ray3d};",
+                "epilogue": null
+              },
+              {
+                "prologue": null,
+                "epilogue": "#[cfg(feature = \"bevy_math\")]\n    impl From<Aabb3d> for Aabb {\n        fn from(aabb: Aabb3d) -> Self {\n            Self {\n                min: Vector3 {\n                    data: aabb.min.to_array(),\n                },\n                max: Vector3 {\n                    data: aabb.max.to_array(),\n                },\n            }\n        }\n    }\n    #[cfg(feature = \"bevy_math\")]\n    impl From<Aabb> for Aabb3d {\n        fn from(aabb: Aabb) -> Self {\n            Aabb3d {\n                min: bevy_math::Vec3A::from_array(aabb.min.data),\n                max: bevy_math::Vec3A::from_array(aabb.max.data),\n            }\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "#[cfg(feature = \"glam\")]\n    impl From<Mat3> for Matrix3 {\n        fn from(m: Mat3) -> Self {\n            Self {\n                data: m.to_cols_array(),\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Matrix3> for Mat3 {\n        fn from(m: Matrix3) -> Self {\n            Mat3::from_cols_array(&m.data)\n        }\n    }\n    impl Matrix3 {\n        pub fn as_ptr(&self) -> *const f32 {\n            self.data.as_ptr()\n        }\n\n        pub fn as_mut_ptr(&mut self) -> *mut f32 {\n            self.data.as_mut_ptr()\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "#[cfg(feature = \"glam\")]\n    impl From<Mat4> for Matrix4 {\n        fn from(m: Mat4) -> Self {\n            Self {\n                data: m.to_cols_array(),\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Matrix4> for Mat4 {\n        fn from(m: Matrix4) -> Self {\n            Mat4::from_cols_array(&m.data)\n        }\n    }\n    impl Matrix4 {\n        pub fn as_ptr(&self) -> *const f32 {\n            self.data.as_ptr()\n        }\n\n        pub fn as_mut_ptr(&mut self) -> *mut f32 {\n            self.data.as_mut_ptr()\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "#[cfg(feature = \"bevy_math\")]\n    impl From<Ray> for Ray3d {\n        fn from(r: Ray) -> Self {\n            Self::new(r.origin.into(), r.direction.into())\n        }\n    }\n    #[cfg(feature = \"bevy_math\")]\n    impl From<Ray3d> for Ray {\n        fn from(r: Ray3d) -> Self {\n            Self::new(r.origin.into(), Vec3::from(r.direction).into())\n        }\n    }\n    impl Ray {\n        fn new(origin: Vector3, direction: Vector3) -> Self {\n            Self {\n                origin,\n                direction,\n            }\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "#[cfg(feature = \"glam\")]\n    impl From<Vec2> for Vector2 {\n        fn from(v: Vec2) -> Self {\n            Self {\n                data: [v.x, v.y],\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Vector2> for Vec2 {\n        fn from(v: Vector2) -> Self {\n            Vec2::new(v.data[0], v.data[1])\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "#[cfg(feature = \"glam\")]\n    impl From<Vec3> for Vector3 {\n        fn from(v: Vec3) -> Self {\n            Self {\n                data: [v.x, v.y, v.z],\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Vector3> for Vec3 {\n        fn from(v: Vector3) -> Self {\n            Vec3::new(v.data[0], v.data[1], v.data[2])\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "#[cfg(feature = \"glam\")]\n    impl From<Vec4> for Vector4 {\n        fn from(v: Vec4) -> Self {\n            Self {\n                data: [v.x, v.y, v.z, v.w],\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Vector4> for Vec4 {\n        fn from(v: Vector4) -> Self {\n            Vec4::new(v.data[0], v.data[1], v.data[2], v.data[3])\n        }\n    }"
+              }
+            ]
+          }
         },
         "object_id": {
           "doc": null,
@@ -19139,7 +19294,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "rtti": {
           "doc": null,
@@ -19149,7 +19305,8 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         },
         "shared_ptr": {
           "doc": null,
@@ -19162,11 +19319,40 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": "use std::{\n        clone::Clone,\n        ptr,\n        sync::atomic::{AtomicI32, Ordering},\n    };",
+                "epilogue": null
+              },
+              {
+                "prologue": null,
+                "epilogue": "// SharedCountImpl\n    impl SharedCountImpl {\n        fn release(&mut self) {\n            let use_count = self.use_count.load(Ordering::SeqCst) - 1;\n            self.use_count.store(use_count, Ordering::SeqCst);\n            if use_count == 0 {\n                unsafe {\n                    self.dispose();\n                }\n                self.weak_release();\n            }\n        }\n\n        fn weak_release(&mut self) {\n            let weak_count = self.weak_count.load(Ordering::SeqCst) - 1;\n            self.weak_count.store(weak_count, Ordering::SeqCst);\n            if weak_count == 0 {\n                unsafe {\n                    self.destroy();\n                }\n            }\n        }\n\n        fn add_ref_copy(&mut self) {\n            let use_count = self.use_count.load(Ordering::SeqCst) + 1;\n            self.use_count.store(use_count, Ordering::SeqCst);\n        }\n\n        fn weak_add_ref(&mut self) {\n            let weak_count = self.weak_count.load(Ordering::SeqCst) + 1;\n            self.weak_count.store(weak_count, Ordering::SeqCst);\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "// SharedCount\n    #[allow(dead_code)]\n    impl SharedCount {\n        fn swap(&mut self, rhs: &mut SharedCount) {\n            let lhs = self;\n            unsafe {\n                swap_unaligned(\n                    &raw mut lhs.count_impl,\n                    &raw mut rhs.count_impl,\n                );\n            }\n        }\n    }\n    impl Drop for SharedCount {\n        fn drop(&mut self) {\n            if !self.count_impl.is_null() {\n                unsafe {\n                    (*self.count_impl).release();\n                }\n            }\n        }\n    }\n    impl Clone for SharedCount {\n        fn clone(&self) -> SharedCount {\n            unsafe {\n                (*self.count_impl).add_ref_copy();\n            }\n            SharedCount {\n                count_impl: self.count_impl,\n            }\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "// WeakCount\n    impl WeakCount {\n        fn new_from_shared(shared: &SharedCount) -> WeakCount {\n            unsafe {\n                (*shared.count_impl).weak_add_ref();\n            }\n            WeakCount {\n                count_impl: shared.count_impl,\n            }\n        }\n    }\n    impl Drop for WeakCount {\n        fn drop(&mut self) {\n            if !self.count_impl.is_null() {\n                unsafe {\n                    (*self.count_impl).weak_release();\n                }\n            }\n        }\n    }"
+              },
+              {
+                "prologue": null,
+                "epilogue": "// SharedPtr\n    #[repr(C)]\n    pub struct SharedPtr<T> {\n        px: *mut T,\n        pn: SharedCount,\n    }\n    #[allow(dead_code)]\n    impl<T> SharedPtr<T> {\n        pub fn new() -> SharedPtr<T> {\n            SharedPtr {\n                px: ptr::null_mut(),\n                pn: SharedCount {\n                    count_impl: ptr::null_mut(),\n                },\n            }\n        }\n\n        pub unsafe fn as_ref(&self) -> Option<&T> {\n            self.exists().then(|| unsafe { &*self.px })\n        }\n\n        pub unsafe fn as_mut(&mut self) -> Option<&mut T> {\n            self.exists().then(|| unsafe { &mut *self.px })\n        }\n\n        pub fn exists(&self) -> bool {\n            !self.px.is_null()\n        }\n\n        pub fn refcount(&self) -> i32 {\n            unsafe { (*self.pn.count_impl).use_count.load(Ordering::SeqCst) }\n        }\n\n        pub fn is_only_owner(&self) -> bool {\n            self.refcount() == 1\n        }\n\n        pub unsafe fn swap(&mut self, rhs: &mut SharedPtr<T>) {\n            unsafe {\n                swap_unaligned(&raw mut self.px, &raw mut rhs.px);\n            }\n            self.pn.swap(&mut rhs.pn);\n        }\n\n        pub unsafe fn reset_with_empty(&mut self) {\n            unsafe {\n                self.swap(&mut SharedPtr::new());\n            }\n        }\n\n        /// Absolutely no verification on this - make sure that T can be casted to Y!\n        pub unsafe fn static_pointer_cast<Y>(self) -> SharedPtr<Y> {\n            SharedPtr {\n                px: self.px as *mut Y,\n                pn: self.pn,\n            }\n        }\n\n        /// Given a `SharedPtr<T>`, returns a `SharedPtr<Y>` if `T: AsMut<Y>`.\n        /// Pyxis defines `AsMut` conversions for inheritance, so this can be used\n        /// to convert a `SharedPtr<Derived>` to a `SharedPtr<Base>`.\n        ///\n        /// That being said, it's still somewhat unsafe, so use with caution.\n        pub unsafe fn as_mut_cast<Y>(self) -> SharedPtr<Y>\n        where\n            T: AsMut<Y>,\n        {\n            SharedPtr {\n                px: unsafe { (*self.px).as_mut() as *mut Y },\n                pn: self.pn,\n            }\n        }\n    }\n    impl<T> Clone for SharedPtr<T> {\n        fn clone(&self) -> SharedPtr<T> {\n            SharedPtr {\n                px: self.px,\n                pn: self.pn.clone(),\n            }\n        }\n    }\n    impl<T> Default for SharedPtr<T> {\n        fn default() -> SharedPtr<T> {\n            SharedPtr::new()\n        }\n    }\n    impl<T> PartialEq for SharedPtr<T> {\n        fn eq(&self, other: &SharedPtr<T>) -> bool {\n            self.px == other.px\n        }\n    }\n    impl<T> Eq for SharedPtr<T> {}"
+              },
+              {
+                "prologue": null,
+                "epilogue": "// WeakPtr\n    #[allow(dead_code)]\n    #[repr(C)]\n    pub struct WeakPtr<T> {\n        px: *mut T,\n        pn: WeakCount,\n    }\n    impl<T> WeakPtr<T> {\n        pub unsafe fn new_from_shared(shared: SharedPtr<T>) -> WeakPtr<T> {\n            WeakPtr {\n                px: shared.px,\n                pn: WeakCount::new_from_shared(&shared.pn),\n            }\n        }\n    }\n\n    unsafe fn swap_unaligned<T>(p1: *mut T, p2: *mut T) {\n        unsafe {\n            let p1_val = ptr::read_unaligned(p1);\n            let p2_val = ptr::read_unaligned(p2);\n\n            ptr::write_unaligned(p1, p2_val);\n            ptr::write_unaligned(p2, p1_val);\n        }\n    }"
+              }
+            ]
+          }
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "ui": {
       "doc": null,
@@ -19182,11 +19368,13 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     },
     "world": {
       "doc": null,
@@ -19201,11 +19389,13 @@
           ],
           "submodules": {},
           "extern_values": [],
-          "functions": []
+          "functions": [],
+          "backends": {}
         }
       },
       "extern_values": [],
-      "functions": []
+      "functions": [],
+      "backends": {}
     }
   }
 }
