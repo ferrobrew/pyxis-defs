@@ -64,7 +64,7 @@ impl PhysicsSystem {
     #[address(0x9ABEA0)]
     pub fn new_filter_info(&mut self) -> u16;
     #[calling_convention("stdcall"), address(0x9B2540)]
-    pub fn assign_material(material: u32, shape: *mut HkpShape)
+    pub fn assign_material(material: u32, shape: *mut HkpShape);
 }
 backend rust epilogue r#"
     impl PhysicsSystem {
