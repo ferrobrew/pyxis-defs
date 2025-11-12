@@ -1,0 +1,5851 @@
+{
+  "pointer_size": 8,
+  "project_name": "Just Cause 3 (Steam 1227440)",
+  "items": {
+    "bool": {
+      "path": "bool",
+      "visibility": "public",
+      "size": 1,
+      "alignment": 1,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "camera::camera::Camera": {
+      "path": "camera::camera::Camera",
+      "visibility": "public",
+      "size": 1456,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_OrthoValues",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Vector2"
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_OffCenterTiles",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 8,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_OffCenterTileX",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 12,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_OffCenterTileY",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 16,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_PreviousTransformF",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 20,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_TransformF",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 84,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_TransformT0",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 148,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_TransformT1",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 212,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ShakeTransform",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 276,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ProjectionF",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 340,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ViewProjectionF",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 404,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_PreviousProjF",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 468,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_PreviousViewF",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 532,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_PreviousViewProjectionF",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 596,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Projection",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 660,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_View",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 724,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ViewProjection",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 788,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_PreviousProj",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 852,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_PreviousView",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 916,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_PreviousViewProjection",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 980,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_FrustumPlane",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "types::math::Plane"
+              },
+              "size": 6
+            },
+            "offset": 1044,
+            "size": 96,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_AABNormal",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "types::math::Vector4"
+              },
+              "size": 12
+            },
+            "offset": 1140,
+            "size": 192,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Distance",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              },
+              "size": 6
+            },
+            "offset": 1332,
+            "size": 24,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ClosestCorner",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "camera::camera::Corner"
+              },
+              "size": 6
+            },
+            "offset": 1356,
+            "size": 18,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_StateBitfield",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "camera::camera::CameraState"
+            },
+            "offset": 1374,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_55f",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 1
+            },
+            "offset": 1375,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ConePos",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Vector3"
+            },
+            "offset": 1376,
+            "size": 12,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ConeAxis",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Vector3"
+            },
+            "offset": 1388,
+            "size": 12,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ConeAngleOuterTan",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 1400,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ConeAngleOuterCosReci",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 1404,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_FOVT0",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 1408,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_FOVT1",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 1412,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_FOV",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 1416,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_FOVProjFactor",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 1420,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_FOVFactor",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 1424,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Near",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 1428,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Far",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 1432,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_FactorR",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 1436,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_FactorU",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 1440,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_AspectRatio",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 1444,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Width",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 1448,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Height",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 1452,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "camera::camera::CameraState": {
+      "path": "camera::camera::CameraState",
+      "visibility": "public",
+      "size": 1,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "bitflags",
+        "doc": null,
+        "underlying_type": {
+          "type": "raw",
+          "path": "u8"
+        },
+        "flags": [
+          {
+            "name": "m_UseOffCenter",
+            "value": 1
+          },
+          {
+            "name": "m_ScreenshotSeriesRunning",
+            "value": 2
+          },
+          {
+            "name": "m_Ortho",
+            "value": 4
+          },
+          {
+            "name": "m_ComputeView",
+            "value": 8
+          },
+          {
+            "name": "m_DirtyProjection",
+            "value": 16
+          },
+          {
+            "name": "m_IsRenderCamera",
+            "value": 32
+          }
+        ],
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "default": null
+      }
+    },
+    "camera::camera::Corner": {
+      "path": "camera::camera::Corner",
+      "visibility": "public",
+      "size": 3,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "x",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u8"
+            },
+            "offset": 0,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "y",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u8"
+            },
+            "offset": 1,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "z",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u8"
+            },
+            "offset": 2,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "camera::camera_context::CameraContext": {
+      "path": "camera::camera_context::CameraContext",
+      "visibility": "public",
+      "size": 336,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_CameraTransform",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 0,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_AlternateAimTransform",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 64,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ListenerTransform",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 128,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_FOV",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 192,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_DOFParameters",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "camera::camera_context::CameraDOFParameters"
+            },
+            "offset": 196,
+            "size": 28,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_MotionBlurShutterExposure",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 224,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_MaxMotionBlur",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 228,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_MotionBlurFactor",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 232,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RadialBlurFactor",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 236,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RadialBlurOffset",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 240,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RadialBlurPosX",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 244,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RadialBlurPosY",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 248,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ExposureValue",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 252,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_BloomLighten",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 256,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_BloomContrast",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 260,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_BloomSecontaryLighten",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 264,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_BloomThreshold",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 268,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ColorTint",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Vector3"
+            },
+            "offset": 272,
+            "size": 12,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ColorTintCurveTexWeight",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 284,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_VignetteIndex",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 288,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_124",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 4
+            },
+            "offset": 292,
+            "size": 4,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ShadowFocusAlias",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "offset": 296,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ColorTintCurveTexturePath",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "offset": 304,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_134",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 4
+            },
+            "offset": 308,
+            "size": 4,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ShadowRadiusNear",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 312,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ShadowRadiusMedium",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 316,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ShadowRadiusFar",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 320,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ShadowFocusOffsetNear",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 324,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ShadowFocusOffsetMedium",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 328,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ShadowFocusOffsetFar",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 332,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "camera::camera_context::CameraControlContext": {
+      "path": "camera::camera_context::CameraControlContext",
+      "visibility": "public",
+      "size": 1488,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_Dt",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 0,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RenderDt",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 4,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RenderDtf",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 8,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_BlendDt",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 12,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_CAMERA_DT_EPSILON",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 16,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_14",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 12
+            },
+            "offset": 20,
+            "size": 12,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_PreviousCameraContext",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "camera::camera_context::CameraContext"
+            },
+            "offset": 32,
+            "size": 336,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_NextCameraContext",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "camera::camera_context::CameraContext"
+            },
+            "offset": 368,
+            "size": 336,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_PreviousRenderContext",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "camera::camera_context::CameraContext"
+            },
+            "offset": 704,
+            "size": 336,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_NextRenderContext",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "camera::camera_context::CameraContext"
+            },
+            "offset": 1040,
+            "size": 336,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_PresetWeights",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "camera::camera_context::CameraEnvironmentPresetWeights"
+            },
+            "offset": 1376,
+            "size": 80,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ActivePipelines",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 32
+            },
+            "offset": 1456,
+            "size": 32,
+            "alignment": 1,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "camera::camera_context::CameraDOFParameters": {
+      "path": "camera::camera_context::CameraDOFParameters",
+      "visibility": "public",
+      "size": 28,
+      "alignment": 4,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_FocalDistanceNear",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 0,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_FocalDistanceFar",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 4,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_MaxDOF",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 8,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_MaxDOFNear",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 12,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_DOFSmoothness",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 16,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_DOFSmoothnessNear",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 20,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_DOFHeightFalloff",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 24,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "camera::camera_context::CameraEnvironmentPresetWeights": {
+      "path": "camera::camera_context::CameraEnvironmentPresetWeights",
+      "visibility": "public",
+      "size": 80,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_DOFParameters",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "camera::camera_context::CameraDOFParameters"
+            },
+            "offset": 0,
+            "size": 28,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_MotionBlurShutterExposureWeight",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 28,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_MotionBlurFactorWeight",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 32,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_MaxMotionBlurWeight",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 36,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RadialBlurFactorWeight",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 40,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RadialBlurOffsetWeight",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 44,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RadialBlurPosXWeight",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 48,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RadialBlurPosYWeight",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 52,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_BloomContrastWeight",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 56,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_BloomLightenWeight",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 60,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_BloomSecontaryLightenWeight",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 64,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_BloomThresholdWeight",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 68,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ColorTintWeight",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 72,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ColorTintCurveTexWeight",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 76,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "camera::camera_manager::CameraManager": {
+      "path": "camera::camera_manager::CameraManager",
+      "visibility": "public",
+      "size": 1512,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 16
+            },
+            "offset": 0,
+            "size": 16,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_DefaultCamera",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "camera::camera::Camera"
+            },
+            "offset": 16,
+            "size": 1456,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ActiveCamera",
+            "doc": null,
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "camera::camera::Camera"
+              }
+            },
+            "offset": 1472,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RenderCamera",
+            "doc": null,
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "camera::camera::Camera"
+              }
+            },
+            "offset": 1480,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_AspectRatio",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 1488,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_5d4",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 20
+            },
+            "offset": 1492,
+            "size": 20,
+            "alignment": 1,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": 5417799200,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "camera::game_camera_manager::GameCameraManager": {
+      "path": "camera::game_camera_manager::GameCameraManager",
+      "visibility": "public",
+      "size": 1880,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 224
+            },
+            "offset": 0,
+            "size": 224,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ControlContext",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "camera::camera_context::CameraControlContext"
+            },
+            "offset": 224,
+            "size": 1488,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_6b0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 168
+            },
+            "offset": 1712,
+            "size": 168,
+            "alignment": 1,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": 5418092208,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "character::character::AnimatedModel": {
+      "path": "character::character::AnimatedModel",
+      "visibility": "public",
+      "size": 576,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 376
+            },
+            "offset": 0,
+            "size": 376,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_AnimationController",
+            "doc": null,
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "character::character::AnimationController"
+              }
+            },
+            "offset": 376,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_180",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 192
+            },
+            "offset": 384,
+            "size": 192,
+            "alignment": 1,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "character::character::AnimationController": {
+      "path": "character::character::AnimationController",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "GetBoneIndex",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5426165696
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "hash",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "calling_convention": "system"
+          },
+          {
+            "visibility": "public",
+            "name": "GetBoneMatrix",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5426228064
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "index",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              },
+              {
+                "type": "field",
+                "name": "matrix",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "types::math::Matrix4"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system"
+          },
+          {
+            "visibility": "public",
+            "name": "GetJoint",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5426228368
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "index",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              },
+              {
+                "type": "field",
+                "name": "joint",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "character::character::Joint"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system"
+          },
+          {
+            "visibility": "public",
+            "name": "SetJoint",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5426228464
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "index",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              },
+              {
+                "type": "field",
+                "name": "joint",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "character::character::Joint"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system"
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "character::character::Character": {
+      "path": "character::character::Character",
+      "visibility": "public",
+      "size": 13632,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 6016
+            },
+            "offset": 0,
+            "size": 6016,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_AnimatedModel",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "character::character::AnimatedModel"
+            },
+            "offset": 6016,
+            "size": 576,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_19c0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 3178
+            },
+            "offset": 6592,
+            "size": 3178,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_IsLocalCharacter",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 9770,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_262b",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 453
+            },
+            "offset": 9771,
+            "size": 453,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_WorldMatrixT0",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 10224,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_WorldMatrixT1",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 10288,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_2870",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 3280
+            },
+            "offset": 10352,
+            "size": 3280,
+            "alignment": 1,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "GetLocalPlayerCharacter",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5430410096
+            },
+            "arguments": [],
+            "return_type": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "character::character::Character"
+              }
+            },
+            "calling_convention": "system"
+          },
+          {
+            "visibility": "public",
+            "name": "GetHeadPosition",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5430241600
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "position",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "types::math::Vector3"
+                  }
+                }
+              }
+            ],
+            "return_type": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "types::math::Vector3"
+              }
+            },
+            "calling_convention": "system"
+          },
+          {
+            "visibility": "public",
+            "name": "GetSafeIndex",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5430153376
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "safe_index",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "character::character::SafeBoneIndex"
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "calling_convention": "system"
+          },
+          {
+            "visibility": "public",
+            "name": "GetSafeBoneMatrix",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5430153648
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "safe_index",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "character::character::SafeBoneIndex"
+                }
+              },
+              {
+                "type": "field",
+                "name": "matrix",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "types::math::Matrix4"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system"
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "character::character::Joint": {
+      "path": "character::character::Joint",
+      "visibility": "public",
+      "size": 48,
+      "alignment": 16,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_Translation",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::vector_math::AlignedVector3"
+            },
+            "offset": 0,
+            "size": 16,
+            "alignment": 16,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Orientation",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::vector_math::AlignedQuat"
+            },
+            "offset": 16,
+            "size": 16,
+            "alignment": 16,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Scale",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::vector_math::AlignedVector3"
+            },
+            "offset": 32,
+            "size": 16,
+            "alignment": 16,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "character::character::SafeBoneIndex": {
+      "path": "character::character::SafeBoneIndex",
+      "visibility": "public",
+      "size": 4,
+      "alignment": 4,
+      "category": "defined",
+      "kind": {
+        "type": "enum",
+        "doc": null,
+        "underlying_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "variants": [
+          {
+            "name": "REFERENCE",
+            "value": 2394094972
+          },
+          {
+            "name": "OFFSET",
+            "value": 1252689883
+          },
+          {
+            "name": "HIPS",
+            "value": 1757849759
+          },
+          {
+            "name": "LEFT_FOOT",
+            "value": 1712403628
+          },
+          {
+            "name": "RIGHT_FOOT",
+            "value": 4282253387
+          },
+          {
+            "name": "LEFT_TOE",
+            "value": 3005147562
+          },
+          {
+            "name": "RIGHT_TOE",
+            "value": 3710742389
+          },
+          {
+            "name": "LEFT_HAND",
+            "value": 1472741269
+          },
+          {
+            "name": "RIGHT_HAND",
+            "value": 1776779174
+          },
+          {
+            "name": "HEAD",
+            "value": 2826426828
+          },
+          {
+            "name": "NECK",
+            "value": 2714329432
+          },
+          {
+            "name": "SPINE",
+            "value": 237553739
+          },
+          {
+            "name": "SPINE1",
+            "value": 3839615855
+          },
+          {
+            "name": "SPINE2",
+            "value": 1877494024
+          },
+          {
+            "name": "STERNUM",
+            "value": 2647308479
+          },
+          {
+            "name": "LEFT_SHOULDER",
+            "value": 2268405885
+          },
+          {
+            "name": "RIGHT_SHOULDER",
+            "value": 808382080
+          },
+          {
+            "name": "BACK_ATTACH",
+            "value": 227257561
+          },
+          {
+            "name": "BACK_ATTACH_2",
+            "value": 3083906404
+          },
+          {
+            "name": "EQUIPPED_EXPLOSIVE",
+            "value": 2808756785
+          },
+          {
+            "name": "LEFT_HOLSTER",
+            "value": 1672209727
+          },
+          {
+            "name": "RIGHT_HOLSTER",
+            "value": 2077750035
+          },
+          {
+            "name": "ATTACH_HAND_RIGHT",
+            "value": 1707463403
+          },
+          {
+            "name": "ATTACH_HAND_LEFT",
+            "value": 1100005367
+          },
+          {
+            "name": "ATTACH_HAND_RIGHT2",
+            "value": 2079854409
+          },
+          {
+            "name": "ATTACH_HAND_LEFT2",
+            "value": 1576246544
+          },
+          {
+            "name": "RIGHT_HAND_IK_TARGET",
+            "value": 4159613865
+          },
+          {
+            "name": "LEFT_HAND_IK_TARGET",
+            "value": 2805860545
+          },
+          {
+            "name": "RIGHT_FOOT_IK_TARGET",
+            "value": 1012388403
+          },
+          {
+            "name": "LEFT_FOOT_IK_TARGET",
+            "value": 2290357383
+          },
+          {
+            "name": "AIM_TARGET",
+            "value": 2541339648
+          },
+          {
+            "name": "TARGET_REF_1",
+            "value": 3212017811
+          },
+          {
+            "name": "TARGET_REF_2",
+            "value": 994268807
+          },
+          {
+            "name": "RIGHT_LEG",
+            "value": 2828697949
+          },
+          {
+            "name": "LEFT_LEG",
+            "value": 2016147705
+          },
+          {
+            "name": "RIGHT_UP_LEG",
+            "value": 2401446677
+          },
+          {
+            "name": "LEFT_UP_LEG",
+            "value": 641280962
+          },
+          {
+            "name": "RIGHT_ARM",
+            "value": 433370831
+          },
+          {
+            "name": "LEFT_ARM",
+            "value": 1307615921
+          },
+          {
+            "name": "GRAPPLE_ATTACH",
+            "value": 4033878745
+          },
+          {
+            "name": "GRAPPLE_SHOULDER_ATTACH",
+            "value": 1040341121
+          },
+          {
+            "name": "GRAPPLE_DEVICE_ATTACH_BONE",
+            "value": 2618472340
+          },
+          {
+            "name": "CAMERA",
+            "value": 3048058670
+          },
+          {
+            "name": "NORMAL_MAP0",
+            "value": 4017403211
+          },
+          {
+            "name": "NORMAL_MAP1",
+            "value": 2614705093
+          },
+          {
+            "name": "NORMAL_MAP2",
+            "value": 4032476450
+          },
+          {
+            "name": "NORMAL_MAP3",
+            "value": 333548
+          },
+          {
+            "name": "NORMAL_MAP4",
+            "value": 2094004130
+          },
+          {
+            "name": "NORMAL_MAP5",
+            "value": 205856033
+          },
+          {
+            "name": "BONE_AMOUNT",
+            "value": 4294967295
+          }
+        ],
+        "associated_functions": [],
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "default": null
+      }
+    },
+    "clock::Clock": {
+      "path": "clock::Clock",
+      "visibility": "public",
+      "size": 112,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "__vftable",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_HasBeenInitialized",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 8,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_9",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 7
+            },
+            "offset": 9,
+            "size": 7,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_FPS",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 16,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_SPF",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 20,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RealFPS",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 24,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RealSPF",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 28,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_UpdateSpeed",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 32,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ForceToThisFPS",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 36,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ForceToThisSPF",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 40,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Stop",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 44,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ForceToFps",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 45,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_2e",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 2
+            },
+            "offset": 46,
+            "size": 2,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Time",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "offset": 48,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RealTimeAtUpdateGame",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "offset": 56,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_PauseTimeAtUpdateGame",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "offset": 64,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_GameTimeMicro",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "offset": 72,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_GameRunTimeMicro",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "offset": 80,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ElapsedTime",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "offset": 88,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_LastCount",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "offset": 96,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_CpuFrequency",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "offset": 104,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "GetSPF",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5421844576
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "ignore_pause",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "bool"
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "calling_convention": "system"
+          },
+          {
+            "visibility": "public",
+            "name": "Pause",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5421844448
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "pause",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "bool"
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system"
+          }
+        ],
+        "vftable": null,
+        "singleton": 5417799288,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "f32": {
+      "path": "f32",
+      "visibility": "public",
+      "size": 4,
+      "alignment": 4,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "f64": {
+      "path": "f64",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 8,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "game::Game": {
+      "path": "game::Game",
+      "visibility": "public",
+      "size": 704,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 16
+            },
+            "offset": 0,
+            "size": 16,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_CountAccumulator",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "offset": 16,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_UpdateFrequency",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "offset": 24,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_DefaultUpdateFrequency",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "offset": 28,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_20",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 20
+            },
+            "offset": 32,
+            "size": 20,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Exit",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u8"
+            },
+            "offset": 52,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_35",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 75
+            },
+            "offset": 53,
+            "size": 75,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_FilteredDrawTime",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "offset": 128,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_88",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 12
+            },
+            "offset": 136,
+            "size": 12,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RenderCount",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "offset": 148,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_InterpolationMethod",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "offset": 152,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_PrevInterpolationMethod",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "offset": 156,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_InterpolationOverride",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 160,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_a4",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 444
+            },
+            "offset": 164,
+            "size": 444,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_DecoupleEnabled",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 608,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_261",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 87
+            },
+            "offset": 609,
+            "size": 87,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_UpdateFlags",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "offset": 696,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_2bc",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 4
+            },
+            "offset": 700,
+            "size": 4,
+            "alignment": 1,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "Draw",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5432056896
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "dt",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "f32"
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system"
+          }
+        ],
+        "vftable": null,
+        "singleton": 5417086568,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "game::GameObjectInitContext": {
+      "path": "game::GameObjectInitContext",
+      "visibility": "public",
+      "size": 32,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_Dt",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 0,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_DtIgnorePause",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 4,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RealDt",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 8,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_c",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 4
+            },
+            "offset": 12,
+            "size": 4,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ResourceCache",
+            "doc": null,
+            "type_ref": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "void"
+              }
+            },
+            "offset": 16,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ProjectContext",
+            "doc": null,
+            "type_ref": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "void"
+              }
+            },
+            "offset": 24,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "game::GameObjectRenderContext": {
+      "path": "game::GameObjectRenderContext",
+      "visibility": "public",
+      "size": 32,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_Dt",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 0,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Dtf",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 4,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_OriginalDt",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 8,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_DtIgnorePause",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 12,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RealDt",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 16,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_14",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 4
+            },
+            "offset": 20,
+            "size": 4,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ProjectContext",
+            "doc": null,
+            "type_ref": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "void"
+              }
+            },
+            "offset": 24,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "game::GameObjectUpdateContext": {
+      "path": "game::GameObjectUpdateContext",
+      "visibility": "public",
+      "size": 32,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_Dt",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 0,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_OriginalDt",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 4,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_DtIgnorePause",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 8,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RealDt",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 12,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_SkippedDt",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 16,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Paused",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 20,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_15",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 3
+            },
+            "offset": 21,
+            "size": 3,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ProjectContext",
+            "doc": null,
+            "type_ref": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "void"
+              }
+            },
+            "offset": 24,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "game::GameState": {
+      "path": "game::GameState",
+      "visibility": "public",
+      "size": 4,
+      "alignment": 4,
+      "category": "defined",
+      "kind": {
+        "type": "enum",
+        "doc": null,
+        "underlying_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "variants": [
+          {
+            "name": "E_GAME_INSTALL",
+            "value": 0
+          },
+          {
+            "name": "E_GAME_INIT",
+            "value": 1
+          },
+          {
+            "name": "E_GAME_FRONTEND",
+            "value": 2
+          },
+          {
+            "name": "E_GAME_LOAD",
+            "value": 3
+          },
+          {
+            "name": "E_GAME_RUN",
+            "value": 4
+          },
+          {
+            "name": "E_GAME_STARTUP",
+            "value": 5
+          },
+          {
+            "name": "NOF_GAME_STATES",
+            "value": 6
+          }
+        ],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "PostUpdateRender",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5432865072
+            },
+            "arguments": [
+              {
+                "type": "field",
+                "name": "update_contexts",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "game::UpdateContexts"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system"
+          }
+        ],
+        "singleton": 5418205260,
+        "copyable": true,
+        "cloneable": true,
+        "default": null
+      }
+    },
+    "game::UpdateContexts": {
+      "path": "game::UpdateContexts",
+      "visibility": "public",
+      "size": 96,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_InitContext",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "game::GameObjectInitContext"
+            },
+            "offset": 0,
+            "size": 32,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_UpdateContext",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "game::GameObjectUpdateContext"
+            },
+            "offset": 32,
+            "size": 32,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RenderContext",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "game::GameObjectRenderContext"
+            },
+            "offset": 64,
+            "size": 32,
+            "alignment": 8,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "graphics_engine::device::CRITICAL_SECTION": {
+      "path": "graphics_engine::device::CRITICAL_SECTION",
+      "visibility": "public",
+      "size": 40,
+      "alignment": 8,
+      "category": "extern",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "graphics_engine::device::Context": {
+      "path": "graphics_engine::device::Context",
+      "visibility": "public",
+      "size": 36080,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 32800
+            },
+            "offset": 0,
+            "size": 32800,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Context",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "graphics_engine::device::ID3D11DeviceContext"
+            },
+            "offset": 32800,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Mutex",
+            "doc": null,
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::device::CRITICAL_SECTION"
+              }
+            },
+            "offset": 32808,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_8030",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 3264
+            },
+            "offset": 32816,
+            "size": 3264,
+            "alignment": 1,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "graphics_engine::device::Device": {
+      "path": "graphics_engine::device::Device",
+      "visibility": "public",
+      "size": 36224,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_Context",
+            "doc": null,
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::device::Context"
+              }
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_BackBuffer",
+            "doc": null,
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::texture::Texture"
+              }
+            },
+            "offset": 8,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_10",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 16
+            },
+            "offset": 16,
+            "size": 16,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_SwapChain",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "graphics_engine::device::IDXGISwapChain"
+            },
+            "offset": 32,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Device",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "graphics_engine::device::ID3D11Device"
+            },
+            "offset": 40,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_30",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 8
+            },
+            "offset": 48,
+            "size": 8,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_DXGIOutput",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "graphics_engine::device::IDXGIOutput"
+            },
+            "offset": 56,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_40",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 36160
+            },
+            "offset": 64,
+            "size": 36160,
+            "alignment": 1,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "graphics_engine::device::ID3D11Device": {
+      "path": "graphics_engine::device::ID3D11Device",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 8,
+      "category": "extern",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "graphics_engine::device::ID3D11DeviceContext": {
+      "path": "graphics_engine::device::ID3D11DeviceContext",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 8,
+      "category": "extern",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "graphics_engine::device::IDXGIOutput": {
+      "path": "graphics_engine::device::IDXGIOutput",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 8,
+      "category": "extern",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "graphics_engine::device::IDXGISwapChain": {
+      "path": "graphics_engine::device::IDXGISwapChain",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 8,
+      "category": "extern",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "graphics_engine::graphics_engine::ActiveCursor": {
+      "path": "graphics_engine::graphics_engine::ActiveCursor",
+      "visibility": "public",
+      "size": 4,
+      "alignment": 4,
+      "category": "defined",
+      "kind": {
+        "type": "enum",
+        "doc": null,
+        "underlying_type": {
+          "type": "raw",
+          "path": "i32"
+        },
+        "variants": [
+          {
+            "name": "None",
+            "value": -1
+          },
+          {
+            "name": "Arrow",
+            "value": 0
+          },
+          {
+            "name": "Cross",
+            "value": 1
+          },
+          {
+            "name": "Slider",
+            "value": 2
+          },
+          {
+            "name": "Zoom",
+            "value": 3
+          }
+        ],
+        "associated_functions": [],
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "default": null
+      }
+    },
+    "graphics_engine::graphics_engine::GraphicsEngine": {
+      "path": "graphics_engine::graphics_engine::GraphicsEngine",
+      "visibility": "public",
+      "size": 7952,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 24
+            },
+            "offset": 0,
+            "size": 24,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_CPUFinishedDrawingEvent",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "offset": 24,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_1c",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 268
+            },
+            "offset": 28,
+            "size": 268,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_ActiveCursor",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "graphics_engine::graphics_engine::ActiveCursor"
+            },
+            "offset": 296,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_12c",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 3460
+            },
+            "offset": 300,
+            "size": 3460,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Device",
+            "doc": null,
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::device::Device"
+              }
+            },
+            "offset": 3760,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_eb8",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 432
+            },
+            "offset": 3768,
+            "size": 432,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_MainColorBuffer",
+            "doc": null,
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::texture::Texture"
+              }
+            },
+            "offset": 4200,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_1070",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 448
+            },
+            "offset": 4208,
+            "size": 448,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_BackBufferLinear",
+            "doc": null,
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::texture::Texture"
+              }
+            },
+            "offset": 4656,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_1238",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 3288
+            },
+            "offset": 4664,
+            "size": 3288,
+            "alignment": 1,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "WaitForCPUDrawToFinish",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5422109568
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system"
+          }
+        ],
+        "vftable": null,
+        "singleton": 5417121520,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "graphics_engine::graphics_engine::GraphicsParams": {
+      "path": "graphics_engine::graphics_engine::GraphicsParams",
+      "visibility": "public",
+      "size": 112,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_AppTitle",
+            "doc": null,
+            "type_ref": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              }
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Cursors",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::graphics_engine::HICON"
+              },
+              "size": 4
+            },
+            "offset": 8,
+            "size": 32,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Hwnd",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "graphics_engine::graphics_engine::HWND"
+            },
+            "offset": 40,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_FullscreenWidth",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 48,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_FullscreenHeight",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 52,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_WindowedWidth",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 56,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_WindowedHeight",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 60,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Fullscreen",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 64,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_HighResShadows",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 65,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_42",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 2
+            },
+            "offset": 66,
+            "size": 2,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Width",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "offset": 68,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Height",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "offset": 72,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_IsHighDef",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 76,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_4d",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 3
+            },
+            "offset": 77,
+            "size": 3,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_DisplayPresentationInterval",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "offset": 80,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RendertargetCount",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "offset": 84,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RefreshRate",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u16"
+            },
+            "offset": 88,
+            "size": 2,
+            "alignment": 2,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_5a",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 22
+            },
+            "offset": 90,
+            "size": 22,
+            "alignment": 1,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "graphics_engine::graphics_engine::HICON": {
+      "path": "graphics_engine::graphics_engine::HICON",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 8,
+      "category": "extern",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "graphics_engine::graphics_engine::HWND": {
+      "path": "graphics_engine::graphics_engine::HWND",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 8,
+      "category": "extern",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "graphics_engine::render_engine::RenderEngine": {
+      "path": "graphics_engine::render_engine::RenderEngine",
+      "visibility": "public",
+      "size": 8736,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 8736
+            },
+            "offset": 0,
+            "size": 8736,
+            "alignment": 1,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": 5417799192,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "graphics_engine::texture::ID3D11DepthStencilView": {
+      "path": "graphics_engine::texture::ID3D11DepthStencilView",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 8,
+      "category": "extern",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "graphics_engine::texture::ID3D11RenderTargetView": {
+      "path": "graphics_engine::texture::ID3D11RenderTargetView",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 8,
+      "category": "extern",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "graphics_engine::texture::ID3D11Resource": {
+      "path": "graphics_engine::texture::ID3D11Resource",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 8,
+      "category": "extern",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "graphics_engine::texture::ID3D11ShaderResourceView": {
+      "path": "graphics_engine::texture::ID3D11ShaderResourceView",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 8,
+      "category": "extern",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "graphics_engine::texture::Texture": {
+      "path": "graphics_engine::texture::Texture",
+      "visibility": "public",
+      "size": 88,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_Texture",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "graphics_engine::texture::ID3D11Resource"
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_8",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 8
+            },
+            "offset": 8,
+            "size": 8,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_SRV",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "graphics_engine::texture::ID3D11ShaderResourceView"
+            },
+            "offset": 16,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_RTV",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "graphics_engine::texture::ID3D11RenderTargetView"
+            },
+            "offset": 24,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_DSV",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "graphics_engine::texture::ID3D11DepthStencilView"
+            },
+            "offset": 32,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_28",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 8
+            },
+            "offset": 40,
+            "size": 8,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Width",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u16"
+            },
+            "offset": 48,
+            "size": 2,
+            "alignment": 2,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Height",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u16"
+            },
+            "offset": 50,
+            "size": 2,
+            "alignment": 2,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_34",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 8
+            },
+            "offset": 52,
+            "size": 8,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "m_Format",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "offset": 60,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_40",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 24
+            },
+            "offset": 64,
+            "size": 24,
+            "alignment": 1,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "i128": {
+      "path": "i128",
+      "visibility": "public",
+      "size": 16,
+      "alignment": 16,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "i16": {
+      "path": "i16",
+      "visibility": "public",
+      "size": 2,
+      "alignment": 2,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "i32": {
+      "path": "i32",
+      "visibility": "public",
+      "size": 4,
+      "alignment": 4,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "i64": {
+      "path": "i64",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 8,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "i8": {
+      "path": "i8",
+      "visibility": "public",
+      "size": 1,
+      "alignment": 1,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "input::input_device_manager::InputDeviceManager": {
+      "path": "input::input_device_manager::InputDeviceManager",
+      "visibility": "public",
+      "size": 120,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "vftable",
+            "doc": null,
+            "type_ref": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "input::input_device_manager::InputDeviceManagerVftable"
+              }
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_8",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 4
+            },
+            "offset": 8,
+            "size": 4,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "enabled",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 12,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false
+          },
+          {
+            "visibility": "private",
+            "name": "_field_d",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 107
+            },
+            "offset": 13,
+            "size": 107,
+            "alignment": 1,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": {
+          "functions": [
+            {
+              "visibility": "public",
+              "name": "Destructor",
+              "doc": null,
+              "body": {
+                "type": "vftable",
+                "function_name": "Destructor"
+              },
+              "arguments": [
+                {
+                  "type": "mut_self"
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system"
+            }
+          ]
+        },
+        "singleton": 5417121528,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "input::input_device_manager::InputDeviceManagerVftable": {
+      "path": "input::input_device_manager::InputDeviceManagerVftable",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "Destructor",
+            "doc": null,
+            "type_ref": {
+              "type": "function",
+              "calling_convention": "system",
+              "arguments": [
+                {
+                  "name": "this",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "input::input_device_manager::InputDeviceManager"
+                    }
+                  }
+                }
+              ],
+              "return_type": null
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      }
+    },
+    "types::math::Matrix3": {
+      "path": "types::math::Matrix3",
+      "visibility": "public",
+      "size": 36,
+      "alignment": 4,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "data",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              },
+              "size": 9
+            },
+            "offset": 0,
+            "size": 36,
+            "alignment": 4,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "types::math::Matrix4": {
+      "path": "types::math::Matrix4",
+      "visibility": "public",
+      "size": 64,
+      "alignment": 4,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "data",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              },
+              "size": 16
+            },
+            "offset": 0,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "types::math::Plane": {
+      "path": "types::math::Plane",
+      "visibility": "public",
+      "size": 16,
+      "alignment": 4,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "normal",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Vector3"
+            },
+            "offset": 0,
+            "size": 12,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "distance",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 12,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "types::math::Vector2": {
+      "path": "types::math::Vector2",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 4,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "data",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              },
+              "size": 2
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 4,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "types::math::Vector3": {
+      "path": "types::math::Vector3",
+      "visibility": "public",
+      "size": 12,
+      "alignment": 4,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "data",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              },
+              "size": 3
+            },
+            "offset": 0,
+            "size": 12,
+            "alignment": 4,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "types::math::Vector4": {
+      "path": "types::math::Vector4",
+      "visibility": "public",
+      "size": 16,
+      "alignment": 4,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "data",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              },
+              "size": 4
+            },
+            "offset": 0,
+            "size": 16,
+            "alignment": 4,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "types::vector_math::AlignedQuat": {
+      "path": "types::vector_math::AlignedQuat",
+      "visibility": "public",
+      "size": 16,
+      "alignment": 16,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "data",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              },
+              "size": 4
+            },
+            "offset": 0,
+            "size": 16,
+            "alignment": 4,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "types::vector_math::AlignedVector3": {
+      "path": "types::vector_math::AlignedVector3",
+      "visibility": "public",
+      "size": 16,
+      "alignment": 16,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "data",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              },
+              "size": 3
+            },
+            "offset": 0,
+            "size": 12,
+            "alignment": 4,
+            "is_base": false
+          },
+          {
+            "visibility": "public",
+            "name": "_w",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 12,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "u128": {
+      "path": "u128",
+      "visibility": "public",
+      "size": 16,
+      "alignment": 16,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "u16": {
+      "path": "u16",
+      "visibility": "public",
+      "size": 2,
+      "alignment": 2,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "u32": {
+      "path": "u32",
+      "visibility": "public",
+      "size": 4,
+      "alignment": 4,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "u64": {
+      "path": "u64",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 8,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "u8": {
+      "path": "u8",
+      "visibility": "public",
+      "size": 1,
+      "alignment": 1,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    },
+    "void": {
+      "path": "void",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      }
+    }
+  },
+  "modules": {
+    "camera": {
+      "doc": null,
+      "items": [],
+      "submodules": {
+        "camera": {
+          "doc": null,
+          "items": [
+            "camera::camera::Camera",
+            "camera::camera::CameraState",
+            "camera::camera::Corner"
+          ],
+          "submodules": {},
+          "extern_values": [],
+          "functions": []
+        },
+        "camera_context": {
+          "doc": null,
+          "items": [
+            "camera::camera_context::CameraContext",
+            "camera::camera_context::CameraControlContext",
+            "camera::camera_context::CameraDOFParameters",
+            "camera::camera_context::CameraEnvironmentPresetWeights"
+          ],
+          "submodules": {},
+          "extern_values": [],
+          "functions": []
+        },
+        "camera_manager": {
+          "doc": null,
+          "items": [
+            "camera::camera_manager::CameraManager"
+          ],
+          "submodules": {},
+          "extern_values": [],
+          "functions": []
+        },
+        "game_camera_manager": {
+          "doc": null,
+          "items": [
+            "camera::game_camera_manager::GameCameraManager"
+          ],
+          "submodules": {},
+          "extern_values": [],
+          "functions": []
+        }
+      },
+      "extern_values": [],
+      "functions": []
+    },
+    "character": {
+      "doc": null,
+      "items": [],
+      "submodules": {
+        "character": {
+          "doc": null,
+          "items": [
+            "character::character::AnimatedModel",
+            "character::character::AnimationController",
+            "character::character::Character",
+            "character::character::Joint",
+            "character::character::SafeBoneIndex"
+          ],
+          "submodules": {},
+          "extern_values": [
+            {
+              "visibility": "public",
+              "name": "Character_GoreEnabled",
+              "type_ref": {
+                "type": "raw",
+                "path": "bool"
+              },
+              "address": 5418185473
+            }
+          ],
+          "functions": []
+        }
+      },
+      "extern_values": [],
+      "functions": []
+    },
+    "clock": {
+      "doc": null,
+      "items": [],
+      "submodules": {},
+      "extern_values": [],
+      "functions": []
+    },
+    "game": {
+      "doc": null,
+      "items": [],
+      "submodules": {},
+      "extern_values": [],
+      "functions": []
+    },
+    "graphics_engine": {
+      "doc": null,
+      "items": [],
+      "submodules": {
+        "device": {
+          "doc": null,
+          "items": [
+            "graphics_engine::device::CRITICAL_SECTION",
+            "graphics_engine::device::Context",
+            "graphics_engine::device::Device",
+            "graphics_engine::device::ID3D11Device",
+            "graphics_engine::device::ID3D11DeviceContext",
+            "graphics_engine::device::IDXGIOutput",
+            "graphics_engine::device::IDXGISwapChain"
+          ],
+          "submodules": {},
+          "extern_values": [],
+          "functions": []
+        },
+        "graphics_engine": {
+          "doc": null,
+          "items": [
+            "graphics_engine::graphics_engine::ActiveCursor",
+            "graphics_engine::graphics_engine::GraphicsEngine",
+            "graphics_engine::graphics_engine::GraphicsParams",
+            "graphics_engine::graphics_engine::HICON",
+            "graphics_engine::graphics_engine::HWND"
+          ],
+          "submodules": {},
+          "extern_values": [
+            {
+              "visibility": "public",
+              "name": "graphics_params",
+              "type_ref": {
+                "type": "raw",
+                "path": "graphics_engine::graphics_engine::GraphicsParams"
+              },
+              "address": 5416134736
+            }
+          ],
+          "functions": []
+        },
+        "render_engine": {
+          "doc": null,
+          "items": [
+            "graphics_engine::render_engine::RenderEngine"
+          ],
+          "submodules": {},
+          "extern_values": [],
+          "functions": []
+        },
+        "texture": {
+          "doc": null,
+          "items": [
+            "graphics_engine::texture::ID3D11DepthStencilView",
+            "graphics_engine::texture::ID3D11RenderTargetView",
+            "graphics_engine::texture::ID3D11Resource",
+            "graphics_engine::texture::ID3D11ShaderResourceView",
+            "graphics_engine::texture::Texture"
+          ],
+          "submodules": {},
+          "extern_values": [],
+          "functions": []
+        }
+      },
+      "extern_values": [],
+      "functions": []
+    },
+    "hash": {
+      "doc": null,
+      "items": [],
+      "submodules": {},
+      "extern_values": [],
+      "functions": []
+    },
+    "input": {
+      "doc": null,
+      "items": [],
+      "submodules": {
+        "input_device_manager": {
+          "doc": null,
+          "items": [
+            "input::input_device_manager::InputDeviceManager",
+            "input::input_device_manager::InputDeviceManagerVftable"
+          ],
+          "submodules": {},
+          "extern_values": [],
+          "functions": []
+        }
+      },
+      "extern_values": [],
+      "functions": []
+    },
+    "root": {
+      "doc": null,
+      "items": [
+        "bool",
+        "f32",
+        "f64",
+        "i128",
+        "i16",
+        "i32",
+        "i64",
+        "i8",
+        "u128",
+        "u16",
+        "u32",
+        "u64",
+        "u8",
+        "void"
+      ],
+      "submodules": {},
+      "extern_values": [],
+      "functions": []
+    },
+    "types": {
+      "doc": null,
+      "items": [],
+      "submodules": {
+        "math": {
+          "doc": null,
+          "items": [
+            "types::math::Matrix3",
+            "types::math::Matrix4",
+            "types::math::Plane",
+            "types::math::Vector2",
+            "types::math::Vector3",
+            "types::math::Vector4"
+          ],
+          "submodules": {},
+          "extern_values": [],
+          "functions": []
+        },
+        "vector_math": {
+          "doc": null,
+          "items": [
+            "types::vector_math::AlignedQuat",
+            "types::vector_math::AlignedVector3"
+          ],
+          "submodules": {},
+          "extern_values": [],
+          "functions": []
+        }
+      },
+      "extern_values": [],
+      "functions": []
+    }
+  }
+}
