@@ -118,16 +118,22 @@ def main():
         print("No pyxis.toml files found.")
         sys.exit(1)
 
-    documents: List[Dict[str, Any]] = []
-
-    # Process each pyxis.toml file
+    # Build array of (output_name, toml_path) tuples
+    projects: List[tuple[str, Path]] = []
     for toml_file in toml_files:
         input_dir = toml_file.parent
-
-        # Convert path to output directory name (replace / with _)
-        # Get relative path from repo root
         rel_path = input_dir.relative_to(project_dir)
         output_name = str(rel_path).replace(os.sep, "_").replace("/", "_")
+        projects.append((output_name, toml_file))
+
+    # Sort by output_name
+    projects.sort(key=lambda x: x[0])
+
+    documents: List[Dict[str, Any]] = []
+
+    # Process each project
+    for output_name, toml_file in projects:
+        input_dir = toml_file.parent
         output_dir = docs_dir / output_name
 
         print(f"Building {input_dir} -> {output_dir}")
