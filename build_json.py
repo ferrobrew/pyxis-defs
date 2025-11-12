@@ -4,8 +4,10 @@ Build script that finds all pyxis.toml files, builds them with pyxis,
 and generates an index.json file with metadata.
 """
 
+import argparse
 import json
 import os
+import platform
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -13,14 +15,31 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 
 
-def install_pyxis():
-    """Install pyxis if not available."""
+def install_pyxis(
+    branch: Optional[str] = None,
+    tag: Optional[str] = None,
+    rev: Optional[str] = None,
+):
+    """Install pyxis if not available.
+
+    Args:
+        branch: Optional branch name to install.
+        tag: Optional tag name to install.
+        rev: Optional commit revision to install.
+    """
     print("Installing pyxis...")
     try:
-        subprocess.run(
-            ["cargo", "install", "--git", "https://github.com/ferrobrew/pyxis.git"],
-            check=True,
-        )
+        cmd = ["cargo", "install", "--git", "https://github.com/ferrobrew/pyxis.git"]
+        if branch:
+            cmd.extend(["--branch", branch])
+            print(f"Installing pyxis from branch: {branch}")
+        elif tag:
+            cmd.extend(["--tag", tag])
+            print(f"Installing pyxis from tag: {tag}")
+        elif rev:
+            cmd.extend(["--rev", rev])
+            print(f"Installing pyxis from revision: {rev}")
+        subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError as e:
         print(f"Error installing pyxis: {e}", file=sys.stderr)
         sys.exit(1)
@@ -33,6 +52,21 @@ def find_pyxis_toml_files(root_dir: Path) -> List[Path]:
 
 def build_pyxis_project(input_dir: Path, output_dir: Path) -> bool:
     """Build a pyxis project and return True if successful."""
+    # On Windows, ensure UTF-8 encoding for subprocess output
+    env = os.environ.copy()
+    if platform.system() == "Windows":
+        env["PYTHONIOENCODING"] = "utf-8"
+        # Ensure console can handle UTF-8
+        if sys.stderr.isatty():
+            try:
+                # Try to set console code page to UTF-8
+                import ctypes
+
+                kernel32 = ctypes.windll.kernel32
+                kernel32.SetConsoleOutputCP(65001)  # UTF-8 code page
+            except Exception:
+                pass  # Ignore if we can't set it
+
     try:
         subprocess.run(
             [
@@ -46,14 +80,24 @@ def build_pyxis_project(input_dir: Path, output_dir: Path) -> bool:
             check=True,
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
+            env=env,
         )
         return True
     except subprocess.CalledProcessError as e:
         print(f"Error building {input_dir}:", file=sys.stderr)
+        # Ensure stderr can handle UTF-8 output on Windows
+        if platform.system() == "Windows":
+            try:
+                if sys.stderr.encoding != "utf-8":
+                    sys.stderr.reconfigure(encoding="utf-8")
+            except Exception:
+                pass  # Ignore if reconfiguration fails
         if e.stderr:
-            print(e.stderr, file=sys.stderr)
+            print(e.stderr, file=sys.stderr, end="")
         if e.stdout:
-            print(e.stdout, file=sys.stderr)
+            print(e.stdout, file=sys.stderr, end="")
         return False
 
 
@@ -102,8 +146,38 @@ def get_git_last_modified(path: Path) -> Optional[datetime]:
 
 def main():
     """Main function."""
+    parser = argparse.ArgumentParser(
+        description="Build pyxis projects and generate index.json"
+    )
+    parser.add_argument(
+        "--branch",
+        type=str,
+        default=None,
+        help="Optional branch name of Pyxis to install",
+    )
+    parser.add_argument(
+        "--tag",
+        type=str,
+        default=None,
+        help="Optional tag name of Pyxis to install",
+    )
+    parser.add_argument(
+        "--rev",
+        type=str,
+        default=None,
+        help="Optional commit revision of Pyxis to install",
+    )
+    args = parser.parse_args()
+
+    # Validate that only one of branch, tag, or rev is specified
+    specified = sum(
+        [args.branch is not None, args.tag is not None, args.rev is not None]
+    )
+    if specified > 1:
+        parser.error("Only one of --branch, --tag, or --rev can be specified")
+
     # Check for required tools
-    install_pyxis()
+    install_pyxis(branch=args.branch, tag=args.tag, rev=args.rev)
 
     # Get repository root
     repo_root = Path(__file__).parent.resolve()
