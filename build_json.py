@@ -111,7 +111,8 @@ def main():
     docs_dir.mkdir(exist_ok=True)
 
     # Find all pyxis.toml files
-    toml_files = find_pyxis_toml_files(repo_root)
+    project_dir = repo_root / "projects"
+    toml_files = find_pyxis_toml_files(project_dir)
 
     if not toml_files:
         print("No pyxis.toml files found.")
@@ -125,7 +126,7 @@ def main():
 
         # Convert path to output directory name (replace / with _)
         # Get relative path from repo root
-        rel_path = input_dir.relative_to(repo_root)
+        rel_path = input_dir.relative_to(project_dir)
         output_name = str(rel_path).replace(os.sep, "_").replace("/", "_")
         output_dir = docs_dir / output_name
 
