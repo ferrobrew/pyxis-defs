@@ -1,0 +1,19 @@
+use game_objects::character::Character;
+
+backend rust prologue "use crate::{game_objects::Character, shared_ptr::*};";
+
+#[size(8), align(4)]
+extern type SharedPtr<Character>;
+#[size(8), align(4)]
+extern type WeakPtr<Avatar>;
+
+#[size(0x70)]
+pub type Avatar {
+    vftable {
+        pub fn destructor(&mut self);
+    },
+
+    #[address(0x44)]
+    pub character: SharedPtr<Character>,
+    pub weak_this: WeakPtr<Avatar>
+}

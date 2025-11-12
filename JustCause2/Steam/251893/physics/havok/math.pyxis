@@ -1,0 +1,64 @@
+backend rust prologue r#"
+    #[cfg(feature = "glam")]
+    use glam::{Mat3, Vec3, Vec4};
+"#;
+
+#[copyable, defaultable, align(16)]
+pub type HkMatrix3 {
+    pub data: [HkVector4; 3],
+}
+backend rust epilogue r#"
+    #[cfg(feature = "glam")]
+    impl From<Mat3> for HkMatrix3 {
+        fn from(m: Mat3) -> Self {
+            Self {
+                data: [
+                    m.col(0).into(),
+                    m.col(1).into(),
+                    m.col(2).into(),
+                ],
+            }
+        }
+    }
+    #[cfg(feature = "glam")]
+    impl From<HkMatrix3> for Mat3 {
+        fn from(m: HkMatrix3) -> Self {
+            Mat3::from_cols(m.data[0].into(), m.data[1].into(), m.data[2].into())
+        }
+    }
+"#;
+
+#[copyable, defaultable, align(16)]
+pub type HkVector4 {
+    pub data: [f32; 4],
+}
+backend rust epilogue r#"
+    #[cfg(feature = "glam")]
+    impl From<Vec3> for HkVector4 {
+        fn from(v: Vec3) -> Self {
+            Self {
+                data: [v.x, v.y, v.z, 0.0],
+            }
+        }
+    }
+    #[cfg(feature = "glam")]
+    impl From<HkVector4> for Vec3 {
+        fn from(v: HkVector4) -> Self {
+            Vec3::new(v.data[0], v.data[1], v.data[2])
+        }
+    }
+    #[cfg(feature = "glam")]
+    impl From<Vec4> for HkVector4 {
+        fn from(v: Vec4) -> Self {
+            Self {
+                data: [v.x, v.y, v.z, v.w],
+            }
+        }
+    }
+    #[cfg(feature = "glam")]
+    impl From<HkVector4> for Vec4 {
+        fn from(v: HkVector4) -> Self {
+            Vec4::new(v.data[0], v.data[1], v.data[2], v.data[3])
+        }
+    }
+"#;

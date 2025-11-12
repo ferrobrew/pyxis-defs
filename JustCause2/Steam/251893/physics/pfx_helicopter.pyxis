@@ -1,0 +1,11 @@
+use physics::pfx_vehicle::PfxVehicle;
+use physics::pfx_vehicle::PfxVehicleInstance;
+
+pub type PfxHelicopter {
+    #[base]
+    pub vehicle: PfxVehicle,
+}
+pub type PfxHelicopterInstance {
+    #[base]
+    pub vehicle: PfxVehicleInstance,
+}

@@ -1,0 +1,44 @@
+use game_objects::physics_game_object::PhysicsGameObject;
+use physics::pfx_instance::PfxInstance;
+
+backend rust prologue "use crate::{CharacterBase, SharedPtr, WeakPtr};";
+
+#[size(8), align(4)]
+extern type SharedPtr<CharacterController>;
+#[size(8), align(4)]
+extern type SharedPtr<SmartObjectAction>;
+#[size(8), align(4)]
+extern type WeakPtr<CharacterBase>;
+
+pub type CharacterController;
+pub type SmartObjectAction;
+
+#[size(0x128)]
+pub type SmartObject {
+    vftable {
+        pub fn destructor(&mut self);
+
+        #[index(7)]
+        pub fn get_pfx_instance(&mut self) -> *mut PfxInstance;
+
+        #[index(24)]
+        pub fn attach_occupant(&mut self, character: *const WeakPtr<CharacterBase>);
+        pub fn detach_occupant(&mut self);
+    },
+
+    #[base]
+    physics_game_object: PhysicsGameObject,
+
+    #[address(0x44)]
+    pub name_hash: u32,
+
+    #[address(0xB8)]
+    pub character_controller: SharedPtr<CharacterController>,
+    pub occupant: WeakPtr<CharacterBase>,
+
+    pub action_triggers: unknown<0x10>,
+    pub vec_unknown: unknown<0x10>,
+
+    pub enter_action: SharedPtr<SmartObjectAction>,
+    pub exit_action: SharedPtr<SmartObjectAction>,
+}

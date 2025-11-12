@@ -1,0 +1,9 @@
+use physics::pfx_instance::PfxInstance;
+
+#[size(8)]
+pub type PfxGameObject {
+    vftable {
+        pub fn destructor(&mut self);
+        pub fn get_pfx_instance(&self) -> *mut PfxInstance;
+    }
+}

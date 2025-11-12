@@ -1,0 +1,246 @@
+use physics::havok::math::HkMatrix3;
+use physics::havok::math::HkVector4;
+use physics::havok::referenced_object::HkReferencedObject;
+
+backend rust prologue "use crate::havok::memory::HkMemoryClass;";
+backend rust prologue "use crate::havok::referenced_object::{HkReferencedObject, HkReferencedObjectInstance};";
+
+// HkMemoryClass::Entity
+#[size(0xC0), align(16)]
+pub type HkpRigidBodyCInfo {
+    #[address(0x4)]
+    pub shape: *mut HkpShape,
+
+    #[address(0x10)]
+    pub position: HkVector4,
+    pub rotation: HkVector4,
+    pub linear_velocity: HkVector4,
+    pub angular_velocity: HkVector4,
+    pub inertia_tensor: HkMatrix3,
+    pub center_of_mass: HkVector4,
+    pub mass: f32,
+    pub linear_damping: f32,
+    pub angular_damping: f32,
+    pub friction: f32,
+    pub restitution: f32,
+    pub max_linear_velocity: f32,
+    pub max_angular_velocity: f32,
+    pub allowed_penetration_depth: f32,
+
+    #[address(0xB0)]
+    pub motion_type: u8,
+}
+impl HkpRigidBodyCInfo {
+    #[address(0xB7A930)]
+    fn constructor(&mut self);
+}
+backend rust epilogue r#"
+    impl HkpRigidBodyCInfo {
+        pub unsafe fn new() -> Self {
+            unsafe {
+                let mut instance = std::mem::MaybeUninit::<Self>::uninit();
+                (*instance.as_mut_ptr()).constructor();
+                instance.assume_init()
+            }
+        }
+    }
+"#;
+
+#[size(0x200), align(16)]
+pub type HkpRigidBody {
+    referenced_object: HkReferencedObject,
+}
+impl HkpRigidBody {
+    #[address(0xB7A070)]
+    fn constructor(&mut self, info: *mut HkpRigidBodyCInfo);
+    #[address(0xB7A900)]
+    fn destructor(&mut self, free: bool);
+}
+backend rust epilogue r#"
+    unsafe impl HkReferencedObjectInstance for HkpRigidBody {
+        type ConstructorArgs = *mut HkpRigidBodyCInfo;
+        fn allocation_size() -> u32 {
+            std::mem::size_of::<Self>() as u32
+        }
+        fn memory_class() -> HkMemoryClass {
+            HkMemoryClass::Entity
+        }
+        fn as_referenced_object(&self) -> &HkReferencedObject {
+            &self.referenced_object
+        }
+        fn as_referenced_object_mut(&mut self) -> &mut HkReferencedObject {
+            &mut self.referenced_object
+        }
+        #[allow(clippy::not_unsafe_ptr_arg_deref)]
+        fn construct(&mut self, args: Self::ConstructorArgs) {
+            unsafe {
+                self.constructor(args);
+            }
+        }
+        fn free(&mut self) {
+            unsafe {
+                self.destructor(true);
+            }
+        }
+    }
+"#;
+
+#[size(0x10)]
+pub type HkpShape {
+    referenced_object: HkReferencedObject,
+}
+
+#[size(0x30), align(16)]
+pub type HkpBoxShape {
+    pub shape: HkpShape,
+}
+impl HkpBoxShape {
+    #[address(0xB56730)]
+    fn constructor(&mut self, half_extents: *const HkVector4, padding: f32);
+    #[address(0xB40330)]
+    fn destructor(&mut self, free: bool);
+}
+backend rust epilogue r#"
+    unsafe impl HkReferencedObjectInstance for HkpBoxShape {
+        type ConstructorArgs = (*const crate::havok::math::HkVector4, f32);
+        fn allocation_size() -> u32 {
+            std::mem::size_of::<Self>() as u32
+        }
+        fn memory_class() -> HkMemoryClass {
+            HkMemoryClass::CdInfo
+        }
+        fn as_referenced_object(&self) -> &HkReferencedObject {
+            &self.shape.referenced_object
+        }
+        fn as_referenced_object_mut(&mut self) -> &mut HkReferencedObject {
+            &mut self.shape.referenced_object
+        }
+        fn construct(&mut self, args: Self::ConstructorArgs) {
+            unsafe {
+                let (half_extents, padding) = args;
+                self.constructor(half_extents, padding);
+            }
+        }
+        fn free(&mut self) {
+            unsafe {
+                self.destructor(true);
+            }
+        }
+    }
+"#;
+
+#[size(0x20), align(16)]
+pub type HkpSphereShape {
+    pub shape: HkpShape,
+}
+impl HkpSphereShape {
+    #[address(0xB40260)]
+    fn constructor(&mut self, radius: f32);
+    #[address(0xB40330)]
+    fn destructor(&mut self, free: bool);
+}
+backend rust epilogue r#"
+    unsafe impl HkReferencedObjectInstance for HkpSphereShape {
+        type ConstructorArgs = f32;
+        fn allocation_size() -> u32 {
+            std::mem::size_of::<Self>() as u32
+        }
+        fn memory_class() -> HkMemoryClass {
+            HkMemoryClass::CdInfo
+        }
+        fn as_referenced_object(&self) -> &HkReferencedObject {
+            &self.shape.referenced_object
+        }
+        fn as_referenced_object_mut(&mut self) -> &mut HkReferencedObject {
+            &mut self.shape.referenced_object
+        }
+        fn construct(&mut self, args: Self::ConstructorArgs) {
+            unsafe {
+                self.constructor(args);
+            }
+        }
+        fn free(&mut self) {
+            unsafe {
+                self.destructor(true);
+            }
+        }
+    }
+"#;
+
+#[size(0x40), align(16)]
+pub type HkpCapsule {
+    pub shape: HkpShape,
+}
+impl HkpCapsule {
+    #[address(0xB3F790)]
+    fn constructor(&mut self, start: *const HkVector4, end: *const HkVector4, radius: f32);
+    #[address(0xB40330)]
+    fn destructor(&mut self, free: bool);
+}
+backend rust epilogue r#"
+    unsafe impl HkReferencedObjectInstance for HkpCapsule {
+        type ConstructorArgs = (*const crate::havok::math::HkVector4, *const crate::havok::math::HkVector4, f32);
+        fn allocation_size() -> u32 {
+            std::mem::size_of::<Self>() as u32
+        }
+        fn memory_class() -> HkMemoryClass {
+            HkMemoryClass::CdInfo
+        }
+        fn as_referenced_object(&self) -> &HkReferencedObject {
+            &self.shape.referenced_object
+        }
+        fn as_referenced_object_mut(&mut self) -> &mut HkReferencedObject {
+            &mut self.shape.referenced_object
+        }
+        fn construct(&mut self, args: Self::ConstructorArgs) {
+            unsafe {
+                let (start, end, radius) = args;
+                self.constructor(start, end, radius);
+            }
+        }
+        fn free(&mut self) {
+            unsafe {
+                self.destructor(true);
+            }
+        }
+    }
+"#;
+
+#[size(0x60), align(16)]
+pub type HkpCylinderShape {
+    pub shape: HkpShape,
+}
+impl HkpCylinderShape {
+    #[address(0xB425B0)]
+    fn constructor(&mut self, start: *const HkVector4, end: *const HkVector4, radius: f32, padding: f32);
+    #[address(0xB40330)]
+    fn destructor(&mut self, free: bool);
+}
+backend rust epilogue r#"
+    unsafe impl HkReferencedObjectInstance for HkpCylinderShape {
+        type ConstructorArgs = (*const crate::havok::math::HkVector4, *const crate::havok::math::HkVector4, f32, f32);
+        fn allocation_size() -> u32 {
+            std::mem::size_of::<Self>() as u32
+        }
+        fn memory_class() -> HkMemoryClass {
+            HkMemoryClass::CdInfo
+        }
+        fn as_referenced_object(&self) -> &HkReferencedObject {
+            &self.shape.referenced_object
+        }
+        fn as_referenced_object_mut(&mut self) -> &mut HkReferencedObject {
+            &mut self.shape.referenced_object
+        }
+        fn construct(&mut self, args: Self::ConstructorArgs) {
+            unsafe {
+                let (start, end, radius, padding) = args;
+                self.constructor(start, end, radius, padding);
+            }
+        }
+        fn free(&mut self) {
+            unsafe {
+                self.destructor(true);
+            }
+        }
+    }
+"#;

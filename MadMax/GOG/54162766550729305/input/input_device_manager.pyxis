@@ -1,0 +1,23 @@
+use input::input_action_map::InputActionMap;
+use input::input_device::DeviceType;
+use input::input_device::InputDevice;
+use types::hash_string::HashString;
+
+#[size(0x88), align(4)]
+pub type InputDeviceManager {
+    #[address(0xC)]
+    pub enabled: bool,
+
+    #[address(0x80)]
+    pub in_focus: bool,
+}
+impl InputDeviceManager {
+    #[address(0x140925280)]
+    pub fn get_action_map(&mut self, id: *const HashString) -> *mut InputActionMap;
+
+    #[address(0x140922780)]
+    pub fn get_device_count(&self, device_type: DeviceType) -> u64;
+
+    #[address(0x140926580)]
+    pub fn get_device(&mut self, device_type: DeviceType, index: u32) -> *mut InputDevice;
+}

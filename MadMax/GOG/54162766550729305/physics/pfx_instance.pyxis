@@ -1,0 +1,48 @@
+use physics::pfx_game_object::PfxGameObject;
+use types::math::Vector3;
+
+backend rust prologue "use crate::shared_ptr::*;";
+
+#[size(16), align(8)]
+extern type WeakPtr<PfxInstance>;
+#[size(16), align(8)]
+extern type SharedPtr<PfxInstance>;
+
+#[copyable, cloneable]
+pub enum PfxID: u32 {
+    Generic = 0,
+    RigidBody = 1,
+    Character = 2,
+    HeightField = 3,
+    Vehicle = 4,
+    Breakable = 5,
+    MotorBike = 6,
+    Helicopter = 8,
+    Boat = 9,
+    AirPlane = 10,
+    V22 = 11,
+    MoppCode = 12,
+    Submarine = 13,
+    Camera = 14,
+    RagdollProxyPhantom = 15,
+}
+
+#[size(0x30)]
+pub type PfxInstance {    
+    vftable {
+        pub fn destructor(&mut self);
+        pub fn get_type(&self) -> PfxID;
+
+        #[index(4)]
+        pub fn get_velocity(&self, vel: *mut Vector3);
+        pub fn get_angular_velocity(&self, vel: *mut Vector3);
+        pub fn set_mass(&self, mass: f32, unk: bool);
+
+        #[index(9)]
+        pub fn is_type(&self, id: PfxID);
+    },
+
+    pub weak_this: WeakPtr<PfxInstance>,
+    pub prototype: SharedPtr<PfxInstance>,
+    pub game_object: *mut PfxGameObject,
+}

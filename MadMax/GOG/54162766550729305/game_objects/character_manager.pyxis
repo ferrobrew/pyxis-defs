@@ -1,0 +1,21 @@
+use types::math::Matrix4;
+
+backend rust prologue "use crate::{character::*, player::*, shared_ptr::*};";
+
+#[size(16), align(8)]
+extern type SharedPtr<Player>;
+
+#[singleton(0x141715FB8), size(0x3B00), align(16)]
+pub type CharacterManager {
+    vftable {
+        pub fn destructor(&mut self);
+
+        #[index(3)]
+        pub fn is_player_paused(&self) -> bool;
+        pub fn pause_player(&mut self, despawn_vehicle: bool);
+        pub fn unpause_player(&mut self);
+    },
+
+    #[address(0x37A8)]
+    pub player: SharedPtr<Player>,
+}

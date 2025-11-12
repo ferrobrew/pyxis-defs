@@ -1,0 +1,51 @@
+use types::math::Vector2;
+use types::math::Matrix4;
+
+#[size(0x658)]
+pub type Camera {
+    #[address(0x4)]
+    pub recalculate: bool,
+    pub render_camera: bool,
+
+    #[address(0x8)]
+    pub orthographic_size: Vector2,
+
+    #[address(0x20)]
+    pub orthographic: bool,
+
+    #[address(0x24)]
+    pub transform_matrix: Matrix4,
+    pub projection_matrix: Matrix4,
+    pub view_matrix: Matrix4,
+    pub view_projection_matrix: Matrix4,
+
+    #[address(0x618)]
+    pub fov: f32,
+
+    #[address(0x624)]
+    pub near: f32,
+    pub far: f32,
+
+    #[address(0x634)]
+    pub aspect_ratio: f32,
+    pub width: u32,
+    pub height: u32,
+}
+impl Camera {
+    #[address(0x924D80)]
+    fn constructor(&mut self);
+
+    #[address(0x933A10)]
+    pub fn update(&mut self, full_update: bool);
+}
+backend rust epilogue r#"
+    impl Camera {
+        pub unsafe fn new() -> Camera {
+            unsafe {
+                let mut instance = std::mem::MaybeUninit::<Self>::uninit();
+                (*instance.as_mut_ptr()).constructor();
+                instance.assume_init()
+            }
+        }
+    }
+"#;

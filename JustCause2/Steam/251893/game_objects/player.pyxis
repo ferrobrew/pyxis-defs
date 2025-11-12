@@ -1,0 +1,31 @@
+use game_objects::avatar::Avatar;
+use game::event_handler::EventHandler;
+
+backend rust prologue "use crate::game_objects::Character;";
+
+#[size(0x468), align(8)]
+pub type Player {
+    #[base]
+    pub event_handler: EventHandler,
+    #[base]
+    pub avatar: Avatar,
+}
+backend rust epilogue r#"
+    pub trait PlayerExt {
+        unsafe fn get_character(&self) -> Option<&Character>;
+    }
+    impl<T: std::convert::AsRef<crate::game_objects::player::Player>> PlayerExt for T {
+        unsafe fn get_character(&self) -> Option<&Character> {
+            unsafe { self.as_ref().avatar.character.as_ref() }
+        }
+    }
+    pub trait PlayerMutExt {
+        unsafe fn get_character(&mut self) -> Option<&mut Character>;
+    }
+    impl<T: std::convert::AsMut<crate::game_objects::player::Player>> PlayerMutExt for T {
+        unsafe fn get_character(&mut self) -> Option<&mut Character> {
+            unsafe { self.as_mut().avatar.character.as_mut() }
+        }
+    }
+"#;
+

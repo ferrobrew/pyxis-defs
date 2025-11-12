@@ -1,0 +1,18 @@
+#[copyable, cloneable]
+#[singleton(0x14171E7AC)]
+pub enum GameState: u32 {
+    Installing,
+    Initializing,
+    Loading,
+    Running,
+    StartUp,
+}
+
+#[address(0x1416C6F0C)]
+pub extern decoupled_update: bool;
+
+#[address(0x14171E7A8)]
+pub extern skip_front_end: bool;
+
+#[address(0x1416C8EE4)]
+pub extern requested_game_state: GameState;

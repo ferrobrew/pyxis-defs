@@ -1,0 +1,187 @@
+backend rust prologue r#"
+    #[cfg(feature = "glam")]
+    use glam::{Mat3, Mat4, Vec2, Vec3, Vec4};
+    #[cfg(feature = "bevy_math")]
+    use bevy_math::{bounding::Aabb3d, Ray3d};
+"#;
+
+#[copyable, defaultable]
+pub type Aabb {
+    pub min: Vector3,
+    pub max: Vector3,
+}
+backend rust epilogue r#"
+    #[cfg(feature = "bevy_math")]
+    impl From<Aabb3d> for Aabb {
+        fn from(aabb: Aabb3d) -> Self {
+            Self {
+                min: Vector3 {
+                    data: aabb.min.to_array(),
+                },
+                max: Vector3 {
+                    data: aabb.max.to_array(),
+                },
+            }
+        }
+    }
+    #[cfg(feature = "bevy_math")]
+    impl From<Aabb> for Aabb3d {
+        fn from(aabb: Aabb) -> Self {
+            Aabb3d {
+                min: bevy_math::Vec3A::from_array(aabb.min.data),
+                max: bevy_math::Vec3A::from_array(aabb.max.data),
+            }
+        }
+    }
+"#;
+
+#[copyable, defaultable]
+pub type Matrix3 {
+    pub data: [f32; 9],
+}
+backend rust epilogue r#"
+    #[cfg(feature = "glam")]
+    impl From<Mat3> for Matrix3 {
+        fn from(m: Mat3) -> Self {
+            Self {
+                data: m.to_cols_array(),
+            }
+        }
+    }
+    #[cfg(feature = "glam")]
+    impl From<Matrix3> for Mat3 {
+        fn from(m: Matrix3) -> Self {
+            Mat3::from_cols_array(&m.data)
+        }
+    }
+    impl Matrix3 {
+        pub fn as_ptr(&self) -> *const f32 {
+            self.data.as_ptr()
+        }
+
+        pub fn as_mut_ptr(&mut self) -> *mut f32 {
+            self.data.as_mut_ptr()
+        }
+    }
+"#;
+
+#[copyable, defaultable]
+pub type Matrix4 {
+    pub data: [f32; 16],
+}
+backend rust epilogue r#"
+    #[cfg(feature = "glam")]
+    impl From<Mat4> for Matrix4 {
+        fn from(m: Mat4) -> Self {
+            Self {
+                data: m.to_cols_array(),
+            }
+        }
+    }
+    #[cfg(feature = "glam")]
+    impl From<Matrix4> for Mat4 {
+        fn from(m: Matrix4) -> Self {
+            Mat4::from_cols_array(&m.data)
+        }
+    }
+    impl Matrix4 {
+        pub fn as_ptr(&self) -> *const f32 {
+            self.data.as_ptr()
+        }
+
+        pub fn as_mut_ptr(&mut self) -> *mut f32 {
+            self.data.as_mut_ptr()
+        }
+    }
+"#;
+
+#[copyable, defaultable]
+pub type Ray {
+    origin: Vector3,
+    direction: Vector3,
+}
+backend rust epilogue r#"
+    #[cfg(feature = "bevy_math")]
+    impl From<Ray> for Ray3d {
+        fn from(r: Ray) -> Self {
+            Self::new(r.origin.into(), r.direction.into())
+        }
+    }
+    #[cfg(feature = "bevy_math")]
+    impl From<Ray3d> for Ray {
+        fn from(r: Ray3d) -> Self {
+            Self::new(r.origin.into(), Vec3::from(r.direction).into())
+        }
+    }
+    impl Ray {
+        fn new(origin: Vector3, direction: Vector3) -> Self {
+            Self {
+                origin,
+                direction,
+            }
+        }
+    }
+"#;
+
+#[copyable, defaultable]
+pub type Vector2 {
+    pub data: [f32; 2],
+}
+backend rust epilogue r#"
+    #[cfg(feature = "glam")]
+    impl From<Vec2> for Vector2 {
+        fn from(v: Vec2) -> Self {
+            Self {
+                data: [v.x, v.y],
+            }
+        }
+    }
+    #[cfg(feature = "glam")]
+    impl From<Vector2> for Vec2 {
+        fn from(v: Vector2) -> Self {
+            Vec2::new(v.data[0], v.data[1])
+        }
+    }
+"#;
+
+#[copyable, defaultable]
+pub type Vector3 {
+    pub data: [f32; 3],
+}
+backend rust epilogue r#"
+    #[cfg(feature = "glam")]
+    impl From<Vec3> for Vector3 {
+        fn from(v: Vec3) -> Self {
+            Self {
+                data: [v.x, v.y, v.z],
+            }
+        }
+    }
+    #[cfg(feature = "glam")]
+    impl From<Vector3> for Vec3 {
+        fn from(v: Vector3) -> Self {
+            Vec3::new(v.data[0], v.data[1], v.data[2])
+        }
+    }
+"#;
+
+#[copyable, defaultable]
+pub type Vector4 {
+    pub data: [f32; 4],
+}
+backend rust epilogue r#"
+    #[cfg(feature = "glam")]
+    impl From<Vec4> for Vector4 {
+        fn from(v: Vec4) -> Self {
+            Self {
+                data: [v.x, v.y, v.z, v.w],
+            }
+        }
+    }
+    #[cfg(feature = "glam")]
+    impl From<Vector4> for Vec4 {
+        fn from(v: Vector4) -> Self {
+            Vec4::new(v.data[0], v.data[1], v.data[2], v.data[3])
+        }
+    }
+"#;

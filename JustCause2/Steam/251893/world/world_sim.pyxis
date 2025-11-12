@@ -1,0 +1,10 @@
+#[size(0x988)]
+pub type WorldSim {
+    #[address(8)]
+    pub enabled: bool,
+    pub enable_pedestrians: bool,
+    pub enable_traffic: bool,
+
+    #[address(0x910)]
+    pub ai_team: *const void,
+}

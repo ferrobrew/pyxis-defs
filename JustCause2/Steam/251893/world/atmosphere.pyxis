@@ -1,0 +1,6 @@
+use world::weather::Weather;
+
+pub type Atmosphere {
+    #[address(0x4CC)]
+    pub weather: *mut Weather,
+}

@@ -1,0 +1,50 @@
+use types::math::Matrix4;
+use types::math::Vector3;
+use types::rtti::Rtti;
+use game_objects::damageable::Damageable;
+use physics::pfx_character::PfxCharacter;
+use physics::pfx_instance::PfxInstance;
+
+backend rust prologue "use crate::{shared_ptr::*, Vehicle, Vector3};";
+
+#[size(8), align(4)]
+extern type SharedPtr<Vehicle>;
+
+pub type CharacterBase {
+    vftable {
+        fn destructor(&mut self);
+    },
+
+    #[base]
+    pub pfx: PfxCharacter,
+    #[base]
+    pub rtti: Rtti,
+
+    #[address(0x6C)]
+    pub matrix: Matrix4,
+}
+pub type Character {
+    vftable {
+        pub fn destructor(&mut self);
+
+        #[index(7)]
+        pub fn get_pfx_instance(&mut self) -> *mut PfxInstance;
+    },
+
+    #[base]
+    pub damageable: Damageable,
+    #[base]
+    pub base: CharacterBase,
+
+    #[address(0xA34)]
+    pub aim_info: *mut AimInfo,
+}
+impl Character {
+    #[address(0x758_AE0)]
+    pub fn get_occupied_vehicle(&self, vehicle: *mut SharedPtr<Vehicle>) -> *mut void;
+}
+
+pub type AimInfo {
+    #[address(0x44)]
+    pub shoot_position: Vector3,
+}

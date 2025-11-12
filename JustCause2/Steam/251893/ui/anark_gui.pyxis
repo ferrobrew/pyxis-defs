@@ -1,0 +1,38 @@
+#[copyable]
+pub enum AnarkState: u32 {
+    None,
+    Main,
+    Pause,
+    GameOver,
+    Hud,
+    Pda,
+    CreditScreen,
+    EndScreen,
+    LoadingScreen,
+    CutsceneLoadingScreen,
+    Cutscene,
+    Tutorial,
+    BenchmarkHud,
+    BenchmarkPause,
+    BenchmarkComplete,
+    Unassigned
+}
+backend rust epilogue r#"
+impl AnarkState {
+    pub fn in_game(&self) -> bool {
+        matches!(
+            *self,
+            AnarkState::None | AnarkState::Hud | AnarkState::BenchmarkHud
+        )
+    }
+}
+"#;
+
+#[singleton(0x1_18F_C20), size(0x620 /* actually 0x61C */), align(16)]
+pub type AnarkGui {
+    vftable {},
+
+    #[address(0x1A0)]
+    pub next_state: AnarkState,
+    pub active_state: AnarkState,
+}

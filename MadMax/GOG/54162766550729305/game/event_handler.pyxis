@@ -1,0 +1,306 @@
+use types::hash_string::HashString;
+
+backend rust prologue "use crate::HashString;";
+
+#[singleton(0x141715B58), size(0x17A088)]
+pub type EventSystem {
+    vftable {}
+}
+impl EventSystem {
+    #[address(0x1409C47C0)]
+    pub fn send_event(&mut self, event_ids: *const EventID, event_count: u32, args: *const u8);
+}
+
+#[size(0x8), align(0x4)]
+pub type EventID {
+    hash: HashString,
+    namespace: HashString,
+}
+backend rust epilogue r#"
+    impl EventID {
+        pub fn new(hash: HashString, namespace: HashString) -> Self {
+            Self {
+                hash,
+                namespace
+            }
+        }
+    }
+"#;
+
+#[size(0x10)]
+pub type EventHandler {
+    vftable {}
+}
+
+#[size(0x8)]
+pub type EventBase {
+    pub event_impl: *mut u16,
+}
+
+#[size(0x8)]
+pub type BaseSendEvent {
+    pub event_base: *mut EventBase,
+}
+
+// CInteractionMessageData -> 10
+// STrackEventData -> 0E
+// CDamageController -> 0F
+// SSisMonitorChunkStateCallbackData -> 16
+
+backend rust epilogue r#"
+    #[repr(C, align(8))]
+    pub struct EventData<
+        Arg1: EventArgument,
+        Arg2: EventArgument,
+        Arg3: EventArgument,
+        Arg4: EventArgument,
+        Arg5: EventArgument,
+    > {
+        pub type_id: u64,
+        pub arg1: <Arg1 as EventArgument>::Type,
+        pub arg2: <Arg2 as EventArgument>::Type,
+        pub arg3: <Arg3 as EventArgument>::Type,
+        pub arg4: <Arg4 as EventArgument>::Type,
+        pub arg5: <Arg5 as EventArgument>::Type,
+    }
+
+    impl<
+            Arg1: EventArgument,
+            Arg2: EventArgument,
+            Arg3: EventArgument,
+            Arg4: EventArgument,
+            Arg5: EventArgument,
+        > EventData<Arg1, Arg2, Arg3, Arg4, Arg5>
+    where
+        (Arg1, Arg2, Arg3, Arg4, Arg5): EventPayload<Arg1, Arg2, Arg3, Arg4, Arg5>,
+    {
+        pub fn new<
+            AsArg1: AsEventArgument<Arg1>,
+            AsArg2: AsEventArgument<Arg2>,
+            AsArg3: AsEventArgument<Arg3>,
+            AsArg4: AsEventArgument<Arg4>,
+            AsArg5: AsEventArgument<Arg5>,
+        >(
+            arg1: AsArg1,
+            arg2: AsArg2,
+            arg3: AsArg3,
+            arg4: AsArg4,
+            arg5: AsArg5,
+        ) -> Self {
+            Self {
+                type_id: <(Arg1, Arg2, Arg3, Arg4, Arg5) as EventPayload<
+                    Arg1,
+                    Arg2,
+                    Arg3,
+                    Arg4,
+                    Arg5,
+                >>::TYPE_ID,
+                arg1: <AsArg1 as AsEventArgument<Arg1>>::as_arg(arg1),
+                arg2: <AsArg2 as AsEventArgument<Arg2>>::as_arg(arg2),
+                arg3: <AsArg3 as AsEventArgument<Arg3>>::as_arg(arg3),
+                arg4: <AsArg4 as AsEventArgument<Arg4>>::as_arg(arg4),
+                arg5: <AsArg5 as AsEventArgument<Arg5>>::as_arg(arg5),
+            }
+        }
+    }
+
+    impl<T: EventArgument<Type = *const T>> AsEventArgument<T> for &T {
+        fn as_arg(arg: Self) -> <T as EventArgument>::Type {
+            arg as *const T
+        }
+    }
+
+    impl<T: EventArgument<Type = *const T>> AsEventArgument<T> for *const T {
+        fn as_arg(arg: Self) -> <T as EventArgument>::Type {
+            arg as *const T
+        }
+    }
+
+    impl<T: EventArgument<Type = *const *mut T>> AsEventArgument<T> for &*mut T {
+        fn as_arg(arg: Self) -> <T as EventArgument>::Type {
+            arg as *const *mut T
+        }
+    }
+
+    impl<T: EventArgument<Type = *const T>> AsEventArgument<Option<T>> for Option<&T> {
+        fn as_arg(arg: Self) -> <Option<T> as EventArgument>::Type {
+            if let Some(arg) = arg {
+                arg as *const T
+            } else {
+                std::ptr::null()
+            }
+        }
+    }
+
+    impl<T: EventArgument<Type = *const T>> AsEventArgument<Option<T>> for Option<*const T> {
+        fn as_arg(arg: Self) -> <Option<T> as EventArgument>::Type {
+            if let Some(arg) = arg {
+                arg as *const T
+            } else {
+                std::ptr::null()
+            }
+        }
+    }
+
+    impl<T: EventArgument<Type = *const *mut T>> AsEventArgument<Option<T>> for Option<&*mut T> {
+        fn as_arg(arg: Self) -> <Option<T> as EventArgument>::Type {
+            if let Some(arg) = arg {
+                arg as *const *mut T
+            } else {
+                std::ptr::null()
+            }
+        }
+    }
+
+    pub trait EventArgument {
+        type Type;
+        const TYPE_ID: u64;
+    }
+
+    impl EventArgument for () {
+        type Type = *const std::ffi::c_void;
+        const TYPE_ID: u64 = 0xFF;
+    }
+
+    impl EventArgument for i32 {
+        type Type = *const i32;
+        const TYPE_ID: u64 = 0x01;
+    }
+
+    impl EventArgument for f32 {
+        type Type = *const f32;
+        const TYPE_ID: u64 = 0x02;
+    }
+
+    impl EventArgument for std::ffi::CString {
+        type Type = *const i8;
+        const TYPE_ID: u64 = 0x03;
+    }
+
+    impl EventArgument for crate::types::math::Matrix4 {
+        type Type = *const crate::types::math::Matrix4;
+        const TYPE_ID: u64 = 0x04;
+    }
+
+    impl EventArgument for u32 {
+        type Type = *const u32;
+        const TYPE_ID: u64 = 0x05;
+    }
+
+    impl EventArgument for crate::game_objects::Character {
+        type Type = *const *mut crate::game_objects::Character;
+        const TYPE_ID: u64 = 0x0C;
+    }
+
+    impl EventArgument for crate::game_objects::GameObject {
+        type Type = *const *mut crate::game_objects::GameObject;
+        const TYPE_ID: u64 = 0x0B;
+    }
+
+    impl<T: EventArgument> EventArgument for Option<T> {
+        type Type = <T as EventArgument>::Type;
+        const TYPE_ID: u64 = <T as EventArgument>::TYPE_ID | 0x80;
+    }
+
+    pub trait EventPayload<
+        Arg1: EventArgument,
+        Arg2: EventArgument,
+        Arg3: EventArgument,
+        Arg4: EventArgument,
+        Arg5: EventArgument,
+    >
+    {
+        const TYPE_ID: u64 = Arg1::TYPE_ID
+            | (Arg2::TYPE_ID << 8)
+            | (Arg3::TYPE_ID << 16)
+            | (Arg4::TYPE_ID << 24)
+            | (Arg5::TYPE_ID << 32);
+    }
+
+    impl<
+            Arg1: EventArgument,
+            Arg2: EventArgument,
+            Arg3: EventArgument,
+            Arg4: EventArgument,
+            Arg5: EventArgument,
+        > EventPayload<Arg1, Arg2, Arg3, Arg4, Arg5> for (Arg1, Arg2, Arg3, Arg4, Arg5)
+    {
+    }
+
+    pub trait AsEventArgument<Arg: EventArgument + ?Sized> {
+        fn as_arg(arg: Self) -> <Arg as EventArgument>::Type;
+    }
+
+    impl AsEventArgument<()> for () {
+        fn as_arg(_arg: Self) -> *const std::ffi::c_void {
+            std::ptr::null()
+        }
+    }
+
+    impl AsEventArgument<std::ffi::CString> for &std::ffi::CStr {
+        fn as_arg(arg: Self) -> *const i8 {
+            arg.as_ptr()
+        }
+    }
+
+    impl AsEventArgument<std::ffi::CString> for &std::ffi::CString {
+        fn as_arg(arg: Self) -> *const i8 {
+            arg.as_ptr()
+        }
+    }
+
+    impl AsEventArgument<std::ffi::CString> for *const i8 {
+        fn as_arg(arg: Self) -> *const i8 {
+            arg
+        }
+    }
+
+    pub unsafe fn send_event(event_hash: crate::hash_string::HashString) {
+        if let Some(es) = unsafe { EventSystem::get() } {
+            let event_id = EventID::new(event_hash, crate::hash_string::HashString { hash: 0u32 });
+            let data = EventData::new((), (), (), (), ());
+
+            unsafe {
+                es.send_event(&event_id as _, 1, &data as *const _ as *const u8);
+            }
+        }
+    }
+
+    pub unsafe fn send_event_with_arg<Arg1: EventArgument, AsArg1: AsEventArgument<Arg1>>(
+        event_hash: crate::hash_string::HashString,
+        arg1: AsArg1,
+    ) {
+        unsafe {
+            send_event_with_args(event_hash, arg1, (), (), (), ());
+        }
+    }
+
+    pub unsafe fn send_event_with_args<
+        Arg1: EventArgument,
+        Arg2: EventArgument,
+        Arg3: EventArgument,
+        Arg4: EventArgument,
+        Arg5: EventArgument,
+        AsArg1: AsEventArgument<Arg1>,
+        AsArg2: AsEventArgument<Arg2>,
+        AsArg3: AsEventArgument<Arg3>,
+        AsArg4: AsEventArgument<Arg4>,
+        AsArg5: AsEventArgument<Arg5>,
+    >(
+        event_hash: crate::hash_string::HashString,
+        arg1: AsArg1,
+        arg2: AsArg2,
+        arg3: AsArg3,
+        arg4: AsArg4,
+        arg5: AsArg5,
+    ) {
+        if let Some(es) = unsafe { EventSystem::get() } {
+            let event_id = EventID::new(event_hash, crate::hash_string::HashString { hash: 0u32 });
+            let data = EventData::new(arg1, arg2, arg3, arg4, arg5);
+
+            unsafe {
+                es.send_event(&event_id as _, 1, &data as *const _ as *const u8);
+            }
+        }
+    }
+"#;

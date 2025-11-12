@@ -1,0 +1,77 @@
+backend rust prologue r#"
+    use std::{ffi::c_void, os::raw::c_char, sync::OnceLock};
+    use windows::Win32::System::LibraryLoader::{GetModuleHandleA, GetProcAddress};
+
+    use crate::util::pcstr;
+"#;
+
+#[defaultable, size(28)]
+pub type StdString {
+    #[address(4)]
+    buffer: unknown<16>,
+    size: u32,
+    res: u32,
+}
+backend rust epilogue r#"
+    struct StringFunctions {
+        ctor_default: extern "thiscall" fn(*mut StdString) -> *mut c_void,
+        ctor_cstr: extern "thiscall" fn(*mut StdString, *const c_char) -> *mut c_void,
+        dtor: extern "thiscall" fn(*mut StdString) -> *mut c_void,
+        copy: extern "thiscall" fn(*mut StdString, *const StdString) -> *mut c_void,
+    }
+    impl StringFunctions {
+        const CTOR_DEFAULT: &'static std::ffi::CStr =
+            c"??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@XZ";
+        const CTOR_CSTR: &'static std::ffi::CStr =
+            c"??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@PBD@Z";
+        const DTOR: &'static std::ffi::CStr =
+            c"??1?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@XZ";
+        const COPY: &'static std::ffi::CStr =
+            c"??4?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAEAAV01@ABV01@@Z";
+
+        pub fn get() -> &'static Self {
+            static STRING_FUNCTIONS: OnceLock<StringFunctions> = OnceLock::new();
+            #[allow(clippy::missing_transmute_annotations)]
+            STRING_FUNCTIONS.get_or_init(|| unsafe {
+                use std::mem::transmute;
+                let module = GetModuleHandleA(pcstr(c"MSVCP80")).unwrap();
+                StringFunctions {
+                    ctor_default: transmute(GetProcAddress(module, pcstr(Self::CTOR_DEFAULT))),
+                    ctor_cstr: transmute(GetProcAddress(module, pcstr(Self::CTOR_CSTR))),
+                    dtor: transmute(GetProcAddress(module, pcstr(Self::DTOR))),
+                    copy: transmute(GetProcAddress(module, pcstr(Self::COPY))),
+                }
+            })
+        }
+    }
+
+    #[allow(dead_code)]
+    impl StdString {
+        pub fn new() -> StdString {
+            let mut ret = StdString::default();
+            (StringFunctions::get().ctor_default)(&mut ret);
+            ret
+        }
+
+        pub fn new_from_str(s: &str) -> Result<Self, std::ffi::NulError> {
+            let tmp = std::ffi::CString::new(s)?;
+            Ok(unsafe { Self::new_from_c_str(tmp.as_c_str().as_ptr()) })
+        }
+
+        pub unsafe fn new_from_c_str(s: *const c_char) -> StdString {
+            let mut ret = StdString::default();
+            (StringFunctions::get().ctor_cstr)(&mut ret, s);
+            ret
+        }
+
+        pub unsafe fn copy_from(&mut self, s: *mut StdString) {
+            (StringFunctions::get().copy)(self, s);
+        }
+    }
+
+    impl Drop for StdString {
+        fn drop(&mut self) {
+            (StringFunctions::get().dtor)(self);
+        }
+    }
+"#;

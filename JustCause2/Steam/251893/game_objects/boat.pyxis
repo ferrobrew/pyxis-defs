@@ -1,0 +1,6 @@
+use game_objects::sea_vehicle::SeaVehicle;
+
+pub type Boat {
+    #[base]
+    pub sea_vehicle: SeaVehicle,
+}

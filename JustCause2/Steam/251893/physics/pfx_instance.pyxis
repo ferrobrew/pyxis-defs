@@ -1,0 +1,22 @@
+use game_objects::physics_game_object::PfxGameObject;
+
+backend rust prologue "use crate::SharedPtr;";
+
+#[size(8), align(4)]
+extern type SharedPtr<PfxInstanceInterface>;
+
+/// `IPfxInstance` in original game
+pub type PfxInstanceInterface {
+    vftable {}
+}
+
+#[size(0x10)]
+/// `CPfxInstance` in original game
+pub type PfxInstance {
+    vftable {},
+    pub instance: SharedPtr<PfxInstanceInterface>,
+}
+impl PfxInstance {
+    #[address(0x6B7C40)]
+    pub fn set_game_object(&mut self, game_object: *mut PfxGameObject);
+}

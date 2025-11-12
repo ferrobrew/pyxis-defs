@@ -1,0 +1,11 @@
+#[singleton(0x1_191_154)]
+pub type WorldTime {
+    vftable {},
+
+    #[address(0x20)]
+    pub time: f32,
+}
+impl WorldTime {
+    #[address(0x903_AE0)]
+    pub fn clamp(&mut self);
+}

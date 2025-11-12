@@ -1,0 +1,8 @@
+#[size(0x900 /* actually 0x8AC */), align(128)]
+pub type Weather {
+    #[address(0x85C)]
+    pub severity: f32,
+
+    #[address(0x876)]
+    pub severity_simulation_enabled: bool,
+}

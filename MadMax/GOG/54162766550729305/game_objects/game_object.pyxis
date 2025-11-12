@@ -1,0 +1,73 @@
+use types::hash_string::HashString;
+use types::math::Aabb;
+use types::object_id::ObjectID;
+use types::rtti::Rtti;
+
+backend rust prologue "use crate::{math::Matrix4, shared_ptr::*};";
+
+#[size(16), align(8)]
+extern type SharedPtr<GameObject>;
+#[size(16), align(8)]
+extern type WeakPtr<GameObject>;
+
+#[size(0xD0)]
+pub type GameObject {
+    vftable {
+        pub fn destructor(&mut self);
+        pub fn get_type(&mut self) -> *const u32;
+        pub fn is_type(&mut self, ty: *const u32) -> bool;
+
+        #[index(20)]
+        pub fn init_transform(&mut self, mat: *const f32);
+        pub fn set_matrix_raw(&mut self, mat: *const f32);
+        pub fn get_matrix_raw(&self, mat: *mut f32) -> bool;
+
+        #[index(30)]
+        pub fn get_model_aabb(&self, aabb: *mut Aabb) -> bool;
+        pub fn get_model_aabb_local(&self, aabb: *mut Aabb) -> bool;
+
+        #[index(34)]
+        pub fn set_opacity(&mut self, val: f32);
+
+        #[index(38)]
+        pub fn enable(&mut self, enable: bool);
+    },
+
+    #[base]
+    pub rtti: Rtti,
+
+    pub tags: *mut u32,
+    pub tag_count: u8,
+
+    #[address(0x14)]
+    pub object_id: ObjectID,
+    pub alias_id: HashString,
+    pub name_hash: HashString,
+
+    #[address(0x8D)]
+    pub child_objects: unknown<0x20>,
+
+    #[address(0xB0)]
+    pub parent_object: SharedPtr<GameObject>,
+    pub weak_this: WeakPtr<GameObject>,
+}
+backend rust epilogue r#"
+    pub trait GameObjectExt {
+        unsafe fn get_matrix(&self) -> Option<Matrix4>;
+    }
+    pub trait GameObjectMutExt {
+        unsafe fn set_matrix(&mut self, matrix: &Matrix4);
+    }
+    impl<T: std::convert::AsRef<crate::game_object::GameObject>> GameObjectExt for T {
+        unsafe fn get_matrix(&self) -> Option<Matrix4> {
+            let mut out = Matrix4::default();
+            let set = unsafe { self.as_ref().get_matrix_raw(out.as_mut_ptr()) };
+            set.then_some(out)
+        }
+    }
+    impl<T: std::convert::AsMut<crate::game_object::GameObject>> GameObjectMutExt for T {
+        unsafe fn set_matrix(&mut self, matrix: &Matrix4) {
+            unsafe { self.as_mut().set_matrix_raw(matrix.as_ptr()); }
+        }
+    }
+"#;

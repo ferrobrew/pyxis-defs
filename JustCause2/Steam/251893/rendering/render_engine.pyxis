@@ -1,0 +1,100 @@
+use types::math::Matrix3;
+use types::math::Matrix4;
+use types::math::Vector3;
+use types::math::Vector4;
+
+use rendering::render_block::RenderBlock;
+use rendering::render_block::GenericRenderBlock;
+
+backend rust prologue "use windows::Win32::Foundation::HANDLE;";
+#[size(4), align(4)]
+extern type HANDLE;
+
+#[address(0x108CD40)]
+extern default_render_block_info: RenderBlockInstanceInfo;
+
+#[size(0xB0)]
+pub type RenderBlockInstanceInfo {
+    #[address(0x8)]
+    pub colors: [u32; 4],
+    
+    #[address(0x20)]
+    pub world_translation: [Vector3; 3],
+    pub world_matrix: [Matrix3; 3],
+}
+impl RenderBlockInstanceInfo {
+    #[address(0x6B0660)]
+    pub fn initialize_matrix(&mut self, matrix: *const Matrix4);
+
+    #[address(0x7682E0)]
+    pub fn update_matrix(&mut self, matrix: *const Matrix4);
+}
+backend rust epilogue r#"
+    impl RenderBlockInstanceInfo {
+        pub unsafe fn new() -> RenderBlockInstanceInfo {
+            unsafe {
+                let mut instance: RenderBlockInstanceInfo = std::mem::zeroed();
+                instance.colors[0] = 0xFFFFFFFF;
+                instance.colors[1] = 0xFFFFFFFF;
+                instance
+            }
+        }
+    }
+"#;
+
+#[size(0x1364)]
+pub type PrimitiveRenderer {
+    #[address(0x8)]
+    pub render_block_mutex: HANDLE,
+
+    #[address(0x424)]
+    pub lines_3d: GenericRenderBlock,
+    pub lines_3d_no_ztest: GenericRenderBlock,
+    pub lines_2d: GenericRenderBlock,
+    pub triangles_2d: GenericRenderBlock,
+}
+
+#[size(0x1A28)]
+pub type RenderPass {
+    vftable {
+        pub fn destructor(&mut self);
+
+        #[index(16)]
+        pub fn add_render_block(&mut self, render_block: *mut RenderBlock, render_block_info: *mut RenderBlockInstanceInfo);
+    },
+}
+
+#[singleton(0x1191AB4), size(0xEC8)]
+pub type RenderEngine {
+    vftable {
+        pub fn destructor(&mut self);
+
+        #[index(25)]
+        pub fn get_default_render_pass(&mut self) -> *mut RenderPass;
+    },
+
+    #[address(0xAC)]
+    pub time_of_day: f32,
+
+    #[address(0xC8)]
+    pub fog_color: [Vector4; 2],
+    pub distance_fog_start: [f32; 2],
+    pub distance_fog_end: [f32; 2],
+    pub height_fog_density: [f32; 2],
+    pub height_fog_start: [f32; 2],
+    pub height_fog_range: [f32; 2],
+    pub sky_color: Vector4,
+    pub ground_color: Vector4,
+
+    #[address(0xEA0)]
+    pub primitive_renderer: *mut PrimitiveRenderer,
+    pub is_rendering_reflections: bool,
+    pub is_rendering_shadow_maps: bool,
+
+    #[address(0xEC4)]
+    pub post_effects_enabled: bool,
+}
+impl RenderEngine {
+    #[address(0x954540)]
+    pub fn draw_line(&mut self, from: *const Vector3, to: *const Vector3, from_color: Vector4, to_color: Vector4);
+}

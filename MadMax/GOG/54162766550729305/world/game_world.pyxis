@@ -1,0 +1,31 @@
+use types::math::Matrix4;
+
+#[singleton(0x141716110), size(0x281678), align(8)]
+pub type GameWorld {
+    vftable {
+        pub fn destructor(&mut self);
+
+        #[index(4)]
+        pub fn pause(&mut self, paused: bool);
+
+        #[index(19)]
+        pub fn is_paused(&self) -> bool;
+
+        #[index(21)]
+        pub fn teleport_to_position(&mut self, matrix: *const Matrix4);
+
+        #[index(37)]
+        pub fn is_teleporting(&self) -> bool;
+    },
+
+    #[address(0x241560)]
+    teleport_update_state: TeleportUpdateState,
+}
+
+#[copyable, cloneable]
+pub enum TeleportUpdateState: u8 {
+    Idle,
+    Init,
+    Loading,
+    WaitPositioning,
+}

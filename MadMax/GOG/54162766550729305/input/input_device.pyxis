@@ -1,0 +1,244 @@
+#[size(0xC0), align(8)]
+pub type InputDevice {
+    vftable {
+        pub fn destructor(&mut self);
+
+        #[index(4)]
+        pub fn get_key_value(&self, value: *mut f32) -> bool;
+
+        #[index(8)]
+        pub fn is_connected(&self) -> bool;
+    },
+
+    #[address(0x30)]
+    info: DeviceInfo,
+
+    #[address(0x78)]
+    is_lost: bool,
+    is_dummy: bool,
+}
+
+#[size(0x4), align(4)]
+pub type DeviceInfo {
+    device_type: u8,
+    active: bool,
+    is_dualshock: bool,
+}
+
+#[size(0x1C8)]
+pub type Keyboard {
+    #[base]
+    pub input_device: InputDevice,
+}
+
+#[size(0x198)]
+pub type Mouse {
+    #[base]
+    pub input_device: InputDevice,
+}
+
+#[size(0xE0)]
+pub type Gamepad {
+    #[base]
+    pub input_device: InputDevice,
+}
+
+#[size(0xD0)]
+pub type GamepadDualshock4 {
+    #[base]
+    pub input_device: InputDevice,
+}
+
+backend rust epilogue r#"
+    macro_rules! impl_try_from_input_device {
+        ($target:ty, $device_type:expr, $dualshock:expr) => {
+            macro_rules! impl_try_from {
+                ($target_ref:ty, $device_ref:ty) => {
+                    impl std::convert::TryFrom<$device_ref> for $target_ref {
+                        type Error = ();
+                        fn try_from(device: $device_ref) -> Result<Self, Self::Error> {
+                            if device.info.device_type == ($device_type as u8) && device.info.is_dualshock == $dualshock {
+                                #[allow(clippy::missing_transmute_annotations)]
+                                Ok(unsafe { std::mem::transmute(device) })
+                            } else {
+                                Err(())
+                            }
+                        }
+                    }
+                }
+            }
+
+            impl_try_from!(&$target, &InputDevice);
+            impl_try_from!(&mut $target, &mut InputDevice);
+        };
+    }
+
+    impl_try_from_input_device!(Keyboard, DeviceType::Keyboard, false);
+    impl_try_from_input_device!(Mouse, DeviceType::Mouse, false);
+    impl_try_from_input_device!(Gamepad, DeviceType::Gamepad, false);
+    impl_try_from_input_device!(GamepadDualshock4, DeviceType::Gamepad, true);
+"#;
+
+pub enum DeviceType: i32 {
+    Default,
+    Keyboard,
+    Mouse,
+    Gamepad,
+    Unknown,
+    Count
+}
+
+pub enum KeyID: i32 {
+    Invalid = -1,
+    KeyboardA,
+    KeyboardB,
+    KeyboardC,
+    KeyboardD,
+    KeyboardE,
+    KeyboardF,
+    KeyboardG,
+    KeyboardH,
+    KeyboardI,
+    KeyboardJ,
+    KeyboardK,
+    KeyboardL,
+    KeyboardM,
+    KeyboardN,
+    KeyboardO,
+    KeyboardP,
+    KeyboardQ,
+    KeyboardR,
+    KeyboardS,
+    KeyboardT,
+    KeyboardU,
+    KeyboardV,
+    KeyboardW,
+    KeyboardX,
+    KeyboardY,
+    KeyboardZ,
+    Keyboard1,
+    Keyboard2,
+    Keyboard3,
+    Keyboard4,
+    Keyboard5,
+    Keyboard6,
+    Keyboard7,
+    Keyboard8,
+    Keyboard9,
+    Keyboard0,
+    KeyboardF1,
+    KeyboardF2,
+    KeyboardF3,
+    KeyboardF4,
+    KeyboardF5,
+    KeyboardF6,
+    KeyboardF7,
+    KeyboardF8,
+    KeyboardF9,
+    KeyboardF10,
+    KeyboardF11,
+    KeyboardF12,
+    KeyboardSpace,
+    KeyboardBackspace,
+    KeyboardReturn,
+    KeyboardLShift,
+    KeyboardRShift,
+    KeyboardLControl,
+    KeyboardRControl,
+    KeyboardUp,
+    KeyboardDown,
+    KeyboardLeft,
+    KeyboardRight,
+    KeyboardDecimal,
+    KeyboardMinus,
+    KeyboardPlus,
+    KeyboardEscape,
+    KeyboardEquals,
+    KeyboardBack,
+    KeyboardTab,
+    KeyboardLBracket,
+    KeyboardRBracket,
+    KeyboardSemicolon,
+    KeyboardApostrophe,
+    KeyboardGrave,
+    KeyboardBackslash,
+    KeyboardComma,
+    KeyboardPeriod,
+    KeyboardSlash,
+    KeyboardLAlt,
+    KeyboardCapsLock,
+    KeyboardPrintscreen,
+    KeyboardScrollLock,
+    KeyboardPause,
+    KeyboardOEM102,
+    KeyboardRAlt,
+    KeyboardHome,
+    KeyboardEnd,
+    KeyboardPageUp,
+    KeyboardPageDown,
+    KeyboardInsert,
+    KeyboardDelete,
+    KeyboardLWin,
+    KeyboardRWin,
+    KeyboardNumlock,
+    KeyboardNumpadPlus,
+    KeyboardNumpad1,
+    KeyboardNumpad2,
+    KeyboardNumpad3,
+    KeyboardNumpad4,
+    KeyboardNumpad5,
+    KeyboardNumpad6,
+    KeyboardNumpad7,
+    KeyboardNumpad8,
+    KeyboardNumpad9,
+    KeyboardNumpad0,
+    KeyboardNumpadMultiply,
+    KeyboardNumpadDivide,
+    KeyboardNumpadMinus,
+    KeyboardNumpadDelete,
+    KeyboardNumpadEnter,
+    MouseLeft,
+    MouseRight,
+    MouseDown,
+    MouseUp,
+    MouseWheelUp,
+    MouseWheelDown,
+    MouseButton1,
+    MouseButton2,
+    MouseButton3,
+    MouseButton4,
+    MouseButton5,
+    GamepadRightDown,
+    GamepadRightRight,
+    GamepadRightLeft,
+    GamepadRightUp,
+    GamepadLeftDown,
+    GamepadLeftRight,
+    GamepadLeftLeft,
+    GamepadLeftUp,
+    GamepadLeftTrigger,
+    GamepadRightTrigger,
+    GamepadRightShoulder,
+    GamepadLeftShoulder,
+    GamepadLeftThumbUp,
+    GamepadLeftThumbDown,
+    GamepadLeftThumbRight,
+    GamepadLeftThumbLeft,
+    GamepadRightThumbUp,
+    GamepadRightThumbDown,
+    GamepadRightThumbRight,
+    GamepadRightThumbLeft,
+    GamepadLeftThumbPress,
+    GamepadRightThumbPress,
+    GamepadStart,
+    GamepadSelect,
+    GamepadTouchpadClick,
+    GamepadTouchpadTouch,
+    GamepadTouchpadPinch,
+    GamepadTouchpadZoom,
+    GamepadTouchpadTouchLeftDelta,
+    GamepadTouchpadTouchRightDelta,
+    GamepadTouchpadTouchUpDelta,
+    GamepadTouchpadTouchDownDelta,
+    Count
+}

@@ -1,0 +1,160 @@
+use game_objects::damageable::Damageable;
+use game_objects::game_object::GameObject;
+use physics::pfx_instance::PfxInstance;
+use types::math::Aabb;
+use types::math::Vector3;
+
+backend rust prologue "use crate::{GameObject, SharedPtr, SmartObject, WeakPtr, PfxVehicle};";
+
+#[size(8), align(4)]
+extern type WeakPtr<SmartObject>;
+
+#[copyable, cloneable]
+pub enum LightEffect: u32 {
+    LeftBlinker,
+    RightBlinker,
+    LeftConstantBlinker,
+    RightConstantBlinker,
+    CenterConstantBlinker,
+    AlarmBlinkers,
+    LeftSirenBlinker,
+    RightSirenBlinker,
+}
+
+#[copyable, cloneable]
+pub enum DoorSlot: u8 {
+    FrontLeft,
+    FrontRight,
+    RearLeft,
+    RearRight,
+}
+
+#[size(0xBC0)]
+pub type Vehicle {
+    vftable {
+        pub fn destructor(&mut self);
+
+        #[index(7)]
+        pub fn get_pfx_instance(&mut self) -> *mut PfxInstance;
+
+        #[index(31)]
+        pub fn set_palette_data(&mut self, panel_ptr: *const void, use_death_color: bool);
+        pub fn set_decal_data(&mut self, panel_ptr: *const void);
+
+        #[index(42)]
+        pub fn set_linear_velocity(&mut self, velocity: *const Vector3);
+
+        #[index(44)]
+        pub fn set_invulnerable(&mut self);
+
+        #[index(47)]
+        pub fn get_health_ratio(&mut self) -> f32;
+        pub fn get_angular_velocity(&mut self, velocity: *mut Vector3);
+        pub fn get_linear_velocity(&mut self, velocity: *mut Vector3);
+
+        #[index(55)]
+        pub fn get_top_speed_ms(&mut self) -> f32;
+        pub fn get_pfx_aabb(&self, aabb: *mut Aabb);
+        pub fn get_pfx_aabb_local(&self, aabb: *mut Aabb);
+
+        #[index(82)]
+        pub fn start_engine(&mut self);
+        pub fn shutdown_engine(&mut self);
+    },
+
+    #[base]
+    pub damageable: Damageable,
+
+    #[address(0x14E)]
+    pub head_lights_on: bool,
+    pub tail_lights_on: bool,
+
+    #[address(0x180)]
+    pub seats: [WeakPtr<SmartObject>; 12],
+
+    #[address(0x1E0)]
+    pub num_seats: u32,
+
+    #[address(0x200)]
+    pub steering_input: SteeringInput,
+
+    #[address(0x359)]
+    pub unbreakable: bool,
+    pub smoke: bool,
+    pub fire: bool,
+    pub exploded: bool,
+    pub water_explosion: bool,
+    pub engine_running: bool,
+
+    #[address(0x361)]
+    pub in_water: bool,
+    pub exploding: bool,
+
+    #[address(0x365)]
+    pub visible: bool,
+
+    #[address(0x367)]
+    pub enabled: bool,
+    pub physics_enabled: bool,
+    pub air_vehicle_is_crashing: bool,
+
+    #[address(0x36B)]
+    pub sirens_active: bool,
+    pub alarm_type: u8,
+
+    #[address(0x370)]
+    pub num_wheel_models: u8,
+    pub num_wheels: u8,
+
+    #[address(0xBA5)]
+    pub is_occupied: bool,
+    pub is_occupied_by_player: bool,
+    pub is_locked_for_player: bool,
+    pub is_invalid: bool,
+}
+impl Vehicle {
+    #[address(0x6B4350)]
+    pub fn set_blinker(&mut self, effect: LightEffect, active: bool);
+
+    #[address(0x5EF560)]
+    pub fn open_door(&mut self, door_slot: DoorSlot, keep_open: bool);
+
+    #[address(0x562250)]
+    pub fn close_door(&self, door_slot: DoorSlot);
+
+    #[address(0x5DA043)]
+    pub fn is_door_open(&self, door_slot: DoorSlot) -> bool;
+
+    #[address(0x723C40)]
+    pub fn disconnect_door(&mut self, door_slot: DoorSlot);
+
+    #[address(0x83FD70)]
+    pub fn quick_open_door(&mut self, door_slot: DoorSlot);
+}
+backend rust epilogue r#"
+    pub trait VehicleMutExt {
+        unsafe fn get_pfx_vehicle(&mut self) -> SharedPtr<PfxVehicle>;
+    }
+    impl<T: std::convert::AsMut<Vehicle>> VehicleMutExt for T {
+        unsafe fn get_pfx_vehicle(&mut self) -> SharedPtr<PfxVehicle> {
+            unsafe { (*self.as_mut().get_pfx_instance()).instance.clone().static_pointer_cast::<PfxVehicle>() }
+        }
+    }
+"#;
+
+#[size(0x24)]
+pub type SteeringInput {
+    pub acceleration: f32,
+    pub brake: f32,
+    pub turn: f32,
+    pub tilt: f32,
+    pub turn_x: f32,
+    pub turn_y: f32,
+    pub increase_altitude: bool,
+    pub decrease_altitude: bool,
+    pub handbrake: bool,
+    pub horn: bool,
+
+    #[address(0x20)]
+    pub target_altitude: f32,
+}

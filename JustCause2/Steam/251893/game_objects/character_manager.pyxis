@@ -1,0 +1,31 @@
+backend rust prologue "use crate::{character::*, player::*, shared_ptr::*};";
+
+use types::math::Matrix4;
+
+#[size(8), align(4)]
+extern type SharedPtr<Player>;
+
+#[singleton(0x1_18F_B24)]
+pub type CharacterManager {
+    vftable {
+        pub fn destructor(&mut self);
+
+        #[index(8)]
+        pub fn teleport_player(&mut self, mat: *const Matrix4, animation: *const u32, unk2: bool, unk3: bool);
+    },
+
+    #[address(0xB0)]
+    pub teleport_state: CharacterManagerTeleportState,
+
+    #[address(0x3570)]
+    pub player: SharedPtr<Player>,
+}
+
+pub enum CharacterManagerTeleportState : u32 {
+    Idle,
+    Requested,
+    Teleporting,
+    RequestedInCutscene,
+    TeleportingInCutscene,
+    Done,
+}

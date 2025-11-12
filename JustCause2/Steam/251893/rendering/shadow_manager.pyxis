@@ -1,0 +1,11 @@
+use rendering::render_engine::RenderPass;
+
+#[size(0x1FFC)]
+pub type ShadowManager {
+    #[address(0x8)]
+    pub shadows_enabled: bool,
+    pub soft_shadowed_enabled: bool,
+
+    #[address(0x18)]
+    pub shadow_passes: [*mut RenderPass; 3],
+}

@@ -1,0 +1,100 @@
+backend rust prologue r#"
+use windows::{
+    core::InterfaceRef,
+    Win32::{
+        Foundation::HWND,
+        UI::WindowsAndMessaging::HCURSOR,    
+        Graphics::{Direct3D11::ID3D11Device, Direct3D11::ID3D11DeviceContext, Dxgi::IDXGISwapChain},
+        System::Threading::CRITICAL_SECTION
+    }
+};
+"#;
+
+#[size(8), align(8)]
+extern type HWND;
+#[size(8), align(8)]
+extern type HCURSOR;
+#[size(0x28), align(8)]
+extern type CRITICAL_SECTION;
+
+pub enum ActiveCursor: i32 {
+    None = -1,
+    Arrow,
+    Cross,
+    Slider,
+    Zoom
+}
+
+#[singleton(0x141715B50), size(0x2108)]
+pub type GraphicsEngine {
+    #[address(0x1EC)]
+    pub active_cursor: ActiveCursor,
+    #[address(0x1F18)]
+    pub graphics_device: *mut GraphicsDevice,
+}
+impl GraphicsEngine {
+    #[address(0x14087A9A0)]
+    pub fn update_cursor(&mut self);
+}
+
+#[size(0x380)]
+pub type GraphicsDevice {
+    pub context: *mut GraphicsDeviceContext,
+    #[address(0x20)]
+    pub swap_chain: *mut u64,
+    pub device: *mut u64,
+}
+
+#[size(0x8E70)]
+pub type GraphicsDeviceContext {
+    #[address(0x8020)]
+    pub context: *mut u64,
+    pub mutex: *mut CRITICAL_SECTION,
+}
+
+#[size(0x60)]
+pub type GraphicsGlobalSettings {
+    pub title: *const u8,
+    pub hwnd: HWND,
+    pub cursors: [HCURSOR; 4]
+}
+#[address(0x1416EDDB0)]
+pub extern graphics_global_settings: GraphicsGlobalSettings;
+
+backend rust epilogue r#"
+pub unsafe fn get_d3d11_device() -> Option<InterfaceRef<'static, ID3D11Device>> {
+    unsafe {
+        GraphicsEngine::get()
+            .and_then(|ge| ge.graphics_device.as_ref())
+            .and_then(|d| {
+                let raw = std::ptr::NonNull::new(
+                    d.device as *mut std::os::raw::c_void
+                )?;
+                Some(InterfaceRef::from_raw(raw))
+            })
+    }
+}
+pub unsafe fn get_d3d11_device_context() -> Option<InterfaceRef<'static, ID3D11DeviceContext>> {
+    unsafe {
+        GraphicsEngine::get()
+            .and_then(|ge| ge.graphics_device.as_ref())
+            .and_then(|d| d.context.as_ref())
+            .and_then(|c| {
+                let raw = std::ptr::NonNull::new(
+                    c.context as *mut std::os::raw::c_void
+                )?;
+                Some(InterfaceRef::from_raw(raw))
+            })
+    }
+}
+pub unsafe fn get_dxgi_swapchain() -> Option<InterfaceRef<'static, IDXGISwapChain>> {
+    unsafe {
+        GraphicsEngine::get().and_then(|ge| ge.graphics_device.as_ref()).and_then(|d| {
+            let raw = std::ptr::NonNull::new(
+                d.swap_chain as *mut std::os::raw::c_void
+            )?;
+            Some(InterfaceRef::from_raw(raw))
+        })
+    }
+}
+"#;

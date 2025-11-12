@@ -1,0 +1,11 @@
+use physics::pfx_helicopter::PfxHelicopter;
+use physics::pfx_helicopter::PfxHelicopterInstance;
+
+pub type PfxAirPlane {
+    #[base]
+    pub helicopter: PfxHelicopter,
+}
+pub type PfxAirPlaneInstance {
+    #[base]
+    pub helicopter: PfxHelicopterInstance,
+}

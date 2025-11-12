@@ -1,0 +1,30 @@
+#[copyable, cloneable]
+#[size(0x4), align(4)]
+pub type HashString {
+    pub hash: u32,
+}
+impl HashString {
+    #[address(0x14000BA60)]
+    fn constructor(&mut self, value: *const i8) -> *mut HashString;
+}
+backend rust epilogue r#"
+    impl HashString {
+        pub unsafe fn from_cstr(str: impl AsRef<std::ffi::CStr>) -> Self {
+            unsafe {
+                let mut instance = std::mem::MaybeUninit::<Self>::uninit();
+                (*instance.as_mut_ptr()).constructor(str.as_ref().as_ptr());
+                instance.assume_init()
+            }
+        }
+
+        pub const fn from_u32(hash: u32) -> Self {
+            Self { hash }
+        }
+    }
+
+    impl From<u32> for HashString {
+        fn from(hash: u32) -> Self {
+            Self { hash }
+        }
+    }
+"#;

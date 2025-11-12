@@ -1,0 +1,7 @@
+use input::input_device_manager::InputDeviceManager;
+
+#[singleton(0x141715B88), size(0x130), align(8)]
+pub type DeviceManager {
+    #[address(0xA0)]
+    pub input_device_manager: InputDeviceManager,
+}

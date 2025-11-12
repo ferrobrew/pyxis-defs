@@ -1,0 +1,15 @@
+use types::std_string::StdString;
+
+backend rust prologue "use crate::shared_ptr::*;";
+#[size(8), align(4)]
+extern type SharedPtr<u32>;
+
+#[singleton(0x1190B50)]
+pub type TextureManager {
+    vftable {
+        pub fn destructor(&mut self);
+
+        #[index(10)]
+        pub fn get_texture(&mut self, texture: *mut SharedPtr<u32>, path: *const StdString, format: u32, lods: u32, mips: u32) -> *mut SharedPtr<u32>;
+    },
+}

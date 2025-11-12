@@ -1,0 +1,10 @@
+use game_objects::game_object::GameObject;
+use physics::pfx_game_object::PfxGameObject;
+
+#[size(0xD8)]
+pub type PhysicsGameObject {
+    #[base]
+    pub pfx_game_object: PfxGameObject,
+    #[base]
+    pub game_object: GameObject,
+}

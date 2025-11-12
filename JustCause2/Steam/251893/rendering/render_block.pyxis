@@ -1,0 +1,345 @@
+use types::math::Vector2;
+use types::math::Vector3;
+use types::math::Vector4;
+use types::std_string::StdString;
+
+backend rust prologue "
+    use crate::shared_ptr::*;
+    use std::mem::ManuallyDrop;
+";
+
+#[size(8), align(4)]
+/// `ManuallyDrop<SharedPtr<u32>>` is used instead of `SharedPtr<u32>` to avoid
+/// the `Drop` implementation of `SharedPtr<u32>` being called when the `RenderBlock`
+/// is dropped. The destructor, which we call in `drop`, will decrement the refcount
+/// for us.
+extern type ManuallyDrop<SharedPtr<u32>>;
+
+#[address(0x13E0EA0)]
+pub extern render_block_memory: u32;
+
+#[copyable, cloneable, defaultable]
+pub enum RenderBlockTopology: i32 {
+    #[default]
+    None = -1,
+    TriangleList,
+    TriangleStrip,
+    TriangleFan,
+    IndexedTriangleList,
+    IndexedTriangleStrip,
+    IndexedTriangleFan,
+    LineList,
+    PointSprite,
+    IndexedPointSprite,
+}
+
+#[copyable, defaultable, size(0xE4)]
+pub type GenericVertex {
+    pub position: Vector3,
+    pub normal: Vector3,
+    pub tangent: Vector3,
+    pub bitangent: Vector3,
+    pub morph_position: Vector3,
+    pub morph_normal: Vector3,
+    pub morph_tangent: Vector3,
+    pub morph_bitangent: Vector3,
+    pub uvs: [Vector2; 4],
+    pub size: f32,
+    pub weights: [f32; 8],
+    pub indices: [u32; 8],
+    pub diffuse_color: Vector4,
+    pub specular_color: Vector4,
+}
+
+#[size(0x10)]
+pub type GenericVertexArray {
+    _: unknown<0x4>,
+    pub first: *mut GenericVertex,
+    pub last: *mut GenericVertex,
+    pub end: *mut GenericVertex,
+}
+impl GenericVertexArray {
+    #[address(0x6F90E0)]
+    pub fn reserve(&mut self, count: u32);
+
+    #[address(0x93ED80)]
+    pub fn push_back(&mut self, vertex: *const GenericVertex);
+}
+
+#[size(0x10)]
+pub type IndexArray {
+    _: unknown<0x4>,
+    pub first: *mut u16,
+    pub last: *mut u16,
+    pub end: *mut u16,
+}
+impl IndexArray {
+    #[address(0x4D60E0)]
+    pub fn push_back(&mut self, index: *const u16);
+}
+
+#[size(0x3D0)]
+pub type GenericRenderBlock {
+    #[address(0x4)]
+    pub textures: [ManuallyDrop<SharedPtr<u32>>; 8],
+
+    #[address(0x80)]
+    pub vertex: GenericVertex,
+
+    #[address(0x164)]
+    pub topology: RenderBlockTopology,
+    pub vertices: GenericVertexArray,
+    pub indices: IndexArray,
+}
+impl GenericRenderBlock {
+    #[address(0x956480)]
+    fn constructor(&mut self);
+
+    #[address(0x943720)]
+    fn destructor(&mut self);
+}
+backend rust epilogue r#"
+    impl GenericRenderBlock {
+        pub unsafe fn new() -> GenericRenderBlock {
+            unsafe {
+                let mut instance = std::mem::MaybeUninit::<Self>::uninit();
+                (*instance.as_mut_ptr()).constructor();
+                instance.assume_init()
+            }
+        }
+    }
+    impl std::ops::Drop for GenericRenderBlock {
+        fn drop(&mut self) {
+            unsafe {
+                self.destructor();
+            }
+        }
+    }
+"#;
+
+#[size(0x10), align(16)]
+pub type RenderBlock {
+    vftable {},
+
+    #[address(0xC)]
+    pub topology: i16,
+}
+
+#[size(0x20), align(16)] // size = 0x1C
+pub type RenderBlockLine {
+    #[base]
+    pub render_block: RenderBlock,
+
+    #[address(0x11)]
+    pub enable_2d: bool,
+    pub enable_ztest: bool,
+    pub enable_culling: bool,
+
+    #[address(0x18)]
+    pub vertex_count: u32,
+}
+impl RenderBlockLine {
+    #[address(0x920210)]
+    fn constructor(&mut self);
+
+    #[address(0x933110)]
+    fn destructor(&mut self, free: bool);
+
+    #[address(0x92E210)]
+    pub fn update(&mut self, render_block: *mut GenericRenderBlock) -> i32;
+}
+backend rust epilogue r#"
+    impl RenderBlockLine {
+        pub unsafe fn new() -> RenderBlockLine {
+            unsafe {
+                let mut instance = std::mem::MaybeUninit::<Self>::uninit();
+                (*instance.as_mut_ptr()).constructor();
+                instance.assume_init()
+            }
+        }
+    }
+    impl std::ops::Drop for RenderBlockLine {
+        fn drop(&mut self) {
+            unsafe { self.destructor(false); }
+        }
+    }
+"#;
+
+#[size(0x20), align(16)]
+pub type RenderBlockTriangle {
+    #[base]
+    pub render_block: RenderBlock,
+
+    #[address(0x18)]
+    pub enable_2d: bool,
+    pub enable_ztest: bool,
+    pub enable_culling: bool,
+
+    #[address(0x1C)]
+    pub vertex_count: u32,
+}
+impl RenderBlockTriangle {
+    #[address(0x937FF0)]
+    fn constructor(&mut self);
+
+    #[address(0x971730)]
+    fn destructor(&mut self, free: bool);
+
+    #[address(0x93ACC0)]
+    pub fn update(&mut self, render_block: *mut GenericRenderBlock) -> i32;
+}
+backend rust epilogue r#"
+    impl RenderBlockTriangle {
+        pub unsafe fn new() -> RenderBlockTriangle {
+            unsafe {
+                let mut instance = std::mem::MaybeUninit::<Self>::uninit();
+                (*instance.as_mut_ptr()).constructor();
+                instance.assume_init()
+            }
+        }
+    }
+    impl std::ops::Drop for RenderBlockTriangle {
+        fn drop(&mut self) {
+            unsafe { self.destructor(false); }
+        }
+    }
+"#;
+
+#[size(0x20)]
+pub type RenderBlockPacking {
+    pub format: u32,
+    pub scale: f32,
+    pub uv_extents: [Vector2; 2],
+    pub color_extents: f32,
+    pub color: u32,
+}
+
+#[size(0x4C)]
+pub type RenderBlockGeneralAttributes {
+    #[address(0x20)]
+    pub depth_bias: f32,
+    pub specular_power: f32,
+    pub packing: RenderBlockPacking,
+    pub flags: u32,
+}
+
+#[size(0x80), align(16)]
+pub type RenderBlockGeneral {
+    #[base]
+    pub render_block: RenderBlock,
+
+    #[address(0x11)]
+    pub outline_size: u8,
+
+    #[address(0x34)]
+    pub attributes: RenderBlockGeneralAttributes,
+}
+impl RenderBlockGeneral {
+    #[address(0x937210)]
+    fn constructor(&mut self);
+
+    #[address(0x92CE70)]
+    fn destructor(&mut self, free: bool);
+
+    #[address(0x95FF10)]
+    pub fn update(&mut self, render_block: *mut GenericRenderBlock) -> i32;
+}
+backend rust epilogue r#"
+    impl RenderBlockGeneral {
+        pub unsafe fn new() -> RenderBlockGeneral {
+            unsafe {
+                let mut instance = std::mem::MaybeUninit::<Self>::uninit();
+                (*instance.as_mut_ptr()).constructor();
+                instance.assume_init()
+            }
+        }
+    }
+    impl std::ops::Drop for RenderBlockGeneral {
+        fn drop(&mut self) {
+            unsafe { self.destructor(false); }
+        }
+    }
+"#;
+
+#[copyable, cloneable, defaultable]
+pub enum TextType: u32 {
+    #[default]
+    Line = 0,
+    Paragraph,
+}
+
+#[copyable, cloneable, defaultable]
+pub enum TextHorizontalAlignment: u32 {
+    #[default]
+    Left = 0,
+    Center,
+    Right,
+}
+
+#[copyable, cloneable, defaultable]
+pub enum TextVerticalAlignment: u32 {
+    #[default]
+    Top = 0,
+    Center,
+    Bottom,
+}
+
+#[defaultable, size(0x5C)]
+pub type RenderBlock3DTextDesc {
+    pub text: StdString,
+    pub font: StdString,
+    pub bounds: Vector2,
+    pub render_style: u32,
+    pub text_type: TextType,
+    pub horizontal_alignment: TextHorizontalAlignment,
+    pub vertical_alignment: TextVerticalAlignment,
+    pub tracking: f32,
+    pub leading: f32,
+    pub wrapping: bool,
+}
+
+#[size(0x50), align(16)] // size = 0x48
+pub type RenderBlock3DText {
+    #[base]
+    pub render_block: RenderBlock,
+    pub texture: ManuallyDrop<SharedPtr<u32>>,
+    pub color: u32,
+
+    #[address(0x2C)]
+    pub text_hash: u32,
+    pub font_hash: u32,
+
+    #[address(0x34)]
+    pub num_characters: u16,
+    pub render_style: u8,
+    pub font_size: u8,
+}
+impl RenderBlock3DText {
+    #[address(0x962D50)]
+    fn destructor(&mut self, free: bool);
+
+    #[calling_convention("cdecl"), address(0x939810)]
+    pub fn set_text(render_block: *mut RenderBlock3DText, description: *const RenderBlock3DTextDesc);
+}
+backend rust epilogue r#"
+    impl RenderBlock3DText {
+        pub unsafe fn new() -> RenderBlock3DText {
+            unsafe {
+                let mut instance: RenderBlock3DText = std::mem::zeroed();
+                instance.render_block.vftable = 0xF23584 as *const _;
+                instance.text_hash = u32::MAX;
+                instance.font_hash = u32::MAX;
+                instance.render_style = 2;
+                instance.font_size = 16;
+                instance
+            }
+        }
+    }
+    impl std::ops::Drop for RenderBlock3DText {
+        fn drop(&mut self) {
+            unsafe {
+                self.destructor(false);
+            }
+        }
+    }
+"#;

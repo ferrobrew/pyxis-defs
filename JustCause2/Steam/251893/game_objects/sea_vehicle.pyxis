@@ -1,0 +1,6 @@
+use game_objects::vehicle::Vehicle;
+
+pub type SeaVehicle {
+    #[base]
+    pub vehicle: Vehicle,
+}

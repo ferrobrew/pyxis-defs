@@ -1,0 +1,19 @@
+use rendering::render_engine::RenderPass;
+
+#[singleton(0x11911F0), size(0xE0)]
+pub type ModelInstanceManager {
+    #[address(0x14)]
+    pub static_model_pass: [*mut RenderPass; 2],
+    pub dynamic_model_pass: [*mut RenderPass; 2],
+    pub transparent_model_pass: *mut RenderPass,
+    pub halo_pass: *mut RenderPass,
+    pub transparent_model_post_pass: *mut RenderPass,
+    pub static_shadow_pass: [*mut RenderPass; 3],
+    pub dynamic_shadow_pass: [*mut RenderPass; 3],
+    pub reflection_pass: *mut RenderPass,
+    pub transparent_reflection_pass: *mut RenderPass,
+    pub refraction_pass: *mut RenderPass,
+    pub outline_pass: *mut RenderPass,
+    pub transparent_z_pass: *mut RenderPass,
+    pub transparent_final_pass: *mut RenderPass,
+}

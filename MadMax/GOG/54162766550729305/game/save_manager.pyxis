@@ -1,0 +1,108 @@
+#[singleton(0x141715B48), size(0xEA0), align(8)]
+pub type SaveManager {
+    #[address(0xC20)]
+    pub auto_save_slot: u32,
+    pub current_slot: u32,
+    pub error_slot: u32,
+    pub state: SaveManagerState,
+    pub error_state: SaveManagerErrorState,
+
+    #[address(0xD0C)]
+    pub meta_data_loaded: bool,
+
+    #[address(0xD28)]
+    pub save_device: SaveDeviceWin32,
+    pub device_status: SaveDeviceStatus,
+    pub delete_device_status: SaveDeviceStatus,
+}
+impl SaveManager {
+    #[address(0x1404A24B0)]
+    pub fn sync_load_profile(&mut self);
+
+    #[address(0x1404BFC10)]
+    pub fn load_autosave(&mut self);
+}
+
+#[defaultable, copyable, cloneable]
+pub bitflags SaveManagerState: u32 {
+    #[default]
+    None = 0x0,
+    Idle = 0x1,
+    SetupDevices = 0x2,
+    InitDevices = 0x4,
+    SavePhase1 = 0x8,
+    SavePhase2 = 0x10,
+    SavePhase3 = 0x20,
+    Saving = 0x40,
+    SavingProfile = 0x80,
+    SavingWaitMinFrames = 0x100,
+    SavingFailedWaitMinFrames = 0x200,
+    Loading = 0x400,
+    Restoring = 0x800,
+    EnumerateSlots = 0x1000,
+    EnumerateRestoreSlot = 0x2000,
+    Deleting = 0x4000,
+    DeletingWaitMinFrames = 0x8000,
+    Formatting = 0x10000,
+    NeedDeviceStates = 0x17CF8,
+    ShowIconStates = 0x16BF8,
+    SetupStates = 0x3006,
+}
+
+#[defaultable, copyable, cloneable]
+pub bitflags SaveManagerErrorState: u32 {
+    #[default]
+    None = 0x0,
+    NoSpace = 0x1,
+    WaitNoSpace = 0x2,
+    EnumerateFileWrongVersion = 0x3,
+    WaitEnumerateFileWrongVersion = 0x4,
+    EnumerateFileCorrupt = 0x5,
+    WaitEnumerateFileCorrupt = 0x6,
+    WaitEnumerateBACKUP = 0x7,
+    EnumerateRestoreFileOk = 0x8,
+    WaitEnumerateRestoreFileOk = 0x9,
+    EnumerateRestoreFileFail = 0xA,
+    WaitEnumerateRestoreFileFail = 0xB,
+    LoadFileCorrupt = 0xC,
+    WaitLoadFileCorrupt = 0xD,
+    RestoreOk = 0xE,
+    WaitRestoreOk = 0xF,
+    RestoreFail = 0x10,
+    WaitRestoreFail = 0x11,
+    QueueLoadFailed = 0x12,
+    WaitQueueLoadFailed = 0x13,
+    QueueSaveFailed = 0x14,
+    ExitMessage = 0x15,
+    Deleting = 0x16,
+    WaitDeleteMessage = 0x17,
+    WaitGUI = 0x18,
+}
+
+#[size(0x100), align(8)]
+pub type SaveDeviceWin32 {
+    vftable {
+        pub fn destructor(&mut self);
+        pub fn is_initialized(&mut self) -> bool;
+        pub fn initialize(&mut self) -> SaveDeviceStatus;
+        pub fn reset(&mut self);
+
+        #[index(10)]
+        pub fn load(&mut self, file_name: *const i8, save_data: *const u8, save_data_size: u64, load_backup: bool) -> SaveDeviceStatus;
+        pub fn save(&mut self, file_name: *const i8, save_data: *const u8, save_data_size: u64) -> SaveDeviceStatus;
+        pub fn delete(&mut self, file_name: *const i8) -> SaveDeviceStatus;
+
+        #[index(16)]
+        pub fn is_processing(&self) -> bool;
+    },
+
+    #[addres(0x8)]
+    pub initialized: bool,
+}
+
+#[copyable, cloneable]
+pub enum SaveDeviceStatus: u32 {
+    Finished,
+    NotFinished,
+    Failed
+}

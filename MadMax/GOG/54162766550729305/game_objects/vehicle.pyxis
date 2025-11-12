@@ -1,0 +1,43 @@
+use game_objects::damageable::Damageable;
+use physics::pfx_instance::PfxInstance;
+use types::math::Vector3;
+
+#[size(0x3F10), align(16)]
+pub type Vehicle {
+    vftable {
+        pub fn destructor(&mut self);
+        pub fn get_pfx_instance(&self) -> *mut PfxInstance;
+
+        #[index(38)]
+        pub fn set_linear_velocity(&mut self, vel: *const Vector3);
+
+        #[index(57)]
+        pub fn get_angular_velocity(&self, vel: *mut Vector3);
+        pub fn get_linear_velocity(&self, vel: *mut Vector3);
+
+        #[index(60)]
+        pub fn get_acceleration(&self, vel: *mut Vector3);
+    },
+
+    #[base]
+    pub damageable: Damageable,
+
+    #[address(0x1C8)]
+    pub opacity: f32,
+
+    #[address(0x205)]
+    pub driving_enabled: bool,
+
+    #[address(0x3D5)]
+    pub engine_running: bool,
+
+    #[address(0x3D8)]
+    pub visible: bool,
+
+    #[address(0x3DA)]
+    pub enabled: bool,
+
+    #[address(0x3E0)]
+    pub is_occupied: bool,
+    pub is_occupied_by_player: bool,
+}

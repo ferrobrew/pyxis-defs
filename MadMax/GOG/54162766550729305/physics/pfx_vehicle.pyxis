@@ -1,0 +1,7 @@
+use physics::pfx_rigid_body::PfxRigidBody;
+
+#[size(0x80), align(8)]
+pub type PfxVehicle {
+    #[base]
+    pub rigid_body: PfxRigidBody,
+}

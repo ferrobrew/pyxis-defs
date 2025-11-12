@@ -1,0 +1,244 @@
+backend rust prologue r#"
+    use std::{
+        clone::Clone,
+        ptr,
+        sync::atomic::{AtomicI32, Ordering},
+    };
+"#;
+
+#[size(4), align(4)]
+extern type AtomicI32;
+
+#[size(12)]
+type SharedCountImpl {
+    vftable {
+        fn destructor(&mut self);
+        fn dispose(&mut self);
+        fn destroy(&mut self);
+    },
+    use_count: AtomicI32,
+    weak_count: AtomicI32,
+}
+backend rust epilogue r#"
+    // SharedCountImpl
+    impl SharedCountImpl {
+        fn release(&mut self) {
+            let use_count = self.use_count.load(Ordering::SeqCst) - 1;
+            self.use_count.store(use_count, Ordering::SeqCst);
+            if use_count == 0 {
+                unsafe {
+                    self.dispose();
+                }
+                self.weak_release();
+            }
+        }
+
+        fn weak_release(&mut self) {
+            let weak_count = self.weak_count.load(Ordering::SeqCst) - 1;
+            self.weak_count.store(weak_count, Ordering::SeqCst);
+            if weak_count == 0 {
+                unsafe {
+                    self.destroy();
+                }
+            }
+        }
+
+        fn add_ref_copy(&mut self) {
+            let use_count = self.use_count.load(Ordering::SeqCst) + 1;
+            self.use_count.store(use_count, Ordering::SeqCst);
+        }
+
+        fn weak_add_ref(&mut self) {
+            let weak_count = self.weak_count.load(Ordering::SeqCst) + 1;
+            self.weak_count.store(weak_count, Ordering::SeqCst);
+        }
+    }
+"#;
+
+
+#[size(4)]
+type SharedCount {
+    count_impl: *mut SharedCountImpl,
+}
+backend rust epilogue r#"
+    // SharedCount
+    #[allow(dead_code)]
+    impl SharedCount {
+        fn swap(&mut self, rhs: &mut SharedCount) {
+            let lhs = self;
+            unsafe {
+                swap_unaligned(
+                    &raw mut lhs.count_impl,
+                    &raw mut rhs.count_impl,
+                );
+            }
+        }
+    }
+    impl Drop for SharedCount {
+        fn drop(&mut self) {
+            if !self.count_impl.is_null() {
+                unsafe {
+                    (*self.count_impl).release();
+                }
+            }
+        }
+    }
+    impl Clone for SharedCount {
+        fn clone(&self) -> SharedCount {
+            unsafe {
+                (*self.count_impl).add_ref_copy();
+            }
+            SharedCount {
+                count_impl: self.count_impl,
+            }
+        }
+    }
+"#;
+
+#[size(4)]
+type WeakCount {
+    count_impl: *mut SharedCountImpl,
+}
+backend rust epilogue r#"
+    // WeakCount
+    impl WeakCount {
+        fn new_from_shared(shared: &SharedCount) -> WeakCount {
+            unsafe {
+                (*shared.count_impl).weak_add_ref();
+            }
+            WeakCount {
+                count_impl: shared.count_impl,
+            }
+        }
+    }
+    impl Drop for WeakCount {
+        fn drop(&mut self) {
+            if !self.count_impl.is_null() {
+                unsafe {
+                    (*self.count_impl).weak_release();
+                }
+            }
+        }
+    }
+"#;
+
+backend rust epilogue r#"
+    // SharedPtr
+    #[repr(C)]
+    pub struct SharedPtr<T> {
+        px: *mut T,
+        pn: SharedCount,
+    }
+    #[allow(dead_code)]
+    impl<T> SharedPtr<T> {
+        pub fn new() -> SharedPtr<T> {
+            SharedPtr {
+                px: ptr::null_mut(),
+                pn: SharedCount {
+                    count_impl: ptr::null_mut(),
+                },
+            }
+        }
+
+        pub unsafe fn as_ref(&self) -> Option<&T> {
+            self.exists().then(|| unsafe { &*self.px })
+        }
+
+        pub unsafe fn as_mut(&mut self) -> Option<&mut T> {
+            self.exists().then(|| unsafe { &mut *self.px })
+        }
+
+        pub fn exists(&self) -> bool {
+            !self.px.is_null()
+        }
+
+        pub fn refcount(&self) -> i32 {
+            unsafe { (*self.pn.count_impl).use_count.load(Ordering::SeqCst) }
+        }
+
+        pub fn is_only_owner(&self) -> bool {
+            self.refcount() == 1
+        }
+
+        pub unsafe fn swap(&mut self, rhs: &mut SharedPtr<T>) {
+            unsafe {
+                swap_unaligned(&raw mut self.px, &raw mut rhs.px);
+            }
+            self.pn.swap(&mut rhs.pn);
+        }
+
+        pub unsafe fn reset_with_empty(&mut self) {
+            unsafe { self.swap(&mut SharedPtr::new()) };
+        }
+
+        /// Absolutely no verification on this - make sure that T can be casted to Y!
+        pub unsafe fn static_pointer_cast<Y>(self) -> SharedPtr<Y> {
+            SharedPtr {
+                px: self.px as *mut Y,
+                pn: self.pn,
+            }
+        }
+
+        /// Given a `SharedPtr<T>`, returns a `SharedPtr<Y>` if `T: AsMut<Y>`.
+        /// Pyxis defines `AsMut` conversions for inheritance, so this can be used
+        /// to convert a `SharedPtr<Derived>` to a `SharedPtr<Base>`.
+        ///
+        /// That being said, it's still somewhat unsafe, so use with caution.
+        pub unsafe fn as_mut_cast<Y>(self) -> SharedPtr<Y>
+        where
+            T: AsMut<Y>,
+        {
+            SharedPtr {
+                px: unsafe { (*self.px).as_mut() as *mut Y },
+                pn: self.pn,
+            }
+        }
+    }
+    impl<T> Clone for SharedPtr<T> {
+        fn clone(&self) -> SharedPtr<T> {
+            SharedPtr {
+                px: self.px,
+                pn: self.pn.clone(),
+            }
+        }
+    }
+    impl<T> Default for SharedPtr<T> {
+        fn default() -> SharedPtr<T> {
+            SharedPtr::new()
+        }
+    }
+    impl<T> PartialEq for SharedPtr<T> {
+        fn eq(&self, other: &SharedPtr<T>) -> bool {
+            self.px == other.px
+        }
+    }
+    impl<T> Eq for SharedPtr<T> {}
+"#;
+
+backend rust epilogue r#"
+    // WeakPtr
+    #[allow(dead_code)]
+    #[repr(C)]
+    pub struct WeakPtr<T> {
+        px: *mut T,
+        pn: WeakCount,
+    }
+    impl<T> WeakPtr<T> {
+        pub unsafe fn new_from_shared(shared: SharedPtr<T>) -> WeakPtr<T> {
+            WeakPtr {
+                px: shared.px,
+                pn: WeakCount::new_from_shared(&shared.pn),
+            }
+        }
+    }
+
+    unsafe fn swap_unaligned<T>(p1: *mut T, p2: *mut T) {
+        unsafe {
+            let p1_val = ptr::read_unaligned(p1);
+            let p2_val = ptr::read_unaligned(p2);
+
+            ptr::write_unaligned(p1, p2_val);
+            ptr::write_unaligned(p2, p1_val);
+        }
+    }
+"#;

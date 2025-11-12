@@ -1,0 +1,15 @@
+backend rust prologue "use crate::{GameObject, WeakPtr};";
+
+#[size(8), align(4)]
+extern type WeakPtr<GameObject>;
+
+#[singleton(0x1_191_720)]
+pub type GameWorld {
+    vftable {
+        pub fn destructor(&mut self);
+
+        #[index(2)]
+        pub fn add_object(&mut self, vehicle: WeakPtr<GameObject>);
+        pub fn remove_object(&mut self, vehicle: WeakPtr<GameObject>);
+    }
+}

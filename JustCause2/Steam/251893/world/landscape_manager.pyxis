@@ -1,0 +1,7 @@
+use world::atmosphere::Atmosphere;
+
+#[singleton(0x1_191_C48)]
+pub type LandscapeManager {
+    #[address(0x2C)]
+    pub atmosphere: *mut Atmosphere,
+}

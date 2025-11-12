@@ -1,0 +1,79 @@
+use physics::pfx_instance::PfxInstance;
+use physics::pfx_instance::PfxInstanceInterface;
+use physics::havok::rigid_body::HkpRigidBody;
+use types::math::Matrix4;
+use types::math::Vector3;
+
+backend rust prologue "use crate::shared_ptr::*;";
+#[size(8), align(4)]
+extern type SharedPtr<u32>;
+
+#[size(0x30)]
+pub type PfxRigidBody {
+    #[base]
+    pub instance: PfxInstanceInterface,
+}
+impl PfxRigidBody {
+    #[address(0x988E90)]
+    fn constructor(&mut self, rigid_body: *mut HkpRigidBody, unk0: *const SharedPtr<u32>, unk1: bool, unk2: u32);
+    #[address(0x99EF50)]
+    fn destructor(&mut self, free: bool);
+
+    #[address(0x996130)]
+    pub fn enable(&mut self);
+    #[address(0x996000)]
+    pub fn disable(&mut self);
+
+    #[address(0x99BE90)]
+    pub fn is_enabled(&self) -> bool;
+
+    #[address(0x9A8BB0)]
+    pub fn set_filter_info(&mut self, group: *const PfxFilterInfo);
+    #[address(0x9AB720)]
+    pub fn set_layer(&mut self, layer: u32);
+
+    #[address(0x9B8960)]
+    pub fn set_angular_velocity(&mut self, x: f32, y: f32, z: f32);
+    #[address(0x996290)]
+    pub fn set_linear_velocity(&mut self, v: *const Vector3);
+
+    #[address(0x9A53C0)]
+    pub fn get_angular_velocity(&self, v: *mut Vector3);
+    #[address(0x9B06F0)]
+    pub fn get_linear_velocity(&self, v: *mut Vector3);
+
+    #[address(0x988D30)]
+    pub fn set_mass(&mut self, mass: f32, rescale_inertia: bool);
+    #[address(0x9BDD30)]
+    pub fn set_transform(&mut self, m: *const Matrix4);
+
+    #[address(0x9AC380)]
+    pub fn get_mass(&self) -> f32;
+    #[address(0x9B2560)]
+    pub fn get_transform(&self, m: *mut Matrix4, translate: bool);
+}
+backend rust epilogue r#"
+    impl PfxRigidBody {
+        pub unsafe fn new(rigid_body: *mut crate::havok::rigid_body::HkpRigidBody) -> std::pin::Pin<std::boxed::Box<Self>> {
+            unsafe {
+                let mut instance = std::boxed::Box::pin(std::mem::zeroed::<Self>());
+                instance.constructor(rigid_body, &SharedPtr::<u32>::new(), false, 0);
+                instance
+            }
+        }
+    }
+    impl std::ops::Drop for PfxRigidBody {
+        fn drop(&mut self) {
+            unsafe { self.destructor(false); }
+        }
+    }
+"#;
+pub type PfxRigidBodyInstance {
+    #[base]
+    pub instance: PfxInstance,
+}
+
+#[copyable, defaultable]
+pub type PfxFilterInfo {
+    pub data: [u16; 3],
+}

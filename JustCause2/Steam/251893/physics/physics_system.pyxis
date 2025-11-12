@@ -1,0 +1,83 @@
+use physics::havok::rigid_body::HkpShape;
+use types::math::Ray;
+use types::math::Vector3;
+
+#[size(0x90), align(16)]
+pub type RayCastFilter;
+
+#[size(0xA0), align(16)]
+pub type AIRayCastFilter {
+    pub ray_cast_filter: RayCastFilter,
+
+    #[address(0x98)]
+    pub ignored_pfx_types: u32,
+}
+impl AIRayCastFilter {
+    #[address(0x908600)]
+    fn constructor(&mut self);
+}
+backend rust epilogue r#"
+    impl AIRayCastFilter {
+        pub unsafe fn new() -> Self {
+            unsafe {
+                let mut instance = std::mem::MaybeUninit::<Self>::uninit();
+                (*instance.as_mut_ptr()).constructor();
+                instance.assume_init()
+            }
+        }
+    }
+"#;
+
+#[size(0x2C)]
+pub type RayCastResult {
+    game_object: *mut u32,
+    pub normal: Vector3,
+    pub distance: f32,
+    rigid_body: *mut u32,
+    shape: *mut u32,
+    unknown: [u32; 4],
+}
+backend rust epilogue r#"
+    impl RayCastResult {
+        pub unsafe fn new() -> RayCastResult {
+            unsafe {
+                let mut instance: RayCastResult = std::mem::zeroed();
+                instance.normal = crate::math::Vector3 { data: [1., 0., 0.] };
+                instance.distance = 1.;
+                instance.unknown = [u32::MAX; 4];
+                instance
+            }
+        }
+    }
+    impl Default for RayCastResult {
+        fn default() -> Self {
+            unsafe { Self::new() }
+        }
+    }
+"#;
+
+#[singleton(0x118FFF4), size(0x250), align(16)] // 0x248
+pub type PhysicsSystem;
+impl PhysicsSystem {
+    #[address(0x9A9A50)]
+    fn ray_cast_internal(&mut self, ray: *const Ray, start: f32, end: f32, result: *mut RayCastResult, filter: *mut RayCastFilter, unused: bool, default_filter: bool, filter_group: u8) -> bool;
+    #[address(0x9ABEA0)]
+    pub fn new_filter_info(&mut self) -> u16;
+    #[calling_convention("stdcall"), address(0x9B2540)]
+    pub fn assign_material(material: u32, shape: *mut HkpShape)
+}
+backend rust epilogue r#"
+    impl PhysicsSystem {
+        pub fn ray_cast(&mut self, ray: &crate::math::Ray, start: f32, end: f32, ignored_pfx_types: u32) -> Option<RayCastResult> {
+            unsafe {
+                let mut result = RayCastResult::default();
+                let mut filter = AIRayCastFilter::new();
+                filter.ignored_pfx_types = ignored_pfx_types;
+                self.ray_cast_internal(ray, start, end, &mut result, &mut filter.ray_cast_filter, false, true, 0).then(|| {
+                    result.distance *= end - start;
+                    result
+                })
+            }
+        }
+    }
+"#;

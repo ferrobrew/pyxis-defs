@@ -1,0 +1,85 @@
+backend rust prologue "use crate::havok::memory::{get_hk_thread_memory_tls_index, HkThreadMemory, HkMemoryClass};";
+backend rust prologue "use windows::Win32::System::Threading::TlsGetValue;";
+
+#[size(0x8)]
+pub type HkReferencedObject {
+    #[address(0x4)]
+    mem_size_and_flags: u16,
+    reference_count: u16,
+}
+backend rust epilogue r#"
+    impl HkReferencedObject {
+        pub unsafe fn allocation_size(&self) -> u32 {
+            (self.mem_size_and_flags & 0x7FFF) as u32
+        }
+        pub unsafe fn reference_count(&self) -> u16 {
+            self.reference_count
+        }
+        pub unsafe fn add_reference(&mut self) {
+            self.reference_count += 1;
+        }
+        pub unsafe fn remove_reference(&mut self) {
+            self.reference_count -= 1;
+        }
+    }
+    pub unsafe trait HkReferencedObjectInstance {
+        type ConstructorArgs;
+        fn allocation_size() -> u32;
+        fn memory_class() -> HkMemoryClass;
+        fn as_referenced_object(&self) -> &HkReferencedObject;
+        fn as_referenced_object_mut(&mut self) -> &mut HkReferencedObject;
+        fn construct(&mut self, args: Self::ConstructorArgs);
+        fn free(&mut self);
+    }
+    pub struct HkRefCounted<T: HkReferencedObjectInstance>(*mut T);
+    impl<T: HkReferencedObjectInstance> HkRefCounted<T> {
+        pub unsafe fn new(args: T::ConstructorArgs) -> Self {
+            unsafe {
+                let thread_memory = &mut *(TlsGetValue(*get_hk_thread_memory_tls_index()) as *mut HkThreadMemory);
+                let instance = std::mem::transmute::<*mut std::ffi::c_void, *mut T>(
+                    thread_memory.allocate_chunk(
+                        T::allocation_size(),
+                        T::memory_class(),
+                    )
+                );
+                (*instance).construct(args);
+                (*instance).as_referenced_object_mut().mem_size_and_flags = T::allocation_size() as u16;
+                Self(instance)
+            }
+        }
+        pub unsafe fn as_ptr(&self) -> *const T {
+            self.0
+        }
+        pub unsafe fn as_mut_ptr(&mut self) -> *mut T {
+            self.0
+        }
+        pub unsafe fn as_ref(&self) -> &T {
+            unsafe { &(*self.0) }
+        }
+        pub unsafe fn as_mut_ref(&mut self) -> &mut T {
+            unsafe { &mut (*self.0) }
+        }
+    }
+    impl<T: HkReferencedObjectInstance> Clone for HkRefCounted<T> {
+        fn clone(&self) -> Self {
+            unsafe {
+                let reference = &mut (*self.0);
+                let object = reference.as_referenced_object_mut();
+                object.add_reference();
+                Self(self.0)
+            }
+        }
+    }
+    impl<T: HkReferencedObjectInstance> Drop for HkRefCounted<T> {
+        fn drop(&mut self) {
+            unsafe {
+                let reference = &mut (*self.0);
+                let object = reference.as_referenced_object_mut();
+                object.remove_reference();
+                if object.reference_count() == 0 {
+                    reference.free();
+                }
+            }
+        }
+    }
+"#;

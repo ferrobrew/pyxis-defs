@@ -1,0 +1,70 @@
+use physics::pfx_rigid_body::PfxRigidBody;
+use types::math::Aabb;
+use types::rtti::Rtti;
+
+backend rust prologue "use crate::{math::Matrix4, shared_ptr::*};";
+
+#[size(8), align(4)]
+extern type SharedPtr<GameObject>;
+#[size(8), align(4)]
+extern type WeakPtr<GameObject>;
+
+pub type PropertyFile;
+pub type ModelInstance;
+
+#[size(0x30)]
+pub type GameObject {
+    vftable {
+        pub fn destructor(&mut self);
+        pub fn get_type(&mut self) -> *const u32;
+        pub fn is_type(&mut self, ty: *const u32) -> bool;
+
+        pub fn initialise(&mut self);
+
+        #[index(16)]
+        pub fn init_transform(&mut self, mat: *const f32);
+        pub fn set_matrix_raw(&mut self, mat: *const f32);
+        pub fn get_matrix_raw(&self, mat: *mut f32) -> bool;
+
+        #[index(27)]
+        pub fn get_model_aabb(&self, aabb: *mut Aabb) -> bool;
+        pub fn get_model_aabb_local(&self, aabb: *mut Aabb) -> bool;
+
+        #[index(37)]
+        pub fn enable(&mut self, enable: bool);
+    },
+
+    #[base]
+    pub rtti: Rtti,
+
+    pub child_objects: unknown<0x10>,
+    pub parent_object: SharedPtr<GameObject>,
+    pub weak_this: WeakPtr<GameObject>,
+
+    pub object_id: u32,
+    pub instance_id: u32,
+}
+impl GameObject {
+    #[address(0x917_A00)]
+    pub fn init_transform_recursively(&mut self, mat: *const f32);
+}
+backend rust epilogue r#"
+    pub trait GameObjectExt {
+        unsafe fn get_matrix(&self) -> Option<Matrix4>;
+    }
+    pub trait GameObjectMutExt {
+        unsafe fn set_matrix(&mut self, matrix: &Matrix4);
+    }
+    impl<T: std::convert::AsRef<crate::game_object::GameObject>> GameObjectExt for T {
+        unsafe fn get_matrix(&self) -> Option<Matrix4> {
+            let mut out = Matrix4::default();
+            let set = unsafe { self.as_ref().get_matrix_raw(out.as_mut_ptr()) };
+            set.then_some(out)
+        }
+    }
+    impl<T: std::convert::AsMut<crate::game_object::GameObject>> GameObjectMutExt for T {
+        unsafe fn set_matrix(&mut self, matrix: &Matrix4) {
+            unsafe { self.as_mut().set_matrix_raw(matrix.as_ptr()); }
+        }
+    }
+"#;

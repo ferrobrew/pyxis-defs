@@ -1,0 +1,42 @@
+use game_objects::damageable::Damageable;
+use game_objects::vehicle::Vehicle;
+use physics::pfx_character::PfxCharacter;
+use physics::pfx_game_object::PfxGameObject;
+use types::math::Matrix4;
+use types::rtti::Rtti;
+
+backend rust prologue "use crate::{game_objects::vehicle::Vehicle, shared_ptr::*};";
+
+#[size(16), align(8)]
+extern type SharedPtr<Vehicle>;
+
+#[size(0x32B0)]
+pub type Character {
+    #[base]
+    pub damageable: Damageable,
+    #[base]
+    pub base: CharacterBase,
+}
+
+#[size(0x1F0)]
+pub type CharacterBase {
+    vftable {
+        pub fn destructor(&mut self);
+        pub fn get_pfx_game_object(&self) -> *mut PfxGameObject;
+
+        #[index(3)]
+        pub fn is_player_controller(&self) -> bool;
+
+        #[index(12)]
+        pub fn get_occupied_vehicle(&self, vehicle: *mut SharedPtr<Vehicle>) -> *mut void;
+    },
+
+    #[base]
+    pub pfx: PfxCharacter,
+    #[base]
+    pub rtti: Rtti,
+
+    #[address(0x18)]
+    pub matrix: Matrix4,
+    pub previous_matrix: Matrix4,
+}

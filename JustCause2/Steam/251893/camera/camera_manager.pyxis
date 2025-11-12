@@ -1,0 +1,18 @@
+use types::math::Matrix4;
+use camera::camera::Camera;
+
+#[singleton(0x11919F4), size(0x6C4)]
+pub type CameraManager {
+    #[address(0xC)]
+    pub next_active_camera: *mut Camera,
+    pub active_camera: *mut Camera,
+    pub render_camera: *mut Camera,
+    pub default_camera: Camera,
+
+    #[address(0x67C)]
+    pub aspect_ratio: f32,
+    pub apply_transformation: bool,
+
+    #[address(0x684)]
+    pub transformation_matrix: Matrix4,
+}

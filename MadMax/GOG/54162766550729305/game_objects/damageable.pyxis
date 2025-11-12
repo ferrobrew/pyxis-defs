@@ -1,0 +1,19 @@
+use game_objects::physics_game_object::PhysicsGameObject;
+use game::event_handler::EventHandler;
+
+#[size(0x1C0)]
+pub type Damageable {
+    #[base]
+    pub physics_game_object: PhysicsGameObject,
+    #[base]
+    pub event_handler: EventHandler,
+
+    #[address(0xE8)]
+    pub destroyed: bool,
+    pub invulnerable: bool,
+
+    #[address(0x180)]
+    pub max_health: f32,
+    pub current_health: f32,
+    pub last_health: f32,
+}

@@ -1,0 +1,76 @@
+backend rust prologue r#"
+use windows::{
+    core::InterfaceRef,
+    Win32::{
+        Foundation::HWND,
+        UI::WindowsAndMessaging::HCURSOR,    
+        Graphics::{Direct3D10::ID3D10Device, Dxgi::IDXGISwapChain}
+    }
+};
+"#;
+
+use rendering::shadow_manager::ShadowManager;
+
+#[size(4), align(4)]
+extern type HWND;
+#[size(4), align(4)]
+extern type HCURSOR;
+
+#[address(0x108C598)]
+pub extern frame_number: u32;
+
+#[address(0x13C16F8)]
+pub extern frame_index: u32;
+
+#[address(0x13D9C70)]
+extern raw_dxgi_swapchain: *mut u32;
+
+#[address(0x13D9C74)]
+extern raw_d3d10_device: *mut u32;
+
+pub enum ActiveCursor: i32 {
+    None = -1,
+    Arrow,
+    Cross,
+    Slider,
+    Zoom
+}
+
+#[singleton(0x1_18F_BDC)]
+pub type GraphicsEngine {
+    vftable {
+        #[index(13)]
+        pub fn update_cursor(&mut self);
+    },
+
+    #[address(0xDF0)]
+    pub shadow_manager: *mut ShadowManager,
+    #[address(0x1480)]
+    pub num_worker_threads: u32,
+    _: unknown<0xC>,
+    pub active_cursor: ActiveCursor,
+}
+
+pub type GraphicsGlobalSettings {
+    pub hwnd: HWND,
+    pub cursors: [HCURSOR; 4]
+}
+#[address(0x1_08C_658)]
+pub extern graphics_global_settings: GraphicsGlobalSettings;
+#[address(0x1191EC4)]
+pub extern game_suspended: bool;
+
+backend rust epilogue r#"
+pub unsafe fn get_d3d10_device() -> Option<InterfaceRef<'static, ID3D10Device>> {
+    unsafe {
+        let raw = std::ptr::NonNull::new(*get_raw_d3d10_device() as *mut std::os::raw::c_void)?;
+        Some(InterfaceRef::from_raw(raw))
+    }
+}
+pub unsafe fn get_dxgi_swapchain() -> Option<InterfaceRef<'static, IDXGISwapChain>> {
+    unsafe {
+        let raw = std::ptr::NonNull::new(*get_raw_dxgi_swapchain() as *mut std::os::raw::c_void)?;
+        Some(InterfaceRef::from_raw(raw))
+    }
+}
+"#;

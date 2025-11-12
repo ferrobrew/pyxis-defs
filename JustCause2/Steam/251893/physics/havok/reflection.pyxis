@@ -1,0 +1,151 @@
+backend rust prologue r#"
+    use std::{ffi::c_void, os::raw::c_char};
+"#;
+
+#[size(4), align(4)]
+extern type c_void;
+
+#[size(1), align(1)]
+extern type c_char;
+
+#[address(0xF25650)]
+pub extern hk_type_infos: *const HkTypeInfo;
+
+#[address(0xF25CB0)]
+pub extern hk_classes: *const HkClass;
+
+#[size(0x10)]
+pub type HkTypeInfo {
+    pub name: *const c_char,
+    pub finish_loaded: *const c_void,
+    pub clean_up_loaded: *const c_void,
+    pub vtable: *const c_void,
+}
+
+#[size(0x30)]
+pub type HkClass {
+    pub name: *const c_char,
+    pub parent: *const HkClass,
+    pub size: u32,
+    pub num_interfaces: u32,
+    pub enums: *const HkClassEnum,
+    pub num_enums: u32,
+    pub members: *const HkClassMember,
+    pub num_members: u32,
+    pub defaults: *const c_void,
+    pub attributes: *const HkCustomAttributes,
+    pub flags: HkClassFlags,
+    pub version: u32,
+}
+
+#[copyable, cloneable]
+pub enum HkClassFlags: u32 {
+    None,
+    NotSerializable,
+}
+
+#[size(0x14)]
+pub type HkClassEnum
+{
+    pub name: *const c_char,
+    pub items: *const HkClassEnumItem,
+    pub num_items: u32,
+    pub attributes: *const HkCustomAttributes,
+    pub flags: HkClassEnumFlags,
+}
+
+#[size(0x8)]
+pub type HkClassEnumItem
+{
+    pub value: i32,
+    pub name: *const c_char,
+}
+
+#[copyable, cloneable]
+pub enum HkClassEnumFlags: u32 {
+    None,
+}
+
+#[size(0x18)]
+pub type HkClassMember
+{
+    pub name: *const c_char,
+    pub class: *const HkClass,
+    pub class_enum: *const HkClassEnum,
+    pub base_type: HkClassMemberType,
+    pub sub_type: HkClassMemberType,
+    pub array_size: u16,
+    pub flags: HkClassMemberFlags,
+    pub offset: u16,
+    pub attributes: *const HkCustomAttributes,
+}
+
+#[copyable, cloneable]
+pub enum HkClassMemberType: u8 {
+    None,
+    Bool,
+    Char,
+    I8,
+    U8,
+    I16,
+    U16,
+    I32,
+    U32,
+    I64,
+    U64,
+    F32,
+    Vector4,
+    Quaternion,
+    Matrix3,
+    Rotation,
+    QsTransform,
+    Matrix4,
+    Transform,
+    Zero,
+    Pointer,
+    FunctionPointer,
+    Array,
+    InplaceArray,
+    Enum,
+    Struct,
+    SimpleArray,
+    HomogeneousArray,
+    Variant,
+    CString,
+    USize,
+    Flags,
+    Max,
+}
+
+#[copyable, cloneable]
+pub enum HkClassMemberFlags: u16 {
+    None,
+    Size8 = 8,
+    Size16 = 16,
+    Size32 = 32,
+    Align8 = 128,
+    Align16 = 256,
+    NotOwned = 512,
+    SerializeIgnored = 1024,
+}
+
+#[size(0x8)]
+pub type HkCustomAttributes
+{
+    pub attributes: *const HkCustomAttribute,
+    pub num_attributes: u32,
+}
+
+#[size(0xC)]
+pub type HkCustomAttribute
+{
+    pub name: *const c_char,
+    pub value: HkVariant,
+}
+
+#[size(0x8)]
+pub type HkVariant
+{
+    pub object: *mut c_void,
+    pub class: *const HkClass,
+}

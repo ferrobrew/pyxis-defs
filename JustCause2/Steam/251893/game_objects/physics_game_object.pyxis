@@ -1,0 +1,23 @@
+use game_objects::game_object::GameObject;
+use physics::pfx_instance::PfxInstance;
+
+/// `IPfxGameObject` in original game
+#[size(0x4)]
+pub type PfxGameObject {
+    vftable {}
+}
+
+#[size(0x38)]
+pub type PhysicsGameObject {
+    vftable {
+        pub fn destructor(&mut self);
+
+        #[index(7)]
+        pub fn get_pfx_instance(&mut self) -> *mut PfxInstance;
+    },
+
+    #[base]
+    pub pfx_game_object: PfxGameObject,
+    #[base]
+    pub game_object: GameObject,
+}

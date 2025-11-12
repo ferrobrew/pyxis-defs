@@ -1,0 +1,27 @@
+use game_objects::physics_game_object::PhysicsGameObject;
+use game::event_handler::EventHandler;
+use physics::pfx_instance::PfxInstance;
+
+#[size(0xF0)]
+pub type Damageable {
+    vftable {
+        pub fn destructor(&mut self);
+
+        #[index(7)]
+        pub fn get_pfx_instance(&mut self) -> *mut PfxInstance;
+    },
+
+    #[base]
+    pub physics_game_object: PhysicsGameObject,
+    #[base]
+    pub event_handler: EventHandler,
+
+    #[address(0x40)]
+    pub destroyed: bool,
+    pub invulnerable: bool,
+
+    #[address(0xE4)]
+    pub max_health: f32,
+    pub current_health: f32,
+    pub last_health: f32,
+}
