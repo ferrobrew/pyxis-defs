@@ -5695,7 +5695,9 @@
     },
     "clock": {
       "doc": null,
-      "items": [],
+      "items": [
+        "clock::Clock"
+      ],
       "submodules": {},
       "extern_values": [],
       "functions": [],
@@ -5703,7 +5705,14 @@
     },
     "game": {
       "doc": null,
-      "items": [],
+      "items": [
+        "game::Game",
+        "game::GameObjectInitContext",
+        "game::GameObjectRenderContext",
+        "game::GameObjectUpdateContext",
+        "game::GameState",
+        "game::UpdateContexts"
+      ],
       "submodules": {},
       "extern_values": [],
       "functions": [],
@@ -5808,8 +5817,59 @@
       "items": [],
       "submodules": {},
       "extern_values": [],
-      "functions": [],
-      "backends": {}
+      "functions": [
+        {
+          "visibility": "private",
+          "name": "hashlittle_impl",
+          "doc": null,
+          "body": {
+            "type": "address",
+            "address": 5446880000
+          },
+          "arguments": [
+            {
+              "type": "field",
+              "name": "data",
+              "type_ref": {
+                "type": "const_pointer",
+                "inner": {
+                  "type": "raw",
+                  "path": "u8"
+                }
+              }
+            },
+            {
+              "type": "field",
+              "name": "len",
+              "type_ref": {
+                "type": "raw",
+                "path": "u64"
+              }
+            },
+            {
+              "type": "field",
+              "name": "seed",
+              "type_ref": {
+                "type": "raw",
+                "path": "u32"
+              }
+            }
+          ],
+          "return_type": {
+            "type": "raw",
+            "path": "u64"
+          },
+          "calling_convention": "system"
+        }
+      ],
+      "backends": {
+        "rust": [
+          {
+            "prologue": null,
+            "epilogue": "pub fn hashlittle(data: &[u8]) -> u64 {\n    unsafe { hashlittle_impl(data.as_ptr(), data.len() as u64, 0) }\n}"
+          }
+        ]
+      }
     },
     "input": {
       "doc": null,
