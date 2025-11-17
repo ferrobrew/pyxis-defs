@@ -167,6 +167,9 @@ def main():
         default=None,
         help="Optional commit revision of Pyxis to install",
     )
+    parser.add_argument(
+        "--no-install", action="store_true", help="Do not install pyxis"
+    )
     args = parser.parse_args()
 
     # Validate that only one of branch, tag, or rev is specified
@@ -177,7 +180,8 @@ def main():
         parser.error("Only one of --branch, --tag, or --rev can be specified")
 
     # Check for required tools
-    install_pyxis(branch=args.branch, tag=args.tag, rev=args.rev)
+    if not args.no_install:
+        install_pyxis(branch=args.branch, tag=args.tag, rev=args.rev)
 
     # Get repository root
     repo_root = Path(__file__).parent.resolve()
