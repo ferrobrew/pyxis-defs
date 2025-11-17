@@ -48,7 +48,7 @@ jobs:
       - name: Check for changes
         id: verify-changed-files
         run: |
-          if [ -n "$(git status --porcelain docs/)" ]; then
+          if [ -n "$(git status --porcelain docs/ projects/)" ]; then
             echo "changed=true" >> $GITHUB_OUTPUT
           else
             echo "changed=false" >> $GITHUB_OUTPUT
@@ -59,7 +59,7 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add docs/
+          git add docs/ projects/
           git commit -m "chore: update documentation [skip ci]"
           git push
 
