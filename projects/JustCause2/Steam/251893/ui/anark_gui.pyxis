@@ -15,8 +15,9 @@ pub enum AnarkState: u32 {
     BenchmarkHud,
     BenchmarkPause,
     BenchmarkComplete,
-    Unassigned
+    Unassigned,
 }
+
 backend rust epilogue r#"
 impl AnarkState {
     pub fn in_game(&self) -> bool {

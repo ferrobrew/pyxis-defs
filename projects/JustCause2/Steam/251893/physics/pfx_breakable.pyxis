@@ -5,6 +5,7 @@ pub type PfxBreakable {
     #[base]
     pub rigid_body: PfxRigidBody,
 }
+
 pub type PfxBreakableInstance {
     #[base]
     pub rigid_body: PfxRigidBodyInstance,

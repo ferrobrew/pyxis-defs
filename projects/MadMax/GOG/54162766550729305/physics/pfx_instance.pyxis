@@ -5,6 +5,7 @@ backend rust prologue "use crate::shared_ptr::*;";
 
 #[size(16), align(8)]
 extern type WeakPtr<PfxInstance>;
+
 #[size(16), align(8)]
 extern type SharedPtr<PfxInstance>;
 
@@ -28,7 +29,7 @@ pub enum PfxID: u32 {
 }
 
 #[size(0x30)]
-pub type PfxInstance {    
+pub type PfxInstance {
     vftable {
         pub fn destructor(&mut self);
         pub fn get_type(&self) -> PfxID;

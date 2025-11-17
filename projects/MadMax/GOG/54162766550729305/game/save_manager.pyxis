@@ -1,4 +1,4 @@
-#[singleton(0x141715B48), size(0xEA0), align(8)]
+#[singleton(0x141_715_B48), size(0xEA0), align(8)]
 pub type SaveManager {
     #[address(0xC20)]
     pub auto_save_slot: u32,
@@ -16,10 +16,10 @@ pub type SaveManager {
     pub delete_device_status: SaveDeviceStatus,
 }
 impl SaveManager {
-    #[address(0x1404A24B0)]
+    #[address(0x140_4A2_4B0)]
     pub fn sync_load_profile(&mut self);
 
-    #[address(0x1404BFC10)]
+    #[address(0x140_4BF_C10)]
     pub fn load_autosave(&mut self);
 }
 
@@ -104,5 +104,5 @@ pub type SaveDeviceWin32 {
 pub enum SaveDeviceStatus: u32 {
     Finished,
     NotFinished,
-    Failed
+    Failed,
 }

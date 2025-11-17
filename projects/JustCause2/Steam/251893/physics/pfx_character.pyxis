@@ -3,8 +3,9 @@ use physics::pfx_instance::PfxInstanceInterface;
 pub type PfxCharacter {
     vftable {
         fn destructor(&mut self);
-    }
+    },
 }
+
 pub type PfxCharacterInstance {
     #[base]
     pub instance: PfxInstanceInterface,

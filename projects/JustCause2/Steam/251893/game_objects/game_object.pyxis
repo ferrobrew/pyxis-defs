@@ -6,10 +6,12 @@ backend rust prologue "use crate::{math::Matrix4, shared_ptr::*};";
 
 #[size(8), align(4)]
 extern type SharedPtr<GameObject>;
+
 #[size(8), align(4)]
 extern type WeakPtr<GameObject>;
 
 pub type PropertyFile;
+
 pub type ModelInstance;
 
 #[size(0x30)]
@@ -18,7 +20,6 @@ pub type GameObject {
         pub fn destructor(&mut self);
         pub fn get_type(&mut self) -> *const u32;
         pub fn is_type(&mut self, ty: *const u32) -> bool;
-
         pub fn initialise(&mut self);
 
         #[index(16)]
@@ -36,11 +37,9 @@ pub type GameObject {
 
     #[base]
     pub rtti: Rtti,
-
     pub child_objects: unknown<0x10>,
     pub parent_object: SharedPtr<GameObject>,
     pub weak_this: WeakPtr<GameObject>,
-
     pub object_id: u32,
     pub instance_id: u32,
 }
@@ -48,6 +47,7 @@ impl GameObject {
     #[address(0x917_A00)]
     pub fn init_transform_recursively(&mut self, mat: *const f32);
 }
+
 backend rust epilogue r#"
     pub trait GameObjectExt {
         unsafe fn get_matrix(&self) -> Option<Matrix4>;

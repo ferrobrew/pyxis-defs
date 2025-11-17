@@ -7,6 +7,7 @@ backend rust prologue r#"
 pub type HkMatrix3 {
     pub data: [HkVector4; 3],
 }
+
 backend rust epilogue r#"
     #[cfg(feature = "glam")]
     impl From<Mat3> for HkMatrix3 {
@@ -32,6 +33,7 @@ backend rust epilogue r#"
 pub type HkVector4 {
     pub data: [f32; 4],
 }
+
 backend rust epilogue r#"
     #[cfg(feature = "glam")]
     impl From<Vec3> for HkVector4 {

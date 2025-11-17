@@ -10,6 +10,7 @@ pub type Player {
     #[base]
     pub avatar: Avatar,
 }
+
 backend rust epilogue r#"
     pub trait PlayerExt {
         unsafe fn get_character(&self) -> Option<&Character>;
@@ -28,4 +29,3 @@ backend rust epilogue r#"
         }
     }
 "#;
-

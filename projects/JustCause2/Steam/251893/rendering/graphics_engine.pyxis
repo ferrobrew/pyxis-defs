@@ -13,19 +13,20 @@ use rendering::shadow_manager::ShadowManager;
 
 #[size(4), align(4)]
 extern type HWND;
+
 #[size(4), align(4)]
 extern type HCURSOR;
 
-#[address(0x108C598)]
+#[address(0x1_08C_598)]
 pub extern frame_number: u32;
 
-#[address(0x13C16F8)]
+#[address(0x1_3C1_6F8)]
 pub extern frame_index: u32;
 
-#[address(0x13D9C70)]
+#[address(0x1_3D9_C70)]
 extern raw_dxgi_swapchain: *mut u32;
 
-#[address(0x13D9C74)]
+#[address(0x1_3D9_C74)]
 extern raw_d3d10_device: *mut u32;
 
 pub enum ActiveCursor: i32 {
@@ -33,7 +34,7 @@ pub enum ActiveCursor: i32 {
     Arrow,
     Cross,
     Slider,
-    Zoom
+    Zoom,
 }
 
 #[singleton(0x1_18F_BDC)]
@@ -45,7 +46,8 @@ pub type GraphicsEngine {
 
     #[address(0xDF0)]
     pub shadow_manager: *mut ShadowManager,
-    #[address(0x1480)]
+
+    #[address(0x1_480)]
     pub num_worker_threads: u32,
     _: unknown<0xC>,
     pub active_cursor: ActiveCursor,
@@ -53,11 +55,13 @@ pub type GraphicsEngine {
 
 pub type GraphicsGlobalSettings {
     pub hwnd: HWND,
-    pub cursors: [HCURSOR; 4]
+    pub cursors: [HCURSOR; 4],
 }
+
 #[address(0x1_08C_658)]
 pub extern graphics_global_settings: GraphicsGlobalSettings;
-#[address(0x1191EC4)]
+
+#[address(0x1_191_EC4)]
 pub extern game_suspended: bool;
 
 backend rust epilogue r#"

@@ -1,4 +1,5 @@
 backend rust prologue "use crate::havok::memory::{get_hk_thread_memory_tls_index, HkThreadMemory, HkMemoryClass};";
+
 backend rust prologue "use windows::Win32::System::Threading::TlsGetValue;";
 
 #[size(0x8)]
@@ -7,6 +8,7 @@ pub type HkReferencedObject {
     mem_size_and_flags: u16,
     reference_count: u16,
 }
+
 backend rust epilogue r#"
     impl HkReferencedObject {
         pub unsafe fn allocation_size(&self) -> u32 {

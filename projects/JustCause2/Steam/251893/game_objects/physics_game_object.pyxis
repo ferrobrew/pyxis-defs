@@ -4,7 +4,7 @@ use physics::pfx_instance::PfxInstance;
 /// `IPfxGameObject` in original game
 #[size(0x4)]
 pub type PfxGameObject {
-    vftable {}
+    vftable {},
 }
 
 #[size(0x38)]

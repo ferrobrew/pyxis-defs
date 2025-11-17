@@ -9,7 +9,7 @@ extern type SharedPtr<Vehicle>;
 #[size(0x58)]
 pub type LoadedModel {
     pub load_state: i32,
-    
+
     #[address(0xC)]
     pub model_id: u32,
 
@@ -23,11 +23,11 @@ pub type VehicleTypes {
     hash_2ff58884: i32,
     pub maximum_gpu_cost: i32,
     pub maximum_cpu_cost: i32,
-    
+
     #[address(0x14)]
     pub accumulated_gpu_cost: i32,
     pub accumulated_cpu_cost: i32,
-    
+
     #[address(0x20)]
     pub loaded_models: *const LoadedModel,
 }
@@ -40,25 +40,18 @@ pub type SpawnManager {
 
     #[address(0xA00)]
     pub world_sim: WorldSim,
-    pub enemy_type_spawn_settings: unknown<804>,
+    pub enemy_type_spawn_settings: unknown<0x324>,
     pub character_types: unknown<0x74>,
     pub vehicle_types: VehicleTypes,
 }
 impl SpawnManager {
     #[address(0x84C_4C0)]
-    pub fn engine_spawn_vehicle(
-        &mut self,
-        vehicle: *mut SharedPtr<Vehicle>,
-        context: i32,
-        unk1: *mut StdString,
-        model_id: *const u32,
-        faction: u32,
-        unk2: *mut StdString
-    ) -> *mut SharedPtr<Vehicle>;
+    pub fn engine_spawn_vehicle(&mut self, vehicle: *mut SharedPtr<Vehicle>, context: i32, unk1: *mut StdString, model_id: *const u32, faction: u32, unk2: *mut StdString) -> *mut SharedPtr<Vehicle>;
 
     #[address(0x73F_DB0)]
     pub fn request_vehicle_model(&mut self, model_id: *const u32, category: i32);
 }
+
 backend rust epilogue r#"
     impl SpawnManager {
         pub unsafe fn is_vehicle_loaded(&self, id: u32) -> bool {

@@ -1,5 +1,4 @@
-#[copyable, cloneable]
-#[singleton(0x14171E7AC)]
+#[copyable, cloneable, singleton(0x141_71E_7AC)]
 pub enum GameState: u32 {
     Installing,
     Initializing,
@@ -8,11 +7,11 @@ pub enum GameState: u32 {
     StartUp,
 }
 
-#[address(0x1416C6F0C)]
+#[address(0x141_6C6_F0C)]
 pub extern decoupled_update: bool;
 
-#[address(0x14171E7A8)]
+#[address(0x141_71E_7A8)]
 pub extern skip_front_end: bool;
 
-#[address(0x1416C8EE4)]
+#[address(0x141_6C8_EE4)]
 pub extern requested_game_state: GameState;

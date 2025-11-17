@@ -16,9 +16,11 @@ type SharedCountImpl {
         fn dispose(&mut self);
         fn destroy(&mut self);
     },
+
     use_count: AtomicI32,
     weak_count: AtomicI32,
 }
+
 backend rust epilogue r#"
     // SharedCountImpl
     impl SharedCountImpl {
@@ -55,11 +57,11 @@ backend rust epilogue r#"
     }
 "#;
 
-
 #[size(4)]
 type SharedCount {
     count_impl: *mut SharedCountImpl,
 }
+
 backend rust epilogue r#"
     // SharedCount
     #[allow(dead_code)]
@@ -99,6 +101,7 @@ backend rust epilogue r#"
 type WeakCount {
     count_impl: *mut SharedCountImpl,
 }
+
 backend rust epilogue r#"
     // WeakCount
     impl WeakCount {

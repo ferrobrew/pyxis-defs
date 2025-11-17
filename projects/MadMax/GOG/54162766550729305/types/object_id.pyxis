@@ -1,5 +1,4 @@
-#[copyable, cloneable]
-#[size(0x8), align(4)]
+#[copyable, cloneable, size(0x8), align(4)]
 pub type ObjectID {
     hash: u32,
     user_data: u32,

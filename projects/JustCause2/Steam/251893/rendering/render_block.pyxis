@@ -3,19 +3,16 @@ use types::math::Vector3;
 use types::math::Vector4;
 use types::std_string::StdString;
 
-backend rust prologue "
-    use crate::shared_ptr::*;
-    use std::mem::ManuallyDrop;
-";
+backend rust prologue "\n    use crate::shared_ptr::*;\n    use std::mem::ManuallyDrop;\n";
 
-#[size(8), align(4)]
 /// `ManuallyDrop<SharedPtr<u32>>` is used instead of `SharedPtr<u32>` to avoid
 /// the `Drop` implementation of `SharedPtr<u32>` being called when the `RenderBlock`
 /// is dropped. The destructor, which we call in `drop`, will decrement the refcount
 /// for us.
+#[size(8), align(4)]
 extern type ManuallyDrop<SharedPtr<u32>>;
 
-#[address(0x13E0EA0)]
+#[address(0x1_3E0_EA0)]
 pub extern render_block_memory: u32;
 
 #[copyable, cloneable, defaultable]
@@ -59,10 +56,10 @@ pub type GenericVertexArray {
     pub end: *mut GenericVertex,
 }
 impl GenericVertexArray {
-    #[address(0x6F90E0)]
+    #[address(0x6F9_0E0)]
     pub fn reserve(&mut self, count: u32);
 
-    #[address(0x93ED80)]
+    #[address(0x93E_D80)]
     pub fn push_back(&mut self, vertex: *const GenericVertex);
 }
 
@@ -74,7 +71,7 @@ pub type IndexArray {
     pub end: *mut u16,
 }
 impl IndexArray {
-    #[address(0x4D60E0)]
+    #[address(0x4D6_0E0)]
     pub fn push_back(&mut self, index: *const u16);
 }
 
@@ -92,12 +89,13 @@ pub type GenericRenderBlock {
     pub indices: IndexArray,
 }
 impl GenericRenderBlock {
-    #[address(0x956480)]
+    #[address(0x956_480)]
     fn constructor(&mut self);
 
-    #[address(0x943720)]
+    #[address(0x943_720)]
     fn destructor(&mut self);
 }
+
 backend rust epilogue r#"
     impl GenericRenderBlock {
         pub unsafe fn new() -> GenericRenderBlock {
@@ -139,15 +137,16 @@ pub type RenderBlockLine {
     pub vertex_count: u32,
 }
 impl RenderBlockLine {
-    #[address(0x920210)]
+    #[address(0x920_210)]
     fn constructor(&mut self);
 
-    #[address(0x933110)]
+    #[address(0x933_110)]
     fn destructor(&mut self, free: bool);
 
-    #[address(0x92E210)]
+    #[address(0x92E_210)]
     pub fn update(&mut self, render_block: *mut GenericRenderBlock) -> i32;
 }
+
 backend rust epilogue r#"
     impl RenderBlockLine {
         pub unsafe fn new() -> RenderBlockLine {
@@ -179,15 +178,16 @@ pub type RenderBlockTriangle {
     pub vertex_count: u32,
 }
 impl RenderBlockTriangle {
-    #[address(0x937FF0)]
+    #[address(0x937_FF0)]
     fn constructor(&mut self);
 
-    #[address(0x971730)]
+    #[address(0x971_730)]
     fn destructor(&mut self, free: bool);
 
-    #[address(0x93ACC0)]
+    #[address(0x93A_CC0)]
     pub fn update(&mut self, render_block: *mut GenericRenderBlock) -> i32;
 }
+
 backend rust epilogue r#"
     impl RenderBlockTriangle {
         pub unsafe fn new() -> RenderBlockTriangle {
@@ -235,15 +235,16 @@ pub type RenderBlockGeneral {
     pub attributes: RenderBlockGeneralAttributes,
 }
 impl RenderBlockGeneral {
-    #[address(0x937210)]
+    #[address(0x937_210)]
     fn constructor(&mut self);
 
-    #[address(0x92CE70)]
+    #[address(0x92C_E70)]
     fn destructor(&mut self, free: bool);
 
-    #[address(0x95FF10)]
+    #[address(0x95F_F10)]
     pub fn update(&mut self, render_block: *mut GenericRenderBlock) -> i32;
 }
+
 backend rust epilogue r#"
     impl RenderBlockGeneral {
         pub unsafe fn new() -> RenderBlockGeneral {
@@ -315,12 +316,13 @@ pub type RenderBlock3DText {
     pub font_size: u8,
 }
 impl RenderBlock3DText {
-    #[address(0x962D50)]
+    #[address(0x962_D50)]
     fn destructor(&mut self, free: bool);
 
-    #[calling_convention("cdecl"), address(0x939810)]
+    #[calling_convention("cdecl"), address(0x939_810)]
     pub fn set_text(render_block: *mut RenderBlock3DText, description: *const RenderBlock3DTextDesc);
 }
+
 backend rust epilogue r#"
     impl RenderBlock3DText {
         pub unsafe fn new() -> RenderBlock3DText {

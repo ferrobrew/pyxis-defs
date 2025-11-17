@@ -7,11 +7,12 @@ backend rust prologue r#"
 
 #[defaultable, size(28)]
 pub type StdString {
-    #[address(4)]
-    buffer: unknown<16>,
+    #[address(0x4)]
+    buffer: unknown<0x10>,
     size: u32,
     res: u32,
 }
+
 backend rust epilogue r#"
     struct StringFunctions {
         ctor_default: extern "thiscall" fn(*mut StdString) -> *mut c_void,

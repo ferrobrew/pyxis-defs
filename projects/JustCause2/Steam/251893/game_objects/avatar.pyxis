@@ -4,6 +4,7 @@ backend rust prologue "use crate::{game_objects::Character, shared_ptr::*};";
 
 #[size(8), align(4)]
 extern type SharedPtr<Character>;
+
 #[size(8), align(4)]
 extern type WeakPtr<Avatar>;
 
@@ -15,5 +16,5 @@ pub type Avatar {
 
     #[address(0x44)]
     pub character: SharedPtr<Character>,
-    pub weak_this: WeakPtr<Avatar>
+    pub weak_this: WeakPtr<Avatar>,
 }

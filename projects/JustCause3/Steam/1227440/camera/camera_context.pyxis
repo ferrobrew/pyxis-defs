@@ -68,17 +68,17 @@ pub type CameraEnvironmentPresetWeights {
 
 #[size(0x5D0)]
 pub type CameraControlContext {
-  pub m_Dt: f32,
-  pub m_RenderDt: f32,
-  pub m_RenderDtf: f32,
-  pub m_BlendDt: f32,
-  pub m_CAMERA_DT_EPSILON: f32,
+    pub m_Dt: f32,
+    pub m_RenderDt: f32,
+    pub m_RenderDtf: f32,
+    pub m_BlendDt: f32,
+    pub m_CAMERA_DT_EPSILON: f32,
 
-  #[address(0x20)]
-  pub m_PreviousCameraContext: CameraContext,
-  pub m_NextCameraContext: CameraContext,
-  pub m_PreviousRenderContext: CameraContext,
-  pub m_NextRenderContext: CameraContext,
-  pub m_PresetWeights: CameraEnvironmentPresetWeights,
-  pub m_ActivePipelines: [u8; 32],
+    #[address(0x20)]
+    pub m_PreviousCameraContext: CameraContext,
+    pub m_NextCameraContext: CameraContext,
+    pub m_PreviousRenderContext: CameraContext,
+    pub m_NextRenderContext: CameraContext,
+    pub m_PresetWeights: CameraEnvironmentPresetWeights,
+    pub m_ActivePipelines: [u8; 32],
 }

@@ -1,10 +1,11 @@
 use types::hash_string::HashString;
 
-#[singleton(0x141718B88), size(0x3CF0), align(8)]
+#[singleton(0x141_718_B88), size(0x3CF0), align(8)]
 pub type GameGui {
-    #[address(0x29B0)]
+    #[address(0x2_9B0)]
     pub init_state: GameGuiInitState,
-    #[address(0x29D5)]
+
+    #[address(0x2_9D5)]
     pub switched_on: bool,
     pub visible: bool,
     pub in_focus: bool,
@@ -12,7 +13,7 @@ pub type GameGui {
     pub hide_tutorials: bool,
 }
 impl GameGui {
-    #[address(0x1402661B0)]
+    #[address(0x140_266_1B0)]
     pub fn request_state_transition(&mut self, transition_name: HashString) -> u64;
 }
 
@@ -26,16 +27,17 @@ pub enum GameGuiInitState: u32 {
     Error,
 }
 
-#[singleton(0x141718B90), size(0x1A500), align(16)]
+#[singleton(0x141_718_B90), size(0x1A500), align(16)]
 pub type GameGuiCallbacks {
     pub game_data: GameGuiData,
-    #[address(0x1A4F0)]
+
+    #[address(0x1A_4F0)]
     pub teleported_player: bool,
     pub input_enabled: bool,
 }
 
 #[size(0x184A0)]
 pub type GameGuiData {
-    #[address(0x179B4)]
+    #[address(0x17_9B4)]
     pub skip_front_end: bool,
 }

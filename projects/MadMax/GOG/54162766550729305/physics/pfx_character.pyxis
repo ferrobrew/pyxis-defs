@@ -5,8 +5,9 @@ pub type PfxCharacter {
     vftable {
         pub fn destructor(&mut self);
         pub fn get_pfx_game_object(&self) -> *mut PfxGameObject;
-    }
+    },
 }
+
 #[size(0x3050)]
 pub type PfxCharacterInstance {
     #[base]

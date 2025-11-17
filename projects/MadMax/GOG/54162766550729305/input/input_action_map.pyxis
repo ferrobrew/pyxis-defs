@@ -12,31 +12,31 @@ pub type InputActionMap {
     pub has_engaged: bool,
 }
 impl InputActionMap {
-    #[address(0x1409222F0)]
+    #[address(0x140_922_2F0)]
     pub fn reset(&mut self);
 
-    #[address(0x140925230)]
+    #[address(0x140_925_230)]
     pub fn set_enabled(&mut self, enabled: bool);
 
-    #[address(0x14092DCD0)]
+    #[address(0x140_92D_CD0)]
     pub fn set_enable_device(&mut self, device_type: DeviceType, index: u32, enable: bool);
 
-    #[address(0x14091E910)]
+    #[address(0x140_91E_910)]
     pub fn set_engaging(&mut self, engage: bool, key: KeyID);
 
-    #[address(0x1409279A0)]
+    #[address(0x140_927_9A0)]
     pub fn is_valid_action(&self, action: HashString) -> bool;
 
-    #[address(0x1409289D0)]
+    #[address(0x140_928_9D0)]
     pub fn is_set(&self, action: HashString) -> bool;
 
-    #[address(0x1409289F0)]
+    #[address(0x140_928_9F0)]
     pub fn is_clicked(&self, action: HashString) -> bool;
 
-    #[address(0x140928A20)]
+    #[address(0x140_928_A20)]
     pub fn is_released(&self, action: HashString) -> bool;
 
-    #[address(0x140928A50)]
+    #[address(0x140_928_A50)]
     pub fn get_value(&self, action: HashString) -> f32;
 }
 

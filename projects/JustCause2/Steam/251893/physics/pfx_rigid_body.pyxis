@@ -5,6 +5,7 @@ use types::math::Matrix4;
 use types::math::Vector3;
 
 backend rust prologue "use crate::shared_ptr::*;";
+
 #[size(8), align(4)]
 extern type SharedPtr<u32>;
 
@@ -14,44 +15,52 @@ pub type PfxRigidBody {
     pub instance: PfxInstanceInterface,
 }
 impl PfxRigidBody {
-    #[address(0x988E90)]
+    #[address(0x988_E90)]
     fn constructor(&mut self, rigid_body: *mut HkpRigidBody, unk0: *const SharedPtr<u32>, unk1: bool, unk2: u32);
-    #[address(0x99EF50)]
+
+    #[address(0x99E_F50)]
     fn destructor(&mut self, free: bool);
 
-    #[address(0x996130)]
+    #[address(0x996_130)]
     pub fn enable(&mut self);
-    #[address(0x996000)]
+
+    #[address(0x996_000)]
     pub fn disable(&mut self);
 
-    #[address(0x99BE90)]
+    #[address(0x99B_E90)]
     pub fn is_enabled(&self) -> bool;
 
-    #[address(0x9A8BB0)]
+    #[address(0x9A8_BB0)]
     pub fn set_filter_info(&mut self, group: *const PfxFilterInfo);
-    #[address(0x9AB720)]
+
+    #[address(0x9AB_720)]
     pub fn set_layer(&mut self, layer: u32);
 
-    #[address(0x9B8960)]
+    #[address(0x9B8_960)]
     pub fn set_angular_velocity(&mut self, x: f32, y: f32, z: f32);
-    #[address(0x996290)]
+
+    #[address(0x996_290)]
     pub fn set_linear_velocity(&mut self, v: *const Vector3);
 
-    #[address(0x9A53C0)]
+    #[address(0x9A5_3C0)]
     pub fn get_angular_velocity(&self, v: *mut Vector3);
-    #[address(0x9B06F0)]
+
+    #[address(0x9B0_6F0)]
     pub fn get_linear_velocity(&self, v: *mut Vector3);
 
-    #[address(0x988D30)]
+    #[address(0x988_D30)]
     pub fn set_mass(&mut self, mass: f32, rescale_inertia: bool);
-    #[address(0x9BDD30)]
+
+    #[address(0x9BD_D30)]
     pub fn set_transform(&mut self, m: *const Matrix4);
 
-    #[address(0x9AC380)]
+    #[address(0x9AC_380)]
     pub fn get_mass(&self) -> f32;
-    #[address(0x9B2560)]
+
+    #[address(0x9B2_560)]
     pub fn get_transform(&self, m: *mut Matrix4, translate: bool);
 }
+
 backend rust epilogue r#"
     impl PfxRigidBody {
         pub unsafe fn new(rigid_body: *mut crate::havok::rigid_body::HkpRigidBody) -> std::pin::Pin<std::boxed::Box<Self>> {
@@ -68,6 +77,7 @@ backend rust epilogue r#"
         }
     }
 "#;
+
 pub type PfxRigidBodyInstance {
     #[base]
     pub instance: PfxInstance,

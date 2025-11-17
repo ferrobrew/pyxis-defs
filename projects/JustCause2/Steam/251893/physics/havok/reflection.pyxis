@@ -8,10 +8,10 @@ extern type c_void;
 #[size(1), align(1)]
 extern type c_char;
 
-#[address(0xF25650)]
+#[address(0xF25_650)]
 pub extern hk_type_infos: *const HkTypeInfo;
 
-#[address(0xF25CB0)]
+#[address(0xF25_CB0)]
 pub extern hk_classes: *const HkClass;
 
 #[size(0x10)]
@@ -45,8 +45,7 @@ pub enum HkClassFlags: u32 {
 }
 
 #[size(0x14)]
-pub type HkClassEnum
-{
+pub type HkClassEnum {
     pub name: *const c_char,
     pub items: *const HkClassEnumItem,
     pub num_items: u32,
@@ -55,8 +54,7 @@ pub type HkClassEnum
 }
 
 #[size(0x8)]
-pub type HkClassEnumItem
-{
+pub type HkClassEnumItem {
     pub value: i32,
     pub name: *const c_char,
 }
@@ -67,8 +65,7 @@ pub enum HkClassEnumFlags: u32 {
 }
 
 #[size(0x18)]
-pub type HkClassMember
-{
+pub type HkClassMember {
     pub name: *const c_char,
     pub class: *const HkClass,
     pub class_enum: *const HkClassEnum,
@@ -130,22 +127,19 @@ pub enum HkClassMemberFlags: u16 {
 }
 
 #[size(0x8)]
-pub type HkCustomAttributes
-{
+pub type HkCustomAttributes {
     pub attributes: *const HkCustomAttribute,
     pub num_attributes: u32,
 }
 
 #[size(0xC)]
-pub type HkCustomAttribute
-{
+pub type HkCustomAttribute {
     pub name: *const c_char,
     pub value: HkVariant,
 }
 
 #[size(0x8)]
-pub type HkVariant
-{
+pub type HkVariant {
     pub object: *mut c_void,
     pub class: *const HkClass,
 }

@@ -159,6 +159,7 @@ pub enum InputAction: u32 {
     /// The actiion mapper only supports 256 actions.
     Max = 256,
 }
+
 backend rust epilogue r#"
 impl InputAction {
     pub fn is_gui(&self) -> bool {

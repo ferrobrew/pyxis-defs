@@ -75,14 +75,15 @@ pub enum HkMemoryClass: u32 {
     Max,
 }
 
-#[address(0x1403758)]
+#[address(0x1_403_758)]
 pub extern hk_thread_memory_tls_index: u32;
 
 #[size(0x330), align(16)]
 pub type HkThreadMemory;
 impl HkThreadMemory {
-    #[address(0xB246E0)]
+    #[address(0xB24_6E0)]
     pub fn allocate_chunk(&mut self, size: u32, class: HkMemoryClass) -> *mut void;
-    #[address(0xB24740)]
+
+    #[address(0xB24_740)]
     pub fn deallocate_chunk(&mut self, data: *mut void, size: u32, class: HkMemoryClass);
 }

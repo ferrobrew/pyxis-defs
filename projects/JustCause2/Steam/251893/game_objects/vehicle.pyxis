@@ -113,24 +113,25 @@ pub type Vehicle {
     pub is_invalid: bool,
 }
 impl Vehicle {
-    #[address(0x6B4350)]
+    #[address(0x6B4_350)]
     pub fn set_blinker(&mut self, effect: LightEffect, active: bool);
 
-    #[address(0x5EF560)]
+    #[address(0x5EF_560)]
     pub fn open_door(&mut self, door_slot: DoorSlot, keep_open: bool);
 
-    #[address(0x562250)]
+    #[address(0x562_250)]
     pub fn close_door(&self, door_slot: DoorSlot);
 
-    #[address(0x5DA043)]
+    #[address(0x5DA_043)]
     pub fn is_door_open(&self, door_slot: DoorSlot) -> bool;
 
-    #[address(0x723C40)]
+    #[address(0x723_C40)]
     pub fn disconnect_door(&mut self, door_slot: DoorSlot);
 
-    #[address(0x83FD70)]
+    #[address(0x83F_D70)]
     pub fn quick_open_door(&mut self, door_slot: DoorSlot);
 }
+
 backend rust epilogue r#"
     pub trait VehicleMutExt {
         unsafe fn get_pfx_vehicle(&mut self) -> SharedPtr<PfxVehicle>;

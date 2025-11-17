@@ -2,33 +2,34 @@ use types::math::Matrix3;
 use types::math::Matrix4;
 use types::math::Vector3;
 use types::math::Vector4;
-
 use rendering::render_block::RenderBlock;
 use rendering::render_block::GenericRenderBlock;
 
 backend rust prologue "use windows::Win32::Foundation::HANDLE;";
+
 #[size(4), align(4)]
 extern type HANDLE;
 
-#[address(0x108CD40)]
+#[address(0x1_08C_D40)]
 extern default_render_block_info: RenderBlockInstanceInfo;
 
 #[size(0xB0)]
 pub type RenderBlockInstanceInfo {
     #[address(0x8)]
     pub colors: [u32; 4],
-    
+
     #[address(0x20)]
     pub world_translation: [Vector3; 3],
     pub world_matrix: [Matrix3; 3],
 }
 impl RenderBlockInstanceInfo {
-    #[address(0x6B0660)]
+    #[address(0x6B0_660)]
     pub fn initialize_matrix(&mut self, matrix: *const Matrix4);
 
-    #[address(0x7682E0)]
+    #[address(0x768_2E0)]
     pub fn update_matrix(&mut self, matrix: *const Matrix4);
 }
+
 backend rust epilogue r#"
     impl RenderBlockInstanceInfo {
         pub unsafe fn new() -> RenderBlockInstanceInfo {
@@ -64,7 +65,7 @@ pub type RenderPass {
     },
 }
 
-#[singleton(0x1191AB4), size(0xEC8)]
+#[singleton(0x1_191_AB4), size(0xEC8)]
 pub type RenderEngine {
     vftable {
         pub fn destructor(&mut self);
@@ -95,6 +96,6 @@ pub type RenderEngine {
     pub post_effects_enabled: bool,
 }
 impl RenderEngine {
-    #[address(0x954540)]
+    #[address(0x954_540)]
     pub fn draw_line(&mut self, from: *const Vector3, to: *const Vector3, from_color: Vector4, to_color: Vector4);
 }

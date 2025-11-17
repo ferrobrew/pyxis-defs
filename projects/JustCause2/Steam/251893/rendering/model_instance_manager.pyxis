@@ -1,6 +1,6 @@
 use rendering::render_engine::RenderPass;
 
-#[singleton(0x11911F0), size(0xE0)]
+#[singleton(0x1_191_1F0), size(0xE0)]
 pub type ModelInstanceManager {
     #[address(0x14)]
     pub static_model_pass: [*mut RenderPass; 2],

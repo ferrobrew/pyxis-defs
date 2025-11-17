@@ -1,4 +1,4 @@
-#[singleton(0x142E22E68), min_size(0x2C0)]
+#[singleton(0x142_E22_E68), min_size(0x2C0)]
 pub type Game {
     #[address(0x10)]
     pub m_CountAccumulator: u64,
@@ -71,14 +71,14 @@ pub type UpdateContexts {
     pub m_RenderContext: GameObjectRenderContext,
 }
 
-#[singleton(0x142F3404C), copyable]
+#[singleton(0x142_F34_04C), copyable]
 pub enum GameState: u32 {
-    E_GAME_INSTALL  = 0x0,
-    E_GAME_INIT     = 0x1,
+    E_GAME_INSTALL = 0x0,
+    E_GAME_INIT = 0x1,
     E_GAME_FRONTEND = 0x2,
-    E_GAME_LOAD     = 0x3,
-    E_GAME_RUN      = 0x4,
-    E_GAME_STARTUP  = 0x5,
+    E_GAME_LOAD = 0x3,
+    E_GAME_RUN = 0x4,
+    E_GAME_STARTUP = 0x5,
     NOF_GAME_STATES = 0x6,
 }
 impl GameState {

@@ -5,6 +5,7 @@ pub type PfxAirPlane {
     #[base]
     pub helicopter: PfxHelicopter,
 }
+
 pub type PfxAirPlaneInstance {
     #[base]
     pub helicopter: PfxHelicopterInstance,

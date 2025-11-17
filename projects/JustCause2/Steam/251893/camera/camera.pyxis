@@ -32,12 +32,13 @@ pub type Camera {
     pub height: u32,
 }
 impl Camera {
-    #[address(0x924D80)]
+    #[address(0x924_D80)]
     fn constructor(&mut self);
 
-    #[address(0x933A10)]
+    #[address(0x933_A10)]
     pub fn update(&mut self, full_update: bool);
 }
+
 backend rust epilogue r#"
     impl Camera {
         pub unsafe fn new() -> Camera {

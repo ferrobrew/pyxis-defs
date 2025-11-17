@@ -5,13 +5,13 @@ use types::vector_math::AlignedQuat;
 
 #[size(0x3540)]
 pub type Character {
-    #[address(0x1780)]
+    #[address(0x1_780)]
     pub m_AnimatedModel: AnimatedModel,
 
-    #[address(0x262A)]
+    #[address(0x2_62A)]
     pub m_IsLocalCharacter: bool,
 
-    #[address(0x27F0)]
+    #[address(0x2_7F0)]
     pub m_WorldMatrixT0: Matrix4,
     pub m_WorldMatrixT1: Matrix4,
 }
@@ -35,7 +35,7 @@ pub type AnimatedModel {
     pub m_AnimationController: *mut AnimationController,
 }
 
-pub type AnimationController {}
+pub type AnimationController;
 impl AnimationController {
     #[address(0x143_6CB_7C0)]
     pub fn GetBoneIndex(&self, hash: u32) -> u32;
@@ -61,7 +61,7 @@ pub type Joint {
 #[address(0x142_F2F_301)]
 pub extern Character_GoreEnabled: bool;
 
-pub enum SafeBoneIndex : u32 {
+pub enum SafeBoneIndex: u32 {
     REFERENCE = 0x8EB2FD7C,
     OFFSET = 0x4AAA87DB,
     HIPS = 0x68C6A89F,

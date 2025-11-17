@@ -14,5 +14,5 @@ pub type Avatar {
 
     #[address(0x10)]
     pub character: *mut Character,
-    pub weak_this: WeakPtr<Avatar>
+    pub weak_this: WeakPtr<Avatar>,
 }

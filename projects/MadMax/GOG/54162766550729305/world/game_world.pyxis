@@ -1,6 +1,6 @@
 use types::math::Matrix4;
 
-#[singleton(0x141716110), size(0x281678), align(8)]
+#[singleton(0x141_716_110), size(0x281678), align(8)]
 pub type GameWorld {
     vftable {
         pub fn destructor(&mut self);
@@ -18,7 +18,7 @@ pub type GameWorld {
         pub fn is_teleporting(&self) -> bool;
     },
 
-    #[address(0x241560)]
+    #[address(0x241_560)]
     teleport_update_state: TeleportUpdateState,
 }
 

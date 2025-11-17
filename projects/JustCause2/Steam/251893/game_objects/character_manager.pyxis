@@ -17,11 +17,11 @@ pub type CharacterManager {
     #[address(0xB0)]
     pub teleport_state: CharacterManagerTeleportState,
 
-    #[address(0x3570)]
+    #[address(0x3_570)]
     pub player: SharedPtr<Player>,
 }
 
-pub enum CharacterManagerTeleportState : u32 {
+pub enum CharacterManagerTeleportState: u32 {
     Idle,
     Requested,
     Teleporting,

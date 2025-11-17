@@ -5,6 +5,7 @@ pub type PfxBoat {
     #[base]
     pub vehicle: PfxVehicle,
 }
+
 pub type PfxBoatInstance {
     #[base]
     pub vehicle: PfxVehicleInstance,

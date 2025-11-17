@@ -12,12 +12,12 @@ pub type InputDeviceManager {
     pub in_focus: bool,
 }
 impl InputDeviceManager {
-    #[address(0x140925280)]
+    #[address(0x140_925_280)]
     pub fn get_action_map(&mut self, id: *const HashString) -> *mut InputActionMap;
 
-    #[address(0x140922780)]
+    #[address(0x140_922_780)]
     pub fn get_device_count(&self, device_type: DeviceType) -> u64;
 
-    #[address(0x140926580)]
+    #[address(0x140_926_580)]
     pub fn get_device(&mut self, device_type: DeviceType, index: u32) -> *mut InputDevice;
 }

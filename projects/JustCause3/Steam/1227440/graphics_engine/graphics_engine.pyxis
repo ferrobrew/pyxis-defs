@@ -17,10 +17,10 @@ pub enum ActiveCursor: i32 {
     Arrow,
     Cross,
     Slider,
-    Zoom
+    Zoom,
 }
 
-#[singleton(0x142E2B6F0), min_size(0x1F10)]
+#[singleton(0x142_E2B_6F0), min_size(0x1F10)]
 pub type GraphicsEngine {
     #[address(0x18)]
     pub m_CPUFinishedDrawingEvent: u32,
@@ -31,10 +31,10 @@ pub type GraphicsEngine {
     #[address(0xEB0)]
     pub m_Device: *mut Device,
 
-    #[address(0x1068)]
+    #[address(0x1_068)]
     pub m_MainColorBuffer: *mut Texture,
 
-    #[address(0x1230)]
+    #[address(0x1_230)]
     pub m_BackBufferLinear: *mut Texture,
 }
 impl GraphicsEngine {

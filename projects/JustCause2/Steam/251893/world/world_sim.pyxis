@@ -1,6 +1,6 @@
 #[size(0x988)]
 pub type WorldSim {
-    #[address(8)]
+    #[address(0x8)]
     pub enabled: bool,
     pub enable_pedestrians: bool,
     pub enable_traffic: bool,

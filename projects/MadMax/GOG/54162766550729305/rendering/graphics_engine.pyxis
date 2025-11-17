@@ -12,8 +12,10 @@ use windows::{
 
 #[size(8), align(8)]
 extern type HWND;
+
 #[size(8), align(8)]
 extern type HCURSOR;
+
 #[size(0x28), align(8)]
 extern type CRITICAL_SECTION;
 
@@ -22,24 +24,26 @@ pub enum ActiveCursor: i32 {
     Arrow,
     Cross,
     Slider,
-    Zoom
+    Zoom,
 }
 
-#[singleton(0x141715B50), size(0x2108)]
+#[singleton(0x141_715_B50), size(0x2108)]
 pub type GraphicsEngine {
     #[address(0x1EC)]
     pub active_cursor: ActiveCursor,
-    #[address(0x1F18)]
+
+    #[address(0x1_F18)]
     pub graphics_device: *mut GraphicsDevice,
 }
 impl GraphicsEngine {
-    #[address(0x14087A9A0)]
+    #[address(0x140_87A_9A0)]
     pub fn update_cursor(&mut self);
 }
 
 #[size(0x380)]
 pub type GraphicsDevice {
     pub context: *mut GraphicsDeviceContext,
+
     #[address(0x20)]
     pub swap_chain: *mut u64,
     pub device: *mut u64,
@@ -47,7 +51,7 @@ pub type GraphicsDevice {
 
 #[size(0x8E70)]
 pub type GraphicsDeviceContext {
-    #[address(0x8020)]
+    #[address(0x8_020)]
     pub context: *mut u64,
     pub mutex: *mut CRITICAL_SECTION,
 }
@@ -56,9 +60,10 @@ pub type GraphicsDeviceContext {
 pub type GraphicsGlobalSettings {
     pub title: *const u8,
     pub hwnd: HWND,
-    pub cursors: [HCURSOR; 4]
+    pub cursors: [HCURSOR; 4],
 }
-#[address(0x1416EDDB0)]
+
+#[address(0x141_6ED_DB0)]
 pub extern graphics_global_settings: GraphicsGlobalSettings;
 
 backend rust epilogue r#"

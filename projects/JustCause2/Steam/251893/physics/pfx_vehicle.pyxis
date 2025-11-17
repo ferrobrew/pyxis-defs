@@ -5,6 +5,7 @@ pub type PfxVehicle {
     #[base]
     pub breakable: PfxBreakable,
 }
+
 pub type PfxVehicleInstance {
     #[base]
     pub breakable: PfxBreakableInstance,

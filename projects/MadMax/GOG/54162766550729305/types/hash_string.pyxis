@@ -1,12 +1,12 @@
-#[copyable, cloneable]
-#[size(0x4), align(4)]
+#[copyable, cloneable, size(0x4), align(4)]
 pub type HashString {
     pub hash: u32,
 }
 impl HashString {
-    #[address(0x14000BA60)]
+    #[address(0x140_00B_A60)]
     fn constructor(&mut self, value: *const i8) -> *mut HashString;
 }
+
 backend rust epilogue r#"
     impl HashString {
         pub unsafe fn from_cstr(str: impl AsRef<std::ffi::CStr>) -> Self {

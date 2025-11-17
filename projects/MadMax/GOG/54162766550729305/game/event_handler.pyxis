@@ -2,12 +2,12 @@ use types::hash_string::HashString;
 
 backend rust prologue "use crate::HashString;";
 
-#[singleton(0x141715B58), size(0x17A088)]
+#[singleton(0x141_715_B58), size(0x17A088)]
 pub type EventSystem {
-    vftable {}
+    vftable {},
 }
 impl EventSystem {
-    #[address(0x1409C47C0)]
+    #[address(0x140_9C4_7C0)]
     pub fn send_event(&mut self, event_ids: *const EventID, event_count: u32, args: *const u8);
 }
 
@@ -16,6 +16,7 @@ pub type EventID {
     hash: HashString,
     namespace: HashString,
 }
+
 backend rust epilogue r#"
     impl EventID {
         pub fn new(hash: HashString, namespace: HashString) -> Self {
@@ -29,7 +30,7 @@ backend rust epilogue r#"
 
 #[size(0x10)]
 pub type EventHandler {
-    vftable {}
+    vftable {},
 }
 
 #[size(0x8)]
@@ -46,7 +47,6 @@ pub type BaseSendEvent {
 // STrackEventData -> 0E
 // CDamageController -> 0F
 // SSisMonitorChunkStateCallbackData -> 16
-
 backend rust epilogue r#"
     #[repr(C, align(8))]
     pub struct EventData<

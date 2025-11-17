@@ -23,6 +23,7 @@ pub type CharacterBase {
     #[address(0x6C)]
     pub matrix: Matrix4,
 }
+
 pub type Character {
     vftable {
         pub fn destructor(&mut self);

@@ -5,12 +5,15 @@ backend rust prologue "use crate::{CharacterBase, SharedPtr, WeakPtr};";
 
 #[size(8), align(4)]
 extern type SharedPtr<CharacterController>;
+
 #[size(8), align(4)]
 extern type SharedPtr<SmartObjectAction>;
+
 #[size(8), align(4)]
 extern type WeakPtr<CharacterBase>;
 
 pub type CharacterController;
+
 pub type SmartObjectAction;
 
 #[size(0x128)]
@@ -35,10 +38,8 @@ pub type SmartObject {
     #[address(0xB8)]
     pub character_controller: SharedPtr<CharacterController>,
     pub occupant: WeakPtr<CharacterBase>,
-
     pub action_triggers: unknown<0x10>,
     pub vec_unknown: unknown<0x10>,
-
     pub enter_action: SharedPtr<SmartObjectAction>,
     pub exit_action: SharedPtr<SmartObjectAction>,
 }

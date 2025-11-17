@@ -11,5 +11,5 @@ pub type GameWorld {
         #[index(2)]
         pub fn add_object(&mut self, vehicle: WeakPtr<GameObject>);
         pub fn remove_object(&mut self, vehicle: WeakPtr<GameObject>);
-    }
+    },
 }

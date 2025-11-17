@@ -1,13 +1,15 @@
-#[singleton(0x14171DF00), size(0x1D0), align(8)]
+#[singleton(0x141_71D_F00), size(0x1D0), align(8)]
 pub type VideoManager {
     #[address(0x1A9)]
     pub playing: bool,
+
     #[address(0x1C8)]
     pub transition: bool,
 }
 impl VideoManager {
-    #[address(0x1405D9FF0)]
+    #[address(0x140_5D9_FF0)]
     pub fn is_playing_fullscreen_video(&self) -> bool;
-    #[address(0x1405D9F40)]
+
+    #[address(0x140_5D9_F40)]
     pub fn stop_video(&mut self);
 }

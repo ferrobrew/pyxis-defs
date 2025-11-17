@@ -10,6 +10,7 @@ pub type Aabb {
     pub min: Vector3,
     pub max: Vector3,
 }
+
 backend rust epilogue r#"
     #[cfg(feature = "bevy_math")]
     impl From<Aabb3d> for Aabb {
@@ -39,6 +40,7 @@ backend rust epilogue r#"
 pub type Matrix3 {
     pub data: [f32; 9],
 }
+
 backend rust epilogue r#"
     #[cfg(feature = "glam")]
     impl From<Mat3> for Matrix3 {
@@ -69,6 +71,7 @@ backend rust epilogue r#"
 pub type Matrix4 {
     pub data: [f32; 16],
 }
+
 backend rust epilogue r#"
     #[cfg(feature = "glam")]
     impl From<Mat4> for Matrix4 {
@@ -100,6 +103,7 @@ pub type Ray {
     origin: Vector3,
     direction: Vector3,
 }
+
 backend rust epilogue r#"
     #[cfg(feature = "bevy_math")]
     impl From<Ray> for Ray3d {
@@ -127,6 +131,7 @@ backend rust epilogue r#"
 pub type Vector2 {
     pub data: [f32; 2],
 }
+
 backend rust epilogue r#"
     #[cfg(feature = "glam")]
     impl From<Vec2> for Vector2 {
@@ -148,6 +153,7 @@ backend rust epilogue r#"
 pub type Vector3 {
     pub data: [f32; 3],
 }
+
 backend rust epilogue r#"
     #[cfg(feature = "glam")]
     impl From<Vec3> for Vector3 {
@@ -169,6 +175,7 @@ backend rust epilogue r#"
 pub type Vector4 {
     pub data: [f32; 4],
 }
+
 backend rust epilogue r#"
     #[cfg(feature = "glam")]
     impl From<Vec4> for Vector4 {

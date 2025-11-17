@@ -3,5 +3,5 @@ pub type Rtti {
         pub fn destructor(&mut self);
         pub fn get_type(&mut self) -> *const u32;
         pub fn is_type(&mut self, ty: *const u32) -> bool;
-    }
+    },
 }

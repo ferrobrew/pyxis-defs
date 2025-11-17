@@ -85,7 +85,7 @@ pub enum DeviceType: i32 {
     Mouse,
     Gamepad,
     Unknown,
-    Count
+    Count,
 }
 
 pub enum KeyID: i32 {
@@ -240,5 +240,5 @@ pub enum KeyID: i32 {
     GamepadTouchpadTouchRightDelta,
     GamepadTouchpadTouchUpDelta,
     GamepadTouchpadTouchDownDelta,
-    Count
+    Count,
 }

@@ -7,6 +7,7 @@ backend rust prologue "use crate::{math::Matrix4, shared_ptr::*};";
 
 #[size(16), align(8)]
 extern type SharedPtr<GameObject>;
+
 #[size(16), align(8)]
 extern type WeakPtr<GameObject>;
 
@@ -35,7 +36,6 @@ pub type GameObject {
 
     #[base]
     pub rtti: Rtti,
-
     pub tags: *mut u32,
     pub tag_count: u8,
 
@@ -51,6 +51,7 @@ pub type GameObject {
     pub parent_object: SharedPtr<GameObject>,
     pub weak_this: WeakPtr<GameObject>,
 }
+
 backend rust epilogue r#"
     pub trait GameObjectExt {
         unsafe fn get_matrix(&self) -> Option<Matrix4>;

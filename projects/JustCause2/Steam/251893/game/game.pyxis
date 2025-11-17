@@ -1,10 +1,9 @@
-#[copyable, cloneable]
-#[singleton(0x1_195_8C4)]
+#[copyable, cloneable, singleton(0x1_195_8C4)]
 pub enum GameState: u32 {
     Installing,
     Initializing,
     Loading,
     Running,
     Pause,
-    PDA
+    PDA,
 }
