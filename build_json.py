@@ -19,6 +19,7 @@ def install_pyxis(
     branch: Optional[str] = None,
     tag: Optional[str] = None,
     rev: Optional[str] = None,
+    path: Optional[str] = None,
 ):
     """Install pyxis if not available.
 
@@ -29,16 +30,21 @@ def install_pyxis(
     """
     print("Installing pyxis...")
     try:
-        cmd = ["cargo", "install", "--git", "https://github.com/ferrobrew/pyxis.git"]
-        if branch:
-            cmd.extend(["--branch", branch])
-            print(f"Installing pyxis from branch: {branch}")
-        elif tag:
-            cmd.extend(["--tag", tag])
-            print(f"Installing pyxis from tag: {tag}")
-        elif rev:
-            cmd.extend(["--rev", rev])
-            print(f"Installing pyxis from revision: {rev}")
+        cmd = ["cargo", "install"]
+        if path:
+            cmd.extend(["--path", path])
+            print(f"Installing pyxis from path: {path}")
+        else:
+            cmd.extend(["--git", "https://github.com/ferrobrew/pyxis.git"])
+            if branch:
+                cmd.extend(["--branch", branch])
+                print(f"Installing pyxis from branch: {branch}")
+            elif tag:
+                cmd.extend(["--tag", tag])
+                print(f"Installing pyxis from tag: {tag}")
+            elif rev:
+                cmd.extend(["--rev", rev])
+                print(f"Installing pyxis from revision: {rev}")
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError as e:
         print(f"Error installing pyxis: {e}", file=sys.stderr)
@@ -168,20 +174,30 @@ def main():
         help="Optional commit revision of Pyxis to install",
     )
     parser.add_argument(
+        "--path",
+        type=str,
+        default=None,
+        help="Optional path to Pyxis to install",
+    )
+    parser.add_argument(
         "--no-install", action="store_true", help="Do not install pyxis"
     )
     args = parser.parse_args()
 
-    # Validate that only one of branch, tag, or rev is specified
     specified = sum(
-        [args.branch is not None, args.tag is not None, args.rev is not None]
+        [
+            args.branch is not None,
+            args.tag is not None,
+            args.rev is not None,
+            args.path is not None,
+        ]
     )
     if specified > 1:
-        parser.error("Only one of --branch, --tag, or --rev can be specified")
+        parser.error("Only one of --branch, --tag, --rev, or --path can be specified")
 
     # Check for required tools
     if not args.no_install:
-        install_pyxis(branch=args.branch, tag=args.tag, rev=args.rev)
+        install_pyxis(branch=args.branch, tag=args.tag, rev=args.rev, path=args.path)
 
     # Get repository root
     repo_root = Path(__file__).parent.resolve()
