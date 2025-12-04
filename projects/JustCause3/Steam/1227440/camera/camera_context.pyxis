@@ -1,5 +1,4 @@
-use types::math::Matrix4;
-use types::math::Vector3;
+use types::math::{Matrix4, Vector3};
 
 #[size(0x1C), align(4)]
 pub type CameraDOFParameters {

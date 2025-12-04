@@ -1,6 +1,4 @@
-use physics::havok::math::HkMatrix3;
-use physics::havok::math::HkVector4;
-use physics::havok::referenced_object::HkReferencedObject;
+use physics::havok::{math::{HkMatrix3, HkVector4}, referenced_object::HkReferencedObject};
 
 backend rust prologue "use crate::havok::memory::HkMemoryClass;";
 

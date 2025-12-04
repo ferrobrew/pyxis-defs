@@ -1,7 +1,4 @@
-use types::math::Vector2;
-use types::math::Vector3;
-use types::math::Vector4;
-use types::std_string::StdString;
+use types::{math::{Vector2, Vector3, Vector4}, std_string::StdString};
 
 backend rust prologue "\n    use crate::shared_ptr::*;\n    use std::mem::ManuallyDrop;\n";
 

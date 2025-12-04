@@ -1,5 +1,4 @@
-use physics::pfx_breakable::PfxBreakable;
-use physics::pfx_breakable::PfxBreakableInstance;
+use physics::pfx_breakable::{PfxBreakable, PfxBreakableInstance};
 
 pub type PfxVehicle {
     #[base]

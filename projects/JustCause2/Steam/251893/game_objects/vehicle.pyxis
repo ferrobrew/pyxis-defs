@@ -1,8 +1,6 @@
-use game_objects::damageable::Damageable;
-use game_objects::game_object::GameObject;
+use game_objects::{damageable::Damageable, game_object::GameObject};
 use physics::pfx_instance::PfxInstance;
-use types::math::Aabb;
-use types::math::Vector3;
+use types::math::{Aabb, Vector3};
 
 backend rust prologue "use crate::{GameObject, SharedPtr, SmartObject, WeakPtr, PfxVehicle};";
 

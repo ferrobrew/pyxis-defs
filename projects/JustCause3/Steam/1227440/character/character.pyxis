@@ -1,7 +1,4 @@
-use types::math::Matrix4;
-use types::math::Vector3;
-use types::vector_math::AlignedVector3;
-use types::vector_math::AlignedQuat;
+use types::{math::{Matrix4, Vector3}, vector_math::{AlignedQuat, AlignedVector3}};
 
 #[size(0x3540)]
 pub type Character {

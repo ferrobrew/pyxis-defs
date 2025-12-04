@@ -1,9 +1,5 @@
-use types::math::Matrix3;
-use types::math::Matrix4;
-use types::math::Vector3;
-use types::math::Vector4;
-use rendering::render_block::RenderBlock;
-use rendering::render_block::GenericRenderBlock;
+use types::math::{Matrix3, Matrix4, Vector3, Vector4};
+use rendering::render_block::{RenderBlock, GenericRenderBlock};
 
 backend rust prologue "use windows::Win32::Foundation::HANDLE;";
 

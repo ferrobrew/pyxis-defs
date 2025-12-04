@@ -1,5 +1,4 @@
-use physics::pfx_car::PfxCar;
-use physics::pfx_car::PfxCarInstance;
+use physics::pfx_car::{PfxCar, PfxCarInstance};
 
 pub type PfxMotorBike {
     #[base]

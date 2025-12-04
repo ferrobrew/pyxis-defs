@@ -1,8 +1,4 @@
-use types::math::Vector2;
-use types::math::Vector3;
-use types::math::Vector4;
-use types::math::Matrix4;
-use types::math::Plane;
+use types::math::{Vector2, Vector3, Vector4, Matrix4, Plane};
 
 #[copyable, defaultable, size(3), align(1)]
 pub type Corner {

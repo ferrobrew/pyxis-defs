@@ -1,9 +1,6 @@
-use types::math::Matrix4;
-use types::math::Vector3;
-use types::rtti::Rtti;
+use types::{math::{Matrix4, Vector3}, rtti::Rtti};
 use game_objects::damageable::Damageable;
-use physics::pfx_character::PfxCharacter;
-use physics::pfx_instance::PfxInstance;
+use physics::{pfx_character::PfxCharacter, pfx_instance::PfxInstance};
 
 backend rust prologue "use crate::{shared_ptr::*, Vehicle, Vector3};";
 

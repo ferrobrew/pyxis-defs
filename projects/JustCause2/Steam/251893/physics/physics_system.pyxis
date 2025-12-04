@@ -1,6 +1,5 @@
 use physics::havok::rigid_body::HkpShape;
-use types::math::Ray;
-use types::math::Vector3;
+use types::math::{Ray, Vector3};
 
 #[size(0x90), align(16)]
 pub type RayCastFilter;

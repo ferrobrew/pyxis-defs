@@ -1,7 +1,4 @@
-use types::hash_string::HashString;
-use types::math::Aabb;
-use types::object_id::ObjectID;
-use types::rtti::Rtti;
+use types::{hash_string::HashString, math::Aabb, object_id::ObjectID, rtti::Rtti};
 
 backend rust prologue "use crate::{math::Matrix4, shared_ptr::*};";
 

@@ -1,5 +1,4 @@
-use physics::pfx_rigid_body::PfxRigidBody;
-use physics::pfx_rigid_body::PfxRigidBodyInstance;
+use physics::pfx_rigid_body::{PfxRigidBody, PfxRigidBodyInstance};
 
 pub type PfxBreakable {
     #[base]

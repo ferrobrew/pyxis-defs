@@ -1,5 +1,4 @@
-use physics::pfx_instance::PfxInstance;
-use physics::pfx_rigid_body::PfxRigidBody;
+use physics::{pfx_instance::PfxInstance, pfx_rigid_body::PfxRigidBody};
 
 #[size(0x58)]
 pub type PfxRigidBody {

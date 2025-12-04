@@ -1,5 +1,4 @@
-use graphics_engine::device::Device;
-use graphics_engine::texture::Texture;
+use graphics_engine::{device::Device, texture::Texture};
 
 backend rust prologue r#"
 use windows::Win32::{Foundation::HWND, UI::WindowsAndMessaging::HICON};

@@ -1,6 +1,4 @@
-use input::input_action_map::InputActionMap;
-use input::input_device::DeviceType;
-use input::input_device::InputDevice;
+use input::{input_action_map::InputActionMap, input_device::{DeviceType, InputDevice}};
 use types::hash_string::HashString;
 
 #[size(0x88), align(4)]
