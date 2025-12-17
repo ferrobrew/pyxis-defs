@@ -1,9 +1,6 @@
-use types::std_string::StdString;
+use types::{std_string::StdString, shared_ptr::SharedPtr};
 
 backend rust prologue "use crate::shared_ptr::*;";
-
-#[size(8), align(4)]
-extern type SharedPtr<u32>;
 
 #[singleton(0x1_190_B50)]
 pub type TextureManager {

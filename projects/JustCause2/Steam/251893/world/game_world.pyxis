@@ -1,7 +1,7 @@
-backend rust prologue "use crate::{GameObject, WeakPtr};";
+use game_objects::game_object::GameObject;
+use types::shared_ptr::WeakPtr;
 
-#[size(8), align(4)]
-extern type WeakPtr<GameObject>;
+backend rust prologue "use crate::{GameObject, WeakPtr};";
 
 #[singleton(0x1_191_720)]
 pub type GameWorld {

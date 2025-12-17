@@ -1,9 +1,7 @@
 use game_objects::character::Character;
+use types::shared_ptr::WeakPtr;
 
 backend rust prologue "use crate::{math::Matrix4, shared_ptr::*};";
-
-#[size(16), align(8)]
-extern type WeakPtr<Avatar>;
 
 #[size(0x58), align(8)]
 pub type Avatar {

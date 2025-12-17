@@ -2612,7 +2612,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 10
+              "line": 8
             }
           },
           {
@@ -2633,7 +2633,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 15
+              "line": 13
             }
           },
           {
@@ -2653,7 +2653,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 15
+              "line": 13
             }
           },
           {
@@ -2661,8 +2661,14 @@
             "name": "weak_this",
             "doc": null,
             "type_ref": {
-              "type": "raw",
-              "path": "game_objects::avatar::WeakPtr<Avatar>"
+              "type": "generic",
+              "base": "types::shared_ptr::WeakPtr",
+              "args": [
+                {
+                  "type": "raw",
+                  "path": "game_objects::avatar::Avatar"
+                }
+              ]
             },
             "offset": 24,
             "size": 16,
@@ -2670,7 +2676,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 17
+              "line": 15
             }
           },
           {
@@ -2691,7 +2697,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 8
+              "line": 6
             }
           }
         ],
@@ -2715,7 +2721,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 6,
-                "line": 10
+                "line": 8
               }
             },
             {
@@ -2735,7 +2741,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 6,
-                "line": 10
+                "line": 8
               }
             },
             {
@@ -2755,7 +2761,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 6,
-                "line": 10
+                "line": 8
               }
             },
             {
@@ -2775,7 +2781,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 6,
-                "line": 10
+                "line": 8
               }
             },
             {
@@ -2795,7 +2801,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 6,
-                "line": 10
+                "line": 8
               }
             },
             {
@@ -2815,7 +2821,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 6,
-                "line": 10
+                "line": 8
               }
             },
             {
@@ -2843,7 +2849,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 6,
-                "line": 11
+                "line": 9
               }
             }
           ]
@@ -2856,7 +2862,7 @@
       },
       "source": {
         "file_index": 6,
-        "line": 8
+        "line": 6
       }
     },
     "game_objects::avatar::AvatarVftable": {
@@ -2896,7 +2902,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 10
+              "line": 8
             }
           },
           {
@@ -2926,7 +2932,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 10
+              "line": 8
             }
           },
           {
@@ -2956,7 +2962,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 10
+              "line": 8
             }
           },
           {
@@ -2986,7 +2992,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 10
+              "line": 8
             }
           },
           {
@@ -3016,7 +3022,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 10
+              "line": 8
             }
           },
           {
@@ -3046,7 +3052,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 10
+              "line": 8
             }
           },
           {
@@ -3083,7 +3089,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 11
+              "line": 9
             }
           }
         ],
@@ -3097,30 +3103,7 @@
       },
       "source": {
         "file_index": 6,
-        "line": 10
-      }
-    },
-    "game_objects::avatar::WeakPtr<Avatar>": {
-      "path": "game_objects::avatar::WeakPtr<Avatar>",
-      "visibility": "public",
-      "size": 16,
-      "alignment": 8,
-      "category": "extern",
-      "kind": {
-        "type": "type",
-        "doc": null,
-        "fields": [],
-        "associated_functions": [],
-        "vftable": null,
-        "singleton": null,
-        "copyable": false,
-        "cloneable": false,
-        "defaultable": false,
-        "packed": false
-      },
-      "source": {
-        "file_index": 6,
-        "line": 5
+        "line": 8
       }
     },
     "game_objects::character::Character": {
@@ -3147,7 +3130,7 @@
             "is_base": true,
             "source": {
               "file_index": 7,
-              "line": 12
+              "line": 9
             }
           },
           {
@@ -3164,7 +3147,7 @@
             "is_base": true,
             "source": {
               "file_index": 7,
-              "line": 14
+              "line": 11
             }
           },
           {
@@ -3185,7 +3168,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 10
+              "line": 7
             }
           }
         ],
@@ -3208,7 +3191,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 14
+              "line": 8
             }
           },
           {
@@ -3235,7 +3218,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 15
+              "line": 9
             }
           },
           {
@@ -3270,7 +3253,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 16
+              "line": 10
             }
           },
           {
@@ -3302,7 +3285,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 18
+              "line": 12
             }
           },
           {
@@ -3334,7 +3317,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 20
+              "line": 14
             }
           },
           {
@@ -3369,7 +3352,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 21
+              "line": 15
             }
           },
           {
@@ -3404,7 +3387,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 23
+              "line": 17
             }
           },
           {
@@ -3439,7 +3422,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 25
+              "line": 19
             }
           },
           {
@@ -3468,7 +3451,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 27
+              "line": 21
             }
           },
           {
@@ -3497,7 +3480,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 30
+              "line": 24
             }
           },
           {
@@ -3601,7 +3584,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 7,
-              "line": 21
+              "line": 18
             }
           },
           {
@@ -3628,7 +3611,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 7,
-              "line": 22
+              "line": 19
             }
           },
           {
@@ -3652,7 +3635,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 7,
-              "line": 24
+              "line": 21
             }
           },
           {
@@ -3674,8 +3657,14 @@
                 "type_ref": {
                   "type": "mut_pointer",
                   "inner": {
-                    "type": "raw",
-                    "path": "game_objects::character::SharedPtr<Vehicle>"
+                    "type": "generic",
+                    "base": "types::shared_ptr::SharedPtr",
+                    "args": [
+                      {
+                        "type": "raw",
+                        "path": "game_objects::vehicle::Vehicle"
+                      }
+                    ]
                   }
                 }
               }
@@ -3690,7 +3679,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 7,
-              "line": 27
+              "line": 24
             }
           }
         ],
@@ -3752,7 +3741,7 @@
       },
       "source": {
         "file_index": 7,
-        "line": 10
+        "line": 7
       }
     },
     "game_objects::character::CharacterBase": {
@@ -3779,7 +3768,7 @@
             "is_base": true,
             "source": {
               "file_index": 7,
-              "line": 31
+              "line": 28
             }
           },
           {
@@ -3796,7 +3785,7 @@
             "is_base": true,
             "source": {
               "file_index": 7,
-              "line": 33
+              "line": 30
             }
           },
           {
@@ -3817,7 +3806,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 36
+              "line": 33
             }
           },
           {
@@ -3834,7 +3823,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 36
+              "line": 33
             }
           },
           {
@@ -3851,7 +3840,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 38
+              "line": 35
             }
           },
           {
@@ -3872,7 +3861,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 18
+              "line": 15
             }
           }
         ],
@@ -3980,7 +3969,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 21
+                "line": 18
               }
             },
             {
@@ -4006,7 +3995,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 22
+                "line": 19
               }
             },
             {
@@ -4026,7 +4015,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 20
+                "line": 17
               }
             },
             {
@@ -4049,7 +4038,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 24
+                "line": 21
               }
             },
             {
@@ -4069,7 +4058,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 20
+                "line": 17
               }
             },
             {
@@ -4089,7 +4078,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 20
+                "line": 17
               }
             },
             {
@@ -4109,7 +4098,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 20
+                "line": 17
               }
             },
             {
@@ -4129,7 +4118,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 20
+                "line": 17
               }
             },
             {
@@ -4149,7 +4138,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 20
+                "line": 17
               }
             },
             {
@@ -4169,7 +4158,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 20
+                "line": 17
               }
             },
             {
@@ -4189,7 +4178,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 20
+                "line": 17
               }
             },
             {
@@ -4209,7 +4198,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 20
+                "line": 17
               }
             },
             {
@@ -4230,8 +4219,14 @@
                   "type_ref": {
                     "type": "mut_pointer",
                     "inner": {
-                      "type": "raw",
-                      "path": "game_objects::character::SharedPtr<Vehicle>"
+                      "type": "generic",
+                      "base": "types::shared_ptr::SharedPtr",
+                      "args": [
+                        {
+                          "type": "raw",
+                          "path": "game_objects::vehicle::Vehicle"
+                        }
+                      ]
                     }
                   }
                 }
@@ -4246,7 +4241,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 27
+                "line": 24
               }
             }
           ]
@@ -4259,7 +4254,7 @@
       },
       "source": {
         "file_index": 7,
-        "line": 18
+        "line": 15
       }
     },
     "game_objects::character::CharacterBaseVftable": {
@@ -4299,7 +4294,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 21
+              "line": 18
             }
           },
           {
@@ -4335,7 +4330,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 22
+              "line": 19
             }
           },
           {
@@ -4365,7 +4360,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 20
+              "line": 17
             }
           },
           {
@@ -4398,7 +4393,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 24
+              "line": 21
             }
           },
           {
@@ -4428,7 +4423,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 20
+              "line": 17
             }
           },
           {
@@ -4458,7 +4453,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 20
+              "line": 17
             }
           },
           {
@@ -4488,7 +4483,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 20
+              "line": 17
             }
           },
           {
@@ -4518,7 +4513,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 20
+              "line": 17
             }
           },
           {
@@ -4548,7 +4543,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 20
+              "line": 17
             }
           },
           {
@@ -4578,7 +4573,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 20
+              "line": 17
             }
           },
           {
@@ -4608,7 +4603,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 20
+              "line": 17
             }
           },
           {
@@ -4638,7 +4633,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 20
+              "line": 17
             }
           },
           {
@@ -4664,8 +4659,14 @@
                   "type_ref": {
                     "type": "mut_pointer",
                     "inner": {
-                      "type": "raw",
-                      "path": "game_objects::character::SharedPtr<Vehicle>"
+                      "type": "generic",
+                      "base": "types::shared_ptr::SharedPtr",
+                      "args": [
+                        {
+                          "type": "raw",
+                          "path": "game_objects::vehicle::Vehicle"
+                        }
+                      ]
                     }
                   }
                 }
@@ -4684,7 +4685,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 27
+              "line": 24
             }
           }
         ],
@@ -4698,30 +4699,7 @@
       },
       "source": {
         "file_index": 7,
-        "line": 21
-      }
-    },
-    "game_objects::character::SharedPtr<Vehicle>": {
-      "path": "game_objects::character::SharedPtr<Vehicle>",
-      "visibility": "public",
-      "size": 16,
-      "alignment": 8,
-      "category": "extern",
-      "kind": {
-        "type": "type",
-        "doc": null,
-        "fields": [],
-        "associated_functions": [],
-        "vftable": null,
-        "singleton": null,
-        "copyable": false,
-        "cloneable": false,
-        "defaultable": false,
-        "packed": false
-      },
-      "source": {
-        "file_index": 7,
-        "line": 7
+        "line": 18
       }
     },
     "game_objects::character_manager::CharacterManager": {
@@ -4751,7 +4729,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 11
+              "line": 9
             }
           },
           {
@@ -4772,7 +4750,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 19
+              "line": 17
             }
           },
           {
@@ -4780,8 +4758,14 @@
             "name": "player",
             "doc": null,
             "type_ref": {
-              "type": "raw",
-              "path": "game_objects::character_manager::SharedPtr<Player>"
+              "type": "generic",
+              "base": "types::shared_ptr::SharedPtr",
+              "args": [
+                {
+                  "type": "raw",
+                  "path": "game_objects::player::Player"
+                }
+              ]
             },
             "offset": 14248,
             "size": 16,
@@ -4789,7 +4773,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 19
+              "line": 17
             }
           },
           {
@@ -4810,7 +4794,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 8
+              "line": 6
             }
           }
         ],
@@ -4834,7 +4818,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 8,
-                "line": 11
+                "line": 9
               }
             },
             {
@@ -4854,7 +4838,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 8,
-                "line": 10
+                "line": 8
               }
             },
             {
@@ -4874,7 +4858,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 8,
-                "line": 10
+                "line": 8
               }
             },
             {
@@ -4897,7 +4881,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 8,
-                "line": 13
+                "line": 11
               }
             },
             {
@@ -4925,7 +4909,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 8,
-                "line": 15
+                "line": 13
               }
             },
             {
@@ -4945,7 +4929,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 8,
-                "line": 16
+                "line": 14
               }
             }
           ]
@@ -4958,7 +4942,7 @@
       },
       "source": {
         "file_index": 8,
-        "line": 8
+        "line": 6
       }
     },
     "game_objects::character_manager::CharacterManagerVftable": {
@@ -4998,7 +4982,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 11
+              "line": 9
             }
           },
           {
@@ -5028,7 +5012,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 10
+              "line": 8
             }
           },
           {
@@ -5058,7 +5042,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 10
+              "line": 8
             }
           },
           {
@@ -5091,7 +5075,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 13
+              "line": 11
             }
           },
           {
@@ -5128,7 +5112,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 15
+              "line": 13
             }
           },
           {
@@ -5158,7 +5142,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 16
+              "line": 14
             }
           }
         ],
@@ -5172,30 +5156,7 @@
       },
       "source": {
         "file_index": 8,
-        "line": 11
-      }
-    },
-    "game_objects::character_manager::SharedPtr<Player>": {
-      "path": "game_objects::character_manager::SharedPtr<Player>",
-      "visibility": "public",
-      "size": 16,
-      "alignment": 8,
-      "category": "extern",
-      "kind": {
-        "type": "type",
-        "doc": null,
-        "fields": [],
-        "associated_functions": [],
-        "vftable": null,
-        "singleton": null,
-        "copyable": false,
-        "cloneable": false,
-        "defaultable": false,
-        "packed": false
-      },
-      "source": {
-        "file_index": 8,
-        "line": 5
+        "line": 9
       }
     },
     "game_objects::damageable::Damageable": {
@@ -5389,7 +5350,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 14
+              "line": 8
             }
           },
           {
@@ -5416,7 +5377,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 15
+              "line": 9
             }
           },
           {
@@ -5451,7 +5412,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 16
+              "line": 10
             }
           },
           {
@@ -5483,7 +5444,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 18
+              "line": 12
             }
           },
           {
@@ -5515,7 +5476,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 20
+              "line": 14
             }
           },
           {
@@ -5550,7 +5511,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 21
+              "line": 15
             }
           },
           {
@@ -5585,7 +5546,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 23
+              "line": 17
             }
           },
           {
@@ -5620,7 +5581,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 25
+              "line": 19
             }
           },
           {
@@ -5649,7 +5610,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 27
+              "line": 21
             }
           },
           {
@@ -5678,7 +5639,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 30
+              "line": 24
             }
           }
         ],
@@ -5767,7 +5728,7 @@
             "is_base": true,
             "source": {
               "file_index": 10,
-              "line": 34
+              "line": 28
             }
           },
           {
@@ -5787,7 +5748,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 36
+              "line": 30
             }
           },
           {
@@ -5804,7 +5765,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 37
+              "line": 31
             }
           },
           {
@@ -5825,7 +5786,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 39
+              "line": 33
             }
           },
           {
@@ -5842,7 +5803,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 39
+              "line": 33
             }
           },
           {
@@ -5859,7 +5820,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 41
+              "line": 35
             }
           },
           {
@@ -5876,7 +5837,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 42
+              "line": 36
             }
           },
           {
@@ -5897,7 +5858,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 44
+              "line": 38
             }
           },
           {
@@ -5918,7 +5879,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 44
+              "line": 38
             }
           },
           {
@@ -5939,7 +5900,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 47
+              "line": 41
             }
           },
           {
@@ -5947,8 +5908,14 @@
             "name": "parent_object",
             "doc": null,
             "type_ref": {
-              "type": "raw",
-              "path": "game_objects::game_object::SharedPtr<GameObject>"
+              "type": "generic",
+              "base": "types::shared_ptr::SharedPtr",
+              "args": [
+                {
+                  "type": "raw",
+                  "path": "game_objects::game_object::GameObject"
+                }
+              ]
             },
             "offset": 176,
             "size": 16,
@@ -5956,7 +5923,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 47
+              "line": 41
             }
           },
           {
@@ -5964,8 +5931,14 @@
             "name": "weak_this",
             "doc": null,
             "type_ref": {
-              "type": "raw",
-              "path": "game_objects::game_object::WeakPtr<GameObject>"
+              "type": "generic",
+              "base": "types::shared_ptr::WeakPtr",
+              "args": [
+                {
+                  "type": "raw",
+                  "path": "game_objects::game_object::GameObject"
+                }
+              ]
             },
             "offset": 192,
             "size": 16,
@@ -5973,7 +5946,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 49
+              "line": 43
             }
           }
         ],
@@ -5997,7 +5970,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 14
+                "line": 8
               }
             },
             {
@@ -6023,7 +5996,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 15
+                "line": 9
               }
             },
             {
@@ -6057,7 +6030,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 16
+                "line": 10
               }
             },
             {
@@ -6077,7 +6050,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6097,7 +6070,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6117,7 +6090,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6137,7 +6110,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6157,7 +6130,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6177,7 +6150,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6197,7 +6170,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6217,7 +6190,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6237,7 +6210,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6257,7 +6230,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6277,7 +6250,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6297,7 +6270,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6317,7 +6290,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6337,7 +6310,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6357,7 +6330,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6377,7 +6350,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6397,7 +6370,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6428,7 +6401,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 18
+                "line": 12
               }
             },
             {
@@ -6459,7 +6432,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 20
+                "line": 14
               }
             },
             {
@@ -6493,7 +6466,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 21
+                "line": 15
               }
             },
             {
@@ -6513,7 +6486,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6533,7 +6506,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6553,7 +6526,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6573,7 +6546,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6593,7 +6566,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6613,7 +6586,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6633,7 +6606,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6667,7 +6640,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 23
+                "line": 17
               }
             },
             {
@@ -6701,7 +6674,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 25
+                "line": 19
               }
             },
             {
@@ -6721,7 +6694,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6741,7 +6714,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6769,7 +6742,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 27
+                "line": 21
               }
             },
             {
@@ -6789,7 +6762,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6809,7 +6782,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6829,7 +6802,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 13
+                "line": 7
               }
             },
             {
@@ -6857,7 +6830,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 30
+                "line": 24
               }
             }
           ]
@@ -6870,7 +6843,7 @@
       },
       "source": {
         "file_index": 10,
-        "line": 11
+        "line": 5
       }
     },
     "game_objects::game_object::GameObjectVftable": {
@@ -6910,7 +6883,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 14
+              "line": 8
             }
           },
           {
@@ -6946,7 +6919,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 15
+              "line": 9
             }
           },
           {
@@ -6989,7 +6962,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 16
+              "line": 10
             }
           },
           {
@@ -7019,7 +6992,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7049,7 +7022,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7079,7 +7052,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7109,7 +7082,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7139,7 +7112,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7169,7 +7142,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7199,7 +7172,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7229,7 +7202,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7259,7 +7232,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7289,7 +7262,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7319,7 +7292,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7349,7 +7322,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7379,7 +7352,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7409,7 +7382,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7439,7 +7412,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7469,7 +7442,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7499,7 +7472,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7539,7 +7512,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 18
+              "line": 12
             }
           },
           {
@@ -7579,7 +7552,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 20
+              "line": 14
             }
           },
           {
@@ -7622,7 +7595,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 21
+              "line": 15
             }
           },
           {
@@ -7652,7 +7625,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7682,7 +7655,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7712,7 +7685,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7742,7 +7715,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7772,7 +7745,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7802,7 +7775,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7832,7 +7805,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7875,7 +7848,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 23
+              "line": 17
             }
           },
           {
@@ -7918,7 +7891,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 25
+              "line": 19
             }
           },
           {
@@ -7948,7 +7921,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -7978,7 +7951,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -8015,7 +7988,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 27
+              "line": 21
             }
           },
           {
@@ -8045,7 +8018,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -8075,7 +8048,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -8105,7 +8078,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 13
+              "line": 7
             }
           },
           {
@@ -8142,56 +8115,10 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 30
+              "line": 24
             }
           }
         ],
-        "associated_functions": [],
-        "vftable": null,
-        "singleton": null,
-        "copyable": false,
-        "cloneable": false,
-        "defaultable": false,
-        "packed": false
-      },
-      "source": {
-        "file_index": 10,
-        "line": 14
-      }
-    },
-    "game_objects::game_object::SharedPtr<GameObject>": {
-      "path": "game_objects::game_object::SharedPtr<GameObject>",
-      "visibility": "public",
-      "size": 16,
-      "alignment": 8,
-      "category": "extern",
-      "kind": {
-        "type": "type",
-        "doc": null,
-        "fields": [],
-        "associated_functions": [],
-        "vftable": null,
-        "singleton": null,
-        "copyable": false,
-        "cloneable": false,
-        "defaultable": false,
-        "packed": false
-      },
-      "source": {
-        "file_index": 10,
-        "line": 5
-      }
-    },
-    "game_objects::game_object::WeakPtr<GameObject>": {
-      "path": "game_objects::game_object::WeakPtr<GameObject>",
-      "visibility": "public",
-      "size": 16,
-      "alignment": 8,
-      "category": "extern",
-      "kind": {
-        "type": "type",
-        "doc": null,
-        "fields": [],
         "associated_functions": [],
         "vftable": null,
         "singleton": null,
@@ -8269,7 +8196,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 14
+              "line": 8
             }
           },
           {
@@ -8296,7 +8223,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 15
+              "line": 9
             }
           },
           {
@@ -8331,7 +8258,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 16
+              "line": 10
             }
           },
           {
@@ -8363,7 +8290,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 18
+              "line": 12
             }
           },
           {
@@ -8395,7 +8322,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 20
+              "line": 14
             }
           },
           {
@@ -8430,7 +8357,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 21
+              "line": 15
             }
           },
           {
@@ -8465,7 +8392,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 23
+              "line": 17
             }
           },
           {
@@ -8500,7 +8427,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 25
+              "line": 19
             }
           },
           {
@@ -8529,7 +8456,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 27
+              "line": 21
             }
           },
           {
@@ -8558,7 +8485,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 30
+              "line": 24
             }
           }
         ],
@@ -8716,7 +8643,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 6,
-              "line": 11
+              "line": 9
             }
           }
         ],
@@ -9047,7 +8974,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 14
+              "line": 8
             }
           },
           {
@@ -9074,7 +9001,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 15
+              "line": 9
             }
           },
           {
@@ -9109,7 +9036,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 16
+              "line": 10
             }
           },
           {
@@ -9141,7 +9068,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 18
+              "line": 12
             }
           },
           {
@@ -9173,7 +9100,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 20
+              "line": 14
             }
           },
           {
@@ -9208,7 +9135,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 21
+              "line": 15
             }
           },
           {
@@ -9243,7 +9170,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 23
+              "line": 17
             }
           },
           {
@@ -9278,7 +9205,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 25
+              "line": 19
             }
           },
           {
@@ -9307,7 +9234,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 27
+              "line": 21
             }
           },
           {
@@ -9336,7 +9263,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 30
+              "line": 24
             }
           }
         ],
@@ -17147,7 +17074,7 @@
             "value": 0,
             "source": {
               "file_index": 20,
-              "line": 14
+              "line": 8
             }
           },
           {
@@ -17155,7 +17082,7 @@
             "value": 1,
             "source": {
               "file_index": 20,
-              "line": 15
+              "line": 9
             }
           },
           {
@@ -17163,7 +17090,7 @@
             "value": 2,
             "source": {
               "file_index": 20,
-              "line": 16
+              "line": 10
             }
           },
           {
@@ -17171,7 +17098,7 @@
             "value": 3,
             "source": {
               "file_index": 20,
-              "line": 17
+              "line": 11
             }
           },
           {
@@ -17179,7 +17106,7 @@
             "value": 4,
             "source": {
               "file_index": 20,
-              "line": 18
+              "line": 12
             }
           },
           {
@@ -17187,7 +17114,7 @@
             "value": 5,
             "source": {
               "file_index": 20,
-              "line": 19
+              "line": 13
             }
           },
           {
@@ -17195,7 +17122,7 @@
             "value": 6,
             "source": {
               "file_index": 20,
-              "line": 20
+              "line": 14
             }
           },
           {
@@ -17203,7 +17130,7 @@
             "value": 8,
             "source": {
               "file_index": 20,
-              "line": 21
+              "line": 15
             }
           },
           {
@@ -17211,7 +17138,7 @@
             "value": 9,
             "source": {
               "file_index": 20,
-              "line": 22
+              "line": 16
             }
           },
           {
@@ -17219,7 +17146,7 @@
             "value": 10,
             "source": {
               "file_index": 20,
-              "line": 23
+              "line": 17
             }
           },
           {
@@ -17227,7 +17154,7 @@
             "value": 11,
             "source": {
               "file_index": 20,
-              "line": 24
+              "line": 18
             }
           },
           {
@@ -17235,7 +17162,7 @@
             "value": 12,
             "source": {
               "file_index": 20,
-              "line": 25
+              "line": 19
             }
           },
           {
@@ -17243,7 +17170,7 @@
             "value": 13,
             "source": {
               "file_index": 20,
-              "line": 26
+              "line": 20
             }
           },
           {
@@ -17251,7 +17178,7 @@
             "value": 14,
             "source": {
               "file_index": 20,
-              "line": 27
+              "line": 21
             }
           },
           {
@@ -17259,7 +17186,7 @@
             "value": 15,
             "source": {
               "file_index": 20,
-              "line": 28
+              "line": 22
             }
           }
         ],
@@ -17271,7 +17198,7 @@
       },
       "source": {
         "file_index": 20,
-        "line": 12
+        "line": 6
       }
     },
     "physics::pfx_instance::PfxInstance": {
@@ -17301,7 +17228,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 34
+              "line": 28
             }
           },
           {
@@ -17309,8 +17236,14 @@
             "name": "weak_this",
             "doc": null,
             "type_ref": {
-              "type": "raw",
-              "path": "physics::pfx_instance::WeakPtr<PfxInstance>"
+              "type": "generic",
+              "base": "types::shared_ptr::WeakPtr",
+              "args": [
+                {
+                  "type": "raw",
+                  "path": "physics::pfx_instance::PfxInstance"
+                }
+              ]
             },
             "offset": 8,
             "size": 16,
@@ -17318,7 +17251,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 46
+              "line": 40
             }
           },
           {
@@ -17326,8 +17259,14 @@
             "name": "prototype",
             "doc": null,
             "type_ref": {
-              "type": "raw",
-              "path": "physics::pfx_instance::SharedPtr<PfxInstance>"
+              "type": "generic",
+              "base": "types::shared_ptr::SharedPtr",
+              "args": [
+                {
+                  "type": "raw",
+                  "path": "physics::pfx_instance::PfxInstance"
+                }
+              ]
             },
             "offset": 24,
             "size": 16,
@@ -17335,7 +17274,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 47
+              "line": 41
             }
           },
           {
@@ -17355,7 +17294,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 48
+              "line": 42
             }
           }
         ],
@@ -17379,7 +17318,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 34
+                "line": 28
               }
             },
             {
@@ -17402,7 +17341,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 35
+                "line": 29
               }
             },
             {
@@ -17422,7 +17361,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 33
+                "line": 27
               }
             },
             {
@@ -17442,7 +17381,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 33
+                "line": 27
               }
             },
             {
@@ -17473,7 +17412,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 37
+                "line": 31
               }
             },
             {
@@ -17504,7 +17443,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 39
+                "line": 33
               }
             },
             {
@@ -17540,7 +17479,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 40
+                "line": 34
               }
             },
             {
@@ -17560,7 +17499,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 33
+                "line": 27
               }
             },
             {
@@ -17580,7 +17519,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 33
+                "line": 27
               }
             },
             {
@@ -17608,7 +17547,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 42
+                "line": 36
               }
             }
           ]
@@ -17621,7 +17560,7 @@
       },
       "source": {
         "file_index": 20,
-        "line": 31
+        "line": 25
       }
     },
     "physics::pfx_instance::PfxInstanceVftable": {
@@ -17661,7 +17600,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 34
+              "line": 28
             }
           },
           {
@@ -17694,7 +17633,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 35
+              "line": 29
             }
           },
           {
@@ -17724,7 +17663,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 33
+              "line": 27
             }
           },
           {
@@ -17754,7 +17693,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 33
+              "line": 27
             }
           },
           {
@@ -17794,7 +17733,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 37
+              "line": 31
             }
           },
           {
@@ -17834,7 +17773,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 39
+              "line": 33
             }
           },
           {
@@ -17878,7 +17817,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 40
+              "line": 34
             }
           },
           {
@@ -17908,7 +17847,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 33
+              "line": 27
             }
           },
           {
@@ -17938,7 +17877,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 33
+              "line": 27
             }
           },
           {
@@ -17975,7 +17914,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 42
+              "line": 36
             }
           }
         ],
@@ -17989,53 +17928,7 @@
       },
       "source": {
         "file_index": 20,
-        "line": 34
-      }
-    },
-    "physics::pfx_instance::SharedPtr<PfxInstance>": {
-      "path": "physics::pfx_instance::SharedPtr<PfxInstance>",
-      "visibility": "public",
-      "size": 16,
-      "alignment": 8,
-      "category": "extern",
-      "kind": {
-        "type": "type",
-        "doc": null,
-        "fields": [],
-        "associated_functions": [],
-        "vftable": null,
-        "singleton": null,
-        "copyable": false,
-        "cloneable": false,
-        "defaultable": false,
-        "packed": false
-      },
-      "source": {
-        "file_index": 20,
-        "line": 9
-      }
-    },
-    "physics::pfx_instance::WeakPtr<PfxInstance>": {
-      "path": "physics::pfx_instance::WeakPtr<PfxInstance>",
-      "visibility": "public",
-      "size": 16,
-      "alignment": 8,
-      "category": "extern",
-      "kind": {
-        "type": "type",
-        "doc": null,
-        "fields": [],
-        "associated_functions": [],
-        "vftable": null,
-        "singleton": null,
-        "copyable": false,
-        "cloneable": false,
-        "defaultable": false,
-        "packed": false
-      },
-      "source": {
-        "file_index": 20,
-        "line": 6
+        "line": 28
       }
     },
     "physics::pfx_rigid_body::PfxRigidBody": {
@@ -18107,7 +18000,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 34
+                "line": 28
               }
             },
             {
@@ -18130,7 +18023,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 35
+                "line": 29
               }
             },
             {
@@ -18150,7 +18043,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 33
+                "line": 27
               }
             },
             {
@@ -18170,7 +18063,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 33
+                "line": 27
               }
             },
             {
@@ -18201,7 +18094,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 37
+                "line": 31
               }
             },
             {
@@ -18232,7 +18125,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 39
+                "line": 33
               }
             },
             {
@@ -18268,7 +18161,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 40
+                "line": 34
               }
             },
             {
@@ -18288,7 +18181,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 33
+                "line": 27
               }
             },
             {
@@ -18308,7 +18201,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 33
+                "line": 27
               }
             },
             {
@@ -18336,7 +18229,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 42
+                "line": 36
               }
             }
           ]
@@ -18421,7 +18314,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 34
+                "line": 28
               }
             },
             {
@@ -18444,7 +18337,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 35
+                "line": 29
               }
             },
             {
@@ -18464,7 +18357,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 33
+                "line": 27
               }
             },
             {
@@ -18484,7 +18377,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 33
+                "line": 27
               }
             },
             {
@@ -18515,7 +18408,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 37
+                "line": 31
               }
             },
             {
@@ -18546,7 +18439,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 39
+                "line": 33
               }
             },
             {
@@ -18582,7 +18475,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 40
+                "line": 34
               }
             },
             {
@@ -18602,7 +18495,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 33
+                "line": 27
               }
             },
             {
@@ -18622,7 +18515,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 33
+                "line": 27
               }
             },
             {
@@ -18650,7 +18543,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 42
+                "line": 36
               }
             }
           ]
@@ -20341,6 +20234,70 @@
         "line": 15
       }
     },
+    "types::shared_ptr::SharedPtr": {
+      "path": "types::shared_ptr::SharedPtr",
+      "visibility": "public",
+      "type_parameters": [
+        "T"
+      ],
+      "size": 16,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "px",
+            "doc": null,
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "type_parameter",
+                "name": "T"
+              }
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 28,
+              "line": 130
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "pn",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::shared_ptr::SharedCount"
+            },
+            "offset": 8,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 28,
+              "line": 131
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      },
+      "source": {
+        "file_index": 28,
+        "line": 128
+      }
+    },
     "types::shared_ptr::WeakCount": {
       "path": "types::shared_ptr::WeakCount",
       "visibility": "private",
@@ -20383,6 +20340,70 @@
       "source": {
         "file_index": 28,
         "line": 100
+      }
+    },
+    "types::shared_ptr::WeakPtr": {
+      "path": "types::shared_ptr::WeakPtr",
+      "visibility": "public",
+      "type_parameters": [
+        "T"
+      ],
+      "size": 16,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "px",
+            "doc": null,
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "type_parameter",
+                "name": "T"
+              }
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 28,
+              "line": 226
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "pn",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::shared_ptr::WeakCount"
+            },
+            "offset": 8,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 28,
+              "line": 227
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      },
+      "source": {
+        "file_index": 28,
+        "line": 224
       }
     },
     "u128": {
@@ -23249,8 +23270,7 @@
           "doc": null,
           "items": [
             "game_objects::avatar::Avatar",
-            "game_objects::avatar::AvatarVftable",
-            "game_objects::avatar::WeakPtr<Avatar>"
+            "game_objects::avatar::AvatarVftable"
           ],
           "submodules": {},
           "extern_values": [],
@@ -23269,8 +23289,7 @@
           "items": [
             "game_objects::character::Character",
             "game_objects::character::CharacterBase",
-            "game_objects::character::CharacterBaseVftable",
-            "game_objects::character::SharedPtr<Vehicle>"
+            "game_objects::character::CharacterBaseVftable"
           ],
           "submodules": {},
           "extern_values": [],
@@ -23288,8 +23307,7 @@
           "doc": null,
           "items": [
             "game_objects::character_manager::CharacterManager",
-            "game_objects::character_manager::CharacterManagerVftable",
-            "game_objects::character_manager::SharedPtr<Player>"
+            "game_objects::character_manager::CharacterManagerVftable"
           ],
           "submodules": {},
           "extern_values": [],
@@ -23317,9 +23335,7 @@
           "doc": null,
           "items": [
             "game_objects::game_object::GameObject",
-            "game_objects::game_object::GameObjectVftable",
-            "game_objects::game_object::SharedPtr<GameObject>",
-            "game_objects::game_object::WeakPtr<GameObject>"
+            "game_objects::game_object::GameObjectVftable"
           ],
           "submodules": {},
           "extern_values": [],
@@ -23482,9 +23498,7 @@
           "items": [
             "physics::pfx_instance::PfxID",
             "physics::pfx_instance::PfxInstance",
-            "physics::pfx_instance::PfxInstanceVftable",
-            "physics::pfx_instance::SharedPtr<PfxInstance>",
-            "physics::pfx_instance::WeakPtr<PfxInstance>"
+            "physics::pfx_instance::PfxInstanceVftable"
           ],
           "submodules": {},
           "extern_values": [],
@@ -23693,7 +23707,9 @@
             "types::shared_ptr::SharedCount",
             "types::shared_ptr::SharedCountImpl",
             "types::shared_ptr::SharedCountImplVftable",
-            "types::shared_ptr::WeakCount"
+            "types::shared_ptr::SharedPtr",
+            "types::shared_ptr::WeakCount",
+            "types::shared_ptr::WeakPtr"
           ],
           "submodules": {},
           "extern_values": [],
@@ -23718,11 +23734,11 @@
               },
               {
                 "prologue": null,
-                "epilogue": "\n    // SharedPtr\n    #[repr(C)]\n    pub struct SharedPtr<T> {\n        px: *mut T,\n        pn: SharedCount,\n    }\n    #[allow(dead_code)]\n    impl<T> SharedPtr<T> {\n        pub fn new() -> SharedPtr<T> {\n            SharedPtr {\n                px: ptr::null_mut(),\n                pn: SharedCount {\n                    count_impl: ptr::null_mut(),\n                },\n            }\n        }\n\n        pub unsafe fn as_ref(&self) -> Option<&T> {\n            self.exists().then(|| unsafe { &*self.px })\n        }\n\n        pub unsafe fn as_mut(&mut self) -> Option<&mut T> {\n            self.exists().then(|| unsafe { &mut *self.px })\n        }\n\n        pub fn exists(&self) -> bool {\n            !self.px.is_null()\n        }\n\n        pub fn refcount(&self) -> i32 {\n            unsafe { (*self.pn.count_impl).use_count.load(Ordering::SeqCst) }\n        }\n\n        pub fn is_only_owner(&self) -> bool {\n            self.refcount() == 1\n        }\n\n        pub unsafe fn swap(&mut self, rhs: &mut SharedPtr<T>) {\n            unsafe {\n                swap_unaligned(&raw mut self.px, &raw mut rhs.px);\n            }\n            self.pn.swap(&mut rhs.pn);\n        }\n\n        pub unsafe fn reset_with_empty(&mut self) {\n            unsafe {\n                self.swap(&mut SharedPtr::new());\n            }\n        }\n\n        /// Absolutely no verification on this - make sure that T can be casted to Y!\n        pub unsafe fn static_pointer_cast<Y>(self) -> SharedPtr<Y> {\n            SharedPtr {\n                px: self.px as *mut Y,\n                pn: self.pn,\n            }\n        }\n\n        /// Given a `SharedPtr<T>`, returns a `SharedPtr<Y>` if `T: AsMut<Y>`.\n        /// Pyxis defines `AsMut` conversions for inheritance, so this can be used\n        /// to convert a `SharedPtr<Derived>` to a `SharedPtr<Base>`.\n        ///\n        /// That being said, it's still somewhat unsafe, so use with caution.\n        pub unsafe fn as_mut_cast<Y>(self) -> SharedPtr<Y>\n        where\n            T: AsMut<Y>,\n        {\n            SharedPtr {\n                px: unsafe { (*self.px).as_mut() as *mut Y },\n                pn: self.pn,\n            }\n        }\n    }\n    impl<T> Clone for SharedPtr<T> {\n        fn clone(&self) -> SharedPtr<T> {\n            SharedPtr {\n                px: self.px,\n                pn: self.pn.clone(),\n            }\n        }\n    }\n    impl<T> Default for SharedPtr<T> {\n        fn default() -> SharedPtr<T> {\n            SharedPtr::new()\n        }\n    }\n    impl<T> PartialEq for SharedPtr<T> {\n        fn eq(&self, other: &SharedPtr<T>) -> bool {\n            self.px == other.px\n        }\n    }\n    impl<T> Eq for SharedPtr<T> {}\n"
+                "epilogue": "\n    // SharedPtr\n    #[allow(dead_code)]\n    impl<T> SharedPtr<T> {\n        pub fn new() -> SharedPtr<T> {\n            SharedPtr {\n                px: ptr::null_mut(),\n                pn: SharedCount {\n                    count_impl: ptr::null_mut(),\n                },\n            }\n        }\n\n        pub unsafe fn as_ref(&self) -> Option<&T> {\n            self.exists().then(|| unsafe { &*self.px })\n        }\n\n        pub unsafe fn as_mut(&mut self) -> Option<&mut T> {\n            self.exists().then(|| unsafe { &mut *self.px })\n        }\n\n        pub fn exists(&self) -> bool {\n            !self.px.is_null()\n        }\n\n        pub fn refcount(&self) -> i32 {\n            unsafe { (*self.pn.count_impl).use_count.load(Ordering::SeqCst) }\n        }\n\n        pub fn is_only_owner(&self) -> bool {\n            self.refcount() == 1\n        }\n\n        pub unsafe fn swap(&mut self, rhs: &mut SharedPtr<T>) {\n            unsafe {\n                swap_unaligned(&raw mut self.px, &raw mut rhs.px);\n            }\n            self.pn.swap(&mut rhs.pn);\n        }\n\n        pub unsafe fn reset_with_empty(&mut self) {\n            unsafe {\n                self.swap(&mut SharedPtr::new());\n            }\n        }\n\n        /// Absolutely no verification on this - make sure that T can be casted to Y!\n        pub unsafe fn static_pointer_cast<Y>(self) -> SharedPtr<Y> {\n            SharedPtr {\n                px: self.px as *mut Y,\n                pn: self.pn,\n            }\n        }\n\n        /// Given a `SharedPtr<T>`, returns a `SharedPtr<Y>` if `T: AsMut<Y>`.\n        /// Pyxis defines `AsMut` conversions for inheritance, so this can be used\n        /// to convert a `SharedPtr<Derived>` to a `SharedPtr<Base>`.\n        ///\n        /// That being said, it's still somewhat unsafe, so use with caution.\n        pub unsafe fn as_mut_cast<Y>(self) -> SharedPtr<Y>\n        where\n            T: AsMut<Y>,\n        {\n            SharedPtr {\n                px: unsafe { (*self.px).as_mut() as *mut Y },\n                pn: self.pn,\n            }\n        }\n    }\n    impl<T> Clone for SharedPtr<T> {\n        fn clone(&self) -> SharedPtr<T> {\n            SharedPtr {\n                px: self.px,\n                pn: self.pn.clone(),\n            }\n        }\n    }\n    impl<T> Default for SharedPtr<T> {\n        fn default() -> SharedPtr<T> {\n            SharedPtr::new()\n        }\n    }\n    impl<T> PartialEq for SharedPtr<T> {\n        fn eq(&self, other: &SharedPtr<T>) -> bool {\n            self.px == other.px\n        }\n    }\n    impl<T> Eq for SharedPtr<T> {}\n"
               },
               {
                 "prologue": null,
-                "epilogue": "\n    // WeakPtr\n    #[allow(dead_code)]\n    #[repr(C)]\n    pub struct WeakPtr<T> {\n        px: *mut T,\n        pn: WeakCount,\n    }\n    impl<T> WeakPtr<T> {\n        pub unsafe fn new_from_shared(shared: SharedPtr<T>) -> WeakPtr<T> {\n            WeakPtr {\n                px: shared.px,\n                pn: WeakCount::new_from_shared(&shared.pn),\n            }\n        }\n    }\n\n    unsafe fn swap_unaligned<T>(p1: *mut T, p2: *mut T) {\n        unsafe {\n            let p1_val = ptr::read_unaligned(p1);\n            let p2_val = ptr::read_unaligned(p2);\n\n            ptr::write_unaligned(p1, p2_val);\n            ptr::write_unaligned(p2, p1_val);\n        }\n    }\n"
+                "epilogue": "\n    // WeakPtr\n    #[allow(dead_code)]\n    impl<T> WeakPtr<T> {\n        pub unsafe fn new_from_shared(shared: SharedPtr<T>) -> WeakPtr<T> {\n            WeakPtr {\n                px: shared.px,\n                pn: WeakCount::new_from_shared(&shared.pn),\n            }\n        }\n    }\n\n    unsafe fn swap_unaligned<T>(p1: *mut T, p2: *mut T) {\n        unsafe {\n            let p1_val = ptr::read_unaligned(p1);\n            let p2_val = ptr::read_unaligned(p2);\n\n            ptr::write_unaligned(p1, p2_val);\n            ptr::write_unaligned(p2, p1_val);\n        }\n    }\n"
               }
             ]
           }

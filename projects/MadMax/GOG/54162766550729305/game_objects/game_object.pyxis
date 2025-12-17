@@ -1,12 +1,6 @@
-use types::{hash_string::HashString, math::Aabb, object_id::ObjectID, rtti::Rtti};
+use types::{hash_string::HashString, math::Aabb, object_id::ObjectID, rtti::Rtti, shared_ptr::{SharedPtr, WeakPtr}};
 
 backend rust prologue "use crate::{math::Matrix4, shared_ptr::*};";
-
-#[size(16), align(8)]
-extern type SharedPtr<GameObject>;
-
-#[size(16), align(8)]
-extern type WeakPtr<GameObject>;
 
 #[size(0xD0)]
 pub type GameObject {

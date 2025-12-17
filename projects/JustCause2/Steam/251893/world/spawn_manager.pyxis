@@ -1,10 +1,8 @@
+use game_objects::vehicle::Vehicle;
 use world::world_sim::WorldSim;
-use types::std_string::StdString;
+use types::{std_string::StdString, shared_ptr::SharedPtr};
 
 backend rust prologue "use crate::{SharedPtr, Vehicle};";
-
-#[size(8), align(4)]
-extern type SharedPtr<Vehicle>;
 
 #[size(0x58)]
 pub type LoadedModel {

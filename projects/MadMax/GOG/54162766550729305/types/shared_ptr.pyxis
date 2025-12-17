@@ -125,13 +125,14 @@ backend rust epilogue r#"
     }
 "#;
 
+#[size(0x10)]
+pub type SharedPtr<T> {
+    pub px: *mut T,
+    pub pn: SharedCount,
+}
+
 backend rust epilogue r#"
     // SharedPtr
-    #[repr(C)]
-    pub struct SharedPtr<T> {
-        px: *mut T,
-        pn: SharedCount,
-    }
     #[allow(dead_code)]
     impl<T> SharedPtr<T> {
         pub fn new() -> SharedPtr<T> {
@@ -220,14 +221,15 @@ backend rust epilogue r#"
     impl<T> Eq for SharedPtr<T> {}
 "#;
 
+#[size(0x10)]
+pub type WeakPtr<T> {
+    pub px: *mut T,
+    pub pn: WeakCount,
+}
+
 backend rust epilogue r#"
     // WeakPtr
     #[allow(dead_code)]
-    #[repr(C)]
-    pub struct WeakPtr<T> {
-        px: *mut T,
-        pn: WeakCount,
-    }
     impl<T> WeakPtr<T> {
         pub unsafe fn new_from_shared(shared: SharedPtr<T>) -> WeakPtr<T> {
             WeakPtr {

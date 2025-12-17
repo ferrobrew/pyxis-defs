@@ -1,9 +1,7 @@
-use types::math::Matrix4;
+use game_objects::player::Player;
+use types::{math::Matrix4, shared_ptr::SharedPtr};
 
 backend rust prologue "use crate::{character::*, player::*, shared_ptr::*};";
-
-#[size(16), align(8)]
-extern type SharedPtr<Player>;
 
 #[singleton(0x141_715_FB8), size(0x3B00), align(16)]
 pub type CharacterManager {

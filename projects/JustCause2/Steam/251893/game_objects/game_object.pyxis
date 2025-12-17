@@ -1,13 +1,9 @@
 use physics::pfx_rigid_body::PfxRigidBody;
 use types::{math::Aabb, rtti::Rtti};
 
+use types::shared_ptr::{SharedPtr, WeakPtr};
+
 backend rust prologue "use crate::{math::Matrix4, shared_ptr::*};";
-
-#[size(8), align(4)]
-extern type SharedPtr<GameObject>;
-
-#[size(8), align(4)]
-extern type WeakPtr<GameObject>;
 
 pub type PropertyFile;
 

@@ -1,10 +1,7 @@
 use physics::{havok::rigid_body::HkpRigidBody, pfx_instance::{PfxInstance, PfxInstanceInterface}};
-use types::math::{Matrix4, Vector3};
+use types::{math::{Matrix4, Vector3}, shared_ptr::SharedPtr};
 
 backend rust prologue "use crate::shared_ptr::*;";
-
-#[size(8), align(4)]
-extern type SharedPtr<u32>;
 
 #[size(0x30)]
 pub type PfxRigidBody {

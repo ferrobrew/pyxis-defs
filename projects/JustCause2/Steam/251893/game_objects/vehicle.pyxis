@@ -1,11 +1,8 @@
-use game_objects::{damageable::Damageable, game_object::GameObject};
+use game_objects::{damageable::Damageable, game_object::GameObject, smart_object::SmartObject};
 use physics::pfx_instance::PfxInstance;
-use types::math::{Aabb, Vector3};
+use types::{math::{Aabb, Vector3}, shared_ptr::WeakPtr};
 
 backend rust prologue "use crate::{GameObject, SharedPtr, SmartObject, WeakPtr, PfxVehicle};";
-
-#[size(8), align(4)]
-extern type WeakPtr<SmartObject>;
 
 #[copyable, cloneable]
 pub enum LightEffect: u32 {
