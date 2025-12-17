@@ -2,7 +2,7 @@ backend rust prologue r#"
     #[cfg(feature = "glam")]
     use glam::{Mat3, Mat4, Vec2, Vec3, Vec4};
     #[cfg(feature = "bevy_math")]
-    use bevy_math::{bounding::Aabb3d, Ray3d};
+    use bevy_math::{bounding::Aabb3d, Dir3, Ray3d};
 "#;
 
 #[copyable, defaultable]
@@ -108,13 +108,16 @@ backend rust epilogue r#"
     #[cfg(feature = "bevy_math")]
     impl From<Ray> for Ray3d {
         fn from(r: Ray) -> Self {
-            Self::new(r.origin.into(), r.direction.into())
+            Self::new(
+                bevy_math::Vec3::from(r.origin),
+                Dir3::new(bevy_math::Vec3::from(r.direction)).unwrap(),
+            )
         }
     }
     #[cfg(feature = "bevy_math")]
     impl From<Ray3d> for Ray {
         fn from(r: Ray3d) -> Self {
-            Self::new(r.origin.into(), Vec3::from(r.direction).into())
+            Self::new(r.origin.into(), (*r.direction).into())
         }
     }
     impl Ray {
@@ -167,6 +170,20 @@ backend rust epilogue r#"
     impl From<Vector3> for Vec3 {
         fn from(v: Vector3) -> Self {
             Vec3::new(v.data[0], v.data[1], v.data[2])
+        }
+    }
+    #[cfg(feature = "bevy_math")]
+    impl From<bevy_math::Vec3> for Vector3 {
+        fn from(v: bevy_math::Vec3) -> Self {
+            Self {
+                data: [v.x, v.y, v.z],
+            }
+        }
+    }
+    #[cfg(feature = "bevy_math")]
+    impl From<Vector3> for bevy_math::Vec3 {
+        fn from(v: Vector3) -> Self {
+            bevy_math::Vec3::new(v.data[0], v.data[1], v.data[2])
         }
     }
 "#;
