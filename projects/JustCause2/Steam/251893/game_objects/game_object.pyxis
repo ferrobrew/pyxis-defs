@@ -1,6 +1,5 @@
 use physics::pfx_rigid_body::PfxRigidBody;
 use types::{math::Aabb, rtti::Rtti};
-
 use types::shared_ptr::{SharedPtr, WeakPtr};
 
 backend rust prologue "use crate::{math::Matrix4, shared_ptr::*};";

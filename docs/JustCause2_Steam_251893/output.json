@@ -52732,7 +52732,7 @@
             "is_base": false,
             "source": {
               "file_index": 47,
-              "line": 132
+              "line": 135
             }
           }
         ],
@@ -52746,7 +52746,7 @@
       },
       "source": {
         "file_index": 47,
-        "line": 130
+        "line": 133
       }
     },
     "types::math::Vector3": {
@@ -52777,7 +52777,7 @@
             "is_base": false,
             "source": {
               "file_index": 47,
-              "line": 154
+              "line": 157
             }
           }
         ],
@@ -52791,7 +52791,7 @@
       },
       "source": {
         "file_index": 47,
-        "line": 152
+        "line": 155
       }
     },
     "types::math::Vector4": {
@@ -52822,7 +52822,7 @@
             "is_base": false,
             "source": {
               "file_index": 47,
-              "line": 176
+              "line": 193
             }
           }
         ],
@@ -52836,7 +52836,7 @@
       },
       "source": {
         "file_index": 47,
-        "line": 174
+        "line": 191
       }
     },
     "types::rtti::Rtti": {
@@ -56635,7 +56635,7 @@
           "backends": {
             "rust": [
               {
-                "prologue": "\n    #[cfg(feature = \"glam\")]\n    use glam::{Mat3, Mat4, Vec2, Vec3, Vec4};\n    #[cfg(feature = \"bevy_math\")]\n    use bevy_math::{bounding::Aabb3d, Ray3d};\n",
+                "prologue": "\n    #[cfg(feature = \"glam\")]\n    use glam::{Mat3, Mat4, Vec2, Vec3, Vec4};\n    #[cfg(feature = \"bevy_math\")]\n    use bevy_math::{bounding::Aabb3d, Dir3, Ray3d};\n",
                 "epilogue": null
               },
               {
@@ -56652,7 +56652,7 @@
               },
               {
                 "prologue": null,
-                "epilogue": "\n    #[cfg(feature = \"bevy_math\")]\n    impl From<Ray> for Ray3d {\n        fn from(r: Ray) -> Self {\n            Self::new(r.origin.into(), r.direction.into())\n        }\n    }\n    #[cfg(feature = \"bevy_math\")]\n    impl From<Ray3d> for Ray {\n        fn from(r: Ray3d) -> Self {\n            Self::new(r.origin.into(), Vec3::from(r.direction).into())\n        }\n    }\n    impl Ray {\n        fn new(origin: Vector3, direction: Vector3) -> Self {\n            Self {\n                origin,\n                direction,\n            }\n        }\n    }\n"
+                "epilogue": "\n    #[cfg(feature = \"bevy_math\")]\n    impl From<Ray> for Ray3d {\n        fn from(r: Ray) -> Self {\n            Self::new(\n                bevy_math::Vec3::from(r.origin),\n                Dir3::new(bevy_math::Vec3::from(r.direction)).unwrap(),\n            )\n        }\n    }\n    #[cfg(feature = \"bevy_math\")]\n    impl From<Ray3d> for Ray {\n        fn from(r: Ray3d) -> Self {\n            Self::new(r.origin.into(), (*r.direction).into())\n        }\n    }\n    impl Ray {\n        fn new(origin: Vector3, direction: Vector3) -> Self {\n            Self {\n                origin,\n                direction,\n            }\n        }\n    }\n"
               },
               {
                 "prologue": null,
@@ -56660,7 +56660,7 @@
               },
               {
                 "prologue": null,
-                "epilogue": "\n    #[cfg(feature = \"glam\")]\n    impl From<Vec3> for Vector3 {\n        fn from(v: Vec3) -> Self {\n            Self {\n                data: [v.x, v.y, v.z],\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Vector3> for Vec3 {\n        fn from(v: Vector3) -> Self {\n            Vec3::new(v.data[0], v.data[1], v.data[2])\n        }\n    }\n"
+                "epilogue": "\n    #[cfg(feature = \"glam\")]\n    impl From<Vec3> for Vector3 {\n        fn from(v: Vec3) -> Self {\n            Self {\n                data: [v.x, v.y, v.z],\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Vector3> for Vec3 {\n        fn from(v: Vector3) -> Self {\n            Vec3::new(v.data[0], v.data[1], v.data[2])\n        }\n    }\n    #[cfg(feature = \"bevy_math\")]\n    impl From<bevy_math::Vec3> for Vector3 {\n        fn from(v: bevy_math::Vec3) -> Self {\n            Self {\n                data: [v.x, v.y, v.z],\n            }\n        }\n    }\n    #[cfg(feature = \"bevy_math\")]\n    impl From<Vector3> for bevy_math::Vec3 {\n        fn from(v: Vector3) -> Self {\n            bevy_math::Vec3::new(v.data[0], v.data[1], v.data[2])\n        }\n    }\n"
               },
               {
                 "prologue": null,
