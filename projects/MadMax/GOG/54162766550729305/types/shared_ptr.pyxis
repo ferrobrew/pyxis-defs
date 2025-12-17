@@ -127,8 +127,8 @@ backend rust epilogue r#"
 
 #[size(0x10)]
 pub type SharedPtr<T> {
-    pub px: *mut T,
-    pub pn: SharedCount,
+    px: *mut T,
+    pn: SharedCount,
 }
 
 backend rust epilogue r#"
@@ -223,8 +223,8 @@ backend rust epilogue r#"
 
 #[size(0x10)]
 pub type WeakPtr<T> {
-    pub px: *mut T,
-    pub pn: WeakCount,
+    px: *mut T,
+    pn: WeakCount,
 }
 
 backend rust epilogue r#"
