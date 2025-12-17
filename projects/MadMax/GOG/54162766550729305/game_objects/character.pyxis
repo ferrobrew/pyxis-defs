@@ -1,11 +1,8 @@
 use game_objects::{damageable::Damageable, vehicle::Vehicle};
 use physics::{pfx_character::PfxCharacter, pfx_game_object::PfxGameObject};
-use types::{math::Matrix4, rtti::Rtti};
+use types::{math::Matrix4, rtti::Rtti, shared_ptr::SharedPtr};
 
 backend rust prologue "use crate::{game_objects::vehicle::Vehicle, shared_ptr::*};";
-
-#[size(16), align(8)]
-extern type SharedPtr<Vehicle>;
 
 #[size(0x32B0)]
 pub type Character {

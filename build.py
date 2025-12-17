@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Build script that finds all pyxis.toml files, builds them with pyxis,
-and generates an index.json file with metadata.
+Build script that finds all pyxis.toml files and builds them with pyxis.
+For the JSON backend, generates an index.json file with metadata.
 """
 
 import argparse
@@ -56,7 +56,7 @@ def find_pyxis_toml_files(root_dir: Path) -> List[Path]:
     return list(root_dir.rglob("pyxis.toml"))
 
 
-def build_pyxis_project(input_dir: Path, output_dir: Path) -> bool:
+def build_pyxis_project(input_dir: Path, output_dir: Path, backend: str) -> bool:
     """Build a pyxis project and return True if successful."""
     # On Windows, ensure UTF-8 encoding for subprocess output
     env = os.environ.copy()
@@ -79,7 +79,7 @@ def build_pyxis_project(input_dir: Path, output_dir: Path) -> bool:
                 "pyxis",
                 "build",
                 "--backend",
-                "json",
+                backend,
                 str(input_dir),
                 str(output_dir) + "/",
             ],
@@ -182,6 +182,12 @@ def main():
     parser.add_argument(
         "--no-install", action="store_true", help="Do not install pyxis"
     )
+    parser.add_argument(
+        "--backend",
+        type=str,
+        default="json",
+        help="Backend to use for code generation (default: json)",
+    )
     args = parser.parse_args()
 
     specified = sum(
@@ -201,8 +207,14 @@ def main():
 
     # Get repository root
     repo_root = Path(__file__).parent.resolve()
-    docs_dir = repo_root / "docs"
-    docs_dir.mkdir(exist_ok=True)
+    backend = args.backend
+
+    # For JSON backend, use docs/ directory; otherwise use {backend}/ directory
+    if backend == "json":
+        output_base_dir = repo_root / "docs"
+    else:
+        output_base_dir = repo_root / backend
+    output_base_dir.mkdir(exist_ok=True)
 
     # Find all pyxis.toml files
     project_dir = repo_root / "projects"
@@ -228,67 +240,71 @@ def main():
     # Process each project
     for output_name, toml_file in projects:
         input_dir = toml_file.parent
-        output_dir = docs_dir / output_name
+        output_dir = output_base_dir / output_name
 
         print(f"Building {input_dir} -> {output_dir}")
 
         # Build with pyxis
-        if not build_pyxis_project(input_dir, output_dir):
+        if not build_pyxis_project(input_dir, output_dir, backend):
             print(f"Error: Failed to build {input_dir}", file=sys.stderr)
             sys.exit(1)
 
-        # Extract project_name from the generated JSON
-        json_file = output_dir / "output.json"
-        if not json_file.exists():
-            print(f"Error: {json_file} not found after build", file=sys.stderr)
-            sys.exit(1)
+        # For JSON backend, collect metadata for index generation
+        if backend == "json":
+            # Extract project_name from the generated JSON
+            json_file = output_dir / "output.json"
+            if not json_file.exists():
+                print(f"Error: {json_file} not found after build", file=sys.stderr)
+                sys.exit(1)
 
-        project_name = get_project_name(json_file)
-        if not project_name:
-            print(
-                f"Error: Could not extract project_name from {json_file}",
-                file=sys.stderr,
+            project_name = get_project_name(json_file)
+            if not project_name:
+                print(
+                    f"Error: Could not extract project_name from {json_file}",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
+
+            # Get last modified timestamp from Git
+            last_modified_dt = get_git_last_modified(input_dir)
+            # Convert to ISO8601 string if available, otherwise None
+            last_modified_iso8601 = (
+                last_modified_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+                if last_modified_dt is not None
+                else None
             )
+
+            # Get relative path to JSON from repo root
+            json_path = json_file.relative_to(repo_root)
+
+            # Add document to list
+            documents.append(
+                {
+                    "name": project_name,
+                    "path": str(json_path).replace(
+                        "\\", "/"
+                    ),  # Use forward slashes for paths
+                    "last_modified_iso8601": last_modified_iso8601,
+                }
+            )
+
+    # Generate index.json only for JSON backend
+    if backend == "json":
+        # Generate current timestamp in ISO 8601 format
+        generated_iso8601 = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        # Build the index.json
+        index_data = {"generated_iso8601": generated_iso8601, "docs": documents}
+
+        index_file = output_base_dir / "index.json"
+        try:
+            with open(index_file, "w", encoding="utf-8") as f:
+                json.dump(index_data, f, indent=2, ensure_ascii=False)
+        except (IOError, OSError) as e:
+            print(f"Error: Failed to write {index_file}: {e}", file=sys.stderr)
             sys.exit(1)
 
-        # Get last modified timestamp from Git
-        last_modified_dt = get_git_last_modified(input_dir)
-        # Convert to ISO8601 string if available, otherwise None
-        last_modified_iso8601 = (
-            last_modified_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
-            if last_modified_dt is not None
-            else None
-        )
-
-        # Get relative path to JSON from repo root
-        json_path = json_file.relative_to(repo_root)
-
-        # Add document to list
-        documents.append(
-            {
-                "name": project_name,
-                "path": str(json_path).replace(
-                    "\\", "/"
-                ),  # Use forward slashes for paths
-                "last_modified_iso8601": last_modified_iso8601,
-            }
-        )
-
-    # Generate current timestamp in ISO 8601 format
-    generated_iso8601 = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-    # Build the index.json
-    index_data = {"generated_iso8601": generated_iso8601, "docs": documents}
-
-    index_file = docs_dir / "index.json"
-    try:
-        with open(index_file, "w", encoding="utf-8") as f:
-            json.dump(index_data, f, indent=2, ensure_ascii=False)
-    except (IOError, OSError) as e:
-        print(f"Error: Failed to write {index_file}: {e}", file=sys.stderr)
-        sys.exit(1)
-
-    print(f"Index generated at {index_file}")
+        print(f"Index generated at {index_file}")
 
 
 if __name__ == "__main__":
