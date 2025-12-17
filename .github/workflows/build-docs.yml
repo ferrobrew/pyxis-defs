@@ -6,13 +6,13 @@ on:
       - main
     paths:
       - "projects/**"
-      - "build_json.py"
+      - "build.py"
   pull_request:
     branches:
       - main
     paths:
       - "projects/**"
-      - "build_json.py"
+      - "build.py"
   workflow_dispatch:
 
 jobs:
@@ -40,7 +40,7 @@ jobs:
         run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
       - name: Run build script
-        run: python3 build_json.py
+        run: python3 build.py
 
       - name: Run pyxis format
         run: pyxis fmt
@@ -66,5 +66,5 @@ jobs:
       - name: Fail if docs need updating in PR
         if: steps.verify-changed-files.outputs.changed == 'true' && github.event_name == 'pull_request'
         run: |
-          echo "::error::Documentation is out of date. Please run build_json.py locally and commit the changes."
+          echo "::error::Documentation is out of date. Please run build.py locally and commit the changes."
           exit 1
