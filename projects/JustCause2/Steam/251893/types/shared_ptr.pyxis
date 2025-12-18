@@ -2,12 +2,9 @@ backend rust prologue r#"
     use std::{
         clone::Clone,
         ptr,
-        sync::atomic::{AtomicI32, Ordering},
+        sync::atomic::Ordering,
     };
 "#;
-
-#[size(4), align(4)]
-extern type AtomicI32;
 
 #[size(12)]
 type SharedCountImpl {

@@ -2,6 +2,186 @@
   "pointer_size": 8,
   "project_name": "Just Cause 3 (Steam 1227440)",
   "items": {
+    "AtomicBool": {
+      "path": "AtomicBool",
+      "visibility": "public",
+      "size": 1,
+      "alignment": 1,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      },
+      "source": null
+    },
+    "AtomicI16": {
+      "path": "AtomicI16",
+      "visibility": "public",
+      "size": 2,
+      "alignment": 2,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      },
+      "source": null
+    },
+    "AtomicI32": {
+      "path": "AtomicI32",
+      "visibility": "public",
+      "size": 4,
+      "alignment": 4,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      },
+      "source": null
+    },
+    "AtomicI64": {
+      "path": "AtomicI64",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 8,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      },
+      "source": null
+    },
+    "AtomicI8": {
+      "path": "AtomicI8",
+      "visibility": "public",
+      "size": 1,
+      "alignment": 1,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      },
+      "source": null
+    },
+    "AtomicU16": {
+      "path": "AtomicU16",
+      "visibility": "public",
+      "size": 2,
+      "alignment": 2,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      },
+      "source": null
+    },
+    "AtomicU32": {
+      "path": "AtomicU32",
+      "visibility": "public",
+      "size": 4,
+      "alignment": 4,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      },
+      "source": null
+    },
+    "AtomicU64": {
+      "path": "AtomicU64",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 8,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      },
+      "source": null
+    },
+    "AtomicU8": {
+      "path": "AtomicU8",
+      "visibility": "public",
+      "size": 1,
+      "alignment": 1,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      },
+      "source": null
+    },
     "bool": {
       "path": "bool",
       "visibility": "public",
@@ -7484,6 +7664,15 @@
     "root": {
       "doc": null,
       "items": [
+        "AtomicBool",
+        "AtomicI16",
+        "AtomicI32",
+        "AtomicI64",
+        "AtomicI8",
+        "AtomicU16",
+        "AtomicU32",
+        "AtomicU64",
+        "AtomicU8",
         "bool",
         "f32",
         "f64",

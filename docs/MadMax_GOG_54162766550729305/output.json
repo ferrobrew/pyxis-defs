@@ -2,6 +2,186 @@
   "pointer_size": 8,
   "project_name": "Mad Max (1.0.3 / GOG 54162766550729305)",
   "items": {
+    "AtomicBool": {
+      "path": "AtomicBool",
+      "visibility": "public",
+      "size": 1,
+      "alignment": 1,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      },
+      "source": null
+    },
+    "AtomicI16": {
+      "path": "AtomicI16",
+      "visibility": "public",
+      "size": 2,
+      "alignment": 2,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      },
+      "source": null
+    },
+    "AtomicI32": {
+      "path": "AtomicI32",
+      "visibility": "public",
+      "size": 4,
+      "alignment": 4,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      },
+      "source": null
+    },
+    "AtomicI64": {
+      "path": "AtomicI64",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 8,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      },
+      "source": null
+    },
+    "AtomicI8": {
+      "path": "AtomicI8",
+      "visibility": "public",
+      "size": 1,
+      "alignment": 1,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      },
+      "source": null
+    },
+    "AtomicU16": {
+      "path": "AtomicU16",
+      "visibility": "public",
+      "size": 2,
+      "alignment": 2,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      },
+      "source": null
+    },
+    "AtomicU32": {
+      "path": "AtomicU32",
+      "visibility": "public",
+      "size": 4,
+      "alignment": 4,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      },
+      "source": null
+    },
+    "AtomicU64": {
+      "path": "AtomicU64",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 8,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      },
+      "source": null
+    },
+    "AtomicU8": {
+      "path": "AtomicU8",
+      "visibility": "public",
+      "size": 1,
+      "alignment": 1,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false
+      },
+      "source": null
+    },
     "bool": {
       "path": "bool",
       "visibility": "public",
@@ -19912,29 +20092,6 @@
         "line": 3
       }
     },
-    "types::shared_ptr::AtomicI32": {
-      "path": "types::shared_ptr::AtomicI32",
-      "visibility": "public",
-      "size": 4,
-      "alignment": 4,
-      "category": "extern",
-      "kind": {
-        "type": "type",
-        "doc": null,
-        "fields": [],
-        "associated_functions": [],
-        "vftable": null,
-        "singleton": null,
-        "copyable": false,
-        "cloneable": false,
-        "defaultable": false,
-        "packed": false
-      },
-      "source": {
-        "file_index": 28,
-        "line": 9
-      }
-    },
     "types::shared_ptr::SharedCount": {
       "path": "types::shared_ptr::SharedCount",
       "visibility": "private",
@@ -19962,7 +20119,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 62
+              "line": 59
             }
           }
         ],
@@ -19976,7 +20133,7 @@
       },
       "source": {
         "file_index": 28,
-        "line": 60
+        "line": 57
       }
     },
     "types::shared_ptr::SharedCountImpl": {
@@ -20006,7 +20163,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 15
+              "line": 12
             }
           },
           {
@@ -20015,7 +20172,7 @@
             "doc": null,
             "type_ref": {
               "type": "raw",
-              "path": "types::shared_ptr::AtomicI32"
+              "path": "AtomicI32"
             },
             "offset": 8,
             "size": 4,
@@ -20023,7 +20180,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 20
+              "line": 17
             }
           },
           {
@@ -20032,7 +20189,7 @@
             "doc": null,
             "type_ref": {
               "type": "raw",
-              "path": "types::shared_ptr::AtomicI32"
+              "path": "AtomicI32"
             },
             "offset": 12,
             "size": 4,
@@ -20040,7 +20197,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 21
+              "line": 18
             }
           }
         ],
@@ -20064,7 +20221,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 28,
-                "line": 15
+                "line": 12
               }
             },
             {
@@ -20084,7 +20241,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 28,
-                "line": 16
+                "line": 13
               }
             },
             {
@@ -20104,7 +20261,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 28,
-                "line": 17
+                "line": 14
               }
             }
           ]
@@ -20117,7 +20274,7 @@
       },
       "source": {
         "file_index": 28,
-        "line": 12
+        "line": 9
       }
     },
     "types::shared_ptr::SharedCountImplVftable": {
@@ -20157,7 +20314,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 15
+              "line": 12
             }
           },
           {
@@ -20187,7 +20344,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 16
+              "line": 13
             }
           },
           {
@@ -20217,7 +20374,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 17
+              "line": 14
             }
           }
         ],
@@ -20231,7 +20388,7 @@
       },
       "source": {
         "file_index": 28,
-        "line": 15
+        "line": 12
       }
     },
     "types::shared_ptr::SharedPtr": {
@@ -20264,7 +20421,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 130
+              "line": 127
             }
           },
           {
@@ -20281,7 +20438,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 131
+              "line": 128
             }
           }
         ],
@@ -20295,7 +20452,7 @@
       },
       "source": {
         "file_index": 28,
-        "line": 128
+        "line": 125
       }
     },
     "types::shared_ptr::WeakCount": {
@@ -20325,7 +20482,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 102
+              "line": 99
             }
           }
         ],
@@ -20339,7 +20496,7 @@
       },
       "source": {
         "file_index": 28,
-        "line": 100
+        "line": 97
       }
     },
     "types::shared_ptr::WeakPtr": {
@@ -20372,7 +20529,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 226
+              "line": 223
             }
           },
           {
@@ -20389,7 +20546,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 227
+              "line": 224
             }
           }
         ],
@@ -20403,7 +20560,7 @@
       },
       "source": {
         "file_index": 28,
-        "line": 224
+        "line": 221
       }
     },
     "u128": {
@@ -23587,6 +23744,15 @@
     "root": {
       "doc": null,
       "items": [
+        "AtomicBool",
+        "AtomicI16",
+        "AtomicI32",
+        "AtomicI64",
+        "AtomicI8",
+        "AtomicU16",
+        "AtomicU32",
+        "AtomicU64",
+        "AtomicU8",
         "bool",
         "f32",
         "f64",
@@ -23703,7 +23869,6 @@
         "shared_ptr": {
           "doc": null,
           "items": [
-            "types::shared_ptr::AtomicI32",
             "types::shared_ptr::SharedCount",
             "types::shared_ptr::SharedCountImpl",
             "types::shared_ptr::SharedCountImplVftable",
@@ -23717,7 +23882,7 @@
           "backends": {
             "rust": [
               {
-                "prologue": "\n    use std::{\n        clone::Clone,\n        ptr,\n        sync::atomic::{AtomicI32, Ordering},\n    };\n",
+                "prologue": "\n    use std::{\n        clone::Clone,\n        ptr,\n        sync::atomic::Ordering,\n    };\n",
                 "epilogue": null
               },
               {
