@@ -2,7 +2,7 @@ backend rust prologue r#"
     #[cfg(feature = "glam")]
     use glam::{Mat3, Mat4, Vec2, Vec3, Vec4};
     #[cfg(feature = "bevy_math")]
-    use bevy_math::{bounding::Aabb3d, Dir3, Ray3d};
+    use bevy_math::{bounding::Aabb3d, Dir3, Mat4 as BevyMat4, Ray3d};
 "#;
 
 #[copyable, defaultable]
@@ -85,6 +85,20 @@ backend rust epilogue r#"
     impl From<Matrix4> for Mat4 {
         fn from(m: Matrix4) -> Self {
             Mat4::from_cols_array(&m.data)
+        }
+    }
+    #[cfg(feature = "bevy_math")]
+    impl From<BevyMat4> for Matrix4 {
+        fn from(m: BevyMat4) -> Self {
+            Self {
+                data: m.to_cols_array(),
+            }
+        }
+    }
+    #[cfg(feature = "bevy_math")]
+    impl From<Matrix4> for BevyMat4 {
+        fn from(m: Matrix4) -> Self {
+            BevyMat4::from_cols_array(&m.data)
         }
     }
     impl Matrix4 {
