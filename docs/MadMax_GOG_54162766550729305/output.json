@@ -19605,7 +19605,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 103
+              "line": 117
             }
           },
           {
@@ -19622,7 +19622,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 104
+              "line": 118
             }
           }
         ],
@@ -19636,7 +19636,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 101
+        "line": 115
       }
     },
     "types::math::Vector2": {
@@ -19667,7 +19667,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 135
+              "line": 149
             }
           }
         ],
@@ -19681,7 +19681,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 133
+        "line": 147
       }
     },
     "types::math::Vector3": {
@@ -19712,7 +19712,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 157
+              "line": 171
             }
           }
         ],
@@ -19726,7 +19726,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 155
+        "line": 169
       }
     },
     "types::math::Vector4": {
@@ -19757,7 +19757,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 193
+              "line": 207
             }
           }
         ],
@@ -19771,7 +19771,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 191
+        "line": 205
       }
     },
     "types::object_id::ObjectID": {
@@ -23811,7 +23811,7 @@
           "backends": {
             "rust": [
               {
-                "prologue": "\n    #[cfg(feature = \"glam\")]\n    use glam::{Mat3, Mat4, Vec2, Vec3, Vec4};\n    #[cfg(feature = \"bevy_math\")]\n    use bevy_math::{bounding::Aabb3d, Dir3, Ray3d};\n",
+                "prologue": "\n    #[cfg(feature = \"glam\")]\n    use glam::{Mat3, Mat4, Vec2, Vec3, Vec4};\n    #[cfg(feature = \"bevy_math\")]\n    use bevy_math::{bounding::Aabb3d, Dir3, Mat4 as BevyMat4, Ray3d};\n",
                 "epilogue": null
               },
               {
@@ -23824,7 +23824,7 @@
               },
               {
                 "prologue": null,
-                "epilogue": "\n    #[cfg(feature = \"glam\")]\n    impl From<Mat4> for Matrix4 {\n        fn from(m: Mat4) -> Self {\n            Self {\n                data: m.to_cols_array(),\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Matrix4> for Mat4 {\n        fn from(m: Matrix4) -> Self {\n            Mat4::from_cols_array(&m.data)\n        }\n    }\n    impl Matrix4 {\n        pub fn as_ptr(&self) -> *const f32 {\n            self.data.as_ptr()\n        }\n\n        pub fn as_mut_ptr(&mut self) -> *mut f32 {\n            self.data.as_mut_ptr()\n        }\n    }\n"
+                "epilogue": "\n    #[cfg(feature = \"glam\")]\n    impl From<Mat4> for Matrix4 {\n        fn from(m: Mat4) -> Self {\n            Self {\n                data: m.to_cols_array(),\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Matrix4> for Mat4 {\n        fn from(m: Matrix4) -> Self {\n            Mat4::from_cols_array(&m.data)\n        }\n    }\n    #[cfg(feature = \"bevy_math\")]\n    impl From<BevyMat4> for Matrix4 {\n        fn from(m: BevyMat4) -> Self {\n            Self {\n                data: m.to_cols_array(),\n            }\n        }\n    }\n    #[cfg(feature = \"bevy_math\")]\n    impl From<Matrix4> for BevyMat4 {\n        fn from(m: Matrix4) -> Self {\n            BevyMat4::from_cols_array(&m.data)\n        }\n    }\n    impl Matrix4 {\n        pub fn as_ptr(&self) -> *const f32 {\n            self.data.as_ptr()\n        }\n\n        pub fn as_mut_ptr(&mut self) -> *mut f32 {\n            self.data.as_mut_ptr()\n        }\n    }\n"
               },
               {
                 "prologue": null,
