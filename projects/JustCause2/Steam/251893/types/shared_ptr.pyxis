@@ -146,18 +146,37 @@ pub type SharedPtr<T> {
     pn: SharedCount,
 }
 impl<T> SharedPtr<T> {
-    #[external_body] pub fn exists(&self) -> bool;
-    #[external_body] pub fn refcount(&self) -> i32;
-    #[external_body] pub fn is_only_owner(&self) -> bool;
-    #[external_body] pub fn release(&mut self);
-    #[external_body] pub fn make() -> SharedPtr<T>;
-    #[external_body] pub fn clone_(&self) -> SharedPtr<T>;
+    #[external_body]
+    pub fn exists(&self) -> bool;
+    #[external_body]
+    pub fn refcount(&self) -> i32;
+    #[external_body]
+    pub fn is_only_owner(&self) -> bool;
+    #[external_body]
+    pub fn release(&mut self);
+    #[external_body]
+    pub fn make() -> SharedPtr<T>;
+    #[external_body]
+    pub fn clone_(&self) -> SharedPtr<T>;
 }
+
 impl<T, Y> SharedPtr<T> {
     /// Bit-cast to `SharedPtr<Y>` while preserving the refcount block.
-    /// Caller asserts that T can be reinterpreted as Y. Doesn't transfer
-    /// ownership - the caller can keep using `self` after, but should
-    /// generally treat it as moved-from.
+    /// Caller asserts that T can be reinterpreted as Y.
+    ///
+    /// Note: the Rust and C++ sides of this method diverge by language
+    /// idiom and that's intentional.
+    /// - Rust (`backend rust epilogue` below): MOVES `self`. Refcount is
+    ///   unchanged; the SharedPtr<T> is consumed and replaced by the
+    ///   returned SharedPtr<Y>. Mirrors how Rust's standard ownership
+    ///   model handles transformations on Drop-bearing types.
+    /// - C++ (`backend cpp epilogue` below): SHARES from `&self`.
+    ///   Refcount is bumped; the original SharedPtr<T> stays valid and
+    ///   the returned SharedPtr<Y> co-owns the same refcount block.
+    ///   Mirrors `std::static_pointer_cast<Y>` from `<memory>`.
+    /// Both produce equivalent end states (a SharedPtr<Y> over the
+    /// same refcount block); they differ only in whether the original
+    /// pointer remains a live owner after the call.
     #[external_body]
     pub fn static_cast_to(&self) -> SharedPtr<Y>;
 }
@@ -206,7 +225,20 @@ backend rust epilogue r#"
             unsafe { self.swap(&mut SharedPtr::new()) };
         }
 
-        /// Absolutely no verification on this - make sure that T can be casted to Y!
+        /// Bit-cast to `SharedPtr<Y>` while preserving the refcount block.
+        /// Caller asserts that T can be reinterpreted as Y.
+        ///
+        /// MOVE semantics: this method consumes `self`. The original
+        /// `SharedPtr<T>` is invalidated; the returned `SharedPtr<Y>`
+        /// inherits its refcount block with no atomic increment. If you
+        /// need to keep the `T` view alongside the `Y` view, call
+        /// `.clone()` first.
+        ///
+        /// The C++ side of this same `#[external_body]` method
+        /// (declared as `static_cast_to`) uses SHARE semantics instead,
+        /// matching `std::static_pointer_cast<Y>`. Both produce a
+        /// `SharedPtr<Y>` over the same refcount block; only the
+        /// fate-of-the-original differs.
         pub unsafe fn static_pointer_cast<Y>(self) -> SharedPtr<Y> {
             SharedPtr {
                 px: self.px as *mut Y,
@@ -362,9 +394,24 @@ inline SharedPtr<T> SharedPtr<T>::clone_() const {
     return SharedPtr<T>{px, SharedCount{pn.count_impl}};
 }
 
+// Bit-cast to `SharedPtr<Y>` while preserving the refcount block.
+//
+// SHARE semantics: this method bumps the refcount and leaves `*this`
+// valid, so the caller can keep using the original SharedPtr<T> alongside
+// the returned SharedPtr<Y>. Both will keep the underlying allocation
+// alive; both will decrement the refcount when destroyed. This matches
+// `std::static_pointer_cast<Y>` from <memory>.
+//
+// The Rust side of this same `#[external_body]` method uses MOVE
+// semantics (consume `self`, no refcount bump) — see the rust epilogue
+// above. Both produce a `SharedPtr<Y>` over the same refcount block;
+// only the fate-of-the-original differs.
 template <class T> template <class Y>
 inline SharedPtr<Y> SharedPtr<T>::static_cast_to() const {
-    return SharedPtr<Y>{reinterpret_cast<Y*>(px), pn};
+    if (pn.count_impl != nullptr) {
+        pn.count_impl->add_ref_copy();
+    }
+    return SharedPtr<Y>{reinterpret_cast<Y*>(px), SharedCount{pn.count_impl}};
 }
 
 // Free functions retained for non-method shapes (e.g. `SharedCount` /
