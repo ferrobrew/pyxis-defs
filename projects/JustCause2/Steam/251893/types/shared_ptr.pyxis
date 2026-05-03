@@ -145,6 +145,12 @@ pub type SharedPtr<T> {
     px: *mut T,
     pn: SharedCount,
 }
+impl<T> SharedPtr<T> {
+    #[external_body] pub fn exists(&self) -> bool;
+    #[external_body] pub fn refcount(&self) -> i32;
+    #[external_body] pub fn is_only_owner(&self) -> bool;
+    #[external_body] pub fn release(&mut self);
+}
 
 backend rust epilogue r#"
     // SharedPtr
@@ -265,14 +271,9 @@ backend rust epilogue r#"
 
 backend cpp epilogue r#"
 // All atomic mutations use `std::memory_order_seq_cst`, matching the Rust
-// impls' `Ordering::SeqCst`.
-//
-// Methods declared `#[external_body]` on the pyxis side appear here as
-// idiomatic out-of-class definitions. Methods that return `Self` or that
-// belong to a generic template (`SharedPtr<T>`, `WeakPtr<T>`) remain free
-// functions for now — pyxis can't yet host the former (the resolver
-// defer-loops on impl methods that return their own type) or the latter
-// (no `impl<T> Foo<T> { ... }` syntax).
+// impls' `Ordering::SeqCst`. Methods declared `#[external_body]` on the
+// pyxis side appear here as idiomatic out-of-class definitions, including
+// templated methods on `SharedPtr<T>` / `WeakPtr<T>`.
 
 inline void SharedCountImpl::release() {
     auto uc = use_count.load(::std::memory_order_seq_cst) - 1;
@@ -313,7 +314,36 @@ inline void WeakCount::release() {
     }
 }
 
-// Free functions for cases pyxis can't currently host as member methods.
+template <class T>
+inline bool SharedPtr<T>::exists() const {
+    return px != nullptr;
+}
+
+template <class T>
+inline ::std::int32_t SharedPtr<T>::refcount() const {
+    if (pn.count_impl == nullptr) {
+        return 0;
+    }
+    return pn.count_impl->use_count.load(::std::memory_order_seq_cst);
+}
+
+template <class T>
+inline bool SharedPtr<T>::is_only_owner() const {
+    return refcount() == 1;
+}
+
+template <class T>
+inline void SharedPtr<T>::release() {
+    pn.release();
+    px = nullptr;
+    pn.count_impl = nullptr;
+}
+
+// Self-returning factories and conversions still live as free functions:
+// pyxis's resolver doesn't yet schedule self-returning impl methods (the
+// post-pass doesn't know the *return type* in advance), and inter-type
+// conversions like `SharedPtr<T> → SharedPtr<Y>` need two type parameters
+// at the impl level which pyxis doesn't express today.
 
 inline SharedCount SharedCount_clone(const SharedCount* self) {
     if (self->count_impl != nullptr) {
@@ -335,33 +365,8 @@ inline SharedPtr<T> SharedPtr_default() {
 }
 
 template <class T>
-inline bool SharedPtr_exists(const SharedPtr<T>& self) {
-    return self.px != nullptr;
-}
-
-template <class T>
-inline ::std::int32_t SharedPtr_refcount(const SharedPtr<T>& self) {
-    if (self.pn.count_impl == nullptr) {
-        return 0;
-    }
-    return self.pn.count_impl->use_count.load(::std::memory_order_seq_cst);
-}
-
-template <class T>
-inline bool SharedPtr_is_only_owner(const SharedPtr<T>& self) {
-    return SharedPtr_refcount(self) == 1;
-}
-
-template <class T>
 inline SharedPtr<T> SharedPtr_clone(const SharedPtr<T>* self) {
     return SharedPtr<T>{self->px, SharedCount_clone(&self->pn)};
-}
-
-template <class T>
-inline void SharedPtr_release(SharedPtr<T>* self) {
-    self->pn.release();
-    self->px = nullptr;
-    self->pn.count_impl = nullptr;
 }
 
 /// Bit-cast a `SharedPtr<T>` to a `SharedPtr<Y>` while preserving the
