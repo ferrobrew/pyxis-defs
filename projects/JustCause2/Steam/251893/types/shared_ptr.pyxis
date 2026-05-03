@@ -17,6 +17,16 @@ type SharedCountImpl {
     use_count: AtomicI32,
     weak_count: AtomicI32,
 }
+impl SharedCountImpl {
+    #[external_body]
+    pub fn release(&mut self);
+    #[external_body]
+    pub fn weak_release(&mut self);
+    #[external_body]
+    pub fn add_ref_copy(&mut self);
+    #[external_body]
+    pub fn weak_add_ref(&mut self);
+}
 
 backend rust epilogue r#"
     // SharedCountImpl
@@ -58,6 +68,10 @@ backend rust epilogue r#"
 type SharedCount {
     count_impl: *mut SharedCountImpl,
 }
+impl SharedCount {
+    #[external_body]
+    pub fn release(&mut self);
+}
 
 backend rust epilogue r#"
     // SharedCount
@@ -97,6 +111,10 @@ backend rust epilogue r#"
 #[size(4)]
 type WeakCount {
     count_impl: *mut SharedCountImpl,
+}
+impl WeakCount {
+    #[external_body]
+    pub fn release(&mut self);
 }
 
 backend rust epilogue r#"
@@ -246,68 +264,67 @@ backend rust epilogue r#"
 "#;
 
 backend cpp epilogue r#"
-// Free-function helpers mirroring the core methods of SharedCount /
-// WeakCount / SharedPtr<T> / WeakPtr<T> from the Rust side. Pyxis can't
-// (yet) attach pure-C++ member functions to a generated struct without an
-// `#[address]` binding, so we expose the equivalent operations here as
-// inline free functions in the same namespace. All atomic mutations use
-// `std::memory_order_seq_cst`, matching the Rust impls' `Ordering::SeqCst`.
+// All atomic mutations use `std::memory_order_seq_cst`, matching the Rust
+// impls' `Ordering::SeqCst`.
+//
+// Methods declared `#[external_body]` on the pyxis side appear here as
+// idiomatic out-of-class definitions. Methods that return `Self` or that
+// belong to a generic template (`SharedPtr<T>`, `WeakPtr<T>`) remain free
+// functions for now — pyxis can't yet host the former (the resolver
+// defer-loops on impl methods that return their own type) or the latter
+// (no `impl<T> Foo<T> { ... }` syntax).
 
-inline void SharedCountImpl_release(SharedCountImpl* self) {
-    auto use_count = self->use_count.load(::std::memory_order_seq_cst) - 1;
-    self->use_count.store(use_count, ::std::memory_order_seq_cst);
-    if (use_count == 0) {
-        // dispose / destroy are private in pyxis (so they don't get
-        // auto-generated public method wrappers); call through the vftable
-        // fn-pointer directly. The pointers receive `self` as `this`.
-        self->_vftable_ptr()->dispose(self);
-        // weak_release inlined to avoid a second virtual call boundary.
-        auto weak_count = self->weak_count.load(::std::memory_order_seq_cst) - 1;
-        self->weak_count.store(weak_count, ::std::memory_order_seq_cst);
-        if (weak_count == 0) {
-            self->_vftable_ptr()->destroy(self);
-        }
+inline void SharedCountImpl::release() {
+    auto uc = use_count.load(::std::memory_order_seq_cst) - 1;
+    use_count.store(uc, ::std::memory_order_seq_cst);
+    if (uc == 0) {
+        // dispose / destroy are private vfuncs (no auto-generated public
+        // wrappers); call through the vftable pointer directly.
+        _vftable_ptr()->dispose(this);
+        weak_release();
     }
 }
 
-inline void SharedCountImpl_weak_release(SharedCountImpl* self) {
-    auto weak_count = self->weak_count.load(::std::memory_order_seq_cst) - 1;
-    self->weak_count.store(weak_count, ::std::memory_order_seq_cst);
-    if (weak_count == 0) {
-        self->_vftable_ptr()->destroy(self);
+inline void SharedCountImpl::weak_release() {
+    auto wc = weak_count.load(::std::memory_order_seq_cst) - 1;
+    weak_count.store(wc, ::std::memory_order_seq_cst);
+    if (wc == 0) {
+        _vftable_ptr()->destroy(this);
     }
 }
 
-inline void SharedCountImpl_add_ref_copy(SharedCountImpl* self) {
-    self->use_count.fetch_add(1, ::std::memory_order_seq_cst);
+inline void SharedCountImpl::add_ref_copy() {
+    use_count.fetch_add(1, ::std::memory_order_seq_cst);
 }
 
-inline void SharedCountImpl_weak_add_ref(SharedCountImpl* self) {
-    self->weak_count.fetch_add(1, ::std::memory_order_seq_cst);
+inline void SharedCountImpl::weak_add_ref() {
+    weak_count.fetch_add(1, ::std::memory_order_seq_cst);
 }
 
-inline void SharedCount_release(SharedCount* self) {
-    if (self->count_impl != nullptr) {
-        SharedCountImpl_release(self->count_impl);
+inline void SharedCount::release() {
+    if (count_impl != nullptr) {
+        count_impl->release();
     }
 }
+
+inline void WeakCount::release() {
+    if (count_impl != nullptr) {
+        count_impl->weak_release();
+    }
+}
+
+// Free functions for cases pyxis can't currently host as member methods.
 
 inline SharedCount SharedCount_clone(const SharedCount* self) {
     if (self->count_impl != nullptr) {
-        SharedCountImpl_add_ref_copy(self->count_impl);
+        self->count_impl->add_ref_copy();
     }
     return SharedCount{self->count_impl};
 }
 
-inline void WeakCount_release(WeakCount* self) {
-    if (self->count_impl != nullptr) {
-        SharedCountImpl_weak_release(self->count_impl);
-    }
-}
-
 inline WeakCount WeakCount_from_shared(const SharedCount* shared) {
     if (shared->count_impl != nullptr) {
-        SharedCountImpl_weak_add_ref(shared->count_impl);
+        shared->count_impl->weak_add_ref();
     }
     return WeakCount{shared->count_impl};
 }
@@ -342,14 +359,13 @@ inline SharedPtr<T> SharedPtr_clone(const SharedPtr<T>* self) {
 
 template <class T>
 inline void SharedPtr_release(SharedPtr<T>* self) {
-    SharedCount_release(&self->pn);
+    self->pn.release();
     self->px = nullptr;
     self->pn.count_impl = nullptr;
 }
 
 /// Bit-cast a `SharedPtr<T>` to a `SharedPtr<Y>` while preserving the
-/// refcount block. Mirrors the Rust `static_pointer_cast` — caller asserts
-/// that T can be reinterpreted as Y.
+/// refcount block. Caller asserts that T can be reinterpreted as Y.
 template <class Y, class T>
 inline SharedPtr<Y> SharedPtr_static_cast(SharedPtr<T> self) {
     return SharedPtr<Y>{reinterpret_cast<Y*>(self.px), self.pn};
