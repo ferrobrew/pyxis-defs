@@ -2,10 +2,10 @@ backend rust prologue r#"
     use std::{ffi::c_void, os::raw::c_char};
 "#;
 
-#[size(4), align(4)]
+#[size(4), align(4), cpp_name = "void"]
 extern type c_void;
 
-#[size(1), align(1)]
+#[size(1), align(1), cpp_name = "char"]
 extern type c_char;
 
 #[address(0xF25_650)]

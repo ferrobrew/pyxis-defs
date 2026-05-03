@@ -6,8 +6,20 @@ backend rust prologue "\n    use crate::shared_ptr::*;\n    use std::mem::Manual
 /// the `Drop` implementation of `SharedPtr<u32>` being called when the `RenderBlock`
 /// is dropped. The destructor, which we call in `drop`, will decrement the refcount
 /// for us.
-#[size(8), align(4)]
+#[size(8), align(4), cpp_name = "::pyxis::ManuallyDrop<::types::shared_ptr::SharedPtr<::std::uint32_t>>"]
 extern type ManuallyDrop<SharedPtr<u32>>;
+
+backend cpp prologue r#"
+// `::pyxis::ManuallyDrop<T>` mirrors `core::mem::ManuallyDrop<T>` from Rust:
+// it suppresses T's destructor so callers can drive teardown manually. Same
+// layout as T (single-field union); accessing `.value` gives the wrapped value.
+//
+// The extern-type machinery elides the `SharedPtr<u32>` reference from
+// pyxis's dep walker (the extern's name is opaque), so we have to pull in
+// the shared_ptr header explicitly here.
+#include "pyxis_runtime.hpp"
+#include "types/shared_ptr.hpp"
+"#;
 
 #[address(0x1_3E0_EA0)]
 pub extern render_block_memory: u32;

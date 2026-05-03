@@ -11,10 +11,10 @@ use windows::{
 
 use rendering::shadow_manager::ShadowManager;
 
-#[size(4), align(4)]
+#[size(4), align(4), cpp_header = "<windows.h>", cpp_name = "::HWND"]
 extern type HWND;
 
-#[size(4), align(4)]
+#[size(4), align(4), cpp_header = "<windows.h>", cpp_name = "::HCURSOR"]
 extern type HCURSOR;
 
 #[address(0x1_08C_598)]

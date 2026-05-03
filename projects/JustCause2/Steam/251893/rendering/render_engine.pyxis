@@ -3,7 +3,7 @@ use rendering::render_block::{RenderBlock, GenericRenderBlock};
 
 backend rust prologue "use windows::Win32::Foundation::HANDLE;";
 
-#[size(4), align(4)]
+#[size(4), align(4), cpp_header = "<windows.h>", cpp_name = "::HANDLE"]
 extern type HANDLE;
 
 #[address(0x1_08C_D40)]
