@@ -116,18 +116,49 @@ inline ::physics::havok::memory::HkThreadMemory* hk_thread_memory() {
     return reinterpret_cast<::physics::havok::memory::HkThreadMemory*>(::TlsGetValue(tls_index));
 }
 
-// Caller-supplied trait that describes how to allocate, construct, and
-// free an instance of `T` against the Havok thread allocator. Since
-// pyxis can't currently express a C++ template member-function contract,
-// we rely on duck-typed members on `T`:
+// =============================================================================
+// HkRefCounted<T> protocol
+// =============================================================================
 //
-//   static ::std::uint32_t T::pyxis_hk_allocation_size();
-//   static ::physics::havok::memory::HkMemoryClass T::pyxis_hk_memory_class();
-//   void T::pyxis_hk_construct(/* user-defined ctor args */);
+// `HkRefCounted<T>` is the C++ analog of rust's
+// `HkRefCounted<T: HkReferencedObjectInstance>`. The rust side uses a trait
+// to abstract over "any havok refcounted object"; we can't translate that
+// directly without virtual inheritance or CRTP (both have layout costs we
+// don't want, since pyxis emits composition-only POD-shaped structs).
+//
+// Instead we use *template duck-typing*: `HkRefCounted<T>` calls named
+// member methods on `T*`, and any `T` that provides them is usable. If a
+// type doesn't provide them, the template fails to instantiate at the
+// call site - the C++20 `concept`-of-a-concept idiom, expressed without
+// a `requires` clause.
+//
+// Required members on `T`:
+//
+//   ::physics::havok::referenced_object::HkReferencedObject*
+//       T::pyxis_hk_as_referenced_object();
+//
+//       Returns a pointer to the embedded `HkReferencedObject` field.
+//       The field path differs per type (HkpRigidBody embeds it directly;
+//       shape types embed it nested inside HkpShape), so the navigation
+//       has to live on T.
+//
 //   void T::pyxis_hk_free();
-//   HkReferencedObject* T::pyxis_hk_as_referenced_object();
 //
-// Downstream code adds these via free helpers or wrapper templates.
+//       Tear-down hook invoked when the reference count hits zero.
+//       Implementations call the type's `#[address]`-bound destructor
+//       with `free=true` so the Havok thread-memory chunk is reclaimed.
+//
+// The `pyxis_hk_` prefix marks these as backend-emitted machinery rather
+// than user-facing API: a JC2 consumer skimming a header should see them
+// and recognize "not for me." The protocol is closed-coded - if it grows
+// further (e.g. to support a `clone` operation), update both this list
+// and every refcounted havok type at the same time.
+//
+// Construction is deliberately *not* part of this protocol. Different
+// types have different ctor signatures, so each type ships a free
+// factory `T_make_refcounted(args...)` instead - it allocates from the
+// thread allocator with the right `HkMemoryClass`, runs the native ctor,
+// primes `mem_size_and_flags`, and returns the wrapped `HkRefCounted<T>`.
 
 template <class T>
 class HkRefCounted {
