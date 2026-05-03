@@ -150,6 +150,16 @@ impl<T> SharedPtr<T> {
     #[external_body] pub fn refcount(&self) -> i32;
     #[external_body] pub fn is_only_owner(&self) -> bool;
     #[external_body] pub fn release(&mut self);
+    #[external_body] pub fn make() -> SharedPtr<T>;
+    #[external_body] pub fn clone_(&self) -> SharedPtr<T>;
+}
+impl<T, Y> SharedPtr<T> {
+    /// Bit-cast to `SharedPtr<Y>` while preserving the refcount block.
+    /// Caller asserts that T can be reinterpreted as Y. Doesn't transfer
+    /// ownership - the caller can keep using `self` after, but should
+    /// generally treat it as moved-from.
+    #[external_body]
+    pub fn static_cast_to(&self) -> SharedPtr<Y>;
 }
 
 backend rust epilogue r#"
@@ -339,11 +349,28 @@ inline void SharedPtr<T>::release() {
     pn.count_impl = nullptr;
 }
 
-// Self-returning factories and conversions still live as free functions:
-// pyxis's resolver doesn't yet schedule self-returning impl methods (the
-// post-pass doesn't know the *return type* in advance), and inter-type
-// conversions like `SharedPtr<T> → SharedPtr<Y>` need two type parameters
-// at the impl level which pyxis doesn't express today.
+template <class T>
+inline SharedPtr<T> SharedPtr<T>::make() {
+    return SharedPtr<T>{nullptr, SharedCount{nullptr}};
+}
+
+template <class T>
+inline SharedPtr<T> SharedPtr<T>::clone_() const {
+    if (pn.count_impl != nullptr) {
+        pn.count_impl->add_ref_copy();
+    }
+    return SharedPtr<T>{px, SharedCount{pn.count_impl}};
+}
+
+template <class T> template <class Y>
+inline SharedPtr<Y> SharedPtr<T>::static_cast_to() const {
+    return SharedPtr<Y>{reinterpret_cast<Y*>(px), pn};
+}
+
+// Free functions retained for non-method shapes (e.g. `SharedCount` /
+// `WeakCount` factories that return their own type — the post-pass can
+// emit member methods for these now too, but the existing call sites use
+// the free-function form).
 
 inline SharedCount SharedCount_clone(const SharedCount* self) {
     if (self->count_impl != nullptr) {
@@ -367,13 +394,6 @@ inline SharedPtr<T> SharedPtr_default() {
 template <class T>
 inline SharedPtr<T> SharedPtr_clone(const SharedPtr<T>* self) {
     return SharedPtr<T>{self->px, SharedCount_clone(&self->pn)};
-}
-
-/// Bit-cast a `SharedPtr<T>` to a `SharedPtr<Y>` while preserving the
-/// refcount block. Caller asserts that T can be reinterpreted as Y.
-template <class Y, class T>
-inline SharedPtr<Y> SharedPtr_static_cast(SharedPtr<T> self) {
-    return SharedPtr<Y>{reinterpret_cast<Y*>(self.px), self.pn};
 }
 
 template <class T>
