@@ -85,3 +85,95 @@ backend rust epilogue r#"
         }
     }
 "#;
+
+backend cpp prologue r#"
+#include <windows.h>
+#include "physics/havok/memory.hpp"
+"#;
+
+backend cpp epilogue r#"
+// Trivial bit-twiddle helpers on the embedded refcount field. The high
+// bits of `mem_size_and_flags` are flags; low 15 bits are the allocation
+// size in bytes.
+inline ::std::uint32_t HkReferencedObject_allocation_size(const HkReferencedObject* self) {
+    return static_cast<::std::uint32_t>(self->mem_size_and_flags & 0x7FFF);
+}
+inline ::std::uint16_t HkReferencedObject_reference_count(const HkReferencedObject* self) {
+    return self->reference_count;
+}
+inline void HkReferencedObject_add_reference(HkReferencedObject* self) {
+    self->reference_count += 1;
+}
+inline void HkReferencedObject_remove_reference(HkReferencedObject* self) {
+    self->reference_count -= 1;
+}
+
+// Get the Havok thread-local memory allocator from TLS. JC2 stores a
+// `HkThreadMemory*` in the TLS slot whose index is held in
+// `havok::memory::hk_thread_memory_tls_index` (an `extern u32`).
+inline ::physics::havok::memory::HkThreadMemory* hk_thread_memory() {
+    auto& tls_index = ::physics::havok::memory::get_hk_thread_memory_tls_index();
+    return reinterpret_cast<::physics::havok::memory::HkThreadMemory*>(::TlsGetValue(tls_index));
+}
+
+// Caller-supplied trait that describes how to allocate, construct, and
+// free an instance of `T` against the Havok thread allocator. Since
+// pyxis can't currently express a C++ template member-function contract,
+// we rely on duck-typed members on `T`:
+//
+//   static ::std::uint32_t T::pyxis_hk_allocation_size();
+//   static ::physics::havok::memory::HkMemoryClass T::pyxis_hk_memory_class();
+//   void T::pyxis_hk_construct(/* user-defined ctor args */);
+//   void T::pyxis_hk_free();
+//   HkReferencedObject* T::pyxis_hk_as_referenced_object();
+//
+// Downstream code adds these via free helpers or wrapper templates.
+
+template <class T>
+class HkRefCounted {
+public:
+    HkRefCounted() : ptr_(nullptr) {}
+    explicit HkRefCounted(T* ptr) : ptr_(ptr) {}
+
+    HkRefCounted(const HkRefCounted& other) : ptr_(other.ptr_) {
+        if (ptr_ != nullptr) {
+            HkReferencedObject_add_reference(ptr_->pyxis_hk_as_referenced_object());
+        }
+    }
+    HkRefCounted& operator=(const HkRefCounted& other) {
+        if (this == &other) return *this;
+        release();
+        ptr_ = other.ptr_;
+        if (ptr_ != nullptr) {
+            HkReferencedObject_add_reference(ptr_->pyxis_hk_as_referenced_object());
+        }
+        return *this;
+    }
+    HkRefCounted(HkRefCounted&& other) noexcept : ptr_(other.ptr_) { other.ptr_ = nullptr; }
+    HkRefCounted& operator=(HkRefCounted&& other) noexcept {
+        if (this == &other) return *this;
+        release();
+        ptr_ = other.ptr_;
+        other.ptr_ = nullptr;
+        return *this;
+    }
+    ~HkRefCounted() { release(); }
+
+    T* get() const { return ptr_; }
+    T& operator*() const { return *ptr_; }
+    T* operator->() const { return ptr_; }
+    explicit operator bool() const { return ptr_ != nullptr; }
+
+private:
+    void release() {
+        if (ptr_ == nullptr) return;
+        auto* obj = ptr_->pyxis_hk_as_referenced_object();
+        HkReferencedObject_remove_reference(obj);
+        if (HkReferencedObject_reference_count(obj) == 0) {
+            ptr_->pyxis_hk_free();
+        }
+        ptr_ = nullptr;
+    }
+    T* ptr_;
+};
+"#;
