@@ -4,6 +4,11 @@ backend rust prologue "use crate::havok::memory::HkMemoryClass;";
 
 backend rust prologue "use crate::havok::referenced_object::{HkReferencedObject, HkReferencedObjectInstance};";
 
+backend cpp prologue r#"
+#include "physics/havok/memory.hpp"
+#include "physics/havok/referenced_object.hpp"
+"#;
+
 // HkMemoryClass::Entity
 #[size(0xC0), align(16)]
 pub type HkpRigidBodyCInfo {
@@ -33,6 +38,11 @@ impl HkpRigidBodyCInfo {
     #[address(0xB7A_930)]
     fn constructor(&mut self);
 }
+#[cfg(backend = "cpp")]
+impl HkpRigidBodyCInfo {
+    #[external_body]
+    pub fn make() -> HkpRigidBodyCInfo;
+}
 
 backend rust epilogue r#"
     impl HkpRigidBodyCInfo {
@@ -46,6 +56,14 @@ backend rust epilogue r#"
     }
 "#;
 
+backend cpp epilogue r#"
+inline HkpRigidBodyCInfo HkpRigidBodyCInfo::make() {
+    HkpRigidBodyCInfo self{};
+    self.constructor();
+    return self;
+}
+"#;
+
 #[size(0x200), align(16)]
 pub type HkpRigidBody {
     referenced_object: HkReferencedObject,
@@ -56,6 +74,21 @@ impl HkpRigidBody {
 
     #[address(0xB7A_900)]
     fn destructor(&mut self, free: bool);
+}
+#[cfg(backend = "cpp")]
+impl HkpRigidBody {
+    /// Returns a pointer to the embedded `HkReferencedObject` field.
+    /// The `HkRefCounted<T>` template uses this to drive ref/unref via
+    /// `referenced_object.hpp`'s free helpers; each shape type exposes
+    /// it because the field path differs per type (direct vs nested
+    /// inside `HkpShape`).
+    #[external_body]
+    pub fn pyxis_hk_as_referenced_object(&mut self) -> *mut HkReferencedObject;
+    /// Tear-down hook invoked from `HkRefCounted<T>::release()` once the
+    /// reference count hits zero. Calls the `#[address]`-bound destructor
+    /// with `free=true` so the Havok thread-memory chunk gets reclaimed.
+    #[external_body]
+    pub fn pyxis_hk_free(&mut self);
 }
 
 backend rust epilogue r#"
@@ -87,6 +120,31 @@ backend rust epilogue r#"
     }
 "#;
 
+// Mirrors the rust `HkReferencedObjectInstance` impl: provides the
+// duck-typed hooks expected by `HkRefCounted<T>` (defined in
+// referenced_object.cpp epilogue) plus a free factory that allocates
+// a `T*` from the Havok thread allocator, runs the native ctor, and
+// hands back the wrapped refcounted handle.
+backend cpp epilogue r#"
+inline ::physics::havok::referenced_object::HkReferencedObject* HkpRigidBody::pyxis_hk_as_referenced_object() {
+    return &this->referenced_object;
+}
+
+inline void HkpRigidBody::pyxis_hk_free() {
+    this->destructor(true);
+}
+
+inline ::physics::havok::referenced_object::HkRefCounted<HkpRigidBody> HkpRigidBody_make_refcounted(HkpRigidBodyCInfo* info) {
+    auto* mem = ::physics::havok::referenced_object::hk_thread_memory();
+    auto* ptr = static_cast<HkpRigidBody*>(mem->allocate_chunk(
+        sizeof(HkpRigidBody),
+        ::physics::havok::memory::HkMemoryClass::Entity));
+    ptr->constructor(info);
+    ptr->referenced_object.mem_size_and_flags = static_cast<::std::uint16_t>(sizeof(HkpRigidBody));
+    return ::physics::havok::referenced_object::HkRefCounted<HkpRigidBody>{ptr};
+}
+"#;
+
 #[size(0x10)]
 pub type HkpShape {
     referenced_object: HkReferencedObject,
@@ -102,6 +160,13 @@ impl HkpBoxShape {
 
     #[address(0xB40_330)]
     fn destructor(&mut self, free: bool);
+}
+#[cfg(backend = "cpp")]
+impl HkpBoxShape {
+    #[external_body]
+    pub fn pyxis_hk_as_referenced_object(&mut self) -> *mut HkReferencedObject;
+    #[external_body]
+    pub fn pyxis_hk_free(&mut self);
 }
 
 backend rust epilogue r#"
@@ -133,6 +198,26 @@ backend rust epilogue r#"
     }
 "#;
 
+backend cpp epilogue r#"
+inline ::physics::havok::referenced_object::HkReferencedObject* HkpBoxShape::pyxis_hk_as_referenced_object() {
+    return &this->shape.referenced_object;
+}
+
+inline void HkpBoxShape::pyxis_hk_free() {
+    this->destructor(true);
+}
+
+inline ::physics::havok::referenced_object::HkRefCounted<HkpBoxShape> HkpBoxShape_make_refcounted(const ::physics::havok::math::HkVector4* half_extents, float padding) {
+    auto* mem = ::physics::havok::referenced_object::hk_thread_memory();
+    auto* ptr = static_cast<HkpBoxShape*>(mem->allocate_chunk(
+        sizeof(HkpBoxShape),
+        ::physics::havok::memory::HkMemoryClass::CdInfo));
+    ptr->constructor(half_extents, padding);
+    ptr->shape.referenced_object.mem_size_and_flags = static_cast<::std::uint16_t>(sizeof(HkpBoxShape));
+    return ::physics::havok::referenced_object::HkRefCounted<HkpBoxShape>{ptr};
+}
+"#;
+
 #[size(0x20), align(16)]
 pub type HkpSphereShape {
     pub shape: HkpShape,
@@ -143,6 +228,13 @@ impl HkpSphereShape {
 
     #[address(0xB40_330)]
     fn destructor(&mut self, free: bool);
+}
+#[cfg(backend = "cpp")]
+impl HkpSphereShape {
+    #[external_body]
+    pub fn pyxis_hk_as_referenced_object(&mut self) -> *mut HkReferencedObject;
+    #[external_body]
+    pub fn pyxis_hk_free(&mut self);
 }
 
 backend rust epilogue r#"
@@ -173,6 +265,26 @@ backend rust epilogue r#"
     }
 "#;
 
+backend cpp epilogue r#"
+inline ::physics::havok::referenced_object::HkReferencedObject* HkpSphereShape::pyxis_hk_as_referenced_object() {
+    return &this->shape.referenced_object;
+}
+
+inline void HkpSphereShape::pyxis_hk_free() {
+    this->destructor(true);
+}
+
+inline ::physics::havok::referenced_object::HkRefCounted<HkpSphereShape> HkpSphereShape_make_refcounted(float radius) {
+    auto* mem = ::physics::havok::referenced_object::hk_thread_memory();
+    auto* ptr = static_cast<HkpSphereShape*>(mem->allocate_chunk(
+        sizeof(HkpSphereShape),
+        ::physics::havok::memory::HkMemoryClass::CdInfo));
+    ptr->constructor(radius);
+    ptr->shape.referenced_object.mem_size_and_flags = static_cast<::std::uint16_t>(sizeof(HkpSphereShape));
+    return ::physics::havok::referenced_object::HkRefCounted<HkpSphereShape>{ptr};
+}
+"#;
+
 #[size(0x40), align(16)]
 pub type HkpCapsule {
     pub shape: HkpShape,
@@ -183,6 +295,13 @@ impl HkpCapsule {
 
     #[address(0xB40_330)]
     fn destructor(&mut self, free: bool);
+}
+#[cfg(backend = "cpp")]
+impl HkpCapsule {
+    #[external_body]
+    pub fn pyxis_hk_as_referenced_object(&mut self) -> *mut HkReferencedObject;
+    #[external_body]
+    pub fn pyxis_hk_free(&mut self);
 }
 
 backend rust epilogue r#"
@@ -214,6 +333,26 @@ backend rust epilogue r#"
     }
 "#;
 
+backend cpp epilogue r#"
+inline ::physics::havok::referenced_object::HkReferencedObject* HkpCapsule::pyxis_hk_as_referenced_object() {
+    return &this->shape.referenced_object;
+}
+
+inline void HkpCapsule::pyxis_hk_free() {
+    this->destructor(true);
+}
+
+inline ::physics::havok::referenced_object::HkRefCounted<HkpCapsule> HkpCapsule_make_refcounted(const ::physics::havok::math::HkVector4* start, const ::physics::havok::math::HkVector4* end, float radius) {
+    auto* mem = ::physics::havok::referenced_object::hk_thread_memory();
+    auto* ptr = static_cast<HkpCapsule*>(mem->allocate_chunk(
+        sizeof(HkpCapsule),
+        ::physics::havok::memory::HkMemoryClass::CdInfo));
+    ptr->constructor(start, end, radius);
+    ptr->shape.referenced_object.mem_size_and_flags = static_cast<::std::uint16_t>(sizeof(HkpCapsule));
+    return ::physics::havok::referenced_object::HkRefCounted<HkpCapsule>{ptr};
+}
+"#;
+
 #[size(0x60), align(16)]
 pub type HkpCylinderShape {
     pub shape: HkpShape,
@@ -224,6 +363,13 @@ impl HkpCylinderShape {
 
     #[address(0xB40_330)]
     fn destructor(&mut self, free: bool);
+}
+#[cfg(backend = "cpp")]
+impl HkpCylinderShape {
+    #[external_body]
+    pub fn pyxis_hk_as_referenced_object(&mut self) -> *mut HkReferencedObject;
+    #[external_body]
+    pub fn pyxis_hk_free(&mut self);
 }
 
 backend rust epilogue r#"
@@ -253,4 +399,24 @@ backend rust epilogue r#"
             }
         }
     }
+"#;
+
+backend cpp epilogue r#"
+inline ::physics::havok::referenced_object::HkReferencedObject* HkpCylinderShape::pyxis_hk_as_referenced_object() {
+    return &this->shape.referenced_object;
+}
+
+inline void HkpCylinderShape::pyxis_hk_free() {
+    this->destructor(true);
+}
+
+inline ::physics::havok::referenced_object::HkRefCounted<HkpCylinderShape> HkpCylinderShape_make_refcounted(const ::physics::havok::math::HkVector4* start, const ::physics::havok::math::HkVector4* end, float radius, float padding) {
+    auto* mem = ::physics::havok::referenced_object::hk_thread_memory();
+    auto* ptr = static_cast<HkpCylinderShape*>(mem->allocate_chunk(
+        sizeof(HkpCylinderShape),
+        ::physics::havok::memory::HkMemoryClass::CdInfo));
+    ptr->constructor(start, end, radius, padding);
+    ptr->shape.referenced_object.mem_size_and_flags = static_cast<::std::uint16_t>(sizeof(HkpCylinderShape));
+    return ::physics::havok::referenced_object::HkRefCounted<HkpCylinderShape>{ptr};
+}
 "#;
