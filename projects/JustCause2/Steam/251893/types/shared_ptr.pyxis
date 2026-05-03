@@ -17,6 +17,10 @@ type SharedCountImpl {
     use_count: AtomicI32,
     weak_count: AtomicI32,
 }
+// These methods exist only to scaffold C++ in-class declarations. Rust
+// uses multiple `impl Foo` blocks freely, so the rust epilogue defines
+// these directly without needing a pyxis-side declaration.
+#[cfg(backend = "cpp")]
 impl SharedCountImpl {
     #[external_body]
     pub fn release(&mut self);
@@ -68,6 +72,7 @@ backend rust epilogue r#"
 type SharedCount {
     count_impl: *mut SharedCountImpl,
 }
+#[cfg(backend = "cpp")]
 impl SharedCount {
     #[external_body]
     pub fn release(&mut self);
@@ -112,6 +117,7 @@ backend rust epilogue r#"
 type WeakCount {
     count_impl: *mut SharedCountImpl,
 }
+#[cfg(backend = "cpp")]
 impl WeakCount {
     #[external_body]
     pub fn release(&mut self);
@@ -145,6 +151,7 @@ pub type SharedPtr<T> {
     px: *mut T,
     pn: SharedCount,
 }
+#[cfg(backend = "cpp")]
 impl<T> SharedPtr<T> {
     #[external_body]
     pub fn exists(&self) -> bool;
@@ -160,6 +167,7 @@ impl<T> SharedPtr<T> {
     pub fn clone_(&self) -> SharedPtr<T>;
 }
 
+#[cfg(backend = "cpp")]
 impl<T, Y> SharedPtr<T> {
     /// Bit-cast to `SharedPtr<Y>` while preserving the refcount block.
     /// Caller asserts that T can be reinterpreted as Y.
