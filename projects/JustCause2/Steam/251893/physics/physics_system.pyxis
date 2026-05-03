@@ -15,6 +15,11 @@ impl AIRayCastFilter {
     #[address(0x908_600)]
     fn constructor(&mut self);
 }
+#[cfg(backend = "cpp")]
+impl AIRayCastFilter {
+    #[external_body]
+    pub fn make() -> AIRayCastFilter;
+}
 
 backend rust epilogue r#"
     impl AIRayCastFilter {
@@ -36,6 +41,11 @@ pub type RayCastResult {
     rigid_body: *mut u32,
     shape: *mut u32,
     unknown: [u32; 4],
+}
+#[cfg(backend = "cpp")]
+impl RayCastResult {
+    #[external_body]
+    pub fn make() -> RayCastResult;
 }
 
 backend rust epilogue r#"
@@ -84,4 +94,22 @@ backend rust epilogue r#"
             }
         }
     }
+"#;
+
+backend cpp epilogue r#"
+inline AIRayCastFilter AIRayCastFilter::make() {
+    AIRayCastFilter self{};
+    self.constructor();
+    return self;
+}
+
+// Mirrors the rust factory: zero-init, set the rust-side `Default` shape
+// (forward normal, distance=1, sentinel `unknown` slots), return.
+inline RayCastResult RayCastResult::make() {
+    RayCastResult self{};
+    self.normal = ::types::math::Vector3{{1.0f, 0.0f, 0.0f}};
+    self.distance = 1.0f;
+    self.unknown = {0xFFFFFFFFu, 0xFFFFFFFFu, 0xFFFFFFFFu, 0xFFFFFFFFu};
+    return self;
+}
 "#;

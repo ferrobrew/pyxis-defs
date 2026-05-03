@@ -25,6 +25,11 @@ impl RenderBlockInstanceInfo {
     #[address(0x768_2E0)]
     pub fn update_matrix(&mut self, matrix: *const Matrix4);
 }
+#[cfg(backend = "cpp")]
+impl RenderBlockInstanceInfo {
+    #[external_body]
+    pub fn make() -> RenderBlockInstanceInfo;
+}
 
 backend rust epilogue r#"
     impl RenderBlockInstanceInfo {
@@ -37,6 +42,18 @@ backend rust epilogue r#"
             }
         }
     }
+"#;
+
+backend cpp epilogue r#"
+// JC2 has no `constructor()` symbol for this struct; it's just a zeroed
+// instance with two color slots primed to opaque-white. The remaining
+// fields are populated by `initialize_matrix` / `update_matrix`.
+inline RenderBlockInstanceInfo RenderBlockInstanceInfo::make() {
+    RenderBlockInstanceInfo self{};
+    self.colors[0] = 0xFFFFFFFFu;
+    self.colors[1] = 0xFFFFFFFFu;
+    return self;
+}
 "#;
 
 #[size(0x1364)]

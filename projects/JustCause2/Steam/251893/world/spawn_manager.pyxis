@@ -49,6 +49,11 @@ impl SpawnManager {
     #[address(0x73F_DB0)]
     pub fn request_vehicle_model(&mut self, model_id: *const u32, category: i32);
 }
+#[cfg(backend = "cpp")]
+impl SpawnManager {
+    #[external_body]
+    pub fn is_vehicle_loaded(&self, id: u32) -> bool;
+}
 
 backend rust epilogue r#"
     impl SpawnManager {
@@ -61,4 +66,24 @@ backend rust epilogue r#"
             })
         }
     }
+"#;
+
+backend cpp epilogue r#"
+// Walks the `loaded_models` array (capacity is the field oddly named
+// `hash_edacd65b_likely_max_models`) and returns true once it finds an
+// entry with the requested model id and `load_state == 2`. Mirrors the
+// rust impl, which uses unaligned reads via raw-pointer accessors;
+// `loaded_models` is a packed struct on the JC2 side so the unaligned
+// read matters - C++ accesses `LoadedModel`'s fields through a `const
+// LoadedModel*`, which on x86 is identical in cost.
+inline bool SpawnManager::is_vehicle_loaded(::std::uint32_t id) const {
+    const auto count = vehicle_types.hash_edacd65b_likely_max_models;
+    for (::std::int32_t i = 0; i < count; ++i) {
+        const auto* model = vehicle_types.loaded_models + i;
+        if (model->model_id == id && model->load_state == 2) {
+            return true;
+        }
+    }
+    return false;
+}
 "#;
