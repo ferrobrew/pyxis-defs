@@ -129,6 +129,17 @@ backend rust epilogue r#"
     }
 "#;
 
+// Mirrors the rust factory: zero-init, run the native ctor, return by
+// value (RVO elides the copy). The native destructor is already declared
+// as a regular member, so callers invoke it directly when tearing down.
+backend cpp epilogue r#"
+inline GenericRenderBlock GenericRenderBlock::make() {
+    GenericRenderBlock self{};
+    self.constructor();
+    return self;
+}
+"#;
+
 #[size(0x10), align(16)]
 pub type RenderBlock {
     vftable {},
@@ -183,6 +194,14 @@ backend rust epilogue r#"
     }
 "#;
 
+backend cpp epilogue r#"
+inline RenderBlockLine RenderBlockLine::make() {
+    RenderBlockLine self{};
+    self.constructor();
+    return self;
+}
+"#;
+
 #[size(0x20), align(16)]
 pub type RenderBlockTriangle {
     #[base]
@@ -227,6 +246,14 @@ backend rust epilogue r#"
             unsafe { self.destructor(false); }
         }
     }
+"#;
+
+backend cpp epilogue r#"
+inline RenderBlockTriangle RenderBlockTriangle::make() {
+    RenderBlockTriangle self{};
+    self.constructor();
+    return self;
+}
 "#;
 
 #[size(0x20)]
@@ -289,6 +316,14 @@ backend rust epilogue r#"
             unsafe { self.destructor(false); }
         }
     }
+"#;
+
+backend cpp epilogue r#"
+inline RenderBlockGeneral RenderBlockGeneral::make() {
+    RenderBlockGeneral self{};
+    self.constructor();
+    return self;
+}
 "#;
 
 #[copyable, cloneable, defaultable]
@@ -380,40 +415,10 @@ backend rust epilogue r#"
     }
 "#;
 
-backend cpp epilogue r#"
-// Each render block type has a `#[address]`-bound native constructor /
-// destructor; `make()` mirrors the rust factory: zero the storage, run
-// the native ctor, return by value (RVO elides the copy). The native
-// destructor is already declared as a regular member (with `free=false`
-// for the heap-or-stack-agnostic teardown path), so callers invoke it
-// directly when they want to tear an instance down.
-inline GenericRenderBlock GenericRenderBlock::make() {
-    GenericRenderBlock self{};
-    self.constructor();
-    return self;
-}
-
-inline RenderBlockLine RenderBlockLine::make() {
-    RenderBlockLine self{};
-    self.constructor();
-    return self;
-}
-
-inline RenderBlockTriangle RenderBlockTriangle::make() {
-    RenderBlockTriangle self{};
-    self.constructor();
-    return self;
-}
-
-inline RenderBlockGeneral RenderBlockGeneral::make() {
-    RenderBlockGeneral self{};
-    self.constructor();
-    return self;
-}
-
 // RenderBlock3DText has no `constructor()` symbol in JC2 - the rust impl
 // builds one by zeroing the struct then assigning a known-good vftable
 // pointer + sentinel hashes + default text-render flags. Keep parity here.
+backend cpp epilogue r#"
 inline RenderBlock3DText RenderBlock3DText::make() {
     RenderBlock3DText self{};
     self.render_block.vftable = reinterpret_cast<const RenderBlockVftable*>(0xF23584);

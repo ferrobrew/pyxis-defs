@@ -33,6 +33,14 @@ backend rust epilogue r#"
     }
 "#;
 
+backend cpp epilogue r#"
+inline AIRayCastFilter AIRayCastFilter::make() {
+    AIRayCastFilter self{};
+    self.constructor();
+    return self;
+}
+"#;
+
 #[size(0x2C)]
 pub type RayCastResult {
     game_object: *mut u32,
@@ -67,6 +75,18 @@ backend rust epilogue r#"
     }
 "#;
 
+// Mirrors the rust factory: zero-init, set the rust-side `Default` shape
+// (forward normal, distance=1, sentinel `unknown` slots), return.
+backend cpp epilogue r#"
+inline RayCastResult RayCastResult::make() {
+    RayCastResult self{};
+    self.normal = ::types::math::Vector3{{1.0f, 0.0f, 0.0f}};
+    self.distance = 1.0f;
+    self.unknown = {0xFFFFFFFFu, 0xFFFFFFFFu, 0xFFFFFFFFu, 0xFFFFFFFFu};
+    return self;
+}
+"#;
+
 #[singleton(0x1_18F_FF4), size(0x250), align(16)] // 0x248
 pub type PhysicsSystem;
 impl PhysicsSystem {
@@ -96,20 +116,3 @@ backend rust epilogue r#"
     }
 "#;
 
-backend cpp epilogue r#"
-inline AIRayCastFilter AIRayCastFilter::make() {
-    AIRayCastFilter self{};
-    self.constructor();
-    return self;
-}
-
-// Mirrors the rust factory: zero-init, set the rust-side `Default` shape
-// (forward normal, distance=1, sentinel `unknown` slots), return.
-inline RayCastResult RayCastResult::make() {
-    RayCastResult self{};
-    self.normal = ::types::math::Vector3{{1.0f, 0.0f, 0.0f}};
-    self.distance = 1.0f;
-    self.unknown = {0xFFFFFFFFu, 0xFFFFFFFFu, 0xFFFFFFFFu, 0xFFFFFFFFu};
-    return self;
-}
-"#;
