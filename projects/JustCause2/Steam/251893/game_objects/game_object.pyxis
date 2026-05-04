@@ -1,5 +1,5 @@
 use physics::pfx_rigid_body::PfxRigidBody;
-use types::{math::Aabb, rtti::Rtti};
+use types::{math::{Aabb, Matrix4}, rtti::Rtti};
 use types::shared_ptr::{SharedPtr, WeakPtr};
 
 backend rust prologue "use crate::{math::Matrix4, shared_ptr::*};";
@@ -45,6 +45,19 @@ impl GameObject {
     #[address(0x917_A00)]
     pub fn init_transform_recursively(&mut self, mat: *const f32);
 }
+#[cfg(backend = "cpp")]
+impl GameObject {
+    /// Cpp analog of rust's `GameObjectExt::get_matrix`. Reach is the same
+    /// (every derived type has an implicit `operator GameObject&()` so a
+    /// derived `obj.try_get_matrix(&m)` works without an explicit cast).
+    /// Returns `bool` rather than `std::optional<Matrix4>` to keep the
+    /// `<optional>` include out of the public surface.
+    #[external_body]
+    pub fn try_get_matrix(&self, out: *mut Matrix4) -> bool;
+    /// Cpp analog of rust's `GameObjectMutExt::set_matrix`.
+    #[external_body]
+    pub fn set_matrix(&mut self, matrix: *const Matrix4);
+}
 
 backend rust epilogue r#"
     pub trait GameObjectExt {
@@ -67,25 +80,12 @@ backend rust epilogue r#"
     }
 "#;
 
-// Cpp analogs of `GameObjectExt` / `GameObjectMutExt`. The rust trait
-// definitions get blanket-impl'd via `T: AsRef<GameObject>`, so any
-// derived type picks them up automatically. In cpp we get the same
-// reach by taking `const GameObject&` / `GameObject&` directly: every
-// derived type has an implicit `operator GameObject&()` conversion
-// (emitted from the `#[base] rtti: Rtti` ... wait no, the `#[base]` is
-// `Rtti`, GameObject *is* the base). For deeply-nested types like
-// `Player` -> `PhysicsGameObject` -> `GameObject`, callers chain via
-// the per-base `operator T&()` conversions or pass `&derived.game_object`.
-//
-// `try_get_matrix` returns `bool` rather than `std::optional<Matrix4>`
-// to keep the `<optional>` include out of the public surface; callers
-// that want the optional shape can wrap it themselves.
 backend cpp epilogue r#"
-inline bool GameObject_try_get_matrix(const GameObject* self, ::types::math::Matrix4* out) {
-    return self->get_matrix_raw(out->data);
+bool GameObject::try_get_matrix(::types::math::Matrix4* out) const {
+    return this->get_matrix_raw(out->data);
 }
 
-inline void GameObject_set_matrix(GameObject* self, const ::types::math::Matrix4* matrix) {
-    self->set_matrix_raw(matrix->data);
+void GameObject::set_matrix(const ::types::math::Matrix4* matrix) {
+    this->set_matrix_raw(matrix->data);
 }
 "#;
