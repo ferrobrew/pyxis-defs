@@ -12,6 +12,22 @@ pub type StdString {
     size: u32,
     res: u32,
 }
+#[cfg(backend = "cpp")]
+impl StdString {
+    /// Default-construct via MSVCP80's `std::basic_string::basic_string()`.
+    #[external_body]
+    pub fn ctor(&mut self);
+    /// Construct from a NUL-terminated C string via MSVCP80's
+    /// `std::basic_string::basic_string(const char*)`.
+    #[external_body]
+    pub fn ctor_cstr(&mut self, s: *const c_char);
+    /// Destructor; does not free `self`'s storage.
+    #[external_body]
+    pub fn dtor(&mut self);
+    /// Copy-assign from `other` via MSVCP80's `operator=`.
+    #[external_body]
+    pub fn copy(&mut self, other: *const StdString);
+}
 
 backend rust epilogue r#"
     struct StringFunctions {
@@ -77,45 +93,51 @@ backend rust epilogue r#"
     }
 "#;
 
-backend cpp prologue r#"
-#include <windows.h>
-"#;
-
-backend cpp epilogue r#"
+// `<windows.h>` is only needed for the source-side DLL lookup; keeping
+// it out of the .hpp avoids leaking the full Windows API into every
+// header consumer.
+backend cpp {
+    prologue definition r#"
+        #include <windows.h>
+    "#;
+    epilogue definition r#"
 // JC2 ships against MSVCP80's `std::basic_string` ABI; we resolve the
 // constructors / destructor / copy by mangled name from the loaded DLL on
 // first use (mirrors the Rust impl). The mangled names target the 32-bit
 // __thiscall variants from MSVCP80, which is what the game binary links
 // against.
-struct StdStringFunctions {
-    void (PYXIS_THISCALL *ctor_default)(StdString*);
-    void (PYXIS_THISCALL *ctor_cstr)(StdString*, const char*);
-    void (PYXIS_THISCALL *dtor)(StdString*);
-    void (PYXIS_THISCALL *copy)(StdString*, const StdString*);
-};
+namespace {
+    struct StdStringFunctions {
+        void (PYXIS_THISCALL *ctor_default)(StdString*);
+        void (PYXIS_THISCALL *ctor_cstr)(StdString*, const char*);
+        void (PYXIS_THISCALL *dtor)(StdString*);
+        void (PYXIS_THISCALL *copy)(StdString*, const StdString*);
+    };
 
-inline const StdStringFunctions& std_string_functions() {
-    static const StdStringFunctions fns = []() -> StdStringFunctions {
-        HMODULE module = ::GetModuleHandleA("MSVCP80");
-        auto resolve = [&](const char* mangled) -> FARPROC {
-            return module ? ::GetProcAddress(module, mangled) : nullptr;
-        };
-        StdStringFunctions out{};
-        out.ctor_default = reinterpret_cast<decltype(out.ctor_default)>(
-            resolve("??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@XZ"));
-        out.ctor_cstr = reinterpret_cast<decltype(out.ctor_cstr)>(
-            resolve("??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@PBD@Z"));
-        out.dtor = reinterpret_cast<decltype(out.dtor)>(
-            resolve("??1?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@XZ"));
-        out.copy = reinterpret_cast<decltype(out.copy)>(
-            resolve("??4?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAEAAV01@ABV01@@Z"));
-        return out;
-    }();
-    return fns;
+    const StdStringFunctions& std_string_functions() {
+        static const StdStringFunctions fns = []() -> StdStringFunctions {
+            HMODULE module = ::GetModuleHandleA("MSVCP80");
+            auto resolve = [&](const char* mangled) -> FARPROC {
+                return module ? ::GetProcAddress(module, mangled) : nullptr;
+            };
+            StdStringFunctions out{};
+            out.ctor_default = reinterpret_cast<decltype(out.ctor_default)>(
+                resolve("??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@XZ"));
+            out.ctor_cstr = reinterpret_cast<decltype(out.ctor_cstr)>(
+                resolve("??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@PBD@Z"));
+            out.dtor = reinterpret_cast<decltype(out.dtor)>(
+                resolve("??1?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@XZ"));
+            out.copy = reinterpret_cast<decltype(out.copy)>(
+                resolve("??4?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAEAAV01@ABV01@@Z"));
+            return out;
+        }();
+        return fns;
+    }
 }
 
-inline void StdString_ctor(StdString* self) { std_string_functions().ctor_default(self); }
-inline void StdString_ctor_cstr(StdString* self, const char* s) { std_string_functions().ctor_cstr(self, s); }
-inline void StdString_dtor(StdString* self) { std_string_functions().dtor(self); }
-inline void StdString_copy(StdString* self, const StdString* other) { std_string_functions().copy(self, other); }
+void StdString::ctor() { std_string_functions().ctor_default(this); }
+void StdString::ctor_cstr(const char* s) { std_string_functions().ctor_cstr(this, s); }
+void StdString::dtor() { std_string_functions().dtor(this); }
+void StdString::copy(const StdString* other) { std_string_functions().copy(this, other); }
 "#;
+}

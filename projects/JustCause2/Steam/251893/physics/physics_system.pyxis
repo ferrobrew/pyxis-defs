@@ -33,8 +33,8 @@ backend rust epilogue r#"
     }
 "#;
 
-backend cpp epilogue r#"
-inline AIRayCastFilter AIRayCastFilter::make() {
+backend cpp epilogue definition r#"
+AIRayCastFilter AIRayCastFilter::make() {
     AIRayCastFilter self{};
     self.constructor();
     return self;
@@ -77,8 +77,8 @@ backend rust epilogue r#"
 
 // Mirrors the rust factory: zero-init, set the rust-side `Default` shape
 // (forward normal, distance=1, sentinel `unknown` slots), return.
-backend cpp epilogue r#"
-inline RayCastResult RayCastResult::make() {
+backend cpp epilogue definition r#"
+RayCastResult RayCastResult::make() {
     RayCastResult self{};
     self.normal = ::types::math::Vector3{{1.0f, 0.0f, 0.0f}};
     self.distance = 1.0f;

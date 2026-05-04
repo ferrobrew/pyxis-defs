@@ -80,7 +80,7 @@ backend rust epilogue r#"
     }
 "#;
 
-backend cpp epilogue r#"
+backend cpp epilogue definition r#"
 bool GameObject::try_get_matrix(::types::math::Matrix4* out) const {
     return this->get_matrix_raw(out->data);
 }

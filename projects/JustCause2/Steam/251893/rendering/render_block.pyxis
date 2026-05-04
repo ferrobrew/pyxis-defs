@@ -132,8 +132,8 @@ backend rust epilogue r#"
 // Mirrors the rust factory: zero-init, run the native ctor, return by
 // value (RVO elides the copy). The native destructor is already declared
 // as a regular member, so callers invoke it directly when tearing down.
-backend cpp epilogue r#"
-inline GenericRenderBlock GenericRenderBlock::make() {
+backend cpp epilogue definition r#"
+GenericRenderBlock GenericRenderBlock::make() {
     GenericRenderBlock self{};
     self.constructor();
     return self;
@@ -194,8 +194,8 @@ backend rust epilogue r#"
     }
 "#;
 
-backend cpp epilogue r#"
-inline RenderBlockLine RenderBlockLine::make() {
+backend cpp epilogue definition r#"
+RenderBlockLine RenderBlockLine::make() {
     RenderBlockLine self{};
     self.constructor();
     return self;
@@ -248,8 +248,8 @@ backend rust epilogue r#"
     }
 "#;
 
-backend cpp epilogue r#"
-inline RenderBlockTriangle RenderBlockTriangle::make() {
+backend cpp epilogue definition r#"
+RenderBlockTriangle RenderBlockTriangle::make() {
     RenderBlockTriangle self{};
     self.constructor();
     return self;
@@ -318,8 +318,8 @@ backend rust epilogue r#"
     }
 "#;
 
-backend cpp epilogue r#"
-inline RenderBlockGeneral RenderBlockGeneral::make() {
+backend cpp epilogue definition r#"
+RenderBlockGeneral RenderBlockGeneral::make() {
     RenderBlockGeneral self{};
     self.constructor();
     return self;
@@ -418,8 +418,8 @@ backend rust epilogue r#"
 // RenderBlock3DText has no `constructor()` symbol in JC2 - the rust impl
 // builds one by zeroing the struct then assigning a known-good vftable
 // pointer + sentinel hashes + default text-render flags. Keep parity here.
-backend cpp epilogue r#"
-inline RenderBlock3DText RenderBlock3DText::make() {
+backend cpp epilogue definition r#"
+RenderBlock3DText RenderBlock3DText::make() {
     RenderBlock3DText self{};
     self.render_block.vftable = reinterpret_cast<const RenderBlockVftable*>(0xF23584);
     self.text_hash = 0xFFFFFFFFu;

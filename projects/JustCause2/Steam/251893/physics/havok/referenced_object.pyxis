@@ -8,6 +8,21 @@ pub type HkReferencedObject {
     mem_size_and_flags: u16,
     reference_count: u16,
 }
+#[cfg(backend = "cpp")]
+impl HkReferencedObject {
+    /// Low 15 bits of `mem_size_and_flags` are the chunk size in bytes;
+    /// high bit is a flag.
+    #[external_body]
+    pub fn allocation_size(&self) -> u32;
+    /// Named `refcount` rather than `reference_count` to avoid colliding
+    /// with the field of the same name.
+    #[external_body]
+    pub fn refcount(&self) -> u16;
+    #[external_body]
+    pub fn add_reference(&mut self);
+    #[external_body]
+    pub fn remove_reference(&mut self);
+}
 
 backend rust epilogue r#"
     impl HkReferencedObject {
@@ -91,23 +106,29 @@ backend cpp prologue r#"
 #include "physics/havok/memory.hpp"
 "#;
 
-backend cpp epilogue r#"
-// Trivial bit-twiddle helpers on the embedded refcount field. The high
-// bits of `mem_size_and_flags` are flags; low 15 bits are the allocation
-// size in bytes.
-inline ::std::uint32_t HkReferencedObject_allocation_size(const HkReferencedObject* self) {
-    return static_cast<::std::uint32_t>(self->mem_size_and_flags & 0x7FFF);
+backend cpp epilogue definition r#"
+// Trivial bit-twiddle helpers on the embedded refcount field. High bit
+// of `mem_size_and_flags` is a flag; low 15 bits are the chunk size.
+::std::uint32_t HkReferencedObject::allocation_size() const {
+    return static_cast<::std::uint32_t>(mem_size_and_flags & 0x7FFF);
 }
-inline ::std::uint16_t HkReferencedObject_reference_count(const HkReferencedObject* self) {
-    return self->reference_count;
+::std::uint16_t HkReferencedObject::refcount() const {
+    return this->reference_count;
 }
-inline void HkReferencedObject_add_reference(HkReferencedObject* self) {
-    self->reference_count += 1;
+void HkReferencedObject::add_reference() {
+    this->reference_count += 1;
 }
-inline void HkReferencedObject_remove_reference(HkReferencedObject* self) {
-    self->reference_count -= 1;
+void HkReferencedObject::remove_reference() {
+    this->reference_count -= 1;
 }
+"#;
 
+// `hk_thread_memory` and `HkRefCounted<T>` stay in the header epilogue:
+// the template's release path calls hk_thread_memory through a derived
+// type's factory, and template member-function definitions must be
+// header-visible at every instantiation site. The dep walker can't see
+// into the template body, so the helper rides along inline.
+backend cpp epilogue r#"
 // Get the Havok thread-local memory allocator from TLS. JC2 stores a
 // `HkThreadMemory*` in the TLS slot whose index is held in
 // `havok::memory::hk_thread_memory_tls_index` (an `extern u32`).
@@ -168,7 +189,7 @@ public:
 
     HkRefCounted(const HkRefCounted& other) : ptr_(other.ptr_) {
         if (ptr_ != nullptr) {
-            HkReferencedObject_add_reference(ptr_->pyxis_hk_as_referenced_object());
+            ptr_->pyxis_hk_as_referenced_object()->add_reference();
         }
     }
     HkRefCounted& operator=(const HkRefCounted& other) {
@@ -176,7 +197,7 @@ public:
         release();
         ptr_ = other.ptr_;
         if (ptr_ != nullptr) {
-            HkReferencedObject_add_reference(ptr_->pyxis_hk_as_referenced_object());
+            ptr_->pyxis_hk_as_referenced_object()->add_reference();
         }
         return *this;
     }
@@ -199,8 +220,8 @@ private:
     void release() {
         if (ptr_ == nullptr) return;
         auto* obj = ptr_->pyxis_hk_as_referenced_object();
-        HkReferencedObject_remove_reference(obj);
-        if (HkReferencedObject_reference_count(obj) == 0) {
+        obj->remove_reference();
+        if (obj->refcount() == 0) {
             ptr_->pyxis_hk_free();
         }
         ptr_ = nullptr;

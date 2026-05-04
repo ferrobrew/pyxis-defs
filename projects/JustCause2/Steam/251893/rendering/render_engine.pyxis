@@ -44,11 +44,11 @@ backend rust epilogue r#"
     }
 "#;
 
-backend cpp epilogue r#"
 // JC2 has no `constructor()` symbol for this struct; it's just a zeroed
 // instance with two color slots primed to opaque-white. The remaining
 // fields are populated by `initialize_matrix` / `update_matrix`.
-inline RenderBlockInstanceInfo RenderBlockInstanceInfo::make() {
+backend cpp epilogue definition r#"
+RenderBlockInstanceInfo RenderBlockInstanceInfo::make() {
     RenderBlockInstanceInfo self{};
     self.colors[0] = 0xFFFFFFFFu;
     self.colors[1] = 0xFFFFFFFFu;
