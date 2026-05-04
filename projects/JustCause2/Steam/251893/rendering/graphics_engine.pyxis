@@ -78,3 +78,22 @@ pub unsafe fn get_dxgi_swapchain() -> Option<InterfaceRef<'static, IDXGISwapChai
     }
 }
 "#;
+
+// Cpp side just hands back COM interface pointers cast from the raw u32
+// slots that `raw_d3d10_device` / `raw_dxgi_swapchain` resolve to.
+// AddRef/Release management is the caller's job - mirroring the rust
+// `InterfaceRef` borrow shape.
+backend cpp prologue r#"
+#include <d3d10.h>
+#include <dxgi.h>
+"#;
+
+backend cpp epilogue r#"
+inline ID3D10Device* get_d3d10_device() {
+    return reinterpret_cast<ID3D10Device*>(*get_raw_d3d10_device());
+}
+
+inline IDXGISwapChain* get_dxgi_swapchain() {
+    return reinterpret_cast<IDXGISwapChain*>(*get_raw_dxgi_swapchain());
+}
+"#;
