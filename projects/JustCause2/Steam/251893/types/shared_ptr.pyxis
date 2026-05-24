@@ -401,18 +401,6 @@ inline SharedPtr<T> SharedPtr<T>::clone_() const {
     return SharedPtr<T>{px, pn.clone_()};
 }
 
-// Bit-cast to `SharedPtr<Y>` while preserving the refcount block.
-//
-// SHARE semantics: this method bumps the refcount and leaves `*this`
-// valid, so the caller can keep using the original SharedPtr<T> alongside
-// the returned SharedPtr<Y>. Both will keep the underlying allocation
-// alive; both will decrement the refcount when destroyed. This matches
-// `std::static_pointer_cast<Y>` from <memory>.
-//
-// The Rust side of this same `#[external_body]` method uses MOVE
-// semantics (consume `self`, no refcount bump) - see the rust epilogue
-// above. Both produce a `SharedPtr<Y>` over the same refcount block;
-// only the fate-of-the-original differs.
 template <class T> template <class Y>
 inline SharedPtr<Y> SharedPtr<T>::static_cast_to() const {
     return SharedPtr<Y>{reinterpret_cast<Y*>(px), pn.clone_()};

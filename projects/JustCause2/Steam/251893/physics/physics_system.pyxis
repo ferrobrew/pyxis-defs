@@ -52,6 +52,9 @@ pub type RayCastResult {
 }
 #[cfg(backend = "cpp")]
 impl RayCastResult {
+    /// Default-constructed `RayCastResult`: forward-pointing normal,
+    /// `distance = 1`, sentinel `0xFFFFFFFF` in every `unknown` slot.
+    /// Matches the shape rust's `Default` impl produces.
     #[external_body]
     pub fn make() -> RayCastResult;
 }
@@ -75,8 +78,6 @@ backend rust epilogue r#"
     }
 "#;
 
-// Mirrors the rust factory: zero-init, set the rust-side `Default` shape
-// (forward normal, distance=1, sentinel `unknown` slots), return.
 backend cpp epilogue definition r#"
 RayCastResult RayCastResult::make() {
     RayCastResult self{};

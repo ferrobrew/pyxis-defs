@@ -4,14 +4,15 @@ backend rust prologue "use windows::Win32::System::Threading::TlsGetValue;";
 
 #[size(0x8)]
 pub type HkReferencedObject {
+    /// Packed allocation size + flags. Low 15 bits are the chunk size
+    /// in bytes (as allocated from the Havok thread allocator); the
+    /// high bit is a flag.
     #[address(0x4)]
     mem_size_and_flags: u16,
     reference_count: u16,
 }
 #[cfg(backend = "cpp")]
 impl HkReferencedObject {
-    /// Low 15 bits of `mem_size_and_flags` are the chunk size in bytes;
-    /// high bit is a flag.
     #[external_body]
     pub fn allocation_size(&self) -> u32;
     /// Named `refcount` rather than `reference_count` to avoid colliding
@@ -107,8 +108,6 @@ backend cpp prologue r#"
 "#;
 
 backend cpp epilogue definition r#"
-// Trivial bit-twiddle helpers on the embedded refcount field. High bit
-// of `mem_size_and_flags` is a flag; low 15 bits are the chunk size.
 ::std::uint32_t HkReferencedObject::allocation_size() const {
     return static_cast<::std::uint32_t>(mem_size_and_flags & 0x7FFF);
 }

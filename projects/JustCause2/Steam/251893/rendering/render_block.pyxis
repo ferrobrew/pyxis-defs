@@ -129,9 +129,6 @@ backend rust epilogue r#"
     }
 "#;
 
-// Mirrors the rust factory: zero-init, run the native ctor, return by
-// value (RVO elides the copy). The native destructor is already declared
-// as a regular member, so callers invoke it directly when tearing down.
 backend cpp epilogue definition r#"
 GenericRenderBlock GenericRenderBlock::make() {
     GenericRenderBlock self{};
@@ -388,6 +385,10 @@ impl RenderBlock3DText {
 }
 #[cfg(backend = "cpp")]
 impl RenderBlock3DText {
+    /// JC2 ships no `constructor()` symbol for this type; the factory
+    /// builds one by zeroing the struct then assigning the known-good
+    /// vftable pointer, sentinel text/font hashes, and default text-
+    /// render flags (`render_style = 2`, `font_size = 16`).
     #[external_body]
     pub fn make() -> RenderBlock3DText;
 }
@@ -415,9 +416,6 @@ backend rust epilogue r#"
     }
 "#;
 
-// RenderBlock3DText has no `constructor()` symbol in JC2 - the rust impl
-// builds one by zeroing the struct then assigning a known-good vftable
-// pointer + sentinel hashes + default text-render flags. Keep parity here.
 backend cpp epilogue definition r#"
 RenderBlock3DText RenderBlock3DText::make() {
     RenderBlock3DText self{};

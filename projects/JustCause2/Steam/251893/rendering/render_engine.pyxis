@@ -27,6 +27,10 @@ impl RenderBlockInstanceInfo {
 }
 #[cfg(backend = "cpp")]
 impl RenderBlockInstanceInfo {
+    /// JC2 ships no `constructor()` symbol for this type; the factory
+    /// returns a zeroed instance with `colors[0]` and `colors[1]` primed
+    /// to opaque white. The remaining fields are filled in by
+    /// `initialize_matrix` / `update_matrix`.
     #[external_body]
     pub fn make() -> RenderBlockInstanceInfo;
 }
@@ -44,9 +48,6 @@ backend rust epilogue r#"
     }
 "#;
 
-// JC2 has no `constructor()` symbol for this struct; it's just a zeroed
-// instance with two color slots primed to opaque-white. The remaining
-// fields are populated by `initialize_matrix` / `update_matrix`.
 backend cpp epilogue definition r#"
 RenderBlockInstanceInfo RenderBlockInstanceInfo::make() {
     RenderBlockInstanceInfo self{};

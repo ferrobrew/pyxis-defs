@@ -86,10 +86,6 @@ backend rust epilogue r#"
     }
 "#;
 
-// Heap factory for `PfxRigidBody`. Rust's `Pin<Box<Self>>` is the
-// idiomatic shape there; the C++ analog is a plain raw `new`-allocated
-// pointer the caller takes ownership of (and tears down via
-// `destructor(false)` + `delete`, or wraps in a smart-pointer themselves).
 backend cpp epilogue definition r#"
 PfxRigidBody* PfxRigidBody::make_heap(::physics::havok::rigid_body::HkpRigidBody* rigid_body) {
     auto* instance = new PfxRigidBody{};
