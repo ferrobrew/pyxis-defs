@@ -59,6 +59,7 @@ impl PfxRigidBody {
     #[address(0x9B2_560)]
     pub fn get_transform(&self, m: *mut Matrix4, translate: bool);
 }
+
 #[cfg(backend = "cpp")]
 impl PfxRigidBody {
     /// Heap-allocates a `PfxRigidBody` and runs the native ctor against

@@ -17,6 +17,7 @@ type SharedCountImpl {
     use_count: AtomicI32,
     weak_count: AtomicI32,
 }
+
 // These methods exist only to scaffold C++ in-class declarations. Rust
 // uses multiple `impl Foo` blocks freely, so the rust epilogue defines
 // these directly without needing a pyxis-side declaration.
@@ -449,4 +450,3 @@ inline WeakPtr<T> WeakPtr<T>::from_shared(const SharedPtr<T>* shared) {
     return WeakPtr<T>{shared->px, WeakCount::from_shared(&shared->pn)};
 }
 "#;
-

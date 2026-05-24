@@ -15,6 +15,7 @@ impl AIRayCastFilter {
     #[address(0x908_600)]
     fn constructor(&mut self);
 }
+
 #[cfg(backend = "cpp")]
 impl AIRayCastFilter {
     #[external_body]
@@ -119,4 +120,3 @@ backend rust epilogue r#"
         }
     }
 "#;
-

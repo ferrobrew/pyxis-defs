@@ -45,6 +45,7 @@ impl GameObject {
     #[address(0x917_A00)]
     pub fn init_transform_recursively(&mut self, mat: *const f32);
 }
+
 #[cfg(backend = "cpp")]
 impl GameObject {
     /// Cpp analog of rust's `GameObjectExt::get_matrix`. Reach is the same

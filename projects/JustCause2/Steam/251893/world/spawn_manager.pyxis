@@ -49,6 +49,7 @@ impl SpawnManager {
     #[address(0x73F_DB0)]
     pub fn request_vehicle_model(&mut self, model_id: *const u32, category: i32);
 }
+
 #[cfg(backend = "cpp")]
 impl SpawnManager {
     /// Returns true once any entry in `vehicle_types.loaded_models`

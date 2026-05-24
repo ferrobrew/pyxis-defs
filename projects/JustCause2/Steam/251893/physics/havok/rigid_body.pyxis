@@ -38,6 +38,7 @@ impl HkpRigidBodyCInfo {
     #[address(0xB7A_930)]
     fn constructor(&mut self);
 }
+
 #[cfg(backend = "cpp")]
 impl HkpRigidBodyCInfo {
     #[external_body]
@@ -75,6 +76,7 @@ impl HkpRigidBody {
     #[address(0xB7A_900)]
     fn destructor(&mut self, free: bool);
 }
+
 #[cfg(backend = "cpp")]
 impl HkpRigidBody {
     /// Returns a pointer to the embedded `HkReferencedObject` field.
@@ -166,6 +168,7 @@ impl HkpBoxShape {
     #[address(0xB40_330)]
     fn destructor(&mut self, free: bool);
 }
+
 #[cfg(backend = "cpp")]
 impl HkpBoxShape {
     #[external_body]
@@ -239,6 +242,7 @@ impl HkpSphereShape {
     #[address(0xB40_330)]
     fn destructor(&mut self, free: bool);
 }
+
 #[cfg(backend = "cpp")]
 impl HkpSphereShape {
     #[external_body]
@@ -311,6 +315,7 @@ impl HkpCapsule {
     #[address(0xB40_330)]
     fn destructor(&mut self, free: bool);
 }
+
 #[cfg(backend = "cpp")]
 impl HkpCapsule {
     #[external_body]
@@ -384,6 +389,7 @@ impl HkpCylinderShape {
     #[address(0xB40_330)]
     fn destructor(&mut self, free: bool);
 }
+
 #[cfg(backend = "cpp")]
 impl HkpCylinderShape {
     #[external_body]

@@ -25,6 +25,7 @@ impl RenderBlockInstanceInfo {
     #[address(0x768_2E0)]
     pub fn update_matrix(&mut self, matrix: *const Matrix4);
 }
+
 #[cfg(backend = "cpp")]
 impl RenderBlockInstanceInfo {
     /// JC2 ships no `constructor()` symbol for this type; the factory
