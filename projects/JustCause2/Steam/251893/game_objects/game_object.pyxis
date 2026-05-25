@@ -1,8 +1,12 @@
 use physics::pfx_rigid_body::PfxRigidBody;
-use types::{math::Aabb, rtti::Rtti};
+use types::{math::{Aabb, Matrix4}, rtti::Rtti};
 use types::shared_ptr::{SharedPtr, WeakPtr};
 
 backend rust prologue "use crate::{math::Matrix4, shared_ptr::*};";
+
+backend cpp {
+    use types::math::Matrix4;
+}
 
 pub type PropertyFile;
 
@@ -42,6 +46,20 @@ impl GameObject {
     pub fn init_transform_recursively(&mut self, mat: *const f32);
 }
 
+#[cfg(backend = "cpp")]
+impl GameObject {
+    /// Cpp analog of rust's `GameObjectExt::get_matrix`. Reach is the same
+    /// (every derived type has an implicit `operator GameObject&()` so a
+    /// derived `obj.try_get_matrix(&m)` works without an explicit cast).
+    /// Returns `bool` rather than `std::optional<Matrix4>` to keep the
+    /// `<optional>` include out of the public surface.
+    #[external_body]
+    pub fn try_get_matrix(&self, out: *mut Matrix4) -> bool;
+    /// Cpp analog of rust's `GameObjectMutExt::set_matrix`.
+    #[external_body]
+    pub fn set_matrix(&mut self, matrix: *const Matrix4);
+}
+
 backend rust epilogue r#"
     pub trait GameObjectExt {
         unsafe fn get_matrix(&self) -> Option<Matrix4>;
@@ -61,4 +79,14 @@ backend rust epilogue r#"
             unsafe { self.as_mut().set_matrix_raw(matrix.as_ptr()); }
         }
     }
+"#;
+
+backend cpp epilogue definition r#"
+bool GameObject::try_get_matrix(::types::math::Matrix4* out) const {
+    return this->get_matrix_raw(out->data);
+}
+
+void GameObject::set_matrix(const ::types::math::Matrix4* matrix) {
+    this->set_matrix_raw(matrix->data);
+}
 "#;

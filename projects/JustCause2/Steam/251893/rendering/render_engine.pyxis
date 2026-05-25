@@ -3,7 +3,7 @@ use rendering::render_block::{RenderBlock, GenericRenderBlock};
 
 backend rust prologue "use windows::Win32::Foundation::HANDLE;";
 
-#[size(4), align(4)]
+#[size(4), align(4), cpp_header = "<windows.h>", cpp_name = "::HANDLE"]
 extern type HANDLE;
 
 #[address(0x1_08C_D40)]
@@ -26,6 +26,16 @@ impl RenderBlockInstanceInfo {
     pub fn update_matrix(&mut self, matrix: *const Matrix4);
 }
 
+#[cfg(backend = "cpp")]
+impl RenderBlockInstanceInfo {
+    /// JC2 ships no `constructor()` symbol for this type; the factory
+    /// returns a zeroed instance with `colors[0]` and `colors[1]` primed
+    /// to opaque white. The remaining fields are filled in by
+    /// `initialize_matrix` / `update_matrix`.
+    #[external_body]
+    pub fn make() -> RenderBlockInstanceInfo;
+}
+
 backend rust epilogue r#"
     impl RenderBlockInstanceInfo {
         pub unsafe fn new() -> RenderBlockInstanceInfo {
@@ -37,6 +47,15 @@ backend rust epilogue r#"
             }
         }
     }
+"#;
+
+backend cpp epilogue definition r#"
+RenderBlockInstanceInfo RenderBlockInstanceInfo::make() {
+    RenderBlockInstanceInfo self{};
+    self.colors[0] = 0xFFFFFFFFu;
+    self.colors[1] = 0xFFFFFFFFu;
+    return self;
+}
 "#;
 
 #[size(0x1364)]

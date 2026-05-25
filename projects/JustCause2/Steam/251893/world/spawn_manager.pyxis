@@ -50,6 +50,15 @@ impl SpawnManager {
     pub fn request_vehicle_model(&mut self, model_id: *const u32, category: i32);
 }
 
+#[cfg(backend = "cpp")]
+impl SpawnManager {
+    /// Returns true once any entry in `vehicle_types.loaded_models`
+    /// matches `id` and is in load state 2 (loaded). Walks up to
+    /// `vehicle_types.hash_edacd65b_likely_max_models` entries.
+    #[external_body]
+    pub fn is_vehicle_loaded(&self, id: u32) -> bool;
+}
+
 backend rust epilogue r#"
     impl SpawnManager {
         pub unsafe fn is_vehicle_loaded(&self, id: u32) -> bool {
@@ -61,4 +70,17 @@ backend rust epilogue r#"
             })
         }
     }
+"#;
+
+backend cpp epilogue definition r#"
+bool SpawnManager::is_vehicle_loaded(::std::uint32_t id) const {
+    const auto count = vehicle_types.hash_edacd65b_likely_max_models;
+    for (::std::int32_t i = 0; i < count; ++i) {
+        const auto* model = vehicle_types.loaded_models + i;
+        if (model->model_id == id && model->load_state == 2) {
+            return true;
+        }
+    }
+    return false;
+}
 "#;

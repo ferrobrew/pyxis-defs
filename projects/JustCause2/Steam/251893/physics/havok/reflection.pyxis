@@ -1,13 +1,3 @@
-backend rust prologue r#"
-    use std::{ffi::c_void, os::raw::c_char};
-"#;
-
-#[size(4), align(4)]
-extern type c_void;
-
-#[size(1), align(1)]
-extern type c_char;
-
 #[address(0xF25_650)]
 pub extern hk_type_infos: *const HkTypeInfo;
 
@@ -17,9 +7,9 @@ pub extern hk_classes: *const HkClass;
 #[size(0x10)]
 pub type HkTypeInfo {
     pub name: *const c_char,
-    pub finish_loaded: *const c_void,
-    pub clean_up_loaded: *const c_void,
-    pub vtable: *const c_void,
+    pub finish_loaded: *const void,
+    pub clean_up_loaded: *const void,
+    pub vtable: *const void,
 }
 
 #[size(0x30)]
@@ -32,7 +22,7 @@ pub type HkClass {
     pub num_enums: u32,
     pub members: *const HkClassMember,
     pub num_members: u32,
-    pub defaults: *const c_void,
+    pub defaults: *const void,
     pub attributes: *const HkCustomAttributes,
     pub flags: HkClassFlags,
     pub version: u32,
@@ -140,6 +130,6 @@ pub type HkCustomAttribute {
 
 #[size(0x8)]
 pub type HkVariant {
-    pub object: *mut c_void,
+    pub object: *mut void,
     pub class: *const HkClass,
 }

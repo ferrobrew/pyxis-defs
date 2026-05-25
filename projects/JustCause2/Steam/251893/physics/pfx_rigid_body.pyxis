@@ -3,6 +3,11 @@ use types::{math::{Matrix4, Vector3}, shared_ptr::SharedPtr};
 
 backend rust prologue "use crate::shared_ptr::*;";
 
+backend cpp {
+    use types::shared_ptr::SharedPtr;
+    use physics::havok::rigid_body::HkpRigidBody;
+}
+
 #[size(0x30)]
 pub type PfxRigidBody {
     #[base]
@@ -55,6 +60,16 @@ impl PfxRigidBody {
     pub fn get_transform(&self, m: *mut Matrix4, translate: bool);
 }
 
+#[cfg(backend = "cpp")]
+impl PfxRigidBody {
+    /// Heap-allocates a `PfxRigidBody` and runs the native ctor against
+    /// the provided `HkpRigidBody`. Caller takes ownership; tear down
+    /// via `destructor(false)` + `delete` or wrap in a smart-pointer.
+    /// Mirrors rust's `unsafe fn new() -> Pin<Box<Self>>`.
+    #[external_body]
+    pub fn make_heap(rigid_body: *mut HkpRigidBody) -> *mut PfxRigidBody;
+}
+
 backend rust epilogue r#"
     impl PfxRigidBody {
         pub unsafe fn new(rigid_body: *mut crate::havok::rigid_body::HkpRigidBody) -> std::pin::Pin<std::boxed::Box<Self>> {
@@ -70,6 +85,15 @@ backend rust epilogue r#"
             unsafe { self.destructor(false); }
         }
     }
+"#;
+
+backend cpp epilogue definition r#"
+PfxRigidBody* PfxRigidBody::make_heap(::physics::havok::rigid_body::HkpRigidBody* rigid_body) {
+    auto* instance = new PfxRigidBody{};
+    auto empty = ::types::shared_ptr::SharedPtr<::std::uint32_t>::make();
+    instance->constructor(rigid_body, &empty, false, 0);
+    return instance;
+}
 "#;
 
 pub type PfxRigidBodyInstance {

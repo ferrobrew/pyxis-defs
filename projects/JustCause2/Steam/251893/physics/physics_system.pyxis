@@ -16,6 +16,12 @@ impl AIRayCastFilter {
     fn constructor(&mut self);
 }
 
+#[cfg(backend = "cpp")]
+impl AIRayCastFilter {
+    #[external_body]
+    pub fn make() -> AIRayCastFilter;
+}
+
 backend rust epilogue r#"
     impl AIRayCastFilter {
         pub unsafe fn new() -> Self {
@@ -28,6 +34,14 @@ backend rust epilogue r#"
     }
 "#;
 
+backend cpp epilogue definition r#"
+AIRayCastFilter AIRayCastFilter::make() {
+    AIRayCastFilter self{};
+    self.constructor();
+    return self;
+}
+"#;
+
 #[size(0x2C)]
 pub type RayCastResult {
     game_object: *mut u32,
@@ -36,6 +50,14 @@ pub type RayCastResult {
     rigid_body: *mut u32,
     shape: *mut u32,
     unknown: [u32; 4],
+}
+#[cfg(backend = "cpp")]
+impl RayCastResult {
+    /// Default-constructed `RayCastResult`: forward-pointing normal,
+    /// `distance = 1`, sentinel `0xFFFFFFFF` in every `unknown` slot.
+    /// Matches the shape rust's `Default` impl produces.
+    #[external_body]
+    pub fn make() -> RayCastResult;
 }
 
 backend rust epilogue r#"
@@ -55,6 +77,19 @@ backend rust epilogue r#"
             unsafe { Self::new() }
         }
     }
+"#;
+
+backend cpp epilogue definition r#"
+RayCastResult RayCastResult::make() {
+    RayCastResult self{};
+    self.normal = ::types::math::Vector3{{1.0f, 0.0f, 0.0f}};
+    self.distance = 1.0f;
+    self.unknown[0] = 0xFFFFFFFFu;
+    self.unknown[1] = 0xFFFFFFFFu;
+    self.unknown[2] = 0xFFFFFFFFu;
+    self.unknown[3] = 0xFFFFFFFFu;
+    return self;
+}
 "#;
 
 #[singleton(0x1_18F_FF4), size(0x250), align(16)] // 0x248

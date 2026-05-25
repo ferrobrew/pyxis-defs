@@ -6,8 +6,20 @@ backend rust prologue "\n    use crate::shared_ptr::*;\n    use std::mem::Manual
 /// the `Drop` implementation of `SharedPtr<u32>` being called when the `RenderBlock`
 /// is dropped. The destructor, which we call in `drop`, will decrement the refcount
 /// for us.
-#[size(8), align(4)]
+#[size(8), align(4), cpp_name = "::pyxis::ManuallyDrop<::types::shared_ptr::SharedPtr<::std::uint32_t>>"]
 extern type ManuallyDrop<SharedPtr<u32>>;
+
+backend cpp prologue r#"
+// `::pyxis::ManuallyDrop<T>` mirrors `core::mem::ManuallyDrop<T>` from Rust:
+// it suppresses T's destructor so callers can drive teardown manually. Same
+// layout as T (single-field union); accessing `.value` gives the wrapped value.
+//
+// The extern-type machinery elides the `SharedPtr<u32>` reference from
+// pyxis's dep walker (the extern's name is opaque), so we have to pull in
+// the shared_ptr header explicitly here.
+#include "pyxis_runtime.hpp"
+#include "types/shared_ptr.hpp"
+"#;
 
 #[address(0x1_3E0_EA0)]
 pub extern render_block_memory: u32;
@@ -93,6 +105,12 @@ impl GenericRenderBlock {
     fn destructor(&mut self);
 }
 
+#[cfg(backend = "cpp")]
+impl GenericRenderBlock {
+    #[external_body]
+    pub fn make() -> GenericRenderBlock;
+}
+
 backend rust epilogue r#"
     impl GenericRenderBlock {
         pub unsafe fn new() -> GenericRenderBlock {
@@ -110,6 +128,14 @@ backend rust epilogue r#"
             }
         }
     }
+"#;
+
+backend cpp epilogue definition r#"
+GenericRenderBlock GenericRenderBlock::make() {
+    GenericRenderBlock self{};
+    self.constructor();
+    return self;
+}
 "#;
 
 #[size(0x10), align(16)]
@@ -144,6 +170,12 @@ impl RenderBlockLine {
     pub fn update(&mut self, render_block: *mut GenericRenderBlock) -> i32;
 }
 
+#[cfg(backend = "cpp")]
+impl RenderBlockLine {
+    #[external_body]
+    pub fn make() -> RenderBlockLine;
+}
+
 backend rust epilogue r#"
     impl RenderBlockLine {
         pub unsafe fn new() -> RenderBlockLine {
@@ -159,6 +191,14 @@ backend rust epilogue r#"
             unsafe { self.destructor(false); }
         }
     }
+"#;
+
+backend cpp epilogue definition r#"
+RenderBlockLine RenderBlockLine::make() {
+    RenderBlockLine self{};
+    self.constructor();
+    return self;
+}
 "#;
 
 #[size(0x20), align(16)]
@@ -185,6 +225,12 @@ impl RenderBlockTriangle {
     pub fn update(&mut self, render_block: *mut GenericRenderBlock) -> i32;
 }
 
+#[cfg(backend = "cpp")]
+impl RenderBlockTriangle {
+    #[external_body]
+    pub fn make() -> RenderBlockTriangle;
+}
+
 backend rust epilogue r#"
     impl RenderBlockTriangle {
         pub unsafe fn new() -> RenderBlockTriangle {
@@ -200,6 +246,14 @@ backend rust epilogue r#"
             unsafe { self.destructor(false); }
         }
     }
+"#;
+
+backend cpp epilogue definition r#"
+RenderBlockTriangle RenderBlockTriangle::make() {
+    RenderBlockTriangle self{};
+    self.constructor();
+    return self;
+}
 "#;
 
 #[size(0x20)]
@@ -242,6 +296,12 @@ impl RenderBlockGeneral {
     pub fn update(&mut self, render_block: *mut GenericRenderBlock) -> i32;
 }
 
+#[cfg(backend = "cpp")]
+impl RenderBlockGeneral {
+    #[external_body]
+    pub fn make() -> RenderBlockGeneral;
+}
+
 backend rust epilogue r#"
     impl RenderBlockGeneral {
         pub unsafe fn new() -> RenderBlockGeneral {
@@ -257,6 +317,14 @@ backend rust epilogue r#"
             unsafe { self.destructor(false); }
         }
     }
+"#;
+
+backend cpp epilogue definition r#"
+RenderBlockGeneral RenderBlockGeneral::make() {
+    RenderBlockGeneral self{};
+    self.constructor();
+    return self;
+}
 "#;
 
 #[copyable, cloneable, defaultable]
@@ -320,6 +388,16 @@ impl RenderBlock3DText {
     pub fn set_text(render_block: *mut RenderBlock3DText, description: *const RenderBlock3DTextDesc);
 }
 
+#[cfg(backend = "cpp")]
+impl RenderBlock3DText {
+    /// JC2 ships no `constructor()` symbol for this type; the factory
+    /// builds one by zeroing the struct then assigning the known-good
+    /// vftable pointer, sentinel text/font hashes, and default text-
+    /// render flags (`render_style = 2`, `font_size = 16`).
+    #[external_body]
+    pub fn make() -> RenderBlock3DText;
+}
+
 backend rust epilogue r#"
     impl RenderBlock3DText {
         pub unsafe fn new() -> RenderBlock3DText {
@@ -341,4 +419,16 @@ backend rust epilogue r#"
             }
         }
     }
+"#;
+
+backend cpp epilogue definition r#"
+RenderBlock3DText RenderBlock3DText::make() {
+    RenderBlock3DText self{};
+    self.render_block.vftable = reinterpret_cast<const RenderBlockVftable*>(0xF23584);
+    self.text_hash = 0xFFFFFFFFu;
+    self.font_hash = 0xFFFFFFFFu;
+    self.render_style = 2;
+    self.font_size = 16;
+    return self;
+}
 "#;

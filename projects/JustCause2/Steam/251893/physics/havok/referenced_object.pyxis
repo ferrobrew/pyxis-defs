@@ -4,9 +4,25 @@ backend rust prologue "use windows::Win32::System::Threading::TlsGetValue;";
 
 #[size(0x8)]
 pub type HkReferencedObject {
+    /// Packed allocation size + flags. Low 15 bits are the chunk size
+    /// in bytes (as allocated from the Havok thread allocator); the
+    /// high bit is a flag.
     #[address(0x4)]
     mem_size_and_flags: u16,
     reference_count: u16,
+}
+#[cfg(backend = "cpp")]
+impl HkReferencedObject {
+    #[external_body]
+    pub fn allocation_size(&self) -> u32;
+    /// Named `refcount` rather than `reference_count` to avoid colliding
+    /// with the field of the same name.
+    #[external_body]
+    pub fn refcount(&self) -> u16;
+    #[external_body]
+    pub fn add_reference(&mut self);
+    #[external_body]
+    pub fn remove_reference(&mut self);
 }
 
 backend rust epilogue r#"
@@ -84,4 +100,131 @@ backend rust epilogue r#"
             }
         }
     }
+"#;
+
+backend cpp prologue r#"
+#include <windows.h>
+#include "physics/havok/memory.hpp"
+"#;
+
+backend cpp epilogue definition r#"
+::std::uint32_t HkReferencedObject::allocation_size() const {
+    return static_cast<::std::uint32_t>(mem_size_and_flags & 0x7FFF);
+}
+::std::uint16_t HkReferencedObject::refcount() const {
+    return this->reference_count;
+}
+void HkReferencedObject::add_reference() {
+    this->reference_count += 1;
+}
+void HkReferencedObject::remove_reference() {
+    this->reference_count -= 1;
+}
+"#;
+
+// `hk_thread_memory` and `HkRefCounted<T>` stay in the header epilogue:
+// the template's release path calls hk_thread_memory through a derived
+// type's factory, and template member-function definitions must be
+// header-visible at every instantiation site. The dep walker can't see
+// into the template body, so the helper rides along inline.
+backend cpp epilogue r#"
+// Get the Havok thread-local memory allocator from TLS. JC2 stores a
+// `HkThreadMemory*` in the TLS slot whose index is held in
+// `havok::memory::hk_thread_memory_tls_index` (an `extern u32`).
+inline ::physics::havok::memory::HkThreadMemory* hk_thread_memory() {
+    auto& tls_index = ::physics::havok::memory::get_hk_thread_memory_tls_index();
+    return reinterpret_cast<::physics::havok::memory::HkThreadMemory*>(::TlsGetValue(tls_index));
+}
+
+// =============================================================================
+// HkRefCounted<T> protocol
+// =============================================================================
+//
+// `HkRefCounted<T>` is the C++ analog of rust's
+// `HkRefCounted<T: HkReferencedObjectInstance>`. The rust side uses a trait
+// to abstract over "any havok refcounted object"; we can't translate that
+// directly without virtual inheritance or CRTP (both have layout costs we
+// don't want, since pyxis emits composition-only POD-shaped structs).
+//
+// Instead we use *template duck-typing*: `HkRefCounted<T>` calls named
+// member methods on `T*`, and any `T` that provides them is usable. If a
+// type doesn't provide them, the template fails to instantiate at the
+// call site - the C++20 `concept`-of-a-concept idiom, expressed without
+// a `requires` clause.
+//
+// Required members on `T`:
+//
+//   ::physics::havok::referenced_object::HkReferencedObject*
+//       T::pyxis_hk_as_referenced_object();
+//
+//       Returns a pointer to the embedded `HkReferencedObject` field.
+//       The field path differs per type (HkpRigidBody embeds it directly;
+//       shape types embed it nested inside HkpShape), so the navigation
+//       has to live on T.
+//
+//   void T::pyxis_hk_free();
+//
+//       Tear-down hook invoked when the reference count hits zero.
+//       Implementations call the type's `#[address]`-bound destructor
+//       with `free=true` so the Havok thread-memory chunk is reclaimed.
+//
+// The `pyxis_hk_` prefix marks these as backend-emitted machinery rather
+// than user-facing API: a JC2 consumer skimming a header should see them
+// and recognize "not for me." The protocol is closed-coded - if it grows
+// further (e.g. to support a `clone` operation), update both this list
+// and every refcounted havok type at the same time.
+//
+// Construction is deliberately *not* part of this protocol. Different
+// types have different ctor signatures, so each type ships a free
+// factory `T_make_refcounted(args...)` instead - it allocates from the
+// thread allocator with the right `HkMemoryClass`, runs the native ctor,
+// primes `mem_size_and_flags`, and returns the wrapped `HkRefCounted<T>`.
+
+template <class T>
+class HkRefCounted {
+public:
+    HkRefCounted() : ptr_(nullptr) {}
+    explicit HkRefCounted(T* ptr) : ptr_(ptr) {}
+
+    HkRefCounted(const HkRefCounted& other) : ptr_(other.ptr_) {
+        if (ptr_ != nullptr) {
+            ptr_->pyxis_hk_as_referenced_object()->add_reference();
+        }
+    }
+    HkRefCounted& operator=(const HkRefCounted& other) {
+        if (this == &other) return *this;
+        release();
+        ptr_ = other.ptr_;
+        if (ptr_ != nullptr) {
+            ptr_->pyxis_hk_as_referenced_object()->add_reference();
+        }
+        return *this;
+    }
+    HkRefCounted(HkRefCounted&& other) noexcept : ptr_(other.ptr_) { other.ptr_ = nullptr; }
+    HkRefCounted& operator=(HkRefCounted&& other) noexcept {
+        if (this == &other) return *this;
+        release();
+        ptr_ = other.ptr_;
+        other.ptr_ = nullptr;
+        return *this;
+    }
+    ~HkRefCounted() { release(); }
+
+    T* get() const { return ptr_; }
+    T& operator*() const { return *ptr_; }
+    T* operator->() const { return ptr_; }
+    explicit operator bool() const { return ptr_ != nullptr; }
+
+private:
+    void release() {
+        if (ptr_ == nullptr) return;
+        auto* obj = ptr_->pyxis_hk_as_referenced_object();
+        obj->remove_reference();
+        if (obj->refcount() == 0) {
+            ptr_->pyxis_hk_free();
+        }
+        ptr_ = nullptr;
+    }
+    T* ptr_;
+};
 "#;
