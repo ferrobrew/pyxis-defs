@@ -290,34 +290,13 @@ def main():
 
     # Generate index.json only for JSON backend
     if backend == "json":
-        index_file = output_base_dir / "index.json"
-
-        # Reuse the existing `generated_iso8601` when the `docs` list is
-        # unchanged. Otherwise every build.py run would rewrite the
-        # timestamp and `git status` would always show a diff, which
-        # makes CI's "docs out of date" check on PRs fire spuriously.
-        existing_generated_iso8601: Optional[str] = None
-        existing_docs: Optional[List[Dict[str, Any]]] = None
-        if index_file.exists():
-            try:
-                with open(index_file, "r", encoding="utf-8") as f:
-                    existing = json.load(f)
-                existing_generated_iso8601 = existing.get("generated_iso8601")
-                existing_docs = existing.get("docs")
-            except (json.JSONDecodeError, IOError, OSError):
-                # Malformed or unreadable; fall through and overwrite.
-                pass
-
-        if existing_docs == documents and existing_generated_iso8601:
-            generated_iso8601 = existing_generated_iso8601
-        else:
-            generated_iso8601 = datetime.now(timezone.utc).strftime(
-                "%Y-%m-%dT%H:%M:%SZ"
-            )
+        # Generate current timestamp in ISO 8601 format
+        generated_iso8601 = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
         # Build the index.json
         index_data = {"generated_iso8601": generated_iso8601, "docs": documents}
 
+        index_file = output_base_dir / "index.json"
         try:
             with open(index_file, "w", encoding="utf-8") as f:
                 json.dump(index_data, f, indent=2, ensure_ascii=False)
