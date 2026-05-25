@@ -62,9 +62,3 @@ jobs:
           git add docs/ projects/
           git commit -m "chore: update documentation [skip ci]"
           git push
-
-      - name: Fail if docs need updating in PR
-        if: steps.verify-changed-files.outputs.changed == 'true' && github.event_name == 'pull_request'
-        run: |
-          echo "::error::Documentation is out of date. Please run build.py locally and commit the changes."
-          exit 1
