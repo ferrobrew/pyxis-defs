@@ -27,6 +27,10 @@ impl Character {
 
     #[address(0x140_79A_C30)]
     pub fn GetSafeBoneMatrix(&self, safe_index: SafeBoneIndex, matrix: *mut Matrix4);
+
+    // Per-frame update of the character's attached prop visual effects. `dt` is the frame delta.
+    #[address(0x140_7C2_380)]
+    pub fn UpdatePropEffects(&mut self, dt: f32);
 }
 
 #[size(0x240)]
