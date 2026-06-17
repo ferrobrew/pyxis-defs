@@ -1,0 +1,18 @@
+// Scaleform-backed UI manager (the concrete class behind IUIManager; a single instance exists).
+// Known members (offsets TBD): m_RenderHAL (Scaleform render HAL), m_BackBufferRenderSetup,
+// m_RenderThreadSignal.
+pub type CUIManager {}
+impl CUIManager {
+    // Begins the UI render job (posts to the async render thread). `context` is
+    // Graphics::HContext_t* (opaque).
+    #[address(0x140_F1B_030)]
+    pub fn StartRender(&mut self, context: *const void);
+
+    // Final commit: submits the render HAL's output under a graphics scoped lock.
+    #[address(0x140_F1B_0D0)]
+    pub fn Submit(&mut self);
+
+    // True when a static background is being shown.
+    #[address(0x140_F1B_4C0)]
+    pub fn IsUsingStaticBackGround(&self) -> bool;
+}

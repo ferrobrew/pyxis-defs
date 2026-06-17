@@ -1,0 +1,25 @@
+use types::math::Vector3;
+
+// Autodesk HumanIK wrapper.
+pub type CHumanIK {}
+impl CHumanIK {
+    // Pushes an IK effector target (character-local space). Signature approximate: enums modeled as
+    // i32, and the trailing float args (interpolation rate / blend weight) need verification.
+    #[address(0x140_408_860)]
+    pub fn AddEffectorTargetPosition(
+        &mut self,
+        effector_id: i32,
+        pos: *const Vector3,
+        solve_step: i32,
+        pass_info: i32,
+        full_body: bool,
+        rate: f32,
+        arg7: f32,
+        blend_weight: f32,
+    );
+}
+
+// Per-frame hand-IK driver (sources its targets from weapon grip positions). Free function;
+// `ctx` is SStateContext*.
+#[address(0x140_816_430)]
+fn NHandIKTask_Update(ctx: *mut void, p1: *mut void, p2: *mut void);

@@ -1,0 +1,15 @@
+// One input effector slot: an analog value plus a digital state. Field names are known; offsets
+// are unverified (needs further reversing).
+#[size(0x10)]
+pub type CInputDeviceEffector {
+    pub m_Value: f32,       // analog value (trigger pressure, stick axis)
+    pub m_State: u32,       // digital state
+    pub m_IsAnalogue: bool,
+}
+
+// Maps action IDs to effector slots (255 action IDs total).
+pub type CInputActionMap {}
+impl CInputActionMap {
+    #[address(0x140_2F4_3B0)]
+    pub fn GetActionEffector(&mut self, action_id: i32, device_index: i32) -> *mut CInputDeviceEffector;
+}

@@ -69,3 +69,10 @@ pub type Camera {
     pub m_Width: i32,
     pub m_Height: i32,
 }
+impl Camera {
+    // Per-frame camera update: snapshots the previous view-projection, Lerps the transform between
+    // T0 and T1 by `dtf`, and recalculates projection and frustum. `ctx` is an opaque per-call
+    // parameter (unused in the body); `dtf` is the render interpolation factor.
+    #[address(0x140_0C3_020)]
+    pub fn UpdateRender(&mut self, ctx: *const void, dtf: f32);
+}

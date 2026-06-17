@@ -1,0 +1,9 @@
+use camera::camera_context::CameraControlContext;
+
+// Root of the camera pipeline tree: flattens and weights the pipelines and runs their render
+// modifiers, populating the render contexts each frame. `ctx` is the CCameraControlContext.
+pub type CameraTree {}
+impl CameraTree {
+    #[address(0x140_465_AD0)]
+    pub fn UpdateRenderContexts(&mut self, ctx: *mut CameraControlContext);
+}
