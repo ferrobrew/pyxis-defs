@@ -1,30 +1,30 @@
 use camera::camera_context::CameraControlContext;
 
-#[singleton(0x142F186B0), size(0x758)]
+#[singleton(0x142_F18_6B0), size(0x758)]
 pub type GameCameraManager {
     #[address(0xE0)]
     pub m_ControlContext: CameraControlContext,
 }
 
 // A node in the camera pipeline (opaque).
-pub type CCameraPipeline {}
-
+pub type CCameraPipeline;
 impl GameCameraManager {
     // Funnels the camera control contexts into the active camera state: reads m_NextRenderContext,
     // sets the audio listener, applies the jitter filter, and calls CameraManager InitTransform/InitFOV.
+
     #[address(0x140_7EC_B00)]
     pub fn PushRenderContext(&mut self);
-
     // Reads the action-effector inputs into m_TransformedGamepadInput. `pipeline` is
     // CCameraPipeline* (opaque).
+
     #[address(0x140_7FF_F90)]
     pub fn UpdateBlackboardValues(&mut self, pipeline: *const CCameraPipeline, dt: f32);
-
     // True when the currently selected camera in the director stack has the cinematic flag set.
+
     #[address(0x140_75C_850)]
     pub fn IsInCinematicCamera(&self) -> bool;
-
     // True when the alternate-aim (ADS) transform is in use.
+
     #[address(0x140_75C_820)]
     pub fn IsAlternateAimTransformUsed(&self) -> bool;
 }

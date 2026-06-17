@@ -1,11 +1,11 @@
 use graphics_engine::graphics_engine::HContext_t;
 
 #[singleton(0x142_ED0_E18), size(0x2220)]
-pub type RenderEngine {
-}
+pub type RenderEngine;
 impl RenderEngine {
     // Late render-pass step (finalizes / copies render targets under the context mutex).
     // `context` is Graphics::HContext_t* (opaque).
+
     #[address(0x140_1C2_350)]
     pub fn PostDraw(&mut self, context: *const HContext_t);
 }

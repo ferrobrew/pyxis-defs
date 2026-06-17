@@ -17,10 +17,10 @@ pub enum ActiveCursor: i32 {
     Arrow,
     Cross,
     Slider,
-    Zoom
+    Zoom,
 }
 
-#[singleton(0x142E2B6F0), min_size(0x1F10)]
+#[singleton(0x142_E2B_6F0), min_size(0x1F10)]
 pub type GraphicsEngine {
     #[address(0x18)]
     pub m_CPUFinishedDrawingEvent: u32,
@@ -31,37 +31,42 @@ pub type GraphicsEngine {
     #[address(0xEB0)]
     pub m_Device: *mut Device,
 
-    #[address(0x1068)]
+    #[address(0x1_068)]
     pub m_MainColorBuffer: *mut Texture,
 
-    #[address(0x1230)]
+    #[address(0x1_230)]
     pub m_BackBufferLinear: *mut Texture,
 }
 
 // Opaque graphics handles / params (used behind pointers).
-pub type HContext_t {}          // Graphics::HContext_t (GPU context handle)
-pub type HDevice_t {}           // Graphics::HDevice_t (GPU device handle)
-pub type DrawThreadTaskParam {} // CGraphicsEngine::DrawThreadTaskParam
+pub type HContext_t;
 
+// Graphics::HContext_t (GPU context handle)
+pub type HDevice_t;
+
+// Graphics::HDevice_t (GPU device handle)
+pub type DrawThreadTaskParam;
+
+// CGraphicsEngine::DrawThreadTaskParam
 impl GraphicsEngine {
     #[address(0x140_0C4_690)]
     pub fn WaitForCPUDrawToFinish(&mut self);
-
     // Graphics entry point: runs the per-frame prologue (presents the previous frame, advances the
     // clock and constant-buffer pools) then dispatches this frame's draw.
+
     #[address(0x140_0F4_170)]
     pub fn Draw(&mut self, dt: f32);
-
     // Presents the previous frame's back buffer.
+
     #[address(0x140_0B8_9D0)]
     pub fn Flip(&mut self);
-
     // Queues this frame's render work on the render thread.
+
     #[address(0x140_0F3_A30)]
     pub fn DispatchDraw(&mut self);
-
     // Render-thread body: gbuffer, lighting, post-effects and UI. `param` is
     // DrawThreadTaskParam* (layout TBD).
+
     #[address(0x140_0F1_D10)]
     pub fn HandleDrawThreadTask(&mut self, param: *mut DrawThreadTaskParam) -> u32;
 }

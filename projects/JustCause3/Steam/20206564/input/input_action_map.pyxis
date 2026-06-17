@@ -4,9 +4,9 @@
 // follow this struct; reading the effector itself uses these offsets.
 #[size(0x14), align(4)]
 pub type CInputDeviceEffector {
-    pub m_Value: f32,        // analog value (trigger pressure, stick axis)
+    pub m_Value: f32, // analog value (trigger pressure, stick axis)
     pub m_PrevValue: f32,
-    pub m_State: u32,        // digital state
+    pub m_State: u32, // digital state
     pub m_IsAnalogue: bool,
     pub m_IsDeltaBased: bool,
     pub m_IsUpdated: bool,
@@ -15,7 +15,7 @@ pub type CInputDeviceEffector {
 }
 
 // Maps action IDs to effector slots (255 action IDs total).
-pub type CInputActionMap {}
+pub type CInputActionMap;
 impl CInputActionMap {
     #[address(0x140_2F4_3B0)]
     pub fn GetActionEffector(&mut self, action_id: i32, device_index: i32) -> *mut CInputDeviceEffector;

@@ -30,9 +30,9 @@ impl Clock {
 
     #[address(0x140_091_BB0)]
     pub fn Pause(&mut self, pause: bool);
-
     // Per-frame tick: measures the QueryPerformanceCounter delta and updates m_SPF (an exponential
     // moving average), m_RealSPF, m_FPS, and m_GameTimeMicro.
+
     #[address(0x140_093_230)]
     pub fn Update(&mut self);
 

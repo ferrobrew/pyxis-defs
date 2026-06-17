@@ -2,6 +2,7 @@
 pub type Matrix3 {
     pub data: [f32; 9],
 }
+
 backend rust epilogue r#"
     impl From<glam::Mat3> for Matrix3 {
         fn from(m: glam::Mat3) -> Self {
@@ -30,6 +31,7 @@ backend rust epilogue r#"
 pub type Matrix4 {
     pub data: [f32; 16],
 }
+
 backend rust epilogue r#"
     impl From<glam::Mat4> for Matrix4 {
         fn from(m: glam::Mat4) -> Self {
@@ -58,6 +60,7 @@ backend rust epilogue r#"
 pub type Vector2 {
     pub data: [f32; 2],
 }
+
 backend rust epilogue r#"
     impl From<glam::Vec2> for Vector2 {
         fn from(v: glam::Vec2) -> Self {
@@ -77,6 +80,7 @@ backend rust epilogue r#"
 pub type Vector3 {
     pub data: [f32; 3],
 }
+
 backend rust epilogue r#"
     impl From<glam::Vec3> for Vector3 {
         fn from(v: glam::Vec3) -> Self {
@@ -96,6 +100,7 @@ backend rust epilogue r#"
 pub type Vector4 {
     pub data: [f32; 4],
 }
+
 backend rust epilogue r#"
     impl From<glam::Vec4> for Vector4 {
         fn from(v: glam::Vec4) -> Self {
