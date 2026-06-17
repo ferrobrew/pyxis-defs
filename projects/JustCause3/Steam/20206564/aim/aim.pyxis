@@ -1,4 +1,5 @@
 use types::math::Matrix4;
+use state::SStateContext;
 
 pub type CWeaponBase {}
 impl CWeaponBase {
@@ -24,4 +25,4 @@ impl CPlayerAimControl {
 // Character-state task that overrides the aim direction toward a locked target. Free function;
 // `ctx` is SStateContext*, `p` opaque.
 #[address(0x140_809_C60)]
-fn NAutoAimToTarget_Update(ctx: *mut void, p: *mut void);
+fn NAutoAimToTarget_Update(ctx: *mut SStateContext, p: *mut void);

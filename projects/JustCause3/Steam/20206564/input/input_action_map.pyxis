@@ -1,10 +1,17 @@
-// One input effector slot: an analog value plus a digital state. Field names are known; offsets
-// are unverified (needs further reversing).
-#[size(0x10)]
+// One input effector slot. Layout from the debug PDB (Input::CInputDeviceEffector, 0x14),
+// cross-checked against retail usage (m_Value@0, m_State@8, m_StateTime@0x10 all match). The
+// pointer GetActionEffector returns is the head of a linked-list node whose extra id/next fields
+// follow this struct; reading the effector itself uses these offsets.
+#[size(0x14), align(4)]
 pub type CInputDeviceEffector {
-    pub m_Value: f32,       // analog value (trigger pressure, stick axis)
-    pub m_State: u32,       // digital state
+    pub m_Value: f32,        // analog value (trigger pressure, stick axis)
+    pub m_PrevValue: f32,
+    pub m_State: u32,        // digital state
     pub m_IsAnalogue: bool,
+    pub m_IsDeltaBased: bool,
+    pub m_IsUpdated: bool,
+    pub m_ForceClick: bool,
+    pub m_StateTime: f32,
 }
 
 // Maps action IDs to effector slots (255 action IDs total).

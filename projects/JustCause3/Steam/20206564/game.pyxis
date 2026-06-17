@@ -36,6 +36,10 @@ impl Game {
     pub fn UpdateRender(&mut self, update_contexts: *mut UpdateContexts);
 }
 
+// Opaque engine context pointers carried by the per-frame update contexts.
+pub type CResourceCache {}
+pub type CProjectContext {}
+
 #[size(0x20), copyable]
 pub type GameObjectInitContext {
     pub m_Dt: f32,
@@ -43,8 +47,8 @@ pub type GameObjectInitContext {
     pub m_RealDt: f32,
 
     #[address(0x10)]
-    pub m_ResourceCache: *const void,
-    pub m_ProjectContext: *const void,
+    pub m_ResourceCache: *const CResourceCache,
+    pub m_ProjectContext: *const CProjectContext,
 }
 
 #[size(0x20), copyable]
@@ -57,7 +61,7 @@ pub type GameObjectUpdateContext {
     pub m_Paused: bool,
 
     #[address(0x18)]
-    pub m_ProjectContext: *const void,
+    pub m_ProjectContext: *const CProjectContext,
 }
 
 #[size(0x20), copyable]
@@ -69,7 +73,7 @@ pub type GameObjectRenderContext {
     pub m_RealDt: f32,
 
     #[address(0x18)]
-    pub m_ProjectContext: *const void,
+    pub m_ProjectContext: *const CProjectContext,
 }
 
 #[size(0x60), copyable]

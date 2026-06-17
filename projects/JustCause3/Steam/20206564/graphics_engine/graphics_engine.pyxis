@@ -37,6 +37,12 @@ pub type GraphicsEngine {
     #[address(0x1230)]
     pub m_BackBufferLinear: *mut Texture,
 }
+
+// Opaque graphics handles / params (used behind pointers).
+pub type HContext_t {}          // Graphics::HContext_t (GPU context handle)
+pub type HDevice_t {}           // Graphics::HDevice_t (GPU device handle)
+pub type DrawThreadTaskParam {} // CGraphicsEngine::DrawThreadTaskParam
+
 impl GraphicsEngine {
     #[address(0x140_0C4_690)]
     pub fn WaitForCPUDrawToFinish(&mut self);
@@ -57,13 +63,13 @@ impl GraphicsEngine {
     // Render-thread body: gbuffer, lighting, post-effects and UI. `param` is
     // DrawThreadTaskParam* (layout TBD).
     #[address(0x140_0F1_D10)]
-    pub fn HandleDrawThreadTask(&mut self, param: *mut void) -> u32;
+    pub fn HandleDrawThreadTask(&mut self, param: *mut DrawThreadTaskParam) -> u32;
 }
 
 // Low-level present (Graphics::Flip); returns Graphics::EResult. `device` is
 // Graphics::HDevice_t* (opaque).
 #[address(0x141_95A_820)]
-fn graphics_flip(device: *mut void) -> i32;
+fn graphics_flip(device: *mut HDevice_t) -> i32;
 
 #[size(0x70)]
 pub type GraphicsParams {

@@ -5,6 +5,10 @@ pub type GameCameraManager {
     #[address(0xE0)]
     pub m_ControlContext: CameraControlContext,
 }
+
+// A node in the camera pipeline (opaque).
+pub type CCameraPipeline {}
+
 impl GameCameraManager {
     // Funnels the camera control contexts into the active camera state: reads m_NextRenderContext,
     // sets the audio listener, applies the jitter filter, and calls CameraManager InitTransform/InitFOV.
@@ -14,7 +18,7 @@ impl GameCameraManager {
     // Reads the action-effector inputs into m_TransformedGamepadInput. `pipeline` is
     // CCameraPipeline* (opaque).
     #[address(0x140_7FF_F90)]
-    pub fn UpdateBlackboardValues(&mut self, pipeline: *const void, dt: f32);
+    pub fn UpdateBlackboardValues(&mut self, pipeline: *const CCameraPipeline, dt: f32);
 
     // True when the currently selected camera in the director stack has the cinematic flag set.
     #[address(0x140_75C_850)]
