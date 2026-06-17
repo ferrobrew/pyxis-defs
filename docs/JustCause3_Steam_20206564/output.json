@@ -236,7 +236,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 2,
-              "line": 17
+              "line": 19
             }
           },
           {
@@ -256,7 +256,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 2,
-              "line": 21
+              "line": 23
             }
           }
         ],
@@ -269,7 +269,7 @@
       },
       "source": {
         "file_index": 2,
-        "line": 12
+        "line": 13
       }
     },
     "aim::aim::CWeaponBase": {
@@ -322,7 +322,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 2,
-              "line": 7
+              "line": 8
             }
           }
         ],
@@ -433,7 +433,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 3,
-              "line": 10
+              "line": 11
             }
           }
         ],
@@ -1268,7 +1268,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 5,
-              "line": 75
+              "line": 76
             }
           }
         ],
@@ -2717,7 +2717,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 10
+              "line": 11
             }
           },
           {
@@ -2771,7 +2771,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 7,
-              "line": 16
+              "line": 18
             }
           },
           {
@@ -2799,7 +2799,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 7,
-              "line": 20
+              "line": 22
             }
           }
         ],
@@ -3110,7 +3110,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 34
+              "line": 38
             }
           },
           {
@@ -3130,7 +3130,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 34
+              "line": 38
             }
           },
           {
@@ -3151,7 +3151,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 32
+              "line": 36
             }
           }
         ],
@@ -3165,7 +3165,7 @@
       },
       "source": {
         "file_index": 10,
-        "line": 32
+        "line": 36
       }
     },
     "character::character::AnimationController": {
@@ -3207,7 +3207,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 40
+              "line": 44
             }
           },
           {
@@ -3246,7 +3246,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 43
+              "line": 47
             }
           },
           {
@@ -3285,7 +3285,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 46
+              "line": 50
             }
           },
           {
@@ -3324,7 +3324,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 49
+              "line": 53
             }
           }
         ],
@@ -3337,7 +3337,7 @@
       },
       "source": {
         "file_index": 10,
-        "line": 38
+        "line": 42
       }
     },
     "character::character::Character": {
@@ -3632,6 +3632,34 @@
               "file_index": 10,
               "line": 28
             }
+          },
+          {
+            "visibility": "public",
+            "name": "UpdatePropEffects",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5376844672
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "dt",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "f32"
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 10,
+              "line": 32
+            }
           }
         ],
         "vftable": null,
@@ -3670,7 +3698,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 55
+              "line": 59
             }
           },
           {
@@ -3687,7 +3715,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 56
+              "line": 60
             }
           },
           {
@@ -3704,7 +3732,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 57
+              "line": 61
             }
           }
         ],
@@ -3718,7 +3746,7 @@
       },
       "source": {
         "file_index": 10,
-        "line": 53
+        "line": 57
       }
     },
     "character::character::SafeBoneIndex": {
@@ -3740,7 +3768,7 @@
             "value": 2394094972,
             "source": {
               "file_index": 10,
-              "line": 65
+              "line": 69
             }
           },
           {
@@ -3748,7 +3776,7 @@
             "value": 1252689883,
             "source": {
               "file_index": 10,
-              "line": 66
+              "line": 70
             }
           },
           {
@@ -3756,7 +3784,7 @@
             "value": 1757849759,
             "source": {
               "file_index": 10,
-              "line": 67
+              "line": 71
             }
           },
           {
@@ -3764,7 +3792,7 @@
             "value": 1712403628,
             "source": {
               "file_index": 10,
-              "line": 68
+              "line": 72
             }
           },
           {
@@ -3772,7 +3800,7 @@
             "value": 4282253387,
             "source": {
               "file_index": 10,
-              "line": 69
+              "line": 73
             }
           },
           {
@@ -3780,7 +3808,7 @@
             "value": 3005147562,
             "source": {
               "file_index": 10,
-              "line": 70
+              "line": 74
             }
           },
           {
@@ -3788,7 +3816,7 @@
             "value": 3710742389,
             "source": {
               "file_index": 10,
-              "line": 71
+              "line": 75
             }
           },
           {
@@ -3796,7 +3824,7 @@
             "value": 1472741269,
             "source": {
               "file_index": 10,
-              "line": 72
+              "line": 76
             }
           },
           {
@@ -3804,7 +3832,7 @@
             "value": 1776779174,
             "source": {
               "file_index": 10,
-              "line": 73
+              "line": 77
             }
           },
           {
@@ -3812,7 +3840,7 @@
             "value": 2826426828,
             "source": {
               "file_index": 10,
-              "line": 74
+              "line": 78
             }
           },
           {
@@ -3820,7 +3848,7 @@
             "value": 2714329432,
             "source": {
               "file_index": 10,
-              "line": 75
+              "line": 79
             }
           },
           {
@@ -3828,7 +3856,7 @@
             "value": 237553739,
             "source": {
               "file_index": 10,
-              "line": 76
+              "line": 80
             }
           },
           {
@@ -3836,7 +3864,7 @@
             "value": 3839615855,
             "source": {
               "file_index": 10,
-              "line": 77
+              "line": 81
             }
           },
           {
@@ -3844,7 +3872,7 @@
             "value": 1877494024,
             "source": {
               "file_index": 10,
-              "line": 78
+              "line": 82
             }
           },
           {
@@ -3852,7 +3880,7 @@
             "value": 2647308479,
             "source": {
               "file_index": 10,
-              "line": 79
+              "line": 83
             }
           },
           {
@@ -3860,7 +3888,7 @@
             "value": 2268405885,
             "source": {
               "file_index": 10,
-              "line": 80
+              "line": 84
             }
           },
           {
@@ -3868,7 +3896,7 @@
             "value": 808382080,
             "source": {
               "file_index": 10,
-              "line": 81
+              "line": 85
             }
           },
           {
@@ -3876,7 +3904,7 @@
             "value": 227257561,
             "source": {
               "file_index": 10,
-              "line": 82
+              "line": 86
             }
           },
           {
@@ -3884,7 +3912,7 @@
             "value": 3083906404,
             "source": {
               "file_index": 10,
-              "line": 83
+              "line": 87
             }
           },
           {
@@ -3892,7 +3920,7 @@
             "value": 2808756785,
             "source": {
               "file_index": 10,
-              "line": 84
+              "line": 88
             }
           },
           {
@@ -3900,7 +3928,7 @@
             "value": 1672209727,
             "source": {
               "file_index": 10,
-              "line": 85
+              "line": 89
             }
           },
           {
@@ -3908,7 +3936,7 @@
             "value": 2077750035,
             "source": {
               "file_index": 10,
-              "line": 86
+              "line": 90
             }
           },
           {
@@ -3916,7 +3944,7 @@
             "value": 1707463403,
             "source": {
               "file_index": 10,
-              "line": 87
+              "line": 91
             }
           },
           {
@@ -3924,7 +3952,7 @@
             "value": 1100005367,
             "source": {
               "file_index": 10,
-              "line": 88
+              "line": 92
             }
           },
           {
@@ -3932,7 +3960,7 @@
             "value": 2079854409,
             "source": {
               "file_index": 10,
-              "line": 89
+              "line": 93
             }
           },
           {
@@ -3940,7 +3968,7 @@
             "value": 1576246544,
             "source": {
               "file_index": 10,
-              "line": 90
+              "line": 94
             }
           },
           {
@@ -3948,7 +3976,7 @@
             "value": 4159613865,
             "source": {
               "file_index": 10,
-              "line": 91
+              "line": 95
             }
           },
           {
@@ -3956,7 +3984,7 @@
             "value": 2805860545,
             "source": {
               "file_index": 10,
-              "line": 92
+              "line": 96
             }
           },
           {
@@ -3964,7 +3992,7 @@
             "value": 1012388403,
             "source": {
               "file_index": 10,
-              "line": 93
+              "line": 97
             }
           },
           {
@@ -3972,7 +4000,7 @@
             "value": 2290357383,
             "source": {
               "file_index": 10,
-              "line": 94
+              "line": 98
             }
           },
           {
@@ -3980,7 +4008,7 @@
             "value": 2541339648,
             "source": {
               "file_index": 10,
-              "line": 95
+              "line": 99
             }
           },
           {
@@ -3988,7 +4016,7 @@
             "value": 3212017811,
             "source": {
               "file_index": 10,
-              "line": 96
+              "line": 100
             }
           },
           {
@@ -3996,7 +4024,7 @@
             "value": 994268807,
             "source": {
               "file_index": 10,
-              "line": 97
+              "line": 101
             }
           },
           {
@@ -4004,7 +4032,7 @@
             "value": 2828697949,
             "source": {
               "file_index": 10,
-              "line": 98
+              "line": 102
             }
           },
           {
@@ -4012,7 +4040,7 @@
             "value": 2016147705,
             "source": {
               "file_index": 10,
-              "line": 99
+              "line": 103
             }
           },
           {
@@ -4020,7 +4048,7 @@
             "value": 2401446677,
             "source": {
               "file_index": 10,
-              "line": 100
+              "line": 104
             }
           },
           {
@@ -4028,7 +4056,7 @@
             "value": 641280962,
             "source": {
               "file_index": 10,
-              "line": 101
+              "line": 105
             }
           },
           {
@@ -4036,7 +4064,7 @@
             "value": 433370831,
             "source": {
               "file_index": 10,
-              "line": 102
+              "line": 106
             }
           },
           {
@@ -4044,7 +4072,7 @@
             "value": 1307615921,
             "source": {
               "file_index": 10,
-              "line": 103
+              "line": 107
             }
           },
           {
@@ -4052,7 +4080,7 @@
             "value": 4033878745,
             "source": {
               "file_index": 10,
-              "line": 104
+              "line": 108
             }
           },
           {
@@ -4060,7 +4088,7 @@
             "value": 1040341121,
             "source": {
               "file_index": 10,
-              "line": 105
+              "line": 109
             }
           },
           {
@@ -4068,7 +4096,7 @@
             "value": 2618472340,
             "source": {
               "file_index": 10,
-              "line": 106
+              "line": 110
             }
           },
           {
@@ -4076,7 +4104,7 @@
             "value": 3048058670,
             "source": {
               "file_index": 10,
-              "line": 107
+              "line": 111
             }
           },
           {
@@ -4084,7 +4112,7 @@
             "value": 4017403211,
             "source": {
               "file_index": 10,
-              "line": 108
+              "line": 112
             }
           },
           {
@@ -4092,7 +4120,7 @@
             "value": 2614705093,
             "source": {
               "file_index": 10,
-              "line": 109
+              "line": 113
             }
           },
           {
@@ -4100,7 +4128,7 @@
             "value": 4032476450,
             "source": {
               "file_index": 10,
-              "line": 110
+              "line": 114
             }
           },
           {
@@ -4108,7 +4136,7 @@
             "value": 333548,
             "source": {
               "file_index": 10,
-              "line": 111
+              "line": 115
             }
           },
           {
@@ -4116,7 +4144,7 @@
             "value": 2094004130,
             "source": {
               "file_index": 10,
-              "line": 112
+              "line": 116
             }
           },
           {
@@ -4124,7 +4152,7 @@
             "value": 205856033,
             "source": {
               "file_index": 10,
-              "line": 113
+              "line": 117
             }
           },
           {
@@ -4132,7 +4160,7 @@
             "value": 4294967295,
             "source": {
               "file_index": 10,
-              "line": 114
+              "line": 118
             }
           }
         ],
@@ -4144,7 +4172,7 @@
       },
       "source": {
         "file_index": 10,
-        "line": 64
+        "line": 68
       }
     },
     "clock::Clock": {
@@ -4750,7 +4778,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 41
+        "line": 42
       }
     },
     "game::CResourceCache": {
@@ -5241,7 +5269,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 45
+              "line": 46
             }
           },
           {
@@ -5258,7 +5286,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 46
+              "line": 47
             }
           },
           {
@@ -5275,7 +5303,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 47
+              "line": 48
             }
           },
           {
@@ -5296,7 +5324,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 49
+              "line": 50
             }
           },
           {
@@ -5316,7 +5344,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 49
+              "line": 50
             }
           },
           {
@@ -5336,7 +5364,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 51
+              "line": 52
             }
           }
         ],
@@ -5350,7 +5378,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 43
+        "line": 44
       }
     },
     "game::GameObjectRenderContext": {
@@ -5377,7 +5405,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 69
+              "line": 70
             }
           },
           {
@@ -5394,7 +5422,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 70
+              "line": 71
             }
           },
           {
@@ -5411,7 +5439,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 71
+              "line": 72
             }
           },
           {
@@ -5428,7 +5456,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 72
+              "line": 73
             }
           },
           {
@@ -5445,7 +5473,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 73
+              "line": 74
             }
           },
           {
@@ -5466,7 +5494,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 75
+              "line": 76
             }
           },
           {
@@ -5486,7 +5514,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 75
+              "line": 76
             }
           }
         ],
@@ -5500,7 +5528,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 67
+        "line": 68
       }
     },
     "game::GameObjectUpdateContext": {
@@ -5527,7 +5555,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 56
+              "line": 57
             }
           },
           {
@@ -5544,7 +5572,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 57
+              "line": 58
             }
           },
           {
@@ -5561,7 +5589,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 58
+              "line": 59
             }
           },
           {
@@ -5578,7 +5606,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 59
+              "line": 60
             }
           },
           {
@@ -5595,7 +5623,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 60
+              "line": 61
             }
           },
           {
@@ -5612,7 +5640,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 61
+              "line": 62
             }
           },
           {
@@ -5633,7 +5661,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 63
+              "line": 64
             }
           },
           {
@@ -5653,7 +5681,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 63
+              "line": 64
             }
           }
         ],
@@ -5667,7 +5695,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 54
+        "line": 55
       }
     },
     "game::GameState": {
@@ -5689,7 +5717,7 @@
             "value": 0,
             "source": {
               "file_index": 12,
-              "line": 88
+              "line": 89
             }
           },
           {
@@ -5697,7 +5725,7 @@
             "value": 1,
             "source": {
               "file_index": 12,
-              "line": 89
+              "line": 90
             }
           },
           {
@@ -5705,7 +5733,7 @@
             "value": 2,
             "source": {
               "file_index": 12,
-              "line": 90
+              "line": 91
             }
           },
           {
@@ -5713,7 +5741,7 @@
             "value": 3,
             "source": {
               "file_index": 12,
-              "line": 91
+              "line": 92
             }
           },
           {
@@ -5721,7 +5749,7 @@
             "value": 4,
             "source": {
               "file_index": 12,
-              "line": 92
+              "line": 93
             }
           },
           {
@@ -5729,7 +5757,7 @@
             "value": 5,
             "source": {
               "file_index": 12,
-              "line": 93
+              "line": 94
             }
           },
           {
@@ -5737,7 +5765,7 @@
             "value": 6,
             "source": {
               "file_index": 12,
-              "line": 94
+              "line": 95
             }
           }
         ],
@@ -5767,7 +5795,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 12,
-              "line": 97
+              "line": 98
             }
           }
         ],
@@ -5778,7 +5806,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 86
+        "line": 87
       }
     },
     "game::UpdateContexts": {
@@ -5805,7 +5833,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 81
+              "line": 82
             }
           },
           {
@@ -5822,7 +5850,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 82
+              "line": 83
             }
           },
           {
@@ -5839,7 +5867,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 83
+              "line": 84
             }
           }
         ],
@@ -5853,7 +5881,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 79
+        "line": 80
       }
     },
     "graphics_engine::device::CRITICAL_SECTION": {
@@ -6050,7 +6078,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 35
+              "line": 36
             }
           },
           {
@@ -6067,7 +6095,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 35
+              "line": 36
             }
           },
           {
@@ -6084,7 +6112,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 37
+              "line": 38
             }
           },
           {
@@ -6105,7 +6133,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 38
+              "line": 40
             }
           },
           {
@@ -6122,7 +6150,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 38
+              "line": 40
             }
           },
           {
@@ -6338,7 +6366,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 44
+        "line": 48
       }
     },
     "graphics_engine::graphics_engine::GraphicsEngine": {
@@ -6590,7 +6618,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 47
+              "line": 52
             }
           },
           {
@@ -6618,7 +6646,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 52
+              "line": 57
             }
           },
           {
@@ -6638,7 +6666,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 56
+              "line": 61
             }
           },
           {
@@ -6658,7 +6686,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 60
+              "line": 65
             }
           },
           {
@@ -6692,7 +6720,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 65
+              "line": 70
             }
           }
         ],
@@ -6735,7 +6763,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 76
+              "line": 81
             }
           },
           {
@@ -6756,7 +6784,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 77
+              "line": 82
             }
           },
           {
@@ -6773,7 +6801,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 78
+              "line": 83
             }
           },
           {
@@ -6790,7 +6818,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 79
+              "line": 84
             }
           },
           {
@@ -6807,7 +6835,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 80
+              "line": 85
             }
           },
           {
@@ -6824,7 +6852,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 81
+              "line": 86
             }
           },
           {
@@ -6841,7 +6869,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 82
+              "line": 87
             }
           },
           {
@@ -6858,7 +6886,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 83
+              "line": 88
             }
           },
           {
@@ -6875,7 +6903,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 84
+              "line": 89
             }
           },
           {
@@ -6896,7 +6924,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 86
+              "line": 91
             }
           },
           {
@@ -6913,7 +6941,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 86
+              "line": 91
             }
           },
           {
@@ -6930,7 +6958,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 88
+              "line": 93
             }
           },
           {
@@ -6947,7 +6975,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 89
+              "line": 94
             }
           },
           {
@@ -6968,7 +6996,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 91
+              "line": 96
             }
           },
           {
@@ -6985,7 +7013,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 91
+              "line": 96
             }
           },
           {
@@ -7002,7 +7030,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 93
+              "line": 98
             }
           },
           {
@@ -7019,7 +7047,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 94
+              "line": 99
             }
           },
           {
@@ -7040,7 +7068,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 74
+              "line": 79
             }
           }
         ],
@@ -7054,7 +7082,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 74
+        "line": 79
       }
     },
     "graphics_engine::graphics_engine::HContext_t": {
@@ -7100,7 +7128,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 43
+        "line": 45
       }
     },
     "graphics_engine::graphics_engine::HICON": {
@@ -8147,7 +8175,7 @@
             "is_base": false,
             "source": {
               "file_index": 21,
-              "line": 31
+              "line": 32
             }
           }
         ],
@@ -8161,7 +8189,7 @@
       },
       "source": {
         "file_index": 21,
-        "line": 29
+        "line": 30
       }
     },
     "types::math::Plane": {
@@ -8188,7 +8216,7 @@
             "is_base": false,
             "source": {
               "file_index": 21,
-              "line": 116
+              "line": 121
             }
           },
           {
@@ -8205,7 +8233,7 @@
             "is_base": false,
             "source": {
               "file_index": 21,
-              "line": 117
+              "line": 122
             }
           }
         ],
@@ -8219,7 +8247,7 @@
       },
       "source": {
         "file_index": 21,
-        "line": 114
+        "line": 119
       }
     },
     "types::math::Vector2": {
@@ -8250,7 +8278,7 @@
             "is_base": false,
             "source": {
               "file_index": 21,
-              "line": 59
+              "line": 61
             }
           }
         ],
@@ -8264,7 +8292,7 @@
       },
       "source": {
         "file_index": 21,
-        "line": 57
+        "line": 59
       }
     },
     "types::math::Vector3": {
@@ -8295,7 +8323,7 @@
             "is_base": false,
             "source": {
               "file_index": 21,
-              "line": 78
+              "line": 81
             }
           }
         ],
@@ -8309,7 +8337,7 @@
       },
       "source": {
         "file_index": 21,
-        "line": 76
+        "line": 79
       }
     },
     "types::math::Vector4": {
@@ -8340,7 +8368,7 @@
             "is_base": false,
             "source": {
               "file_index": 21,
-              "line": 97
+              "line": 101
             }
           }
         ],
@@ -8354,7 +8382,7 @@
       },
       "source": {
         "file_index": 21,
-        "line": 95
+        "line": 99
       }
     },
     "types::vector_math::AlignedQuat": {
@@ -8603,7 +8631,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 23,
-              "line": 10
+              "line": 11
             }
           },
           {
@@ -8623,7 +8651,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 23,
-              "line": 14
+              "line": 15
             }
           },
           {
@@ -8646,7 +8674,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 23,
-              "line": 18
+              "line": 19
             }
           }
         ],
@@ -8733,7 +8761,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 2,
-                "line": 27
+                "line": 29
               }
             }
           ],
@@ -8803,7 +8831,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 3,
-                "line": 26
+                "line": 17
               }
             }
           ],
@@ -9087,7 +9115,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 14,
-                "line": 71
+                "line": 76
               }
             }
           ],
@@ -9372,6 +9400,70 @@
       },
       "extern_values": [],
       "functions": [],
+      "backends": {}
+    },
+    "window": {
+      "doc": null,
+      "items": [],
+      "submodules": {},
+      "extern_values": [],
+      "functions": [
+        {
+          "visibility": "private",
+          "name": "WndProc",
+          "doc": null,
+          "body": {
+            "type": "address",
+            "address": 5368737600
+          },
+          "arguments": [
+            {
+              "type": "field",
+              "name": "hwnd",
+              "type_ref": {
+                "type": "mut_pointer",
+                "inner": {
+                  "type": "raw",
+                  "path": "void"
+                }
+              }
+            },
+            {
+              "type": "field",
+              "name": "msg",
+              "type_ref": {
+                "type": "raw",
+                "path": "u32"
+              }
+            },
+            {
+              "type": "field",
+              "name": "wparam",
+              "type_ref": {
+                "type": "raw",
+                "path": "u64"
+              }
+            },
+            {
+              "type": "field",
+              "name": "lparam",
+              "type_ref": {
+                "type": "raw",
+                "path": "i64"
+              }
+            }
+          ],
+          "return_type": {
+            "type": "raw",
+            "path": "i64"
+          },
+          "calling_convention": "system",
+          "source": {
+            "file_index": 24,
+            "line": 3
+          }
+        }
+      ],
       "backends": {}
     }
   },
