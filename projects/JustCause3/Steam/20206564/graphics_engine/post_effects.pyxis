@@ -5,10 +5,11 @@ use graphics_engine::graphics_engine::HContext_t;
 // state is only valid for one camera -- so on a second (stereo) render they paint a sub-region.
 // Their Apply returns the (possibly unchanged) source slot index, so returning `input` skips them.
 // The render context behind a PostEffectContext: camera matrices and per-frame render flags.
-// Per-frame render-context flags.
+
+/// Per-frame render-context flags.
 #[copyable]
 pub bitflags PostEffectRenderFlags: u8 {
-    // Enables DoF's screen-space motion-vector reprojection.
+    /// Enables DoF's screen-space motion-vector reprojection.
     m_MotionVectorReprojection = 0b0000_0001,
 }
 
@@ -36,28 +37,28 @@ impl CDepthOfFieldEffect {
     pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut CPostEffectsManager, input: u32) -> u32;
 }
 
-// Alpha-blended fade quad over the scene.
+/// Alpha-blended fade quad over the scene.
 pub type CFadeEffect;
 impl CFadeEffect {
     #[address(0x140_0A9_570)]
     pub fn Apply(&mut self, ctx: *mut HContext_t, a3: *mut void) -> u64;
 }
 
-// Bloom / glare generator (writes its own scratch targets, composited later).
+/// Bloom / glare generator (writes its own scratch targets, composited later).
 pub type CGlareEffect;
 impl CGlareEffect {
     #[address(0x140_0AA_510)]
     pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, a4: *mut void, a5: *mut void) -> u64;
 }
 
-// Red damage vignette. Slot-passthrough (returns the input slot index).
+/// Red damage vignette. Slot-passthrough (returns the input slot index).
 pub type CPlayerDamageEffect;
 impl CPlayerDamageEffect {
     #[address(0x140_0F7_6E0)]
     pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, a4: *mut void, input: u32) -> u32;
 }
 
-// Sun halo. PreApply prepares and sets the ready flag (byte at +0x114); Apply composites it.
+/// Sun halo. PreApply prepares and sets the ready flag (byte at +0x114); Apply composites it.
 pub type CSunHaloEffect;
 impl CSunHaloEffect {
     #[address(0x140_118_450)]
