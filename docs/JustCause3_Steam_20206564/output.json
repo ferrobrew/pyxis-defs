@@ -7575,7 +7575,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 15,
-              "line": 38
+              "line": 30
             }
           }
         ],
@@ -7588,7 +7588,167 @@
       },
       "source": {
         "file_index": 15,
-        "line": 36
+        "line": 28
+      }
+    },
+    "graphics_engine::post_effects::CFadeEffect": {
+      "path": "graphics_engine::post_effects::CFadeEffect",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "Apply",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5369402736
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "ctx",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::HContext_t"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "a3",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "void"
+                  }
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 15,
+              "line": 37
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      },
+      "source": {
+        "file_index": 15,
+        "line": 35
+      }
+    },
+    "graphics_engine::post_effects::CGlareEffect": {
+      "path": "graphics_engine::post_effects::CGlareEffect",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "Apply",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5369406736
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "ctx",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::HContext_t"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "pec",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::post_effects::PostEffectContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "a4",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "void"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "a5",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "void"
+                  }
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 15,
+              "line": 44
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      },
+      "source": {
+        "file_index": 15,
+        "line": 42
       }
     },
     "graphics_engine::post_effects::CMotionBlurEffect": {
@@ -7687,7 +7847,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 15,
-              "line": 23
+              "line": 24
             }
           }
         ],
@@ -7700,7 +7860,95 @@
       },
       "source": {
         "file_index": 15,
-        "line": 21
+        "line": 22
+      }
+    },
+    "graphics_engine::post_effects::CPlayerDamageEffect": {
+      "path": "graphics_engine::post_effects::CPlayerDamageEffect",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "Apply",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5369722592
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "ctx",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::HContext_t"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "pec",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::post_effects::PostEffectContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "a4",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "void"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "input",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 15,
+              "line": 51
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      },
+      "source": {
+        "file_index": 15,
+        "line": 49
       }
     },
     "graphics_engine::post_effects::CPostEffectsManager": {
@@ -7723,7 +7971,121 @@
       },
       "source": {
         "file_index": 15,
-        "line": 19
+        "line": 20
+      }
+    },
+    "graphics_engine::post_effects::CSunHaloEffect": {
+      "path": "graphics_engine::post_effects::CSunHaloEffect",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "PreApply",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5369857104
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "ctx",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::HContext_t"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "a3",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "void"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "mgr",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::post_effects::CPostEffectsManager"
+                  }
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 15,
+              "line": 58
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "Apply",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5369724976
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "ctx",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::HContext_t"
+                  }
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 15,
+              "line": 61
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      },
+      "source": {
+        "file_index": 15,
+        "line": 56
       }
     },
     "graphics_engine::post_effects::PostEffectContext": {
@@ -7753,7 +8115,7 @@
             "is_base": false,
             "source": {
               "file_index": 15,
-              "line": 16
+              "line": 17
             }
           }
         ],
@@ -7767,7 +8129,7 @@
       },
       "source": {
         "file_index": 15,
-        "line": 15
+        "line": 16
       }
     },
     "graphics_engine::post_effects::PostEffectRenderContext": {
@@ -7798,7 +8160,7 @@
             "is_base": false,
             "source": {
               "file_index": 15,
-              "line": 11
+              "line": 12
             }
           },
           {
@@ -7815,7 +8177,7 @@
             "is_base": false,
             "source": {
               "file_index": 15,
-              "line": 11
+              "line": 12
             }
           },
           {
@@ -7958,7 +8320,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 17,
-              "line": 13
+              "line": 14
             }
           }
         ],
@@ -8343,7 +8705,97 @@
         "type": "type",
         "doc": null,
         "fields": [],
-        "associated_functions": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "GenerateHistogramForFinalScene",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5369861184
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "ctx",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "void"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "a3",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "void"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "a4",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "void"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "a5",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "i32"
+                }
+              },
+              {
+                "type": "field",
+                "name": "a6",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "u32"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "a7",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "u32"
+                  }
+                }
+              }
+            ],
+            "return_type": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "u32"
+              }
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 19,
+              "line": 7
+            }
+          }
+        ],
         "vftable": null,
         "singleton": null,
         "copyable": false,
@@ -8376,7 +8828,7 @@
       },
       "source": {
         "file_index": 19,
-        "line": 12
+        "line": 19
       }
     },
     "graphics_engine::tone_mapping::SSmoothedExposure": {
@@ -8415,7 +8867,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 19,
-              "line": 7
+              "line": 14
             }
           }
         ],
@@ -8428,7 +8880,7 @@
       },
       "source": {
         "file_index": 19,
-        "line": 5
+        "line": 12
       }
     },
     "i128": {
@@ -9994,8 +10446,12 @@
           "doc": null,
           "items": [
             "graphics_engine::post_effects::CDepthOfFieldEffect",
+            "graphics_engine::post_effects::CFadeEffect",
+            "graphics_engine::post_effects::CGlareEffect",
             "graphics_engine::post_effects::CMotionBlurEffect",
+            "graphics_engine::post_effects::CPlayerDamageEffect",
             "graphics_engine::post_effects::CPostEffectsManager",
+            "graphics_engine::post_effects::CSunHaloEffect",
             "graphics_engine::post_effects::PostEffectContext",
             "graphics_engine::post_effects::PostEffectRenderContext"
           ],
@@ -10119,7 +10575,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 19,
-                "line": 16
+                "line": 23
               }
             }
           ],
