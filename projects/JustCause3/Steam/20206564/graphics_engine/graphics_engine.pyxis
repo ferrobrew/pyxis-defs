@@ -138,3 +138,16 @@ pub type GraphicsParams {
 
 #[address(0x142_D3A_850)]
 pub extern graphics_params: GraphicsParams;
+
+/// Per-real-frame counters advanced once in the CGraphicsEngine::Draw prologue. m_FrameIndex (set
+/// from m_Counter, which post-increments) drives the TAA jitter phase and shadow parity (& 1);
+/// m_RingIndex is the %3 constant-buffer ring (m_FrameIndex % 3).
+#[copyable, size(0xC), align(4)]
+pub type RenderFrameCounters {
+    pub m_Counter: u32,
+    pub m_FrameIndex: u32,
+    pub m_RingIndex: u32,
+}
+
+#[address(0x142_D3A_6AC)]
+pub extern render_frame_counters: RenderFrameCounters;
