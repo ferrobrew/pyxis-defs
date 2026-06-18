@@ -1,5 +1,6 @@
 use graphics_engine::device::Device;
 use graphics_engine::texture::Texture;
+use types::math::Matrix4;
 
 backend rust prologue r#"
 use windows::Win32::{Foundation::HWND, UI::WindowsAndMessaging::HICON};
@@ -20,6 +21,17 @@ pub enum ActiveCursor: i32 {
     Zoom,
 }
 
+// One reflection-proxy depth-history slot (the planar / water reflection state machine). Five of
+// these live on the graphics engine; the lifecycle byte advances once per scene dispatch.
+#[size(0x50)]
+pub type EffectInfo {
+    // Reflection-proxy depth texture (Graphics::HTexture_t handle).
+    pub m_DepthTexture: *mut void,
+    pub m_Transform: Matrix4,
+    // Lifecycle counter: 0 = free, 2 -> promote to 3, 3 = pick, else += 1.
+    pub m_FrameIndex: u8,
+}
+
 #[singleton(0x142_E2B_6F0), min_size(0x1F10)]
 pub type GraphicsEngine {
     #[address(0x18)]
@@ -31,11 +43,37 @@ pub type GraphicsEngine {
     #[address(0xEB0)]
     pub m_Device: *mut Device,
 
+    // Deferred-shading render targets ("GBuffer0".."GBuffer3").
+    #[address(0xEC8)]
+    pub m_GBufferTexture: [*mut Texture; 4],
+
+    // Motion-blur velocity buffer.
+    #[address(0xFA0)]
+    pub m_VelocityBufferTexture: *mut Texture,
+
+    // Main scene depth ("MainDepthBuffer").
+    #[address(0x1_058)]
+    pub m_MainDepthTexture: *mut Texture,
+
+    // Main scene HDR color ("MainColorBuffer").
     #[address(0x1_068)]
     pub m_MainColorBuffer: *mut Texture,
 
+    // Hi-Z / downsampled depth ("DownsampledDepth").
+    #[address(0x1_078)]
+    pub m_DownSampledDepthTexture: *mut Texture,
+
+    // Reflection-proxy depth-history (planar / water reflection state machine), 5 slots.
+    #[address(0x10_A0)]
+    pub m_EffectInfo: [EffectInfo; 5],
+
+    // Final linear back buffer ("BackBufferLinear").
     #[address(0x1_230)]
     pub m_BackBufferLinear: *mut Texture,
+
+    // Index of the reflection-proxy slot picked this frame.
+    #[address(0x12_C8)]
+    pub m_EffectInfoIndex: u32,
 }
 
 // Opaque graphics handles / params (used behind pointers).
