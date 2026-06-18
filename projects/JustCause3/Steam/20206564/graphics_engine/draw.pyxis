@@ -1,0 +1,30 @@
+use graphics_engine::graphics_engine::HContext_t;
+
+// The engine's universal draw-call wrappers: every render block issues its geometry through one of
+// these at the end of its Draw (see CRenderBlockGeneralJC3::Draw 0x1401426E0).
+
+/// Indexed draw (`Graphics::DrawIndexed`).
+#[address(0x141_967_720)]
+pub fn DrawIndexed(ctx: *mut HContext_t, prim: i32, arg2: i32, arg3: i32, vbuf: *mut void, ibuf: *mut void);
+
+/// Non-indexed draw (`Graphics::Draw`).
+#[address(0x141_967_680)]
+pub fn Draw(ctx: *mut HContext_t, prim: i32, arg2: i32, arg3: i32);
+
+// Render-target binding, clearing, copying and MSAA-resolve wrappers.
+
+/// Bind a render setup -- the render-target configuration a pass draws into.
+#[address(0x141_966_D20)]
+pub fn SetRenderSetup(ctx: *mut HContext_t, setup: *mut void, restore: bool);
+
+/// Clear the currently-bound render setup (`color` is a 4-float RGBA pointer, may be null).
+#[address(0x141_967_020)]
+pub fn Clear(ctx: *mut HContext_t, flags: u32, color: *mut void, depth: f32, stencil: u32);
+
+/// Copy one surface into another texture.
+#[address(0x141_95A_BA0)]
+pub fn CopySurfaceToTexture(ctx: *mut HContext_t, dst: *mut void, src: *mut void);
+
+/// Resolve an MSAA surface.
+#[address(0x141_967_2B0)]
+pub fn ResolveSurface(ctx: *mut HContext_t, params: *mut void);
