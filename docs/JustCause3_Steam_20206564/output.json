@@ -6299,7 +6299,7 @@
             "value": -1,
             "source": {
               "file_index": 14,
-              "line": 16
+              "line": 17
             }
           },
           {
@@ -6307,7 +6307,7 @@
             "value": 0,
             "source": {
               "file_index": 14,
-              "line": 17
+              "line": 18
             }
           },
           {
@@ -6315,7 +6315,7 @@
             "value": 1,
             "source": {
               "file_index": 14,
-              "line": 18
+              "line": 19
             }
           },
           {
@@ -6323,7 +6323,7 @@
             "value": 2,
             "source": {
               "file_index": 14,
-              "line": 19
+              "line": 20
             }
           },
           {
@@ -6331,7 +6331,7 @@
             "value": 3,
             "source": {
               "file_index": 14,
-              "line": 20
+              "line": 21
             }
           }
         ],
@@ -6343,7 +6343,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 14
+        "line": 15
       }
     },
     "graphics_engine::graphics_engine::DrawThreadTaskParam": {
@@ -6366,7 +6366,106 @@
       },
       "source": {
         "file_index": 14,
-        "line": 48
+        "line": 86
+      }
+    },
+    "graphics_engine::graphics_engine::EffectInfo": {
+      "path": "graphics_engine::graphics_engine::EffectInfo",
+      "visibility": "public",
+      "size": 80,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_DepthTexture",
+            "doc": null,
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "void"
+              }
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 14,
+              "line": 29
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Transform",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 8,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 14,
+              "line": 30
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_FrameIndex",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u8"
+            },
+            "offset": 72,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 14,
+              "line": 32
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_49",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 7
+            },
+            "offset": 73,
+            "size": 7,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 14,
+              "line": 26
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      },
+      "source": {
+        "file_index": 14,
+        "line": 26
       }
     },
     "graphics_engine::graphics_engine::GraphicsEngine": {
@@ -6397,7 +6496,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 25
+              "line": 37
             }
           },
           {
@@ -6414,7 +6513,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 25
+              "line": 37
             }
           },
           {
@@ -6435,7 +6534,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 28
+              "line": 40
             }
           },
           {
@@ -6452,7 +6551,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 28
+              "line": 40
             }
           },
           {
@@ -6473,7 +6572,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 31
+              "line": 43
             }
           },
           {
@@ -6493,7 +6592,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 31
+              "line": 43
             }
           },
           {
@@ -6506,15 +6605,142 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 432
+              "size": 16
             },
             "offset": 3768,
-            "size": 432,
+            "size": 16,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 34
+              "line": 47
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_GBufferTexture",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "mut_pointer",
+                "inner": {
+                  "type": "raw",
+                  "path": "graphics_engine::texture::Texture"
+                }
+              },
+              "size": 4
+            },
+            "offset": 3784,
+            "size": 32,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 14,
+              "line": 47
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_ee8",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 184
+            },
+            "offset": 3816,
+            "size": 184,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 14,
+              "line": 51
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_VelocityBufferTexture",
+            "doc": null,
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::texture::Texture"
+              }
+            },
+            "offset": 4000,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 14,
+              "line": 51
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_fa8",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 176
+            },
+            "offset": 4008,
+            "size": 176,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 14,
+              "line": 55
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_MainDepthTexture",
+            "doc": null,
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::texture::Texture"
+              }
+            },
+            "offset": 4184,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 14,
+              "line": 55
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_1060",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 8
+            },
+            "offset": 4192,
+            "size": 8,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 14,
+              "line": 59
             }
           },
           {
@@ -6534,7 +6760,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 34
+              "line": 59
             }
           },
           {
@@ -6547,15 +6773,77 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 448
+              "size": 8
             },
             "offset": 4208,
-            "size": 448,
+            "size": 8,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 37
+              "line": 63
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_DownSampledDepthTexture",
+            "doc": null,
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::texture::Texture"
+              }
+            },
+            "offset": 4216,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 14,
+              "line": 63
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_1080",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 32
+            },
+            "offset": 4224,
+            "size": 32,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 14,
+              "line": 67
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_EffectInfo",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::graphics_engine::EffectInfo"
+              },
+              "size": 5
+            },
+            "offset": 4256,
+            "size": 400,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 14,
+              "line": 67
             }
           },
           {
@@ -6575,7 +6863,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 37
+              "line": 71
             }
           },
           {
@@ -6588,15 +6876,53 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 3288
+              "size": 144
             },
             "offset": 4664,
-            "size": 3288,
+            "size": 144,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 23
+              "line": 75
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_EffectInfoIndex",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "offset": 4808,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 14,
+              "line": 75
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_12cc",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 3140
+            },
+            "offset": 4812,
+            "size": 3140,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 14,
+              "line": 35
             }
           }
         ],
@@ -6618,7 +6944,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 52
+              "line": 90
             }
           },
           {
@@ -6646,7 +6972,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 57
+              "line": 95
             }
           },
           {
@@ -6666,7 +6992,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 61
+              "line": 99
             }
           },
           {
@@ -6686,7 +7012,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 65
+              "line": 103
             }
           },
           {
@@ -6720,7 +7046,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 70
+              "line": 108
             }
           }
         ],
@@ -6733,7 +7059,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 23
+        "line": 35
       }
     },
     "graphics_engine::graphics_engine::GraphicsParams": {
@@ -6763,7 +7089,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 81
+              "line": 119
             }
           },
           {
@@ -6784,7 +7110,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 82
+              "line": 120
             }
           },
           {
@@ -6801,7 +7127,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 83
+              "line": 121
             }
           },
           {
@@ -6818,7 +7144,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 84
+              "line": 122
             }
           },
           {
@@ -6835,7 +7161,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 85
+              "line": 123
             }
           },
           {
@@ -6852,7 +7178,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 86
+              "line": 124
             }
           },
           {
@@ -6869,7 +7195,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 87
+              "line": 125
             }
           },
           {
@@ -6886,7 +7212,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 88
+              "line": 126
             }
           },
           {
@@ -6903,7 +7229,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 89
+              "line": 127
             }
           },
           {
@@ -6924,7 +7250,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 91
+              "line": 129
             }
           },
           {
@@ -6941,7 +7267,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 91
+              "line": 129
             }
           },
           {
@@ -6958,7 +7284,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 93
+              "line": 131
             }
           },
           {
@@ -6975,7 +7301,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 94
+              "line": 132
             }
           },
           {
@@ -6996,7 +7322,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 96
+              "line": 134
             }
           },
           {
@@ -7013,7 +7339,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 96
+              "line": 134
             }
           },
           {
@@ -7030,7 +7356,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 98
+              "line": 136
             }
           },
           {
@@ -7047,7 +7373,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 99
+              "line": 137
             }
           },
           {
@@ -7068,7 +7394,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 79
+              "line": 117
             }
           }
         ],
@@ -7082,7 +7408,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 79
+        "line": 117
       }
     },
     "graphics_engine::graphics_engine::HContext_t": {
@@ -7105,7 +7431,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 42
+        "line": 80
       }
     },
     "graphics_engine::graphics_engine::HDevice_t": {
@@ -7128,7 +7454,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 45
+        "line": 83
       }
     },
     "graphics_engine::graphics_engine::HICON": {
@@ -7151,7 +7477,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 8
+        "line": 9
       }
     },
     "graphics_engine::graphics_engine::HWND": {
@@ -7174,7 +7500,357 @@
       },
       "source": {
         "file_index": 14,
-        "line": 11
+        "line": 12
+      }
+    },
+    "graphics_engine::post_effects::CDepthOfFieldEffect": {
+      "path": "graphics_engine::post_effects::CDepthOfFieldEffect",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "Apply",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5369526416
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "ctx",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::HContext_t"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "pec",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::post_effects::PostEffectContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "mgr",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::post_effects::CPostEffectsManager"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "input",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 15,
+              "line": 38
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      },
+      "source": {
+        "file_index": 15,
+        "line": 36
+      }
+    },
+    "graphics_engine::post_effects::CMotionBlurEffect": {
+      "path": "graphics_engine::post_effects::CMotionBlurEffect",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "Apply",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5369531936
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "ctx",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::HContext_t"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "pec",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::post_effects::PostEffectContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "mgr",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::post_effects::CPostEffectsManager"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "input",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              },
+              {
+                "type": "field",
+                "name": "blur",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "f32"
+                }
+              },
+              {
+                "type": "field",
+                "name": "flag0",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "bool"
+                }
+              },
+              {
+                "type": "field",
+                "name": "flag1",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "bool"
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 15,
+              "line": 23
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      },
+      "source": {
+        "file_index": 15,
+        "line": 21
+      }
+    },
+    "graphics_engine::post_effects::CPostEffectsManager": {
+      "path": "graphics_engine::post_effects::CPostEffectsManager",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      },
+      "source": {
+        "file_index": 15,
+        "line": 19
+      }
+    },
+    "graphics_engine::post_effects::PostEffectContext": {
+      "path": "graphics_engine::post_effects::PostEffectContext",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_RenderContext",
+            "doc": null,
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::post_effects::PostEffectRenderContext"
+              }
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 15,
+              "line": 16
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      },
+      "source": {
+        "file_index": 15,
+        "line": 15
+      }
+    },
+    "graphics_engine::post_effects::PostEffectRenderContext": {
+      "path": "graphics_engine::post_effects::PostEffectRenderContext",
+      "visibility": "public",
+      "size": 904,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 900
+            },
+            "offset": 0,
+            "size": 900,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 15,
+              "line": 11
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Flags",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u8"
+            },
+            "offset": 900,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 15,
+              "line": 11
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_385",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 3
+            },
+            "offset": 901,
+            "size": 3,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 15,
+              "line": 8
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      },
+      "source": {
+        "file_index": 15,
+        "line": 8
       }
     },
     "graphics_engine::render_engine::RenderEngine": {
@@ -7204,7 +7880,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 15,
+              "file_index": 16,
               "line": 3
             }
           }
@@ -7237,7 +7913,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 15,
+              "file_index": 16,
               "line": 9
             }
           }
@@ -7250,7 +7926,91 @@
         "packed": false
       },
       "source": {
-        "file_index": 15,
+        "file_index": 16,
+        "line": 3
+      }
+    },
+    "graphics_engine::render_pass::CConstantBufferPool": {
+      "path": "graphics_engine::render_pass::CConstantBufferPool",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "HandBackBuffers",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5369627888
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 17,
+              "line": 13
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      },
+      "source": {
+        "file_index": 17,
+        "line": 10
+      }
+    },
+    "graphics_engine::render_pass::CRenderPass": {
+      "path": "graphics_engine::render_pass::CRenderPass",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "SetupRenderFrameData",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5373478112
+            },
+            "arguments": [],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 17,
+              "line": 5
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      },
+      "source": {
+        "file_index": 17,
         "line": 3
       }
     },
@@ -7273,7 +8033,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 16,
+        "file_index": 18,
         "line": 14
       }
     },
@@ -7296,7 +8056,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 16,
+        "file_index": 18,
         "line": 11
       }
     },
@@ -7319,7 +8079,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 16,
+        "file_index": 18,
         "line": 5
       }
     },
@@ -7342,7 +8102,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 16,
+        "file_index": 18,
         "line": 8
       }
     },
@@ -7369,7 +8129,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 16,
+              "file_index": 18,
               "line": 19
             }
           },
@@ -7390,7 +8150,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 16,
+              "file_index": 18,
               "line": 21
             }
           },
@@ -7407,7 +8167,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 16,
+              "file_index": 18,
               "line": 21
             }
           },
@@ -7424,7 +8184,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 16,
+              "file_index": 18,
               "line": 23
             }
           },
@@ -7441,7 +8201,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 16,
+              "file_index": 18,
               "line": 24
             }
           },
@@ -7462,7 +8222,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 16,
+              "file_index": 18,
               "line": 26
             }
           },
@@ -7479,7 +8239,7 @@
             "alignment": 2,
             "is_base": false,
             "source": {
-              "file_index": 16,
+              "file_index": 18,
               "line": 26
             }
           },
@@ -7496,7 +8256,7 @@
             "alignment": 2,
             "is_base": false,
             "source": {
-              "file_index": 16,
+              "file_index": 18,
               "line": 28
             }
           },
@@ -7517,7 +8277,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 16,
+              "file_index": 18,
               "line": 30
             }
           },
@@ -7534,7 +8294,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 16,
+              "file_index": 18,
               "line": 30
             }
           },
@@ -7555,7 +8315,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 16,
+              "file_index": 18,
               "line": 17
             }
           }
@@ -7569,8 +8329,106 @@
         "packed": false
       },
       "source": {
-        "file_index": 16,
+        "file_index": 18,
         "line": 17
+      }
+    },
+    "graphics_engine::tone_mapping::CToneMappingEffect": {
+      "path": "graphics_engine::tone_mapping::CToneMappingEffect",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      },
+      "source": {
+        "file_index": 19,
+        "line": 2
+      }
+    },
+    "graphics_engine::tone_mapping::SHistogramGeneration": {
+      "path": "graphics_engine::tone_mapping::SHistogramGeneration",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      },
+      "source": {
+        "file_index": 19,
+        "line": 12
+      }
+    },
+    "graphics_engine::tone_mapping::SSmoothedExposure": {
+      "path": "graphics_engine::tone_mapping::SSmoothedExposure",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "Update",
+            "doc": null,
+            "body": {
+              "type": "address",
+              "address": 5369725440
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "exposure",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "f32"
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 19,
+              "line": 7
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      },
+      "source": {
+        "file_index": 19,
+        "line": 5
       }
     },
     "i128": {
@@ -7722,7 +8580,7 @@
             },
             "calling_convention": "system",
             "source": {
-              "file_index": 18,
+              "file_index": 21,
               "line": 20
             }
           }
@@ -7735,7 +8593,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 18,
+        "file_index": 21,
         "line": 18
       }
     },
@@ -7762,7 +8620,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 18,
+              "file_index": 21,
               "line": 7
             }
           },
@@ -7779,7 +8637,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 18,
+              "file_index": 21,
               "line": 8
             }
           },
@@ -7796,7 +8654,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 18,
+              "file_index": 21,
               "line": 9
             }
           },
@@ -7813,7 +8671,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 18,
+              "file_index": 21,
               "line": 10
             }
           },
@@ -7830,7 +8688,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 18,
+              "file_index": 21,
               "line": 11
             }
           },
@@ -7847,7 +8705,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 18,
+              "file_index": 21,
               "line": 12
             }
           },
@@ -7864,7 +8722,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 18,
+              "file_index": 21,
               "line": 13
             }
           },
@@ -7881,7 +8739,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 18,
+              "file_index": 21,
               "line": 14
             }
           }
@@ -7895,7 +8753,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 18,
+        "file_index": 21,
         "line": 5
       }
     },
@@ -7925,7 +8783,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 19,
+              "file_index": 22,
               "line": 4
             }
           },
@@ -7946,7 +8804,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 19,
+              "file_index": 22,
               "line": 7
             }
           },
@@ -7963,7 +8821,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 19,
+              "file_index": 22,
               "line": 7
             }
           },
@@ -7984,7 +8842,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 19,
+              "file_index": 22,
               "line": 1
             }
           }
@@ -8008,7 +8866,7 @@
               "return_type": null,
               "calling_convention": "system",
               "source": {
-                "file_index": 19,
+                "file_index": 22,
                 "line": 4
               }
             }
@@ -8021,7 +8879,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 19,
+        "file_index": 22,
         "line": 1
       }
     },
@@ -8061,7 +8919,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 19,
+              "file_index": 22,
               "line": 4
             }
           }
@@ -8075,7 +8933,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 19,
+        "file_index": 22,
         "line": 4
       }
     },
@@ -8098,7 +8956,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 20,
+        "file_index": 23,
         "line": 3
       }
     },
@@ -8129,7 +8987,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 21,
+              "file_index": 24,
               "line": 3
             }
           }
@@ -8143,7 +9001,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 21,
+        "file_index": 24,
         "line": 1
       }
     },
@@ -8174,7 +9032,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 21,
+              "file_index": 24,
               "line": 32
             }
           }
@@ -8188,7 +9046,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 21,
+        "file_index": 24,
         "line": 30
       }
     },
@@ -8215,7 +9073,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 21,
+              "file_index": 24,
               "line": 121
             }
           },
@@ -8232,7 +9090,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 21,
+              "file_index": 24,
               "line": 122
             }
           }
@@ -8246,7 +9104,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 21,
+        "file_index": 24,
         "line": 119
       }
     },
@@ -8277,7 +9135,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 21,
+              "file_index": 24,
               "line": 61
             }
           }
@@ -8291,7 +9149,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 21,
+        "file_index": 24,
         "line": 59
       }
     },
@@ -8322,7 +9180,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 21,
+              "file_index": 24,
               "line": 81
             }
           }
@@ -8336,7 +9194,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 21,
+        "file_index": 24,
         "line": 79
       }
     },
@@ -8367,7 +9225,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 21,
+              "file_index": 24,
               "line": 101
             }
           }
@@ -8381,7 +9239,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 21,
+        "file_index": 24,
         "line": 99
       }
     },
@@ -8412,7 +9270,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 22,
+              "file_index": 25,
               "line": 9
             }
           }
@@ -8426,7 +9284,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 22,
+        "file_index": 25,
         "line": 7
       }
     },
@@ -8457,7 +9315,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 22,
+              "file_index": 25,
               "line": 3
             }
           },
@@ -8474,7 +9332,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 22,
+              "file_index": 25,
               "line": 4
             }
           }
@@ -8488,7 +9346,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 22,
+        "file_index": 25,
         "line": 1
       }
     },
@@ -8630,7 +9488,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 23,
+              "file_index": 26,
               "line": 11
             }
           },
@@ -8650,7 +9508,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 23,
+              "file_index": 26,
               "line": 15
             }
           },
@@ -8673,7 +9531,7 @@
             },
             "calling_convention": "system",
             "source": {
-              "file_index": 23,
+              "file_index": 26,
               "line": 19
             }
           }
@@ -8686,7 +9544,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 23,
+        "file_index": 26,
         "line": 6
       }
     },
@@ -9067,6 +9925,7 @@
           "items": [
             "graphics_engine::graphics_engine::ActiveCursor",
             "graphics_engine::graphics_engine::DrawThreadTaskParam",
+            "graphics_engine::graphics_engine::EffectInfo",
             "graphics_engine::graphics_engine::GraphicsEngine",
             "graphics_engine::graphics_engine::GraphicsParams",
             "graphics_engine::graphics_engine::HContext_t",
@@ -9115,7 +9974,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 14,
-                "line": 76
+                "line": 114
               }
             }
           ],
@@ -9131,10 +9990,35 @@
             ]
           }
         },
+        "post_effects": {
+          "doc": null,
+          "items": [
+            "graphics_engine::post_effects::CDepthOfFieldEffect",
+            "graphics_engine::post_effects::CMotionBlurEffect",
+            "graphics_engine::post_effects::CPostEffectsManager",
+            "graphics_engine::post_effects::PostEffectContext",
+            "graphics_engine::post_effects::PostEffectRenderContext"
+          ],
+          "submodules": {},
+          "extern_values": [],
+          "functions": [],
+          "backends": {}
+        },
         "render_engine": {
           "doc": null,
           "items": [
             "graphics_engine::render_engine::RenderEngine"
+          ],
+          "submodules": {},
+          "extern_values": [],
+          "functions": [],
+          "backends": {}
+        },
+        "render_pass": {
+          "doc": null,
+          "items": [
+            "graphics_engine::render_pass::CConstantBufferPool",
+            "graphics_engine::render_pass::CRenderPass"
           ],
           "submodules": {},
           "extern_values": [],
@@ -9164,6 +10048,82 @@
               }
             ]
           }
+        },
+        "tone_mapping": {
+          "doc": null,
+          "items": [
+            "graphics_engine::tone_mapping::CToneMappingEffect",
+            "graphics_engine::tone_mapping::SHistogramGeneration",
+            "graphics_engine::tone_mapping::SSmoothedExposure"
+          ],
+          "submodules": {},
+          "extern_values": [],
+          "functions": [
+            {
+              "visibility": "private",
+              "name": "CalculateMidAndBrightPointForHistogram",
+              "doc": null,
+              "body": {
+                "type": "address",
+                "address": 5369727984
+              },
+              "arguments": [
+                {
+                  "type": "field",
+                  "name": "ctx",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "void"
+                    }
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "arg1",
+                  "type_ref": {
+                    "type": "raw",
+                    "path": "f32"
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "arg2",
+                  "type_ref": {
+                    "type": "raw",
+                    "path": "i32"
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "arg3",
+                  "type_ref": {
+                    "type": "raw",
+                    "path": "f32"
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "hist",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "graphics_engine::tone_mapping::SHistogramGeneration"
+                    }
+                  }
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system",
+              "source": {
+                "file_index": 19,
+                "line": 16
+              }
+            }
+          ],
+          "backends": {}
         }
       },
       "extern_values": [],
@@ -9219,7 +10179,7 @@
           },
           "calling_convention": "system",
           "source": {
-            "file_index": 17,
+            "file_index": 20,
             "line": 1
           }
         }
@@ -9459,7 +10419,7 @@
           },
           "calling_convention": "system",
           "source": {
-            "file_index": 24,
+            "file_index": 27,
             "line": 3
           }
         }
@@ -9483,8 +10443,11 @@
     "game.pyxis",
     "graphics_engine/device.pyxis",
     "graphics_engine/graphics_engine.pyxis",
+    "graphics_engine/post_effects.pyxis",
     "graphics_engine/render_engine.pyxis",
+    "graphics_engine/render_pass.pyxis",
     "graphics_engine/texture.pyxis",
+    "graphics_engine/tone_mapping.pyxis",
     "hash.pyxis",
     "input/input_action_map.pyxis",
     "input/input_device_manager.pyxis",

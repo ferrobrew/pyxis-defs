@@ -8,6 +8,7 @@ use graphics_engine::graphics_engine::HContext_t;
 #[min_size(0x388)]
 pub type PostEffectRenderContext {
     // Per-frame render flags. Bit 0 enables DoF's screen-space motion-vector reprojection.
+
     #[address(0x384)]
     pub m_Flags: u8,
 }
@@ -16,31 +17,16 @@ pub type PostEffectContext {
     pub m_RenderContext: *mut PostEffectRenderContext,
 }
 
-pub type CPostEffectsManager {}
+pub type CPostEffectsManager;
 
-pub type CMotionBlurEffect {}
+pub type CMotionBlurEffect;
 impl CMotionBlurEffect {
     #[address(0x140_0C8_E20)]
-    pub fn Apply(
-        &mut self,
-        ctx: *mut HContext_t,
-        pec: *mut PostEffectContext,
-        mgr: *mut CPostEffectsManager,
-        input: u32,
-        blur: f32,
-        flag0: bool,
-        flag1: bool,
-    ) -> u32;
+    pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut CPostEffectsManager, input: u32, blur: f32, flag0: bool, flag1: bool) -> u32;
 }
 
-pub type CDepthOfFieldEffect {}
+pub type CDepthOfFieldEffect;
 impl CDepthOfFieldEffect {
     #[address(0x140_0C7_890)]
-    pub fn Apply(
-        &mut self,
-        ctx: *mut HContext_t,
-        pec: *mut PostEffectContext,
-        mgr: *mut CPostEffectsManager,
-        input: u32,
-    ) -> u32;
+    pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut CPostEffectsManager, input: u32) -> u32;
 }

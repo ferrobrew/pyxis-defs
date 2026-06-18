@@ -1,15 +1,16 @@
 // Per-frame render setup. SetupRenderFrameData runs once per frame in the graphics prologue:
 // it toggles the active add-buffer and rebuilds the per-frame render-block-item lists.
-pub type CRenderPass {}
+pub type CRenderPass;
 impl CRenderPass {
     #[address(0x140_48C_4E0)]
     pub fn SetupRenderFrameData();
 }
 
 // The per-frame constant-buffer ring.
-pub type CConstantBufferPool {}
+pub type CConstantBufferPool;
 impl CConstantBufferPool {
     // Recycles last frame's constant buffers from the in-use stack back to the free pool.
+
     #[address(0x140_0E0_4F0)]
     pub fn HandBackBuffers(&mut self);
 }

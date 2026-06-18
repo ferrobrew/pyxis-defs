@@ -42,37 +42,37 @@ pub type GraphicsEngine {
 
     #[address(0xEB0)]
     pub m_Device: *mut Device,
-
     // Deferred-shading render targets ("GBuffer0".."GBuffer3").
+
     #[address(0xEC8)]
     pub m_GBufferTexture: [*mut Texture; 4],
-
     // Motion-blur velocity buffer.
+
     #[address(0xFA0)]
     pub m_VelocityBufferTexture: *mut Texture,
-
     // Main scene depth ("MainDepthBuffer").
+
     #[address(0x1_058)]
     pub m_MainDepthTexture: *mut Texture,
-
     // Main scene HDR color ("MainColorBuffer").
+
     #[address(0x1_068)]
     pub m_MainColorBuffer: *mut Texture,
-
     // Hi-Z / downsampled depth ("DownsampledDepth").
+
     #[address(0x1_078)]
     pub m_DownSampledDepthTexture: *mut Texture,
-
     // Reflection-proxy depth-history (planar / water reflection state machine), 5 slots.
-    #[address(0x10_A0)]
-    pub m_EffectInfo: [EffectInfo; 5],
 
+    #[address(0x1_0A0)]
+    pub m_EffectInfo: [EffectInfo; 5],
     // Final linear back buffer ("BackBufferLinear").
+
     #[address(0x1_230)]
     pub m_BackBufferLinear: *mut Texture,
-
     // Index of the reflection-proxy slot picked this frame.
-    #[address(0x12_C8)]
+
+    #[address(0x1_2C8)]
     pub m_EffectInfoIndex: u32,
 }
 
