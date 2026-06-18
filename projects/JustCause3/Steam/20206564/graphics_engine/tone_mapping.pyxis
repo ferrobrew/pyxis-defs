@@ -1,0 +1,23 @@
+// HDR tone-mapping / auto-exposure (eye adaptation).
+pub type CToneMappingEffect {}
+
+// N-frame exposure smoother (a ring-buffer average; advances once per render, with no dt term).
+pub type SSmoothedExposure {}
+impl SSmoothedExposure {
+    #[address(0x140_0F8_200)]
+    pub fn Update(&mut self, exposure: f32);
+}
+
+// Per-frame brightness histogram used for eye adaptation.
+pub type SHistogramGeneration {}
+
+// Computes the histogram mid / bright points (the per-frame eye-adaptation lerp). Free function;
+// `ctx` is Graphics::HContext_t* (opaque), `hist` is the target SHistogramGeneration.
+#[address(0x140_0F8_BF0)]
+fn CalculateMidAndBrightPointForHistogram(
+    ctx: *mut void,
+    arg1: f32,
+    arg2: i32,
+    arg3: f32,
+    hist: *mut SHistogramGeneration,
+);
