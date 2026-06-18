@@ -5,12 +5,17 @@ use graphics_engine::graphics_engine::HContext_t;
 // state is only valid for one camera -- so on a second (stereo) render they paint a sub-region.
 // Their Apply returns the (possibly unchanged) source slot index, so returning `input` skips them.
 // The render context behind a PostEffectContext: camera matrices and per-frame render flags.
+// Per-frame render-context flags.
+#[copyable]
+pub bitflags PostEffectRenderFlags: u8 {
+    // Enables DoF's screen-space motion-vector reprojection.
+    m_MotionVectorReprojection = 0b0000_0001,
+}
+
 #[min_size(0x388)]
 pub type PostEffectRenderContext {
-    // Per-frame render flags. Bit 0 enables DoF's screen-space motion-vector reprojection.
-
     #[address(0x384)]
-    pub m_Flags: u8,
+    pub m_Flags: PostEffectRenderFlags,
 }
 
 pub type PostEffectContext {
