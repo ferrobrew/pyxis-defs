@@ -75,4 +75,10 @@ impl Camera {
 
     #[address(0x140_0C3_020)]
     pub fn UpdateRender(&mut self, dt: f32, dtf: f32);
+    // Builds the render-camera matrices once per Draw: applies reverse-Z and TAA jitter to the
+    // projection, then rebuilds m_ViewProjection / m_ViewProjectionF from m_View. One-shot per
+    // camera via the m_IsRenderCamera flag (0x20). Returns the last matrix-copy destination.
+
+    #[address(0x140_0B3_B80)]
+    pub fn SetupRenderCamera(&mut self, jitter: bool) -> *mut void;
 }
