@@ -1,5 +1,12 @@
 // HDR tone-mapping / auto-exposure (eye adaptation).
 pub type CToneMappingEffect;
+impl CToneMappingEffect {
+    // Builds the auto-exposure histogram for the final scene and writes the current histogram slot
+    // indices to a6 / a7 (out-params); returns a7.
+
+    #[address(0x140_119_440)]
+    pub fn GenerateHistogramForFinalScene(&mut self, ctx: *mut void, a3: *mut void, a4: *mut void, a5: i32, a6: *mut u32, a7: *mut u32) -> *mut u32;
+}
 
 // N-frame exposure smoother (a ring-buffer average; advances once per render, with no dt term).
 pub type SSmoothedExposure;
