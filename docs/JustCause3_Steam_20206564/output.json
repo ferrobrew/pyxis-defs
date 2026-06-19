@@ -1238,7 +1238,7 @@
           {
             "visibility": "public",
             "name": "UpdateRender",
-            "doc": null,
+            "doc": " Per-frame camera update: snapshots the previous view-projection, Lerps the transform between\n T0 and T1 by `dtf`, and recalculates projection and frustum.",
             "body": {
               "type": "address",
               "address": 5369507872
@@ -1268,7 +1268,41 @@
             "calling_convention": "system",
             "source": {
               "file_index": 5,
-              "line": 76
+              "line": 73
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "SetupRenderCamera",
+            "doc": " Builds the render-camera matrices once per Draw: applies reverse-Z and TAA jitter to the\n projection, then rebuilds m_ViewProjection / m_ViewProjectionF from m_View. One-shot per\n camera via the m_IsRenderCamera flag (0x20). Returns the last matrix-copy destination.",
+            "body": {
+              "type": "address",
+              "address": 5369445248
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "jitter",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "bool"
+                }
+              }
+            ],
+            "return_type": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "void"
+              }
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 5,
+              "line": 78
             }
           }
         ],
@@ -6354,7 +6388,7 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": null,
+        "doc": " CGraphicsEngine::DrawThreadTaskParam",
         "fields": [],
         "associated_functions": [],
         "vftable": null,
@@ -6377,12 +6411,12 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": null,
+        "doc": " One reflection-proxy depth-history slot (the planar / water reflection state machine). Five of\n these live on the graphics engine; the lifecycle byte advances once per scene dispatch.",
         "fields": [
           {
             "visibility": "public",
             "name": "m_DepthTexture",
-            "doc": null,
+            "doc": " Reflection-proxy depth texture (Graphics::HTexture_t handle).",
             "type_ref": {
               "type": "mut_pointer",
               "inner": {
@@ -6396,7 +6430,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 29
+              "line": 28
             }
           },
           {
@@ -6419,7 +6453,7 @@
           {
             "visibility": "public",
             "name": "m_FrameIndex",
-            "doc": null,
+            "doc": " Lifecycle counter: 0 = free, 2 -> promote to 3, 3 = pick, else += 1.",
             "type_ref": {
               "type": "raw",
               "path": "u8"
@@ -6430,7 +6464,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 32
+              "line": 31
             }
           },
           {
@@ -6451,7 +6485,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 26
+              "line": 24
             }
           }
         ],
@@ -6465,7 +6499,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 26
+        "line": 24
       }
     },
     "graphics_engine::graphics_engine::GraphicsEngine": {
@@ -6613,13 +6647,13 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 47
+              "line": 46
             }
           },
           {
             "visibility": "public",
             "name": "m_GBufferTexture",
-            "doc": null,
+            "doc": " Deferred-shading render targets (\"GBuffer0\"..\"GBuffer3\").",
             "type_ref": {
               "type": "array",
               "inner": {
@@ -6637,7 +6671,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 47
+              "line": 46
             }
           },
           {
@@ -6658,13 +6692,13 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 51
+              "line": 50
             }
           },
           {
             "visibility": "public",
             "name": "m_VelocityBufferTexture",
-            "doc": null,
+            "doc": " Motion-blur velocity buffer.",
             "type_ref": {
               "type": "mut_pointer",
               "inner": {
@@ -6678,7 +6712,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 51
+              "line": 50
             }
           },
           {
@@ -6699,13 +6733,13 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 55
+              "line": 54
             }
           },
           {
             "visibility": "public",
             "name": "m_MainDepthTexture",
-            "doc": null,
+            "doc": " Main scene depth (\"MainDepthBuffer\").",
             "type_ref": {
               "type": "mut_pointer",
               "inner": {
@@ -6719,7 +6753,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 55
+              "line": 54
             }
           },
           {
@@ -6740,13 +6774,13 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 59
+              "line": 58
             }
           },
           {
             "visibility": "public",
             "name": "m_MainColorBuffer",
-            "doc": null,
+            "doc": " Main scene HDR color (\"MainColorBuffer\").",
             "type_ref": {
               "type": "mut_pointer",
               "inner": {
@@ -6760,7 +6794,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 59
+              "line": 58
             }
           },
           {
@@ -6781,13 +6815,13 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 63
+              "line": 62
             }
           },
           {
             "visibility": "public",
             "name": "m_DownSampledDepthTexture",
-            "doc": null,
+            "doc": " Hi-Z / downsampled depth (\"DownsampledDepth\").",
             "type_ref": {
               "type": "mut_pointer",
               "inner": {
@@ -6801,7 +6835,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 63
+              "line": 62
             }
           },
           {
@@ -6822,13 +6856,13 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 67
+              "line": 66
             }
           },
           {
             "visibility": "public",
             "name": "m_EffectInfo",
-            "doc": null,
+            "doc": " Reflection-proxy depth-history (planar / water reflection state machine), 5 slots.",
             "type_ref": {
               "type": "array",
               "inner": {
@@ -6843,13 +6877,13 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 67
+              "line": 66
             }
           },
           {
             "visibility": "public",
             "name": "m_BackBufferLinear",
-            "doc": null,
+            "doc": " Final linear back buffer (\"BackBufferLinear\").",
             "type_ref": {
               "type": "mut_pointer",
               "inner": {
@@ -6863,7 +6897,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 71
+              "line": 70
             }
           },
           {
@@ -6884,13 +6918,13 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 75
+              "line": 74
             }
           },
           {
             "visibility": "public",
             "name": "m_EffectInfoIndex",
-            "doc": null,
+            "doc": " Index of the reflection-proxy slot picked this frame.",
             "type_ref": {
               "type": "raw",
               "path": "u32"
@@ -6901,7 +6935,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 75
+              "line": 74
             }
           },
           {
@@ -6944,13 +6978,13 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 90
+              "line": 89
             }
           },
           {
             "visibility": "public",
             "name": "Draw",
-            "doc": null,
+            "doc": " Graphics entry point: runs the per-frame prologue (presents the previous frame, advances the\n clock and constant-buffer pools) then dispatches this frame's draw.",
             "body": {
               "type": "address",
               "address": 5369708912
@@ -6972,13 +7006,13 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 95
+              "line": 92
             }
           },
           {
             "visibility": "public",
             "name": "Flip",
-            "doc": null,
+            "doc": " Presents the previous frame's back buffer.",
             "body": {
               "type": "address",
               "address": 5369465296
@@ -6992,13 +7026,13 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 99
+              "line": 97
             }
           },
           {
             "visibility": "public",
             "name": "DispatchDraw",
-            "doc": null,
+            "doc": " Queues this frame's render work on the render thread.",
             "body": {
               "type": "address",
               "address": 5369707056
@@ -7012,13 +7046,13 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 103
+              "line": 101
             }
           },
           {
             "visibility": "public",
             "name": "HandleDrawThreadTask",
-            "doc": null,
+            "doc": " Render-thread body: gbuffer, lighting, post-effects and UI. `param` is\n DrawThreadTaskParam* (layout TBD).",
             "body": {
               "type": "address",
               "address": 5369699600
@@ -7046,7 +7080,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 108
+              "line": 105
             }
           }
         ],
@@ -7089,7 +7123,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 119
+              "line": 118
             }
           },
           {
@@ -7110,7 +7144,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 120
+              "line": 119
             }
           },
           {
@@ -7127,7 +7161,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 121
+              "line": 120
             }
           },
           {
@@ -7144,7 +7178,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 122
+              "line": 121
             }
           },
           {
@@ -7161,7 +7195,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 123
+              "line": 122
             }
           },
           {
@@ -7178,7 +7212,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 124
+              "line": 123
             }
           },
           {
@@ -7195,7 +7229,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 125
+              "line": 124
             }
           },
           {
@@ -7212,7 +7246,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 126
+              "line": 125
             }
           },
           {
@@ -7229,7 +7263,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 127
+              "line": 126
             }
           },
           {
@@ -7250,7 +7284,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 129
+              "line": 128
             }
           },
           {
@@ -7267,7 +7301,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 129
+              "line": 128
             }
           },
           {
@@ -7284,7 +7318,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 131
+              "line": 130
             }
           },
           {
@@ -7301,7 +7335,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 132
+              "line": 131
             }
           },
           {
@@ -7322,7 +7356,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 134
+              "line": 133
             }
           },
           {
@@ -7339,7 +7373,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 134
+              "line": 133
             }
           },
           {
@@ -7356,7 +7390,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 136
+              "line": 135
             }
           },
           {
@@ -7373,7 +7407,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 137
+              "line": 136
             }
           },
           {
@@ -7394,7 +7428,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 117
+              "line": 116
             }
           }
         ],
@@ -7408,7 +7442,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 117
+        "line": 116
       }
     },
     "graphics_engine::graphics_engine::HContext_t": {
@@ -7419,7 +7453,7 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": null,
+        "doc": " Graphics::HContext_t (GPU context handle)",
         "fields": [],
         "associated_functions": [],
         "vftable": null,
@@ -7442,7 +7476,7 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": null,
+        "doc": " Graphics::HDevice_t (GPU device handle)",
         "fields": [],
         "associated_functions": [],
         "vftable": null,
@@ -7575,7 +7609,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 15,
-              "line": 30
+              "line": 36
             }
           }
         ],
@@ -7588,7 +7622,7 @@
       },
       "source": {
         "file_index": 15,
-        "line": 28
+        "line": 34
       }
     },
     "graphics_engine::post_effects::CFadeEffect": {
@@ -7599,7 +7633,7 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": null,
+        "doc": " Alpha-blended fade quad over the scene.",
         "fields": [],
         "associated_functions": [
           {
@@ -7644,7 +7678,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 15,
-              "line": 37
+              "line": 43
             }
           }
         ],
@@ -7657,7 +7691,7 @@
       },
       "source": {
         "file_index": 15,
-        "line": 35
+        "line": 40
       }
     },
     "graphics_engine::post_effects::CGlareEffect": {
@@ -7668,7 +7702,7 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": null,
+        "doc": " Bloom / glare generator (writes its own scratch targets, composited later).",
         "fields": [],
         "associated_functions": [
           {
@@ -7735,7 +7769,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 15,
-              "line": 44
+              "line": 50
             }
           }
         ],
@@ -7748,7 +7782,7 @@
       },
       "source": {
         "file_index": 15,
-        "line": 42
+        "line": 47
       }
     },
     "graphics_engine::post_effects::CMotionBlurEffect": {
@@ -7847,7 +7881,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 15,
-              "line": 24
+              "line": 30
             }
           }
         ],
@@ -7860,7 +7894,7 @@
       },
       "source": {
         "file_index": 15,
-        "line": 22
+        "line": 28
       }
     },
     "graphics_engine::post_effects::CPlayerDamageEffect": {
@@ -7871,7 +7905,7 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": null,
+        "doc": " Red damage vignette. Slot-passthrough (returns the input slot index).",
         "fields": [],
         "associated_functions": [
           {
@@ -7935,7 +7969,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 15,
-              "line": 51
+              "line": 57
             }
           }
         ],
@@ -7948,7 +7982,7 @@
       },
       "source": {
         "file_index": 15,
-        "line": 49
+        "line": 54
       }
     },
     "graphics_engine::post_effects::CPostEffectsManager": {
@@ -7971,7 +8005,7 @@
       },
       "source": {
         "file_index": 15,
-        "line": 20
+        "line": 26
       }
     },
     "graphics_engine::post_effects::CSunHaloEffect": {
@@ -7982,7 +8016,7 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": null,
+        "doc": " Sun halo. PreApply prepares and sets the ready flag (byte at +0x114); Apply composites it.",
         "fields": [],
         "associated_functions": [
           {
@@ -8038,7 +8072,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 15,
-              "line": 58
+              "line": 64
             }
           },
           {
@@ -8072,7 +8106,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 15,
-              "line": 61
+              "line": 67
             }
           }
         ],
@@ -8085,7 +8119,7 @@
       },
       "source": {
         "file_index": 15,
-        "line": 56
+        "line": 61
       }
     },
     "graphics_engine::post_effects::PostEffectContext": {
@@ -8115,7 +8149,7 @@
             "is_base": false,
             "source": {
               "file_index": 15,
-              "line": 17
+              "line": 23
             }
           }
         ],
@@ -8129,7 +8163,7 @@
       },
       "source": {
         "file_index": 15,
-        "line": 16
+        "line": 22
       }
     },
     "graphics_engine::post_effects::PostEffectRenderContext": {
@@ -8160,7 +8194,7 @@
             "is_base": false,
             "source": {
               "file_index": 15,
-              "line": 12
+              "line": 18
             }
           },
           {
@@ -8169,7 +8203,7 @@
             "doc": null,
             "type_ref": {
               "type": "raw",
-              "path": "u8"
+              "path": "graphics_engine::post_effects::PostEffectRenderFlags"
             },
             "offset": 900,
             "size": 1,
@@ -8177,7 +8211,7 @@
             "is_base": false,
             "source": {
               "file_index": 15,
-              "line": 12
+              "line": 18
             }
           },
           {
@@ -8198,7 +8232,7 @@
             "is_base": false,
             "source": {
               "file_index": 15,
-              "line": 8
+              "line": 16
             }
           }
         ],
@@ -8212,7 +8246,40 @@
       },
       "source": {
         "file_index": 15,
-        "line": 8
+        "line": 16
+      }
+    },
+    "graphics_engine::post_effects::PostEffectRenderFlags": {
+      "path": "graphics_engine::post_effects::PostEffectRenderFlags",
+      "visibility": "public",
+      "size": 1,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "bitflags",
+        "doc": " Per-frame render-context flags.",
+        "underlying_type": {
+          "type": "raw",
+          "path": "u8"
+        },
+        "flags": [
+          {
+            "name": "m_MotionVectorReprojection",
+            "value": 1,
+            "source": {
+              "file_index": 15,
+              "line": 12
+            }
+          }
+        ],
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "default": null
+      },
+      "source": {
+        "file_index": 15,
+        "line": 9
       }
     },
     "graphics_engine::render_engine::RenderEngine": {
@@ -8300,13 +8367,13 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": null,
+        "doc": " The per-frame constant-buffer ring.",
         "fields": [],
         "associated_functions": [
           {
             "visibility": "public",
             "name": "HandBackBuffers",
-            "doc": null,
+            "doc": " Recycles last frame's constant buffers from the in-use stack back to the free pool.",
             "body": {
               "type": "address",
               "address": 5369627888
@@ -8320,7 +8387,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 17,
-              "line": 14
+              "line": 12
             }
           }
         ],
@@ -8333,7 +8400,7 @@
       },
       "source": {
         "file_index": 17,
-        "line": 10
+        "line": 9
       }
     },
     "graphics_engine::render_pass::CRenderPass": {
@@ -8344,7 +8411,7 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": null,
+        "doc": " Per-frame render setup. SetupRenderFrameData runs once per frame in the graphics prologue:\n it toggles the active add-buffer and rebuilds the per-frame render-block-item lists.",
         "fields": [],
         "associated_functions": [
           {
@@ -8373,7 +8440,7 @@
       },
       "source": {
         "file_index": 17,
-        "line": 3
+        "line": 1
       }
     },
     "graphics_engine::texture::ID3D11DepthStencilView": {
@@ -8703,13 +8770,13 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": null,
+        "doc": " HDR tone-mapping / auto-exposure (eye adaptation).",
         "fields": [],
         "associated_functions": [
           {
             "visibility": "public",
             "name": "GenerateHistogramForFinalScene",
-            "doc": null,
+            "doc": " Builds the auto-exposure histogram for the final scene and writes the current histogram slot\n indices to a6 / a7 (out-params); returns a7.",
             "body": {
               "type": "address",
               "address": 5369861184
@@ -8792,7 +8859,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 19,
-              "line": 7
+              "line": 4
             }
           }
         ],
@@ -8805,7 +8872,7 @@
       },
       "source": {
         "file_index": 19,
-        "line": 2
+        "line": 1
       }
     },
     "graphics_engine::tone_mapping::SHistogramGeneration": {
@@ -8816,7 +8883,7 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": null,
+        "doc": " Per-frame brightness histogram used for eye adaptation.",
         "fields": [],
         "associated_functions": [],
         "vftable": null,
@@ -8828,7 +8895,7 @@
       },
       "source": {
         "file_index": 19,
-        "line": 19
+        "line": 17
       }
     },
     "graphics_engine::tone_mapping::SSmoothedExposure": {
@@ -8839,7 +8906,7 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": null,
+        "doc": " N-frame exposure smoother (a ring-buffer average; advances once per render, with no dt term).",
         "fields": [],
         "associated_functions": [
           {
@@ -8867,7 +8934,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 19,
-              "line": 14
+              "line": 13
             }
           }
         ],
@@ -8880,7 +8947,7 @@
       },
       "source": {
         "file_index": 19,
-        "line": 12
+        "line": 10
       }
     },
     "i128": {
@@ -10401,7 +10468,7 @@
             {
               "visibility": "private",
               "name": "graphics_flip",
-              "doc": null,
+              "doc": " Low-level present (Graphics::Flip); returns Graphics::EResult. `device` is\n Graphics::HDevice_t* (opaque).",
               "body": {
                 "type": "address",
                 "address": 5395294240
@@ -10426,7 +10493,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 14,
-                "line": 114
+                "line": 111
               }
             }
           ],
@@ -10453,7 +10520,8 @@
             "graphics_engine::post_effects::CPostEffectsManager",
             "graphics_engine::post_effects::CSunHaloEffect",
             "graphics_engine::post_effects::PostEffectContext",
-            "graphics_engine::post_effects::PostEffectRenderContext"
+            "graphics_engine::post_effects::PostEffectRenderContext",
+            "graphics_engine::post_effects::PostEffectRenderFlags"
           ],
           "submodules": {},
           "extern_values": [],
@@ -10518,7 +10586,7 @@
             {
               "visibility": "private",
               "name": "CalculateMidAndBrightPointForHistogram",
-              "doc": null,
+              "doc": " Computes the histogram mid / bright points (the per-frame eye-adaptation lerp). Free function;\n `ctx` is Graphics::HContext_t* (opaque), `hist` is the target SHistogramGeneration.",
               "body": {
                 "type": "address",
                 "address": 5369727984
@@ -10575,7 +10643,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 19,
-                "line": 23
+                "line": 20
               }
             }
           ],
