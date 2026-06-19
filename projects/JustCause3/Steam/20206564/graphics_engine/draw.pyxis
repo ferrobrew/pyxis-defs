@@ -11,6 +11,36 @@ pub fn DrawIndexed(ctx: *mut HContext_t, prim: i32, arg2: i32, arg3: i32, vbuf: 
 #[address(0x141_967_680)]
 pub fn Draw(ctx: *mut HContext_t, prim: i32, arg2: i32, arg3: i32);
 
+// Instanced / indirect draws and compute dispatches. The demangled symbols for these misreport
+// their argument counts AND types (the disassembly disagrees -- e.g. DrawInstanced's 2nd argument
+// is dereferenced as a pointer although the symbol types it as int, and DrawInstancedIndirect reads
+// five arguments rather than three). They are declared here with a generous list of opaque
+// pointer-sized arguments so callers can forward all the registers/stack slots through intact.
+
+/// Instanced draw (`Graphics::DrawInstanced`).
+#[address(0x141_962_F10)]
+pub fn DrawInstanced(a1: *mut void, a2: *mut void, a3: *mut void, a4: *mut void, a5: *mut void, a6: *mut void);
+
+/// Indexed instanced draw (`Graphics::DrawIndexedInstanced`).
+#[address(0x141_962_E80)]
+pub fn DrawIndexedInstanced(a1: *mut void, a2: *mut void, a3: *mut void, a4: *mut void, a5: *mut void, a6: *mut void);
+
+/// GPU-driven instanced draw (`Graphics::DrawInstancedIndirect`).
+#[address(0x141_962_CC0)]
+pub fn DrawInstancedIndirect(a1: *mut void, a2: *mut void, a3: *mut void, a4: *mut void, a5: *mut void, a6: *mut void);
+
+/// GPU-driven indexed instanced draw (`Graphics::DrawIndexedInstancedIndirect`).
+#[address(0x141_963_080)]
+pub fn DrawIndexedInstancedIndirect(a1: *mut void, a2: *mut void, a3: *mut void, a4: *mut void, a5: *mut void, a6: *mut void);
+
+/// Compute dispatch (`Graphics::Dispatch`).
+#[address(0x141_962_AD0)]
+pub fn Dispatch(a1: *mut void, a2: *mut void, a3: *mut void, a4: *mut void, a5: *mut void, a6: *mut void);
+
+/// GPU-driven compute dispatch (`Graphics::DispatchIndirect`).
+#[address(0x141_962_B60)]
+pub fn DispatchIndirect(a1: *mut void, a2: *mut void, a3: *mut void, a4: *mut void, a5: *mut void, a6: *mut void);
+
 // Render-target binding, clearing, copying and MSAA-resolve wrappers.
 
 /// Bind a render setup -- the render-target configuration a pass draws into.
