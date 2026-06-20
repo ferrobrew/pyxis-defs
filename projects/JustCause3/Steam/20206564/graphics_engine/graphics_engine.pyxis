@@ -83,6 +83,17 @@ pub type HContext_t;
 /// Graphics::HDevice_t (GPU device handle)
 pub type HDevice_t;
 
+/// Graphics::HRenderSetup_t (a render-target configuration a pass draws into).
+pub type HRenderSetup_t;
+
+/// Graphics::HTexture_t (GPU texture handle).
+pub type HTexture_t;
+
+/// The per-view render context the render passes read: camera matrices (view, projection, the
+/// translation-free offset view-projection and the separate camera world position), shadow data and
+/// per-frame flags. Filled each dispatch by CRenderPass::SetRenderContextCamera.
+pub type RenderContext;
+
 /// CGraphicsEngine::DrawThreadTaskParam
 pub type DrawThreadTaskParam;
 impl GraphicsEngine {
@@ -106,6 +117,13 @@ impl GraphicsEngine {
     /// DrawThreadTaskParam* (layout TBD).
     #[address(0x140_0F1_D10)]
     pub fn HandleDrawThreadTask(&mut self, param: *mut DrawThreadTaskParam) -> u32;
+
+    /// Draw-prologue step. Copies m_ActiveCamera into the engine-owned render-camera slot
+    /// (this + 0x170), runs CCamera::SetupRenderCamera on it, publishes it as CameraManager's
+    /// m_RenderCamera, then runs the per-frame texture-cache update under the context lock. `ctx`
+    /// is Graphics::HContext_t* (opaque).
+    #[address(0x140_0C4_6D0)]
+    pub fn TextureCachePlatformUpdate(&mut self, ctx: *mut HContext_t, dt: f32);
 }
 
 /// Low-level present (Graphics::Flip); returns Graphics::EResult. `device` is

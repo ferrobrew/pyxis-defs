@@ -40,3 +40,8 @@ pub type Device {
     #[address(0x38)]
     pub m_DXGIOutput: IDXGIOutput,
 }
+
+/// Returns the master context (the wrapper around the D3D11 immediate context). `device` is
+/// Graphics::HDevice_t* (opaque, unused).
+#[address(0x141_955_0D0)]
+pub fn GetMasterContext(this: *mut void, device: *mut void) -> *mut Context;

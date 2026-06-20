@@ -27,4 +27,9 @@ impl GameCameraManager {
 
     #[address(0x140_75C_820)]
     pub fn IsAlternateAimTransformUsed(&self) -> bool;
+
+    // Per-frame render update: runs the camera tree (UpdateRenderContexts), pushes the render
+    // context, then updates the lighting and water level at the camera.
+    #[address(0x140_7F4_560)]
+    pub fn UpdateRender(&mut self, dt: f32, dtf: f32, blend: f32) -> u64;
 }

@@ -1,0 +1,15 @@
+use character::character::Character;
+
+// NStateTask_InputLocoSetTargetDirTask reads the movement effectors and writes the move direction
+// to the character blackboard.
+
+pub type SInstanceProperties;
+
+pub type NStateTask_InputLocoSetTargetDirTask;
+impl NStateTask_InputLocoSetTargetDirTask {
+    /// Read the move effectors (action IDs 28-31) via the action-map GetEffector, rotate the raw
+    /// vector camera-relative, and write the raw and camera-relative move directions to the
+    /// character blackboard.
+    #[address(0x140_81E_130)]
+    pub fn SetupTargetDir(&mut self, character: *mut Character, props: *mut SInstanceProperties) -> f64;
+}

@@ -1,4 +1,5 @@
-use graphics_engine::graphics_engine::HContext_t;
+use graphics_engine::graphics_engine::{HContext_t, HRenderSetup_t, HTexture_t, RenderContext};
+use types::math::Matrix4;
 
 #[singleton(0x142_ED0_E18), size(0x2220)]
 pub type RenderEngine;
@@ -8,4 +9,41 @@ impl RenderEngine {
 
     #[address(0x140_1C2_350)]
     pub fn PostDraw(&mut self, context: *const HContext_t);
+
+    /// Draws every render block in the half-open pass-index range [first, last): for each pass it
+    /// walks the fixed CRenderPass* array at this + 32*pass + 128 and vtable-dispatches each block.
+    /// GBuffer is 0x2F..0x55, the lighting/scene block 0x56..0x96, post-effects 0x96..0x97.
+    #[address(0x140_186_600)]
+    pub fn DrawRenderPassRange(&mut self, ctx: *mut HContext_t, setup: *mut HRenderSetup_t, first: u32, last: u32);
+
+    /// GBuffer fill: binds two global textures, then DrawRenderPassRange(0x2F, 0x55) (depth /
+    /// velocity prefix, static/dynamic models, decals).
+    #[address(0x140_186_810)]
+    pub fn DrawGBuffer(&mut self, ctx: *mut HContext_t, a3: i64, a4: *mut HTexture_t);
+
+    /// Lighting / reflections / opaque / environment / water / transparency:
+    /// DrawRenderPassRange(0x56, 0x96), then clears the global texture samplers.
+    #[address(0x140_186_8A0)]
+    pub fn Draw(&mut self, ctx: *mut HContext_t) -> u64;
+
+    /// Post-effects pass: DrawRenderPassRange(0x96, 0x97) (the RP_POSTEFFECTS pass, whose block is
+    /// CRenderBlockPostEffects::Draw).
+    #[address(0x140_186_910)]
+    pub fn DrawPosteffects(&mut self, ctx: *mut HContext_t, setup: *mut HRenderSetup_t);
+
+    /// Uploads the global per-view constant buffer for the frame: lighting, fog, wetness, and the
+    /// render camera's full (translation-bearing) m_ViewProjectionF and world position. This block
+    /// drives screen-space / non-geometry work, not opaque-geometry vertex placement.
+    #[address(0x140_185_740)]
+    pub fn SetGlobalShaderConstants(&mut self, ctx: *mut RenderContext);
+
+    /// Per-frame TAA jitter: forwards to CPostEffectsManager::ApplySubsampleJitter, which
+    /// post-multiplies a sub-pixel clip-space translation onto `proj` only when AA mode == 3.
+    #[address(0x140_173_AA0)]
+    pub fn ApplyJitterTransform(&mut self, proj: *mut Matrix4, width: i32, height: i32);
+
+    /// Drains a separate deferred deletion list of render blocks (under its own critical section).
+    /// Does not touch the per-pass draw lists.
+    #[address(0x140_1A4_ED0)]
+    pub fn EraseAllDeletedRenderBlocks(&mut self);
 }

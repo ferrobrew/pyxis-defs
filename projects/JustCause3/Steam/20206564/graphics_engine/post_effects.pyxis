@@ -1,4 +1,5 @@
-use graphics_engine::graphics_engine::HContext_t;
+use graphics_engine::graphics_engine::{HContext_t, HRenderSetup_t, HTexture_t, RenderContext};
+use types::math::Matrix4;
 
 // Fullscreen post-process effects. Both do a screen-space reprojection (DoF via an inverse
 // view-projection; MotionBlur via an unconditional velocity-composite draw) whose per-frame-once
@@ -24,6 +25,68 @@ pub type PostEffectContext {
 }
 
 pub type CPostEffectsManager;
+impl CPostEffectsManager {
+    /// Wires up and enqueues the world post-effect block, then runs the world fade accumulator
+    /// (ApplyWorldFadeFilter). `dt` flows only into that accumulator; the texture arguments are
+    /// the scene inputs.
+    #[address(0x140_14B_FE0)]
+    pub fn ApplyWorldFilters(&mut self, dt: f32, setup: *mut HRenderSetup_t, a4: *mut HTexture_t, a5: *mut HTexture_t, a6: *mut HTexture_t, a7: *mut HTexture_t, a8: *mut HTexture_t);
+
+    /// Enqueues the global post-effect block and advances its dt-driven accumulators: the screen
+    /// fade alpha (clamped [0,1]) and the sun-direction / heat-haze accumulator.
+    #[address(0x140_14C_0C0)]
+    pub fn ApplyGlobalFilters(&mut self, dt: f32, ctx: *mut HContext_t);
+
+    /// The world fade accumulator stepped by ApplyWorldFilters' dt.
+    #[address(0x140_0F9_BD0)]
+    pub fn ApplyWorldFadeFilter(&mut self, dt: f32);
+
+    /// True when the bokeh depth-of-field path is active (selects the downscale + bokeh blur over
+    /// the plain blur).
+    #[address(0x140_0A0_270)]
+    pub fn IsBokehActive(&self) -> bool;
+
+    /// True when motion blur is active.
+    #[address(0x140_0FA_3E0)]
+    pub fn IsMotionBlurActive(&self) -> bool;
+
+    /// Post-multiplies the AA's sub-pixel TAA jitter onto `proj` (effective only at AA mode 3).
+    #[address(0x140_0FA_050)]
+    pub fn ApplySubsampleJitter(&self, proj: *mut Matrix4, width: i32, height: i32);
+}
+
+/// The render block for the RP_POSTEFFECTS pass. Its Draw runs the HDR post chain in order:
+/// histogram generation, sun-halo pre-apply, blur (bokeh or plain), glare, depth of field, motion
+/// blur, the HDR->LDR tonemap (DrawHistogramWindow), player-damage vignette, anti-aliasing, sun
+/// halo + additive blend, and the final fade. It threads a single result-texture slot index through
+/// the slot-returning effects (DoF / motion blur / damage / AA), hopping between the three
+/// fullscreen temp textures. `ctx` is RenderContext*; `info` is a CRBIInfo*.
+pub type CRenderBlockPostEffects;
+impl CRenderBlockPostEffects {
+    #[address(0x140_16A_260)]
+    pub fn Draw(&mut self, ctx: *mut RenderContext, info: *const void) -> u64;
+}
+
+/// Bokeh depth-of-field downscale prepass (2x2 pack + focus).
+pub type CDownScale2x2PackFocus;
+impl CDownScale2x2PackFocus {
+    #[address(0x140_0C8_2E0)]
+    pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut CPostEffectsManager);
+}
+
+/// Gaussian blur (the non-bokeh blur path).
+pub type CBlurEffect;
+impl CBlurEffect {
+    #[address(0x140_0BC_B10)]
+    pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut CPostEffectsManager) -> bool;
+}
+
+/// Bokeh blur (the IsBokehActive path; runs after CDownScale2x2PackFocus).
+pub type CBlurEffectBokeh;
+impl CBlurEffectBokeh {
+    #[address(0x140_0A7_870)]
+    pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut CPostEffectsManager);
+}
 
 pub type CMotionBlurEffect;
 impl CMotionBlurEffect {
@@ -79,4 +142,14 @@ impl CAntiAliasingEffect {
     /// `slot` is the in/out post-effect result-slot index.
     #[address(0x140_0BC_9A0)]
     pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut CPostEffectsManager, slot: *mut u32) -> u64;
+
+    /// Post-multiplies the sub-pixel clip-space jitter translation onto `proj`, but only when
+    /// m_Mode == 3 (SMAA T2X); the phase comes from the previous-frame counter parity.
+    #[address(0x140_0C7_700)]
+    pub fn ApplySubsampleJitter(&self, proj: *mut Matrix4, width: i32, height: i32);
+
+    /// Allocates the AA's render-target resources (the T2X history ping-pong textures and their
+    /// render setups) sized `width` x `height`.
+    #[address(0x140_0A5_E30)]
+    pub fn CreateRenderTargetResources(&mut self, mgr: *const CPostEffectsManager, width: i32, height: i32);
 }

@@ -5,6 +5,11 @@ impl CToneMappingEffect {
     /// indices to a6 / a7 (out-params); returns a7.
     #[address(0x140_119_440)]
     pub fn GenerateHistogramForFinalScene(&mut self, ctx: *mut void, a3: *mut void, a4: *mut void, a5: i32, a6: *mut u32, a7: *mut u32) -> *mut u32;
+
+    /// The HDR->LDR tonemap composite: applies the current exposure (from the histogram) to convert
+    /// the HDR MainColor into the LDR target.
+    #[address(0x140_119_8F0)]
+    pub fn DrawHistogramWindow(&self, ctx: *mut void, pec: *mut void, mgr: *mut void);
 }
 
 /// N-frame exposure smoother (a ring-buffer average; advances once per render, with no dt term).

@@ -80,4 +80,16 @@ impl Camera {
     /// camera via the m_IsRenderCamera flag (0x20). Returns the last matrix-copy destination.
     #[address(0x140_0B3_B80)]
     pub fn SetupRenderCamera(&mut self, jitter: bool) -> *mut void;
+
+    /// Sets (or clears) the m_ComputeView flag bit (0x08). When set, UpdateRender re-derives
+    /// m_View as Inverse(m_TransformF) each frame instead of reading a supplied view matrix.
+    #[address(0x140_09B_DB0)]
+    pub fn SetComputeView(&mut self, enable: bool);
+
+    /// Rebuilds m_Projection from the FOV / near / far / aspect parameters (PerspectiveFov,
+    /// PerspectiveOffCenter or Ortho per the m_UseOffCenter / m_Ortho flags), clears
+    /// m_DirtyProjection, and applies the reverse-Z remap (z' = w - z) only when m_IsRenderCamera
+    /// (0x20) is set.
+    #[address(0x140_0B2_4F0)]
+    pub fn RecalcProjection(&mut self);
 }

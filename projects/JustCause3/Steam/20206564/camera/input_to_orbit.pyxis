@@ -1,0 +1,28 @@
+use camera::camera_context::{CameraContext, CameraPipelineContext};
+use types::math::Vector2;
+
+// InputToOrbitModifier converts the look effectors into a camera orbit delta-angle and applies it
+// to the boom (camera arm) transform.
+
+pub type SInputToOrbitModifierParams;
+
+pub type InputToOrbitModifier;
+impl InputToOrbitModifier {
+    /// Read the look effectors, combine them, apply per-axis sensitivity, and return the
+    /// delta-angle (yaw, pitch).
+    #[address(0x140_6CB_3F0)]
+    pub fn CalculateInputDeltaAngles(&mut self, params: *const SInputToOrbitModifierParams, pipeline: *mut CameraPipelineContext) -> Vector2;
+
+    /// Caller of CalculateInputDeltaAngles: takes the returned delta-angle and applies it to the
+    /// camera via BoomTransform::DeltaTransform (the call is at +0x17D).
+    #[address(0x140_6DB_B80)]
+    pub fn ProcessCameraContext(&mut self, pipeline: *mut CameraPipelineContext, previous: *const CameraContext, out: *mut CameraContext) -> f64;
+}
+
+// The camera arm/boom; the look delta rotates it.
+pub type BoomTransform;
+impl BoomTransform {
+    /// Apply a (yaw, pitch, roll) delta-angle to the boom.
+    #[address(0x140_43D_180)]
+    pub fn DeltaTransform(&mut self, yaw: f32, pitch: f32, roll: f32);
+}

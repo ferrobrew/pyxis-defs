@@ -21,4 +21,13 @@ impl CameraManager {
 
     #[address(0x140_09D_400)]
     pub fn InitFOV(&mut self, fov: f32);
+
+    /// Returns m_RenderCamera (the camera the render thread reads).
+    #[address(0x140_09D_380)]
+    pub fn GetRenderCamera(&self) -> *const Camera;
+
+    /// Sim-path per-frame update: iterates every camera in the manager's list and calls
+    /// Camera::UpdateRender on each. This is where m_ActiveCamera's m_View is produced for the frame.
+    #[address(0x140_0D4_000)]
+    pub fn UpdateRender(&mut self, dt: f32, dtf: f32);
 }
