@@ -69,6 +69,47 @@ backend rust epilogue r#"
             self.data.as_mut_ptr()
         }
     }
+
+    impl std::ops::Mul for Matrix4 {
+        type Output = Matrix4;
+        // `a * b` matches the engine's Multiply4x4(a, b) (row-major a . b). The glam multiply is
+        // reversed on purpose: from_cols_array transposes engine-row-major into glam's column
+        // convention, so the engine product a . b is glam(b) * glam(a) mapped back through From.
+        fn mul(self, rhs: Matrix4) -> Matrix4 {
+            Matrix4::from(glam::Mat4::from(rhs) * glam::Mat4::from(self))
+        }
+    }
+
+    #[cfg(test)]
+    #[allow(clippy::items_after_test_module)]
+    mod matrix4_mul_tests {
+        use super::*;
+        fn translation(x: f32, y: f32, z: f32) -> Matrix4 {
+            // engine row-major: the translation lives in the last row (data[12..14])
+            let mut m = Matrix4 {
+                data: [
+                    1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+                ],
+            };
+            m.data[12] = x;
+            m.data[13] = y;
+            m.data[14] = z;
+            m
+        }
+        #[test]
+        fn mul_matches_engine_convention() {
+            let id = translation(0.0, 0.0, 0.0);
+            let a = translation(1.0, 2.0, 3.0);
+            // identity is the unit on both sides
+            assert_eq!((id * a).data, a.data);
+            assert_eq!((a * id).data, a.data);
+            // row-major translations compose by adding their offsets (engine p . T1 . T2)
+            let ab = a * translation(10.0, 20.0, 30.0);
+            assert!((ab.data[12] - 11.0).abs() < 1e-5);
+            assert!((ab.data[13] - 22.0).abs() < 1e-5);
+            assert!((ab.data[14] - 33.0).abs() < 1e-5);
+        }
+    }
 "#;
 
 #[copyable, defaultable, align(4)]
