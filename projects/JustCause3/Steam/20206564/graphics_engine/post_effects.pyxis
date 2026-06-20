@@ -67,3 +67,16 @@ impl CSunHaloEffect {
     #[address(0x140_0F8_030)]
     pub fn Apply(&mut self, ctx: *mut HContext_t) -> u64;
 }
+
+/// Anti-aliasing resolve. `m_Mode`: 1/4 = FXAA, 2 = SMAA 1x, 3 = SMAA T2X. Mode 3 adds a temporal
+/// reprojection against a previous-frame history texture.
+#[min_size(0x308)]
+pub type CAntiAliasingEffect {
+    #[address(0x300)]
+    pub m_Mode: i32,
+}
+impl CAntiAliasingEffect {
+    /// `slot` is the in/out post-effect result-slot index.
+    #[address(0x140_0BC_9A0)]
+    pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut CPostEffectsManager, slot: *mut u32) -> u64;
+}
