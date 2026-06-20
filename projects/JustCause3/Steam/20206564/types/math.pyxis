@@ -31,6 +31,13 @@ backend rust epilogue r#"
 pub type Matrix4 {
     pub data: [f32; 16],
 }
+impl Matrix4 {
+    /// `CMatrix4f::Multiply4x4` -- the engine's 4x4 matrix product, writing the product of `a` and
+    /// `b` into `result`. Used e.g. to build a view-projection from a view and a projection matrix.
+    /// Static (no `this`).
+    #[address(0x140_034_530)]
+    pub fn Multiply4x4(a: *const Matrix4, b: *const Matrix4, result: *mut Matrix4);
+}
 
 backend rust epilogue r#"
     impl From<glam::Mat4> for Matrix4 {
