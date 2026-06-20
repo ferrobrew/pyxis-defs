@@ -1,6 +1,6 @@
 use types::math::Matrix4;
 use types::math::Vector3;
 
-// Sets the 3D audio listener pose and velocity. Free function.
+/// Sets the 3D audio listener pose and velocity. Free function.
 #[address(0x140_D2A_FF0)]
 fn SetListenerTransform(mat: *const Matrix4, velocity: *const Vector3, enable: bool);

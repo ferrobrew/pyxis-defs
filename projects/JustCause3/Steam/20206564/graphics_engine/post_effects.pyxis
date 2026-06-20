@@ -24,8 +24,8 @@ pub type PostEffectContext {
     pub m_RenderContext: *mut PostEffectRenderContext,
 }
 
-pub type CPostEffectsManager;
-impl CPostEffectsManager {
+pub type PostEffectsManager;
+impl PostEffectsManager {
     /// Wires up and enqueues the world post-effect block, then runs the world fade accumulator
     /// (ApplyWorldFadeFilter). `dt` flows only into that accumulator; the texture arguments are
     /// the scene inputs.
@@ -61,71 +61,71 @@ impl CPostEffectsManager {
 /// halo + additive blend, and the final fade. It threads a single result-texture slot index through
 /// the slot-returning effects (DoF / motion blur / damage / AA), hopping between the three
 /// fullscreen temp textures. `ctx` is RenderContext*; `info` is a CRBIInfo*.
-pub type CRenderBlockPostEffects;
-impl CRenderBlockPostEffects {
+pub type RenderBlockPostEffects;
+impl RenderBlockPostEffects {
     #[address(0x140_16A_260)]
     pub fn Draw(&mut self, ctx: *mut RenderContext, info: *const void) -> u64;
 }
 
 /// Bokeh depth-of-field downscale prepass (2x2 pack + focus).
-pub type CDownScale2x2PackFocus;
-impl CDownScale2x2PackFocus {
+pub type DownScale2x2PackFocus;
+impl DownScale2x2PackFocus {
     #[address(0x140_0C8_2E0)]
-    pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut CPostEffectsManager);
+    pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut PostEffectsManager);
 }
 
 /// Gaussian blur (the non-bokeh blur path).
-pub type CBlurEffect;
-impl CBlurEffect {
+pub type BlurEffect;
+impl BlurEffect {
     #[address(0x140_0BC_B10)]
-    pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut CPostEffectsManager) -> bool;
+    pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut PostEffectsManager) -> bool;
 }
 
-/// Bokeh blur (the IsBokehActive path; runs after CDownScale2x2PackFocus).
-pub type CBlurEffectBokeh;
-impl CBlurEffectBokeh {
+/// Bokeh blur (the IsBokehActive path; runs after DownScale2x2PackFocus).
+pub type BlurEffectBokeh;
+impl BlurEffectBokeh {
     #[address(0x140_0A7_870)]
-    pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut CPostEffectsManager);
+    pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut PostEffectsManager);
 }
 
-pub type CMotionBlurEffect;
-impl CMotionBlurEffect {
+pub type MotionBlurEffect;
+impl MotionBlurEffect {
     #[address(0x140_0C8_E20)]
-    pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut CPostEffectsManager, input: u32, blur: f32, flag0: bool, flag1: bool) -> u32;
+    pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut PostEffectsManager, input: u32, blur: f32, flag0: bool, flag1: bool) -> u32;
 }
 
-pub type CDepthOfFieldEffect;
-impl CDepthOfFieldEffect {
+pub type DepthOfFieldEffect;
+impl DepthOfFieldEffect {
     #[address(0x140_0C7_890)]
-    pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut CPostEffectsManager, input: u32) -> u32;
+    pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut PostEffectsManager, input: u32) -> u32;
 }
 
 /// Alpha-blended fade quad over the scene.
-pub type CFadeEffect;
-impl CFadeEffect {
+pub type FadeEffect;
+impl FadeEffect {
     #[address(0x140_0A9_570)]
     pub fn Apply(&mut self, ctx: *mut HContext_t, a3: *mut void) -> u64;
 }
 
 /// Bloom / glare generator (writes its own scratch targets, composited later).
-pub type CGlareEffect;
-impl CGlareEffect {
+pub type GlareEffect;
+impl GlareEffect {
     #[address(0x140_0AA_510)]
     pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, a4: *mut void, a5: *mut void) -> u64;
 }
 
 /// Red damage vignette. Slot-passthrough (returns the input slot index).
-pub type CPlayerDamageEffect;
-impl CPlayerDamageEffect {
+pub type PlayerDamageEffect;
+impl PlayerDamageEffect {
     #[address(0x140_0F7_6E0)]
     pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, a4: *mut void, input: u32) -> u32;
 }
 
 /// Sun halo. PreApply prepares and sets the ready flag (byte at +0x114); Apply composites it.
-pub type CSunHaloEffect;
-impl CSunHaloEffect {
+pub type SunHaloEffect;
+impl SunHaloEffect {
     #[address(0x140_118_450)]
-    pub fn PreApply(&mut self, ctx: *mut HContext_t, a3: *mut void, mgr: *mut CPostEffectsManager) -> u64;
+    pub fn PreApply(&mut self, ctx: *mut HContext_t, a3: *mut void, mgr: *mut PostEffectsManager) -> u64;
 
     #[address(0x140_0F8_030)]
     pub fn Apply(&mut self, ctx: *mut HContext_t) -> u64;
@@ -134,14 +134,14 @@ impl CSunHaloEffect {
 /// Anti-aliasing resolve. `m_Mode`: 1/4 = FXAA, 2 = SMAA 1x, 3 = SMAA T2X. Mode 3 adds a temporal
 /// reprojection against a previous-frame history texture.
 #[min_size(0x308)]
-pub type CAntiAliasingEffect {
+pub type AntiAliasingEffect {
     #[address(0x300)]
     pub m_Mode: i32,
 }
-impl CAntiAliasingEffect {
+impl AntiAliasingEffect {
     /// `slot` is the in/out post-effect result-slot index.
     #[address(0x140_0BC_9A0)]
-    pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut CPostEffectsManager, slot: *mut u32) -> u64;
+    pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut PostEffectsManager, slot: *mut u32) -> u64;
 
     /// Post-multiplies the sub-pixel clip-space jitter translation onto `proj`, but only when
     /// m_Mode == 3 (SMAA T2X); the phase comes from the previous-frame counter parity.
@@ -151,5 +151,5 @@ impl CAntiAliasingEffect {
     /// Allocates the AA's render-target resources (the T2X history ping-pong textures and their
     /// render setups) sized `width` x `height`.
     #[address(0x140_0A5_E30)]
-    pub fn CreateRenderTargetResources(&mut self, mgr: *const CPostEffectsManager, width: i32, height: i32);
+    pub fn CreateRenderTargetResources(&mut self, mgr: *const PostEffectsManager, width: i32, height: i32);
 }

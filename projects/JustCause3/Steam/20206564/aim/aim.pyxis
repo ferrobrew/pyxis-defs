@@ -1,30 +1,26 @@
 use types::math::Matrix4;
 use state::SStateContext;
 
-pub type CWeaponBase;
-impl CWeaponBase {
-    // Returns the grip transform for the given hand (E_WEAPON_GRIP_HAND_*, modeled as i32).
-
+pub type WeaponBase;
+impl WeaponBase {
+    /// Returns the grip transform for the given hand (E_WEAPON_GRIP_HAND_*, modeled as i32).
     #[address(0x140_966_840)]
     pub fn GetGripPosition(&self, hand: i32, matrix: *mut Matrix4) -> bool;
 }
 
-// Player aim control; in normal third-person play the aim is camera-derived.
-pub type CPlayerAimControl;
-impl CPlayerAimControl {
-    // Returns the matrix used by the aim raycast: the ADS branch reads the alternate-aim transform,
-    // otherwise the camera transform; `weapon` adds optional ballistic pitch. Static method that
-    // returns CMatrix4f by value (sret: `result` out-param, also returned in rax).
-
+/// Player aim control; in normal third-person play the aim is camera-derived.
+pub type PlayerAimControl;
+impl PlayerAimControl {
+    /// Returns the matrix used by the aim raycast: the ADS branch reads the alternate-aim transform,
+    /// otherwise the camera transform; `weapon` adds optional ballistic pitch. Static method that
+    /// returns CMatrix4f by value (sret: `result` out-param, also returned in rax).
     #[address(0x140_C3E_510)]
-    pub fn GetAdjustedCameraMatrix(result: *mut Matrix4, weapon: *mut CWeaponBase) -> *mut Matrix4;
-    // Raycasts from the camera position along camera-forward to determine the aim target.
-
+    pub fn GetAdjustedCameraMatrix(result: *mut Matrix4, weapon: *mut WeaponBase) -> *mut Matrix4;
+    /// Raycasts from the camera position along camera-forward to determine the aim target.
     #[address(0x140_CE5_350)]
     pub fn UpdateDirectAim(&mut self);
 }
 
-// Character-state task that overrides the aim direction toward a locked target. Free function;
-// `ctx` is SStateContext*, `p` opaque.
+/// Character-state task that overrides the aim direction toward a locked target. Free function.
 #[address(0x140_809_C60)]
 fn NAutoAimToTarget_Update(ctx: *mut SStateContext, p: *mut void);

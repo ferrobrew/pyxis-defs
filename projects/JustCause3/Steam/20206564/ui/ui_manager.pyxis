@@ -1,10 +1,10 @@
 use graphics_engine::graphics_engine::HContext_t;
 use types::math::{Vector2, Vector3, Matrix4};
 
-// Scaleform-backed UI manager (the concrete class behind IUIManager; a single instance). It renders
-// the HUD into the engine surface; InitPlatformRT rebinds its render target.
+/// Scaleform-backed UI manager (the concrete class behind IUIManager; a single instance). It renders
+/// the HUD into the engine surface; InitPlatformRT rebinds its render target.
 #[singleton(0x142_E5B_620), size(0x1490)]
-pub type CUIManager {
+pub type UIManager {
     /// The Scaleform RenderBuffer the UI HAL renders into (set up by InitPlatformRT).
     #[address(0x1390)]
     pub m_RenderBuffer: *mut void,
@@ -14,7 +14,7 @@ pub type CUIManager {
     #[address(0x1488)]
     pub m_ViewHeight: f32,
 }
-impl CUIManager {
+impl UIManager {
     /// Bind the UI render target: build a Scaleform RenderTargetData (m_RenderBuffer) from the
     /// engine surface's RTV/DSV (GetRTVFromSurface / GetDSVFromSurface) via RenderTargetData::UpdateData.
     /// Called at startup (InitializeSystem) and on every device/resolution reset (RestoreAfterReset);
@@ -62,6 +62,6 @@ impl CUIManager {
     pub fn IsUsingStaticBackGround(&self) -> bool;
 }
 
-/// Returns the single CUIManager instance (the concrete class behind IUIManager).
+/// Returns the single UIManager instance (the concrete class behind IUIManager).
 #[address(0x140_099_5A0)]
-pub fn GetIUIManager() -> *mut CUIManager;
+pub fn GetIUIManager() -> *mut UIManager;

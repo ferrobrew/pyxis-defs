@@ -1,9 +1,9 @@
-// One input effector slot. Layout from the debug PDB (Input::CInputDeviceEffector, 0x14),
-// cross-checked against retail usage (m_Value@0, m_State@8, m_StateTime@0x10 all match). The
-// pointer GetActionEffector returns is the head of a linked-list node whose extra id/next fields
-// follow this struct; reading the effector itself uses these offsets.
+/// One input effector slot. Layout from the debug PDB (Input::InputDeviceEffector, 0x14),
+/// cross-checked against retail usage (m_Value@0, m_State@8, m_StateTime@0x10 all match). The
+/// pointer GetActionEffector returns is the head of a linked-list node whose extra id/next fields
+/// follow this struct; reading the effector itself uses these offsets.
 #[size(0x14), align(4)]
-pub type CInputDeviceEffector {
+pub type InputDeviceEffector {
     pub m_Value: f32, // analog value (trigger pressure, stick axis)
     pub m_PrevValue: f32,
     pub m_State: u32, // digital state
@@ -14,9 +14,9 @@ pub type CInputDeviceEffector {
     pub m_StateTime: f32,
 }
 
-// Maps action IDs to effector slots (255 action IDs total).
-pub type CInputActionMap;
-impl CInputActionMap {
+/// Maps action IDs to effector slots (255 action IDs total).
+pub type InputActionMap;
+impl InputActionMap {
     #[address(0x140_2F4_3B0)]
-    pub fn GetActionEffector(&mut self, action_id: i32, device_index: i32) -> *mut CInputDeviceEffector;
+    pub fn GetActionEffector(&mut self, action_id: i32, device_index: i32) -> *mut InputDeviceEffector;
 }

@@ -1,6 +1,6 @@
 /// HDR tone-mapping / auto-exposure (eye adaptation).
-pub type CToneMappingEffect;
-impl CToneMappingEffect {
+pub type ToneMappingEffect;
+impl ToneMappingEffect {
     /// Builds the auto-exposure histogram for the final scene and writes the current histogram slot
     /// indices to a6 / a7 (out-params); returns a7.
     #[address(0x140_119_440)]

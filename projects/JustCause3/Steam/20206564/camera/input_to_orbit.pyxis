@@ -19,7 +19,7 @@ impl InputToOrbitModifier {
     pub fn ProcessCameraContext(&mut self, pipeline: *mut CameraPipelineContext, previous: *const CameraContext, out: *mut CameraContext) -> f64;
 }
 
-// The camera arm/boom; the look delta rotates it.
+/// The camera arm/boom; the look delta rotates it.
 pub type BoomTransform;
 impl BoomTransform {
     /// Apply a (yaw, pitch, roll) delta-angle to the boom.

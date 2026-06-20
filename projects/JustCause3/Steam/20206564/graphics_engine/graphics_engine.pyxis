@@ -91,7 +91,7 @@ pub type HTexture_t;
 
 /// The per-view render context the render passes read: camera matrices (view, projection, the
 /// translation-free offset view-projection and the separate camera world position), shadow data and
-/// per-frame flags. Filled each dispatch by CRenderPass::SetRenderContextCamera.
+/// per-frame flags. Filled each dispatch by RenderPass::SetRenderContextCamera.
 pub type RenderContext;
 
 /// CGraphicsEngine::DrawThreadTaskParam

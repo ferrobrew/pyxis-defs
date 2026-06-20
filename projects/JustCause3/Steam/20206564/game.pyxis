@@ -26,20 +26,18 @@ pub type Game {
 impl Game {
     #[address(0x140_952_390)]
     pub fn Draw(&self, dt: f32);
-    // Top-level per-frame update (advances the sim and drives rendering). Returns false on exit.
-
+    /// Top-level per-frame update (advances the sim and drives rendering). Returns false on exit.
     #[address(0x140_960_4E0)]
     pub fn Update(&mut self) -> bool;
-    // Builds the per-frame update contexts and drives rendering.
-
+    /// Builds the per-frame update contexts and drives rendering.
     #[address(0x140_95A_4E0)]
     pub fn UpdateRender(&mut self, update_contexts: *mut UpdateContexts);
 }
 
 // Opaque engine context pointers carried by the per-frame update contexts.
-pub type CResourceCache;
+pub type ResourceCache;
 
-pub type CProjectContext;
+pub type ProjectContext;
 
 #[size(0x20), copyable]
 pub type GameObjectInitContext {
@@ -48,8 +46,8 @@ pub type GameObjectInitContext {
     pub m_RealDt: f32,
 
     #[address(0x10)]
-    pub m_ResourceCache: *const CResourceCache,
-    pub m_ProjectContext: *const CProjectContext,
+    pub m_ResourceCache: *const ResourceCache,
+    pub m_ProjectContext: *const ProjectContext,
 }
 
 #[size(0x20), copyable]
@@ -62,7 +60,7 @@ pub type GameObjectUpdateContext {
     pub m_Paused: bool,
 
     #[address(0x18)]
-    pub m_ProjectContext: *const CProjectContext,
+    pub m_ProjectContext: *const ProjectContext,
 }
 
 #[size(0x20), copyable]
@@ -74,7 +72,7 @@ pub type GameObjectRenderContext {
     pub m_RealDt: f32,
 
     #[address(0x18)]
-    pub m_ProjectContext: *const CProjectContext,
+    pub m_ProjectContext: *const ProjectContext,
 }
 
 #[size(0x60), copyable]

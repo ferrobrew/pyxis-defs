@@ -4,14 +4,12 @@ use types::math::Matrix4;
 #[singleton(0x142_ED0_E18), size(0x2220)]
 pub type RenderEngine;
 impl RenderEngine {
-    // Late render-pass step (finalizes / copies render targets under the context mutex).
-    // `context` is Graphics::HContext_t* (opaque).
-
+    /// Late render-pass step (finalizes / copies render targets under the context mutex).
     #[address(0x140_1C2_350)]
     pub fn PostDraw(&mut self, context: *const HContext_t);
 
     /// Draws every render block in the half-open pass-index range [first, last): for each pass it
-    /// walks the fixed CRenderPass* array at this + 32*pass + 128 and vtable-dispatches each block.
+    /// walks the fixed RenderPass* array at this + 32*pass + 128 and vtable-dispatches each block.
     /// GBuffer is 0x2F..0x55, the lighting/scene block 0x56..0x96, post-effects 0x96..0x97.
     #[address(0x140_186_600)]
     pub fn DrawRenderPassRange(&mut self, ctx: *mut HContext_t, setup: *mut HRenderSetup_t, first: u32, last: u32);
@@ -27,7 +25,7 @@ impl RenderEngine {
     pub fn Draw(&mut self, ctx: *mut HContext_t) -> u64;
 
     /// Post-effects pass: DrawRenderPassRange(0x96, 0x97) (the RP_POSTEFFECTS pass, whose block is
-    /// CRenderBlockPostEffects::Draw).
+    /// RenderBlockPostEffects::Draw).
     #[address(0x140_186_910)]
     pub fn DrawPosteffects(&mut self, ctx: *mut HContext_t, setup: *mut HRenderSetup_t);
 
@@ -37,7 +35,7 @@ impl RenderEngine {
     #[address(0x140_185_740)]
     pub fn SetGlobalShaderConstants(&mut self, ctx: *mut RenderContext);
 
-    /// Per-frame TAA jitter: forwards to CPostEffectsManager::ApplySubsampleJitter, which
+    /// Per-frame TAA jitter: forwards to PostEffectsManager::ApplySubsampleJitter, which
     /// post-multiplies a sub-pixel clip-space translation onto `proj` only when AA mode == 3.
     #[address(0x140_173_AA0)]
     pub fn ApplyJitterTransform(&mut self, proj: *mut Matrix4, width: i32, height: i32);

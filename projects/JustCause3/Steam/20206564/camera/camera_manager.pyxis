@@ -12,13 +12,11 @@ pub type CameraManager {
     pub m_AspectRatio: f32,
 }
 impl CameraManager {
-    // Sets the active camera's transform, writing both T0 and T1 to `mat` (so the subsequent
-    // interpolation is constant).
-
+    /// Sets the active camera's transform, writing both T0 and T1 to `mat` (so the subsequent
+    /// interpolation is constant).
     #[address(0x140_09D_390)]
     pub fn InitTransform(&mut self, mat: *const Matrix4);
-    // Sets the active camera's field of view (both T0 and T1).
-
+    /// Sets the active camera's field of view (both T0 and T1).
     #[address(0x140_09D_400)]
     pub fn InitFOV(&mut self, fov: f32);
 

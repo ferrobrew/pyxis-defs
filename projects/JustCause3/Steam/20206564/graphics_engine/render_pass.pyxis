@@ -7,7 +7,7 @@ use types::math::Matrix4;
 /// into the global overflow list. DoDraw reads min(m_ListSize, m_NumElements) entries and never
 /// writes m_NumElements, so a populated list can be redrawn any number of times.
 #[min_size(0x10)]
-pub type CRBILists {
+pub type RBILists {
     /// Array of 0x20-byte entries.
     pub m_List: *mut void,
     /// Capacity.
@@ -17,7 +17,7 @@ pub type CRBILists {
     #[address(0xC)]
     pub m_NumElements: u32,
 }
-impl CRBILists {
+impl RBILists {
     /// Appends one render-block-item; spills to the global overflow list on capacity overflow.
     #[address(0x140_11C_070)]
     pub fn Add(&mut self, a2: i32, block: *mut void, info: *mut void) -> u64;
@@ -29,9 +29,9 @@ impl CRBILists {
 #[address(0x142_ED0_FA0)]
 pub extern render_block_overflow_count: u32;
 
-pub type CRenderPass;
-impl CRenderPass {
-    /// Appends `count` render-block-items (`items`) to the active CRBILists draw/add lists (`a3`
+pub type RenderPass;
+impl RenderPass {
+    /// Appends `count` render-block-items (`items`) to the active RBILists draw/add lists (`a3`
     /// holds the lists). Static (no `this`). Called per batch, including from CPU fragment worker
     /// threads -- not once per frame. The argument list matters: it dereferences `a3 + 0x8038`.
     #[address(0x140_48C_4E0)]
@@ -67,7 +67,7 @@ pub fn CalculateOffsetViewProjectionMatrix(src: *const Matrix4, proj: *const Mat
 /// The per-frame render-block-item list rotation, run once in each `CGraphicsEngine::Draw`
 /// (0x1400F4170) prologue (its call site at 0x1400F4340 is mislabeled `CKeep1000Frames` in this
 /// binary's symbols). Toggles the global add/draw parity at `0x142ED7680`, then for every render
-/// pass swaps `m_CurrentAddList`/`m_CurrentDrawList` to the new parity (via `CRenderPass`'s vtable
+/// pass swaps `m_CurrentAddList`/`m_CurrentDrawList` to the new parity (via `RenderPass`'s vtable
 /// slot 3) and zeroes the new add-list's element count, and finally flushes the render-block-item
 /// overflow list. Static (no `this`); reads the render engine + parity from globals. This -- not the
 /// per-batch `SetupRenderFrameData` build above -- is the actual draw-list swap.
@@ -75,8 +75,8 @@ pub fn CalculateOffsetViewProjectionMatrix(src: *const Matrix4, proj: *const Mat
 pub fn RotateRenderFrameData();
 
 /// The per-frame constant-buffer ring.
-pub type CConstantBufferPool;
-impl CConstantBufferPool {
+pub type ConstantBufferPool;
+impl ConstantBufferPool {
     /// Recycles last frame's constant buffers from the in-use stack back to the free pool.
     #[address(0x140_0E0_4F0)]
     pub fn HandBackBuffers(&mut self);

@@ -1,7 +1,7 @@
 use camera::camera_context::CameraControlContext;
 
-// Root of the camera pipeline tree: flattens and weights the pipelines and runs their render
-// modifiers, populating the render contexts each frame. `ctx` is the CCameraControlContext.
+/// Root of the camera pipeline tree: flattens and weights the pipelines and runs their render
+/// modifiers, populating the render contexts each frame.
 pub type CameraTree;
 impl CameraTree {
     #[address(0x140_465_AD0)]
