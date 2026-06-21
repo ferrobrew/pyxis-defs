@@ -16,6 +16,7 @@ impl CameraManager {
     /// interpolation is constant).
     #[address(0x140_09D_390)]
     pub fn InitTransform(&mut self, mat: *const Matrix4);
+
     /// Sets the active camera's field of view (both T0 and T1).
     #[address(0x140_09D_400)]
     pub fn InitFOV(&mut self, fov: f32);

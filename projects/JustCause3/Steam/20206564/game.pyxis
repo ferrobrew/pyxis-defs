@@ -26,9 +26,11 @@ pub type Game {
 impl Game {
     #[address(0x140_952_390)]
     pub fn Draw(&self, dt: f32);
+
     /// Top-level per-frame update (advances the sim and drives rendering). Returns false on exit.
     #[address(0x140_960_4E0)]
     pub fn Update(&mut self) -> bool;
+
     /// Builds the per-frame update contexts and drives rendering.
     #[address(0x140_95A_4E0)]
     pub fn UpdateRender(&mut self, update_contexts: *mut UpdateContexts);

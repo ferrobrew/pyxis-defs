@@ -8,9 +8,11 @@ pub type SHistogramGeneration {
     /// at or above the bucket's threshold. Only the first m_NumBuckets entries are live.
     #[address(0x190)]
     pub m_NumPixelsInBuckets: [u32; 64],
+
     /// Bright-point computed from the buckets; drives the exposure target.
     #[address(0x290)]
     pub m_HistogramBrightPoint: f32,
+
     /// Mid-point computed from the buckets.
     #[address(0x294)]
     pub m_HistogramMidPoint: f32,
@@ -22,17 +24,21 @@ pub type ToneMappingEffect {
     /// The exposure histogram: CalculateMidAndBrightPointForHistogram fills it, Update reads it.
     #[address(0x8)]
     pub m_Histogram: SHistogramGeneration,
+
     /// Ping-pong selector for the exposure-weighted histogram metering, flipped each frame by Update.
     #[address(0x2A0)]
     pub m_HistogramPingPong: u32,
+
     /// A second histogram, processed by Update's second CalculateMidAndBrightPointForHistogram call.
     /// Its m_HistogramMidPoint is the divisor of the auto-exposure target (target = key / midpoint),
     /// so this -- not m_Histogram -- is what the converged m_CurrentExposure actually tracks.
     #[address(0x2A8)]
     pub m_Histogram2: SHistogramGeneration,
+
     /// The active histogram bucket count.
     #[address(0x578)]
     pub m_NumBuckets: u32,
+
     /// The current clamped/smoothed auto-exposure multiplier. Written by Update once per frame and
     /// read back into the next frame's GenerateHistogramForFinalScene metering (the feedback loop).
     #[address(0xBF0)]

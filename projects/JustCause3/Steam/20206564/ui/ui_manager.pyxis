@@ -36,12 +36,14 @@ impl RenderTargetData {
 #[singleton(0x142_E5B_620), size(0x1490)]
 pub type UIManager {
     /// The Scaleform RenderBuffer the UI HAL renders into (set up by InitPlatformRT).
-    #[address(0x1390)]
+    #[address(0x1_390)]
     pub m_RenderBuffer: *mut void,
+
     /// Viewport width / height the world-to-screen mapping (Convert3DCoords) maps NDC into.
-    #[address(0x1484)]
+    #[address(0x1_484)]
     pub m_ViewWidth: f32,
-    #[address(0x1488)]
+
+    #[address(0x1_488)]
     pub m_ViewHeight: f32,
 }
 impl UIManager {

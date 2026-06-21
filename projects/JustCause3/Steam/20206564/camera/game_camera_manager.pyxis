@@ -13,12 +13,15 @@ impl GameCameraManager {
     /// sets the audio listener, applies the jitter filter, and calls CameraManager InitTransform/InitFOV.
     #[address(0x140_7EC_B00)]
     pub fn PushRenderContext(&mut self);
+
     /// Reads the action-effector inputs into m_TransformedGamepadInput.
     #[address(0x140_7FF_F90)]
     pub fn UpdateBlackboardValues(&mut self, pipeline: *const CameraPipeline, dt: f32);
+
     /// True when the currently selected camera in the director stack has the cinematic flag set.
     #[address(0x140_75C_850)]
     pub fn IsInCinematicCamera(&self) -> bool;
+
     /// True when the alternate-aim (ADS) transform is in use.
     #[address(0x140_75C_820)]
     pub fn IsAlternateAimTransformUsed(&self) -> bool;

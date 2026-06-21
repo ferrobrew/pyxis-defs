@@ -10,9 +10,11 @@ use types::math::Matrix4;
 pub type RBILists {
     /// Array of 0x20-byte entries.
     pub m_List: *mut void,
+
     /// Capacity.
     #[address(0x8)]
     pub m_ListSize: u16,
+
     /// Live element count (volatile).
     #[address(0xC)]
     pub m_NumElements: u32,

@@ -16,6 +16,7 @@ impl PlayerAimControl {
     /// returns CMatrix4f by value (sret: `result` out-param, also returned in rax).
     #[address(0x140_C3E_510)]
     pub fn GetAdjustedCameraMatrix(result: *mut Matrix4, weapon: *mut WeaponBase) -> *mut Matrix4;
+
     /// Raycasts from the camera position along camera-forward to determine the aim target.
     #[address(0x140_CE5_350)]
     pub fn UpdateDirectAim(&mut self);

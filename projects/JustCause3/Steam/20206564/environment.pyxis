@@ -9,8 +9,10 @@ pub type WorldTime {
     /// write here propagates to lighting.
     #[address(0x80)]
     pub m_CurrentTimeOfDay: f32,
+
     #[address(0x84)]
     pub m_PauseTimeOfDay: f32,
+
     #[address(0x88)]
     pub m_SpeedMultiplicator: f32,
 }
@@ -26,9 +28,11 @@ pub type Weather {
     /// 0..1 snow blend. From the dump's struct layout; not instruction-verified.
     #[address(0x1C)]
     pub m_SnowRatio: f32,
+
     /// 0..1 rain intensity. From the dump's struct layout; not instruction-verified.
     #[address(0x20)]
     pub m_RainIntensity: f32,
+
     /// Storm severity, ~0.1 clear .. ~4.0 full storm.
     #[address(0x1E8)]
     pub m_Severity: f32,
@@ -39,11 +43,14 @@ impl Weather {
     /// or a named weather event holds it -- fire an event (see WeatherController) to pin a state.
     #[address(0x140_3A2_290)]
     pub fn SetSeverity(&mut self, severity: f32);
+
     /// Smoothly drive severity toward `target` over `update_time` seconds.
     #[address(0x140_3A1_F90)]
     pub fn UpdateSeverityTarget(&mut self, update_time: f32, target: f32);
+
     #[address(0x140_3A2_250)]
     pub fn SetWeatherTime(&mut self, time: f32);
+
     #[address(0x140_3A2_240)]
     pub fn GetWeatherTime(&self) -> f32;
 }
