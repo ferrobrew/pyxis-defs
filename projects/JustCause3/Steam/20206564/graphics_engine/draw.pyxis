@@ -1,15 +1,32 @@
 use graphics_engine::graphics_engine::HContext_t;
 
+/// Primitive topology passed to the draw wrappers (Graphics::EPrimitiveType). Patchlists 0x21-0x24
+/// are tessellation control-point counts.
+#[copyable]
+pub enum PrimitiveType: i32 {
+    PRIMTYPE_POINTLIST = 0x1,
+    PRIMTYPE_LINES = 0x2,
+    PRIMTYPE_LINE_STRIP = 0x3,
+    PRIMTYPE_TRIANGLES = 0x4,
+    PRIMTYPE_TRIANGLE_STRIP = 0x5,
+    PRIMTYPE_LINE_LOOP = 0x6,
+    PRIMTYPE_TRIANGLE_FAN = 0x7,
+    PRIMTYPE_PATCHLIST_1 = 0x21,
+    PRIMTYPE_PATCHLIST_2 = 0x22,
+    PRIMTYPE_PATCHLIST_3 = 0x23,
+    PRIMTYPE_PATCHLIST_4 = 0x24,
+}
+
 // The engine's universal draw-call wrappers: every render block issues its geometry through one of
 // these at the end of its Draw (see CRenderBlockGeneralJC3::Draw 0x1401426E0).
 
 /// Indexed draw (`Graphics::DrawIndexed`).
 #[address(0x141_967_720)]
-pub fn DrawIndexed(ctx: *mut HContext_t, prim: i32, arg2: i32, arg3: i32, vbuf: *mut void, ibuf: *mut void);
+pub fn DrawIndexed(ctx: *mut HContext_t, prim: PrimitiveType, arg2: i32, arg3: i32, vbuf: *mut void, ibuf: *mut void);
 
 /// Non-indexed draw (`Graphics::Draw`).
 #[address(0x141_967_680)]
-pub fn Draw(ctx: *mut HContext_t, prim: i32, arg2: i32, arg3: i32);
+pub fn Draw(ctx: *mut HContext_t, prim: PrimitiveType, arg2: i32, arg3: i32);
 
 // Instanced / indirect draws and compute dispatches. The demangled symbols for these misreport
 // their argument counts AND types (the disassembly disagrees -- e.g. DrawInstanced's 2nd argument
@@ -58,3 +75,13 @@ pub fn CopySurfaceToTexture(ctx: *mut HContext_t, dst: *mut void, src: *mut void
 /// Resolve an MSAA surface.
 #[address(0x141_967_2B0)]
 pub fn ResolveSurface(ctx: *mut HContext_t, params: *mut void);
+
+// Surface RTV / DSV accessors (the render-target / depth-stencil views a device surface owns).
+
+/// Returns the surface's render-target view (`*(surface + 0x18)`).
+#[address(0x141_956_240)]
+pub fn GetRTVFromSurface(surface: *mut void) -> *mut void;
+
+/// Returns the surface's depth-stencil view (`*(surface + 0x20)`).
+#[address(0x141_956_250)]
+pub fn GetDSVFromSurface(surface: *mut void) -> *mut void;

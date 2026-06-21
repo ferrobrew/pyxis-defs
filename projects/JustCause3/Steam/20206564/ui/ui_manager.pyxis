@@ -1,6 +1,36 @@
 use graphics_engine::graphics_engine::HContext_t;
 use types::math::{Vector2, Vector3, Matrix4};
 
+/// Screen-position code returned by the UI world-to-screen / marker placement: 0 = on-screen, 1-8 =
+/// off-screen clamped edge/corner, 9 = off-screen in front (no clamp), 10 = off-screen behind.
+#[copyable]
+pub enum ScreenPos: u32 {
+    SCREEN_POS_ONSCREEN = 0x0,
+    SCREEN_POS_OFFSCREEN_LEFT = 0x1,
+    SCREEN_POS_OFFSCREEN_RIGHT = 0x2,
+    SCREEN_POS_OFFSCREEN_TOP = 0x3,
+    SCREEN_POS_OFFSCREEN_BOTTOM = 0x4,
+    SCREEN_POS_OFFSCREEN_TOP_LEFT = 0x5,
+    SCREEN_POS_OFFSCREEN_TOP_RIGHT = 0x6,
+    SCREEN_POS_OFFSCREEN_BOTTOM_LEFT = 0x7,
+    SCREEN_POS_OFFSCREEN_BOTTOM_RIGHT = 0x8,
+    SCREEN_POS_OFFSCREEN_NO_CLAMP_IN_FRONT_CAMERA = 0x9,
+    SCREEN_POS_OFFSCREEN_NO_CLAMP_BEHIND_CAMERA = 0xA,
+}
+
+/// Scaleform render-target binding. The UI's m_RenderBuffer points at one of these; UpdateData
+/// swaps the views it holds (RTV @ +0x20, DSV @ +0x28, depth buffer @ +0x08), refcounting them.
+/// Pointing it at an offscreen RTV redirects where the UI HAL renders. Not tied to startup, so the
+/// rebind can happen at any time.
+pub type RenderTargetData;
+impl RenderTargetData {
+    /// Binds the views into this RenderTargetData (RTV @ +0x20, DSV @ +0x28, depth @ +0x08),
+    /// releasing the old ones and AddRef-ing the new. `self` is the inner RenderTargetData at
+    /// `*(render_buffer + 0x20)`.
+    #[address(0x141_DE0_CF0)]
+    pub fn UpdateData(&mut self, rtv: *mut void, depth: *mut void, dsv: *mut void);
+}
+
 /// Scaleform-backed UI manager (the concrete class behind IUIManager; a single instance). It renders
 /// the HUD into the engine surface; InitPlatformRT rebinds its render target.
 #[singleton(0x142_E5B_620), size(0x1490)]
@@ -22,6 +52,11 @@ impl UIManager {
     #[address(0x140_F69_6E0)]
     pub fn InitPlatformRT(&mut self, a2: i32);
 
+    /// Re-runs InitPlatformRT after a device/resolution reset (`a2` is the new width; the dimensions
+    /// otherwise track the engine surface).
+    #[address(0x140_FA9_C70)]
+    pub fn RestoreAfterReset(&mut self, a2: i32);
+
     /// World-to-screen: project `world` through `vp`, divide by w, aspect-correct, and map NDC to
     /// pixels (m_ViewWidth/Height). Returns false when the point is behind the camera.
     #[address(0x140_F69_A70)]
@@ -30,12 +65,12 @@ impl UIManager {
     /// Marker placement: Convert3DCoords with the supplied `vp`, plus an on-screen test and an
     /// off-screen edge-clamp (ClampToScreen). Gameplay markers route through here.
     #[address(0x140_F69_CB0)]
-    pub fn Get2DInfo(&self, world: *const Vector3, vp: *const Matrix4, camera: *const Matrix4, a5: f32, out_x: *mut f32, out_y: *mut f32, out_pos: *mut u32, margin: f32, a10: bool, offset: Vector2);
+    pub fn Get2DInfo(&self, world: *const Vector3, vp: *const Matrix4, camera: *const Matrix4, a5: f32, out_x: *mut f32, out_y: *mut f32, out_pos: *mut ScreenPos, margin: f32, a10: bool, offset: Vector2);
 
     /// Clamp an off-screen point to the screen-rect edge/corner (atan2 against the corners) and set
     /// the position code. Static.
     #[address(0x140_F47_0A0)]
-    pub fn ClampToScreen(x: *mut f32, y: *mut f32, pos: *mut u32, min_x: f32, max_x: f32, min_y: f32, max_y: f32);
+    pub fn ClampToScreen(x: *mut f32, y: *mut f32, pos: *mut ScreenPos, min_x: f32, max_x: f32, min_y: f32, max_y: f32);
 
     /// Begin the UI render job (post to the async render thread).
     #[address(0x140_F1B_030)]

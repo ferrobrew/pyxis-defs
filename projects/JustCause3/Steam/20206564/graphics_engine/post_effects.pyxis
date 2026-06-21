@@ -1,6 +1,16 @@
 use graphics_engine::graphics_engine::{HContext_t, HRenderSetup_t, HTexture_t, RenderContext};
 use types::math::Matrix4;
 
+/// Anti-aliasing resolve mode (AntiAliasingEffect::m_Mode).
+#[copyable]
+pub enum AAMode: i32 {
+    AA_NONE = 0x0,
+    AA_FXAA_COMPUTE = 0x1,
+    AA_SMAA = 0x2,
+    AA_SMAA_T2X = 0x3,
+    AA_FXAA = 0x4,
+}
+
 // Fullscreen post-process effects. Both do a screen-space reprojection (DoF via an inverse
 // view-projection; MotionBlur via an unconditional velocity-composite draw) whose per-frame-once
 // state is only valid for one camera -- so on a second (stereo) render they paint a sub-region.
@@ -136,7 +146,7 @@ impl SunHaloEffect {
 #[min_size(0x308)]
 pub type AntiAliasingEffect {
     #[address(0x300)]
-    pub m_Mode: i32,
+    pub m_Mode: AAMode,
 }
 impl AntiAliasingEffect {
     /// `slot` is the in/out post-effect result-slot index.

@@ -27,6 +27,7 @@ pub type Texture {
     pub m_Width: u16,
     pub m_Height: u16,
 
+    /// DXGI_FORMAT (e.g. 28 = R8G8B8A8_UNORM).
     #[address(0x3C)]
     pub m_Format: u32,
 }

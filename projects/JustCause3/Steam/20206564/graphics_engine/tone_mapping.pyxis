@@ -23,13 +23,17 @@ pub type ToneMappingEffect {
     /// The active histogram bucket count.
     #[address(0x578)]
     pub m_NumBuckets: u32,
-    /// The current clamped/smoothed auto-exposure multiplier.
+    /// The current clamped/smoothed auto-exposure multiplier. Written by Update once per frame and
+    /// read back into the next frame's GenerateHistogramForFinalScene metering (the feedback loop).
     #[address(0xBF0)]
     pub m_CurrentExposure: f32,
 }
 impl ToneMappingEffect {
     /// Builds the auto-exposure histogram for the final scene and writes the current histogram slot
-    /// indices to a6 / a7 (out-params); returns a7.
+    /// indices to a6 / a7 (out-params); returns a7. Meters luminance through a
+    /// "LuminanceToDepthWithExposure" shader fed the previous frame's m_CurrentExposure as a
+    /// constant, so metering is exposure-weighted -- the histogram feeds back into the exposure that
+    /// weights the next frame's metering (via CalculateMidAndBrightPointForHistogram and Update).
     #[address(0x140_119_440)]
     pub fn GenerateHistogramForFinalScene(&mut self, ctx: *mut void, a3: *mut void, a4: *mut void, a5: i32, a6: *mut u32, a7: *mut u32) -> *mut u32;
 
@@ -37,6 +41,11 @@ impl ToneMappingEffect {
     /// the HDR MainColor into the LDR target.
     #[address(0x140_119_8F0)]
     pub fn DrawHistogramWindow(&self, ctx: *mut void, pec: *mut void, mgr: *mut void);
+
+    /// The per-frame eye-adaptation step: reads the histogram bright-point and writes the new
+    /// m_CurrentExposure. Runs once per real frame (from the post-effects manager's render update).
+    #[address(0x140_119_560)]
+    pub fn Update(&mut self);
 }
 
 /// N-frame exposure smoother (a ring-buffer average; advances once per render, with no dt term).
