@@ -1,3 +1,5 @@
+use graphics_engine::post_effects::PostEffectContext;
+
 /// Per-frame brightness histogram used for eye adaptation. Embedded in ToneMappingEffect at +8; its
 /// occlusion-query bucket counts are what the exposure read-back consumes.
 #[min_size(0x298)]
@@ -20,6 +22,14 @@ pub type ToneMappingEffect {
     /// The exposure histogram: CalculateMidAndBrightPointForHistogram fills it, Update reads it.
     #[address(0x8)]
     pub m_Histogram: SHistogramGeneration,
+    /// Ping-pong selector for the exposure-weighted histogram metering, flipped each frame by Update.
+    #[address(0x2A0)]
+    pub m_HistogramPingPong: u32,
+    /// A second histogram, processed by Update's second CalculateMidAndBrightPointForHistogram call.
+    /// Its m_HistogramMidPoint is the divisor of the auto-exposure target (target = key / midpoint),
+    /// so this -- not m_Histogram -- is what the converged m_CurrentExposure actually tracks.
+    #[address(0x2A8)]
+    pub m_Histogram2: SHistogramGeneration,
     /// The active histogram bucket count.
     #[address(0x578)]
     pub m_NumBuckets: u32,
@@ -37,15 +47,19 @@ impl ToneMappingEffect {
     #[address(0x140_119_440)]
     pub fn GenerateHistogramForFinalScene(&mut self, ctx: *mut void, a3: *mut void, a4: *mut void, a5: i32, a6: *mut u32, a7: *mut u32) -> *mut u32;
 
-    /// The HDR->LDR tonemap composite: applies the current exposure (from the histogram) to convert
-    /// the HDR MainColor into the LDR target.
+    /// Meters the second, NON-exposure-weighted scene-luminance histogram (m_Histogram2) -- it calls
+    /// PopulateHistogram with a fixed exposure of 1.0, so it measures raw scene brightness, which is
+    /// the value Update divides the auto-exposure target by. Runs once per dispatch in the post chain,
+    /// like GenerateHistogramForFinalScene (which meters the exposure-weighted m_Histogram).
     #[address(0x140_119_8F0)]
-    pub fn DrawHistogramWindow(&self, ctx: *mut void, pec: *mut void, mgr: *mut void);
+    pub fn DrawHistogramWindow(&self, ctx: *mut void, pec: *mut void, mgr: *mut void, index: u32);
 
-    /// The per-frame eye-adaptation step: reads the histogram bright-point and writes the new
-    /// m_CurrentExposure. Runs once per real frame (from the post-effects manager's render update).
+    /// The per-frame eye-adaptation step: runs CalculateMidAndBrightPointForHistogram over both
+    /// histograms, then writes the new m_CurrentExposure (target = ctx.m_AutoExposureKey /
+    /// m_Histogram2 midpoint, clamped, then adapted). Runs once per real frame from
+    /// CPostEffectsManager::UpdateRender.
     #[address(0x140_119_560)]
-    pub fn Update(&mut self);
+    pub fn Update(&mut self, manager: *mut void, ctx: *mut PostEffectContext);
 }
 
 /// N-frame exposure smoother (a ring-buffer average; advances once per render, with no dt term).

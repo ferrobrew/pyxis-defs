@@ -32,6 +32,10 @@ pub type PostEffectRenderContext {
 
 pub type PostEffectContext {
     pub m_RenderContext: *mut PostEffectRenderContext,
+    /// The auto-exposure target numerator ("key"): ToneMappingEffect::Update sets the exposure target
+    /// to this divided by the raw-brightness histogram mid-point.
+    #[address(0x9C)]
+    pub m_AutoExposureKey: f32,
 }
 
 pub type PostEffectsManager;
