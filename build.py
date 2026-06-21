@@ -292,6 +292,43 @@ def check_rust_build(
     return check.returncode == 0
 
 
+def check_cpp_build(input_dir: Path, work_dir: Path) -> Optional[bool]:
+    """Generate a project's C++ output and build it with CMake. The build
+    toolchain is the environment's responsibility (vanilla MSVC on Windows,
+    or clang-cl + xwin on Linux); point at one per architecture via
+    `PYXIS_CHECK_CMAKE_TOOLCHAIN_X86` / `_X64`. Returns None (skipped) when no
+    toolchain is configured for the project's architecture and the host can't
+    build MSVC C++ on its own."""
+    pointer_size = read_pointer_size(input_dir / "pyxis.toml")
+    arch = "X86" if pointer_size == 4 else "X64"
+    toolchain = os.environ.get(f"PYXIS_CHECK_CMAKE_TOOLCHAIN_{arch}")
+    if toolchain is None and platform.system() != "Windows":
+        print(f"  (skipped: no PYXIS_CHECK_CMAKE_TOOLCHAIN_{arch} and host isn't Windows)")
+        return None
+
+    out_dir = work_dir / "out"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    gen = subprocess.run(
+        ["pyxis", "build", "--backend", "cpp", str(input_dir), str(out_dir) + "/"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
+    if gen.returncode != 0:
+        print(gen.stderr, file=sys.stderr, end="")
+        return False
+
+    build_dir = work_dir / "build"
+    configure = ["cmake", "-S", str(out_dir), "-B", str(build_dir), "-DCMAKE_BUILD_TYPE=Release"]
+    if toolchain:
+        configure.append(f"-DCMAKE_TOOLCHAIN_FILE={toolchain}")
+    # The xwin toolchains read XWIN_ROOT; forward it if the environment set it.
+    if os.environ.get("XWIN_ROOT"):
+        configure.append(f"-DXWIN_ROOT={os.environ['XWIN_ROOT']}")
+    if subprocess.run(configure).returncode != 0:
+        return False
+    built = subprocess.run(["cmake", "--build", str(build_dir), "--parallel"])
+    return built.returncode == 0
+
+
 def check_all_builds(repo_root: Path, backends: List[str]) -> None:
     """Compile-check the generated output for every project. Exits non-zero
     if any project fails to build."""
@@ -313,6 +350,11 @@ def check_all_builds(repo_root: Path, backends: List[str]) -> None:
                 work_dir = tmp_path / f"{name}-rust"
                 if not check_rust_build(rel_path, input_dir, work_dir, target_dir):
                     failures.append(f"{name} (rust)")
+            if "cpp" in backends:
+                print(f"== checking C++ build: {name} ==")
+                work_dir = tmp_path / f"{name}-cpp"
+                if check_cpp_build(input_dir, work_dir) is False:
+                    failures.append(f"{name} (cpp)")
 
     if failures:
         print("\nBuild check failures:", file=sys.stderr)
