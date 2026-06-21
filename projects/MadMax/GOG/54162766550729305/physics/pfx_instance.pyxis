@@ -1,8 +1,6 @@
 use physics::pfx_game_object::PfxGameObject;
 use types::{math::Vector3, shared_ptr::{SharedPtr, WeakPtr}};
 
-backend rust prologue "use crate::shared_ptr::*;";
-
 #[copyable, cloneable]
 pub enum PfxID: u32 {
     Generic = 0,

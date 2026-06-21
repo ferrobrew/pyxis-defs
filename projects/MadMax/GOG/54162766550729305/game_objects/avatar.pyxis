@@ -1,8 +1,6 @@
 use game_objects::character::Character;
 use types::shared_ptr::WeakPtr;
 
-backend rust prologue "use crate::{math::Matrix4, shared_ptr::*};";
-
 #[size(0x58), align(8)]
 pub type Avatar {
     vftable {

@@ -1,7 +1,5 @@
 use types::hash_string::HashString;
 
-backend rust prologue "use crate::HashString;";
-
 #[singleton(0x141_715_B58), size(0x17A088)]
 pub type EventSystem {
     vftable {},
@@ -19,7 +17,7 @@ pub type EventID {
 
 backend rust epilogue r#"
     impl EventID {
-        pub fn new(hash: HashString, namespace: HashString) -> Self {
+        pub fn new(hash: crate::hash_string::HashString, namespace: crate::hash_string::HashString) -> Self {
             Self {
                 hash,
                 namespace
