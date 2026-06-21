@@ -2,8 +2,6 @@ use game_objects::{character::CharacterBase, physics_game_object::PhysicsGameObj
 use physics::pfx_instance::PfxInstance;
 use types::shared_ptr::{SharedPtr, WeakPtr};
 
-backend rust prologue "use crate::{CharacterBase, SharedPtr, WeakPtr};";
-
 pub type CharacterController;
 
 pub type SmartObjectAction;

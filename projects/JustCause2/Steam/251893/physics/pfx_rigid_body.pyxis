@@ -1,8 +1,6 @@
 use physics::{havok::rigid_body::HkpRigidBody, pfx_instance::{PfxInstance, PfxInstanceInterface}};
 use types::{math::{Matrix4, Vector3}, shared_ptr::SharedPtr};
 
-backend rust prologue "use crate::shared_ptr::*;";
-
 backend cpp {
     use types::shared_ptr::SharedPtr;
     use physics::havok::rigid_body::HkpRigidBody;
@@ -75,7 +73,7 @@ backend rust epilogue r#"
         pub unsafe fn new(rigid_body: *mut crate::havok::rigid_body::HkpRigidBody) -> std::pin::Pin<std::boxed::Box<Self>> {
             unsafe {
                 let mut instance = std::boxed::Box::pin(std::mem::zeroed::<Self>());
-                instance.constructor(rigid_body, &SharedPtr::<u32>::new(), false, 0);
+                instance.constructor(rigid_body, &crate::SharedPtr::<u32>::new(), false, 0);
                 instance
             }
         }

@@ -2,8 +2,6 @@ use game_objects::{damageable::Damageable, game_object::GameObject, smart_object
 use physics::pfx_instance::PfxInstance;
 use types::{math::{Aabb, Vector3}, shared_ptr::WeakPtr};
 
-backend rust prologue "use crate::{GameObject, SharedPtr, SmartObject, WeakPtr, PfxVehicle};";
-
 #[copyable, cloneable]
 pub enum LightEffect: u32 {
     LeftBlinker,
@@ -129,11 +127,11 @@ impl Vehicle {
 
 backend rust epilogue r#"
     pub trait VehicleMutExt {
-        unsafe fn get_pfx_vehicle(&mut self) -> SharedPtr<PfxVehicle>;
+        unsafe fn get_pfx_vehicle(&mut self) -> crate::SharedPtr<crate::PfxVehicle>;
     }
-    impl<T: std::convert::AsMut<Vehicle>> VehicleMutExt for T {
-        unsafe fn get_pfx_vehicle(&mut self) -> SharedPtr<PfxVehicle> {
-            unsafe { (*self.as_mut().get_pfx_instance()).instance.clone().static_pointer_cast::<PfxVehicle>() }
+    impl<T: std::convert::AsMut<crate::game_objects::vehicle::Vehicle>> VehicleMutExt for T {
+        unsafe fn get_pfx_vehicle(&mut self) -> crate::SharedPtr<crate::PfxVehicle> {
+            unsafe { (*self.as_mut().get_pfx_instance()).instance.clone().static_pointer_cast::<crate::PfxVehicle>() }
         }
     }
 "#;

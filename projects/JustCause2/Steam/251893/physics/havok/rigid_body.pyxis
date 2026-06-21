@@ -1,9 +1,5 @@
 use physics::havok::{math::{HkMatrix3, HkVector4}, referenced_object::HkReferencedObject};
 
-backend rust prologue "use crate::havok::memory::HkMemoryClass;";
-
-backend rust prologue "use crate::havok::referenced_object::{HkReferencedObject, HkReferencedObjectInstance};";
-
 backend cpp prologue r#"
 #include "physics/havok/memory.hpp"
 #include "physics/havok/referenced_object.hpp"
@@ -94,18 +90,18 @@ impl HkpRigidBody {
 }
 
 backend rust epilogue r#"
-    unsafe impl HkReferencedObjectInstance for HkpRigidBody {
+    unsafe impl crate::havok::HkReferencedObjectInstance for HkpRigidBody {
         type ConstructorArgs = *mut HkpRigidBodyCInfo;
         fn allocation_size() -> u32 {
             std::mem::size_of::<Self>() as u32
         }
-        fn memory_class() -> HkMemoryClass {
-            HkMemoryClass::Entity
+        fn memory_class() -> crate::havok::HkMemoryClass {
+            crate::havok::HkMemoryClass::Entity
         }
-        fn as_referenced_object(&self) -> &HkReferencedObject {
+        fn as_referenced_object(&self) -> &crate::havok::HkReferencedObject {
             &self.referenced_object
         }
-        fn as_referenced_object_mut(&mut self) -> &mut HkReferencedObject {
+        fn as_referenced_object_mut(&mut self) -> &mut crate::havok::HkReferencedObject {
             &mut self.referenced_object
         }
         #[allow(clippy::not_unsafe_ptr_arg_deref)]
@@ -178,18 +174,18 @@ impl HkpBoxShape {
 }
 
 backend rust epilogue r#"
-    unsafe impl HkReferencedObjectInstance for HkpBoxShape {
+    unsafe impl crate::havok::HkReferencedObjectInstance for HkpBoxShape {
         type ConstructorArgs = (*const crate::havok::math::HkVector4, f32);
         fn allocation_size() -> u32 {
             std::mem::size_of::<Self>() as u32
         }
-        fn memory_class() -> HkMemoryClass {
-            HkMemoryClass::CdInfo
+        fn memory_class() -> crate::havok::HkMemoryClass {
+            crate::havok::HkMemoryClass::CdInfo
         }
-        fn as_referenced_object(&self) -> &HkReferencedObject {
+        fn as_referenced_object(&self) -> &crate::havok::HkReferencedObject {
             &self.shape.referenced_object
         }
-        fn as_referenced_object_mut(&mut self) -> &mut HkReferencedObject {
+        fn as_referenced_object_mut(&mut self) -> &mut crate::havok::HkReferencedObject {
             &mut self.shape.referenced_object
         }
         fn construct(&mut self, args: Self::ConstructorArgs) {
@@ -252,18 +248,18 @@ impl HkpSphereShape {
 }
 
 backend rust epilogue r#"
-    unsafe impl HkReferencedObjectInstance for HkpSphereShape {
+    unsafe impl crate::havok::HkReferencedObjectInstance for HkpSphereShape {
         type ConstructorArgs = f32;
         fn allocation_size() -> u32 {
             std::mem::size_of::<Self>() as u32
         }
-        fn memory_class() -> HkMemoryClass {
-            HkMemoryClass::CdInfo
+        fn memory_class() -> crate::havok::HkMemoryClass {
+            crate::havok::HkMemoryClass::CdInfo
         }
-        fn as_referenced_object(&self) -> &HkReferencedObject {
+        fn as_referenced_object(&self) -> &crate::havok::HkReferencedObject {
             &self.shape.referenced_object
         }
-        fn as_referenced_object_mut(&mut self) -> &mut HkReferencedObject {
+        fn as_referenced_object_mut(&mut self) -> &mut crate::havok::HkReferencedObject {
             &mut self.shape.referenced_object
         }
         fn construct(&mut self, args: Self::ConstructorArgs) {
@@ -325,18 +321,18 @@ impl HkpCapsule {
 }
 
 backend rust epilogue r#"
-    unsafe impl HkReferencedObjectInstance for HkpCapsule {
+    unsafe impl crate::havok::HkReferencedObjectInstance for HkpCapsule {
         type ConstructorArgs = (*const crate::havok::math::HkVector4, *const crate::havok::math::HkVector4, f32);
         fn allocation_size() -> u32 {
             std::mem::size_of::<Self>() as u32
         }
-        fn memory_class() -> HkMemoryClass {
-            HkMemoryClass::CdInfo
+        fn memory_class() -> crate::havok::HkMemoryClass {
+            crate::havok::HkMemoryClass::CdInfo
         }
-        fn as_referenced_object(&self) -> &HkReferencedObject {
+        fn as_referenced_object(&self) -> &crate::havok::HkReferencedObject {
             &self.shape.referenced_object
         }
-        fn as_referenced_object_mut(&mut self) -> &mut HkReferencedObject {
+        fn as_referenced_object_mut(&mut self) -> &mut crate::havok::HkReferencedObject {
             &mut self.shape.referenced_object
         }
         fn construct(&mut self, args: Self::ConstructorArgs) {
@@ -399,18 +395,18 @@ impl HkpCylinderShape {
 }
 
 backend rust epilogue r#"
-    unsafe impl HkReferencedObjectInstance for HkpCylinderShape {
+    unsafe impl crate::havok::HkReferencedObjectInstance for HkpCylinderShape {
         type ConstructorArgs = (*const crate::havok::math::HkVector4, *const crate::havok::math::HkVector4, f32, f32);
         fn allocation_size() -> u32 {
             std::mem::size_of::<Self>() as u32
         }
-        fn memory_class() -> HkMemoryClass {
-            HkMemoryClass::CdInfo
+        fn memory_class() -> crate::havok::HkMemoryClass {
+            crate::havok::HkMemoryClass::CdInfo
         }
-        fn as_referenced_object(&self) -> &HkReferencedObject {
+        fn as_referenced_object(&self) -> &crate::havok::HkReferencedObject {
             &self.shape.referenced_object
         }
-        fn as_referenced_object_mut(&mut self) -> &mut HkReferencedObject {
+        fn as_referenced_object_mut(&mut self) -> &mut crate::havok::HkReferencedObject {
             &mut self.shape.referenced_object
         }
         fn construct(&mut self, args: Self::ConstructorArgs) {

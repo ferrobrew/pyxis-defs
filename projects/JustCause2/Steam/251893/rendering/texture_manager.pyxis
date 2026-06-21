@@ -1,7 +1,5 @@
 use types::{std_string::StdString, shared_ptr::SharedPtr};
 
-backend rust prologue "use crate::shared_ptr::*;";
-
 #[singleton(0x1_190_B50)]
 pub type TextureManager {
     vftable {

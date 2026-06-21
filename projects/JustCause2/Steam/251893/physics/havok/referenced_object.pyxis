@@ -1,7 +1,3 @@
-backend rust prologue "use crate::havok::memory::{get_hk_thread_memory_tls_index, HkThreadMemory, HkMemoryClass};";
-
-backend rust prologue "use windows::Win32::System::Threading::TlsGetValue;";
-
 #[size(0x8)]
 pub type HkReferencedObject {
     /// Packed allocation size + flags. Low 15 bits are the chunk size
@@ -43,7 +39,7 @@ backend rust epilogue r#"
     pub unsafe trait HkReferencedObjectInstance {
         type ConstructorArgs;
         fn allocation_size() -> u32;
-        fn memory_class() -> HkMemoryClass;
+        fn memory_class() -> crate::havok::memory::HkMemoryClass;
         fn as_referenced_object(&self) -> &HkReferencedObject;
         fn as_referenced_object_mut(&mut self) -> &mut HkReferencedObject;
         fn construct(&mut self, args: Self::ConstructorArgs);
@@ -53,7 +49,7 @@ backend rust epilogue r#"
     impl<T: HkReferencedObjectInstance> HkRefCounted<T> {
         pub unsafe fn new(args: T::ConstructorArgs) -> Self {
             unsafe {
-                let thread_memory = &mut *(TlsGetValue(*get_hk_thread_memory_tls_index()) as *mut HkThreadMemory);
+                let thread_memory = &mut *(windows::Win32::System::Threading::TlsGetValue(*crate::havok::memory::get_hk_thread_memory_tls_index()) as *mut crate::havok::memory::HkThreadMemory);
                 let instance = std::mem::transmute::<*mut std::ffi::c_void, *mut T>(
                     thread_memory.allocate_chunk(
                         T::allocation_size(),

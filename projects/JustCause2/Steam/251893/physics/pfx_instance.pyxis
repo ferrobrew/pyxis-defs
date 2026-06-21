@@ -1,8 +1,6 @@
 use game_objects::physics_game_object::PfxGameObject;
 use types::shared_ptr::SharedPtr;
 
-backend rust prologue "use crate::SharedPtr;";
-
 /// `IPfxInstance` in original game
 pub type PfxInstanceInterface {
     vftable {},

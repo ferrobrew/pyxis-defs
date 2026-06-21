@@ -1,8 +1,6 @@
 use game_objects::player::Player;
 use types::{math::Matrix4, shared_ptr::SharedPtr};
 
-backend rust prologue "use crate::{character::*, player::*, shared_ptr::*};";
-
 #[singleton(0x1_18F_B24)]
 pub type CharacterManager {
     vftable {
