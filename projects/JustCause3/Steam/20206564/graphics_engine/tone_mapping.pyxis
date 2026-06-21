@@ -1,5 +1,32 @@
+/// Per-frame brightness histogram used for eye adaptation. Embedded in ToneMappingEffect at +8; its
+/// occlusion-query bucket counts are what the exposure read-back consumes.
+#[min_size(0x298)]
+pub type SHistogramGeneration {
+    /// Per-bucket pixel counts: one occlusion query per bucket counting samples whose luminance is
+    /// at or above the bucket's threshold. Only the first m_NumBuckets entries are live.
+    #[address(0x190)]
+    pub m_NumPixelsInBuckets: [u32; 64],
+    /// Bright-point computed from the buckets; drives the exposure target.
+    #[address(0x290)]
+    pub m_HistogramBrightPoint: f32,
+    /// Mid-point computed from the buckets.
+    #[address(0x294)]
+    pub m_HistogramMidPoint: f32,
+}
+
 /// HDR tone-mapping / auto-exposure (eye adaptation).
-pub type ToneMappingEffect;
+#[min_size(0xBF8)]
+pub type ToneMappingEffect {
+    /// The exposure histogram: CalculateMidAndBrightPointForHistogram fills it, Update reads it.
+    #[address(0x8)]
+    pub m_Histogram: SHistogramGeneration,
+    /// The active histogram bucket count.
+    #[address(0x578)]
+    pub m_NumBuckets: u32,
+    /// The current clamped/smoothed auto-exposure multiplier.
+    #[address(0xBF0)]
+    pub m_CurrentExposure: f32,
+}
 impl ToneMappingEffect {
     /// Builds the auto-exposure histogram for the final scene and writes the current histogram slot
     /// indices to a6 / a7 (out-params); returns a7.
@@ -19,10 +46,7 @@ impl SSmoothedExposure {
     pub fn Update(&mut self, exposure: f32);
 }
 
-/// Per-frame brightness histogram used for eye adaptation.
-pub type SHistogramGeneration;
-
 /// Computes the histogram mid / bright points (the per-frame eye-adaptation lerp). Free function;
-/// `ctx` is Graphics::HContext_t* (opaque), `hist` is the target SHistogramGeneration.
+/// `hist` is the target SHistogramGeneration.
 #[address(0x140_0F8_BF0)]
 fn CalculateMidAndBrightPointForHistogram(ctx: *mut void, arg1: f32, arg2: i32, arg3: f32, hist: *mut SHistogramGeneration);
