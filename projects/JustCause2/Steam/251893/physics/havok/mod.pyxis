@@ -1,0 +1,4 @@
+// The havok types keep their own namespace rather than being flattened into
+// `physics` (and the crate root), since their generic names (`Math`,
+// `Memory`, ...) would otherwise collide with other modules.
+#![rust(no_reexport)]

@@ -1,0 +1,6 @@
+// Shared helpers for the generated bindings.
+backend rust epilogue r#"
+    pub fn pcstr(s: &std::ffi::CStr) -> windows::core::PCSTR {
+        windows::core::PCSTR::from_raw(s.as_ptr() as *const u8)
+    }
+"#;
