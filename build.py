@@ -320,12 +320,20 @@ def check_cpp_build(input_dir: Path, work_dir: Path) -> Optional[bool]:
     configure = ["cmake", "-S", str(out_dir), "-B", str(build_dir), "-DCMAKE_BUILD_TYPE=Release"]
     if toolchain:
         configure.append(f"-DCMAKE_TOOLCHAIN_FILE={toolchain}")
+    elif platform.system() == "Windows":
+        # Native MSVC: select the target architecture for the Visual Studio
+        # generator (32-bit projects must build as Win32, not the x64 host).
+        configure += ["-A", "Win32" if arch == "X86" else "x64"]
     # The xwin toolchains read XWIN_ROOT; forward it if the environment set it.
     if os.environ.get("XWIN_ROOT"):
         configure.append(f"-DXWIN_ROOT={os.environ['XWIN_ROOT']}")
     if subprocess.run(configure).returncode != 0:
         return False
-    built = subprocess.run(["cmake", "--build", str(build_dir), "--parallel"])
+    # --config selects the build type for multi-config generators (Visual
+    # Studio); it's ignored by single-config ones, so it's safe to always pass.
+    built = subprocess.run(
+        ["cmake", "--build", str(build_dir), "--parallel", "--config", "Release"]
+    )
     return built.returncode == 0
 
 
