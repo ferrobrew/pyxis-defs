@@ -1,0 +1,85 @@
+name: Check Builds
+
+# Compile-checks the generated Rust and C++ output for every definition, so a
+# definition can't land in a state that doesn't actually build. Runs entirely
+# on Linux: Rust via the `*-pc-windows-msvc` targets, C++ via clang-cl + xwin
+# (the defs describe Windows game memory, so both target Windows).
+
+on:
+  push:
+    branches: [main]
+    paths: ["projects/**", "build.py", ".github/workflows/check-builds.yml"]
+  pull_request:
+    branches: [main]
+    paths: ["projects/**", "build.py", ".github/workflows/check-builds.yml"]
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout pyxis-defs
+        uses: actions/checkout@v4
+
+      # pyxis is checked out (not just installed) so the cmake xwin toolchains
+      # in tools/cmake-toolchains/ are available to the C++ check.
+      - name: Checkout pyxis
+        uses: actions/checkout@v4
+        with:
+          repository: ferrobrew/pyxis
+          path: .pyxis-src
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Set up Rust (with Windows targets)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: i686-pc-windows-msvc, x86_64-pc-windows-msvc
+
+      - name: Add Rust to PATH
+        run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      # clang-cl / lld-link / llvm-lib drive the C++ cross-build. Ubuntu's
+      # llvm/clang/lld packages ship versioned binaries; symlink the
+      # unversioned names the toolchain expects onto PATH.
+      - name: Install LLVM toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang lld llvm cmake
+          # The xwin toolchains invoke unversioned clang-cl / lld-link /
+          # llvm-lib; ensure they resolve (Ubuntu sometimes ships only
+          # versioned names).
+          LLVM_BIN="$(dirname "$(command -v clang)")"
+          for t in clang-cl lld-link llvm-lib; do
+            command -v "$t" >/dev/null || sudo ln -sf "$LLVM_BIN/$(ls "$LLVM_BIN" | grep -E "^${t}(-[0-9]+)?$" | head -1)" "/usr/local/bin/$t"
+          done
+
+      # xwin provisions the MSVC CRT + Windows SDK *headers* (the C++ check
+      # builds static libraries, so no import libs are needed). Cached across
+      # runs since it's a multi-hundred-MB download.
+      - name: Cache xwin
+        id: cache-xwin
+        uses: actions/cache@v4
+        with:
+          path: ~/.xwin
+          key: xwin-sdk-v1
+
+      - name: Provision xwin
+        if: steps.cache-xwin.outputs.cache-hit != 'true'
+        run: |
+          cargo install xwin --locked
+          xwin --accept-license --arch x86_64 splat --output "$HOME/.xwin"
+
+      - name: Run build checks (Rust + C++)
+        env:
+          PYXIS_CHECK_CMAKE_TOOLCHAIN_X86: ${{ github.workspace }}/.pyxis-src/tools/cmake-toolchains/xwin-x86.cmake
+          PYXIS_CHECK_CMAKE_TOOLCHAIN_X64: ${{ github.workspace }}/.pyxis-src/tools/cmake-toolchains/xwin-x64.cmake
+        run: |
+          # XWIN_ROOT points at the splat root containing crt/ and sdk/; the
+          # cmake toolchains read it. ($HOME isn't expanded in `env:`, so set
+          # it here.)
+          export XWIN_ROOT="$HOME/.xwin"
+          python3 build.py --check-builds rust,cpp --path .pyxis-src/driver
