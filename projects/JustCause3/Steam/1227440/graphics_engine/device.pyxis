@@ -4,19 +4,19 @@ backend rust prologue r#"
 use windows::Win32::{Graphics::{Direct3D11::{ID3D11Device, ID3D11DeviceContext}, Dxgi::{IDXGISwapChain, IDXGIOutput}}, System::Threading::CRITICAL_SECTION};
 "#;
 
-#[size(40), align(8)]
+#[size(40), align(8), cpp_header = "<windows.h>", cpp_name = "::CRITICAL_SECTION"]
 extern type CRITICAL_SECTION;
 
-#[size(8), align(8)]
+#[size(8), align(8), cpp_header = "<d3d11.h>", cpp_name = "::ID3D11Device*"]
 extern type ID3D11Device;
 
-#[size(8), align(8)]
+#[size(8), align(8), cpp_header = "<d3d11.h>", cpp_name = "::ID3D11DeviceContext*"]
 extern type ID3D11DeviceContext;
 
-#[size(8), align(8)]
+#[size(8), align(8), cpp_header = "<dxgi.h>", cpp_name = "::IDXGISwapChain*"]
 extern type IDXGISwapChain;
 
-#[size(8), align(8)]
+#[size(8), align(8), cpp_header = "<dxgi.h>", cpp_name = "::IDXGIOutput*"]
 extern type IDXGIOutput;
 
 #[size(0x8CF0)]

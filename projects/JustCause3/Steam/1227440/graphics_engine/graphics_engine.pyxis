@@ -4,10 +4,10 @@ backend rust prologue r#"
 use windows::Win32::{Foundation::HWND, UI::WindowsAndMessaging::HICON};
 "#;
 
-#[size(8), align(8)]
+#[size(8), align(8), cpp_header = "<windows.h>", cpp_name = "::HICON"]
 extern type HICON;
 
-#[size(8), align(8)]
+#[size(8), align(8), cpp_header = "<windows.h>", cpp_name = "::HWND"]
 extern type HWND;
 
 #[copyable]

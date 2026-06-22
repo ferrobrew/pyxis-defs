@@ -2,16 +2,16 @@ backend rust prologue r#"
 use windows::Win32::Graphics::Direct3D11::{ID3D11Resource, ID3D11ShaderResourceView, ID3D11RenderTargetView, ID3D11DepthStencilView};
 "#;
 
-#[size(8), align(8)]
+#[size(8), align(8), cpp_header = "<d3d11.h>", cpp_name = "::ID3D11Resource*"]
 extern type ID3D11Resource;
 
-#[size(8), align(8)]
+#[size(8), align(8), cpp_header = "<d3d11.h>", cpp_name = "::ID3D11ShaderResourceView*"]
 extern type ID3D11ShaderResourceView;
 
-#[size(8), align(8)]
+#[size(8), align(8), cpp_header = "<d3d11.h>", cpp_name = "::ID3D11RenderTargetView*"]
 extern type ID3D11RenderTargetView;
 
-#[size(8), align(8)]
+#[size(8), align(8), cpp_header = "<d3d11.h>", cpp_name = "::ID3D11DepthStencilView*"]
 extern type ID3D11DepthStencilView;
 
 #[size(0x58)]

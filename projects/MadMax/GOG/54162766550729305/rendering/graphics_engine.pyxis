@@ -10,13 +10,13 @@ use windows::{
 };
 "#;
 
-#[size(8), align(8)]
+#[size(8), align(8), cpp_header = "<windows.h>", cpp_name = "::HWND"]
 extern type HWND;
 
-#[size(8), align(8)]
+#[size(8), align(8), cpp_header = "<windows.h>", cpp_name = "::HCURSOR"]
 extern type HCURSOR;
 
-#[size(0x28), align(8)]
+#[size(0x28), align(8), cpp_header = "<windows.h>", cpp_name = "::CRITICAL_SECTION"]
 extern type CRITICAL_SECTION;
 
 pub enum ActiveCursor: i32 {
