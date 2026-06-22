@@ -1,9 +1,7 @@
 use types::math::{Matrix3, Matrix4, Vector3, Vector4};
 use rendering::render_block::{RenderBlock, GenericRenderBlock};
 
-backend rust prologue "use windows::Win32::Foundation::HANDLE;";
-
-#[size(4), align(4), cpp_header = "<windows.h>", cpp_name = "::HANDLE"]
+#[size(4), align(4), rust_name = "windows::Win32::Foundation::HANDLE", cpp_header = "<windows.h>", cpp_name = "::HANDLE"]
 extern type HANDLE;
 
 #[address(0x1_08C_D40)]

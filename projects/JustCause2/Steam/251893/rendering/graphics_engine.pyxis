@@ -1,20 +1,9 @@
-backend rust prologue r#"
-use windows::{
-    core::InterfaceRef,
-    Win32::{
-        Foundation::HWND,
-        UI::WindowsAndMessaging::HCURSOR,    
-        Graphics::{Direct3D10::ID3D10Device, Dxgi::IDXGISwapChain}
-    }
-};
-"#;
-
 use rendering::shadow_manager::ShadowManager;
 
-#[size(4), align(4), cpp_header = "<windows.h>", cpp_name = "::HWND"]
+#[size(4), align(4), rust_name = "windows::Win32::Foundation::HWND", cpp_header = "<windows.h>", cpp_name = "::HWND"]
 extern type HWND;
 
-#[size(4), align(4), cpp_header = "<windows.h>", cpp_name = "::HCURSOR"]
+#[size(4), align(4), rust_name = "windows::Win32::UI::WindowsAndMessaging::HCURSOR", cpp_header = "<windows.h>", cpp_name = "::HCURSOR"]
 extern type HCURSOR;
 
 #[address(0x1_08C_598)]
@@ -65,16 +54,16 @@ pub extern graphics_global_settings: GraphicsGlobalSettings;
 pub extern game_suspended: bool;
 
 backend rust epilogue r#"
-pub unsafe fn get_d3d10_device() -> Option<InterfaceRef<'static, ID3D10Device>> {
+pub unsafe fn get_d3d10_device() -> Option<windows::core::InterfaceRef<'static, windows::Win32::Graphics::Direct3D10::ID3D10Device>> {
     unsafe {
         let raw = std::ptr::NonNull::new(*get_raw_d3d10_device() as *mut std::os::raw::c_void)?;
-        Some(InterfaceRef::from_raw(raw))
+        Some(windows::core::InterfaceRef::from_raw(raw))
     }
 }
-pub unsafe fn get_dxgi_swapchain() -> Option<InterfaceRef<'static, IDXGISwapChain>> {
+pub unsafe fn get_dxgi_swapchain() -> Option<windows::core::InterfaceRef<'static, windows::Win32::Graphics::Dxgi::IDXGISwapChain>> {
     unsafe {
         let raw = std::ptr::NonNull::new(*get_raw_dxgi_swapchain() as *mut std::os::raw::c_void)?;
-        Some(InterfaceRef::from_raw(raw))
+        Some(windows::core::InterfaceRef::from_raw(raw))
     }
 }
 "#;

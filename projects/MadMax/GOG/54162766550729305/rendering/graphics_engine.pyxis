@@ -1,22 +1,10 @@
-backend rust prologue r#"
-use windows::{
-    core::InterfaceRef,
-    Win32::{
-        Foundation::HWND,
-        UI::WindowsAndMessaging::HCURSOR,    
-        Graphics::{Direct3D11::ID3D11Device, Direct3D11::ID3D11DeviceContext, Dxgi::IDXGISwapChain},
-        System::Threading::CRITICAL_SECTION
-    }
-};
-"#;
-
-#[size(8), align(8), cpp_header = "<windows.h>", cpp_name = "::HWND"]
+#[size(8), align(8), rust_name = "windows::Win32::Foundation::HWND", cpp_header = "<windows.h>", cpp_name = "::HWND"]
 extern type HWND;
 
-#[size(8), align(8), cpp_header = "<windows.h>", cpp_name = "::HCURSOR"]
+#[size(8), align(8), rust_name = "windows::Win32::UI::WindowsAndMessaging::HCURSOR", cpp_header = "<windows.h>", cpp_name = "::HCURSOR"]
 extern type HCURSOR;
 
-#[size(0x28), align(8), cpp_header = "<windows.h>", cpp_name = "::CRITICAL_SECTION"]
+#[size(0x28), align(8), rust_name = "windows::Win32::System::Threading::CRITICAL_SECTION", cpp_header = "<windows.h>", cpp_name = "::CRITICAL_SECTION"]
 extern type CRITICAL_SECTION;
 
 pub enum ActiveCursor: i32 {
@@ -67,7 +55,7 @@ pub type GraphicsGlobalSettings {
 pub extern graphics_global_settings: GraphicsGlobalSettings;
 
 backend rust epilogue r#"
-pub unsafe fn get_d3d11_device() -> Option<InterfaceRef<'static, ID3D11Device>> {
+pub unsafe fn get_d3d11_device() -> Option<windows::core::InterfaceRef<'static, windows::Win32::Graphics::Direct3D11::ID3D11Device>> {
     unsafe {
         GraphicsEngine::get()
             .and_then(|ge| ge.graphics_device.as_ref())
@@ -75,11 +63,11 @@ pub unsafe fn get_d3d11_device() -> Option<InterfaceRef<'static, ID3D11Device>> 
                 let raw = std::ptr::NonNull::new(
                     d.device as *mut std::os::raw::c_void
                 )?;
-                Some(InterfaceRef::from_raw(raw))
+                Some(windows::core::InterfaceRef::from_raw(raw))
             })
     }
 }
-pub unsafe fn get_d3d11_device_context() -> Option<InterfaceRef<'static, ID3D11DeviceContext>> {
+pub unsafe fn get_d3d11_device_context() -> Option<windows::core::InterfaceRef<'static, windows::Win32::Graphics::Direct3D11::ID3D11DeviceContext>> {
     unsafe {
         GraphicsEngine::get()
             .and_then(|ge| ge.graphics_device.as_ref())
@@ -88,17 +76,17 @@ pub unsafe fn get_d3d11_device_context() -> Option<InterfaceRef<'static, ID3D11D
                 let raw = std::ptr::NonNull::new(
                     c.context as *mut std::os::raw::c_void
                 )?;
-                Some(InterfaceRef::from_raw(raw))
+                Some(windows::core::InterfaceRef::from_raw(raw))
             })
     }
 }
-pub unsafe fn get_dxgi_swapchain() -> Option<InterfaceRef<'static, IDXGISwapChain>> {
+pub unsafe fn get_dxgi_swapchain() -> Option<windows::core::InterfaceRef<'static, windows::Win32::Graphics::Dxgi::IDXGISwapChain>> {
     unsafe {
         GraphicsEngine::get().and_then(|ge| ge.graphics_device.as_ref()).and_then(|d| {
             let raw = std::ptr::NonNull::new(
                 d.swap_chain as *mut std::os::raw::c_void
             )?;
-            Some(InterfaceRef::from_raw(raw))
+            Some(windows::core::InterfaceRef::from_raw(raw))
         })
     }
 }
