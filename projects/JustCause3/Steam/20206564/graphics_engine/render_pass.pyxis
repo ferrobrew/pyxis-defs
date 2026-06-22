@@ -31,7 +31,24 @@ impl RBILists {
 #[address(0x142_ED0_FA0)]
 pub extern render_block_overflow_count: u32;
 
-pub type RenderPass;
+/// One entry of CRenderEngine::m_RenderPasses: a `std::vector<CRenderPass*>` holding the pass(es)
+/// for one pass id. The render engine and the per-frame list rotation both walk these.
+#[min_size(0x20)]
+pub type RenderPassList {
+    /// Vector begin: the contiguous `CRenderPass*` array.
+    pub begin: *mut *mut RenderPass,
+    /// Vector end: `begin + element_count`.
+    #[address(0x8)]
+    pub end: *mut *mut RenderPass,
+}
+
+pub type RenderPass {
+    /// The RBI list that new render-block-items append to this frame (the `CRBILists::Add` target).
+    /// Each rotation, `SaveRenderFrameData` re-points this at `m_Lists[parity]` and zeroes its count;
+    /// zeroing `m_CurrentAddList.m_NumElements` is how a pass's draw-time additions are reset.
+    #[address(0x28)]
+    pub m_CurrentAddList: *mut RBILists,
+}
 impl RenderPass {
     /// Appends `count` render-block-items (`items`) to the active RBILists draw/add lists (`a3`
     /// holds the lists). Static (no `this`). Called per batch, including from CPU fragment worker

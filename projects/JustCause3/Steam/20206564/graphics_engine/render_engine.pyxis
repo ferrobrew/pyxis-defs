@@ -1,4 +1,5 @@
 use graphics_engine::graphics_engine::{HContext_t, HRenderSetup_t, HTexture_t, RenderContext};
+use graphics_engine::render_pass::RenderPassList;
 use types::math::Matrix4;
 
 // NOTE: this dump gives RP_POSTEFFECTS = 0x95 and RP_LAST_MAIN = 0x96, whereas the retail range
@@ -172,7 +173,12 @@ pub enum RenderPassId: i32 {
 }
 
 #[singleton(0x142_ED0_E18), size(0x2220)]
-pub type RenderEngine;
+pub type RenderEngine {
+    /// Per-pass render-block-item lists: one `std::vector<CRenderPass*>` per pass id (stride 0x20, at
+    /// `this + 32*pass + 128`). DrawRenderPassRange and the per-frame list rotation walk this.
+    #[address(0x80)]
+    pub m_RenderPasses: [RenderPassList; 157],
+}
 impl RenderEngine {
     /// Late render-pass step (finalizes / copies render targets under the context mutex).
     #[address(0x140_1C2_350)]
