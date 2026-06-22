@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "pointer_size": 8,
   "project_name": "Mad Max (1.0.3 / GOG 54162766550729305)",
   "items": {
@@ -290,7 +290,7 @@
             "is_base": false,
             "source": {
               "file_index": 2,
-              "line": 43
+              "line": 41
             }
           }
         ],
@@ -304,7 +304,7 @@
       },
       "source": {
         "file_index": 2,
-        "line": 41
+        "line": 39
       }
     },
     "game::event_handler::EventBase": {
@@ -334,7 +334,7 @@
             "is_base": false,
             "source": {
               "file_index": 2,
-              "line": 38
+              "line": 36
             }
           }
         ],
@@ -348,7 +348,7 @@
       },
       "source": {
         "file_index": 2,
-        "line": 36
+        "line": 34
       }
     },
     "game::event_handler::EventHandler": {
@@ -378,7 +378,7 @@
             "is_base": false,
             "source": {
               "file_index": 2,
-              "line": 31
+              "line": 29
             }
           },
           {
@@ -399,7 +399,7 @@
             "is_base": false,
             "source": {
               "file_index": 2,
-              "line": 31
+              "line": 29
             }
           }
         ],
@@ -415,7 +415,7 @@
       },
       "source": {
         "file_index": 2,
-        "line": 31
+        "line": 29
       }
     },
     "game::event_handler::EventHandlerVftable": {
@@ -438,7 +438,7 @@
       },
       "source": {
         "file_index": 2,
-        "line": 31
+        "line": 29
       }
     },
     "game::event_handler::EventID": {
@@ -465,7 +465,7 @@
             "is_base": false,
             "source": {
               "file_index": 2,
-              "line": 16
+              "line": 14
             }
           },
           {
@@ -482,7 +482,7 @@
             "is_base": false,
             "source": {
               "file_index": 2,
-              "line": 17
+              "line": 15
             }
           }
         ],
@@ -496,7 +496,7 @@
       },
       "source": {
         "file_index": 2,
-        "line": 14
+        "line": 12
       }
     },
     "game::event_handler::EventSystem": {
@@ -526,7 +526,7 @@
             "is_base": false,
             "source": {
               "file_index": 2,
-              "line": 5
+              "line": 3
             }
           },
           {
@@ -547,7 +547,7 @@
             "is_base": false,
             "source": {
               "file_index": 2,
-              "line": 5
+              "line": 3
             }
           }
         ],
@@ -599,7 +599,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 2,
-              "line": 10
+              "line": 8
             }
           }
         ],
@@ -614,7 +614,7 @@
       },
       "source": {
         "file_index": 2,
-        "line": 5
+        "line": 3
       }
     },
     "game::event_handler::EventSystemVftable": {
@@ -637,7 +637,7 @@
       },
       "source": {
         "file_index": 2,
-        "line": 5
+        "line": 3
       }
     },
     "game::game::GameState": {
@@ -2813,7 +2813,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 8
+              "line": 6
             }
           },
           {
@@ -2834,7 +2834,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 13
+              "line": 11
             }
           },
           {
@@ -2854,7 +2854,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 13
+              "line": 11
             }
           },
           {
@@ -2877,7 +2877,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 15
+              "line": 13
             }
           },
           {
@@ -2898,7 +2898,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 6
+              "line": 4
             }
           }
         ],
@@ -2922,7 +2922,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 6,
-                "line": 8
+                "line": 6
               }
             },
             {
@@ -2942,7 +2942,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 6,
-                "line": 8
+                "line": 6
               }
             },
             {
@@ -2962,7 +2962,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 6,
-                "line": 8
+                "line": 6
               }
             },
             {
@@ -2982,7 +2982,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 6,
-                "line": 8
+                "line": 6
               }
             },
             {
@@ -3002,7 +3002,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 6,
-                "line": 8
+                "line": 6
               }
             },
             {
@@ -3022,7 +3022,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 6,
-                "line": 8
+                "line": 6
               }
             },
             {
@@ -3050,7 +3050,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 6,
-                "line": 9
+                "line": 7
               }
             }
           ]
@@ -3063,7 +3063,7 @@
       },
       "source": {
         "file_index": 6,
-        "line": 6
+        "line": 4
       }
     },
     "game_objects::avatar::AvatarVftable": {
@@ -3103,7 +3103,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 8
+              "line": 6
             }
           },
           {
@@ -3133,7 +3133,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 8
+              "line": 6
             }
           },
           {
@@ -3163,7 +3163,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 8
+              "line": 6
             }
           },
           {
@@ -3193,7 +3193,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 8
+              "line": 6
             }
           },
           {
@@ -3223,7 +3223,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 8
+              "line": 6
             }
           },
           {
@@ -3253,7 +3253,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 8
+              "line": 6
             }
           },
           {
@@ -3290,7 +3290,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 9
+              "line": 7
             }
           }
         ],
@@ -3304,7 +3304,7 @@
       },
       "source": {
         "file_index": 6,
-        "line": 8
+        "line": 6
       }
     },
     "game_objects::character::Character": {
@@ -3331,7 +3331,7 @@
             "is_base": true,
             "source": {
               "file_index": 7,
-              "line": 9
+              "line": 7
             }
           },
           {
@@ -3348,7 +3348,7 @@
             "is_base": true,
             "source": {
               "file_index": 7,
-              "line": 11
+              "line": 9
             }
           },
           {
@@ -3369,7 +3369,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 7
+              "line": 5
             }
           }
         ],
@@ -3392,7 +3392,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 8
+              "line": 6
             }
           },
           {
@@ -3419,7 +3419,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 9
+              "line": 7
             }
           },
           {
@@ -3454,7 +3454,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 10
+              "line": 8
             }
           },
           {
@@ -3486,7 +3486,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 12
+              "line": 10
             }
           },
           {
@@ -3518,7 +3518,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 14
+              "line": 12
             }
           },
           {
@@ -3553,7 +3553,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 15
+              "line": 13
             }
           },
           {
@@ -3588,7 +3588,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 17
+              "line": 15
             }
           },
           {
@@ -3623,7 +3623,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 19
+              "line": 17
             }
           },
           {
@@ -3652,7 +3652,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 21
+              "line": 19
             }
           },
           {
@@ -3681,7 +3681,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 24
+              "line": 22
             }
           },
           {
@@ -3785,7 +3785,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 7,
-              "line": 18
+              "line": 16
             }
           },
           {
@@ -3812,7 +3812,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 7,
-              "line": 19
+              "line": 17
             }
           },
           {
@@ -3836,7 +3836,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 7,
-              "line": 21
+              "line": 19
             }
           },
           {
@@ -3880,7 +3880,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 7,
-              "line": 24
+              "line": 22
             }
           }
         ],
@@ -3942,7 +3942,7 @@
       },
       "source": {
         "file_index": 7,
-        "line": 7
+        "line": 5
       }
     },
     "game_objects::character::CharacterBase": {
@@ -3969,7 +3969,7 @@
             "is_base": true,
             "source": {
               "file_index": 7,
-              "line": 28
+              "line": 26
             }
           },
           {
@@ -3986,7 +3986,7 @@
             "is_base": true,
             "source": {
               "file_index": 7,
-              "line": 30
+              "line": 28
             }
           },
           {
@@ -4007,7 +4007,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 33
+              "line": 31
             }
           },
           {
@@ -4024,7 +4024,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 33
+              "line": 31
             }
           },
           {
@@ -4041,7 +4041,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 35
+              "line": 33
             }
           },
           {
@@ -4062,7 +4062,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 15
+              "line": 13
             }
           }
         ],
@@ -4170,7 +4170,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 18
+                "line": 16
               }
             },
             {
@@ -4196,7 +4196,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 19
+                "line": 17
               }
             },
             {
@@ -4216,7 +4216,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 17
+                "line": 15
               }
             },
             {
@@ -4239,7 +4239,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 21
+                "line": 19
               }
             },
             {
@@ -4259,7 +4259,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 17
+                "line": 15
               }
             },
             {
@@ -4279,7 +4279,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 17
+                "line": 15
               }
             },
             {
@@ -4299,7 +4299,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 17
+                "line": 15
               }
             },
             {
@@ -4319,7 +4319,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 17
+                "line": 15
               }
             },
             {
@@ -4339,7 +4339,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 17
+                "line": 15
               }
             },
             {
@@ -4359,7 +4359,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 17
+                "line": 15
               }
             },
             {
@@ -4379,7 +4379,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 17
+                "line": 15
               }
             },
             {
@@ -4399,7 +4399,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 17
+                "line": 15
               }
             },
             {
@@ -4442,7 +4442,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 24
+                "line": 22
               }
             }
           ]
@@ -4455,7 +4455,7 @@
       },
       "source": {
         "file_index": 7,
-        "line": 15
+        "line": 13
       }
     },
     "game_objects::character::CharacterBaseVftable": {
@@ -4495,7 +4495,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 18
+              "line": 16
             }
           },
           {
@@ -4531,7 +4531,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 19
+              "line": 17
             }
           },
           {
@@ -4561,7 +4561,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 17
+              "line": 15
             }
           },
           {
@@ -4594,7 +4594,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 21
+              "line": 19
             }
           },
           {
@@ -4624,7 +4624,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 17
+              "line": 15
             }
           },
           {
@@ -4654,7 +4654,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 17
+              "line": 15
             }
           },
           {
@@ -4684,7 +4684,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 17
+              "line": 15
             }
           },
           {
@@ -4714,7 +4714,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 17
+              "line": 15
             }
           },
           {
@@ -4744,7 +4744,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 17
+              "line": 15
             }
           },
           {
@@ -4774,7 +4774,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 17
+              "line": 15
             }
           },
           {
@@ -4804,7 +4804,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 17
+              "line": 15
             }
           },
           {
@@ -4834,7 +4834,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 17
+              "line": 15
             }
           },
           {
@@ -4886,7 +4886,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 24
+              "line": 22
             }
           }
         ],
@@ -4900,7 +4900,7 @@
       },
       "source": {
         "file_index": 7,
-        "line": 18
+        "line": 16
       }
     },
     "game_objects::character_manager::CharacterManager": {
@@ -4930,7 +4930,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 9
+              "line": 7
             }
           },
           {
@@ -4951,7 +4951,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 17
+              "line": 15
             }
           },
           {
@@ -4974,7 +4974,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 17
+              "line": 15
             }
           },
           {
@@ -4995,7 +4995,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 6
+              "line": 4
             }
           }
         ],
@@ -5019,7 +5019,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 8,
-                "line": 9
+                "line": 7
               }
             },
             {
@@ -5039,7 +5039,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 8,
-                "line": 8
+                "line": 6
               }
             },
             {
@@ -5059,7 +5059,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 8,
-                "line": 8
+                "line": 6
               }
             },
             {
@@ -5082,7 +5082,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 8,
-                "line": 11
+                "line": 9
               }
             },
             {
@@ -5110,7 +5110,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 8,
-                "line": 13
+                "line": 11
               }
             },
             {
@@ -5130,7 +5130,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 8,
-                "line": 14
+                "line": 12
               }
             }
           ]
@@ -5143,7 +5143,7 @@
       },
       "source": {
         "file_index": 8,
-        "line": 6
+        "line": 4
       }
     },
     "game_objects::character_manager::CharacterManagerVftable": {
@@ -5183,7 +5183,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 9
+              "line": 7
             }
           },
           {
@@ -5213,7 +5213,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 8
+              "line": 6
             }
           },
           {
@@ -5243,7 +5243,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 8
+              "line": 6
             }
           },
           {
@@ -5276,7 +5276,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 11
+              "line": 9
             }
           },
           {
@@ -5313,7 +5313,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 13
+              "line": 11
             }
           },
           {
@@ -5343,7 +5343,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 14
+              "line": 12
             }
           }
         ],
@@ -5357,7 +5357,7 @@
       },
       "source": {
         "file_index": 8,
-        "line": 9
+        "line": 7
       }
     },
     "game_objects::damageable::Damageable": {
@@ -5551,7 +5551,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 8
+              "line": 6
             }
           },
           {
@@ -5578,7 +5578,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 9
+              "line": 7
             }
           },
           {
@@ -5613,7 +5613,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 10
+              "line": 8
             }
           },
           {
@@ -5645,7 +5645,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 12
+              "line": 10
             }
           },
           {
@@ -5677,7 +5677,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 14
+              "line": 12
             }
           },
           {
@@ -5712,7 +5712,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 15
+              "line": 13
             }
           },
           {
@@ -5747,7 +5747,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 17
+              "line": 15
             }
           },
           {
@@ -5782,7 +5782,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 19
+              "line": 17
             }
           },
           {
@@ -5811,7 +5811,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 21
+              "line": 19
             }
           },
           {
@@ -5840,7 +5840,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 24
+              "line": 22
             }
           }
         ],
@@ -5929,7 +5929,7 @@
             "is_base": true,
             "source": {
               "file_index": 10,
-              "line": 28
+              "line": 26
             }
           },
           {
@@ -5949,7 +5949,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 30
+              "line": 28
             }
           },
           {
@@ -5966,7 +5966,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 31
+              "line": 29
             }
           },
           {
@@ -5987,7 +5987,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 33
+              "line": 31
             }
           },
           {
@@ -6004,7 +6004,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 33
+              "line": 31
             }
           },
           {
@@ -6021,7 +6021,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 35
+              "line": 33
             }
           },
           {
@@ -6038,7 +6038,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 36
+              "line": 34
             }
           },
           {
@@ -6059,7 +6059,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 38
+              "line": 36
             }
           },
           {
@@ -6080,7 +6080,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 38
+              "line": 36
             }
           },
           {
@@ -6101,7 +6101,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 41
+              "line": 39
             }
           },
           {
@@ -6124,7 +6124,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 41
+              "line": 39
             }
           },
           {
@@ -6147,7 +6147,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 43
+              "line": 41
             }
           }
         ],
@@ -6171,7 +6171,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 8
+                "line": 6
               }
             },
             {
@@ -6197,7 +6197,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 9
+                "line": 7
               }
             },
             {
@@ -6231,7 +6231,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 10
+                "line": 8
               }
             },
             {
@@ -6251,7 +6251,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6271,7 +6271,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6291,7 +6291,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6311,7 +6311,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6331,7 +6331,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6351,7 +6351,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6371,7 +6371,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6391,7 +6391,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6411,7 +6411,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6431,7 +6431,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6451,7 +6451,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6471,7 +6471,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6491,7 +6491,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6511,7 +6511,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6531,7 +6531,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6551,7 +6551,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6571,7 +6571,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6602,7 +6602,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 12
+                "line": 10
               }
             },
             {
@@ -6633,7 +6633,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 14
+                "line": 12
               }
             },
             {
@@ -6667,7 +6667,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 15
+                "line": 13
               }
             },
             {
@@ -6687,7 +6687,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6707,7 +6707,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6727,7 +6727,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6747,7 +6747,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6767,7 +6767,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6787,7 +6787,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6807,7 +6807,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6841,7 +6841,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 17
+                "line": 15
               }
             },
             {
@@ -6875,7 +6875,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 19
+                "line": 17
               }
             },
             {
@@ -6895,7 +6895,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6915,7 +6915,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6943,7 +6943,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 21
+                "line": 19
               }
             },
             {
@@ -6963,7 +6963,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -6983,7 +6983,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -7003,7 +7003,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 7
+                "line": 5
               }
             },
             {
@@ -7031,7 +7031,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 24
+                "line": 22
               }
             }
           ]
@@ -7044,7 +7044,7 @@
       },
       "source": {
         "file_index": 10,
-        "line": 5
+        "line": 3
       }
     },
     "game_objects::game_object::GameObjectVftable": {
@@ -7084,7 +7084,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 8
+              "line": 6
             }
           },
           {
@@ -7120,7 +7120,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 9
+              "line": 7
             }
           },
           {
@@ -7163,7 +7163,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 10
+              "line": 8
             }
           },
           {
@@ -7193,7 +7193,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7223,7 +7223,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7253,7 +7253,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7283,7 +7283,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7313,7 +7313,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7343,7 +7343,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7373,7 +7373,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7403,7 +7403,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7433,7 +7433,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7463,7 +7463,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7493,7 +7493,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7523,7 +7523,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7553,7 +7553,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7583,7 +7583,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7613,7 +7613,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7643,7 +7643,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7673,7 +7673,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7713,7 +7713,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 12
+              "line": 10
             }
           },
           {
@@ -7753,7 +7753,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 14
+              "line": 12
             }
           },
           {
@@ -7796,7 +7796,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 15
+              "line": 13
             }
           },
           {
@@ -7826,7 +7826,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7856,7 +7856,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7886,7 +7886,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7916,7 +7916,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7946,7 +7946,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -7976,7 +7976,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -8006,7 +8006,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -8049,7 +8049,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 17
+              "line": 15
             }
           },
           {
@@ -8092,7 +8092,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 19
+              "line": 17
             }
           },
           {
@@ -8122,7 +8122,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -8152,7 +8152,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -8189,7 +8189,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 21
+              "line": 19
             }
           },
           {
@@ -8219,7 +8219,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -8249,7 +8249,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -8279,7 +8279,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 7
+              "line": 5
             }
           },
           {
@@ -8316,7 +8316,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 24
+              "line": 22
             }
           }
         ],
@@ -8330,7 +8330,7 @@
       },
       "source": {
         "file_index": 10,
-        "line": 8
+        "line": 6
       }
     },
     "game_objects::physics_game_object::PhysicsGameObject": {
@@ -8397,7 +8397,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 8
+              "line": 6
             }
           },
           {
@@ -8424,7 +8424,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 9
+              "line": 7
             }
           },
           {
@@ -8459,7 +8459,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 10
+              "line": 8
             }
           },
           {
@@ -8491,7 +8491,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 12
+              "line": 10
             }
           },
           {
@@ -8523,7 +8523,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 14
+              "line": 12
             }
           },
           {
@@ -8558,7 +8558,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 15
+              "line": 13
             }
           },
           {
@@ -8593,7 +8593,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 17
+              "line": 15
             }
           },
           {
@@ -8628,7 +8628,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 19
+              "line": 17
             }
           },
           {
@@ -8657,7 +8657,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 21
+              "line": 19
             }
           },
           {
@@ -8686,7 +8686,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 24
+              "line": 22
             }
           }
         ],
@@ -8775,7 +8775,7 @@
             "is_base": true,
             "source": {
               "file_index": 12,
-              "line": 8
+              "line": 6
             }
           },
           {
@@ -8792,7 +8792,7 @@
             "is_base": true,
             "source": {
               "file_index": 12,
-              "line": 10
+              "line": 8
             }
           },
           {
@@ -8813,7 +8813,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 6
+              "line": 4
             }
           }
         ],
@@ -8844,7 +8844,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 6,
-              "line": 9
+              "line": 7
             }
           }
         ],
@@ -8859,7 +8859,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 6
+        "line": 4
       }
     },
     "game_objects::vehicle::Vehicle": {
@@ -9175,7 +9175,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 8
+              "line": 6
             }
           },
           {
@@ -9202,7 +9202,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 9
+              "line": 7
             }
           },
           {
@@ -9237,7 +9237,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 10
+              "line": 8
             }
           },
           {
@@ -9269,7 +9269,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 12
+              "line": 10
             }
           },
           {
@@ -9301,7 +9301,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 14
+              "line": 12
             }
           },
           {
@@ -9336,7 +9336,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 15
+              "line": 13
             }
           },
           {
@@ -9371,7 +9371,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 17
+              "line": 15
             }
           },
           {
@@ -9406,7 +9406,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 19
+              "line": 17
             }
           },
           {
@@ -9435,7 +9435,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 21
+              "line": 19
             }
           },
           {
@@ -9464,7 +9464,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 24
+              "line": 22
             }
           }
         ],
@@ -17275,7 +17275,7 @@
             "value": 0,
             "source": {
               "file_index": 20,
-              "line": 8
+              "line": 6
             }
           },
           {
@@ -17283,7 +17283,7 @@
             "value": 1,
             "source": {
               "file_index": 20,
-              "line": 9
+              "line": 7
             }
           },
           {
@@ -17291,7 +17291,7 @@
             "value": 2,
             "source": {
               "file_index": 20,
-              "line": 10
+              "line": 8
             }
           },
           {
@@ -17299,7 +17299,7 @@
             "value": 3,
             "source": {
               "file_index": 20,
-              "line": 11
+              "line": 9
             }
           },
           {
@@ -17307,7 +17307,7 @@
             "value": 4,
             "source": {
               "file_index": 20,
-              "line": 12
+              "line": 10
             }
           },
           {
@@ -17315,7 +17315,7 @@
             "value": 5,
             "source": {
               "file_index": 20,
-              "line": 13
+              "line": 11
             }
           },
           {
@@ -17323,7 +17323,7 @@
             "value": 6,
             "source": {
               "file_index": 20,
-              "line": 14
+              "line": 12
             }
           },
           {
@@ -17331,7 +17331,7 @@
             "value": 8,
             "source": {
               "file_index": 20,
-              "line": 15
+              "line": 13
             }
           },
           {
@@ -17339,7 +17339,7 @@
             "value": 9,
             "source": {
               "file_index": 20,
-              "line": 16
+              "line": 14
             }
           },
           {
@@ -17347,7 +17347,7 @@
             "value": 10,
             "source": {
               "file_index": 20,
-              "line": 17
+              "line": 15
             }
           },
           {
@@ -17355,7 +17355,7 @@
             "value": 11,
             "source": {
               "file_index": 20,
-              "line": 18
+              "line": 16
             }
           },
           {
@@ -17363,7 +17363,7 @@
             "value": 12,
             "source": {
               "file_index": 20,
-              "line": 19
+              "line": 17
             }
           },
           {
@@ -17371,7 +17371,7 @@
             "value": 13,
             "source": {
               "file_index": 20,
-              "line": 20
+              "line": 18
             }
           },
           {
@@ -17379,7 +17379,7 @@
             "value": 14,
             "source": {
               "file_index": 20,
-              "line": 21
+              "line": 19
             }
           },
           {
@@ -17387,7 +17387,7 @@
             "value": 15,
             "source": {
               "file_index": 20,
-              "line": 22
+              "line": 20
             }
           }
         ],
@@ -17399,7 +17399,7 @@
       },
       "source": {
         "file_index": 20,
-        "line": 6
+        "line": 4
       }
     },
     "physics::pfx_instance::PfxInstance": {
@@ -17429,7 +17429,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 28
+              "line": 26
             }
           },
           {
@@ -17452,7 +17452,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 40
+              "line": 38
             }
           },
           {
@@ -17475,7 +17475,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 41
+              "line": 39
             }
           },
           {
@@ -17495,7 +17495,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 42
+              "line": 40
             }
           }
         ],
@@ -17519,7 +17519,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 28
+                "line": 26
               }
             },
             {
@@ -17542,7 +17542,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 29
+                "line": 27
               }
             },
             {
@@ -17562,7 +17562,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 27
+                "line": 25
               }
             },
             {
@@ -17582,7 +17582,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 27
+                "line": 25
               }
             },
             {
@@ -17613,7 +17613,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 31
+                "line": 29
               }
             },
             {
@@ -17644,7 +17644,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 33
+                "line": 31
               }
             },
             {
@@ -17680,7 +17680,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 34
+                "line": 32
               }
             },
             {
@@ -17700,7 +17700,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 27
+                "line": 25
               }
             },
             {
@@ -17720,7 +17720,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 27
+                "line": 25
               }
             },
             {
@@ -17748,7 +17748,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 36
+                "line": 34
               }
             }
           ]
@@ -17761,7 +17761,7 @@
       },
       "source": {
         "file_index": 20,
-        "line": 25
+        "line": 23
       }
     },
     "physics::pfx_instance::PfxInstanceVftable": {
@@ -17801,7 +17801,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 28
+              "line": 26
             }
           },
           {
@@ -17834,7 +17834,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 29
+              "line": 27
             }
           },
           {
@@ -17864,7 +17864,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 27
+              "line": 25
             }
           },
           {
@@ -17894,7 +17894,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 27
+              "line": 25
             }
           },
           {
@@ -17934,7 +17934,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 31
+              "line": 29
             }
           },
           {
@@ -17974,7 +17974,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 33
+              "line": 31
             }
           },
           {
@@ -18018,7 +18018,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 34
+              "line": 32
             }
           },
           {
@@ -18048,7 +18048,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 27
+              "line": 25
             }
           },
           {
@@ -18078,7 +18078,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 27
+              "line": 25
             }
           },
           {
@@ -18115,7 +18115,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 36
+              "line": 34
             }
           }
         ],
@@ -18129,7 +18129,7 @@
       },
       "source": {
         "file_index": 20,
-        "line": 28
+        "line": 26
       }
     },
     "physics::pfx_rigid_body::PfxRigidBody": {
@@ -18201,7 +18201,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 28
+                "line": 26
               }
             },
             {
@@ -18224,7 +18224,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 29
+                "line": 27
               }
             },
             {
@@ -18244,7 +18244,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 27
+                "line": 25
               }
             },
             {
@@ -18264,7 +18264,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 27
+                "line": 25
               }
             },
             {
@@ -18295,7 +18295,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 31
+                "line": 29
               }
             },
             {
@@ -18326,7 +18326,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 33
+                "line": 31
               }
             },
             {
@@ -18362,7 +18362,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 34
+                "line": 32
               }
             },
             {
@@ -18382,7 +18382,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 27
+                "line": 25
               }
             },
             {
@@ -18402,7 +18402,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 27
+                "line": 25
               }
             },
             {
@@ -18430,7 +18430,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 36
+                "line": 34
               }
             }
           ]
@@ -18515,7 +18515,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 28
+                "line": 26
               }
             },
             {
@@ -18538,7 +18538,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 29
+                "line": 27
               }
             },
             {
@@ -18558,7 +18558,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 27
+                "line": 25
               }
             },
             {
@@ -18578,7 +18578,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 27
+                "line": 25
               }
             },
             {
@@ -18609,7 +18609,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 31
+                "line": 29
               }
             },
             {
@@ -18640,7 +18640,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 33
+                "line": 31
               }
             },
             {
@@ -18676,7 +18676,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 34
+                "line": 32
               }
             },
             {
@@ -18696,7 +18696,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 27
+                "line": 25
               }
             },
             {
@@ -18716,7 +18716,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 27
+                "line": 25
               }
             },
             {
@@ -18744,7 +18744,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 36
+                "line": 34
               }
             }
           ]
@@ -18779,7 +18779,7 @@
             "value": -1,
             "source": {
               "file_index": 23,
-              "line": 23
+              "line": 11
             }
           },
           {
@@ -18787,7 +18787,7 @@
             "value": 0,
             "source": {
               "file_index": 23,
-              "line": 24
+              "line": 12
             }
           },
           {
@@ -18795,7 +18795,7 @@
             "value": 1,
             "source": {
               "file_index": 23,
-              "line": 25
+              "line": 13
             }
           },
           {
@@ -18803,7 +18803,7 @@
             "value": 2,
             "source": {
               "file_index": 23,
-              "line": 26
+              "line": 14
             }
           },
           {
@@ -18811,7 +18811,7 @@
             "value": 3,
             "source": {
               "file_index": 23,
-              "line": 27
+              "line": 15
             }
           }
         ],
@@ -18823,7 +18823,7 @@
       },
       "source": {
         "file_index": 23,
-        "line": 22
+        "line": 10
       }
     },
     "rendering::graphics_engine::CRITICAL_SECTION": {
@@ -18832,6 +18832,9 @@
       "size": 40,
       "alignment": 8,
       "category": "extern",
+      "cpp_name": "::CRITICAL_SECTION",
+      "cpp_header": "<windows.h>",
+      "rust_name": "windows::Win32::System::Threading::CRITICAL_SECTION",
       "kind": {
         "type": "type",
         "doc": null,
@@ -18846,7 +18849,7 @@
       },
       "source": {
         "file_index": 23,
-        "line": 19
+        "line": 7
       }
     },
     "rendering::graphics_engine::GraphicsDevice": {
@@ -18876,7 +18879,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 45
+              "line": 33
             }
           },
           {
@@ -18897,7 +18900,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 47
+              "line": 35
             }
           },
           {
@@ -18917,7 +18920,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 47
+              "line": 35
             }
           },
           {
@@ -18937,7 +18940,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 49
+              "line": 37
             }
           },
           {
@@ -18958,7 +18961,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 43
+              "line": 31
             }
           }
         ],
@@ -18972,7 +18975,7 @@
       },
       "source": {
         "file_index": 23,
-        "line": 43
+        "line": 31
       }
     },
     "rendering::graphics_engine::GraphicsDeviceContext": {
@@ -19003,7 +19006,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 54
+              "line": 42
             }
           },
           {
@@ -19023,7 +19026,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 54
+              "line": 42
             }
           },
           {
@@ -19043,7 +19046,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 56
+              "line": 44
             }
           },
           {
@@ -19064,7 +19067,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 52
+              "line": 40
             }
           }
         ],
@@ -19078,7 +19081,7 @@
       },
       "source": {
         "file_index": 23,
-        "line": 52
+        "line": 40
       }
     },
     "rendering::graphics_engine::GraphicsEngine": {
@@ -19109,7 +19112,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 32
+              "line": 20
             }
           },
           {
@@ -19126,7 +19129,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 32
+              "line": 20
             }
           },
           {
@@ -19147,7 +19150,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 35
+              "line": 23
             }
           },
           {
@@ -19167,7 +19170,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 35
+              "line": 23
             }
           },
           {
@@ -19188,7 +19191,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 30
+              "line": 18
             }
           }
         ],
@@ -19210,7 +19213,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 23,
-              "line": 39
+              "line": 27
             }
           }
         ],
@@ -19223,7 +19226,7 @@
       },
       "source": {
         "file_index": 23,
-        "line": 30
+        "line": 18
       }
     },
     "rendering::graphics_engine::GraphicsGlobalSettings": {
@@ -19253,7 +19256,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 61
+              "line": 49
             }
           },
           {
@@ -19270,7 +19273,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 62
+              "line": 50
             }
           },
           {
@@ -19291,7 +19294,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 63
+              "line": 51
             }
           },
           {
@@ -19312,7 +19315,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 59
+              "line": 47
             }
           }
         ],
@@ -19326,7 +19329,7 @@
       },
       "source": {
         "file_index": 23,
-        "line": 59
+        "line": 47
       }
     },
     "rendering::graphics_engine::HCURSOR": {
@@ -19335,6 +19338,9 @@
       "size": 8,
       "alignment": 8,
       "category": "extern",
+      "cpp_name": "::HCURSOR",
+      "cpp_header": "<windows.h>",
+      "rust_name": "windows::Win32::UI::WindowsAndMessaging::HCURSOR",
       "kind": {
         "type": "type",
         "doc": null,
@@ -19349,7 +19355,7 @@
       },
       "source": {
         "file_index": 23,
-        "line": 16
+        "line": 4
       }
     },
     "rendering::graphics_engine::HWND": {
@@ -19358,6 +19364,9 @@
       "size": 8,
       "alignment": 8,
       "category": "extern",
+      "cpp_name": "::HWND",
+      "cpp_header": "<windows.h>",
+      "rust_name": "windows::Win32::Foundation::HWND",
       "kind": {
         "type": "type",
         "doc": null,
@@ -19372,7 +19381,7 @@
       },
       "source": {
         "file_index": 23,
-        "line": 13
+        "line": 1
       }
     },
     "types::hash_string::HashString": {
@@ -23358,16 +23367,9 @@
           "backends": {
             "rust": [
               {
-                "prologue": {
-                  "header": "use crate::HashString;",
-                  "definition": null
-                },
-                "epilogue": null
-              },
-              {
                 "prologue": null,
                 "epilogue": {
-                  "header": "\n    impl EventID {\n        pub fn new(hash: HashString, namespace: HashString) -> Self {\n            Self {\n                hash,\n                namespace\n            }\n        }\n    }\n",
+                  "header": "\n    impl EventID {\n        pub fn new(hash: crate::hash_string::HashString, namespace: crate::hash_string::HashString) -> Self {\n            Self {\n                hash,\n                namespace\n            }\n        }\n    }\n",
                   "definition": null
                 }
               },
@@ -23462,17 +23464,7 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {
-            "rust": [
-              {
-                "prologue": {
-                  "header": "use crate::{math::Matrix4, shared_ptr::*};",
-                  "definition": null
-                },
-                "epilogue": null
-              }
-            ]
-          }
+          "backends": {}
         },
         "character": {
           "doc": null,
@@ -23484,17 +23476,7 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {
-            "rust": [
-              {
-                "prologue": {
-                  "header": "use crate::{game_objects::vehicle::Vehicle, shared_ptr::*};",
-                  "definition": null
-                },
-                "epilogue": null
-              }
-            ]
-          }
+          "backends": {}
         },
         "character_manager": {
           "doc": null,
@@ -23505,17 +23487,7 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {
-            "rust": [
-              {
-                "prologue": {
-                  "header": "use crate::{character::*, player::*, shared_ptr::*};",
-                  "definition": null
-                },
-                "epilogue": null
-              }
-            ]
-          }
+          "backends": {}
         },
         "damageable": {
           "doc": null,
@@ -23539,16 +23511,9 @@
           "backends": {
             "rust": [
               {
-                "prologue": {
-                  "header": "use crate::{math::Matrix4, shared_ptr::*};",
-                  "definition": null
-                },
-                "epilogue": null
-              },
-              {
                 "prologue": null,
                 "epilogue": {
-                  "header": "\n    pub trait GameObjectExt {\n        unsafe fn get_matrix(&self) -> Option<Matrix4>;\n    }\n    pub trait GameObjectMutExt {\n        unsafe fn set_matrix(&mut self, matrix: &Matrix4);\n    }\n    impl<T: std::convert::AsRef<crate::game_object::GameObject>> GameObjectExt for T {\n        unsafe fn get_matrix(&self) -> Option<Matrix4> {\n            let mut out = Matrix4::default();\n            let set = unsafe { self.as_ref().get_matrix_raw(out.as_mut_ptr()) };\n            set.then_some(out)\n        }\n    }\n    impl<T: std::convert::AsMut<crate::game_object::GameObject>> GameObjectMutExt for T {\n        unsafe fn set_matrix(&mut self, matrix: &Matrix4) {\n            unsafe { self.as_mut().set_matrix_raw(matrix.as_ptr()); }\n        }\n    }\n",
+                  "header": "\n    pub trait GameObjectExt {\n        unsafe fn get_matrix(&self) -> Option<crate::math::Matrix4>;\n    }\n    pub trait GameObjectMutExt {\n        unsafe fn set_matrix(&mut self, matrix: &crate::math::Matrix4);\n    }\n    impl<T: std::convert::AsRef<crate::game_object::GameObject>> GameObjectExt for T {\n        unsafe fn get_matrix(&self) -> Option<crate::math::Matrix4> {\n            let mut out = crate::math::Matrix4::default();\n            let set = unsafe { self.as_ref().get_matrix_raw(out.as_mut_ptr()) };\n            set.then_some(out)\n        }\n    }\n    impl<T: std::convert::AsMut<crate::game_object::GameObject>> GameObjectMutExt for T {\n        unsafe fn set_matrix(&mut self, matrix: &crate::math::Matrix4) {\n            unsafe { self.as_mut().set_matrix_raw(matrix.as_ptr()); }\n        }\n    }\n",
                   "definition": null
                 }
               }
@@ -23576,16 +23541,9 @@
           "backends": {
             "rust": [
               {
-                "prologue": {
-                  "header": "use crate::game_objects::Character;",
-                  "definition": null
-                },
-                "epilogue": null
-              },
-              {
                 "prologue": null,
                 "epilogue": {
-                  "header": "\n    pub trait PlayerExt {\n        unsafe fn get_character(&self) -> Option<&Character>;\n    }\n    impl<T: std::convert::AsRef<crate::game_objects::player::Player>> PlayerExt for T {\n        unsafe fn get_character(&self) -> Option<&Character> {\n            unsafe { self.as_ref().avatar.character.as_ref() }\n        }\n    }\n    pub trait PlayerMutExt {\n        unsafe fn get_character(&mut self) -> Option<&mut Character>;\n    }\n    impl<T: std::convert::AsMut<crate::game_objects::player::Player>> PlayerMutExt for T {\n        unsafe fn get_character(&mut self) -> Option<&mut Character> {\n            unsafe { self.as_mut().avatar.character.as_mut() }\n        }\n    }\n",
+                  "header": "\n    pub trait PlayerExt {\n        unsafe fn get_character(&self) -> Option<&crate::game_objects::Character>;\n    }\n    impl<T: std::convert::AsRef<crate::game_objects::player::Player>> PlayerExt for T {\n        unsafe fn get_character(&self) -> Option<&crate::game_objects::Character> {\n            unsafe { self.as_ref().avatar.character.as_ref() }\n        }\n    }\n    pub trait PlayerMutExt {\n        unsafe fn get_character(&mut self) -> Option<&mut crate::game_objects::Character>;\n    }\n    impl<T: std::convert::AsMut<crate::game_objects::player::Player>> PlayerMutExt for T {\n        unsafe fn get_character(&mut self) -> Option<&mut crate::game_objects::Character> {\n            unsafe { self.as_mut().avatar.character.as_mut() }\n        }\n    }\n",
                   "definition": null
                 }
               }
@@ -23714,17 +23672,7 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {
-            "rust": [
-              {
-                "prologue": {
-                  "header": "use crate::shared_ptr::*;",
-                  "definition": null
-                },
-                "epilogue": null
-              }
-            ]
-          }
+          "backends": {}
         },
         "pfx_rigid_body": {
           "doc": null,
@@ -23783,16 +23731,9 @@
           "backends": {
             "rust": [
               {
-                "prologue": {
-                  "header": "\nuse windows::{\n    core::InterfaceRef,\n    Win32::{\n        Foundation::HWND,\n        UI::WindowsAndMessaging::HCURSOR,    \n        Graphics::{Direct3D11::ID3D11Device, Direct3D11::ID3D11DeviceContext, Dxgi::IDXGISwapChain},\n        System::Threading::CRITICAL_SECTION\n    }\n};\n",
-                  "definition": null
-                },
-                "epilogue": null
-              },
-              {
                 "prologue": null,
                 "epilogue": {
-                  "header": "\npub unsafe fn get_d3d11_device() -> Option<InterfaceRef<'static, ID3D11Device>> {\n    unsafe {\n        GraphicsEngine::get()\n            .and_then(|ge| ge.graphics_device.as_ref())\n            .and_then(|d| {\n                let raw = std::ptr::NonNull::new(\n                    d.device as *mut std::os::raw::c_void\n                )?;\n                Some(InterfaceRef::from_raw(raw))\n            })\n    }\n}\npub unsafe fn get_d3d11_device_context() -> Option<InterfaceRef<'static, ID3D11DeviceContext>> {\n    unsafe {\n        GraphicsEngine::get()\n            .and_then(|ge| ge.graphics_device.as_ref())\n            .and_then(|d| d.context.as_ref())\n            .and_then(|c| {\n                let raw = std::ptr::NonNull::new(\n                    c.context as *mut std::os::raw::c_void\n                )?;\n                Some(InterfaceRef::from_raw(raw))\n            })\n    }\n}\npub unsafe fn get_dxgi_swapchain() -> Option<InterfaceRef<'static, IDXGISwapChain>> {\n    unsafe {\n        GraphicsEngine::get().and_then(|ge| ge.graphics_device.as_ref()).and_then(|d| {\n            let raw = std::ptr::NonNull::new(\n                d.swap_chain as *mut std::os::raw::c_void\n            )?;\n            Some(InterfaceRef::from_raw(raw))\n        })\n    }\n}\n",
+                  "header": "\npub unsafe fn get_d3d11_device() -> Option<windows::core::InterfaceRef<'static, windows::Win32::Graphics::Direct3D11::ID3D11Device>> {\n    unsafe {\n        GraphicsEngine::get()\n            .and_then(|ge| ge.graphics_device.as_ref())\n            .and_then(|d| {\n                let raw = std::ptr::NonNull::new(\n                    d.device as *mut std::os::raw::c_void\n                )?;\n                Some(windows::core::InterfaceRef::from_raw(raw))\n            })\n    }\n}\npub unsafe fn get_d3d11_device_context() -> Option<windows::core::InterfaceRef<'static, windows::Win32::Graphics::Direct3D11::ID3D11DeviceContext>> {\n    unsafe {\n        GraphicsEngine::get()\n            .and_then(|ge| ge.graphics_device.as_ref())\n            .and_then(|d| d.context.as_ref())\n            .and_then(|c| {\n                let raw = std::ptr::NonNull::new(\n                    c.context as *mut std::os::raw::c_void\n                )?;\n                Some(windows::core::InterfaceRef::from_raw(raw))\n            })\n    }\n}\npub unsafe fn get_dxgi_swapchain() -> Option<windows::core::InterfaceRef<'static, windows::Win32::Graphics::Dxgi::IDXGISwapChain>> {\n    unsafe {\n        GraphicsEngine::get().and_then(|ge| ge.graphics_device.as_ref()).and_then(|d| {\n            let raw = std::ptr::NonNull::new(\n                d.swap_chain as *mut std::os::raw::c_void\n            )?;\n            Some(windows::core::InterfaceRef::from_raw(raw))\n        })\n    }\n}\n",
                   "definition": null
                 }
               }
@@ -23879,7 +23820,7 @@
             "rust": [
               {
                 "prologue": {
-                  "header": "\n    #[cfg(feature = \"glam\")]\n    use glam::{Mat3, Mat4, Vec2, Vec3, Vec4};\n    #[cfg(feature = \"bevy_math\")]\n    use bevy_math::{bounding::Aabb3d, Dir3, Ray3d};\n",
+                  "header": "\n    #[cfg(feature = \"glam\")]\n    use glam::{Mat3, Mat4, Vec2, Vec3, Vec4};\n    #[cfg(feature = \"bevy_math\")]\n    use bevy_math::{bounding::Aabb3d, Ray3d};\n",
                   "definition": null
                 },
                 "epilogue": null
@@ -23908,7 +23849,7 @@
               {
                 "prologue": null,
                 "epilogue": {
-                  "header": "\n    #[cfg(feature = \"bevy_math\")]\n    impl From<Ray> for Ray3d {\n        fn from(r: Ray) -> Self {\n            Self::new(\n                bevy_math::Vec3::from(r.origin),\n                Dir3::new(bevy_math::Vec3::from(r.direction)).unwrap(),\n            )\n        }\n    }\n    #[cfg(feature = \"bevy_math\")]\n    impl From<Ray3d> for Ray {\n        fn from(r: Ray3d) -> Self {\n            Self::new(r.origin.into(), (*r.direction).into())\n        }\n    }\n    impl Ray {\n        fn new(origin: Vector3, direction: Vector3) -> Self {\n            Self {\n                origin,\n                direction,\n            }\n        }\n    }\n",
+                  "header": "\n    #[cfg(feature = \"bevy_math\")]\n    impl From<Ray> for Ray3d {\n        fn from(r: Ray) -> Self {\n            Self::new(\n                bevy_math::Vec3::from(r.origin),\n                bevy_math::Vec3::from(r.direction),\n            )\n        }\n    }\n    #[cfg(feature = \"bevy_math\")]\n    impl From<Ray3d> for Ray {\n        fn from(r: Ray3d) -> Self {\n            Self::new(r.origin.into(), (*r.direction).into())\n        }\n    }\n    impl Ray {\n        fn new(origin: Vector3, direction: Vector3) -> Self {\n            Self {\n                origin,\n                direction,\n            }\n        }\n    }\n",
                   "definition": null
                 }
               },
