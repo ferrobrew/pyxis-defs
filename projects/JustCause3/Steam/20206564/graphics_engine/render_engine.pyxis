@@ -1,6 +1,7 @@
 use graphics_engine::graphics_engine::{HContext_t, HRenderSetup_t, HTexture_t, RenderContext};
-use graphics_engine::render_pass::RenderPassList;
+use graphics_engine::render_pass::RenderPass;
 use types::math::Matrix4;
+use types::std_vector::Vector;
 
 // NOTE: this dump gives RP_POSTEFFECTS = 0x95 and RP_LAST_MAIN = 0x96, whereas the retail range
 // comments below describe the post-effects pass as 0x96..0x97. That is an unverified off-by-one (a
@@ -177,7 +178,7 @@ pub type RenderEngine {
     /// Per-pass render-block-item lists: one `std::vector<CRenderPass*>` per pass id (stride 0x20, at
     /// `this + 32*pass + 128`). DrawRenderPassRange and the per-frame list rotation walk this.
     #[address(0x80)]
-    pub m_RenderPasses: [RenderPassList; 157],
+    pub m_RenderPasses: [Vector<*mut RenderPass>; 157],
 }
 impl RenderEngine {
     /// Late render-pass step (finalizes / copies render targets under the context mutex).
