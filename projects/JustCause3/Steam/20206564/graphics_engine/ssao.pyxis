@@ -1,0 +1,16 @@
+/// SSAO render pass. Maintains a two-slot temporal AO history (m_AO_HistoryBufferTexture[2] /
+/// m_TemporalFilterRenderSetup[2], selected by m_PrevFrameIndex / m_CurrFrameIndex and advanced by
+/// SetNextHistoryBuffer) that is blended in when m_EnableTemporalFilter is set.
+#[min_size(0xaa0)]
+pub type SSAOPass {
+    /// Enables the temporal filter: the current AO is blended against the previous frame's result
+    /// through the history ping-pong. Set by the constructor (defaults on). The history advances once
+    /// per pass, so the filter assumes the pass runs once per frame.
+    #[address(0x9b0)]
+    pub m_EnableTemporalFilter: bool,
+}
+impl SSAOPass {
+    /// Sets up the SSAO render context and enqueues the SSAO render block onto the active draw list.
+    #[address(0x140_1A3_ED0)]
+    pub fn Draw(&mut self);
+}
