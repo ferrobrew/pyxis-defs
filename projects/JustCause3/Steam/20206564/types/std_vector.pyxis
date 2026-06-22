@@ -5,9 +5,11 @@
 pub type Vector<T> {
     /// `_Myfirst`: start of the element array.
     pub begin: *mut T,
+
     /// `_Mylast`: one past the last live element.
     #[address(0x8)]
     pub end: *mut T,
+
     /// `_Myend`: one past the allocated capacity.
     #[address(0x10)]
     pub capacity_end: *mut T,

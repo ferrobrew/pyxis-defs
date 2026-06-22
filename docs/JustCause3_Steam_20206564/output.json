@@ -10552,7 +10552,7 @@
       "path": "graphics_engine::render_engine::RenderEngine",
       "visibility": "public",
       "size": 8736,
-      "alignment": 1,
+      "alignment": 8,
       "category": "defined",
       "kind": {
         "type": "type",
@@ -10568,15 +10568,66 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 8736
+              "size": 128
             },
             "offset": 0,
-            "size": 8736,
+            "size": 128,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 19,
-              "line": 174
+              "line": 178
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_RenderPasses",
+            "doc": " Per-pass render-block-item lists: one `std::vector<CRenderPass*>` per pass id (stride 0x20, at\n `this + 32*pass + 128`). DrawRenderPassRange and the per-frame list rotation walk this.",
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "generic",
+                "base": "types::std_vector::Vector",
+                "args": [
+                  {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "graphics_engine::render_pass::RenderPass"
+                    }
+                  }
+                ]
+              },
+              "size": 157
+            },
+            "offset": 128,
+            "size": 5024,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 19,
+              "line": 178
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_1420",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 3584
+            },
+            "offset": 5152,
+            "size": 3584,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 19,
+              "line": 176
             }
           }
         ],
@@ -10609,7 +10660,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 19,
-              "line": 177
+              "line": 184
             }
           },
           {
@@ -10667,7 +10718,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 19,
-              "line": 181
+              "line": 188
             }
           },
           {
@@ -10717,7 +10768,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 19,
-              "line": 187
+              "line": 194
             }
           },
           {
@@ -10751,7 +10802,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 19,
-              "line": 192
+              "line": 199
             }
           },
           {
@@ -10793,7 +10844,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 19,
-              "line": 197
+              "line": 204
             }
           },
           {
@@ -10824,7 +10875,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 19,
-              "line": 202
+              "line": 209
             }
           },
           {
@@ -10871,7 +10922,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 19,
-              "line": 208
+              "line": 215
             }
           },
           {
@@ -10891,7 +10942,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 19,
-              "line": 213
+              "line": 220
             }
           }
         ],
@@ -10904,7 +10955,7 @@
       },
       "source": {
         "file_index": 19,
-        "line": 174
+        "line": 176
       }
     },
     "graphics_engine::render_engine::RenderPassId": {
@@ -10926,7 +10977,7 @@
             "value": 0,
             "source": {
               "file_index": 19,
-              "line": 15
+              "line": 17
             }
           },
           {
@@ -10934,7 +10985,7 @@
             "value": 1,
             "source": {
               "file_index": 19,
-              "line": 16
+              "line": 18
             }
           },
           {
@@ -10942,7 +10993,7 @@
             "value": 2,
             "source": {
               "file_index": 19,
-              "line": 17
+              "line": 19
             }
           },
           {
@@ -10950,7 +11001,7 @@
             "value": 3,
             "source": {
               "file_index": 19,
-              "line": 18
+              "line": 20
             }
           },
           {
@@ -10958,7 +11009,7 @@
             "value": 4,
             "source": {
               "file_index": 19,
-              "line": 19
+              "line": 21
             }
           },
           {
@@ -10966,7 +11017,7 @@
             "value": 5,
             "source": {
               "file_index": 19,
-              "line": 20
+              "line": 22
             }
           },
           {
@@ -10974,7 +11025,7 @@
             "value": 6,
             "source": {
               "file_index": 19,
-              "line": 21
+              "line": 23
             }
           },
           {
@@ -10982,7 +11033,7 @@
             "value": 7,
             "source": {
               "file_index": 19,
-              "line": 22
+              "line": 24
             }
           },
           {
@@ -10990,7 +11041,7 @@
             "value": 8,
             "source": {
               "file_index": 19,
-              "line": 23
+              "line": 25
             }
           },
           {
@@ -10998,7 +11049,7 @@
             "value": 9,
             "source": {
               "file_index": 19,
-              "line": 24
+              "line": 26
             }
           },
           {
@@ -11006,7 +11057,7 @@
             "value": 10,
             "source": {
               "file_index": 19,
-              "line": 25
+              "line": 27
             }
           },
           {
@@ -11014,7 +11065,7 @@
             "value": 11,
             "source": {
               "file_index": 19,
-              "line": 26
+              "line": 28
             }
           },
           {
@@ -11022,7 +11073,7 @@
             "value": 12,
             "source": {
               "file_index": 19,
-              "line": 27
+              "line": 29
             }
           },
           {
@@ -11030,7 +11081,7 @@
             "value": 13,
             "source": {
               "file_index": 19,
-              "line": 28
+              "line": 30
             }
           },
           {
@@ -11038,7 +11089,7 @@
             "value": 14,
             "source": {
               "file_index": 19,
-              "line": 29
+              "line": 31
             }
           },
           {
@@ -11046,7 +11097,7 @@
             "value": 15,
             "source": {
               "file_index": 19,
-              "line": 30
+              "line": 32
             }
           },
           {
@@ -11054,7 +11105,7 @@
             "value": 16,
             "source": {
               "file_index": 19,
-              "line": 31
+              "line": 33
             }
           },
           {
@@ -11062,7 +11113,7 @@
             "value": 17,
             "source": {
               "file_index": 19,
-              "line": 32
+              "line": 34
             }
           },
           {
@@ -11070,7 +11121,7 @@
             "value": 18,
             "source": {
               "file_index": 19,
-              "line": 33
+              "line": 35
             }
           },
           {
@@ -11078,7 +11129,7 @@
             "value": 19,
             "source": {
               "file_index": 19,
-              "line": 34
+              "line": 36
             }
           },
           {
@@ -11086,7 +11137,7 @@
             "value": 20,
             "source": {
               "file_index": 19,
-              "line": 35
+              "line": 37
             }
           },
           {
@@ -11094,7 +11145,7 @@
             "value": 21,
             "source": {
               "file_index": 19,
-              "line": 36
+              "line": 38
             }
           },
           {
@@ -11102,7 +11153,7 @@
             "value": 22,
             "source": {
               "file_index": 19,
-              "line": 37
+              "line": 39
             }
           },
           {
@@ -11110,7 +11161,7 @@
             "value": 23,
             "source": {
               "file_index": 19,
-              "line": 38
+              "line": 40
             }
           },
           {
@@ -11118,7 +11169,7 @@
             "value": 24,
             "source": {
               "file_index": 19,
-              "line": 39
+              "line": 41
             }
           },
           {
@@ -11126,7 +11177,7 @@
             "value": 25,
             "source": {
               "file_index": 19,
-              "line": 40
+              "line": 42
             }
           },
           {
@@ -11134,7 +11185,7 @@
             "value": 26,
             "source": {
               "file_index": 19,
-              "line": 41
+              "line": 43
             }
           },
           {
@@ -11142,7 +11193,7 @@
             "value": 27,
             "source": {
               "file_index": 19,
-              "line": 42
+              "line": 44
             }
           },
           {
@@ -11150,7 +11201,7 @@
             "value": 28,
             "source": {
               "file_index": 19,
-              "line": 43
+              "line": 45
             }
           },
           {
@@ -11158,7 +11209,7 @@
             "value": 29,
             "source": {
               "file_index": 19,
-              "line": 44
+              "line": 46
             }
           },
           {
@@ -11166,7 +11217,7 @@
             "value": 30,
             "source": {
               "file_index": 19,
-              "line": 45
+              "line": 47
             }
           },
           {
@@ -11174,7 +11225,7 @@
             "value": 31,
             "source": {
               "file_index": 19,
-              "line": 46
+              "line": 48
             }
           },
           {
@@ -11182,7 +11233,7 @@
             "value": 32,
             "source": {
               "file_index": 19,
-              "line": 47
+              "line": 49
             }
           },
           {
@@ -11190,7 +11241,7 @@
             "value": 33,
             "source": {
               "file_index": 19,
-              "line": 48
+              "line": 50
             }
           },
           {
@@ -11198,7 +11249,7 @@
             "value": 34,
             "source": {
               "file_index": 19,
-              "line": 49
+              "line": 51
             }
           },
           {
@@ -11206,7 +11257,7 @@
             "value": 35,
             "source": {
               "file_index": 19,
-              "line": 50
+              "line": 52
             }
           },
           {
@@ -11214,7 +11265,7 @@
             "value": 36,
             "source": {
               "file_index": 19,
-              "line": 51
+              "line": 53
             }
           },
           {
@@ -11222,7 +11273,7 @@
             "value": 37,
             "source": {
               "file_index": 19,
-              "line": 52
+              "line": 54
             }
           },
           {
@@ -11230,7 +11281,7 @@
             "value": 38,
             "source": {
               "file_index": 19,
-              "line": 53
+              "line": 55
             }
           },
           {
@@ -11238,7 +11289,7 @@
             "value": 39,
             "source": {
               "file_index": 19,
-              "line": 54
+              "line": 56
             }
           },
           {
@@ -11246,7 +11297,7 @@
             "value": 40,
             "source": {
               "file_index": 19,
-              "line": 55
+              "line": 57
             }
           },
           {
@@ -11254,7 +11305,7 @@
             "value": 41,
             "source": {
               "file_index": 19,
-              "line": 56
+              "line": 58
             }
           },
           {
@@ -11262,7 +11313,7 @@
             "value": 42,
             "source": {
               "file_index": 19,
-              "line": 57
+              "line": 59
             }
           },
           {
@@ -11270,7 +11321,7 @@
             "value": 43,
             "source": {
               "file_index": 19,
-              "line": 58
+              "line": 60
             }
           },
           {
@@ -11278,7 +11329,7 @@
             "value": 44,
             "source": {
               "file_index": 19,
-              "line": 59
+              "line": 61
             }
           },
           {
@@ -11286,7 +11337,7 @@
             "value": 45,
             "source": {
               "file_index": 19,
-              "line": 60
+              "line": 62
             }
           },
           {
@@ -11294,7 +11345,7 @@
             "value": 46,
             "source": {
               "file_index": 19,
-              "line": 61
+              "line": 63
             }
           },
           {
@@ -11302,7 +11353,7 @@
             "value": 47,
             "source": {
               "file_index": 19,
-              "line": 62
+              "line": 64
             }
           },
           {
@@ -11310,7 +11361,7 @@
             "value": 48,
             "source": {
               "file_index": 19,
-              "line": 63
+              "line": 65
             }
           },
           {
@@ -11318,7 +11369,7 @@
             "value": 49,
             "source": {
               "file_index": 19,
-              "line": 64
+              "line": 66
             }
           },
           {
@@ -11326,7 +11377,7 @@
             "value": 50,
             "source": {
               "file_index": 19,
-              "line": 65
+              "line": 67
             }
           },
           {
@@ -11334,7 +11385,7 @@
             "value": 51,
             "source": {
               "file_index": 19,
-              "line": 66
+              "line": 68
             }
           },
           {
@@ -11342,7 +11393,7 @@
             "value": 52,
             "source": {
               "file_index": 19,
-              "line": 67
+              "line": 69
             }
           },
           {
@@ -11350,7 +11401,7 @@
             "value": 53,
             "source": {
               "file_index": 19,
-              "line": 68
+              "line": 70
             }
           },
           {
@@ -11358,7 +11409,7 @@
             "value": 54,
             "source": {
               "file_index": 19,
-              "line": 69
+              "line": 71
             }
           },
           {
@@ -11366,7 +11417,7 @@
             "value": 55,
             "source": {
               "file_index": 19,
-              "line": 70
+              "line": 72
             }
           },
           {
@@ -11374,7 +11425,7 @@
             "value": 56,
             "source": {
               "file_index": 19,
-              "line": 71
+              "line": 73
             }
           },
           {
@@ -11382,7 +11433,7 @@
             "value": 57,
             "source": {
               "file_index": 19,
-              "line": 72
+              "line": 74
             }
           },
           {
@@ -11390,7 +11441,7 @@
             "value": 58,
             "source": {
               "file_index": 19,
-              "line": 73
+              "line": 75
             }
           },
           {
@@ -11398,7 +11449,7 @@
             "value": 59,
             "source": {
               "file_index": 19,
-              "line": 74
+              "line": 76
             }
           },
           {
@@ -11406,7 +11457,7 @@
             "value": 60,
             "source": {
               "file_index": 19,
-              "line": 75
+              "line": 77
             }
           },
           {
@@ -11414,7 +11465,7 @@
             "value": 61,
             "source": {
               "file_index": 19,
-              "line": 76
+              "line": 78
             }
           },
           {
@@ -11422,7 +11473,7 @@
             "value": 62,
             "source": {
               "file_index": 19,
-              "line": 77
+              "line": 79
             }
           },
           {
@@ -11430,7 +11481,7 @@
             "value": 63,
             "source": {
               "file_index": 19,
-              "line": 78
+              "line": 80
             }
           },
           {
@@ -11438,7 +11489,7 @@
             "value": 64,
             "source": {
               "file_index": 19,
-              "line": 79
+              "line": 81
             }
           },
           {
@@ -11446,7 +11497,7 @@
             "value": 65,
             "source": {
               "file_index": 19,
-              "line": 80
+              "line": 82
             }
           },
           {
@@ -11454,7 +11505,7 @@
             "value": 66,
             "source": {
               "file_index": 19,
-              "line": 81
+              "line": 83
             }
           },
           {
@@ -11462,7 +11513,7 @@
             "value": 67,
             "source": {
               "file_index": 19,
-              "line": 82
+              "line": 84
             }
           },
           {
@@ -11470,7 +11521,7 @@
             "value": 68,
             "source": {
               "file_index": 19,
-              "line": 83
+              "line": 85
             }
           },
           {
@@ -11478,7 +11529,7 @@
             "value": 69,
             "source": {
               "file_index": 19,
-              "line": 84
+              "line": 86
             }
           },
           {
@@ -11486,7 +11537,7 @@
             "value": 70,
             "source": {
               "file_index": 19,
-              "line": 85
+              "line": 87
             }
           },
           {
@@ -11494,7 +11545,7 @@
             "value": 71,
             "source": {
               "file_index": 19,
-              "line": 86
+              "line": 88
             }
           },
           {
@@ -11502,7 +11553,7 @@
             "value": 72,
             "source": {
               "file_index": 19,
-              "line": 87
+              "line": 89
             }
           },
           {
@@ -11510,7 +11561,7 @@
             "value": 73,
             "source": {
               "file_index": 19,
-              "line": 88
+              "line": 90
             }
           },
           {
@@ -11518,7 +11569,7 @@
             "value": 74,
             "source": {
               "file_index": 19,
-              "line": 89
+              "line": 91
             }
           },
           {
@@ -11526,7 +11577,7 @@
             "value": 75,
             "source": {
               "file_index": 19,
-              "line": 90
+              "line": 92
             }
           },
           {
@@ -11534,7 +11585,7 @@
             "value": 76,
             "source": {
               "file_index": 19,
-              "line": 91
+              "line": 93
             }
           },
           {
@@ -11542,7 +11593,7 @@
             "value": 77,
             "source": {
               "file_index": 19,
-              "line": 92
+              "line": 94
             }
           },
           {
@@ -11550,7 +11601,7 @@
             "value": 78,
             "source": {
               "file_index": 19,
-              "line": 93
+              "line": 95
             }
           },
           {
@@ -11558,7 +11609,7 @@
             "value": 79,
             "source": {
               "file_index": 19,
-              "line": 94
+              "line": 96
             }
           },
           {
@@ -11566,7 +11617,7 @@
             "value": 80,
             "source": {
               "file_index": 19,
-              "line": 95
+              "line": 97
             }
           },
           {
@@ -11574,7 +11625,7 @@
             "value": 81,
             "source": {
               "file_index": 19,
-              "line": 96
+              "line": 98
             }
           },
           {
@@ -11582,7 +11633,7 @@
             "value": 82,
             "source": {
               "file_index": 19,
-              "line": 97
+              "line": 99
             }
           },
           {
@@ -11590,7 +11641,7 @@
             "value": 83,
             "source": {
               "file_index": 19,
-              "line": 98
+              "line": 100
             }
           },
           {
@@ -11598,7 +11649,7 @@
             "value": 84,
             "source": {
               "file_index": 19,
-              "line": 99
+              "line": 101
             }
           },
           {
@@ -11606,7 +11657,7 @@
             "value": 85,
             "source": {
               "file_index": 19,
-              "line": 100
+              "line": 102
             }
           },
           {
@@ -11614,7 +11665,7 @@
             "value": 86,
             "source": {
               "file_index": 19,
-              "line": 101
+              "line": 103
             }
           },
           {
@@ -11622,7 +11673,7 @@
             "value": 87,
             "source": {
               "file_index": 19,
-              "line": 102
+              "line": 104
             }
           },
           {
@@ -11630,7 +11681,7 @@
             "value": 88,
             "source": {
               "file_index": 19,
-              "line": 103
+              "line": 105
             }
           },
           {
@@ -11638,7 +11689,7 @@
             "value": 89,
             "source": {
               "file_index": 19,
-              "line": 104
+              "line": 106
             }
           },
           {
@@ -11646,7 +11697,7 @@
             "value": 90,
             "source": {
               "file_index": 19,
-              "line": 105
+              "line": 107
             }
           },
           {
@@ -11654,7 +11705,7 @@
             "value": 91,
             "source": {
               "file_index": 19,
-              "line": 106
+              "line": 108
             }
           },
           {
@@ -11662,7 +11713,7 @@
             "value": 92,
             "source": {
               "file_index": 19,
-              "line": 107
+              "line": 109
             }
           },
           {
@@ -11670,7 +11721,7 @@
             "value": 93,
             "source": {
               "file_index": 19,
-              "line": 108
+              "line": 110
             }
           },
           {
@@ -11678,7 +11729,7 @@
             "value": 94,
             "source": {
               "file_index": 19,
-              "line": 109
+              "line": 111
             }
           },
           {
@@ -11686,7 +11737,7 @@
             "value": 95,
             "source": {
               "file_index": 19,
-              "line": 110
+              "line": 112
             }
           },
           {
@@ -11694,7 +11745,7 @@
             "value": 96,
             "source": {
               "file_index": 19,
-              "line": 111
+              "line": 113
             }
           },
           {
@@ -11702,7 +11753,7 @@
             "value": 97,
             "source": {
               "file_index": 19,
-              "line": 112
+              "line": 114
             }
           },
           {
@@ -11710,7 +11761,7 @@
             "value": 98,
             "source": {
               "file_index": 19,
-              "line": 113
+              "line": 115
             }
           },
           {
@@ -11718,7 +11769,7 @@
             "value": 99,
             "source": {
               "file_index": 19,
-              "line": 114
+              "line": 116
             }
           },
           {
@@ -11726,7 +11777,7 @@
             "value": 100,
             "source": {
               "file_index": 19,
-              "line": 115
+              "line": 117
             }
           },
           {
@@ -11734,7 +11785,7 @@
             "value": 101,
             "source": {
               "file_index": 19,
-              "line": 116
+              "line": 118
             }
           },
           {
@@ -11742,7 +11793,7 @@
             "value": 102,
             "source": {
               "file_index": 19,
-              "line": 117
+              "line": 119
             }
           },
           {
@@ -11750,7 +11801,7 @@
             "value": 103,
             "source": {
               "file_index": 19,
-              "line": 118
+              "line": 120
             }
           },
           {
@@ -11758,7 +11809,7 @@
             "value": 104,
             "source": {
               "file_index": 19,
-              "line": 119
+              "line": 121
             }
           },
           {
@@ -11766,7 +11817,7 @@
             "value": 105,
             "source": {
               "file_index": 19,
-              "line": 120
+              "line": 122
             }
           },
           {
@@ -11774,7 +11825,7 @@
             "value": 106,
             "source": {
               "file_index": 19,
-              "line": 121
+              "line": 123
             }
           },
           {
@@ -11782,7 +11833,7 @@
             "value": 107,
             "source": {
               "file_index": 19,
-              "line": 122
+              "line": 124
             }
           },
           {
@@ -11790,7 +11841,7 @@
             "value": 108,
             "source": {
               "file_index": 19,
-              "line": 123
+              "line": 125
             }
           },
           {
@@ -11798,7 +11849,7 @@
             "value": 109,
             "source": {
               "file_index": 19,
-              "line": 124
+              "line": 126
             }
           },
           {
@@ -11806,7 +11857,7 @@
             "value": 110,
             "source": {
               "file_index": 19,
-              "line": 125
+              "line": 127
             }
           },
           {
@@ -11814,7 +11865,7 @@
             "value": 111,
             "source": {
               "file_index": 19,
-              "line": 126
+              "line": 128
             }
           },
           {
@@ -11822,7 +11873,7 @@
             "value": 112,
             "source": {
               "file_index": 19,
-              "line": 127
+              "line": 129
             }
           },
           {
@@ -11830,7 +11881,7 @@
             "value": 113,
             "source": {
               "file_index": 19,
-              "line": 128
+              "line": 130
             }
           },
           {
@@ -11838,7 +11889,7 @@
             "value": 114,
             "source": {
               "file_index": 19,
-              "line": 129
+              "line": 131
             }
           },
           {
@@ -11846,7 +11897,7 @@
             "value": 115,
             "source": {
               "file_index": 19,
-              "line": 130
+              "line": 132
             }
           },
           {
@@ -11854,7 +11905,7 @@
             "value": 116,
             "source": {
               "file_index": 19,
-              "line": 131
+              "line": 133
             }
           },
           {
@@ -11862,7 +11913,7 @@
             "value": 117,
             "source": {
               "file_index": 19,
-              "line": 132
+              "line": 134
             }
           },
           {
@@ -11870,7 +11921,7 @@
             "value": 118,
             "source": {
               "file_index": 19,
-              "line": 133
+              "line": 135
             }
           },
           {
@@ -11878,7 +11929,7 @@
             "value": 119,
             "source": {
               "file_index": 19,
-              "line": 134
+              "line": 136
             }
           },
           {
@@ -11886,7 +11937,7 @@
             "value": 120,
             "source": {
               "file_index": 19,
-              "line": 135
+              "line": 137
             }
           },
           {
@@ -11894,7 +11945,7 @@
             "value": 121,
             "source": {
               "file_index": 19,
-              "line": 136
+              "line": 138
             }
           },
           {
@@ -11902,7 +11953,7 @@
             "value": 122,
             "source": {
               "file_index": 19,
-              "line": 137
+              "line": 139
             }
           },
           {
@@ -11910,7 +11961,7 @@
             "value": 123,
             "source": {
               "file_index": 19,
-              "line": 138
+              "line": 140
             }
           },
           {
@@ -11918,7 +11969,7 @@
             "value": 124,
             "source": {
               "file_index": 19,
-              "line": 139
+              "line": 141
             }
           },
           {
@@ -11926,7 +11977,7 @@
             "value": 125,
             "source": {
               "file_index": 19,
-              "line": 140
+              "line": 142
             }
           },
           {
@@ -11934,7 +11985,7 @@
             "value": 126,
             "source": {
               "file_index": 19,
-              "line": 141
+              "line": 143
             }
           },
           {
@@ -11942,7 +11993,7 @@
             "value": 127,
             "source": {
               "file_index": 19,
-              "line": 142
+              "line": 144
             }
           },
           {
@@ -11950,7 +12001,7 @@
             "value": 128,
             "source": {
               "file_index": 19,
-              "line": 143
+              "line": 145
             }
           },
           {
@@ -11958,7 +12009,7 @@
             "value": 129,
             "source": {
               "file_index": 19,
-              "line": 144
+              "line": 146
             }
           },
           {
@@ -11966,7 +12017,7 @@
             "value": 130,
             "source": {
               "file_index": 19,
-              "line": 145
+              "line": 147
             }
           },
           {
@@ -11974,7 +12025,7 @@
             "value": 131,
             "source": {
               "file_index": 19,
-              "line": 146
+              "line": 148
             }
           },
           {
@@ -11982,7 +12033,7 @@
             "value": 132,
             "source": {
               "file_index": 19,
-              "line": 147
+              "line": 149
             }
           },
           {
@@ -11990,7 +12041,7 @@
             "value": 133,
             "source": {
               "file_index": 19,
-              "line": 148
+              "line": 150
             }
           },
           {
@@ -11998,7 +12049,7 @@
             "value": 134,
             "source": {
               "file_index": 19,
-              "line": 149
+              "line": 151
             }
           },
           {
@@ -12006,7 +12057,7 @@
             "value": 135,
             "source": {
               "file_index": 19,
-              "line": 150
+              "line": 152
             }
           },
           {
@@ -12014,7 +12065,7 @@
             "value": 136,
             "source": {
               "file_index": 19,
-              "line": 151
+              "line": 153
             }
           },
           {
@@ -12022,7 +12073,7 @@
             "value": 137,
             "source": {
               "file_index": 19,
-              "line": 152
+              "line": 154
             }
           },
           {
@@ -12030,7 +12081,7 @@
             "value": 138,
             "source": {
               "file_index": 19,
-              "line": 153
+              "line": 155
             }
           },
           {
@@ -12038,7 +12089,7 @@
             "value": 139,
             "source": {
               "file_index": 19,
-              "line": 154
+              "line": 156
             }
           },
           {
@@ -12046,7 +12097,7 @@
             "value": 140,
             "source": {
               "file_index": 19,
-              "line": 155
+              "line": 157
             }
           },
           {
@@ -12054,7 +12105,7 @@
             "value": 141,
             "source": {
               "file_index": 19,
-              "line": 156
+              "line": 158
             }
           },
           {
@@ -12062,7 +12113,7 @@
             "value": 142,
             "source": {
               "file_index": 19,
-              "line": 157
+              "line": 159
             }
           },
           {
@@ -12070,7 +12121,7 @@
             "value": 143,
             "source": {
               "file_index": 19,
-              "line": 158
+              "line": 160
             }
           },
           {
@@ -12078,7 +12129,7 @@
             "value": 144,
             "source": {
               "file_index": 19,
-              "line": 159
+              "line": 161
             }
           },
           {
@@ -12086,7 +12137,7 @@
             "value": 145,
             "source": {
               "file_index": 19,
-              "line": 160
+              "line": 162
             }
           },
           {
@@ -12094,7 +12145,7 @@
             "value": 146,
             "source": {
               "file_index": 19,
-              "line": 161
+              "line": 163
             }
           },
           {
@@ -12102,7 +12153,7 @@
             "value": 147,
             "source": {
               "file_index": 19,
-              "line": 162
+              "line": 164
             }
           },
           {
@@ -12110,7 +12161,7 @@
             "value": 148,
             "source": {
               "file_index": 19,
-              "line": 163
+              "line": 165
             }
           },
           {
@@ -12118,7 +12169,7 @@
             "value": 149,
             "source": {
               "file_index": 19,
-              "line": 164
+              "line": 166
             }
           },
           {
@@ -12126,7 +12177,7 @@
             "value": 150,
             "source": {
               "file_index": 19,
-              "line": 165
+              "line": 167
             }
           },
           {
@@ -12134,7 +12185,7 @@
             "value": 151,
             "source": {
               "file_index": 19,
-              "line": 166
+              "line": 168
             }
           },
           {
@@ -12142,7 +12193,7 @@
             "value": 152,
             "source": {
               "file_index": 19,
-              "line": 167
+              "line": 169
             }
           },
           {
@@ -12150,7 +12201,7 @@
             "value": 153,
             "source": {
               "file_index": 19,
-              "line": 168
+              "line": 170
             }
           },
           {
@@ -12158,7 +12209,7 @@
             "value": 154,
             "source": {
               "file_index": 19,
-              "line": 169
+              "line": 171
             }
           },
           {
@@ -12166,7 +12217,7 @@
             "value": 155,
             "source": {
               "file_index": 19,
-              "line": 170
+              "line": 172
             }
           },
           {
@@ -12174,7 +12225,7 @@
             "value": 156,
             "source": {
               "file_index": 19,
-              "line": 171
+              "line": 173
             }
           }
         ],
@@ -12186,7 +12237,7 @@
       },
       "source": {
         "file_index": 19,
-        "line": 8
+        "line": 10
       }
     },
     "graphics_engine::render_pass::ConstantBufferPool": {
@@ -12217,7 +12268,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 20,
-              "line": 82
+              "line": 88
             }
           }
         ],
@@ -12230,7 +12281,7 @@
       },
       "source": {
         "file_index": 20,
-        "line": 79
+        "line": 85
       }
     },
     "graphics_engine::render_pass::RBILists": {
@@ -12389,13 +12440,55 @@
     "graphics_engine::render_pass::RenderPass": {
       "path": "graphics_engine::render_pass::RenderPass",
       "visibility": "public",
-      "size": 0,
+      "size": 48,
       "alignment": 8,
       "category": "defined",
       "kind": {
         "type": "type",
         "doc": null,
-        "fields": [],
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 40
+            },
+            "offset": 0,
+            "size": 40,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 20,
+              "line": 35
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_CurrentAddList",
+            "doc": " The RBI list that new render-block-items append to this frame (the `CRBILists::Add` target).\n Each rotation, `SaveRenderFrameData` re-points this at `m_Lists[parity]` and zeroes its count;\n zeroing `m_CurrentAddList.m_NumElements` is how a pass's draw-time additions are reset.",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::render_pass::RBILists"
+              }
+            },
+            "offset": 40,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 20,
+              "line": 35
+            }
+          }
+        ],
         "associated_functions": [
           {
             "visibility": "public",
@@ -12452,7 +12545,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 20,
-              "line": 36
+              "line": 42
             }
           },
           {
@@ -12494,7 +12587,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 20,
-              "line": 42
+              "line": 48
             }
           },
           {
@@ -12522,7 +12615,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 20,
-              "line": 50
+              "line": 56
             }
           },
           {
@@ -12564,7 +12657,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 20,
-              "line": 56
+              "line": 62
             }
           }
         ],
@@ -12578,6 +12671,161 @@
       "source": {
         "file_index": 20,
         "line": 34
+      }
+    },
+    "graphics_engine::ssao::SSAOPass": {
+      "path": "graphics_engine::ssao::SSAOPass",
+      "visibility": "public",
+      "size": 2720,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " SSAO render pass. Maintains a two-slot temporal AO history (m_AO_HistoryBufferTexture[2] /\n m_TemporalFilterRenderSetup[2], selected by m_PrevFrameIndex / m_CurrFrameIndex and advanced by\n SetNextHistoryBuffer) that is blended in when m_EnableTemporalFilter is set.\n\n The history index advances once per CRenderBlockSSAO::Draw (inlined SetNextHistoryBuffer at the\n end of the apply), not in RotateRenderFrameData -- so a twice-per-frame stereo render double-steps\n the history and blends each eye's AO against the other's. The render block's final composite draw\n lives inside `if (m_EnableTemporalFilter)`, so clearing that flag disables the whole apply (no SSAO\n at all). The per-eye reset lever is m_FirstPass: the engine uses it to mean \"no valid history,\n compute fresh\", and passes it to the temporal shader as a current-vs-history weight. Forcing it on\n before each stereo eye keeps the apply running while making each eye compute AO from its own depth.",
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 2480
+            },
+            "offset": 0,
+            "size": 2480,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 21,
+              "line": 14
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_EnableTemporalFilter",
+            "doc": " Enables the temporal filter: the current AO is blended against the previous frame's result\n through the history ping-pong. Set by the constructor (defaults on). Also gates the render\n block's final composite draw, so clearing it disables SSAO entirely -- prefer m_FirstPass for\n per-eye reset.",
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 2480,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 21,
+              "line": 14
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_EnableDisocclusionTest",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 2481,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 21,
+              "line": 20
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_EnableDeltaWeighting",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 2482,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 21,
+              "line": 21
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_FirstPass",
+            "doc": " Per-eye reset lever. On (the constructor default for the very first frame) it tells the temporal\n shader to weight fully toward the current AO and skip the history resolve (`!m_FirstPass &&\n m_Blur`); the render block clears it after the first apply. Forcing it back on before each eye\n makes every dispatch compute fresh AO with no cross-eye history blend.",
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 2483,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 21,
+              "line": 22
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_9b4",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 236
+            },
+            "offset": 2484,
+            "size": 236,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 21,
+              "line": 1
+            }
+          }
+        ],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "Draw",
+            "doc": " Sets up the SSAO render context and enqueues the SSAO render block onto the active draw list.",
+            "body": {
+              "type": "address",
+              "address": 5370429136
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 21,
+              "line": 29
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      },
+      "source": {
+        "file_index": 21,
+        "line": 1
       }
     },
     "graphics_engine::texture::ID3D11DepthStencilView": {
@@ -12602,7 +12850,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 21,
+        "file_index": 22,
         "line": 10
       }
     },
@@ -12628,7 +12876,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 21,
+        "file_index": 22,
         "line": 7
       }
     },
@@ -12654,7 +12902,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 21,
+        "file_index": 22,
         "line": 1
       }
     },
@@ -12680,7 +12928,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 21,
+        "file_index": 22,
         "line": 4
       }
     },
@@ -12707,7 +12955,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 21,
+              "file_index": 22,
               "line": 15
             }
           },
@@ -12728,7 +12976,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 21,
+              "file_index": 22,
               "line": 17
             }
           },
@@ -12745,7 +12993,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 21,
+              "file_index": 22,
               "line": 17
             }
           },
@@ -12762,7 +13010,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 21,
+              "file_index": 22,
               "line": 19
             }
           },
@@ -12779,7 +13027,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 21,
+              "file_index": 22,
               "line": 20
             }
           },
@@ -12800,7 +13048,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 21,
+              "file_index": 22,
               "line": 22
             }
           },
@@ -12817,7 +13065,7 @@
             "alignment": 2,
             "is_base": false,
             "source": {
-              "file_index": 21,
+              "file_index": 22,
               "line": 22
             }
           },
@@ -12834,7 +13082,7 @@
             "alignment": 2,
             "is_base": false,
             "source": {
-              "file_index": 21,
+              "file_index": 22,
               "line": 24
             }
           },
@@ -12855,7 +13103,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 21,
+              "file_index": 22,
               "line": 26
             }
           },
@@ -12872,7 +13120,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 21,
+              "file_index": 22,
               "line": 26
             }
           },
@@ -12893,7 +13141,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 21,
+              "file_index": 22,
               "line": 13
             }
           }
@@ -12907,7 +13155,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 21,
+        "file_index": 22,
         "line": 13
       }
     },
@@ -12938,7 +13186,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 22,
+              "file_index": 23,
               "line": 7
             }
           },
@@ -12959,7 +13207,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 22,
+              "file_index": 23,
               "line": 7
             }
           },
@@ -12976,7 +13224,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 22,
+              "file_index": 23,
               "line": 12
             }
           },
@@ -12993,7 +13241,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 22,
+              "file_index": 23,
               "line": 16
             }
           }
@@ -13007,7 +13255,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 22,
+        "file_index": 23,
         "line": 3
       }
     },
@@ -13046,7 +13294,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 22,
+              "file_index": 23,
               "line": 74
             }
           }
@@ -13059,7 +13307,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 22,
+        "file_index": 23,
         "line": 71
       }
     },
@@ -13090,7 +13338,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 22,
+              "file_index": 23,
               "line": 24
             }
           },
@@ -13107,7 +13355,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 22,
+              "file_index": 23,
               "line": 24
             }
           },
@@ -13124,7 +13372,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 22,
+              "file_index": 23,
               "line": 28
             }
           },
@@ -13145,7 +13393,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 22,
+              "file_index": 23,
               "line": 32
             }
           },
@@ -13162,7 +13410,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 22,
+              "file_index": 23,
               "line": 32
             }
           },
@@ -13183,7 +13431,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 22,
+              "file_index": 23,
               "line": 38
             }
           },
@@ -13200,7 +13448,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 22,
+              "file_index": 23,
               "line": 38
             }
           },
@@ -13221,7 +13469,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 22,
+              "file_index": 23,
               "line": 42
             }
           },
@@ -13238,7 +13486,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 22,
+              "file_index": 23,
               "line": 42
             }
           },
@@ -13259,7 +13507,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 22,
+              "file_index": 23,
               "line": 21
             }
           }
@@ -13350,7 +13598,7 @@
             },
             "calling_convention": "system",
             "source": {
-              "file_index": 22,
+              "file_index": 23,
               "line": 48
             }
           },
@@ -13411,7 +13659,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 22,
+              "file_index": 23,
               "line": 56
             }
           },
@@ -13453,7 +13701,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 22,
+              "file_index": 23,
               "line": 63
             }
           }
@@ -13466,7 +13714,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 22,
+        "file_index": 23,
         "line": 21
       }
     },
@@ -13588,7 +13836,7 @@
             "name": "PAUSE",
             "value": 0,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 57
             }
           },
@@ -13596,7 +13844,7 @@
             "name": "LOOK_UP",
             "value": 1,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 58
             }
           },
@@ -13604,7 +13852,7 @@
             "name": "LOOK_DOWN",
             "value": 2,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 59
             }
           },
@@ -13612,7 +13860,7 @@
             "name": "LOOK_LEFT",
             "value": 3,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 60
             }
           },
@@ -13620,7 +13868,7 @@
             "name": "LOOK_RIGHT",
             "value": 4,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 61
             }
           },
@@ -13628,7 +13876,7 @@
             "name": "LOOK_BACK_CAM",
             "value": 5,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 62
             }
           },
@@ -13636,7 +13884,7 @@
             "name": "VEHICLE_CAM",
             "value": 6,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 63
             }
           },
@@ -13644,7 +13892,7 @@
             "name": "TOGGLE_MAGNET_1",
             "value": 7,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 64
             }
           },
@@ -13652,7 +13900,7 @@
             "name": "TOGGLE_MAGNET_2",
             "value": 8,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 65
             }
           },
@@ -13660,7 +13908,7 @@
             "name": "FIRE_VEHICLE_WEAPON_PRIMARY",
             "value": 9,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 66
             }
           },
@@ -13668,7 +13916,7 @@
             "name": "FIRE_LEFT",
             "value": 10,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 67
             }
           },
@@ -13676,7 +13924,7 @@
             "name": "FIRE_RIGHT",
             "value": 11,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 68
             }
           },
@@ -13684,7 +13932,7 @@
             "name": "FIRE_VEHICLE_WEAPON_SECONDARY",
             "value": 12,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 69
             }
           },
@@ -13692,7 +13940,7 @@
             "name": "THROW_GRENADE",
             "value": 13,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 70
             }
           },
@@ -13700,7 +13948,7 @@
             "name": "RELOAD",
             "value": 14,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 71
             }
           },
@@ -13708,7 +13956,7 @@
             "name": "NEXT_WEAPON",
             "value": 15,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 72
             }
           },
@@ -13716,7 +13964,7 @@
             "name": "PREV_WEAPON",
             "value": 16,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 73
             }
           },
@@ -13724,7 +13972,7 @@
             "name": "FREEFLY_MOVE_UP",
             "value": 17,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 74
             }
           },
@@ -13732,7 +13980,7 @@
             "name": "FREEFLY_MOVE_DOWN",
             "value": 18,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 75
             }
           },
@@ -13740,7 +13988,7 @@
             "name": "FREEFLY_ROLL_LEFT",
             "value": 19,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 76
             }
           },
@@ -13748,7 +13996,7 @@
             "name": "FREEFLY_ROLL_RIGHT",
             "value": 20,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 77
             }
           },
@@ -13756,7 +14004,7 @@
             "name": "FREEFLY_ZOOM_IN",
             "value": 21,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 78
             }
           },
@@ -13764,7 +14012,7 @@
             "name": "FREEFLY_ZOOM_OUT",
             "value": 22,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 79
             }
           },
@@ -13772,7 +14020,7 @@
             "name": "FREEFLY_TOGGLE_LOCK_HORIZON",
             "value": 23,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 80
             }
           },
@@ -13780,7 +14028,7 @@
             "name": "FREEFLY_MISC_1",
             "value": 24,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 81
             }
           },
@@ -13788,7 +14036,7 @@
             "name": "FREEFLY_MISC_2",
             "value": 25,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 82
             }
           },
@@ -13796,7 +14044,7 @@
             "name": "FREEFLY_SPEED_UP",
             "value": 26,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 83
             }
           },
@@ -13804,7 +14052,7 @@
             "name": "FREEFLY_SLOW_DOWN",
             "value": 27,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 84
             }
           },
@@ -13812,7 +14060,7 @@
             "name": "MOVE_FORWARD",
             "value": 28,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 85
             }
           },
@@ -13820,7 +14068,7 @@
             "name": "MOVE_BACKWARD",
             "value": 29,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 86
             }
           },
@@ -13828,7 +14076,7 @@
             "name": "MOVE_LEFT",
             "value": 30,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 87
             }
           },
@@ -13836,7 +14084,7 @@
             "name": "MOVE_RIGHT",
             "value": 31,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 88
             }
           },
@@ -13844,7 +14092,7 @@
             "name": "WALK",
             "value": 32,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 89
             }
           },
@@ -13852,7 +14100,7 @@
             "name": "JUMP",
             "value": 33,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 90
             }
           },
@@ -13860,7 +14108,7 @@
             "name": "CHALLENGE_RESET_VEHICLE",
             "value": 34,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 91
             }
           },
@@ -13868,7 +14116,7 @@
             "name": "ENTER_VEHICLE",
             "value": 35,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 92
             }
           },
@@ -13876,7 +14124,7 @@
             "name": "USE_ITEM",
             "value": 36,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 93
             }
           },
@@ -13884,7 +14132,7 @@
             "name": "ACCELERATE",
             "value": 37,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 94
             }
           },
@@ -13892,7 +14140,7 @@
             "name": "REVERSE",
             "value": 38,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 95
             }
           },
@@ -13900,7 +14148,7 @@
             "name": "TURN_LEFT",
             "value": 39,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 96
             }
           },
@@ -13908,7 +14156,7 @@
             "name": "TURN_RIGHT",
             "value": 40,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 97
             }
           },
@@ -13916,7 +14164,7 @@
             "name": "HANDBRAKE",
             "value": 41,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 98
             }
           },
@@ -13924,7 +14172,7 @@
             "name": "SOUND_HORN_SIREN",
             "value": 42,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 99
             }
           },
@@ -13932,7 +14180,7 @@
             "name": "EXIT_VEHICLE",
             "value": 43,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 100
             }
           },
@@ -13940,7 +14188,7 @@
             "name": "BIKE_TILT_FORWARD",
             "value": 44,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 101
             }
           },
@@ -13948,7 +14196,7 @@
             "name": "BIKE_TILT_BACKWARD",
             "value": 45,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 102
             }
           },
@@ -13956,7 +14204,7 @@
             "name": "HELI_FORWARD",
             "value": 46,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 103
             }
           },
@@ -13964,7 +14212,7 @@
             "name": "HELI_BACKWARD",
             "value": 47,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 104
             }
           },
@@ -13972,7 +14220,7 @@
             "name": "HELI_TURN_LEFT",
             "value": 48,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 105
             }
           },
@@ -13980,7 +14228,7 @@
             "name": "HELI_TURN_RIGHT",
             "value": 49,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 106
             }
           },
@@ -13988,7 +14236,7 @@
             "name": "HELI_ROLL_LEFT",
             "value": 50,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 107
             }
           },
@@ -13996,7 +14244,7 @@
             "name": "HELI_ROLL_RIGHT",
             "value": 51,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 108
             }
           },
@@ -14004,7 +14252,7 @@
             "name": "HELI_INC_ALTITUDE",
             "value": 52,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 109
             }
           },
@@ -14012,7 +14260,7 @@
             "name": "HELI_DEC_ALTITUDE",
             "value": 53,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 110
             }
           },
@@ -14020,7 +14268,7 @@
             "name": "HELI_AI_TARGET_ALTITUDE",
             "value": 54,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 111
             }
           },
@@ -14028,7 +14276,7 @@
             "name": "PLANE_PITCH_UP",
             "value": 55,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 112
             }
           },
@@ -14036,7 +14284,7 @@
             "name": "PLANE_PITCH_DOWN",
             "value": 56,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 113
             }
           },
@@ -14044,7 +14292,7 @@
             "name": "PLANE_TURN_LEFT",
             "value": 57,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 114
             }
           },
@@ -14052,7 +14300,7 @@
             "name": "PLANE_TURN_RIGHT",
             "value": 58,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 115
             }
           },
@@ -14060,7 +14308,7 @@
             "name": "PLANE_ROLL_LEFT",
             "value": 59,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 116
             }
           },
@@ -14068,7 +14316,7 @@
             "name": "PLANE_ROLL_RIGHT",
             "value": 60,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 117
             }
           },
@@ -14076,7 +14324,7 @@
             "name": "PLANE_INC_TRUST",
             "value": 61,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 118
             }
           },
@@ -14084,7 +14332,7 @@
             "name": "PLANE_DEC_TRUST",
             "value": 62,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 119
             }
           },
@@ -14092,7 +14340,7 @@
             "name": "BOAT_FORWARD",
             "value": 63,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 120
             }
           },
@@ -14100,7 +14348,7 @@
             "name": "BOAT_BACKWARD",
             "value": 64,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 121
             }
           },
@@ -14108,7 +14356,7 @@
             "name": "BOAT_TURN_LEFT",
             "value": 65,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 122
             }
           },
@@ -14116,7 +14364,7 @@
             "name": "BOAT_TURN_RIGHT",
             "value": 66,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 123
             }
           },
@@ -14124,7 +14372,7 @@
             "name": "MOVE_TO_DRIVERS_SEAT",
             "value": 67,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 124
             }
           },
@@ -14132,7 +14380,7 @@
             "name": "BIKE_LEAN_LEFT",
             "value": 68,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 125
             }
           },
@@ -14140,7 +14388,7 @@
             "name": "BIKE_LEAN_RIGHT",
             "value": 69,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 126
             }
           },
@@ -14148,7 +14396,7 @@
             "name": "DIVE",
             "value": 70,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 127
             }
           },
@@ -14156,7 +14404,7 @@
             "name": "SWIM",
             "value": 71,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 128
             }
           },
@@ -14164,7 +14412,7 @@
             "name": "ZOOM_IN",
             "value": 72,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 129
             }
           },
@@ -14172,7 +14420,7 @@
             "name": "ZOOM_OUT",
             "value": 73,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 130
             }
           },
@@ -14180,7 +14428,7 @@
             "name": "GUI_OK",
             "value": 74,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 131
             }
           },
@@ -14188,7 +14436,7 @@
             "name": "GUI_CANCEL",
             "value": 75,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 132
             }
           },
@@ -14196,7 +14444,7 @@
             "name": "GUI_UP",
             "value": 76,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 133
             }
           },
@@ -14204,7 +14452,7 @@
             "name": "GUI_DOWN",
             "value": 77,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 134
             }
           },
@@ -14212,7 +14460,7 @@
             "name": "GUI_LEFT",
             "value": 78,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 135
             }
           },
@@ -14220,7 +14468,7 @@
             "name": "GUI_RIGHT",
             "value": 79,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 136
             }
           },
@@ -14228,7 +14476,7 @@
             "name": "GUI_NEXT",
             "value": 80,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 137
             }
           },
@@ -14236,7 +14484,7 @@
             "name": "GUI_BACK",
             "value": 81,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 138
             }
           },
@@ -14244,7 +14492,7 @@
             "name": "GUI_PDA_ZOOM_OUT",
             "value": 82,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 139
             }
           },
@@ -14252,7 +14500,7 @@
             "name": "GUI_PAUSE",
             "value": 83,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 140
             }
           },
@@ -14260,7 +14508,7 @@
             "name": "XLIVE_LOGOUT",
             "value": 84,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 141
             }
           },
@@ -14268,7 +14516,7 @@
             "name": "XLIVE_APONLINE",
             "value": 85,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 142
             }
           },
@@ -14276,7 +14524,7 @@
             "name": "ARROW_UP",
             "value": 86,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 143
             }
           },
@@ -14284,7 +14532,7 @@
             "name": "ARROW_DOWN",
             "value": 87,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 144
             }
           },
@@ -14292,7 +14540,7 @@
             "name": "ARROW_LEFT",
             "value": 88,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 145
             }
           },
@@ -14300,7 +14548,7 @@
             "name": "ARROW_RIGHT",
             "value": 89,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 146
             }
           },
@@ -14308,7 +14556,7 @@
             "name": "MAP_ZOOM_IN",
             "value": 90,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 147
             }
           },
@@ -14316,7 +14564,7 @@
             "name": "MAP_ZOOM_OUT",
             "value": 91,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 148
             }
           },
@@ -14324,7 +14572,7 @@
             "name": "DEBUG_MODE_COMBO1",
             "value": 92,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 149
             }
           },
@@ -14332,7 +14580,7 @@
             "name": "DEBUG_MODE_COMBO2",
             "value": 93,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 150
             }
           },
@@ -14340,7 +14588,7 @@
             "name": "FREEFLY_COMBO1",
             "value": 94,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 151
             }
           },
@@ -14348,7 +14596,7 @@
             "name": "FREEFLY_COMBO2",
             "value": 95,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 152
             }
           },
@@ -14356,7 +14604,7 @@
             "name": "SWITCH_WEAPON",
             "value": 96,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 153
             }
           },
@@ -14364,7 +14612,7 @@
             "name": "END_MOVIE",
             "value": 97,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 154
             }
           },
@@ -14372,7 +14620,7 @@
             "name": "GUI_LOAD",
             "value": 98,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 155
             }
           },
@@ -14380,7 +14628,7 @@
             "name": "GUI_SAVE",
             "value": 99,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 156
             }
           },
@@ -14388,7 +14636,7 @@
             "name": "GUI_CREATE",
             "value": 100,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 157
             }
           },
@@ -14396,7 +14644,7 @@
             "name": "GUI_DELETE",
             "value": 101,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 158
             }
           },
@@ -14404,7 +14652,7 @@
             "name": "GUI_DEFAULT",
             "value": 102,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 159
             }
           },
@@ -14412,7 +14660,7 @@
             "name": "SCREENSHOT",
             "value": 103,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 160
             }
           },
@@ -14420,7 +14668,7 @@
             "name": "SCREENSHOT_NO_UI",
             "value": 104,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 161
             }
           },
@@ -14428,7 +14676,7 @@
             "name": "MECH_PUNCH",
             "value": 105,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 162
             }
           },
@@ -14436,7 +14684,7 @@
             "name": "MECH_FIRE_GRAVITY_WEAPON_PRIMARY",
             "value": 106,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 163
             }
           },
@@ -14444,7 +14692,7 @@
             "name": "MECH_FIRE_RIGHT_HAND_WEAPON",
             "value": 107,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 164
             }
           },
@@ -14452,7 +14700,7 @@
             "name": "MECH_FIRE_GRAVITY_WEAPON_SECONDARY",
             "value": 108,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 165
             }
           },
@@ -14460,7 +14708,7 @@
             "name": "DASH",
             "value": 109,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 166
             }
           },
@@ -14468,7 +14716,7 @@
             "name": "STUNT_JUMP",
             "value": 110,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 167
             }
           },
@@ -14476,7 +14724,7 @@
             "name": "GUI_PDA",
             "value": 111,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 168
             }
           },
@@ -14484,7 +14732,7 @@
             "name": "GUI_PAGE_NEXT",
             "value": 112,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 169
             }
           },
@@ -14492,7 +14740,7 @@
             "name": "GUI_PAGE_PREV",
             "value": 113,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 170
             }
           },
@@ -14500,7 +14748,7 @@
             "name": "VEHICLE_DOCKING_YAW",
             "value": 114,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 171
             }
           },
@@ -14508,7 +14756,7 @@
             "name": "BYPASS_FALL_PREVENTION",
             "value": 115,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 172
             }
           },
@@ -14516,7 +14764,7 @@
             "name": "SIDESTEP_LEFT_GAIN_LOF",
             "value": 116,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 173
             }
           },
@@ -14524,7 +14772,7 @@
             "name": "SIDESTEP_LEFT_BREAK_LOF",
             "value": 117,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 174
             }
           },
@@ -14532,7 +14780,7 @@
             "name": "SIDESTEP_RIGHT_GAIN_LOF",
             "value": 118,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 175
             }
           },
@@ -14540,7 +14788,7 @@
             "name": "SIDESTEP_RIGHT_BREAK_LOF",
             "value": 119,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 176
             }
           },
@@ -14548,7 +14796,7 @@
             "name": "EVADE",
             "value": 120,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 177
             }
           },
@@ -14556,7 +14804,7 @@
             "name": "MECH_JUMP",
             "value": 121,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 178
             }
           },
@@ -14564,7 +14812,7 @@
             "name": "MECH_CROUCH",
             "value": 122,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 179
             }
           },
@@ -14572,7 +14820,7 @@
             "name": "HELI_AI_AUTO_ROLL",
             "value": 123,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 180
             }
           },
@@ -14580,7 +14828,7 @@
             "name": "SEQUENCE_BUTTON1",
             "value": 124,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 181
             }
           },
@@ -14588,7 +14836,7 @@
             "name": "SEQUENCE_BUTTON2",
             "value": 125,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 182
             }
           },
@@ -14596,7 +14844,7 @@
             "name": "SEQUENCE_BUTTON3",
             "value": 126,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 183
             }
           },
@@ -14604,7 +14852,7 @@
             "name": "SEQUENCE_BUTTON4",
             "value": 127,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 184
             }
           },
@@ -14612,7 +14860,7 @@
             "name": "MC_FIRE",
             "value": 128,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 185
             }
           },
@@ -14620,7 +14868,7 @@
             "name": "MC_RELOAD",
             "value": 129,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 186
             }
           },
@@ -14628,7 +14876,7 @@
             "name": "USE_VEHICLE_MOD",
             "value": 130,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 187
             }
           },
@@ -14636,7 +14884,7 @@
             "name": "QUICK_SAVE",
             "value": 131,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 188
             }
           },
@@ -14644,7 +14892,7 @@
             "name": "QUICK_LOAD",
             "value": 132,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 189
             }
           },
@@ -14652,7 +14900,7 @@
             "name": "DEBUG_INCREE",
             "value": 133,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 190
             }
           },
@@ -14660,7 +14908,7 @@
             "name": "DEBUG_DECREE",
             "value": 134,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 191
             }
           },
@@ -14668,7 +14916,7 @@
             "name": "REELED_IN_JUMP_ACTION",
             "value": 135,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 192
             }
           },
@@ -14676,7 +14924,7 @@
             "name": "REELED_IN_RELEASE_ACTION",
             "value": 136,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 193
             }
           },
@@ -14684,7 +14932,7 @@
             "name": "LOOK_AT",
             "value": 137,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 194
             }
           },
@@ -14692,7 +14940,7 @@
             "name": "SKIP_CUTSCENE",
             "value": 138,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 195
             }
           },
@@ -14700,7 +14948,7 @@
             "name": "EQUIP_BLACK_MARKET_BEACON",
             "value": 139,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 196
             }
           },
@@ -14708,7 +14956,7 @@
             "name": "ACTIVATE_BLACK_MARKET_BEACON",
             "value": 140,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 197
             }
           },
@@ -14716,7 +14964,7 @@
             "name": "ACTIVATE_EXTRACTION_BEACON",
             "value": 141,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 198
             }
           },
@@ -14724,7 +14972,7 @@
             "name": "WINGSUIT_TAKEOFF",
             "value": 142,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 199
             }
           },
@@ -14732,7 +14980,7 @@
             "name": "WINGSUIT_AIRBRAKE",
             "value": 143,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 200
             }
           },
@@ -14740,7 +14988,7 @@
             "name": "WINGSUIT_EVADE",
             "value": 144,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 201
             }
           },
@@ -14748,7 +14996,7 @@
             "name": "MOVE_ALL",
             "value": 145,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 202
             }
           },
@@ -14756,7 +15004,7 @@
             "name": "WINGSUIT_BOOST",
             "value": 146,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 203
             }
           },
@@ -14764,7 +15012,7 @@
             "name": "DP_UP",
             "value": 147,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 204
             }
           },
@@ -14772,7 +15020,7 @@
             "name": "DP_DOWN",
             "value": 148,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 205
             }
           },
@@ -14780,7 +15028,7 @@
             "name": "DP_LEFT",
             "value": 149,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 206
             }
           },
@@ -14788,7 +15036,7 @@
             "name": "DP_RIGHT",
             "value": 150,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 207
             }
           },
@@ -14796,7 +15044,7 @@
             "name": "BTN_Y",
             "value": 151,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 208
             }
           },
@@ -14804,7 +15052,7 @@
             "name": "BTN_A",
             "value": 152,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 209
             }
           },
@@ -14812,7 +15060,7 @@
             "name": "BTN_X",
             "value": 153,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 210
             }
           },
@@ -14820,7 +15068,7 @@
             "name": "BTN_B",
             "value": 154,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 211
             }
           },
@@ -14828,7 +15076,7 @@
             "name": "L1",
             "value": 155,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 212
             }
           },
@@ -14836,7 +15084,7 @@
             "name": "L2",
             "value": 156,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 213
             }
           },
@@ -14844,7 +15092,7 @@
             "name": "R1",
             "value": 157,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 214
             }
           },
@@ -14852,7 +15100,7 @@
             "name": "R2",
             "value": 158,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 215
             }
           },
@@ -14860,7 +15108,7 @@
             "name": "DEBUG_STEP",
             "value": 159,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 216
             }
           },
@@ -14868,7 +15116,7 @@
             "name": "SUBMERSIBLE_DIVE",
             "value": 160,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 217
             }
           },
@@ -14876,7 +15124,7 @@
             "name": "SUBMERSIBLE_SURFACE",
             "value": 161,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 218
             }
           },
@@ -14884,7 +15132,7 @@
             "name": "DEV_MODIFIER_COMBO_1",
             "value": 162,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 219
             }
           },
@@ -14892,7 +15140,7 @@
             "name": "DEV_MODIFIER_COMBO_2",
             "value": 163,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 220
             }
           },
@@ -14900,7 +15148,7 @@
             "name": "FREEFLY",
             "value": 164,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 221
             }
           },
@@ -14908,7 +15156,7 @@
             "name": "MEASURE_TOOL",
             "value": 165,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 222
             }
           },
@@ -14916,7 +15164,7 @@
             "name": "DETONATE_EXPLOSIVE_TAP",
             "value": 166,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 223
             }
           },
@@ -14924,7 +15172,7 @@
             "name": "PLANT_EXPLOSIVE",
             "value": 167,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 224
             }
           },
@@ -14932,7 +15180,7 @@
             "name": "DETONATE_EXPLOSIVE",
             "value": 168,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 225
             }
           },
@@ -14940,7 +15188,7 @@
             "name": "OPEN_WINGSUIT",
             "value": 169,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 226
             }
           },
@@ -14948,7 +15196,7 @@
             "name": "FIRE_WINGSUIT_WEAPON_MAIN",
             "value": 170,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 227
             }
           },
@@ -14956,7 +15204,7 @@
             "name": "OPEN_PARACHUTE",
             "value": 171,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 228
             }
           },
@@ -14964,7 +15212,7 @@
             "name": "FIRE_WINGSUIT_WEAPON_SECONDARY",
             "value": 172,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 229
             }
           },
@@ -14972,7 +15220,7 @@
             "name": "FIRE_GRAPPLE",
             "value": 173,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 230
             }
           },
@@ -14980,7 +15228,7 @@
             "name": "PUSH_GRAPPLE",
             "value": 174,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 231
             }
           },
@@ -14988,7 +15236,7 @@
             "name": "VEHICLE_RELEASE_GRAPPLE",
             "value": 175,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 232
             }
           },
@@ -14996,7 +15244,7 @@
             "name": "PRECISION_AIM",
             "value": 176,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 233
             }
           },
@@ -15004,7 +15252,7 @@
             "name": "QUICK_TURN_COMBO_1",
             "value": 177,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 234
             }
           },
@@ -15012,7 +15260,7 @@
             "name": "QUICK_TURN_COMBO_2",
             "value": 178,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 235
             }
           },
@@ -15020,7 +15268,7 @@
             "name": "START",
             "value": 179,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 236
             }
           },
@@ -15028,7 +15276,7 @@
             "name": "SELECT",
             "value": 180,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 237
             }
           },
@@ -15036,7 +15284,7 @@
             "name": "L3",
             "value": 181,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 238
             }
           },
@@ -15044,7 +15292,7 @@
             "name": "R3",
             "value": 182,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 239
             }
           },
@@ -15052,7 +15300,7 @@
             "name": "SELECT_EXPLOSIVES",
             "value": 183,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 240
             }
           },
@@ -15060,7 +15308,7 @@
             "name": "PROFILER_UP",
             "value": 184,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 241
             }
           },
@@ -15068,7 +15316,7 @@
             "name": "PROFILER_DOWN",
             "value": 185,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 242
             }
           },
@@ -15076,7 +15324,7 @@
             "name": "PROFILER_LEFT",
             "value": 186,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 243
             }
           },
@@ -15084,7 +15332,7 @@
             "name": "PROFILER_RIGHT",
             "value": 187,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 244
             }
           },
@@ -15092,7 +15340,7 @@
             "name": "PROFILER_CLOSE",
             "value": 188,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 245
             }
           },
@@ -15100,7 +15348,7 @@
             "name": "PROFILER_CHANGE_SORTING",
             "value": 189,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 246
             }
           },
@@ -15108,7 +15356,7 @@
             "name": "PROFILER_SHOW_EMPTY_TIMERS",
             "value": 190,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 247
             }
           },
@@ -15116,7 +15364,7 @@
             "name": "PROFILER_PAUSE",
             "value": 191,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 248
             }
           },
@@ -15124,7 +15372,7 @@
             "name": "PROFILER_TOGGLE_INPUT_FOCUS_A",
             "value": 192,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 249
             }
           },
@@ -15132,7 +15380,7 @@
             "name": "PROFILER_TOGGLE_INPUT_FOCUS_B",
             "value": 193,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 250
             }
           },
@@ -15140,7 +15388,7 @@
             "name": "RETRACT_GRAPPLE",
             "value": 194,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 251
             }
           },
@@ -15148,7 +15396,7 @@
             "name": "RELEASE_GRAPPLE",
             "value": 195,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 252
             }
           },
@@ -15156,7 +15404,7 @@
             "name": "GUI_TAB_NEXT",
             "value": 196,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 253
             }
           },
@@ -15164,7 +15412,7 @@
             "name": "GUI_TAB_PREV",
             "value": 197,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 254
             }
           },
@@ -15172,7 +15420,7 @@
             "name": "GUI_SPECIAL_BUTTON",
             "value": 198,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 255
             }
           },
@@ -15180,7 +15428,7 @@
             "name": "GUI_LSTICK_UP",
             "value": 199,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 256
             }
           },
@@ -15188,7 +15436,7 @@
             "name": "GUI_LSTICK_DOWN",
             "value": 200,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 257
             }
           },
@@ -15196,7 +15444,7 @@
             "name": "GUI_LSTICK_LEFT",
             "value": 201,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 258
             }
           },
@@ -15204,7 +15452,7 @@
             "name": "GUI_LSTICK_RIGHT",
             "value": 202,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 259
             }
           },
@@ -15212,7 +15460,7 @@
             "name": "GUI_RSTICK_UP",
             "value": 203,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 260
             }
           },
@@ -15220,7 +15468,7 @@
             "name": "GUI_RSTICK_DOWN",
             "value": 204,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 261
             }
           },
@@ -15228,7 +15476,7 @@
             "name": "GUI_RSTICK_LEFT",
             "value": 205,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 262
             }
           },
@@ -15236,7 +15484,7 @@
             "name": "GUI_RSTICK_RIGHT",
             "value": 206,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 263
             }
           },
@@ -15244,7 +15492,7 @@
             "name": "GUI_ZOOM_IN",
             "value": 207,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 264
             }
           },
@@ -15252,7 +15500,7 @@
             "name": "GUI_ZOOM_OUT",
             "value": 208,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 265
             }
           },
@@ -15260,7 +15508,7 @@
             "name": "DRONE_ZOOM_IN_ANALOG",
             "value": 209,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 266
             }
           },
@@ -15268,7 +15516,7 @@
             "name": "DRONE_ZOOM_IN_DIGITAL",
             "value": 210,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 267
             }
           },
@@ -15276,7 +15524,7 @@
             "name": "DRONE_ZOOM_OUT_ANALOG",
             "value": 211,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 268
             }
           },
@@ -15284,7 +15532,7 @@
             "name": "DRONE_ZOOM_OUT_DIGITAL",
             "value": 212,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 269
             }
           },
@@ -15292,7 +15540,7 @@
             "name": "DRONE_FOCAL_IN_ANALOG",
             "value": 213,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 270
             }
           },
@@ -15300,7 +15548,7 @@
             "name": "DRONE_FOCAL_OUT_ANALOG",
             "value": 214,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 271
             }
           },
@@ -15308,7 +15556,7 @@
             "name": "DRONE_FOV_IN",
             "value": 215,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 272
             }
           },
@@ -15316,7 +15564,7 @@
             "name": "DRONE_FOV_OUT",
             "value": 216,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 273
             }
           },
@@ -15324,7 +15572,7 @@
             "name": "DRONE_MOVE_LEFT",
             "value": 217,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 274
             }
           },
@@ -15332,7 +15580,7 @@
             "name": "DRONE_MOVE_RIGHT",
             "value": 218,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 275
             }
           },
@@ -15340,7 +15588,7 @@
             "name": "DRONE_MOVE_UP",
             "value": 219,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 276
             }
           },
@@ -15348,7 +15596,7 @@
             "name": "DRONE_MOVE_DOWN",
             "value": 220,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 277
             }
           },
@@ -15356,7 +15604,7 @@
             "name": "DRONE_LOOK_LEFT",
             "value": 221,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 278
             }
           },
@@ -15364,7 +15612,7 @@
             "name": "DRONE_LOOK_RIGHT",
             "value": 222,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 279
             }
           },
@@ -15372,7 +15620,7 @@
             "name": "DRONE_LOOK_UP",
             "value": 223,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 280
             }
           },
@@ -15380,7 +15628,7 @@
             "name": "DRONE_LOOK_DOWN",
             "value": 224,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 281
             }
           },
@@ -15388,7 +15636,7 @@
             "name": "DRONE_TOGGLE_FOLLOW",
             "value": 225,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 282
             }
           },
@@ -15396,7 +15644,7 @@
             "name": "DRONE_CENTER",
             "value": 226,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 283
             }
           },
@@ -15404,7 +15652,7 @@
             "name": "DRONE_FIRE",
             "value": 227,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 284
             }
           },
@@ -15412,7 +15660,7 @@
             "name": "DRONE_TAG",
             "value": 228,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 285
             }
           },
@@ -15420,7 +15668,7 @@
             "name": "DRONE_SWITCH_MODE",
             "value": 229,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 286
             }
           },
@@ -15428,7 +15676,7 @@
             "name": "DRONE_WEAPON1",
             "value": 230,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 287
             }
           },
@@ -15436,7 +15684,7 @@
             "name": "DRONE_WEAPON2",
             "value": 231,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 288
             }
           },
@@ -15444,7 +15692,7 @@
             "name": "DRONE_WEAPON3",
             "value": 232,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 289
             }
           },
@@ -15452,7 +15700,7 @@
             "name": "DRONE_WEAPON4",
             "value": 233,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 290
             }
           },
@@ -15460,7 +15708,7 @@
             "name": "SELECT_DUEL_WIELD",
             "value": 234,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 291
             }
           },
@@ -15468,7 +15716,7 @@
             "name": "SELECT_TWO_HANDED",
             "value": 235,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 292
             }
           },
@@ -15476,7 +15724,7 @@
             "name": "SELECT_TWO_HANDED_SPECIAL",
             "value": 236,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 293
             }
           },
@@ -15484,7 +15732,7 @@
             "name": "SOAKFLY_CAM_ACCELERATE",
             "value": 237,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 294
             }
           },
@@ -15492,7 +15740,7 @@
             "name": "SOAKFLY_CAM_REVERSE",
             "value": 238,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 295
             }
           },
@@ -15500,7 +15748,7 @@
             "name": "MOVIE_CAM_TOGGLE_FOV_ROLL",
             "value": 239,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 296
             }
           },
@@ -15508,7 +15756,7 @@
             "name": "MOVIE_CAM_GAME_SPEED_INC",
             "value": 240,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 297
             }
           },
@@ -15516,7 +15764,7 @@
             "name": "MOVIE_CAM_GAME_SPEED_DEC",
             "value": 241,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 298
             }
           },
@@ -15524,7 +15772,7 @@
             "name": "MOVIE_CAM_SHAKE_AMP_DEC",
             "value": 242,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 299
             }
           },
@@ -15532,7 +15780,7 @@
             "name": "MOVIE_CAM_SHAKE_AMP_INC",
             "value": 243,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 300
             }
           },
@@ -15540,7 +15788,7 @@
             "name": "MOVIE_CAM_PAUSE",
             "value": 244,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 301
             }
           },
@@ -15548,7 +15796,7 @@
             "name": "MOVIE_CAM_ATTACH_TO_OBJ",
             "value": 245,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 302
             }
           },
@@ -15556,7 +15804,7 @@
             "name": "MOVIE_CAM_TOGGLE_MOUNT",
             "value": 246,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 303
             }
           },
@@ -15564,7 +15812,7 @@
             "name": "TOGGLE_DEV_MENU",
             "value": 247,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 304
             }
           },
@@ -15572,7 +15820,7 @@
             "name": "CANCEL",
             "value": 248,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 305
             }
           },
@@ -15580,7 +15828,7 @@
             "name": "MOUSE1",
             "value": 249,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 306
             }
           },
@@ -15588,7 +15836,7 @@
             "name": "MOUSE2",
             "value": 250,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 307
             }
           },
@@ -15596,7 +15844,7 @@
             "name": "GUI_FILTER",
             "value": 251,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 308
             }
           },
@@ -15604,7 +15852,7 @@
             "name": "GUI_RECENTER",
             "value": 252,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 309
             }
           },
@@ -15612,7 +15860,7 @@
             "name": "GUI_FOCUS",
             "value": 253,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 310
             }
           },
@@ -15620,7 +15868,7 @@
             "name": "GUI_USE_BUTTON",
             "value": 254,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 311
             }
           }
@@ -15632,7 +15880,7 @@
         "default": null
       },
       "source": {
-        "file_index": 24,
+        "file_index": 25,
         "line": 51
       }
     },
@@ -15654,7 +15902,7 @@
             "name": "Idle",
             "value": 0,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 4
             }
           },
@@ -15662,7 +15910,7 @@
             "name": "Idle2",
             "value": 1,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 6
             }
           },
@@ -15670,7 +15918,7 @@
             "name": "Clicked",
             "value": 2,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 8
             }
           },
@@ -15678,7 +15926,7 @@
             "name": "Pressed",
             "value": 3,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 10
             }
           },
@@ -15686,7 +15934,7 @@
             "name": "Released",
             "value": 4,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 12
             }
           },
@@ -15694,7 +15942,7 @@
             "name": "Frozen",
             "value": 5,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 14
             }
           }
@@ -15706,7 +15954,7 @@
         "default": null
       },
       "source": {
-        "file_index": 24,
+        "file_index": 25,
         "line": 1
       }
     },
@@ -15759,7 +16007,7 @@
             },
             "calling_convention": "system",
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 317
             }
           }
@@ -15772,7 +16020,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 24,
+        "file_index": 25,
         "line": 314
       }
     },
@@ -15799,7 +16047,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 24
             }
           },
@@ -15816,7 +16064,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 25
             }
           },
@@ -15833,7 +16081,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 26
             }
           },
@@ -15850,7 +16098,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 27
             }
           },
@@ -15867,7 +16115,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 28
             }
           },
@@ -15884,7 +16132,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 29
             }
           },
@@ -15901,7 +16149,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 30
             }
           },
@@ -15918,7 +16166,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 31
             }
           }
@@ -15940,7 +16188,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 34
             }
           },
@@ -15968,7 +16216,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 38
             }
           },
@@ -15988,7 +16236,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 42
             }
           },
@@ -16008,7 +16256,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 46
             }
           }
@@ -16021,7 +16269,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 24,
+        "file_index": 25,
         "line": 18
       }
     },
@@ -16068,7 +16316,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 328
             }
           },
@@ -16096,7 +16344,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 24,
+              "file_index": 25,
               "line": 332
             }
           }
@@ -16109,7 +16357,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 24,
+        "file_index": 25,
         "line": 321
       }
     },
@@ -16139,7 +16387,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 25,
+              "file_index": 26,
               "line": 4
             }
           },
@@ -16160,7 +16408,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 25,
+              "file_index": 26,
               "line": 7
             }
           },
@@ -16177,7 +16425,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 25,
+              "file_index": 26,
               "line": 7
             }
           },
@@ -16198,7 +16446,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 25,
+              "file_index": 26,
               "line": 1
             }
           }
@@ -16228,7 +16476,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 25,
+              "file_index": 26,
               "line": 11
             }
           },
@@ -16248,7 +16496,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 25,
+              "file_index": 26,
               "line": 17
             }
           }
@@ -16271,7 +16519,7 @@
               "return_type": null,
               "calling_convention": "system",
               "source": {
-                "file_index": 25,
+                "file_index": 26,
                 "line": 4
               }
             }
@@ -16284,7 +16532,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 25,
+        "file_index": 26,
         "line": 1
       }
     },
@@ -16324,7 +16572,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 25,
+              "file_index": 26,
               "line": 4
             }
           }
@@ -16338,7 +16586,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 25,
+        "file_index": 26,
         "line": 4
       }
     },
@@ -16394,7 +16642,7 @@
             },
             "calling_convention": "system",
             "source": {
-              "file_index": 26,
+              "file_index": 27,
               "line": 10
             }
           }
@@ -16407,7 +16655,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 26,
+        "file_index": 27,
         "line": 8
       }
     },
@@ -16430,7 +16678,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 26,
+        "file_index": 27,
         "line": 6
       }
     },
@@ -16453,7 +16701,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 27,
+        "file_index": 28,
         "line": 1
       }
     },
@@ -16484,7 +16732,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 28,
+              "file_index": 29,
               "line": 3
             }
           }
@@ -16498,7 +16746,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 28,
+        "file_index": 29,
         "line": 1
       }
     },
@@ -16529,7 +16777,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 28,
+              "file_index": 29,
               "line": 42
             }
           }
@@ -16581,7 +16829,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 28,
+              "file_index": 29,
               "line": 45
             }
           }
@@ -16594,7 +16842,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 28,
+        "file_index": 29,
         "line": 32
       }
     },
@@ -16621,7 +16869,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 28,
+              "file_index": 29,
               "line": 188
             }
           },
@@ -16638,7 +16886,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 28,
+              "file_index": 29,
               "line": 189
             }
           }
@@ -16652,7 +16900,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 28,
+        "file_index": 29,
         "line": 186
       }
     },
@@ -16683,7 +16931,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 28,
+              "file_index": 29,
               "line": 122
             }
           }
@@ -16697,7 +16945,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 28,
+        "file_index": 29,
         "line": 120
       }
     },
@@ -16728,7 +16976,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 28,
+              "file_index": 29,
               "line": 144
             }
           }
@@ -16742,7 +16990,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 28,
+        "file_index": 29,
         "line": 142
       }
     },
@@ -16773,7 +17021,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 28,
+              "file_index": 29,
               "line": 166
             }
           }
@@ -16787,8 +17035,116 @@
         "packed": false
       },
       "source": {
-        "file_index": 28,
+        "file_index": 29,
         "line": 164
+      }
+    },
+    "types::std_vector::Vector": {
+      "path": "types::std_vector::Vector",
+      "visibility": "public",
+      "type_parameters": [
+        "T"
+      ],
+      "size": 32,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " A `std::vector<T>` (MSVC layout): the `_Myfirst` / `_Mylast` / `_Myend` pointers. This build's\n vectors measure 0x20 -- a trailing allocator pointer beyond the three -- so the type is sized to\n match (e.g. when used as a fixed array element).",
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "begin",
+            "doc": " `_Myfirst`: start of the element array.",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "type_parameter",
+                "name": "T"
+              }
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 6
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "end",
+            "doc": " `_Mylast`: one past the last live element.",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "type_parameter",
+                "name": "T"
+              }
+            },
+            "offset": 8,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 8
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "capacity_end",
+            "doc": " `_Myend`: one past the allocated capacity.",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "type_parameter",
+                "name": "T"
+              }
+            },
+            "offset": 16,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 11
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_18",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 8
+            },
+            "offset": 24,
+            "size": 8,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 1
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false
+      },
+      "source": {
+        "file_index": 30,
+        "line": 1
       }
     },
     "types::vector_math::AlignedQuat": {
@@ -16818,7 +17174,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 29,
+              "file_index": 31,
               "line": 9
             }
           }
@@ -16832,7 +17188,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 29,
+        "file_index": 31,
         "line": 7
       }
     },
@@ -16863,7 +17219,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 29,
+              "file_index": 31,
               "line": 3
             }
           },
@@ -16880,7 +17236,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 29,
+              "file_index": 31,
               "line": 4
             }
           }
@@ -16894,7 +17250,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 29,
+        "file_index": 31,
         "line": 1
       }
     },
@@ -17058,7 +17414,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 27
             }
           }
@@ -17071,7 +17427,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 30,
+        "file_index": 32,
         "line": 21
       }
     },
@@ -17093,7 +17449,7 @@
             "name": "SCREEN_POS_ONSCREEN",
             "value": 0,
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 8
             }
           },
@@ -17101,7 +17457,7 @@
             "name": "SCREEN_POS_OFFSCREEN_LEFT",
             "value": 1,
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 9
             }
           },
@@ -17109,7 +17465,7 @@
             "name": "SCREEN_POS_OFFSCREEN_RIGHT",
             "value": 2,
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 10
             }
           },
@@ -17117,7 +17473,7 @@
             "name": "SCREEN_POS_OFFSCREEN_TOP",
             "value": 3,
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 11
             }
           },
@@ -17125,7 +17481,7 @@
             "name": "SCREEN_POS_OFFSCREEN_BOTTOM",
             "value": 4,
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 12
             }
           },
@@ -17133,7 +17489,7 @@
             "name": "SCREEN_POS_OFFSCREEN_TOP_LEFT",
             "value": 5,
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 13
             }
           },
@@ -17141,7 +17497,7 @@
             "name": "SCREEN_POS_OFFSCREEN_TOP_RIGHT",
             "value": 6,
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 14
             }
           },
@@ -17149,7 +17505,7 @@
             "name": "SCREEN_POS_OFFSCREEN_BOTTOM_LEFT",
             "value": 7,
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 15
             }
           },
@@ -17157,7 +17513,7 @@
             "name": "SCREEN_POS_OFFSCREEN_BOTTOM_RIGHT",
             "value": 8,
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 16
             }
           },
@@ -17165,7 +17521,7 @@
             "name": "SCREEN_POS_OFFSCREEN_NO_CLAMP_IN_FRONT_CAMERA",
             "value": 9,
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 17
             }
           },
@@ -17173,7 +17529,7 @@
             "name": "SCREEN_POS_OFFSCREEN_NO_CLAMP_BEHIND_CAMERA",
             "value": 10,
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 18
             }
           }
@@ -17185,7 +17541,7 @@
         "default": null
       },
       "source": {
-        "file_index": 30,
+        "file_index": 32,
         "line": 4
       }
     },
@@ -17216,7 +17572,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 38
             }
           },
@@ -17236,7 +17592,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 38
             }
           },
@@ -17257,7 +17613,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 42
             }
           },
@@ -17274,7 +17630,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 42
             }
           },
@@ -17291,7 +17647,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 46
             }
           },
@@ -17312,7 +17668,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 34
             }
           }
@@ -17342,7 +17698,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 50
             }
           },
@@ -17370,7 +17726,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 57
             }
           },
@@ -17437,7 +17793,7 @@
             },
             "calling_convention": "system",
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 62
             }
           },
@@ -17555,7 +17911,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 67
             }
           },
@@ -17637,7 +17993,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 72
             }
           },
@@ -17668,7 +18024,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 77
             }
           },
@@ -17688,7 +18044,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 81
             }
           },
@@ -17708,7 +18064,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 85
             }
           },
@@ -17728,7 +18084,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 89
             }
           },
@@ -17762,7 +18118,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 93
             }
           },
@@ -17785,7 +18141,7 @@
             },
             "calling_convention": "system",
             "source": {
-              "file_index": 30,
+              "file_index": 32,
               "line": 97
             }
           }
@@ -17798,7 +18154,7 @@
         "packed": false
       },
       "source": {
-        "file_index": 30,
+        "file_index": 32,
         "line": 34
       }
     },
@@ -19316,7 +19672,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 62
+                "line": 68
               }
             },
             {
@@ -19332,10 +19688,20 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 69
+                "line": 75
               }
             }
           ],
+          "backends": {}
+        },
+        "ssao": {
+          "doc": null,
+          "items": [
+            "graphics_engine::ssao::SSAOPass"
+          ],
+          "submodules": {},
+          "extern_values": [],
+          "functions": [],
           "backends": {}
         },
         "texture": {
@@ -19421,7 +19787,7 @@
               "return_type": null,
               "calling_convention": "system",
               "source": {
-                "file_index": 22,
+                "file_index": 23,
                 "line": 78
               }
             }
@@ -19482,7 +19848,7 @@
           },
           "calling_convention": "system",
           "source": {
-            "file_index": 23,
+            "file_index": 24,
             "line": 1
           }
         }
@@ -19657,6 +20023,26 @@
             ]
           }
         },
+        "std_vector": {
+          "doc": null,
+          "items": [
+            "types::std_vector::Vector"
+          ],
+          "submodules": {},
+          "extern_values": [],
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": null,
+                "epilogue": {
+                  "header": "\n    #[allow(dead_code)]\n    impl<T> Vector<T> {\n        /// Number of live elements.\n        pub fn len(&self) -> usize {\n            if self.begin.is_null() {\n                0\n            } else {\n                (self.end as usize - self.begin as usize) / ::core::mem::size_of::<T>()\n            }\n        }\n\n        pub fn is_empty(&self) -> bool {\n            self.len() == 0\n        }\n\n        /// The live elements as a slice.\n        ///\n        /// # Safety\n        /// `begin..end` must point to `len()` live `T`s for the borrow.\n        pub unsafe fn as_slice(&self) -> &[T] {\n            if self.begin.is_null() {\n                &[]\n            } else {\n                unsafe { ::core::slice::from_raw_parts(self.begin, self.len()) }\n            }\n        }\n    }\n",
+                  "definition": null
+                }
+              }
+            ]
+          }
+        },
         "vector_math": {
           "doc": null,
           "items": [
@@ -19705,7 +20091,7 @@
               },
               "calling_convention": "system",
               "source": {
-                "file_index": 30,
+                "file_index": 32,
                 "line": 102
               }
             }
@@ -19774,7 +20160,7 @@
           },
           "calling_convention": "system",
           "source": {
-            "file_index": 31,
+            "file_index": 33,
             "line": 1
           }
         }
@@ -19804,6 +20190,7 @@
     "graphics_engine/post_effects.pyxis",
     "graphics_engine/render_engine.pyxis",
     "graphics_engine/render_pass.pyxis",
+    "graphics_engine/ssao.pyxis",
     "graphics_engine/texture.pyxis",
     "graphics_engine/tone_mapping.pyxis",
     "hash.pyxis",
@@ -19812,6 +20199,7 @@
     "input/locomotion.pyxis",
     "state.pyxis",
     "types/math.pyxis",
+    "types/std_vector.pyxis",
     "types/vector_math.pyxis",
     "ui/ui_manager.pyxis"
   ]
