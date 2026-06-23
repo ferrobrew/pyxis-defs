@@ -62,6 +62,7 @@ pub type Joint {
 }
 
 // TODO(review): we might want to add support for putting this in an impl at some point.
+
 #[address(0x142_F2F_301)]
 pub extern Character_GoreEnabled: bool;
 

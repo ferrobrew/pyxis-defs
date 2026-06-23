@@ -337,7 +337,5 @@ impl LocalPlayerActionMap {
     pub fn ForceSetClicked(&mut self, action: Action);
 }
 
-/// The static action-name-to-ID table: action-name pointers indexed by action ID. The full ID-to-name
-/// mapping is the [`Action`] enum.
 #[address(0x142_D99_370)]
 pub extern action_name_table: *const u8;

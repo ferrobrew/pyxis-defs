@@ -1,5 +1,5 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "pointer_size": 8,
   "project_name": "Mad Max (1.0.3 / GOG 54162766550729305)",
   "items": {
@@ -304,7 +304,7 @@
       },
       "source": {
         "file_index": 2,
-        "line": 39
+        "line": 40
       }
     },
     "game::event_handler::EventBase": {
@@ -348,7 +348,7 @@
       },
       "source": {
         "file_index": 2,
-        "line": 34
+        "line": 35
       }
     },
     "game::event_handler::EventHandler": {
@@ -415,7 +415,7 @@
       },
       "source": {
         "file_index": 2,
-        "line": 29
+        "line": 30
       }
     },
     "game::event_handler::EventHandlerVftable": {
@@ -496,7 +496,7 @@
       },
       "source": {
         "file_index": 2,
-        "line": 12
+        "line": 13
       }
     },
     "game::event_handler::EventSystem": {
@@ -599,7 +599,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 2,
-              "line": 8
+              "line": 9
             }
           }
         ],
@@ -614,7 +614,7 @@
       },
       "source": {
         "file_index": 2,
-        "line": 3
+        "line": 4
       }
     },
     "game::event_handler::EventSystemVftable": {
@@ -657,6 +657,7 @@
           {
             "name": "Installing",
             "value": 0,
+            "doc": null,
             "source": {
               "file_index": 3,
               "line": 3
@@ -665,6 +666,7 @@
           {
             "name": "Initializing",
             "value": 1,
+            "doc": null,
             "source": {
               "file_index": 3,
               "line": 4
@@ -673,6 +675,7 @@
           {
             "name": "Loading",
             "value": 2,
+            "doc": null,
             "source": {
               "file_index": 3,
               "line": 5
@@ -681,6 +684,7 @@
           {
             "name": "Running",
             "value": 3,
+            "doc": null,
             "source": {
               "file_index": 3,
               "line": 6
@@ -689,6 +693,7 @@
           {
             "name": "StartUp",
             "value": 4,
+            "doc": null,
             "source": {
               "file_index": 3,
               "line": 7
@@ -703,7 +708,7 @@
       },
       "source": {
         "file_index": 3,
-        "line": 1
+        "line": 2
       }
     },
     "game::save_manager::SaveDeviceStatus": {
@@ -723,6 +728,7 @@
           {
             "name": "Finished",
             "value": 0,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 105
@@ -731,6 +737,7 @@
           {
             "name": "NotFinished",
             "value": 1,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 106
@@ -739,6 +746,7 @@
           {
             "name": "Failed",
             "value": 2,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 107
@@ -753,7 +761,7 @@
       },
       "source": {
         "file_index": 4,
-        "line": 103
+        "line": 104
       }
     },
     "game::save_manager::SaveDeviceWin32": {
@@ -800,7 +808,7 @@
             "is_base": false,
             "source": {
               "file_index": 4,
-              "line": 99
+              "line": 100
             }
           },
           {
@@ -1092,7 +1100,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 4,
-                "line": 90
+                "line": 91
               }
             },
             {
@@ -1262,7 +1270,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 4,
-                "line": 95
+                "line": 96
               }
             }
           ]
@@ -1275,7 +1283,7 @@
       },
       "source": {
         "file_index": 4,
-        "line": 82
+        "line": 83
       }
     },
     "game::save_manager::SaveDeviceWin32Vftable": {
@@ -1658,7 +1666,7 @@
             "is_base": false,
             "source": {
               "file_index": 4,
-              "line": 90
+              "line": 91
             }
           },
           {
@@ -1884,7 +1892,7 @@
             "is_base": false,
             "source": {
               "file_index": 4,
-              "line": 95
+              "line": 96
             }
           }
         ],
@@ -1929,7 +1937,7 @@
             "is_base": false,
             "source": {
               "file_index": 4,
-              "line": 3
+              "line": 4
             }
           },
           {
@@ -1946,7 +1954,7 @@
             "is_base": false,
             "source": {
               "file_index": 4,
-              "line": 3
+              "line": 4
             }
           },
           {
@@ -2035,7 +2043,7 @@
             "is_base": false,
             "source": {
               "file_index": 4,
-              "line": 10
+              "line": 11
             }
           },
           {
@@ -2052,7 +2060,7 @@
             "is_base": false,
             "source": {
               "file_index": 4,
-              "line": 10
+              "line": 11
             }
           },
           {
@@ -2073,7 +2081,7 @@
             "is_base": false,
             "source": {
               "file_index": 4,
-              "line": 13
+              "line": 14
             }
           },
           {
@@ -2090,7 +2098,7 @@
             "is_base": false,
             "source": {
               "file_index": 4,
-              "line": 13
+              "line": 14
             }
           },
           {
@@ -2167,7 +2175,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 4,
-              "line": 19
+              "line": 20
             }
           },
           {
@@ -2187,7 +2195,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 4,
-              "line": 22
+              "line": 23
             }
           }
         ],
@@ -2200,7 +2208,7 @@
       },
       "source": {
         "file_index": 4,
-        "line": 1
+        "line": 2
       }
     },
     "game::save_manager::SaveManagerErrorState": {
@@ -2220,14 +2228,16 @@
           {
             "name": "None",
             "value": 0,
+            "doc": null,
             "source": {
               "file_index": 4,
-              "line": 54
+              "line": 55
             }
           },
           {
             "name": "NoSpace",
             "value": 1,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 56
@@ -2236,6 +2246,7 @@
           {
             "name": "WaitNoSpace",
             "value": 2,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 57
@@ -2244,6 +2255,7 @@
           {
             "name": "EnumerateFileWrongVersion",
             "value": 3,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 58
@@ -2252,6 +2264,7 @@
           {
             "name": "WaitEnumerateFileWrongVersion",
             "value": 4,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 59
@@ -2260,6 +2273,7 @@
           {
             "name": "EnumerateFileCorrupt",
             "value": 5,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 60
@@ -2268,6 +2282,7 @@
           {
             "name": "WaitEnumerateFileCorrupt",
             "value": 6,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 61
@@ -2276,6 +2291,7 @@
           {
             "name": "WaitEnumerateBACKUP",
             "value": 7,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 62
@@ -2284,6 +2300,7 @@
           {
             "name": "EnumerateRestoreFileOk",
             "value": 8,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 63
@@ -2292,6 +2309,7 @@
           {
             "name": "WaitEnumerateRestoreFileOk",
             "value": 9,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 64
@@ -2300,6 +2318,7 @@
           {
             "name": "EnumerateRestoreFileFail",
             "value": 10,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 65
@@ -2308,6 +2327,7 @@
           {
             "name": "WaitEnumerateRestoreFileFail",
             "value": 11,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 66
@@ -2316,6 +2336,7 @@
           {
             "name": "LoadFileCorrupt",
             "value": 12,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 67
@@ -2324,6 +2345,7 @@
           {
             "name": "WaitLoadFileCorrupt",
             "value": 13,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 68
@@ -2332,6 +2354,7 @@
           {
             "name": "RestoreOk",
             "value": 14,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 69
@@ -2340,6 +2363,7 @@
           {
             "name": "WaitRestoreOk",
             "value": 15,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 70
@@ -2348,6 +2372,7 @@
           {
             "name": "RestoreFail",
             "value": 16,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 71
@@ -2356,6 +2381,7 @@
           {
             "name": "WaitRestoreFail",
             "value": 17,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 72
@@ -2364,6 +2390,7 @@
           {
             "name": "QueueLoadFailed",
             "value": 18,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 73
@@ -2372,6 +2399,7 @@
           {
             "name": "WaitQueueLoadFailed",
             "value": 19,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 74
@@ -2380,6 +2408,7 @@
           {
             "name": "QueueSaveFailed",
             "value": 20,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 75
@@ -2388,6 +2417,7 @@
           {
             "name": "ExitMessage",
             "value": 21,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 76
@@ -2396,6 +2426,7 @@
           {
             "name": "Deleting",
             "value": 22,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 77
@@ -2404,6 +2435,7 @@
           {
             "name": "WaitDeleteMessage",
             "value": 23,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 78
@@ -2412,6 +2444,7 @@
           {
             "name": "WaitGUI",
             "value": 24,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 79
@@ -2425,7 +2458,7 @@
       },
       "source": {
         "file_index": 4,
-        "line": 52
+        "line": 53
       }
     },
     "game::save_manager::SaveManagerState": {
@@ -2445,14 +2478,16 @@
           {
             "name": "None",
             "value": 0,
+            "doc": null,
             "source": {
               "file_index": 4,
-              "line": 28
+              "line": 29
             }
           },
           {
             "name": "Idle",
             "value": 1,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 30
@@ -2461,6 +2496,7 @@
           {
             "name": "SetupDevices",
             "value": 2,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 31
@@ -2469,6 +2505,7 @@
           {
             "name": "InitDevices",
             "value": 4,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 32
@@ -2477,6 +2514,7 @@
           {
             "name": "SavePhase1",
             "value": 8,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 33
@@ -2485,6 +2523,7 @@
           {
             "name": "SavePhase2",
             "value": 16,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 34
@@ -2493,6 +2532,7 @@
           {
             "name": "SavePhase3",
             "value": 32,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 35
@@ -2501,6 +2541,7 @@
           {
             "name": "Saving",
             "value": 64,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 36
@@ -2509,6 +2550,7 @@
           {
             "name": "SavingProfile",
             "value": 128,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 37
@@ -2517,6 +2559,7 @@
           {
             "name": "SavingWaitMinFrames",
             "value": 256,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 38
@@ -2525,6 +2568,7 @@
           {
             "name": "SavingFailedWaitMinFrames",
             "value": 512,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 39
@@ -2533,6 +2577,7 @@
           {
             "name": "Loading",
             "value": 1024,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 40
@@ -2541,6 +2586,7 @@
           {
             "name": "Restoring",
             "value": 2048,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 41
@@ -2549,6 +2595,7 @@
           {
             "name": "EnumerateSlots",
             "value": 4096,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 42
@@ -2557,6 +2604,7 @@
           {
             "name": "EnumerateRestoreSlot",
             "value": 8192,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 43
@@ -2565,6 +2613,7 @@
           {
             "name": "Deleting",
             "value": 16384,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 44
@@ -2573,6 +2622,7 @@
           {
             "name": "DeletingWaitMinFrames",
             "value": 32768,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 45
@@ -2581,6 +2631,7 @@
           {
             "name": "Formatting",
             "value": 65536,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 46
@@ -2589,6 +2640,7 @@
           {
             "name": "NeedDeviceStates",
             "value": 97528,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 47
@@ -2597,6 +2649,7 @@
           {
             "name": "ShowIconStates",
             "value": 93176,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 48
@@ -2605,6 +2658,7 @@
           {
             "name": "SetupStates",
             "value": 12294,
+            "doc": null,
             "source": {
               "file_index": 4,
               "line": 49
@@ -2618,7 +2672,7 @@
       },
       "source": {
         "file_index": 4,
-        "line": 26
+        "line": 27
       }
     },
     "game::video_manager::VideoManager": {
@@ -2649,7 +2703,7 @@
             "is_base": false,
             "source": {
               "file_index": 5,
-              "line": 3
+              "line": 4
             }
           },
           {
@@ -2666,7 +2720,7 @@
             "is_base": false,
             "source": {
               "file_index": 5,
-              "line": 3
+              "line": 4
             }
           },
           {
@@ -2687,7 +2741,7 @@
             "is_base": false,
             "source": {
               "file_index": 5,
-              "line": 6
+              "line": 7
             }
           },
           {
@@ -2704,7 +2758,7 @@
             "is_base": false,
             "source": {
               "file_index": 5,
-              "line": 6
+              "line": 7
             }
           },
           {
@@ -2750,7 +2804,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 5,
-              "line": 10
+              "line": 11
             }
           },
           {
@@ -2770,7 +2824,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 5,
-              "line": 13
+              "line": 14
             }
           }
         ],
@@ -2783,7 +2837,7 @@
       },
       "source": {
         "file_index": 5,
-        "line": 1
+        "line": 2
       }
     },
     "game_objects::avatar::Avatar": {
@@ -2834,7 +2888,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 11
+              "line": 12
             }
           },
           {
@@ -2854,7 +2908,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 11
+              "line": 12
             }
           },
           {
@@ -3050,7 +3104,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 6,
-                "line": 7
+                "line": 8
               }
             }
           ]
@@ -3063,7 +3117,7 @@
       },
       "source": {
         "file_index": 6,
-        "line": 4
+        "line": 5
       }
     },
     "game_objects::avatar::AvatarVftable": {
@@ -3290,7 +3344,7 @@
             "is_base": false,
             "source": {
               "file_index": 6,
-              "line": 7
+              "line": 8
             }
           }
         ],
@@ -3331,7 +3385,7 @@
             "is_base": true,
             "source": {
               "file_index": 7,
-              "line": 7
+              "line": 8
             }
           },
           {
@@ -3348,7 +3402,7 @@
             "is_base": true,
             "source": {
               "file_index": 7,
-              "line": 9
+              "line": 10
             }
           },
           {
@@ -3486,7 +3540,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 10
+              "line": 11
             }
           },
           {
@@ -3588,7 +3642,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 15
+              "line": 16
             }
           },
           {
@@ -3652,7 +3706,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 19
+              "line": 20
             }
           },
           {
@@ -3681,7 +3735,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 22
+              "line": 23
             }
           },
           {
@@ -3836,7 +3890,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 7,
-              "line": 19
+              "line": 20
             }
           },
           {
@@ -3880,7 +3934,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 7,
-              "line": 22
+              "line": 23
             }
           }
         ],
@@ -3942,7 +3996,7 @@
       },
       "source": {
         "file_index": 7,
-        "line": 5
+        "line": 6
       }
     },
     "game_objects::character::CharacterBase": {
@@ -3969,7 +4023,7 @@
             "is_base": true,
             "source": {
               "file_index": 7,
-              "line": 26
+              "line": 27
             }
           },
           {
@@ -3986,7 +4040,7 @@
             "is_base": true,
             "source": {
               "file_index": 7,
-              "line": 28
+              "line": 29
             }
           },
           {
@@ -4007,7 +4061,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 31
+              "line": 32
             }
           },
           {
@@ -4024,7 +4078,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 31
+              "line": 32
             }
           },
           {
@@ -4239,7 +4293,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 19
+                "line": 20
               }
             },
             {
@@ -4442,7 +4496,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 7,
-                "line": 22
+                "line": 23
               }
             }
           ]
@@ -4455,7 +4509,7 @@
       },
       "source": {
         "file_index": 7,
-        "line": 13
+        "line": 14
       }
     },
     "game_objects::character::CharacterBaseVftable": {
@@ -4594,7 +4648,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 19
+              "line": 20
             }
           },
           {
@@ -4886,7 +4940,7 @@
             "is_base": false,
             "source": {
               "file_index": 7,
-              "line": 22
+              "line": 23
             }
           }
         ],
@@ -4951,7 +5005,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 15
+              "line": 16
             }
           },
           {
@@ -4974,7 +5028,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 15
+              "line": 16
             }
           },
           {
@@ -5082,7 +5136,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 8,
-                "line": 9
+                "line": 10
               }
             },
             {
@@ -5143,7 +5197,7 @@
       },
       "source": {
         "file_index": 8,
-        "line": 4
+        "line": 5
       }
     },
     "game_objects::character_manager::CharacterManagerVftable": {
@@ -5276,7 +5330,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 9
+              "line": 10
             }
           },
           {
@@ -5384,7 +5438,7 @@
             "is_base": true,
             "source": {
               "file_index": 9,
-              "line": 6
+              "line": 7
             }
           },
           {
@@ -5401,7 +5455,7 @@
             "is_base": true,
             "source": {
               "file_index": 9,
-              "line": 8
+              "line": 9
             }
           },
           {
@@ -5418,7 +5472,7 @@
             "is_base": false,
             "source": {
               "file_index": 9,
-              "line": 11
+              "line": 12
             }
           },
           {
@@ -5456,7 +5510,7 @@
             "is_base": false,
             "source": {
               "file_index": 9,
-              "line": 15
+              "line": 16
             }
           },
           {
@@ -5473,7 +5527,7 @@
             "is_base": false,
             "source": {
               "file_index": 9,
-              "line": 15
+              "line": 16
             }
           },
           {
@@ -5645,7 +5699,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 10
+              "line": 11
             }
           },
           {
@@ -5747,7 +5801,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 15
+              "line": 16
             }
           },
           {
@@ -5811,7 +5865,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 19
+              "line": 20
             }
           },
           {
@@ -5840,7 +5894,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 22
+              "line": 23
             }
           }
         ],
@@ -5902,7 +5956,7 @@
       },
       "source": {
         "file_index": 9,
-        "line": 4
+        "line": 5
       }
     },
     "game_objects::game_object::GameObject": {
@@ -5929,7 +5983,7 @@
             "is_base": true,
             "source": {
               "file_index": 10,
-              "line": 26
+              "line": 27
             }
           },
           {
@@ -5987,7 +6041,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 31
+              "line": 32
             }
           },
           {
@@ -6004,7 +6058,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 31
+              "line": 32
             }
           },
           {
@@ -6059,7 +6113,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 36
+              "line": 37
             }
           },
           {
@@ -6080,7 +6134,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 36
+              "line": 37
             }
           },
           {
@@ -6101,7 +6155,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 39
+              "line": 40
             }
           },
           {
@@ -6124,7 +6178,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 39
+              "line": 40
             }
           },
           {
@@ -6602,7 +6656,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 10
+                "line": 11
               }
             },
             {
@@ -6841,7 +6895,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 15
+                "line": 16
               }
             },
             {
@@ -6943,7 +6997,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 19
+                "line": 20
               }
             },
             {
@@ -7031,7 +7085,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 10,
-                "line": 22
+                "line": 23
               }
             }
           ]
@@ -7044,7 +7098,7 @@
       },
       "source": {
         "file_index": 10,
-        "line": 3
+        "line": 4
       }
     },
     "game_objects::game_object::GameObjectVftable": {
@@ -7713,7 +7767,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 10
+              "line": 11
             }
           },
           {
@@ -8049,7 +8103,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 15
+              "line": 16
             }
           },
           {
@@ -8189,7 +8243,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 19
+              "line": 20
             }
           },
           {
@@ -8316,7 +8370,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 22
+              "line": 23
             }
           }
         ],
@@ -8357,7 +8411,7 @@
             "is_base": true,
             "source": {
               "file_index": 11,
-              "line": 6
+              "line": 7
             }
           },
           {
@@ -8374,7 +8428,7 @@
             "is_base": true,
             "source": {
               "file_index": 11,
-              "line": 8
+              "line": 9
             }
           }
         ],
@@ -8491,7 +8545,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 10
+              "line": 11
             }
           },
           {
@@ -8593,7 +8647,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 15
+              "line": 16
             }
           },
           {
@@ -8657,7 +8711,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 19
+              "line": 20
             }
           },
           {
@@ -8686,7 +8740,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 22
+              "line": 23
             }
           }
         ],
@@ -8748,7 +8802,7 @@
       },
       "source": {
         "file_index": 11,
-        "line": 4
+        "line": 5
       }
     },
     "game_objects::player::Player": {
@@ -8775,7 +8829,7 @@
             "is_base": true,
             "source": {
               "file_index": 12,
-              "line": 6
+              "line": 7
             }
           },
           {
@@ -8792,7 +8846,7 @@
             "is_base": true,
             "source": {
               "file_index": 12,
-              "line": 8
+              "line": 9
             }
           },
           {
@@ -8844,7 +8898,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 6,
-              "line": 7
+              "line": 8
             }
           }
         ],
@@ -8859,7 +8913,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 4
+        "line": 5
       }
     },
     "game_objects::vehicle::Vehicle": {
@@ -8886,7 +8940,7 @@
             "is_base": true,
             "source": {
               "file_index": 13,
-              "line": 22
+              "line": 23
             }
           },
           {
@@ -8907,7 +8961,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 25
+              "line": 26
             }
           },
           {
@@ -8924,7 +8978,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 25
+              "line": 26
             }
           },
           {
@@ -8945,7 +8999,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 28
+              "line": 29
             }
           },
           {
@@ -8962,7 +9016,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 28
+              "line": 29
             }
           },
           {
@@ -8983,7 +9037,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 31
+              "line": 32
             }
           },
           {
@@ -9000,7 +9054,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 31
+              "line": 32
             }
           },
           {
@@ -9021,7 +9075,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 34
+              "line": 35
             }
           },
           {
@@ -9038,7 +9092,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 34
+              "line": 35
             }
           },
           {
@@ -9059,7 +9113,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 37
+              "line": 38
             }
           },
           {
@@ -9076,7 +9130,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 37
+              "line": 38
             }
           },
           {
@@ -9097,7 +9151,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 40
+              "line": 41
             }
           },
           {
@@ -9114,7 +9168,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 40
+              "line": 41
             }
           },
           {
@@ -9269,7 +9323,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 10
+              "line": 11
             }
           },
           {
@@ -9371,7 +9425,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 15
+              "line": 16
             }
           },
           {
@@ -9435,7 +9489,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 19
+              "line": 20
             }
           },
           {
@@ -9464,7 +9518,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 22
+              "line": 23
             }
           }
         ],
@@ -10264,7 +10318,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 13,
-                "line": 11
+                "line": 12
               }
             },
             {
@@ -10655,7 +10709,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 13,
-                "line": 14
+                "line": 15
               }
             },
             {
@@ -10737,7 +10791,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 13,
-                "line": 18
+                "line": 19
               }
             }
           ]
@@ -10750,7 +10804,7 @@
       },
       "source": {
         "file_index": 13,
-        "line": 5
+        "line": 6
       }
     },
     "game_objects::vehicle::VehicleVftable": {
@@ -11946,7 +12000,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 11
+              "line": 12
             }
           },
           {
@@ -12526,7 +12580,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 14
+              "line": 15
             }
           },
           {
@@ -12636,7 +12690,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 18
+              "line": 19
             }
           }
         ],
@@ -12781,7 +12835,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 5
+              "line": 6
             }
           },
           {
@@ -12798,7 +12852,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 5
+              "line": 6
             }
           },
           {
@@ -12833,7 +12887,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 3
+        "line": 4
       }
     },
     "input::input_action_map::InputActionMap": {
@@ -12864,7 +12918,7 @@
             "is_base": false,
             "source": {
               "file_index": 15,
-              "line": 6
+              "line": 7
             }
           },
           {
@@ -12881,7 +12935,7 @@
             "is_base": false,
             "source": {
               "file_index": 15,
-              "line": 6
+              "line": 7
             }
           },
           {
@@ -12992,7 +13046,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 15,
-              "line": 14
+              "line": 15
             }
           },
           {
@@ -13020,7 +13074,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 15,
-              "line": 17
+              "line": 18
             }
           },
           {
@@ -13064,7 +13118,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 15,
-              "line": 20
+              "line": 21
             }
           },
           {
@@ -13100,7 +13154,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 15,
-              "line": 23
+              "line": 24
             }
           },
           {
@@ -13131,7 +13185,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 15,
-              "line": 26
+              "line": 27
             }
           },
           {
@@ -13162,7 +13216,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 15,
-              "line": 29
+              "line": 30
             }
           },
           {
@@ -13193,7 +13247,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 15,
-              "line": 32
+              "line": 33
             }
           },
           {
@@ -13224,7 +13278,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 15,
-              "line": 35
+              "line": 36
             }
           },
           {
@@ -13255,7 +13309,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 15,
-              "line": 38
+              "line": 39
             }
           }
         ],
@@ -13268,7 +13322,7 @@
       },
       "source": {
         "file_index": 15,
-        "line": 4
+        "line": 5
       }
     },
     "input::input_action_map::LockedGamepadOrder": {
@@ -13288,6 +13342,7 @@
           {
             "name": "None",
             "value": -1,
+            "doc": null,
             "source": {
               "file_index": 15,
               "line": 43
@@ -13296,6 +13351,7 @@
           {
             "name": "Order1",
             "value": 0,
+            "doc": null,
             "source": {
               "file_index": 15,
               "line": 44
@@ -13304,6 +13360,7 @@
           {
             "name": "Order2",
             "value": 1,
+            "doc": null,
             "source": {
               "file_index": 15,
               "line": 45
@@ -13312,6 +13369,7 @@
           {
             "name": "Order3",
             "value": 2,
+            "doc": null,
             "source": {
               "file_index": 15,
               "line": 46
@@ -13320,6 +13378,7 @@
           {
             "name": "Order4",
             "value": 3,
+            "doc": null,
             "source": {
               "file_index": 15,
               "line": 47
@@ -13328,6 +13387,7 @@
           {
             "name": "Count",
             "value": 4,
+            "doc": null,
             "source": {
               "file_index": 15,
               "line": 48
@@ -13362,6 +13422,7 @@
           {
             "name": "Ok",
             "value": 0,
+            "doc": null,
             "source": {
               "file_index": 15,
               "line": 52
@@ -13370,6 +13431,7 @@
           {
             "name": "FailedAlreadyLocked",
             "value": 1,
+            "doc": null,
             "source": {
               "file_index": 15,
               "line": 53
@@ -13378,6 +13440,7 @@
           {
             "name": "FailedOrder",
             "value": 2,
+            "doc": null,
             "source": {
               "file_index": 15,
               "line": 54
@@ -13386,6 +13449,7 @@
           {
             "name": "FailedNotPaired",
             "value": 3,
+            "doc": null,
             "source": {
               "file_index": 15,
               "line": 55
@@ -13394,6 +13458,7 @@
           {
             "name": "FailedNoUser",
             "value": 4,
+            "doc": null,
             "source": {
               "file_index": 15,
               "line": 56
@@ -13402,6 +13467,7 @@
           {
             "name": "Failed",
             "value": 5,
+            "doc": null,
             "source": {
               "file_index": 15,
               "line": 57
@@ -13512,7 +13578,7 @@
       },
       "source": {
         "file_index": 16,
-        "line": 21
+        "line": 22
       }
     },
     "input::input_device::DeviceType": {
@@ -13532,6 +13598,7 @@
           {
             "name": "Default",
             "value": 0,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 83
@@ -13540,6 +13607,7 @@
           {
             "name": "Keyboard",
             "value": 1,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 84
@@ -13548,6 +13616,7 @@
           {
             "name": "Mouse",
             "value": 2,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 85
@@ -13556,6 +13625,7 @@
           {
             "name": "Gamepad",
             "value": 3,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 86
@@ -13564,6 +13634,7 @@
           {
             "name": "Unknown",
             "value": 4,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 87
@@ -13572,6 +13643,7 @@
           {
             "name": "Count",
             "value": 5,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 88
@@ -13613,7 +13685,7 @@
             "is_base": true,
             "source": {
               "file_index": 16,
-              "line": 42
+              "line": 43
             }
           },
           {
@@ -13752,7 +13824,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 16,
-                "line": 6
+                "line": 7
               }
             },
             {
@@ -13835,7 +13907,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 16,
-                "line": 9
+                "line": 10
               }
             }
           ]
@@ -13848,7 +13920,7 @@
       },
       "source": {
         "file_index": 16,
-        "line": 40
+        "line": 41
       }
     },
     "input::input_device::GamepadDualshock4": {
@@ -13875,7 +13947,7 @@
             "is_base": true,
             "source": {
               "file_index": 16,
-              "line": 48
+              "line": 49
             }
           },
           {
@@ -14014,7 +14086,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 16,
-                "line": 6
+                "line": 7
               }
             },
             {
@@ -14097,7 +14169,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 16,
-                "line": 9
+                "line": 10
               }
             }
           ]
@@ -14110,7 +14182,7 @@
       },
       "source": {
         "file_index": 16,
-        "line": 46
+        "line": 47
       }
     },
     "input::input_device::InputDevice": {
@@ -14161,7 +14233,7 @@
             "is_base": false,
             "source": {
               "file_index": 16,
-              "line": 13
+              "line": 14
             }
           },
           {
@@ -14178,7 +14250,7 @@
             "is_base": false,
             "source": {
               "file_index": 16,
-              "line": 13
+              "line": 14
             }
           },
           {
@@ -14199,7 +14271,7 @@
             "is_base": false,
             "source": {
               "file_index": 16,
-              "line": 16
+              "line": 17
             }
           },
           {
@@ -14216,7 +14288,7 @@
             "is_base": false,
             "source": {
               "file_index": 16,
-              "line": 16
+              "line": 17
             }
           },
           {
@@ -14372,7 +14444,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 16,
-                "line": 6
+                "line": 7
               }
             },
             {
@@ -14455,7 +14527,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 16,
-                "line": 9
+                "line": 10
               }
             }
           ]
@@ -14468,7 +14540,7 @@
       },
       "source": {
         "file_index": 16,
-        "line": 1
+        "line": 2
       }
     },
     "input::input_device::InputDeviceVftable": {
@@ -14641,7 +14713,7 @@
             "is_base": false,
             "source": {
               "file_index": 16,
-              "line": 6
+              "line": 7
             }
           },
           {
@@ -14764,7 +14836,7 @@
             "is_base": false,
             "source": {
               "file_index": 16,
-              "line": 9
+              "line": 10
             }
           }
         ],
@@ -14798,6 +14870,7 @@
           {
             "name": "Invalid",
             "value": -1,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 92
@@ -14806,6 +14879,7 @@
           {
             "name": "KeyboardA",
             "value": 0,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 93
@@ -14814,6 +14888,7 @@
           {
             "name": "KeyboardB",
             "value": 1,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 94
@@ -14822,6 +14897,7 @@
           {
             "name": "KeyboardC",
             "value": 2,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 95
@@ -14830,6 +14906,7 @@
           {
             "name": "KeyboardD",
             "value": 3,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 96
@@ -14838,6 +14915,7 @@
           {
             "name": "KeyboardE",
             "value": 4,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 97
@@ -14846,6 +14924,7 @@
           {
             "name": "KeyboardF",
             "value": 5,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 98
@@ -14854,6 +14933,7 @@
           {
             "name": "KeyboardG",
             "value": 6,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 99
@@ -14862,6 +14942,7 @@
           {
             "name": "KeyboardH",
             "value": 7,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 100
@@ -14870,6 +14951,7 @@
           {
             "name": "KeyboardI",
             "value": 8,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 101
@@ -14878,6 +14960,7 @@
           {
             "name": "KeyboardJ",
             "value": 9,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 102
@@ -14886,6 +14969,7 @@
           {
             "name": "KeyboardK",
             "value": 10,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 103
@@ -14894,6 +14978,7 @@
           {
             "name": "KeyboardL",
             "value": 11,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 104
@@ -14902,6 +14987,7 @@
           {
             "name": "KeyboardM",
             "value": 12,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 105
@@ -14910,6 +14996,7 @@
           {
             "name": "KeyboardN",
             "value": 13,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 106
@@ -14918,6 +15005,7 @@
           {
             "name": "KeyboardO",
             "value": 14,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 107
@@ -14926,6 +15014,7 @@
           {
             "name": "KeyboardP",
             "value": 15,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 108
@@ -14934,6 +15023,7 @@
           {
             "name": "KeyboardQ",
             "value": 16,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 109
@@ -14942,6 +15032,7 @@
           {
             "name": "KeyboardR",
             "value": 17,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 110
@@ -14950,6 +15041,7 @@
           {
             "name": "KeyboardS",
             "value": 18,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 111
@@ -14958,6 +15050,7 @@
           {
             "name": "KeyboardT",
             "value": 19,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 112
@@ -14966,6 +15059,7 @@
           {
             "name": "KeyboardU",
             "value": 20,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 113
@@ -14974,6 +15068,7 @@
           {
             "name": "KeyboardV",
             "value": 21,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 114
@@ -14982,6 +15077,7 @@
           {
             "name": "KeyboardW",
             "value": 22,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 115
@@ -14990,6 +15086,7 @@
           {
             "name": "KeyboardX",
             "value": 23,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 116
@@ -14998,6 +15095,7 @@
           {
             "name": "KeyboardY",
             "value": 24,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 117
@@ -15006,6 +15104,7 @@
           {
             "name": "KeyboardZ",
             "value": 25,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 118
@@ -15014,6 +15113,7 @@
           {
             "name": "Keyboard1",
             "value": 26,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 119
@@ -15022,6 +15122,7 @@
           {
             "name": "Keyboard2",
             "value": 27,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 120
@@ -15030,6 +15131,7 @@
           {
             "name": "Keyboard3",
             "value": 28,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 121
@@ -15038,6 +15140,7 @@
           {
             "name": "Keyboard4",
             "value": 29,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 122
@@ -15046,6 +15149,7 @@
           {
             "name": "Keyboard5",
             "value": 30,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 123
@@ -15054,6 +15158,7 @@
           {
             "name": "Keyboard6",
             "value": 31,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 124
@@ -15062,6 +15167,7 @@
           {
             "name": "Keyboard7",
             "value": 32,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 125
@@ -15070,6 +15176,7 @@
           {
             "name": "Keyboard8",
             "value": 33,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 126
@@ -15078,6 +15185,7 @@
           {
             "name": "Keyboard9",
             "value": 34,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 127
@@ -15086,6 +15194,7 @@
           {
             "name": "Keyboard0",
             "value": 35,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 128
@@ -15094,6 +15203,7 @@
           {
             "name": "KeyboardF1",
             "value": 36,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 129
@@ -15102,6 +15212,7 @@
           {
             "name": "KeyboardF2",
             "value": 37,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 130
@@ -15110,6 +15221,7 @@
           {
             "name": "KeyboardF3",
             "value": 38,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 131
@@ -15118,6 +15230,7 @@
           {
             "name": "KeyboardF4",
             "value": 39,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 132
@@ -15126,6 +15239,7 @@
           {
             "name": "KeyboardF5",
             "value": 40,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 133
@@ -15134,6 +15248,7 @@
           {
             "name": "KeyboardF6",
             "value": 41,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 134
@@ -15142,6 +15257,7 @@
           {
             "name": "KeyboardF7",
             "value": 42,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 135
@@ -15150,6 +15266,7 @@
           {
             "name": "KeyboardF8",
             "value": 43,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 136
@@ -15158,6 +15275,7 @@
           {
             "name": "KeyboardF9",
             "value": 44,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 137
@@ -15166,6 +15284,7 @@
           {
             "name": "KeyboardF10",
             "value": 45,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 138
@@ -15174,6 +15293,7 @@
           {
             "name": "KeyboardF11",
             "value": 46,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 139
@@ -15182,6 +15302,7 @@
           {
             "name": "KeyboardF12",
             "value": 47,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 140
@@ -15190,6 +15311,7 @@
           {
             "name": "KeyboardSpace",
             "value": 48,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 141
@@ -15198,6 +15320,7 @@
           {
             "name": "KeyboardBackspace",
             "value": 49,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 142
@@ -15206,6 +15329,7 @@
           {
             "name": "KeyboardReturn",
             "value": 50,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 143
@@ -15214,6 +15338,7 @@
           {
             "name": "KeyboardLShift",
             "value": 51,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 144
@@ -15222,6 +15347,7 @@
           {
             "name": "KeyboardRShift",
             "value": 52,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 145
@@ -15230,6 +15356,7 @@
           {
             "name": "KeyboardLControl",
             "value": 53,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 146
@@ -15238,6 +15365,7 @@
           {
             "name": "KeyboardRControl",
             "value": 54,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 147
@@ -15246,6 +15374,7 @@
           {
             "name": "KeyboardUp",
             "value": 55,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 148
@@ -15254,6 +15383,7 @@
           {
             "name": "KeyboardDown",
             "value": 56,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 149
@@ -15262,6 +15392,7 @@
           {
             "name": "KeyboardLeft",
             "value": 57,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 150
@@ -15270,6 +15401,7 @@
           {
             "name": "KeyboardRight",
             "value": 58,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 151
@@ -15278,6 +15410,7 @@
           {
             "name": "KeyboardDecimal",
             "value": 59,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 152
@@ -15286,6 +15419,7 @@
           {
             "name": "KeyboardMinus",
             "value": 60,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 153
@@ -15294,6 +15428,7 @@
           {
             "name": "KeyboardPlus",
             "value": 61,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 154
@@ -15302,6 +15437,7 @@
           {
             "name": "KeyboardEscape",
             "value": 62,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 155
@@ -15310,6 +15446,7 @@
           {
             "name": "KeyboardEquals",
             "value": 63,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 156
@@ -15318,6 +15455,7 @@
           {
             "name": "KeyboardBack",
             "value": 64,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 157
@@ -15326,6 +15464,7 @@
           {
             "name": "KeyboardTab",
             "value": 65,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 158
@@ -15334,6 +15473,7 @@
           {
             "name": "KeyboardLBracket",
             "value": 66,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 159
@@ -15342,6 +15482,7 @@
           {
             "name": "KeyboardRBracket",
             "value": 67,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 160
@@ -15350,6 +15491,7 @@
           {
             "name": "KeyboardSemicolon",
             "value": 68,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 161
@@ -15358,6 +15500,7 @@
           {
             "name": "KeyboardApostrophe",
             "value": 69,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 162
@@ -15366,6 +15509,7 @@
           {
             "name": "KeyboardGrave",
             "value": 70,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 163
@@ -15374,6 +15518,7 @@
           {
             "name": "KeyboardBackslash",
             "value": 71,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 164
@@ -15382,6 +15527,7 @@
           {
             "name": "KeyboardComma",
             "value": 72,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 165
@@ -15390,6 +15536,7 @@
           {
             "name": "KeyboardPeriod",
             "value": 73,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 166
@@ -15398,6 +15545,7 @@
           {
             "name": "KeyboardSlash",
             "value": 74,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 167
@@ -15406,6 +15554,7 @@
           {
             "name": "KeyboardLAlt",
             "value": 75,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 168
@@ -15414,6 +15563,7 @@
           {
             "name": "KeyboardCapsLock",
             "value": 76,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 169
@@ -15422,6 +15572,7 @@
           {
             "name": "KeyboardPrintscreen",
             "value": 77,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 170
@@ -15430,6 +15581,7 @@
           {
             "name": "KeyboardScrollLock",
             "value": 78,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 171
@@ -15438,6 +15590,7 @@
           {
             "name": "KeyboardPause",
             "value": 79,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 172
@@ -15446,6 +15599,7 @@
           {
             "name": "KeyboardOEM102",
             "value": 80,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 173
@@ -15454,6 +15608,7 @@
           {
             "name": "KeyboardRAlt",
             "value": 81,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 174
@@ -15462,6 +15617,7 @@
           {
             "name": "KeyboardHome",
             "value": 82,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 175
@@ -15470,6 +15626,7 @@
           {
             "name": "KeyboardEnd",
             "value": 83,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 176
@@ -15478,6 +15635,7 @@
           {
             "name": "KeyboardPageUp",
             "value": 84,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 177
@@ -15486,6 +15644,7 @@
           {
             "name": "KeyboardPageDown",
             "value": 85,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 178
@@ -15494,6 +15653,7 @@
           {
             "name": "KeyboardInsert",
             "value": 86,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 179
@@ -15502,6 +15662,7 @@
           {
             "name": "KeyboardDelete",
             "value": 87,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 180
@@ -15510,6 +15671,7 @@
           {
             "name": "KeyboardLWin",
             "value": 88,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 181
@@ -15518,6 +15680,7 @@
           {
             "name": "KeyboardRWin",
             "value": 89,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 182
@@ -15526,6 +15689,7 @@
           {
             "name": "KeyboardNumlock",
             "value": 90,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 183
@@ -15534,6 +15698,7 @@
           {
             "name": "KeyboardNumpadPlus",
             "value": 91,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 184
@@ -15542,6 +15707,7 @@
           {
             "name": "KeyboardNumpad1",
             "value": 92,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 185
@@ -15550,6 +15716,7 @@
           {
             "name": "KeyboardNumpad2",
             "value": 93,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 186
@@ -15558,6 +15725,7 @@
           {
             "name": "KeyboardNumpad3",
             "value": 94,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 187
@@ -15566,6 +15734,7 @@
           {
             "name": "KeyboardNumpad4",
             "value": 95,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 188
@@ -15574,6 +15743,7 @@
           {
             "name": "KeyboardNumpad5",
             "value": 96,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 189
@@ -15582,6 +15752,7 @@
           {
             "name": "KeyboardNumpad6",
             "value": 97,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 190
@@ -15590,6 +15761,7 @@
           {
             "name": "KeyboardNumpad7",
             "value": 98,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 191
@@ -15598,6 +15770,7 @@
           {
             "name": "KeyboardNumpad8",
             "value": 99,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 192
@@ -15606,6 +15779,7 @@
           {
             "name": "KeyboardNumpad9",
             "value": 100,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 193
@@ -15614,6 +15788,7 @@
           {
             "name": "KeyboardNumpad0",
             "value": 101,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 194
@@ -15622,6 +15797,7 @@
           {
             "name": "KeyboardNumpadMultiply",
             "value": 102,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 195
@@ -15630,6 +15806,7 @@
           {
             "name": "KeyboardNumpadDivide",
             "value": 103,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 196
@@ -15638,6 +15815,7 @@
           {
             "name": "KeyboardNumpadMinus",
             "value": 104,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 197
@@ -15646,6 +15824,7 @@
           {
             "name": "KeyboardNumpadDelete",
             "value": 105,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 198
@@ -15654,6 +15833,7 @@
           {
             "name": "KeyboardNumpadEnter",
             "value": 106,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 199
@@ -15662,6 +15842,7 @@
           {
             "name": "MouseLeft",
             "value": 107,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 200
@@ -15670,6 +15851,7 @@
           {
             "name": "MouseRight",
             "value": 108,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 201
@@ -15678,6 +15860,7 @@
           {
             "name": "MouseDown",
             "value": 109,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 202
@@ -15686,6 +15869,7 @@
           {
             "name": "MouseUp",
             "value": 110,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 203
@@ -15694,6 +15878,7 @@
           {
             "name": "MouseWheelUp",
             "value": 111,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 204
@@ -15702,6 +15887,7 @@
           {
             "name": "MouseWheelDown",
             "value": 112,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 205
@@ -15710,6 +15896,7 @@
           {
             "name": "MouseButton1",
             "value": 113,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 206
@@ -15718,6 +15905,7 @@
           {
             "name": "MouseButton2",
             "value": 114,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 207
@@ -15726,6 +15914,7 @@
           {
             "name": "MouseButton3",
             "value": 115,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 208
@@ -15734,6 +15923,7 @@
           {
             "name": "MouseButton4",
             "value": 116,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 209
@@ -15742,6 +15932,7 @@
           {
             "name": "MouseButton5",
             "value": 117,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 210
@@ -15750,6 +15941,7 @@
           {
             "name": "GamepadRightDown",
             "value": 118,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 211
@@ -15758,6 +15950,7 @@
           {
             "name": "GamepadRightRight",
             "value": 119,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 212
@@ -15766,6 +15959,7 @@
           {
             "name": "GamepadRightLeft",
             "value": 120,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 213
@@ -15774,6 +15968,7 @@
           {
             "name": "GamepadRightUp",
             "value": 121,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 214
@@ -15782,6 +15977,7 @@
           {
             "name": "GamepadLeftDown",
             "value": 122,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 215
@@ -15790,6 +15986,7 @@
           {
             "name": "GamepadLeftRight",
             "value": 123,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 216
@@ -15798,6 +15995,7 @@
           {
             "name": "GamepadLeftLeft",
             "value": 124,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 217
@@ -15806,6 +16004,7 @@
           {
             "name": "GamepadLeftUp",
             "value": 125,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 218
@@ -15814,6 +16013,7 @@
           {
             "name": "GamepadLeftTrigger",
             "value": 126,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 219
@@ -15822,6 +16022,7 @@
           {
             "name": "GamepadRightTrigger",
             "value": 127,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 220
@@ -15830,6 +16031,7 @@
           {
             "name": "GamepadRightShoulder",
             "value": 128,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 221
@@ -15838,6 +16040,7 @@
           {
             "name": "GamepadLeftShoulder",
             "value": 129,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 222
@@ -15846,6 +16049,7 @@
           {
             "name": "GamepadLeftThumbUp",
             "value": 130,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 223
@@ -15854,6 +16058,7 @@
           {
             "name": "GamepadLeftThumbDown",
             "value": 131,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 224
@@ -15862,6 +16067,7 @@
           {
             "name": "GamepadLeftThumbRight",
             "value": 132,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 225
@@ -15870,6 +16076,7 @@
           {
             "name": "GamepadLeftThumbLeft",
             "value": 133,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 226
@@ -15878,6 +16085,7 @@
           {
             "name": "GamepadRightThumbUp",
             "value": 134,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 227
@@ -15886,6 +16094,7 @@
           {
             "name": "GamepadRightThumbDown",
             "value": 135,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 228
@@ -15894,6 +16103,7 @@
           {
             "name": "GamepadRightThumbRight",
             "value": 136,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 229
@@ -15902,6 +16112,7 @@
           {
             "name": "GamepadRightThumbLeft",
             "value": 137,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 230
@@ -15910,6 +16121,7 @@
           {
             "name": "GamepadLeftThumbPress",
             "value": 138,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 231
@@ -15918,6 +16130,7 @@
           {
             "name": "GamepadRightThumbPress",
             "value": 139,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 232
@@ -15926,6 +16139,7 @@
           {
             "name": "GamepadStart",
             "value": 140,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 233
@@ -15934,6 +16148,7 @@
           {
             "name": "GamepadSelect",
             "value": 141,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 234
@@ -15942,6 +16157,7 @@
           {
             "name": "GamepadTouchpadClick",
             "value": 142,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 235
@@ -15950,6 +16166,7 @@
           {
             "name": "GamepadTouchpadTouch",
             "value": 143,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 236
@@ -15958,6 +16175,7 @@
           {
             "name": "GamepadTouchpadPinch",
             "value": 144,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 237
@@ -15966,6 +16184,7 @@
           {
             "name": "GamepadTouchpadZoom",
             "value": 145,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 238
@@ -15974,6 +16193,7 @@
           {
             "name": "GamepadTouchpadTouchLeftDelta",
             "value": 146,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 239
@@ -15982,6 +16202,7 @@
           {
             "name": "GamepadTouchpadTouchRightDelta",
             "value": 147,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 240
@@ -15990,6 +16211,7 @@
           {
             "name": "GamepadTouchpadTouchUpDelta",
             "value": 148,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 241
@@ -15998,6 +16220,7 @@
           {
             "name": "GamepadTouchpadTouchDownDelta",
             "value": 149,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 242
@@ -16006,6 +16229,7 @@
           {
             "name": "Count",
             "value": 150,
+            "doc": null,
             "source": {
               "file_index": 16,
               "line": 243
@@ -16047,7 +16271,7 @@
             "is_base": true,
             "source": {
               "file_index": 16,
-              "line": 30
+              "line": 31
             }
           },
           {
@@ -16186,7 +16410,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 16,
-                "line": 6
+                "line": 7
               }
             },
             {
@@ -16269,7 +16493,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 16,
-                "line": 9
+                "line": 10
               }
             }
           ]
@@ -16282,7 +16506,7 @@
       },
       "source": {
         "file_index": 16,
-        "line": 28
+        "line": 29
       }
     },
     "input::input_device::Mouse": {
@@ -16309,7 +16533,7 @@
             "is_base": true,
             "source": {
               "file_index": 16,
-              "line": 36
+              "line": 37
             }
           },
           {
@@ -16448,7 +16672,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 16,
-                "line": 6
+                "line": 7
               }
             },
             {
@@ -16531,7 +16755,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 16,
-                "line": 9
+                "line": 10
               }
             }
           ]
@@ -16544,7 +16768,7 @@
       },
       "source": {
         "file_index": 16,
-        "line": 34
+        "line": 35
       }
     },
     "input::input_device_manager::InputDeviceManager": {
@@ -16575,7 +16799,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 6
+              "line": 7
             }
           },
           {
@@ -16592,7 +16816,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 6
+              "line": 7
             }
           },
           {
@@ -16613,7 +16837,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 9
+              "line": 10
             }
           },
           {
@@ -16630,7 +16854,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 9
+              "line": 10
             }
           },
           {
@@ -16690,7 +16914,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 17,
-              "line": 13
+              "line": 14
             }
           },
           {
@@ -16721,7 +16945,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 17,
-              "line": 16
+              "line": 17
             }
           },
           {
@@ -16763,7 +16987,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 17,
-              "line": 19
+              "line": 20
             }
           }
         ],
@@ -16776,7 +17000,7 @@
       },
       "source": {
         "file_index": 17,
-        "line": 4
+        "line": 5
       }
     },
     "physics::pfx_character::PfxCharacter": {
@@ -16869,7 +17093,7 @@
       },
       "source": {
         "file_index": 18,
-        "line": 3
+        "line": 4
       }
     },
     "physics::pfx_character::PfxCharacterInstance": {
@@ -16896,7 +17120,7 @@
             "is_base": true,
             "source": {
               "file_index": 18,
-              "line": 13
+              "line": 14
             }
           },
           {
@@ -16980,7 +17204,7 @@
       },
       "source": {
         "file_index": 18,
-        "line": 11
+        "line": 12
       }
     },
     "physics::pfx_character::PfxCharacterVftable": {
@@ -17163,7 +17387,7 @@
       },
       "source": {
         "file_index": 19,
-        "line": 3
+        "line": 4
       }
     },
     "physics::pfx_game_object::PfxGameObjectVftable": {
@@ -17273,6 +17497,7 @@
           {
             "name": "Generic",
             "value": 0,
+            "doc": null,
             "source": {
               "file_index": 20,
               "line": 6
@@ -17281,6 +17506,7 @@
           {
             "name": "RigidBody",
             "value": 1,
+            "doc": null,
             "source": {
               "file_index": 20,
               "line": 7
@@ -17289,6 +17515,7 @@
           {
             "name": "Character",
             "value": 2,
+            "doc": null,
             "source": {
               "file_index": 20,
               "line": 8
@@ -17297,6 +17524,7 @@
           {
             "name": "HeightField",
             "value": 3,
+            "doc": null,
             "source": {
               "file_index": 20,
               "line": 9
@@ -17305,6 +17533,7 @@
           {
             "name": "Vehicle",
             "value": 4,
+            "doc": null,
             "source": {
               "file_index": 20,
               "line": 10
@@ -17313,6 +17542,7 @@
           {
             "name": "Breakable",
             "value": 5,
+            "doc": null,
             "source": {
               "file_index": 20,
               "line": 11
@@ -17321,6 +17551,7 @@
           {
             "name": "MotorBike",
             "value": 6,
+            "doc": null,
             "source": {
               "file_index": 20,
               "line": 12
@@ -17329,6 +17560,7 @@
           {
             "name": "Helicopter",
             "value": 8,
+            "doc": null,
             "source": {
               "file_index": 20,
               "line": 13
@@ -17337,6 +17569,7 @@
           {
             "name": "Boat",
             "value": 9,
+            "doc": null,
             "source": {
               "file_index": 20,
               "line": 14
@@ -17345,6 +17578,7 @@
           {
             "name": "AirPlane",
             "value": 10,
+            "doc": null,
             "source": {
               "file_index": 20,
               "line": 15
@@ -17353,6 +17587,7 @@
           {
             "name": "V22",
             "value": 11,
+            "doc": null,
             "source": {
               "file_index": 20,
               "line": 16
@@ -17361,6 +17596,7 @@
           {
             "name": "MoppCode",
             "value": 12,
+            "doc": null,
             "source": {
               "file_index": 20,
               "line": 17
@@ -17369,6 +17605,7 @@
           {
             "name": "Submarine",
             "value": 13,
+            "doc": null,
             "source": {
               "file_index": 20,
               "line": 18
@@ -17377,6 +17614,7 @@
           {
             "name": "Camera",
             "value": 14,
+            "doc": null,
             "source": {
               "file_index": 20,
               "line": 19
@@ -17385,6 +17623,7 @@
           {
             "name": "RagdollProxyPhantom",
             "value": 15,
+            "doc": null,
             "source": {
               "file_index": 20,
               "line": 20
@@ -17399,7 +17638,7 @@
       },
       "source": {
         "file_index": 20,
-        "line": 4
+        "line": 5
       }
     },
     "physics::pfx_instance::PfxInstance": {
@@ -17613,7 +17852,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 29
+                "line": 30
               }
             },
             {
@@ -17748,7 +17987,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 34
+                "line": 35
               }
             }
           ]
@@ -17761,7 +18000,7 @@
       },
       "source": {
         "file_index": 20,
-        "line": 23
+        "line": 24
       }
     },
     "physics::pfx_instance::PfxInstanceVftable": {
@@ -17934,7 +18173,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 29
+              "line": 30
             }
           },
           {
@@ -18115,7 +18354,7 @@
             "is_base": false,
             "source": {
               "file_index": 20,
-              "line": 34
+              "line": 35
             }
           }
         ],
@@ -18156,7 +18395,7 @@
             "is_base": true,
             "source": {
               "file_index": 21,
-              "line": 5
+              "line": 6
             }
           },
           {
@@ -18295,7 +18534,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 29
+                "line": 30
               }
             },
             {
@@ -18430,7 +18669,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 34
+                "line": 35
               }
             }
           ]
@@ -18443,7 +18682,7 @@
       },
       "source": {
         "file_index": 21,
-        "line": 3
+        "line": 4
       }
     },
     "physics::pfx_vehicle::PfxVehicle": {
@@ -18470,7 +18709,7 @@
             "is_base": true,
             "source": {
               "file_index": 22,
-              "line": 5
+              "line": 6
             }
           },
           {
@@ -18609,7 +18848,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 29
+                "line": 30
               }
             },
             {
@@ -18744,7 +18983,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 20,
-                "line": 34
+                "line": 35
               }
             }
           ]
@@ -18757,7 +18996,7 @@
       },
       "source": {
         "file_index": 22,
-        "line": 3
+        "line": 4
       }
     },
     "rendering::graphics_engine::ActiveCursor": {
@@ -18777,6 +19016,7 @@
           {
             "name": "None",
             "value": -1,
+            "doc": null,
             "source": {
               "file_index": 23,
               "line": 11
@@ -18785,6 +19025,7 @@
           {
             "name": "Arrow",
             "value": 0,
+            "doc": null,
             "source": {
               "file_index": 23,
               "line": 12
@@ -18793,6 +19034,7 @@
           {
             "name": "Cross",
             "value": 1,
+            "doc": null,
             "source": {
               "file_index": 23,
               "line": 13
@@ -18801,6 +19043,7 @@
           {
             "name": "Slider",
             "value": 2,
+            "doc": null,
             "source": {
               "file_index": 23,
               "line": 14
@@ -18809,6 +19052,7 @@
           {
             "name": "Zoom",
             "value": 3,
+            "doc": null,
             "source": {
               "file_index": 23,
               "line": 15
@@ -18849,7 +19093,7 @@
       },
       "source": {
         "file_index": 23,
-        "line": 7
+        "line": 8
       }
     },
     "rendering::graphics_engine::GraphicsDevice": {
@@ -18900,7 +19144,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 35
+              "line": 36
             }
           },
           {
@@ -18920,7 +19164,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 35
+              "line": 36
             }
           },
           {
@@ -18975,7 +19219,7 @@
       },
       "source": {
         "file_index": 23,
-        "line": 31
+        "line": 32
       }
     },
     "rendering::graphics_engine::GraphicsDeviceContext": {
@@ -19006,7 +19250,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 42
+              "line": 43
             }
           },
           {
@@ -19026,7 +19270,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 42
+              "line": 43
             }
           },
           {
@@ -19081,7 +19325,7 @@
       },
       "source": {
         "file_index": 23,
-        "line": 40
+        "line": 41
       }
     },
     "rendering::graphics_engine::GraphicsEngine": {
@@ -19112,7 +19356,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 20
+              "line": 21
             }
           },
           {
@@ -19129,7 +19373,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 20
+              "line": 21
             }
           },
           {
@@ -19150,7 +19394,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 23
+              "line": 24
             }
           },
           {
@@ -19170,7 +19414,7 @@
             "is_base": false,
             "source": {
               "file_index": 23,
-              "line": 23
+              "line": 24
             }
           },
           {
@@ -19213,7 +19457,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 23,
-              "line": 27
+              "line": 28
             }
           }
         ],
@@ -19226,7 +19470,7 @@
       },
       "source": {
         "file_index": 23,
-        "line": 18
+        "line": 19
       }
     },
     "rendering::graphics_engine::GraphicsGlobalSettings": {
@@ -19329,7 +19573,7 @@
       },
       "source": {
         "file_index": 23,
-        "line": 47
+        "line": 48
       }
     },
     "rendering::graphics_engine::HCURSOR": {
@@ -19355,7 +19599,7 @@
       },
       "source": {
         "file_index": 23,
-        "line": 4
+        "line": 5
       }
     },
     "rendering::graphics_engine::HWND": {
@@ -19381,7 +19625,7 @@
       },
       "source": {
         "file_index": 23,
-        "line": 1
+        "line": 2
       }
     },
     "types::hash_string::HashString": {
@@ -19447,7 +19691,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 6
+              "line": 7
             }
           }
         ],
@@ -19460,7 +19704,7 @@
       },
       "source": {
         "file_index": 24,
-        "line": 1
+        "line": 2
       }
     },
     "types::math::Aabb": {
@@ -19518,7 +19762,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 8
+        "line": 9
       }
     },
     "types::math::Matrix3": {
@@ -19563,7 +19807,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 39
+        "line": 40
       }
     },
     "types::math::Matrix4": {
@@ -19608,7 +19852,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 70
+        "line": 71
       }
     },
     "types::math::Ray": {
@@ -19666,7 +19910,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 101
+        "line": 102
       }
     },
     "types::math::Vector2": {
@@ -19711,7 +19955,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 133
+        "line": 134
       }
     },
     "types::math::Vector3": {
@@ -19756,7 +20000,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 155
+        "line": 156
       }
     },
     "types::math::Vector4": {
@@ -19801,7 +20045,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 177
+        "line": 178
       }
     },
     "types::object_id::ObjectID": {
@@ -19859,7 +20103,7 @@
       },
       "source": {
         "file_index": 26,
-        "line": 1
+        "line": 2
       }
     },
     "types::rtti::Rtti": {
@@ -20163,7 +20407,7 @@
       },
       "source": {
         "file_index": 28,
-        "line": 57
+        "line": 58
       }
     },
     "types::shared_ptr::SharedCountImpl": {
@@ -20304,7 +20548,7 @@
       },
       "source": {
         "file_index": 28,
-        "line": 9
+        "line": 10
       }
     },
     "types::shared_ptr::SharedCountImplVftable": {
@@ -20482,7 +20726,7 @@
       },
       "source": {
         "file_index": 28,
-        "line": 125
+        "line": 126
       }
     },
     "types::shared_ptr::WeakCount": {
@@ -20526,7 +20770,7 @@
       },
       "source": {
         "file_index": 28,
-        "line": 97
+        "line": 98
       }
     },
     "types::shared_ptr::WeakPtr": {
@@ -20590,7 +20834,7 @@
       },
       "source": {
         "file_index": 28,
-        "line": 221
+        "line": 222
       }
     },
     "u128": {
@@ -20721,7 +20965,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 5
+              "line": 6
             }
           },
           {
@@ -20738,7 +20982,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 5
+              "line": 6
             }
           },
           {
@@ -20759,7 +21003,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 8
+              "line": 9
             }
           },
           {
@@ -20776,7 +21020,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 8
+              "line": 9
             }
           },
           {
@@ -20898,7 +21142,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 16
+              "line": 17
             }
           }
         ],
@@ -20911,7 +21155,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 3
+        "line": 4
       }
     },
     "ui::gui::GameGuiCallbacks": {
@@ -20959,7 +21203,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 34
+              "line": 35
             }
           },
           {
@@ -20976,7 +21220,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 34
+              "line": 35
             }
           },
           {
@@ -21028,7 +21272,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 30
+        "line": 31
       }
     },
     "ui::gui::GameGuiData": {
@@ -21059,7 +21303,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 41
+              "line": 42
             }
           },
           {
@@ -21076,7 +21320,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 41
+              "line": 42
             }
           },
           {
@@ -21111,7 +21355,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 39
+        "line": 40
       }
     },
     "ui::gui::GameGuiInitState": {
@@ -21131,6 +21375,7 @@
           {
             "name": "Ok",
             "value": 0,
+            "doc": null,
             "source": {
               "file_index": 29,
               "line": 22
@@ -21139,6 +21384,7 @@
           {
             "name": "LoadCSV",
             "value": 1,
+            "doc": null,
             "source": {
               "file_index": 29,
               "line": 23
@@ -21147,6 +21393,7 @@
           {
             "name": "WaitForGameSystems",
             "value": 2,
+            "doc": null,
             "source": {
               "file_index": 29,
               "line": 24
@@ -21155,6 +21402,7 @@
           {
             "name": "WaitStats",
             "value": 3,
+            "doc": null,
             "source": {
               "file_index": 29,
               "line": 25
@@ -21163,6 +21411,7 @@
           {
             "name": "WaitStrings",
             "value": 4,
+            "doc": null,
             "source": {
               "file_index": 29,
               "line": 26
@@ -21171,6 +21420,7 @@
           {
             "name": "Error",
             "value": 5,
+            "doc": null,
             "source": {
               "file_index": 29,
               "line": 27
@@ -21185,7 +21435,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 20
+        "line": 21
       }
     },
     "void": {
@@ -21256,7 +21506,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 21
+              "line": 22
             }
           },
           {
@@ -21273,7 +21523,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 21
+              "line": 22
             }
           },
           {
@@ -21406,7 +21656,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 30,
-                "line": 8
+                "line": 9
               }
             },
             {
@@ -21709,7 +21959,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 30,
-                "line": 11
+                "line": 12
               }
             },
             {
@@ -21760,7 +22010,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 30,
-                "line": 14
+                "line": 15
               }
             },
             {
@@ -22083,7 +22333,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 30,
-                "line": 17
+                "line": 18
               }
             }
           ]
@@ -22096,7 +22346,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 3
+        "line": 4
       }
     },
     "world::game_world::GameWorldVftable": {
@@ -22263,7 +22513,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 8
+              "line": 9
             }
           },
           {
@@ -22716,7 +22966,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 11
+              "line": 12
             }
           },
           {
@@ -22786,7 +23036,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 14
+              "line": 15
             }
           },
           {
@@ -23269,7 +23519,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 17
+              "line": 18
             }
           }
         ],
@@ -23303,6 +23553,7 @@
           {
             "name": "Idle",
             "value": 0,
+            "doc": null,
             "source": {
               "file_index": 30,
               "line": 27
@@ -23311,6 +23562,7 @@
           {
             "name": "Init",
             "value": 1,
+            "doc": null,
             "source": {
               "file_index": 30,
               "line": 28
@@ -23319,6 +23571,7 @@
           {
             "name": "Loading",
             "value": 2,
+            "doc": null,
             "source": {
               "file_index": 30,
               "line": 29
@@ -23327,6 +23580,7 @@
           {
             "name": "WaitPositioning",
             "value": 3,
+            "doc": null,
             "source": {
               "file_index": 30,
               "line": 30
@@ -23341,7 +23595,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 25
+        "line": 26
       }
     }
   },
@@ -23381,6 +23635,10 @@
                 }
               }
             ]
+          },
+          "source": {
+            "file_index": 2,
+            "line": 1
           }
         },
         "game": {
@@ -23397,7 +23655,12 @@
                 "type": "raw",
                 "path": "bool"
               },
-              "address": 5392592652
+              "address": 5392592652,
+              "doc": null,
+              "source": {
+                "file_index": 3,
+                "line": 11
+              }
             },
             {
               "visibility": "public",
@@ -23406,7 +23669,12 @@
                 "type": "raw",
                 "path": "bool"
               },
-              "address": 5392951208
+              "address": 5392951208,
+              "doc": null,
+              "source": {
+                "file_index": 3,
+                "line": 14
+              }
             },
             {
               "visibility": "public",
@@ -23415,11 +23683,20 @@
                 "type": "raw",
                 "path": "game::game::GameState"
               },
-              "address": 5392600804
+              "address": 5392600804,
+              "doc": null,
+              "source": {
+                "file_index": 3,
+                "line": 17
+              }
             }
           ],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 3,
+            "line": 1
+          }
         },
         "save_manager": {
           "doc": null,
@@ -23434,7 +23711,11 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 4,
+            "line": 1
+          }
         },
         "video_manager": {
           "doc": null,
@@ -23444,12 +23725,17 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 5,
+            "line": 1
+          }
         }
       },
       "extern_values": [],
       "functions": [],
-      "backends": {}
+      "backends": {},
+      "source": null
     },
     "game_objects": {
       "doc": null,
@@ -23464,7 +23750,11 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 6,
+            "line": 1
+          }
         },
         "character": {
           "doc": null,
@@ -23476,7 +23766,11 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 7,
+            "line": 1
+          }
         },
         "character_manager": {
           "doc": null,
@@ -23487,7 +23781,11 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 8,
+            "line": 1
+          }
         },
         "damageable": {
           "doc": null,
@@ -23497,7 +23795,11 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 9,
+            "line": 1
+          }
         },
         "game_object": {
           "doc": null,
@@ -23518,6 +23820,10 @@
                 }
               }
             ]
+          },
+          "source": {
+            "file_index": 10,
+            "line": 1
           }
         },
         "physics_game_object": {
@@ -23528,7 +23834,11 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 11,
+            "line": 1
+          }
         },
         "player": {
           "doc": null,
@@ -23548,6 +23858,10 @@
                 }
               }
             ]
+          },
+          "source": {
+            "file_index": 12,
+            "line": 1
           }
         },
         "vehicle": {
@@ -23559,12 +23873,17 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 13,
+            "line": 1
+          }
         }
       },
       "extern_values": [],
       "functions": [],
-      "backends": {}
+      "backends": {},
+      "source": null
     },
     "input": {
       "doc": null,
@@ -23578,7 +23897,11 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 14,
+            "line": 1
+          }
         },
         "input_action_map": {
           "doc": null,
@@ -23590,7 +23913,11 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 15,
+            "line": 1
+          }
         },
         "input_device": {
           "doc": null,
@@ -23618,6 +23945,10 @@
                 }
               }
             ]
+          },
+          "source": {
+            "file_index": 16,
+            "line": 1
           }
         },
         "input_device_manager": {
@@ -23628,12 +23959,17 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 17,
+            "line": 1
+          }
         }
       },
       "extern_values": [],
       "functions": [],
-      "backends": {}
+      "backends": {},
+      "source": null
     },
     "physics": {
       "doc": null,
@@ -23649,7 +23985,11 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 18,
+            "line": 1
+          }
         },
         "pfx_game_object": {
           "doc": null,
@@ -23660,7 +24000,11 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 19,
+            "line": 1
+          }
         },
         "pfx_instance": {
           "doc": null,
@@ -23672,7 +24016,11 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 20,
+            "line": 1
+          }
         },
         "pfx_rigid_body": {
           "doc": null,
@@ -23682,7 +24030,11 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 21,
+            "line": 1
+          }
         },
         "pfx_vehicle": {
           "doc": null,
@@ -23692,12 +24044,17 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 22,
+            "line": 1
+          }
         }
       },
       "extern_values": [],
       "functions": [],
-      "backends": {}
+      "backends": {},
+      "source": null
     },
     "rendering": {
       "doc": null,
@@ -23724,7 +24081,12 @@
                 "type": "raw",
                 "path": "rendering::graphics_engine::GraphicsGlobalSettings"
               },
-              "address": 5392752048
+              "address": 5392752048,
+              "doc": null,
+              "source": {
+                "file_index": 23,
+                "line": 55
+              }
             }
           ],
           "functions": [],
@@ -23738,12 +24100,17 @@
                 }
               }
             ]
+          },
+          "source": {
+            "file_index": 23,
+            "line": 1
           }
         }
       },
       "extern_values": [],
       "functions": [],
-      "backends": {}
+      "backends": {},
+      "source": null
     },
     "root": {
       "doc": null,
@@ -23776,7 +24143,8 @@
       "submodules": {},
       "extern_values": [],
       "functions": [],
-      "backends": {}
+      "backends": {},
+      "source": null
     },
     "types": {
       "doc": null,
@@ -23800,6 +24168,10 @@
                 }
               }
             ]
+          },
+          "source": {
+            "file_index": 24,
+            "line": 1
           }
         },
         "math": {
@@ -23875,6 +24247,10 @@
                 }
               }
             ]
+          },
+          "source": {
+            "file_index": 25,
+            "line": 1
           }
         },
         "object_id": {
@@ -23885,7 +24261,11 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 26,
+            "line": 1
+          }
         },
         "rtti": {
           "doc": null,
@@ -23896,7 +24276,11 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 27,
+            "line": 1
+          }
         },
         "shared_ptr": {
           "doc": null,
@@ -23956,12 +24340,17 @@
                 }
               }
             ]
+          },
+          "source": {
+            "file_index": 28,
+            "line": 1
           }
         }
       },
       "extern_values": [],
       "functions": [],
-      "backends": {}
+      "backends": {},
+      "source": null
     },
     "ui": {
       "doc": null,
@@ -23978,12 +24367,17 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 29,
+            "line": 1
+          }
         }
       },
       "extern_values": [],
       "functions": [],
-      "backends": {}
+      "backends": {},
+      "source": null
     },
     "world": {
       "doc": null,
@@ -23999,12 +24393,17 @@
           "submodules": {},
           "extern_values": [],
           "functions": [],
-          "backends": {}
+          "backends": {},
+          "source": {
+            "file_index": 30,
+            "line": 1
+          }
         }
       },
       "extern_values": [],
       "functions": [],
-      "backends": {}
+      "backends": {},
+      "source": null
     }
   },
   "source_paths": [
