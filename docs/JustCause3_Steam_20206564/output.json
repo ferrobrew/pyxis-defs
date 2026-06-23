@@ -1,5 +1,5 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "pointer_size": 8,
   "project_name": "Just Cause 3 (Steam 20206564)",
   "items": {
@@ -1309,6 +1309,14 @@
             "visibility": "public",
             "name": "SetComputeView",
             "doc": " Sets or clears the `m_ComputeView` flag. When set, [`UpdateRender`](Camera::UpdateRender)\n re-derives `m_View` as the inverse of `m_TransformF` each frame instead of reading a supplied\n view matrix.",
+            "doc_links": [
+              {
+                "text": "Camera::UpdateRender",
+                "target_kind": "item",
+                "path": "camera::camera::Camera",
+                "anchor": "func-UpdateRender"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5369347504
@@ -2943,6 +2951,14 @@
             "visibility": "public",
             "name": "UpdateRender",
             "doc": " The sim-path per-frame update: iterates every camera in the manager's list and calls\n [`Camera::UpdateRender`] on each. This is where the active camera's `m_View` is produced for the\n frame.",
+            "doc_links": [
+              {
+                "text": "Camera::UpdateRender",
+                "target_kind": "item",
+                "path": "camera::camera::Camera",
+                "anchor": "func-UpdateRender"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5369577472
@@ -3141,6 +3157,20 @@
             "visibility": "public",
             "name": "PushRenderContext",
             "doc": " Funnels the camera control contexts into the active camera state: reads the next render\n context, sets the audio listener, applies the jitter filter, and calls\n [`CameraManager::InitTransform`] and [`CameraManager::InitFOV`].",
+            "doc_links": [
+              {
+                "text": "CameraManager::InitTransform",
+                "target_kind": "item",
+                "path": "camera::camera_manager::CameraManager",
+                "anchor": "func-InitTransform"
+              },
+              {
+                "text": "CameraManager::InitFOV",
+                "target_kind": "item",
+                "path": "camera::camera_manager::CameraManager",
+                "anchor": "func-InitFOV"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5377018624
@@ -3246,6 +3276,14 @@
             "visibility": "public",
             "name": "UpdateRender",
             "doc": " The per-frame render update: runs the camera tree via\n [`CameraTree::UpdateRenderContexts`], pushes the render context, then updates the lighting and\n water level at the camera.",
+            "doc_links": [
+              {
+                "text": "CameraTree::UpdateRenderContexts",
+                "target_kind": "item",
+                "path": "camera::camera_tree::CameraTree",
+                "anchor": "func-UpdateRenderContexts"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5377049952
@@ -3379,6 +3417,13 @@
       "kind": {
         "type": "type",
         "doc": " Converts the look effectors into a camera orbit delta-angle and applies it to the [`BoomTransform`]\n camera arm.",
+        "doc_links": [
+          {
+            "text": "BoomTransform",
+            "target_kind": "item",
+            "path": "camera::input_to_orbit::BoomTransform"
+          }
+        ],
         "fields": [],
         "associated_functions": [
           {
@@ -3430,6 +3475,20 @@
             "visibility": "public",
             "name": "ProcessCameraContext",
             "doc": " The caller of [`CalculateInputDeltaAngles`](InputToOrbitModifier::CalculateInputDeltaAngles):\n takes the returned delta-angle and applies it to the camera via\n [`BoomTransform::DeltaTransform`].",
+            "doc_links": [
+              {
+                "text": "InputToOrbitModifier::CalculateInputDeltaAngles",
+                "target_kind": "item",
+                "path": "camera::input_to_orbit::InputToOrbitModifier",
+                "anchor": "func-CalculateInputDeltaAngles"
+              },
+              {
+                "text": "BoomTransform::DeltaTransform",
+                "target_kind": "item",
+                "path": "camera::input_to_orbit::BoomTransform",
+                "anchor": "func-DeltaTransform"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5375900544
@@ -5239,6 +5298,14 @@
             "visibility": "public",
             "name": "m_Weather",
             "doc": " The live weather, also returned by [`GetWeather`](Atmosphere::GetWeather).",
+            "doc_links": [
+              {
+                "text": "Atmosphere::GetWeather",
+                "target_kind": "item",
+                "path": "environment::Atmosphere",
+                "anchor": "func-GetWeather"
+              }
+            ],
             "type_ref": {
               "type": "mut_pointer",
               "inner": {
@@ -5414,6 +5481,19 @@
       "kind": {
         "type": "type",
         "doc": " The live weather state: a continuous scalar model.\n\n **Caution:** [`WeatherController`]'s per-frame update overwrites these scalars toward its own\n targets unless a force flag or a named weather event holds them, so prefer firing an event (see\n [`WeatherController::Init`]) to pin a state.",
+        "doc_links": [
+          {
+            "text": "WeatherController",
+            "target_kind": "item",
+            "path": "environment::WeatherController"
+          },
+          {
+            "text": "WeatherController::Init",
+            "target_kind": "item",
+            "path": "environment::WeatherController",
+            "anchor": "func-Init"
+          }
+        ],
         "fields": [
           {
             "visibility": "private",
@@ -5674,6 +5754,13 @@
             "visibility": "public",
             "name": "Init",
             "doc": " Subscribes the named weather events (`weather_sunny`, `weather_rain`, `weather_snow`,\n `weather_restore`, `weather_instant`, plus `cloud_base` and `cloud_height`). Firing one via the\n engine's event send is the robust way to hold a weather state, since the controller's per-frame\n update otherwise overwrites the [`Weather`] scalars. Event severities: rain is severity `4.0` /\n intensity `1.0` / snow `0`; snow is severity `4.0` / snow `1.0`; sunny is severity `0.1`.",
+            "doc_links": [
+              {
+                "text": "Weather",
+                "target_kind": "item",
+                "path": "environment::Weather"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5372519664
@@ -7638,6 +7725,14 @@
       "kind": {
         "type": "type",
         "doc": " The opaque parameter block passed to\n [`HandleDrawThreadTask`](GraphicsEngine::HandleDrawThreadTask).",
+        "doc_links": [
+          {
+            "text": "GraphicsEngine::HandleDrawThreadTask",
+            "target_kind": "item",
+            "path": "graphics_engine::graphics_engine::GraphicsEngine",
+            "anchor": "func-HandleDrawThreadTask"
+          }
+        ],
         "fields": [],
         "associated_functions": [],
         "vftable": null,
@@ -8336,6 +8431,14 @@
             "visibility": "public",
             "name": "TextureCachePlatformUpdate",
             "doc": " A draw-prologue step. Copies the active camera into the engine-owned render-camera slot, runs\n [`Camera::SetupRenderCamera`] on it, publishes it as the camera manager's render camera, then\n runs the per-frame texture-cache update under the context lock.",
+            "doc_links": [
+              {
+                "text": "Camera::SetupRenderCamera",
+                "target_kind": "item",
+                "path": "camera::camera::Camera",
+                "anchor": "func-SetupRenderCamera"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5369513680
@@ -8886,6 +8989,14 @@
       "kind": {
         "type": "type",
         "doc": " The per-view render context the render passes read: the camera matrices (view, projection, the\n translation-free offset view-projection, and the separate camera world position), shadow data, and\n per-frame flags. Filled each dispatch by [`RenderPass::SetRenderContextCamera`].",
+        "doc_links": [
+          {
+            "text": "RenderPass::SetRenderContextCamera",
+            "target_kind": "item",
+            "path": "graphics_engine::render_pass::RenderPass",
+            "anchor": "func-SetRenderContextCamera"
+          }
+        ],
         "fields": [],
         "associated_functions": [],
         "vftable": null,
@@ -8909,6 +9020,14 @@
       "kind": {
         "type": "type",
         "doc": " Per-real-frame counters, advanced once in the [`GraphicsEngine::Draw`] prologue. `m_FrameIndex`\n (set from the post-incrementing `m_Counter`) drives the TAA jitter phase and shadow parity;\n `m_RingIndex` is the three-slot constant-buffer ring.",
+        "doc_links": [
+          {
+            "text": "GraphicsEngine::Draw",
+            "target_kind": "item",
+            "path": "graphics_engine::graphics_engine::GraphicsEngine",
+            "anchor": "func-Draw"
+          }
+        ],
         "fields": [
           {
             "visibility": "public",
@@ -9055,6 +9174,14 @@
       "kind": {
         "type": "type",
         "doc": " The anti-aliasing resolve. [`AAMode::AA_SMAA_T2X`] additionally reprojects against a previous-frame\n history texture.",
+        "doc_links": [
+          {
+            "text": "AAMode::AA_SMAA_T2X",
+            "target_kind": "item",
+            "path": "graphics_engine::post_effects::AAMode",
+            "anchor": "variant-AA_SMAA_T2X"
+          }
+        ],
         "fields": [
           {
             "visibility": "private",
@@ -9188,6 +9315,14 @@
             "visibility": "public",
             "name": "ApplySubsampleJitter",
             "doc": " Post-multiplies the sub-pixel clip-space jitter translation onto `proj`, only when the resolve\n mode is [`AAMode::AA_SMAA_T2X`]. The phase comes from the previous-frame counter parity.",
+            "doc_links": [
+              {
+                "text": "AAMode::AA_SMAA_T2X",
+                "target_kind": "item",
+                "path": "graphics_engine::post_effects::AAMode",
+                "anchor": "variant-AA_SMAA_T2X"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5369526016
@@ -9380,6 +9515,19 @@
       "kind": {
         "type": "type",
         "doc": " The bokeh blur, used when [`PostEffectsManager::IsBokehActive`]; runs after\n [`DownScale2x2PackFocus`].",
+        "doc_links": [
+          {
+            "text": "PostEffectsManager::IsBokehActive",
+            "target_kind": "item",
+            "path": "graphics_engine::post_effects::PostEffectsManager",
+            "anchor": "func-IsBokehActive"
+          },
+          {
+            "text": "DownScale2x2PackFocus",
+            "target_kind": "item",
+            "path": "graphics_engine::post_effects::DownScale2x2PackFocus"
+          }
+        ],
         "fields": [],
         "associated_functions": [
           {
@@ -10028,6 +10176,14 @@
             "visibility": "public",
             "name": "m_AutoExposureKey",
             "doc": " The auto-exposure target numerator. [`ToneMappingEffect::Update`] sets the exposure target to\n this divided by the raw-brightness histogram mid-point.",
+            "doc_links": [
+              {
+                "text": "ToneMappingEffect::Update",
+                "target_kind": "item",
+                "path": "graphics_engine::tone_mapping::ToneMappingEffect",
+                "anchor": "func-Update"
+              }
+            ],
             "type_ref": {
               "type": "raw",
               "path": "f32"
@@ -10147,6 +10303,13 @@
       "kind": {
         "type": "bitflags",
         "doc": " Per-frame render-context flags carried by a [`PostEffectRenderContext`].",
+        "doc_links": [
+          {
+            "text": "PostEffectRenderContext",
+            "target_kind": "item",
+            "path": "graphics_engine::post_effects::PostEffectRenderContext"
+          }
+        ],
         "underlying_type": {
           "type": "raw",
           "path": "u8"
@@ -10187,6 +10350,14 @@
             "visibility": "public",
             "name": "ApplyWorldFilters",
             "doc": " Enqueues the world post-effect block, then steps the world fade accumulator\n ([`ApplyWorldFadeFilter`](PostEffectsManager::ApplyWorldFadeFilter)). `dt` flows only into\n that accumulator; the texture arguments are the scene inputs.",
+            "doc_links": [
+              {
+                "text": "PostEffectsManager::ApplyWorldFadeFilter",
+                "target_kind": "item",
+                "path": "graphics_engine::post_effects::PostEffectsManager",
+                "anchor": "func-ApplyWorldFadeFilter"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5370068960
@@ -10348,6 +10519,13 @@
             "visibility": "public",
             "name": "IsBokehActive",
             "doc": " Whether the bokeh depth-of-field path is active, selecting the downscale plus bokeh blur over\n the plain [`BlurEffect`].",
+            "doc_links": [
+              {
+                "text": "BlurEffect",
+                "target_kind": "item",
+                "path": "graphics_engine::post_effects::BlurEffect"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5369365104
@@ -10394,6 +10572,14 @@
             "visibility": "public",
             "name": "ApplySubsampleJitter",
             "doc": " Post-multiplies the temporal sub-pixel jitter onto `proj`. Effective only when the resolve mode\n is [`AAMode::AA_SMAA_T2X`].",
+            "doc_links": [
+              {
+                "text": "AAMode::AA_SMAA_T2X",
+                "target_kind": "item",
+                "path": "graphics_engine::post_effects::AAMode",
+                "anchor": "variant-AA_SMAA_T2X"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5369733200
@@ -10459,6 +10645,34 @@
       "kind": {
         "type": "type",
         "doc": " The render block for the post-effects pass. Its [`Draw`](RenderBlockPostEffects::Draw) runs the\n HDR post chain in order: histogram generation, sun-halo pre-apply, blur (bokeh or plain), glare,\n depth of field, motion blur, the HDR-to-LDR tonemap, the player-damage vignette, anti-aliasing,\n sun halo, and the final fade.\n\n It threads a single result-texture slot index through the slot-returning effects\n ([`DepthOfFieldEffect`], [`MotionBlurEffect`], [`PlayerDamageEffect`], [`AntiAliasingEffect`]),\n hopping between the three fullscreen temp textures.",
+        "doc_links": [
+          {
+            "text": "RenderBlockPostEffects::Draw",
+            "target_kind": "item",
+            "path": "graphics_engine::post_effects::RenderBlockPostEffects",
+            "anchor": "func-Draw"
+          },
+          {
+            "text": "DepthOfFieldEffect",
+            "target_kind": "item",
+            "path": "graphics_engine::post_effects::DepthOfFieldEffect"
+          },
+          {
+            "text": "MotionBlurEffect",
+            "target_kind": "item",
+            "path": "graphics_engine::post_effects::MotionBlurEffect"
+          },
+          {
+            "text": "PlayerDamageEffect",
+            "target_kind": "item",
+            "path": "graphics_engine::post_effects::PlayerDamageEffect"
+          },
+          {
+            "text": "AntiAliasingEffect",
+            "target_kind": "item",
+            "path": "graphics_engine::post_effects::AntiAliasingEffect"
+          }
+        ],
         "fields": [],
         "associated_functions": [
           {
@@ -10528,6 +10742,20 @@
       "kind": {
         "type": "type",
         "doc": " The sun halo. [`PreApply`](SunHaloEffect::PreApply) prepares it and sets the ready flag;\n [`Apply`](SunHaloEffect::Apply) composites it.",
+        "doc_links": [
+          {
+            "text": "SunHaloEffect::PreApply",
+            "target_kind": "item",
+            "path": "graphics_engine::post_effects::SunHaloEffect",
+            "anchor": "func-PreApply"
+          },
+          {
+            "text": "SunHaloEffect::Apply",
+            "target_kind": "item",
+            "path": "graphics_engine::post_effects::SunHaloEffect",
+            "anchor": "func-Apply"
+          }
+        ],
         "fields": [],
         "associated_functions": [
           {
@@ -10668,6 +10896,19 @@
             "visibility": "public",
             "name": "m_RenderPasses",
             "doc": " The per-pass render-block-item lists: one vector of [`RenderPass`] pointers per pass id.\n [`DrawRenderPassRange`](RenderEngine::DrawRenderPassRange) and the per-frame list rotation walk\n this.",
+            "doc_links": [
+              {
+                "text": "RenderPass",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPass"
+              },
+              {
+                "text": "RenderEngine::DrawRenderPassRange",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::RenderEngine",
+                "anchor": "func-DrawRenderPassRange"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -10894,6 +11135,14 @@
             "visibility": "public",
             "name": "DrawPosteffects",
             "doc": " The post-effects pass: draws the `RP_POSTEFFECTS` range, whose block is\n [`RenderBlockPostEffects::Draw`].",
+            "doc_links": [
+              {
+                "text": "RenderBlockPostEffects::Draw",
+                "target_kind": "item",
+                "path": "graphics_engine::post_effects::RenderBlockPostEffects",
+                "anchor": "func-Draw"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5370308880
@@ -10967,6 +11216,14 @@
             "visibility": "public",
             "name": "ApplyJitterTransform",
             "doc": " The per-frame TAA jitter: forwards to [`PostEffectsManager::ApplySubsampleJitter`], which\n post-multiplies a sub-pixel clip-space translation onto `proj` only at the T2X resolve mode.",
+            "doc_links": [
+              {
+                "text": "PostEffectsManager::ApplySubsampleJitter",
+                "target_kind": "item",
+                "path": "graphics_engine::post_effects::PostEffectsManager",
+                "anchor": "func-ApplySubsampleJitter"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5370231456
@@ -11052,6 +11309,18 @@
       "kind": {
         "type": "enum",
         "doc": " The flat, contiguous render-pass id enum. Every pass / first / last index in the render engine is\n one of these. The render engine draws by pass-index range: the GBuffer from `RP_Z_OCCLUDERS` to\n `RP_LAST_GBUFFER`, the scene from `RP_REFLECTIVE_WATER_PLANES` to `RP_LAST_MAIN`, and the\n post-effects at `RP_POSTEFFECTS`. Named [`RenderPassId`] to avoid clashing with the [`RenderPass`]\n type.\n\n **Unverified:** this dump numbers `RP_POSTEFFECTS` and `RP_LAST_MAIN` one lower than the retail\n range comments below describe; a one-pass build delta or comment drift, pending a `.text` check.",
+        "doc_links": [
+          {
+            "text": "RenderPassId",
+            "target_kind": "item",
+            "path": "graphics_engine::render_engine::RenderPassId"
+          },
+          {
+            "text": "RenderPass",
+            "target_kind": "item",
+            "path": "graphics_engine::render_pass::RenderPass"
+          }
+        ],
         "underlying_type": {
           "type": "raw",
           "path": "i32"
@@ -12558,6 +12827,20 @@
       "kind": {
         "type": "type",
         "doc": " One of a render pass's double-buffered render-block-item lists.\n\n [`Add`](RBILists::Add) appends entries; on overflow (`m_NumElements >= m_ListSize`) it spills into\n the global overflow list. [`DoDraw`](RenderPass::DoDraw) reads `min(m_ListSize, m_NumElements)`\n entries and never writes `m_NumElements`, so a populated list can be redrawn any number of times.",
+        "doc_links": [
+          {
+            "text": "RBILists::Add",
+            "target_kind": "item",
+            "path": "graphics_engine::render_pass::RBILists",
+            "anchor": "func-Add"
+          },
+          {
+            "text": "RenderPass::DoDraw",
+            "target_kind": "item",
+            "path": "graphics_engine::render_pass::RenderPass",
+            "anchor": "func-DoDraw"
+          }
+        ],
         "fields": [
           {
             "visibility": "public",
@@ -12760,6 +13043,14 @@
             "visibility": "public",
             "name": "m_CurrentAddList",
             "doc": " The list that new render-block-items append to this frame. Each rotation,\n [`SaveRenderFrameData`](RenderPass::SaveRenderFrameData) re-points it at the new parity's list\n and zeroes its count; zeroing that count is how a pass's draw-time additions are reset.",
+            "doc_links": [
+              {
+                "text": "RenderPass::SaveRenderFrameData",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPass",
+                "anchor": "func-SaveRenderFrameData"
+              }
+            ],
             "type_ref": {
               "type": "mut_pointer",
               "inner": {
@@ -12840,6 +13131,14 @@
             "visibility": "public",
             "name": "SetRenderContextCamera",
             "doc": " Fills the per-view render context from `camera` (the render camera, or a shadow or reflective\n light camera selected by the pass flags): the view, projection, and translation-free offset\n view-projection via [`CalculateOffsetViewProjectionMatrix`], the separate camera world\n position, and the parity-buffered shadow matrices. Static.",
+            "doc_links": [
+              {
+                "text": "CalculateOffsetViewProjectionMatrix",
+                "target_kind": "module",
+                "path": "graphics_engine::render_pass",
+                "anchor": "func-CalculateOffsetViewProjectionMatrix"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5370311728
@@ -12882,6 +13181,14 @@
             "visibility": "public",
             "name": "SaveRenderFrameData",
             "doc": " The per-pass half of the list rotation, driven by [`RotateRenderFrameData`]: points\n `m_CurrentAddList` at the new parity's list, the draw list at the other, and zeroes the new\n add-list's element count. Also snapshots the pass camera.",
+            "doc_links": [
+              {
+                "text": "RotateRenderFrameData",
+                "target_kind": "module",
+                "path": "graphics_engine::render_pass",
+                "anchor": "func-RotateRenderFrameData"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5370365056
@@ -12970,6 +13277,14 @@
       "kind": {
         "type": "type",
         "doc": " The screen-space ambient-occlusion render pass.\n\n It maintains a two-slot temporal AO history, blended in when `m_EnableTemporalFilter` is set. The\n history index advances once per render-block draw (an inlined `SetNextHistoryBuffer` at the end of\n the apply), not in [`RotateRenderFrameData`], so a twice-per-frame stereo render double-steps the\n history and blends each eye's AO against the other's.\n\n The render block's final composite draw lives inside the `m_EnableTemporalFilter` branch, so\n clearing that flag disables the whole apply (no AO at all). The per-eye reset lever is instead\n `m_FirstPass`: the engine uses it to mean \"no valid history, compute fresh\", weighting the temporal\n shader fully toward the current AO. Forcing it on before each stereo eye keeps the apply running\n while making each eye compute AO from its own depth.",
+        "doc_links": [
+          {
+            "text": "RotateRenderFrameData",
+            "target_kind": "module",
+            "path": "graphics_engine::render_pass",
+            "anchor": "func-RotateRenderFrameData"
+          }
+        ],
         "fields": [
           {
             "visibility": "private",
@@ -13634,6 +13949,20 @@
             "visibility": "public",
             "name": "m_Histogram",
             "doc": " The exposure-weighted histogram, filled by\n [`CalculateMidAndBrightPointForHistogram`] and read by [`Update`](ToneMappingEffect::Update).",
+            "doc_links": [
+              {
+                "text": "CalculateMidAndBrightPointForHistogram",
+                "target_kind": "module",
+                "path": "graphics_engine::tone_mapping",
+                "anchor": "func-CalculateMidAndBrightPointForHistogram"
+              },
+              {
+                "text": "ToneMappingEffect::Update",
+                "target_kind": "item",
+                "path": "graphics_engine::tone_mapping::ToneMappingEffect",
+                "anchor": "func-Update"
+              }
+            ],
             "type_ref": {
               "type": "raw",
               "path": "graphics_engine::tone_mapping::HistogramGeneration"
@@ -13651,6 +13980,14 @@
             "visibility": "public",
             "name": "m_HistogramPingPong",
             "doc": " The ping-pong selector for the exposure-weighted histogram metering, flipped each frame by\n [`Update`](ToneMappingEffect::Update).",
+            "doc_links": [
+              {
+                "text": "ToneMappingEffect::Update",
+                "target_kind": "item",
+                "path": "graphics_engine::tone_mapping::ToneMappingEffect",
+                "anchor": "func-Update"
+              }
+            ],
             "type_ref": {
               "type": "raw",
               "path": "u32"
@@ -13765,6 +14102,20 @@
             "visibility": "public",
             "name": "m_CurrentExposure",
             "doc": " The current clamped, smoothed auto-exposure multiplier. Written once per frame by\n [`Update`](ToneMappingEffect::Update) and read back into the next frame's\n [`GenerateHistogramForFinalScene`](ToneMappingEffect::GenerateHistogramForFinalScene) metering,\n closing the feedback loop.",
+            "doc_links": [
+              {
+                "text": "ToneMappingEffect::Update",
+                "target_kind": "item",
+                "path": "graphics_engine::tone_mapping::ToneMappingEffect",
+                "anchor": "func-Update"
+              },
+              {
+                "text": "ToneMappingEffect::GenerateHistogramForFinalScene",
+                "target_kind": "item",
+                "path": "graphics_engine::tone_mapping::ToneMappingEffect",
+                "anchor": "func-GenerateHistogramForFinalScene"
+              }
+            ],
             "type_ref": {
               "type": "raw",
               "path": "f32"
@@ -13894,6 +14245,20 @@
             "visibility": "public",
             "name": "DrawHistogramWindow",
             "doc": " Meters the second, non-exposure-weighted scene-luminance histogram (`m_Histogram2`) at a fixed\n exposure of `1.0`, so it measures raw scene brightness -- the value\n [`Update`](ToneMappingEffect::Update) divides the auto-exposure target by. Runs once per\n dispatch in the post chain, like\n [`GenerateHistogramForFinalScene`](ToneMappingEffect::GenerateHistogramForFinalScene).",
+            "doc_links": [
+              {
+                "text": "ToneMappingEffect::Update",
+                "target_kind": "item",
+                "path": "graphics_engine::tone_mapping::ToneMappingEffect",
+                "anchor": "func-Update"
+              },
+              {
+                "text": "ToneMappingEffect::GenerateHistogramForFinalScene",
+                "target_kind": "item",
+                "path": "graphics_engine::tone_mapping::ToneMappingEffect",
+                "anchor": "func-GenerateHistogramForFinalScene"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5369862384
@@ -13955,6 +14320,14 @@
             "visibility": "public",
             "name": "Update",
             "doc": " The per-frame eye-adaptation step: runs [`CalculateMidAndBrightPointForHistogram`] over both\n histograms, then writes the new `m_CurrentExposure` (the target is `m_AutoExposureKey` over the\n `m_Histogram2` mid-point, clamped, then adapted). Runs once per real frame.",
+            "doc_links": [
+              {
+                "text": "CalculateMidAndBrightPointForHistogram",
+                "target_kind": "module",
+                "path": "graphics_engine::tone_mapping",
+                "anchor": "func-CalculateMidAndBrightPointForHistogram"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5369861472
@@ -14115,6 +14488,14 @@
       "kind": {
         "type": "enum",
         "doc": " An action ID, indexing [`action_name_table`]. The numbering is fixed at build time, so action IDs\n can be hardcoded. The engine takes a raw int, and this enum is int-repr, so it converts cleanly\n into the action parameters.",
+        "doc_links": [
+          {
+            "text": "action_name_table",
+            "target_kind": "module",
+            "path": "input::input_action_map",
+            "anchor": "extval-action_name_table"
+          }
+        ],
         "underlying_type": {
           "type": "raw",
           "path": "i32"
@@ -16436,6 +16817,13 @@
       "kind": {
         "type": "enum",
         "doc": " The digital state of an [`InputDeviceEffector`].",
+        "doc_links": [
+          {
+            "text": "InputDeviceEffector",
+            "target_kind": "item",
+            "path": "input::input_action_map::InputDeviceEffector"
+          }
+        ],
         "underlying_type": {
           "type": "raw",
           "path": "u32"
@@ -16490,6 +16878,14 @@
             "name": "Frozen",
             "value": 5,
             "doc": " Held latched by [`Freeze`](InputDeviceEffector::Freeze), ignoring the device poll.",
+            "doc_links": [
+              {
+                "text": "InputDeviceEffector::Freeze",
+                "target_kind": "item",
+                "path": "input::input_action_map::InputDeviceEffector",
+                "anchor": "func-Freeze"
+              }
+            ],
             "source": {
               "file_index": 25,
               "line": 15
@@ -16582,11 +16978,27 @@
       "kind": {
         "type": "type",
         "doc": " One input effector slot. The pointer [`InputActionMap::GetActionEffector`] returns is the head of a\n linked-list node whose extra id / next fields follow this struct; reading the effector itself uses\n only these fields.\n\n **Provenance:** the layout is from the debug PDB, cross-checked against retail usage (`m_Value`,\n `m_State`, and `m_StateTime` offsets all match).",
+        "doc_links": [
+          {
+            "text": "InputActionMap::GetActionEffector",
+            "target_kind": "item",
+            "path": "input::input_action_map::InputActionMap",
+            "anchor": "func-GetActionEffector"
+          }
+        ],
         "fields": [
           {
             "visibility": "public",
             "name": "m_Value",
             "doc": " The analog value, e.g. trigger pressure or stick axis. [`Click`](InputDeviceEffector::Click)\n sets it to `1.0`.",
+            "doc_links": [
+              {
+                "text": "InputDeviceEffector::Click",
+                "target_kind": "item",
+                "path": "input::input_action_map::InputDeviceEffector",
+                "anchor": "func-Click"
+              }
+            ],
             "type_ref": {
               "type": "raw",
               "path": "f32"
@@ -16725,6 +17137,14 @@
             "visibility": "public",
             "name": "Click",
             "doc": " Drives a one-frame press edge: sets `m_Value` to `1.0` and the state to\n [`EffectorState::Clicked`].",
+            "doc_links": [
+              {
+                "text": "EffectorState::Clicked",
+                "target_kind": "item",
+                "path": "input::input_action_map::EffectorState",
+                "anchor": "variant-Clicked"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5371782704
@@ -16745,6 +17165,14 @@
             "visibility": "public",
             "name": "Press",
             "doc": " Sets `m_Value` and drives the [`EffectorState::Pressed`] state.",
+            "doc_links": [
+              {
+                "text": "EffectorState::Pressed",
+                "target_kind": "item",
+                "path": "input::input_action_map::EffectorState",
+                "anchor": "variant-Pressed"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5371782752
@@ -16773,6 +17201,14 @@
             "visibility": "public",
             "name": "Freeze",
             "doc": " Latches into [`EffectorState::Frozen`], ignoring the device poll until cleared.",
+            "doc_links": [
+              {
+                "text": "EffectorState::Frozen",
+                "target_kind": "item",
+                "path": "input::input_action_map::EffectorState",
+                "anchor": "variant-Frozen"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5371782832
@@ -16831,6 +17267,13 @@
       "kind": {
         "type": "type",
         "doc": " The local player's action map: a write-side wrapper that drives effectors by [`Action`]. Invalid\n action IDs resolve to a shared null-effector sentinel, which the setters guard against.",
+        "doc_links": [
+          {
+            "text": "Action",
+            "target_kind": "item",
+            "path": "input::input_action_map::Action"
+          }
+        ],
         "fields": [],
         "associated_functions": [
           {
@@ -17005,6 +17448,14 @@
             "visibility": "public",
             "name": "Update",
             "doc": " The per-frame device poll: reads all devices, refreshes their effector states, and then runs\n [`UpdateForceClicks`](InputDeviceManager::UpdateForceClicks). Effector writes injected before\n this are overwritten by the poll, so inject after it instead.",
+            "doc_links": [
+              {
+                "text": "InputDeviceManager::UpdateForceClicks",
+                "target_kind": "item",
+                "path": "input::input_device_manager::InputDeviceManager",
+                "anchor": "func-UpdateForceClicks"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5371797696
@@ -17308,6 +17759,13 @@
       "kind": {
         "type": "type",
         "doc": " The engine's 4x4 matrix, in the D3D convention: row-major storage with row vectors (a point is a\n row vector left-multiplied by the matrix, `clip = p * M`).\n\n The 16 floats are four rows; a world or camera transform's rows are its basis vectors:\n `data[0..2]` is right (+X), `data[4..6]` is up (+Y), `data[8..10]` is the +Z basis (so forward is\n `-data[8..10]`), and `data[12..14]` is the translation. Right-handed, Y-up.\n\n The glam conversions below bridge to glam's column-vector convention by transposing (row-major rows\n become glam columns), so glam matrix math on a converted [`Matrix4`] works without an explicit\n transpose. To build an engine transform in glam, set the basis vectors as the glam *columns*\n (right, up, -forward, translation) and use `to_cols_array`.",
+        "doc_links": [
+          {
+            "text": "Matrix4",
+            "target_kind": "item",
+            "path": "types::math::Matrix4"
+          }
+        ],
         "fields": [
           {
             "visibility": "public",
@@ -17912,12 +18370,28 @@
       "kind": {
         "type": "type",
         "doc": " A Scaleform render buffer: what [`UIManager::m_RenderBuffer`] points at. Pointing its bound views\n at an offscreen render-target view redirects where the UI HAL renders, and the rebind is not tied\n to startup, so it can happen at any time.",
+        "doc_links": [
+          {
+            "text": "UIManager::m_RenderBuffer",
+            "target_kind": "item",
+            "path": "ui::ui_manager::UIManager",
+            "anchor": "field-m_RenderBuffer"
+          }
+        ],
         "fields": [],
         "associated_functions": [
           {
             "visibility": "public",
             "name": "UpdateData",
             "doc": " Rebinds the buffer's views, releasing the old ones and adding a reference to the new. `self`\n is the render buffer itself ([`UIManager::m_RenderBuffer`]); the call reaches its inner\n view-holder internally. Passing `depth` as null leaves the depth buffer unchanged.",
+            "doc_links": [
+              {
+                "text": "UIManager::m_RenderBuffer",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "field-m_RenderBuffer"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5400038640
@@ -18114,6 +18588,14 @@
       "kind": {
         "type": "type",
         "doc": " The Scaleform-backed UI manager, the single concrete instance behind `IUIManager`. It renders the\n HUD into the engine surface; [`InitPlatformRT`](UIManager::InitPlatformRT) rebinds its render\n target.",
+        "doc_links": [
+          {
+            "text": "UIManager::InitPlatformRT",
+            "target_kind": "item",
+            "path": "ui::ui_manager::UIManager",
+            "anchor": "func-InitPlatformRT"
+          }
+        ],
         "fields": [
           {
             "visibility": "private",
@@ -18133,18 +18615,32 @@
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 41
+              "line": 42
             }
           },
           {
             "visibility": "public",
             "name": "m_RenderBuffer",
-            "doc": " The Scaleform render buffer the UI HAL renders into, set up by\n [`InitPlatformRT`](UIManager::InitPlatformRT).",
+            "doc": " The Scaleform render buffer the UI HAL renders into, set up by\n [`InitPlatformRT`](UIManager::InitPlatformRT). Pass it to [`RenderTargetData::UpdateData`] to\n rebind where the HUD renders.",
+            "doc_links": [
+              {
+                "text": "UIManager::InitPlatformRT",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-InitPlatformRT"
+              },
+              {
+                "text": "RenderTargetData::UpdateData",
+                "target_kind": "item",
+                "path": "ui::ui_manager::RenderTargetData",
+                "anchor": "func-UpdateData"
+              }
+            ],
             "type_ref": {
               "type": "mut_pointer",
               "inner": {
                 "type": "raw",
-                "path": "void"
+                "path": "ui::ui_manager::RenderTargetData"
               }
             },
             "offset": 5008,
@@ -18153,7 +18649,7 @@
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 41
+              "line": 42
             }
           },
           {
@@ -18174,13 +18670,21 @@
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 46
+              "line": 47
             }
           },
           {
             "visibility": "public",
             "name": "m_ViewWidth",
             "doc": " The viewport width that the world-to-screen mapping\n ([`Convert3DCoords`](UIManager::Convert3DCoords)) maps NDC into.",
+            "doc_links": [
+              {
+                "text": "UIManager::Convert3DCoords",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-Convert3DCoords"
+              }
+            ],
             "type_ref": {
               "type": "raw",
               "path": "f32"
@@ -18191,7 +18695,7 @@
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 46
+              "line": 47
             }
           },
           {
@@ -18208,7 +18712,7 @@
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 49
+              "line": 50
             }
           },
           {
@@ -18238,6 +18742,19 @@
             "visibility": "public",
             "name": "InitPlatformRT",
             "doc": " Binds the UI render target: builds a [`RenderTargetData`] from the engine surface's\n render-target and depth-stencil views via [`RenderTargetData::UpdateData`]. Called at startup\n and on every device or resolution reset; `a2` carries the target dimensions.",
+            "doc_links": [
+              {
+                "text": "RenderTargetData",
+                "target_kind": "item",
+                "path": "ui::ui_manager::RenderTargetData"
+              },
+              {
+                "text": "RenderTargetData::UpdateData",
+                "target_kind": "item",
+                "path": "ui::ui_manager::RenderTargetData",
+                "anchor": "func-UpdateData"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5384869600
@@ -18259,13 +18776,21 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 56
+              "line": 57
             }
           },
           {
             "visibility": "public",
             "name": "RestoreAfterReset",
             "doc": " Re-runs [`InitPlatformRT`](UIManager::InitPlatformRT) after a device or resolution reset (`a2`\n is the new width; the dimensions otherwise track the engine surface).",
+            "doc_links": [
+              {
+                "text": "UIManager::InitPlatformRT",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-InitPlatformRT"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5385133168
@@ -18287,7 +18812,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 61
+              "line": 62
             }
           },
           {
@@ -18354,13 +18879,27 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 66
+              "line": 67
             }
           },
           {
             "visibility": "public",
             "name": "Get2DInfo",
             "doc": " Marker placement: [`Convert3DCoords`](UIManager::Convert3DCoords) with the supplied `vp`, plus\n an on-screen test and an off-screen edge-clamp via [`ClampToScreen`](UIManager::ClampToScreen).\n Gameplay markers route through here.",
+            "doc_links": [
+              {
+                "text": "UIManager::Convert3DCoords",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-Convert3DCoords"
+              },
+              {
+                "text": "UIManager::ClampToScreen",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-ClampToScreen"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5384871088
@@ -18472,7 +19011,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 72
+              "line": 73
             }
           },
           {
@@ -18554,7 +19093,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 77
+              "line": 78
             }
           },
           {
@@ -18585,7 +19124,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 81
+              "line": 82
             }
           },
           {
@@ -18605,7 +19144,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 85
+              "line": 86
             }
           },
           {
@@ -18625,7 +19164,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 89
+              "line": 90
             }
           },
           {
@@ -18645,7 +19184,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 93
+              "line": 94
             }
           },
           {
@@ -18679,7 +19218,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 97
+              "line": 98
             }
           },
           {
@@ -18702,7 +19241,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 101
+              "line": 102
             }
           }
         ],
@@ -20338,6 +20877,20 @@
               "visibility": "public",
               "name": "RotateRenderFrameData",
               "doc": " The per-frame render-block-item list rotation, run once in each graphics-engine draw prologue.\n Toggles the global add/draw parity, then for every render pass swaps the add and draw lists to the\n new parity (via [`RenderPass::SaveRenderFrameData`]) and zeroes the new add-list's element count,\n and finally flushes the overflow list. This -- not the per-batch\n [`SetupRenderFrameData`](RenderPass::SetupRenderFrameData) build above -- is the actual draw-list\n swap. Static; reads the render engine and parity from globals.\n\n **Note:** the call site is mislabeled `CKeep1000Frames` in this binary's symbols.",
+              "doc_links": [
+                {
+                  "text": "RenderPass::SaveRenderFrameData",
+                  "target_kind": "item",
+                  "path": "graphics_engine::render_pass::RenderPass",
+                  "anchor": "func-SaveRenderFrameData"
+                },
+                {
+                  "text": "RenderPass::SetupRenderFrameData",
+                  "target_kind": "item",
+                  "path": "graphics_engine::render_pass::RenderPass",
+                  "anchor": "func-SetupRenderFrameData"
+                }
+              ],
               "body": {
                 "type": "address",
                 "address": 5370425344
@@ -20793,6 +21346,13 @@
               "visibility": "public",
               "name": "GetIUIManager",
               "doc": " Returns the single [`UIManager`] instance.",
+              "doc_links": [
+                {
+                  "text": "UIManager",
+                  "target_kind": "item",
+                  "path": "ui::ui_manager::UIManager"
+                }
+              ],
               "body": {
                 "type": "address",
                 "address": 5369337248
@@ -20808,7 +21368,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 32,
-                "line": 106
+                "line": 107
               }
             }
           ],
