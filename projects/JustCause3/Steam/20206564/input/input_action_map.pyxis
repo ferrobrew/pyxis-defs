@@ -1,57 +1,62 @@
-/// Digital state of an InputDeviceEffector (the m_State enum). IsSet/IsPressed are state in {2, 3}.
+/// The digital state of an [`InputDeviceEffector`].
 #[copyable]
 pub enum EffectorState: u32 {
-    /// Idle (no input this frame).
+    /// Idle, with no input this frame.
     Idle = 0x0,
-    /// Idle (alternate idle slot).
+    /// Idle, in the alternate idle slot.
     Idle2 = 0x1,
-    /// Clicked this frame (a one-frame press edge).
+    /// Clicked this frame: a one-frame press edge.
     Clicked = 0x2,
-    /// Pressed / held.
+    /// Pressed or held.
     Pressed = 0x3,
     /// Released this frame.
     Released = 0x4,
-    /// Frozen (held latched by Freeze, ignoring the device poll).
+    /// Held latched by [`Freeze`](InputDeviceEffector::Freeze), ignoring the device poll.
     Frozen = 0x5,
 }
 
-/// One input effector slot. Layout from the debug PDB (Input::InputDeviceEffector, 0x14),
-/// cross-checked against retail usage (m_Value@0, m_State@8, m_StateTime@0x10 all match). The
-/// pointer GetActionEffector returns is the head of a linked-list node whose extra id/next fields
-/// follow this struct; reading the effector itself uses these offsets.
+/// One input effector slot. The pointer [`InputActionMap::GetActionEffector`] returns is the head of a
+/// linked-list node whose extra id / next fields follow this struct; reading the effector itself uses
+/// only these fields.
+///
+/// **Provenance:** the layout is from the debug PDB, cross-checked against retail usage (`m_Value`,
+/// `m_State`, and `m_StateTime` offsets all match).
 #[size(0x14), align(4)]
 pub type InputDeviceEffector {
-    pub m_Value: f32, // analog value (trigger pressure, stick axis); Click sets 1.0, GetValue returns this
+    /// The analog value, e.g. trigger pressure or stick axis. [`Click`](InputDeviceEffector::Click)
+    /// sets it to `1.0`.
+    pub m_Value: f32,
     pub m_PrevValue: f32,
-    pub m_State: EffectorState, // digital state
+    pub m_State: EffectorState,
     pub m_IsAnalogue: bool,
     pub m_IsDeltaBased: bool,
     pub m_IsUpdated: bool,
-    pub m_ForceClick: bool, // injects a click that survives the next device poll
+    /// Injects a click that survives the next device poll.
+    pub m_ForceClick: bool,
     pub m_StateTime: f32,
 }
 impl InputDeviceEffector {
-    /// Sets m_Value to 1.0 and m_State to Clicked (a one-frame press edge).
+    /// Drives a one-frame press edge: sets `m_Value` to `1.0` and the state to
+    /// [`EffectorState::Clicked`].
     #[address(0x140_2EE_630)]
     pub fn Click(&mut self);
 
-    /// Sets m_Value and m_State to Pressed/Held.
+    /// Sets `m_Value` and drives the [`EffectorState::Pressed`] state.
     #[address(0x140_2EE_660)]
     pub fn Press(&mut self, value: f32);
 
-    /// Latches the effector into the Frozen state (ignores the device poll until cleared).
+    /// Latches into [`EffectorState::Frozen`], ignoring the device poll until cleared.
     #[address(0x140_2EE_6B0)]
     pub fn Freeze(&mut self);
 
-    /// Sets m_ForceClick so the click survives the next per-frame poll (UpdateForceClicks consumes it).
+    /// Sets `m_ForceClick` so the click survives the next per-frame poll.
     #[address(0x140_2EE_6D0)]
     pub fn ForceClick(&mut self);
 }
 
-/// Action ID, indexing the static action-name-to-ID table (action_name_table at 0x142_D99_370).
-/// 255 actions (PAUSE..GUI_USE_BUTTON); the numbering is fixed at build time, so IDs can be
-/// hardcoded. The engine takes a raw int for these, and this enum is repr-int, so it transmutes
-/// cleanly into the action_id / action parameters.
+/// An action ID, indexing [`action_name_table`]. The numbering is fixed at build time, so action IDs
+/// can be hardcoded. The engine takes a raw int, and this enum is int-repr, so it converts cleanly
+/// into the action parameters.
 #[copyable]
 pub enum Action: i32 {
     PAUSE = 0x0,
@@ -311,31 +316,28 @@ pub enum Action: i32 {
     GUI_USE_BUTTON = 0xFE,
 }
 
-/// Maps action IDs to effector slots (255 action IDs total).
+/// Maps action IDs to effector slots.
 pub type InputActionMap;
 impl InputActionMap {
     #[address(0x140_2F4_3B0)]
     pub fn GetActionEffector(&mut self, action_id: i32, device_index: i32) -> *mut InputDeviceEffector;
 }
 
-/// The local player's action map: a write-side wrapper that drives effectors by action ID. The
-/// global at 0x142_F38_740 holds the instance pointer. Invalid action IDs resolve to a shared
-/// null-effector sentinel, which the setters guard against. Action-name-to-ID is a static table
-/// (action_name_table), so action IDs are stable across builds and can be referenced directly.
+/// The local player's action map: a write-side wrapper that drives effectors by [`Action`]. Invalid
+/// action IDs resolve to a shared null-effector sentinel, which the setters guard against.
 #[singleton(0x142_F38_740)]
 pub type LocalPlayerActionMap;
 impl LocalPlayerActionMap {
-    /// Drives an analog / held action: sets the effector's value (and presses it).
+    /// Drives an analog or held action: sets the effector's value and presses it.
     #[address(0x140_C12_4B0)]
     pub fn ForceSetPressed(&mut self, action: Action, value: f32);
 
-    /// Drives a one-frame click for an action (a press edge that survives the poll).
+    /// Drives a one-frame click for an action: a press edge that survives the poll.
     #[address(0x140_C12_480)]
     pub fn ForceSetClicked(&mut self, action: Action);
 }
 
-// Static action-name-to-ID table: 255 action-name pointers, index = action ID (read by the
-// CStringToActionMap ctor). The numbering is fixed at build time, so action IDs can be hardcoded;
-// the full ID->name mapping is the `Action` enum above.
+/// The static action-name-to-ID table: action-name pointers indexed by action ID. The full ID-to-name
+/// mapping is the [`Action`] enum.
 #[address(0x142_D99_370)]
 pub extern action_name_table: *const u8;

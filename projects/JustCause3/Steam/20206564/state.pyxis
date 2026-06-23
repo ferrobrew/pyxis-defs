@@ -1,3 +1,3 @@
-/// Opaque per-task state-machine context passed to character/task Update functions
-/// (SStateContext). Layout TBD; used behind pointers.
-pub type SStateContext;
+/// The opaque per-task state-machine context passed to character and task update functions. Used only
+/// behind pointers; the layout is not yet mapped.
+pub type StateContext;

@@ -1,16 +1,17 @@
 use types::math::Vector3;
-use state::SStateContext;
+use state::StateContext;
 
-/// Autodesk HumanIK wrapper.
+/// An Autodesk HumanIK wrapper.
 pub type HumanIK;
 impl HumanIK {
-    /// Pushes an IK effector target (character-local space). Prototype verified against the debug
-    /// PDB. solve_step / pass_info are 4-byte enums (HumanIK::HIKSolveStep / HIKPassInfo), passed
-    /// as i32.
+    /// Pushes an IK effector target, in character-local space. `solve_step` and `pass_info` are the
+    /// `HIKSolveStep` and `HIKPassInfo` enums.
+    ///
+    /// **Provenance:** the prototype is verified against the debug PDB.
     #[address(0x140_408_860)]
     pub fn AddEffectorTargetPosition(&mut self, effector: i32, pos: *const Vector3, solve_step: i32, pass_info: i32, effector_interpolation: bool, effector_interpolation_rate: f32, effector_blend_out: bool, effector_blend_out_rate: f32);
 }
 
-/// Per-frame hand-IK driver (sources its targets from weapon grip positions). Free function.
+/// The per-frame hand-IK driver. Sources its targets from weapon grip positions.
 #[address(0x140_816_430)]
-fn NHandIKTask_Update(ctx: *mut SStateContext, p1: *mut void, p2: *mut void);
+fn NHandIKTask_Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);

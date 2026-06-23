@@ -3,15 +3,14 @@ use graphics_engine::render_pass::RenderPass;
 use types::math::Matrix4;
 use types::std_vector::Vector;
 
-// NOTE: this dump gives RP_POSTEFFECTS = 0x95 and RP_LAST_MAIN = 0x96, whereas the retail range
-// comments below describe the post-effects pass as 0x96..0x97. That is an unverified off-by-one (a
-// one-pass build delta or comment drift); the range comments are left as-is pending verification
-// against the retail .text.
-/// The flat, contiguous render-pass id enum (ERenderPass). Every `pass` / `first` / `last` index in
-/// the render engine is one of these. The pass-index ranges the render engine draws by:
-/// GBuffer = RP_Z_OCCLUDERS..RP_LAST_GBUFFER, scene = RP_REFLECTIVE_WATER_PLANES..RP_LAST_MAIN,
-/// post-effects = RP_POSTEFFECTS. Named `RenderPassId` to avoid clashing with the `RenderPass` type
-/// (the CRenderPass class in render_pass.pyxis).
+/// The flat, contiguous render-pass id enum. Every pass / first / last index in the render engine is
+/// one of these. The render engine draws by pass-index range: the GBuffer from `RP_Z_OCCLUDERS` to
+/// `RP_LAST_GBUFFER`, the scene from `RP_REFLECTIVE_WATER_PLANES` to `RP_LAST_MAIN`, and the
+/// post-effects at `RP_POSTEFFECTS`. Named [`RenderPassId`] to avoid clashing with the [`RenderPass`]
+/// type.
+///
+/// **Unverified:** this dump numbers `RP_POSTEFFECTS` and `RP_LAST_MAIN` one lower than the retail
+/// range comments below describe; a one-pass build delta or comment drift, pending a `.text` check.
 #[copyable]
 pub enum RenderPassId: i32 {
     RP_NONE = 0x0,
@@ -175,50 +174,50 @@ pub enum RenderPassId: i32 {
 
 #[singleton(0x142_ED0_E18), size(0x2220)]
 pub type RenderEngine {
-    /// Per-pass render-block-item lists: one `std::vector<CRenderPass*>` per pass id (stride 0x20, at
-    /// `this + 32*pass + 128`). DrawRenderPassRange and the per-frame list rotation walk this.
+    /// The per-pass render-block-item lists: one vector of [`RenderPass`] pointers per pass id.
+    /// [`DrawRenderPassRange`](RenderEngine::DrawRenderPassRange) and the per-frame list rotation walk
+    /// this.
     #[address(0x80)]
     pub m_RenderPasses: [Vector<*mut RenderPass>; 157],
 }
 impl RenderEngine {
-    /// Late render-pass step (finalizes / copies render targets under the context mutex).
+    /// The late render-pass step: finalizes and copies render targets under the context mutex.
     #[address(0x140_1C2_350)]
     pub fn PostDraw(&mut self, context: *const HContext_t);
 
-    /// Draws every render block in the half-open pass-index range [first, last): for each pass it
-    /// walks the fixed RenderPass* array at this + 32*pass + 128 and vtable-dispatches each block.
-    /// GBuffer is 0x2F..0x55, the lighting/scene block 0x56..0x96, post-effects 0x96..0x97.
+    /// Draws every render block in the half-open pass-index range `[first, last)`: for each pass it
+    /// walks the [`RenderPass`] list and vtable-dispatches each block.
     #[address(0x140_186_600)]
     pub fn DrawRenderPassRange(&mut self, ctx: *mut HContext_t, setup: *mut HRenderSetup_t, first: RenderPassId, last: RenderPassId);
 
-    /// GBuffer fill: binds two global textures, then DrawRenderPassRange(0x2F, 0x55) (depth /
-    /// velocity prefix, static/dynamic models, decals).
+    /// The GBuffer fill: binds two global textures, then draws the GBuffer pass range (the depth and
+    /// velocity prefix, static and dynamic models, and decals).
     #[address(0x140_186_810)]
     pub fn DrawGBuffer(&mut self, ctx: *mut HContext_t, a3: i64, a4: *mut HTexture_t);
 
-    /// Lighting / reflections / opaque / environment / water / transparency:
-    /// DrawRenderPassRange(0x56, 0x96), then clears the global texture samplers.
+    /// Lighting, reflections, opaque, environment, water, and transparency: draws the scene pass
+    /// range, then clears the global texture samplers.
     #[address(0x140_186_8A0)]
     pub fn Draw(&mut self, ctx: *mut HContext_t) -> u64;
 
-    /// Post-effects pass: DrawRenderPassRange(0x96, 0x97) (the RP_POSTEFFECTS pass, whose block is
-    /// RenderBlockPostEffects::Draw).
+    /// The post-effects pass: draws the `RP_POSTEFFECTS` range, whose block is
+    /// [`RenderBlockPostEffects::Draw`].
     #[address(0x140_186_910)]
     pub fn DrawPosteffects(&mut self, ctx: *mut HContext_t, setup: *mut HRenderSetup_t);
 
     /// Uploads the global per-view constant buffer for the frame: lighting, fog, wetness, and the
-    /// render camera's full (translation-bearing) m_ViewProjectionF and world position. This block
-    /// drives screen-space / non-geometry work, not opaque-geometry vertex placement.
+    /// render camera's full (translation-bearing) view-projection and world position. This drives
+    /// screen-space and non-geometry work, not opaque-geometry vertex placement.
     #[address(0x140_185_740)]
     pub fn SetGlobalShaderConstants(&mut self, ctx: *mut RenderContext);
 
-    /// Per-frame TAA jitter: forwards to PostEffectsManager::ApplySubsampleJitter, which
-    /// post-multiplies a sub-pixel clip-space translation onto `proj` only when AA mode == 3.
+    /// The per-frame TAA jitter: forwards to [`PostEffectsManager::ApplySubsampleJitter`], which
+    /// post-multiplies a sub-pixel clip-space translation onto `proj` only at the T2X resolve mode.
     #[address(0x140_173_AA0)]
     pub fn ApplyJitterTransform(&mut self, proj: *mut Matrix4, width: i32, height: i32);
 
-    /// Drains a separate deferred deletion list of render blocks (under its own critical section).
-    /// Does not touch the per-pass draw lists.
+    /// Drains a separate deferred deletion list of render blocks, under its own critical section. Does
+    /// not touch the per-pass draw lists.
     #[address(0x140_1A4_ED0)]
     pub fn EraseAllDeletedRenderBlocks(&mut self);
 }

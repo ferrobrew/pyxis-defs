@@ -28,7 +28,7 @@ impl Character {
     #[address(0x140_79A_C30)]
     pub fn GetSafeBoneMatrix(&self, safe_index: SafeBoneIndex, matrix: *mut Matrix4);
 
-    /// Per-frame update of the character's attached prop visual effects. `dt` is the frame delta.
+    /// The per-frame update of the character's attached prop visual effects.
     #[address(0x140_7C2_380)]
     pub fn UpdatePropEffects(&mut self, dt: f32);
 }
@@ -61,7 +61,7 @@ pub type Joint {
     pub m_Scale: AlignedVector3,
 }
 
-// Note: We might want to add support for putting this in an impl at some point
+// TODO(review): we might want to add support for putting this in an impl at some point.
 #[address(0x142_F2F_301)]
 pub extern Character_GoreEnabled: bool;
 

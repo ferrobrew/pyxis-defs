@@ -12,21 +12,22 @@ pub type CameraManager {
     pub m_AspectRatio: f32,
 }
 impl CameraManager {
-    /// Sets the active camera's transform, writing both T0 and T1 to `mat` (so the subsequent
-    /// interpolation is constant).
+    /// Sets the active camera's transform, writing both `m_TransformT0` and `m_TransformT1` from `mat`
+    /// so the subsequent interpolation holds it constant.
     #[address(0x140_09D_390)]
     pub fn InitTransform(&mut self, mat: *const Matrix4);
 
-    /// Sets the active camera's field of view (both T0 and T1).
+    /// Sets the active camera's field of view, both the T0 and T1 values.
     #[address(0x140_09D_400)]
     pub fn InitFOV(&mut self, fov: f32);
 
-    /// Returns m_RenderCamera (the camera the render thread reads).
+    /// Returns the camera the render thread reads.
     #[address(0x140_09D_380)]
     pub fn GetRenderCamera(&self) -> *const Camera;
 
-    /// Sim-path per-frame update: iterates every camera in the manager's list and calls
-    /// Camera::UpdateRender on each. This is where m_ActiveCamera's m_View is produced for the frame.
+    /// The sim-path per-frame update: iterates every camera in the manager's list and calls
+    /// [`Camera::UpdateRender`] on each. This is where the active camera's `m_View` is produced for the
+    /// frame.
     #[address(0x140_0D4_000)]
     pub fn UpdateRender(&mut self, dt: f32, dtf: f32);
 }

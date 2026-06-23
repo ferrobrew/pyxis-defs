@@ -6,28 +6,30 @@ pub type GameCameraManager {
     pub m_ControlContext: CameraControlContext,
 }
 
-/// A node in the camera pipeline (opaque).
+/// An opaque node in the camera pipeline.
 pub type CameraPipeline;
 impl GameCameraManager {
-    /// Funnels the camera control contexts into the active camera state: reads m_NextRenderContext,
-    /// sets the audio listener, applies the jitter filter, and calls CameraManager InitTransform/InitFOV.
+    /// Funnels the camera control contexts into the active camera state: reads the next render
+    /// context, sets the audio listener, applies the jitter filter, and calls
+    /// [`CameraManager::InitTransform`] and [`CameraManager::InitFOV`].
     #[address(0x140_7EC_B00)]
     pub fn PushRenderContext(&mut self);
 
-    /// Reads the action-effector inputs into m_TransformedGamepadInput.
+    /// Reads the action-effector inputs into the transformed-gamepad-input blackboard value.
     #[address(0x140_7FF_F90)]
     pub fn UpdateBlackboardValues(&mut self, pipeline: *const CameraPipeline, dt: f32);
 
-    /// True when the currently selected camera in the director stack has the cinematic flag set.
+    /// Whether the currently selected camera in the director stack has the cinematic flag set.
     #[address(0x140_75C_850)]
     pub fn IsInCinematicCamera(&self) -> bool;
 
-    /// True when the alternate-aim (ADS) transform is in use.
+    /// Whether the alternate-aim (aim-down-sights) transform is in use.
     #[address(0x140_75C_820)]
     pub fn IsAlternateAimTransformUsed(&self) -> bool;
 
-    /// Per-frame render update: runs the camera tree (UpdateRenderContexts), pushes the render
-    /// context, then updates the lighting and water level at the camera.
+    /// The per-frame render update: runs the camera tree via
+    /// [`CameraTree::UpdateRenderContexts`], pushes the render context, then updates the lighting and
+    /// water level at the camera.
     #[address(0x140_7F4_560)]
     pub fn UpdateRender(&mut self, dt: f32, dtf: f32, blend: f32) -> u64;
 }

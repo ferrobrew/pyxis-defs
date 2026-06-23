@@ -1,3 +1,3 @@
-/// The game's Win32 window procedure: LRESULT WndProc(HWND, UINT msg, WPARAM, LPARAM).
+/// The game's Win32 window procedure.
 #[address(0x140_006_F40)]
 fn WndProc(hwnd: *mut void, msg: u32, wparam: u64, lparam: i64) -> i64;

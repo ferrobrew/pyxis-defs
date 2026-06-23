@@ -27,7 +27,7 @@ impl Game {
     #[address(0x140_952_390)]
     pub fn Draw(&self, dt: f32);
 
-    /// Top-level per-frame update (advances the sim and drives rendering). Returns false on exit.
+    /// The top-level per-frame update: advances the sim and drives rendering. Returns false on exit.
     #[address(0x140_960_4E0)]
     pub fn Update(&mut self) -> bool;
 
@@ -36,7 +36,7 @@ impl Game {
     pub fn UpdateRender(&mut self, update_contexts: *mut UpdateContexts);
 }
 
-// Opaque engine context pointers carried by the per-frame update contexts.
+// Opaque engine context types carried by the per-frame update contexts.
 pub type ResourceCache;
 
 pub type ProjectContext;

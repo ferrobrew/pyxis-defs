@@ -1,6 +1,6 @@
 use camera::camera_context::CameraControlContext;
 
-/// Root of the camera pipeline tree: flattens and weights the pipelines and runs their render
+/// The root of the camera pipeline tree. Flattens and weights the pipelines and runs their render
 /// modifiers, populating the render contexts each frame.
 pub type CameraTree;
 impl CameraTree {

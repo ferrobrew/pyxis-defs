@@ -8,13 +8,13 @@ pub type InputDeviceManager {
     pub m_Enabled: bool,
 }
 impl InputDeviceManager {
-    /// Per-frame device poll: reads all devices and refreshes their effector states. Runs
-    /// UpdateForceClicks afterwards. Effector writes injected before this are overwritten by the
-    /// poll; inject after it instead.
+    /// The per-frame device poll: reads all devices, refreshes their effector states, and then runs
+    /// [`UpdateForceClicks`](InputDeviceManager::UpdateForceClicks). Effector writes injected before
+    /// this are overwritten by the poll, so inject after it instead.
     #[address(0x140_2F2_0C0)]
     pub fn Update(&mut self, dt: f32);
 
-    /// Applies the m_ForceClick flags latched on effectors so an injected click survives the poll.
+    /// Applies the force-click flags latched on effectors so an injected click survives the poll.
     #[address(0x140_2F2_050)]
     pub fn UpdateForceClicks(&mut self);
 }

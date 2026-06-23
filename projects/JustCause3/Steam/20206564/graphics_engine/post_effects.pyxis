@@ -1,7 +1,8 @@
 use graphics_engine::graphics_engine::{HContext_t, HRenderSetup_t, HTexture_t, RenderContext};
+use graphics_engine::render_pass::RBIInfo;
 use types::math::Matrix4;
 
-/// Anti-aliasing resolve mode (AntiAliasingEffect::m_Mode).
+/// Anti-aliasing resolve mode.
 #[copyable]
 pub enum AAMode: i32 {
     AA_NONE = 0x0,
@@ -11,16 +12,10 @@ pub enum AAMode: i32 {
     AA_FXAA = 0x4,
 }
 
-// Fullscreen post-process effects. Both do a screen-space reprojection (DoF via an inverse
-// view-projection; MotionBlur via an unconditional velocity-composite draw) whose per-frame-once
-// state is only valid for one camera -- so on a second (stereo) render they paint a sub-region.
-// Their Apply returns the (possibly unchanged) source slot index, so returning `input` skips them.
-// The render context behind a PostEffectContext: camera matrices and per-frame render flags.
-
-/// Per-frame render-context flags.
+/// Per-frame render-context flags carried by a [`PostEffectRenderContext`].
 #[copyable]
 pub bitflags PostEffectRenderFlags: u8 {
-    /// Enables DoF's screen-space motion-vector reprojection.
+    /// Enables depth-of-field's screen-space motion-vector reprojection.
     m_MotionVectorReprojection = 0b0000_0001,
 }
 
@@ -33,70 +28,74 @@ pub type PostEffectRenderContext {
 pub type PostEffectContext {
     pub m_RenderContext: *mut PostEffectRenderContext,
 
-    /// The auto-exposure target numerator ("key"): ToneMappingEffect::Update sets the exposure target
-    /// to this divided by the raw-brightness histogram mid-point.
+    /// The auto-exposure target numerator. [`ToneMappingEffect::Update`] sets the exposure target to
+    /// this divided by the raw-brightness histogram mid-point.
     #[address(0x9C)]
     pub m_AutoExposureKey: f32,
 }
 
 pub type PostEffectsManager;
 impl PostEffectsManager {
-    /// Wires up and enqueues the world post-effect block, then runs the world fade accumulator
-    /// (ApplyWorldFadeFilter). `dt` flows only into that accumulator; the texture arguments are
-    /// the scene inputs.
+    /// Enqueues the world post-effect block, then steps the world fade accumulator
+    /// ([`ApplyWorldFadeFilter`](PostEffectsManager::ApplyWorldFadeFilter)). `dt` flows only into
+    /// that accumulator; the texture arguments are the scene inputs.
     #[address(0x140_14B_FE0)]
     pub fn ApplyWorldFilters(&mut self, dt: f32, setup: *mut HRenderSetup_t, a4: *mut HTexture_t, a5: *mut HTexture_t, a6: *mut HTexture_t, a7: *mut HTexture_t, a8: *mut HTexture_t);
 
-    /// Enqueues the global post-effect block and advances its dt-driven accumulators: the screen
-    /// fade alpha (clamped [0,1]) and the sun-direction / heat-haze accumulator.
+    /// Enqueues the global post-effect block and advances its `dt`-driven accumulators: the screen
+    /// fade alpha and the sun-direction / heat-haze accumulator.
     #[address(0x140_14C_0C0)]
     pub fn ApplyGlobalFilters(&mut self, dt: f32, ctx: *mut HContext_t);
 
-    /// The world fade accumulator stepped by ApplyWorldFilters' dt.
+    /// Steps the world fade accumulator.
     #[address(0x140_0F9_BD0)]
     pub fn ApplyWorldFadeFilter(&mut self, dt: f32);
 
-    /// True when the bokeh depth-of-field path is active (selects the downscale + bokeh blur over
-    /// the plain blur).
+    /// Whether the bokeh depth-of-field path is active, selecting the downscale plus bokeh blur over
+    /// the plain [`BlurEffect`].
     #[address(0x140_0A0_270)]
     pub fn IsBokehActive(&self) -> bool;
 
-    /// True when motion blur is active.
+    /// Whether motion blur is active.
     #[address(0x140_0FA_3E0)]
     pub fn IsMotionBlurActive(&self) -> bool;
 
-    /// Post-multiplies the AA's sub-pixel TAA jitter onto `proj` (effective only at AA mode 3).
+    /// Post-multiplies the temporal sub-pixel jitter onto `proj`. Effective only when the resolve mode
+    /// is [`AAMode::AA_SMAA_T2X`].
     #[address(0x140_0FA_050)]
     pub fn ApplySubsampleJitter(&self, proj: *mut Matrix4, width: i32, height: i32);
 }
 
-/// The render block for the RP_POSTEFFECTS pass. Its Draw runs the HDR post chain in order:
-/// histogram generation, sun-halo pre-apply, blur (bokeh or plain), glare, depth of field, motion
-/// blur, the HDR->LDR tonemap (DrawHistogramWindow), player-damage vignette, anti-aliasing, sun
-/// halo + additive blend, and the final fade. It threads a single result-texture slot index through
-/// the slot-returning effects (DoF / motion blur / damage / AA), hopping between the three
-/// fullscreen temp textures. `ctx` is RenderContext*; `info` is a CRBIInfo*.
+/// The render block for the post-effects pass. Its [`Draw`](RenderBlockPostEffects::Draw) runs the
+/// HDR post chain in order: histogram generation, sun-halo pre-apply, blur (bokeh or plain), glare,
+/// depth of field, motion blur, the HDR-to-LDR tonemap, the player-damage vignette, anti-aliasing,
+/// sun halo, and the final fade.
+///
+/// It threads a single result-texture slot index through the slot-returning effects
+/// ([`DepthOfFieldEffect`], [`MotionBlurEffect`], [`PlayerDamageEffect`], [`AntiAliasingEffect`]),
+/// hopping between the three fullscreen temp textures.
 pub type RenderBlockPostEffects;
 impl RenderBlockPostEffects {
     #[address(0x140_16A_260)]
-    pub fn Draw(&mut self, ctx: *mut RenderContext, info: *const void) -> u64;
+    pub fn Draw(&mut self, ctx: *mut RenderContext, info: *const RBIInfo) -> u64;
 }
 
-/// Bokeh depth-of-field downscale prepass (2x2 pack + focus).
+/// The bokeh depth-of-field downscale prepass: a 2x2 pack plus focus.
 pub type DownScale2x2PackFocus;
 impl DownScale2x2PackFocus {
     #[address(0x140_0C8_2E0)]
     pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut PostEffectsManager);
 }
 
-/// Gaussian blur (the non-bokeh blur path).
+/// The Gaussian blur, used on the non-bokeh path.
 pub type BlurEffect;
 impl BlurEffect {
     #[address(0x140_0BC_B10)]
     pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut PostEffectsManager) -> bool;
 }
 
-/// Bokeh blur (the IsBokehActive path; runs after DownScale2x2PackFocus).
+/// The bokeh blur, used when [`PostEffectsManager::IsBokehActive`]; runs after
+/// [`DownScale2x2PackFocus`].
 pub type BlurEffectBokeh;
 impl BlurEffectBokeh {
     #[address(0x140_0A7_870)]
@@ -115,28 +114,29 @@ impl DepthOfFieldEffect {
     pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut PostEffectsManager, input: u32) -> u32;
 }
 
-/// Alpha-blended fade quad over the scene.
+/// The alpha-blended fade quad over the scene.
 pub type FadeEffect;
 impl FadeEffect {
     #[address(0x140_0A9_570)]
     pub fn Apply(&mut self, ctx: *mut HContext_t, a3: *mut void) -> u64;
 }
 
-/// Bloom / glare generator (writes its own scratch targets, composited later).
+/// The bloom / glare generator. Writes its own scratch targets, composited later.
 pub type GlareEffect;
 impl GlareEffect {
     #[address(0x140_0AA_510)]
     pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, a4: *mut void, a5: *mut void) -> u64;
 }
 
-/// Red damage vignette. Slot-passthrough (returns the input slot index).
+/// The red damage vignette. Returns the input slot index unchanged.
 pub type PlayerDamageEffect;
 impl PlayerDamageEffect {
     #[address(0x140_0F7_6E0)]
     pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, a4: *mut void, input: u32) -> u32;
 }
 
-/// Sun halo. PreApply prepares and sets the ready flag (byte at +0x114); Apply composites it.
+/// The sun halo. [`PreApply`](SunHaloEffect::PreApply) prepares it and sets the ready flag;
+/// [`Apply`](SunHaloEffect::Apply) composites it.
 pub type SunHaloEffect;
 impl SunHaloEffect {
     #[address(0x140_118_450)]
@@ -146,8 +146,8 @@ impl SunHaloEffect {
     pub fn Apply(&mut self, ctx: *mut HContext_t) -> u64;
 }
 
-/// Anti-aliasing resolve. `m_Mode`: 1/4 = FXAA, 2 = SMAA 1x, 3 = SMAA T2X. Mode 3 adds a temporal
-/// reprojection against a previous-frame history texture.
+/// The anti-aliasing resolve. [`AAMode::AA_SMAA_T2X`] additionally reprojects against a previous-frame
+/// history texture.
 #[min_size(0x308)]
 pub type AntiAliasingEffect {
     #[address(0x300)]
@@ -158,13 +158,13 @@ impl AntiAliasingEffect {
     #[address(0x140_0BC_9A0)]
     pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, mgr: *mut PostEffectsManager, slot: *mut u32) -> u64;
 
-    /// Post-multiplies the sub-pixel clip-space jitter translation onto `proj`, but only when
-    /// m_Mode == 3 (SMAA T2X); the phase comes from the previous-frame counter parity.
+    /// Post-multiplies the sub-pixel clip-space jitter translation onto `proj`, only when the resolve
+    /// mode is [`AAMode::AA_SMAA_T2X`]. The phase comes from the previous-frame counter parity.
     #[address(0x140_0C7_700)]
     pub fn ApplySubsampleJitter(&self, proj: *mut Matrix4, width: i32, height: i32);
 
-    /// Allocates the AA's render-target resources (the T2X history ping-pong textures and their
-    /// render setups) sized `width` x `height`.
+    /// Allocates the temporal history ping-pong textures and their render setups, sized `width` by
+    /// `height`.
     #[address(0x140_0A5_E30)]
     pub fn CreateRenderTargetResources(&mut self, mgr: *const PostEffectsManager, width: i32, height: i32);
 }

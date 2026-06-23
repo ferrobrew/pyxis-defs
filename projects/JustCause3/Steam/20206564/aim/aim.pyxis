@@ -1,27 +1,27 @@
 use types::math::Matrix4;
-use state::SStateContext;
+use state::StateContext;
 
 pub type WeaponBase;
 impl WeaponBase {
-    /// Returns the grip transform for the given hand (E_WEAPON_GRIP_HAND_*, modeled as i32).
+    /// Writes the grip transform for the given `hand` (a `E_WEAPON_GRIP_HAND_*` value).
     #[address(0x140_966_840)]
     pub fn GetGripPosition(&self, hand: i32, matrix: *mut Matrix4) -> bool;
 }
 
-/// Player aim control; in normal third-person play the aim is camera-derived.
+/// Player aim control. In normal third-person play the aim is camera-derived.
 pub type PlayerAimControl;
 impl PlayerAimControl {
-    /// Returns the matrix used by the aim raycast: the ADS branch reads the alternate-aim transform,
-    /// otherwise the camera transform; `weapon` adds optional ballistic pitch. Static method that
-    /// returns CMatrix4f by value (sret: `result` out-param, also returned in rax).
+    /// Returns the matrix used by the aim raycast: in aim-down-sights it reads the alternate-aim
+    /// transform, otherwise the camera transform. `weapon` adds an optional ballistic pitch. The
+    /// result is written through `result` and also returned.
     #[address(0x140_C3E_510)]
     pub fn GetAdjustedCameraMatrix(result: *mut Matrix4, weapon: *mut WeaponBase) -> *mut Matrix4;
 
-    /// Raycasts from the camera position along camera-forward to determine the aim target.
+    /// Raycasts from the camera position along camera-forward to find the aim target.
     #[address(0x140_CE5_350)]
     pub fn UpdateDirectAim(&mut self);
 }
 
-/// Character-state task that overrides the aim direction toward a locked target. Free function.
+/// The character-state task that overrides the aim direction toward a locked target.
 #[address(0x140_809_C60)]
-fn NAutoAimToTarget_Update(ctx: *mut SStateContext, p: *mut void);
+fn NAutoAimToTarget_Update(ctx: *mut StateContext, p: *mut void);

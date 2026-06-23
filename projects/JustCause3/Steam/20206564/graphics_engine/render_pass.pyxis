@@ -2,83 +2,89 @@ use graphics_engine::graphics_engine::RenderContext;
 use camera::camera::Camera;
 use types::math::Matrix4;
 
-/// One of a render pass's double-buffered render-block-item lists. Add appends entries
-/// (InterlockedExchangeAdd on m_NumElements); on overflow (m_NumElements >= m_ListSize) it spills
-/// into the global overflow list. DoDraw reads min(m_ListSize, m_NumElements) entries and never
-/// writes m_NumElements, so a populated list can be redrawn any number of times.
+/// One render block enqueued onto a draw list. Opaque; handled only behind pointers.
+pub type RenderBlock;
+
+/// The per-item info accompanying a render block on a draw list (transform, sort key, and the like).
+/// Opaque; handled only behind pointers.
+pub type RBIInfo;
+
+/// One of a render pass's double-buffered render-block-item lists.
+///
+/// [`Add`](RBILists::Add) appends entries; on overflow (`m_NumElements >= m_ListSize`) it spills into
+/// the global overflow list. [`DoDraw`](RenderPass::DoDraw) reads `min(m_ListSize, m_NumElements)`
+/// entries and never writes `m_NumElements`, so a populated list can be redrawn any number of times.
 #[min_size(0x10)]
 pub type RBILists {
-    /// Array of 0x20-byte entries.
+    /// The array of entries.
     pub m_List: *mut void,
 
-    /// Capacity.
+    /// The capacity.
     #[address(0x8)]
     pub m_ListSize: u16,
 
-    /// Live element count (volatile).
+    /// The live element count (volatile).
     #[address(0xC)]
     pub m_NumElements: u32,
 }
 impl RBILists {
-    /// Appends one render-block-item; spills to the global overflow list on capacity overflow.
+    /// Appends one render-block-item, spilling to the global overflow list on capacity overflow.
     #[address(0x140_11C_070)]
-    pub fn Add(&mut self, a2: i32, block: *mut void, info: *mut void) -> u64;
+    pub fn Add(&mut self, a2: i32, block: *mut RenderBlock, info: *mut RBIInfo) -> u64;
 }
 
-// Count of entries spilled into the render-block-item overflow list (capacity 1024); the entries
-// themselves (0x18 bytes each) follow at 0x142_ED0_FB0. Flushed back into the per-pass lists by
-// the per-frame list rotation.
+// The count of entries spilled into the render-block-item overflow list. Flushed back into the
+// per-pass lists by the per-frame list rotation.
 #[address(0x142_ED0_FA0)]
 pub extern render_block_overflow_count: u32;
 
 pub type RenderPass {
-    /// The RBI list that new render-block-items append to this frame (the `CRBILists::Add` target).
-    /// Each rotation, `SaveRenderFrameData` re-points this at `m_Lists[parity]` and zeroes its count;
-    /// zeroing `m_CurrentAddList.m_NumElements` is how a pass's draw-time additions are reset.
+    /// The list that new render-block-items append to this frame. Each rotation,
+    /// [`SaveRenderFrameData`](RenderPass::SaveRenderFrameData) re-points it at the new parity's list
+    /// and zeroes its count; zeroing that count is how a pass's draw-time additions are reset.
     #[address(0x28)]
     pub m_CurrentAddList: *mut RBILists,
 }
 impl RenderPass {
-    /// Appends `count` render-block-items (`items`) to the active RBILists draw/add lists (`a3`
-    /// holds the lists). Static (no `this`). Called per batch, including from CPU fragment worker
-    /// threads -- not once per frame. The argument list matters: it dereferences `a3 + 0x8038`.
+    /// Appends `count` render-block-items (`items`) to the active draw / add lists (`a3` holds the
+    /// lists). Static. Called per batch, including from CPU fragment worker threads, not once per
+    /// frame.
     #[address(0x140_48C_4E0)]
     pub fn SetupRenderFrameData(a1: *mut void, count: i32, a3: *mut void, items: *mut void);
 
-    /// Fills the per-view RenderContext from `camera` (the render camera, or a shadow/reflective
-    /// light camera selected by the pass flags): view, projection and offset (translation-free)
-    /// view-projection via CalculateOffsetViewProjectionMatrix, the separate camera world position,
-    /// and the parity-buffered shadow matrices ((render_frame_counters.m_FrameIndex & 1) stride).
-    /// Static (no `this`).
+    /// Fills the per-view render context from `camera` (the render camera, or a shadow or reflective
+    /// light camera selected by the pass flags): the view, projection, and translation-free offset
+    /// view-projection via [`CalculateOffsetViewProjectionMatrix`], the separate camera world
+    /// position, and the parity-buffered shadow matrices. Static.
     #[address(0x140_187_430)]
     pub fn SetRenderContextCamera(ctx: *mut RenderContext, camera: *const Camera) -> u64;
 
-    /// The per-pass half of the list rotation (vtable slot 3, driven by RotateRenderFrameData):
-    /// points m_CurrentAddList at m_Lists[parity], m_CurrentDrawList at the other, and zeroes the
-    /// new add-list's element count. Also snapshots the pass camera.
+    /// The per-pass half of the list rotation, driven by [`RotateRenderFrameData`]: points
+    /// `m_CurrentAddList` at the new parity's list, the draw list at the other, and zeroes the new
+    /// add-list's element count. Also snapshots the pass camera.
     #[address(0x140_194_480)]
     pub fn SaveRenderFrameData(&mut self, parity: u32);
 
-    /// Draws m_CurrentDrawList: walks min(m_ListSize, m_NumElements) blocks via a local cursor and
-    /// vtable-dispatches each. Non-destructive -- never writes m_NumElements (vtable slot 2).
+    /// Draws the current draw list, walking `min(m_ListSize, m_NumElements)` blocks and
+    /// vtable-dispatching each. Non-destructive -- never writes `m_NumElements`.
     #[address(0x140_1AC_7A0)]
     pub fn DoDraw(&mut self, ctx: *mut RenderContext, color_mask: u32) -> bool;
 }
 
-/// Copies `src` (a view matrix), zeroes its translation row ({0,0,0,1}), and multiplies by `proj`,
-/// writing the translation-free OffsetViewProjection into `dst`. This is the view-projection opaque
-/// (camera-relative) geometry actually uses; the camera world position is supplied separately.
-/// Static (no `this`).
+/// Copies `src` (a view matrix), zeroes its translation row, and multiplies by `proj`, writing the
+/// translation-free offset view-projection into `dst`. This is the view-projection that camera-relative
+/// opaque geometry actually uses; the camera world position is supplied separately. Static.
 #[address(0x140_136_020)]
 pub fn CalculateOffsetViewProjectionMatrix(src: *const Matrix4, proj: *const Matrix4, dst: *mut Matrix4);
 
-/// The per-frame render-block-item list rotation, run once in each `CGraphicsEngine::Draw`
-/// (0x1400F4170) prologue (its call site at 0x1400F4340 is mislabeled `CKeep1000Frames` in this
-/// binary's symbols). Toggles the global add/draw parity at `0x142ED7680`, then for every render
-/// pass swaps `m_CurrentAddList`/`m_CurrentDrawList` to the new parity (via `RenderPass`'s vtable
-/// slot 3) and zeroes the new add-list's element count, and finally flushes the render-block-item
-/// overflow list. Static (no `this`); reads the render engine + parity from globals. This -- not the
-/// per-batch `SetupRenderFrameData` build above -- is the actual draw-list swap.
+/// The per-frame render-block-item list rotation, run once in each graphics-engine draw prologue.
+/// Toggles the global add/draw parity, then for every render pass swaps the add and draw lists to the
+/// new parity (via [`RenderPass::SaveRenderFrameData`]) and zeroes the new add-list's element count,
+/// and finally flushes the overflow list. This -- not the per-batch
+/// [`SetupRenderFrameData`](RenderPass::SetupRenderFrameData) build above -- is the actual draw-list
+/// swap. Static; reads the render engine and parity from globals.
+///
+/// **Note:** the call site is mislabeled `CKeep1000Frames` in this binary's symbols.
 #[address(0x140_1A3_000)]
 pub fn RotateRenderFrameData();
 

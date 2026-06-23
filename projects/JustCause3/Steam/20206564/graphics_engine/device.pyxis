@@ -1,3 +1,4 @@
+use graphics_engine::graphics_engine::HDevice_t;
 use graphics_engine::texture::Texture;
 
 #[size(40), align(8), rust_name = "windows::Win32::System::Threading::CRITICAL_SECTION", cpp_header = "<windows.h>", cpp_name = "::CRITICAL_SECTION"]
@@ -37,7 +38,6 @@ pub type Device {
     pub m_DXGIOutput: IDXGIOutput,
 }
 
-/// Returns the master context (the wrapper around the D3D11 immediate context). `device` is
-/// Graphics::HDevice_t* (opaque, unused).
+/// Returns the master context, the wrapper around the D3D11 immediate context. `device` is unused.
 #[address(0x141_955_0D0)]
-pub fn GetMasterContext(this: *mut void, device: *mut void) -> *mut Context;
+pub fn GetMasterContext(this: *mut void, device: *mut HDevice_t) -> *mut Context;

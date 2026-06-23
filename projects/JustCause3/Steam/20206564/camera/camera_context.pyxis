@@ -83,5 +83,5 @@ pub type CameraControlContext {
     pub m_ActivePipelines: [u8; 32],
 }
 
-/// The per-frame camera pipeline context (opaque).
+/// The opaque per-frame camera pipeline context.
 pub type CameraPipelineContext;
