@@ -36,9 +36,10 @@ impl RenderTargetData {
 #[singleton(0x142_E5B_620), size(0x1490)]
 pub type UIManager {
     /// The Scaleform render buffer the UI HAL renders into, set up by
-    /// [`InitPlatformRT`](UIManager::InitPlatformRT).
+    /// [`InitPlatformRT`](UIManager::InitPlatformRT). Pass it to [`RenderTargetData::UpdateData`] to
+    /// rebind where the HUD renders.
     #[address(0x1_390)]
-    pub m_RenderBuffer: *mut void,
+    pub m_RenderBuffer: *mut RenderTargetData,
 
     /// The viewport width that the world-to-screen mapping
     /// ([`Convert3DCoords`](UIManager::Convert3DCoords)) maps NDC into.
