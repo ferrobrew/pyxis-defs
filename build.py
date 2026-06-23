@@ -155,7 +155,7 @@ def get_git_last_modified(path: Path) -> Optional[datetime]:
 # The definitions describe Windows game memory and assume the consuming crate
 # provides the external dependencies their `backend` glue references. The defs
 # can't declare these themselves, so the check harness supplies them per
-# project. `bitflags`/`paste` are codegen support crates needed by any output;
+# project. `paste` is a codegen support crate needed by any output;
 # everything else is project-specific (see RUST_CHECK_OVERRIDES) so a project
 # isn't checked against dependencies it doesn't use.
 #
@@ -233,7 +233,6 @@ def rust_check_cargo_toml(crate_name: str, config: Dict[str, Any]) -> str:
         'edition = "2021"\n\n'
         f"{config['features']}\n"
         "[dependencies]\n"
-        'bitflags = "2.6"\n'
         'paste = "1.0"\n'
         f"{config['dependencies']}"
     )
