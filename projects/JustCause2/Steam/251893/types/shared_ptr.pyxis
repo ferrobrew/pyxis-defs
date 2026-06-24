@@ -227,14 +227,26 @@ pub type SharedPtr<T> {
     px: *mut T,
     pn: SharedCount,
 }
-#[cfg(backend = "cpp")]
+
+// Methods common to both codegen backends. Declared once and cfg-gated
+// to both so they surface on the type page for either; each backend's
+// epilogue below supplies the body (`#[external_body]` skips emission
+// in Rust and routes the declaration to the C++ header).
+#[cfg(any(backend = "cpp", backend = "rust"))]
 impl<T> SharedPtr<T> {
+    /// `true` if the stored pointer is non-null.
     #[external_body]
     pub fn exists(&self) -> bool;
+    /// Current strong reference count, or 0 if the pointer is null.
     #[external_body]
     pub fn refcount(&self) -> i32;
+    /// `true` when this is the sole strong owner (refcount == 1).
     #[external_body]
     pub fn is_only_owner(&self) -> bool;
+}
+
+#[cfg(backend = "cpp")]
+impl<T> SharedPtr<T> {
     #[external_body]
     pub fn release(&mut self);
     #[external_body]
@@ -263,6 +275,15 @@ impl<T, Y> SharedPtr<T> {
     /// pointer remains a live owner after the call.
     #[external_body]
     pub fn static_cast_to(&self) -> SharedPtr<Y>;
+}
+
+// Rust-only constructor; the body lives in the `backend rust epilogue`
+// below. (C++ uses `make()` above.)
+#[cfg(backend = "rust")]
+impl<T> SharedPtr<T> {
+    /// Constructs a null `SharedPtr<T>` (refcount block is null).
+    #[external_body]
+    pub fn new() -> SharedPtr<T>;
 }
 
 backend rust epilogue r#"
