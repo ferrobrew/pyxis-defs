@@ -78,11 +78,6 @@ impl RenderPass {
 #[address(0x140_136_020)]
 pub fn CalculateOffsetViewProjectionMatrix(src: *const Matrix4, proj: *const Matrix4, dst: *mut Matrix4);
 
-/// The global add/draw list parity. Toggled once per `CGraphicsEngine::Draw` by the inlined
-/// `CKeep1000Frames` call, then used by `ToggleRenderpassLists` to select which of each pass's
-/// double-buffered lists is the add list and which is the draw list. Restoring this to its pre-eye-0
-/// value before eye 1's Draw makes eye 1's `SaveRenderFrameData` set the same list pointers as eye 0,
-/// so both eyes draw from the same populated render lists.
 #[address(0x142_ED7_680)]
 pub extern current_add_buffer: u32;
 
