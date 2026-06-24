@@ -118,6 +118,21 @@ def get_project_name(json_file: Path) -> str:
         return ""
 
 
+def get_pyxis_version(json_file: Path) -> Optional[str]:
+    """Extract the pyxis version that generated this doc, if present.
+
+    Older documents (schema < v6) don't carry `pyxis_version`; return None
+    so the index omits the field rather than lying with a placeholder.
+    """
+    try:
+        with open(json_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return data.get("pyxis_version")
+    except (json.JSONDecodeError, FileNotFoundError) as e:
+        print(f"Error reading {json_file}: {e}", file=sys.stderr)
+        return None
+
+
 def get_git_last_modified(path: Path) -> Optional[datetime]:
     """Get the last modified timestamp from Git for a directory.
     Returns None if no Git history is available."""
@@ -510,19 +525,23 @@ def main():
                 else None
             )
 
+            # Which pyxis generated this doc (None for schema < v6).
+            pyxis_version = get_pyxis_version(json_file)
+
             # Get relative path to JSON from repo root
             json_path = json_file.relative_to(repo_root)
 
             # Add document to list
-            documents.append(
-                {
-                    "name": project_name,
-                    "path": str(json_path).replace(
-                        "\\", "/"
-                    ),  # Use forward slashes for paths
-                    "last_modified_iso8601": last_modified_iso8601,
-                }
-            )
+            document = {
+                "name": project_name,
+                "path": str(json_path).replace(
+                    "\\", "/"
+                ),  # Use forward slashes for paths
+                "last_modified_iso8601": last_modified_iso8601,
+            }
+            if pyxis_version is not None:
+                document["pyxis_version"] = pyxis_version
+            documents.append(document)
 
     # Generate index.json only for JSON backend
     if backend == "json":
