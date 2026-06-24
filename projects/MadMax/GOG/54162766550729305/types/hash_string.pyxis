@@ -7,6 +7,13 @@ impl HashString {
     fn constructor(&mut self, value: *const i8) -> *mut HashString;
 }
 
+#[cfg(backend = "rust")]
+impl HashString {
+    /// Wrap a precomputed hash value.
+    #[external_body]
+    pub fn from_u32(hash: u32) -> HashString;
+}
+
 backend rust epilogue r#"
     impl HashString {
         pub unsafe fn from_cstr(str: impl AsRef<std::ffi::CStr>) -> Self {

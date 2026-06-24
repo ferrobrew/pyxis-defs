@@ -2,6 +2,15 @@
 pub type Matrix3 {
     pub data: [f32; 9],
 }
+#[cfg(backend = "rust")]
+impl Matrix3 {
+    /// Raw pointer to the row-major data, for passing to engine APIs.
+    #[external_body]
+    pub fn as_ptr(&self) -> *const f32;
+    /// Mutable raw pointer to the row-major data.
+    #[external_body]
+    pub fn as_mut_ptr(&mut self) -> *mut f32;
+}
 
 backend rust epilogue r#"
     #[cfg(feature = "glam")]
@@ -32,6 +41,15 @@ backend rust epilogue r#"
 #[copyable, defaultable, align(4)]
 pub type Matrix4 {
     pub data: [f32; 16],
+}
+#[cfg(backend = "rust")]
+impl Matrix4 {
+    /// Raw pointer to the row-major data, for passing to engine APIs.
+    #[external_body]
+    pub fn as_ptr(&self) -> *const f32;
+    /// Mutable raw pointer to the row-major data.
+    #[external_body]
+    pub fn as_mut_ptr(&mut self) -> *mut f32;
 }
 
 backend rust epilogue r#"

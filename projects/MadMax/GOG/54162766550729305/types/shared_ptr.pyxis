@@ -128,6 +128,24 @@ pub type SharedPtr<T> {
     pn: SharedCount,
 }
 
+// Rust-only surface declarations; bodies live in the `backend rust epilogue`
+// below. (MadMax's shared_ptr has no C++ side declared here.)
+#[cfg(backend = "rust")]
+impl<T> SharedPtr<T> {
+    /// Constructs a null `SharedPtr<T>` (refcount block is null).
+    #[external_body]
+    pub fn new() -> SharedPtr<T>;
+    /// `true` if the stored pointer is non-null.
+    #[external_body]
+    pub fn exists(&self) -> bool;
+    /// Current strong reference count, or 0 if the pointer is null.
+    #[external_body]
+    pub fn refcount(&self) -> i32;
+    /// `true` when this is the sole strong owner (refcount == 1).
+    #[external_body]
+    pub fn is_only_owner(&self) -> bool;
+}
+
 backend rust epilogue r#"
     // SharedPtr
     #[allow(dead_code)]

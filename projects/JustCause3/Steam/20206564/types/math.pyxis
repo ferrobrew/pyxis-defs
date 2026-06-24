@@ -2,6 +2,15 @@
 pub type Matrix3 {
     pub data: [f32; 9],
 }
+#[cfg(backend = "rust")]
+impl Matrix3 {
+    /// Raw pointer to the row-major data, for passing to engine APIs.
+    #[external_body]
+    pub fn as_ptr(&self) -> *const f32;
+    /// Mutable raw pointer to the row-major data.
+    #[external_body]
+    pub fn as_mut_ptr(&mut self) -> *mut f32;
+}
 
 backend rust epilogue r#"
     #[cfg(feature = "glam")]
@@ -44,6 +53,16 @@ backend rust epilogue r#"
 pub type Matrix4 {
     pub data: [f32; 16],
 }
+#[cfg(backend = "rust")]
+impl Matrix4 {
+    /// Raw pointer to the row-major data, for passing to engine APIs.
+    #[external_body]
+    pub fn as_ptr(&self) -> *const f32;
+    /// Mutable raw pointer to the row-major data.
+    #[external_body]
+    pub fn as_mut_ptr(&mut self) -> *mut f32;
+}
+
 impl Matrix4 {
     /// The engine's 4x4 product, `result = a * b` (row-major: result row `i` is `a`'s row `i` times
     /// `b`). For example, `Multiply4x4(View, Proj, ViewProjection)` gives `VP = View * Proj` and
