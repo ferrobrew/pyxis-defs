@@ -33,7 +33,7 @@ impl SharedCountImpl {
     pub fn weak_add_ref(&mut self);
 }
 
-backend rust epilogue r#"
+backend rust epilogue for SharedCountImpl r#"
     // SharedCountImpl
     impl SharedCountImpl {
         fn release(&mut self) {
@@ -71,7 +71,7 @@ backend rust epilogue r#"
 
 // All atomic mutations use `std::memory_order_seq_cst`, matching the
 // rust impl's `Ordering::SeqCst`.
-backend cpp epilogue definition r#"
+backend cpp epilogue definition for SharedCountImpl r#"
 void SharedCountImpl::release() {
     auto uc = use_count.load(::std::memory_order_seq_cst) - 1;
     use_count.store(uc, ::std::memory_order_seq_cst);
@@ -115,7 +115,7 @@ impl SharedCount {
     pub fn clone_(&self) -> SharedCount;
 }
 
-backend rust epilogue r#"
+backend rust epilogue for SharedCount r#"
     // SharedCount
     #[allow(dead_code)]
     impl SharedCount {
@@ -154,7 +154,7 @@ backend rust epilogue r#"
 // or rule-of-five emission), so callers reach for `clone_()` directly.
 // Drop semantics live at the SharedPtr<T> level - a bare SharedCount
 // value doesn't run release() on destruction.
-backend cpp epilogue definition r#"
+backend cpp epilogue definition for SharedCount r#"
 void SharedCount::release() {
     if (count_impl != nullptr) {
         count_impl->release();
@@ -184,7 +184,7 @@ impl WeakCount {
     pub fn from_shared(shared: *const SharedCount) -> WeakCount;
 }
 
-backend rust epilogue r#"
+backend rust epilogue for WeakCount r#"
     // WeakCount
     impl WeakCount {
         fn new_from_shared(shared: &SharedCount) -> WeakCount {
@@ -207,7 +207,7 @@ backend rust epilogue r#"
     }
 "#;
 
-backend cpp epilogue definition r#"
+backend cpp epilogue definition for WeakCount r#"
 void WeakCount::release() {
     if (count_impl != nullptr) {
         count_impl->weak_release();
@@ -260,21 +260,24 @@ impl<T, Y> SharedPtr<T> {
     /// Bit-cast to `SharedPtr<Y>` while preserving the refcount block.
     /// Caller asserts that T can be reinterpreted as Y.
     ///
-    /// Note: the Rust and C++ sides of this method diverge by language
-    /// idiom and that's intentional.
-    /// - Rust (`backend rust epilogue` below): MOVES `self`. Refcount is
-    ///   unchanged; the SharedPtr<T> is consumed and replaced by the
-    ///   returned SharedPtr<Y>. Mirrors how Rust's standard ownership
-    ///   model handles transformations on Drop-bearing types.
-    /// - C++ (`backend cpp epilogue` below): SHARES from `&self`.
-    ///   Refcount is bumped; the original SharedPtr<T> stays valid and
-    ///   the returned SharedPtr<Y> co-owns the same refcount block.
-    ///   Mirrors `std::static_pointer_cast<Y>` from `<memory>`.
-    /// Both produce equivalent end states (a SharedPtr<Y> over the
-    /// same refcount block); they differ only in whether the original
-    /// pointer remains a live owner after the call.
+    /// SHARE semantics: bumps the refcount; the original `SharedPtr<T>`
+    /// stays valid and the returned `SharedPtr<Y>` co-owns the same
+    /// refcount block. Mirrors `std::static_pointer_cast<Y>`.
     #[external_body]
     pub fn static_cast_to(&self) -> SharedPtr<Y>;
+}
+
+#[cfg(backend = "rust")]
+impl<T, Y> SharedPtr<T> {
+    /// Bit-cast to `SharedPtr<Y>` while preserving the refcount block.
+    /// Caller asserts that T can be reinterpreted as Y.
+    ///
+    /// MOVE semantics: the Rust implementation consumes `self`. The
+    /// original `SharedPtr<T>` is invalidated; the returned `SharedPtr<Y>`
+    /// inherits its refcount block with no atomic increment. If you need
+    /// to keep the `T` view alongside the `Y` view, call `.clone()` first.
+    #[external_body]
+    pub fn static_pointer_cast(&self) -> SharedPtr<Y>;
 }
 
 // Rust-only constructor; the body lives in the `backend rust epilogue`
@@ -286,7 +289,7 @@ impl<T> SharedPtr<T> {
     pub fn new() -> SharedPtr<T>;
 }
 
-backend rust epilogue r#"
+backend rust epilogue for SharedPtr r#"
     // SharedPtr
     #[allow(dead_code)]
     impl<T> SharedPtr<T> {
@@ -333,17 +336,10 @@ backend rust epilogue r#"
         /// Bit-cast to `SharedPtr<Y>` while preserving the refcount block.
         /// Caller asserts that T can be reinterpreted as Y.
         ///
-        /// MOVE semantics: this method consumes `self`. The original
-        /// `SharedPtr<T>` is invalidated; the returned `SharedPtr<Y>`
-        /// inherits its refcount block with no atomic increment. If you
-        /// need to keep the `T` view alongside the `Y` view, call
-        /// `.clone()` first.
-        ///
-        /// The C++ side of this same `#[external_body]` method
-        /// (declared as `static_cast_to`) uses SHARE semantics instead,
-        /// matching `std::static_pointer_cast<Y>`. Both produce a
-        /// `SharedPtr<Y>` over the same refcount block; only the
-        /// fate-of-the-original differs.
+        /// MOVE semantics: consumes `self`. The original `SharedPtr<T>` is
+        /// invalidated; the returned `SharedPtr<Y>` inherits its refcount
+        /// block with no atomic increment. If you need to keep the `T` view
+        /// alongside the `Y` view, call `.clone()` first.
         pub unsafe fn static_pointer_cast<Y>(self) -> SharedPtr<Y> {
             SharedPtr {
                 px: self.px as *mut Y,
@@ -387,7 +383,7 @@ backend rust epilogue r#"
     impl<T> Eq for SharedPtr<T> {}
 "#;
 
-backend cpp epilogue r#"
+backend cpp epilogue for SharedPtr r#"
 template <class T>
 inline bool SharedPtr<T>::exists() const {
     return px != nullptr;
@@ -442,7 +438,7 @@ impl<T> WeakPtr<T> {
     pub fn from_shared(shared: *const SharedPtr<T>) -> WeakPtr<T>;
 }
 
-backend rust epilogue r#"
+backend rust epilogue for WeakPtr r#"
     // WeakPtr
     #[allow(dead_code)]
     impl<T> WeakPtr<T> {
@@ -465,7 +461,7 @@ backend rust epilogue r#"
     }
 "#;
 
-backend cpp epilogue r#"
+backend cpp epilogue for WeakPtr r#"
 template <class T>
 inline WeakPtr<T> WeakPtr<T>::from_shared(const SharedPtr<T>* shared) {
     return WeakPtr<T>{shared->px, WeakCount::from_shared(&shared->pn)};

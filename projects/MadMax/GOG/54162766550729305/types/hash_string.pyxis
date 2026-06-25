@@ -14,7 +14,7 @@ impl HashString {
     pub fn from_u32(hash: u32) -> HashString;
 }
 
-backend rust epilogue r#"
+backend rust epilogue for HashString r#"
     impl HashString {
         pub unsafe fn from_cstr(str: impl AsRef<std::ffi::CStr>) -> Self {
             unsafe {

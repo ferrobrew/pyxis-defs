@@ -34,7 +34,7 @@ impl RenderBlockInstanceInfo {
     pub fn make() -> RenderBlockInstanceInfo;
 }
 
-backend rust epilogue r#"
+backend rust epilogue for RenderBlockInstanceInfo r#"
     impl RenderBlockInstanceInfo {
         pub unsafe fn new() -> RenderBlockInstanceInfo {
             unsafe {
@@ -47,7 +47,7 @@ backend rust epilogue r#"
     }
 "#;
 
-backend cpp epilogue definition r#"
+backend cpp epilogue definition for RenderBlockInstanceInfo r#"
 RenderBlockInstanceInfo RenderBlockInstanceInfo::make() {
     RenderBlockInstanceInfo self{};
     self.colors[0] = 0xFFFFFFFFu;

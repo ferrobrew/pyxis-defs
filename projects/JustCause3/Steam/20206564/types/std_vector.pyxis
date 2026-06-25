@@ -24,7 +24,7 @@ impl<T> Vector<T> {
     pub fn is_empty(&self) -> bool;
 }
 
-backend rust epilogue r#"
+backend rust epilogue for Vector r#"
     #[allow(dead_code)]
     impl<T> Vector<T> {
         /// Number of live elements.

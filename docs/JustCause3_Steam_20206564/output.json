@@ -1,5 +1,6 @@
 {
-  "schema_version": 5,
+  "schema_version": 7,
+  "pyxis_version": "0.1.0",
   "pointer_size": 8,
   "project_name": "Just Cause 3 (Steam 20206564)",
   "items": {
@@ -12779,7 +12780,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 20,
-              "line": 94
+              "line": 89
             }
           }
         ],
@@ -12792,7 +12793,7 @@
       },
       "source": {
         "file_index": 20,
-        "line": 90
+        "line": 85
       }
     },
     "graphics_engine::render_pass::RBIInfo": {
@@ -17721,7 +17722,68 @@
             }
           }
         ],
-        "associated_functions": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "as_ptr",
+            "doc": " Raw pointer to the row-major data, for passing to engine APIs.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              }
+            ],
+            "return_type": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              }
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 29,
+              "line": 9
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "as_mut_ptr",
+            "doc": " Mutable raw pointer to the row-major data.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              }
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 29,
+              "line": 12
+            }
+          }
+        ],
         "vftable": null,
         "singleton": null,
         "copyable": true,
@@ -17769,11 +17831,71 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 45
+              "line": 54
             }
           }
         ],
         "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "as_ptr",
+            "doc": " Raw pointer to the row-major data, for passing to engine APIs.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              }
+            ],
+            "return_type": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              }
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 29,
+              "line": 60
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "as_mut_ptr",
+            "doc": " Mutable raw pointer to the row-major data.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              }
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 29,
+              "line": 63
+            }
+          },
           {
             "visibility": "public",
             "name": "Multiply4x4",
@@ -17821,7 +17943,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 52
+              "line": 71
             }
           }
         ],
@@ -17834,7 +17956,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 44
+        "line": 53
       }
     },
     "types::math::Plane": {
@@ -17861,7 +17983,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 191
+              "line": 210
             }
           },
           {
@@ -17878,7 +18000,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 192
+              "line": 211
             }
           }
         ],
@@ -17892,7 +18014,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 190
+        "line": 209
       }
     },
     "types::math::Vector2": {
@@ -17923,7 +18045,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 125
+              "line": 144
             }
           }
         ],
@@ -17937,7 +18059,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 124
+        "line": 143
       }
     },
     "types::math::Vector3": {
@@ -17968,7 +18090,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 147
+              "line": 166
             }
           }
         ],
@@ -17982,7 +18104,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 146
+        "line": 165
       }
     },
     "types::math::Vector4": {
@@ -18013,7 +18135,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 169
+              "line": 188
             }
           }
         ],
@@ -18027,7 +18149,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 168
+        "line": 187
       }
     },
     "types::std_vector::Vector": {
@@ -18125,7 +18247,59 @@
             }
           }
         ],
-        "associated_functions": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "len",
+            "doc": " Number of live elements.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 30,
+              "line": 21
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "is_empty",
+            "doc": " `true` if there are no live elements.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 30,
+              "line": 24
+            }
+          }
+        ],
         "vftable": null,
         "singleton": null,
         "copyable": false,
@@ -20813,10 +20987,10 @@
                 "path": "u32"
               },
               "address": 5417825920,
-              "doc": " The global add/draw list parity. Toggled once per `CGraphicsEngine::Draw` by the inlined\n `CKeep1000Frames` call, then used by `ToggleRenderpassLists` to select which of each pass's\n double-buffered lists is the add list and which is the draw list. Restoring this to its pre-eye-0\n value before eye 1's Draw makes eye 1's `SaveRenderFrameData` set the same list pointers as eye 0,\n so both eyes draw from the same populated render lists.",
+              "doc": null,
               "source": {
                 "file_index": 20,
-                "line": 87
+                "line": 82
               }
             }
           ],
@@ -21213,35 +21387,40 @@
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    #[cfg(feature = \"glam\")]\n    impl From<glam::Mat3> for Matrix3 {\n        fn from(m: glam::Mat3) -> Self {\n            Self {\n                data: m.to_cols_array(),\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Matrix3> for glam::Mat3 {\n        fn from(m: Matrix3) -> Self {\n            glam::Mat3::from_cols_array(&m.data)\n        }\n    }\n    impl Matrix3 {\n        pub fn as_ptr(&self) -> *const f32 {\n            self.data.as_ptr()\n        }\n\n        pub fn as_mut_ptr(&mut self) -> *mut f32 {\n            self.data.as_mut_ptr()\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::math::Matrix3"
                 }
               },
               {
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    #[cfg(feature = \"glam\")]\n    impl From<glam::Mat4> for Matrix4 {\n        fn from(m: glam::Mat4) -> Self {\n            Self {\n                data: m.to_cols_array(),\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Matrix4> for glam::Mat4 {\n        fn from(m: Matrix4) -> Self {\n            glam::Mat4::from_cols_array(&m.data)\n        }\n    }\n    impl Matrix4 {\n        pub fn as_ptr(&self) -> *const f32 {\n            self.data.as_ptr()\n        }\n\n        pub fn as_mut_ptr(&mut self) -> *mut f32 {\n            self.data.as_mut_ptr()\n        }\n    }\n\n    #[cfg(feature = \"glam\")]\n    impl std::ops::Mul for Matrix4 {\n        type Output = Matrix4;\n        // `a * b` matches the engine's Multiply4x4(a, b) (row-major a . b). The glam multiply is\n        // reversed on purpose: from_cols_array transposes engine-row-major into glam's column\n        // convention, so the engine product a . b is glam(b) * glam(a) mapped back through From.\n        fn mul(self, rhs: Matrix4) -> Matrix4 {\n            Matrix4::from(glam::Mat4::from(rhs) * glam::Mat4::from(self))\n        }\n    }\n\n    #[cfg(all(test, feature = \"glam\"))]\n    #[allow(clippy::items_after_test_module)]\n    mod matrix4_mul_tests {\n        use super::*;\n        fn translation(x: f32, y: f32, z: f32) -> Matrix4 {\n            // engine row-major: the translation lives in the last row (data[12..14])\n            let mut m = Matrix4 {\n                data: [\n                    1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,\n                ],\n            };\n            m.data[12] = x;\n            m.data[13] = y;\n            m.data[14] = z;\n            m\n        }\n        #[test]\n        fn mul_matches_engine_convention() {\n            let id = translation(0.0, 0.0, 0.0);\n            let a = translation(1.0, 2.0, 3.0);\n            // identity is the unit on both sides\n            assert_eq!((id * a).data, a.data);\n            assert_eq!((a * id).data, a.data);\n            // row-major translations compose by adding their offsets (engine p . T1 . T2)\n            let ab = a * translation(10.0, 20.0, 30.0);\n            assert!((ab.data[12] - 11.0).abs() < 1e-5);\n            assert!((ab.data[13] - 22.0).abs() < 1e-5);\n            assert!((ab.data[14] - 33.0).abs() < 1e-5);\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::math::Matrix4"
                 }
               },
               {
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    #[cfg(feature = \"glam\")]\n    impl From<glam::Vec2> for Vector2 {\n        fn from(v: glam::Vec2) -> Self {\n            Self {\n                data: [v.x, v.y],\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Vector2> for glam::Vec2 {\n        fn from(v: Vector2) -> Self {\n            glam::Vec2::new(v.data[0], v.data[1])\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::math::Vector2"
                 }
               },
               {
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    #[cfg(feature = \"glam\")]\n    impl From<glam::Vec3> for Vector3 {\n        fn from(v: glam::Vec3) -> Self {\n            Self {\n                data: [v.x, v.y, v.z],\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Vector3> for glam::Vec3 {\n        fn from(v: Vector3) -> Self {\n            glam::Vec3::new(v.data[0], v.data[1], v.data[2])\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::math::Vector3"
                 }
               },
               {
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    #[cfg(feature = \"glam\")]\n    impl From<glam::Vec4> for Vector4 {\n        fn from(v: glam::Vec4) -> Self {\n            Self {\n                data: [v.x, v.y, v.z, v.w],\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Vector4> for glam::Vec4 {\n        fn from(v: Vector4) -> Self {\n            glam::Vec4::new(v.data[0], v.data[1], v.data[2], v.data[3])\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::math::Vector4"
                 }
               }
             ]
@@ -21265,7 +21444,8 @@
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    #[allow(dead_code)]\n    impl<T> Vector<T> {\n        /// Number of live elements.\n        pub fn len(&self) -> usize {\n            if self.begin.is_null() {\n                0\n            } else {\n                (self.end as usize - self.begin as usize) / ::core::mem::size_of::<T>()\n            }\n        }\n\n        pub fn is_empty(&self) -> bool {\n            self.len() == 0\n        }\n\n        /// The live elements as a slice.\n        ///\n        /// # Safety\n        /// `begin..end` must point to `len()` live `T`s for the borrow.\n        pub unsafe fn as_slice(&self) -> &[T] {\n            if self.begin.is_null() {\n                &[]\n            } else {\n                unsafe { ::core::slice::from_raw_parts(self.begin, self.len()) }\n            }\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::std_vector::Vector"
                 }
               }
             ]

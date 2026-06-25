@@ -15,7 +15,7 @@ pub type EventID {
     namespace: HashString,
 }
 
-backend rust epilogue r#"
+backend rust epilogue for EventID r#"
     impl EventID {
         pub fn new(hash: crate::hash_string::HashString, namespace: crate::hash_string::HashString) -> Self {
             Self {

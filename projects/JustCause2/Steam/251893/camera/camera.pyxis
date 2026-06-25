@@ -38,7 +38,7 @@ impl Camera {
     pub fn update(&mut self, full_update: bool);
 }
 
-backend rust epilogue r#"
+backend rust epilogue for Camera r#"
     impl Camera {
         pub unsafe fn new() -> Camera {
             unsafe {

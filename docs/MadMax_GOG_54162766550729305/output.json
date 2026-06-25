@@ -1,5 +1,6 @@
 {
-  "schema_version": 5,
+  "schema_version": 7,
+  "pyxis_version": "0.1.0",
   "pointer_size": 8,
   "project_name": "Mad Max (1.0.3 / GOG 54162766550729305)",
   "items": {
@@ -19693,6 +19694,38 @@
               "file_index": 24,
               "line": 7
             }
+          },
+          {
+            "visibility": "public",
+            "name": "from_u32",
+            "doc": " Wrap a precomputed hash value.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "field",
+                "name": "hash",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "types::hash_string::HashString"
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 24,
+              "line": 14
+            }
           }
         ],
         "vftable": null,
@@ -19797,7 +19830,68 @@
             }
           }
         ],
-        "associated_functions": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "as_ptr",
+            "doc": " Raw pointer to the row-major data, for passing to engine APIs.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              }
+            ],
+            "return_type": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              }
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 25,
+              "line": 47
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "as_mut_ptr",
+            "doc": " Mutable raw pointer to the row-major data.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              }
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 25,
+              "line": 50
+            }
+          }
+        ],
         "vftable": null,
         "singleton": null,
         "copyable": true,
@@ -19838,11 +19932,72 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 72
+              "line": 81
             }
           }
         ],
-        "associated_functions": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "as_ptr",
+            "doc": " Raw pointer to the row-major data, for passing to engine APIs.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              }
+            ],
+            "return_type": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              }
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 25,
+              "line": 87
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "as_mut_ptr",
+            "doc": " Mutable raw pointer to the row-major data.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              }
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 25,
+              "line": 90
+            }
+          }
+        ],
         "vftable": null,
         "singleton": null,
         "copyable": true,
@@ -19852,7 +20007,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 71
+        "line": 80
       }
     },
     "types::math::Ray": {
@@ -19879,7 +20034,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 103
+              "line": 121
             }
           },
           {
@@ -19896,7 +20051,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 104
+              "line": 122
             }
           }
         ],
@@ -19910,7 +20065,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 102
+        "line": 120
       }
     },
     "types::math::Vector2": {
@@ -19941,7 +20096,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 135
+              "line": 153
             }
           }
         ],
@@ -19955,7 +20110,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 134
+        "line": 152
       }
     },
     "types::math::Vector3": {
@@ -19986,7 +20141,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 157
+              "line": 175
             }
           }
         ],
@@ -20000,7 +20155,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 156
+        "line": 174
       }
     },
     "types::math::Vector4": {
@@ -20031,7 +20186,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 179
+              "line": 197
             }
           }
         ],
@@ -20045,7 +20200,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 178
+        "line": 196
       }
     },
     "types::object_id::ObjectID": {
@@ -20716,7 +20871,118 @@
             }
           }
         ],
-        "associated_functions": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "new",
+            "doc": " Constructs a null `SharedPtr<T>` (refcount block is null).",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [],
+            "return_type": {
+              "type": "generic",
+              "base": "types::shared_ptr::SharedPtr",
+              "args": [
+                {
+                  "type": "type_parameter",
+                  "name": "T"
+                }
+              ]
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 28,
+              "line": 137
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "exists",
+            "doc": " `true` if the stored pointer is non-null.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 28,
+              "line": 140
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "refcount",
+            "doc": " Current strong reference count, or 0 if the pointer is null.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 28,
+              "line": 143
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "is_only_owner",
+            "doc": " `true` when this is the sole strong owner (refcount == 1).",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 28,
+              "line": 146
+            }
+          }
+        ],
         "vftable": null,
         "singleton": null,
         "copyable": false,
@@ -20803,7 +21069,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 223
+              "line": 241
             }
           },
           {
@@ -20820,7 +21086,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 224
+              "line": 242
             }
           }
         ],
@@ -20834,7 +21100,7 @@
       },
       "source": {
         "file_index": 28,
-        "line": 222
+        "line": 240
       }
     },
     "u128": {
@@ -23624,7 +23890,8 @@
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    impl EventID {\n        pub fn new(hash: crate::hash_string::HashString, namespace: crate::hash_string::HashString) -> Self {\n            Self {\n                hash,\n                namespace\n            }\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "game::event_handler::EventID"
                 }
               },
               {
@@ -23816,7 +24083,8 @@
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    pub trait GameObjectExt {\n        unsafe fn get_matrix(&self) -> Option<crate::math::Matrix4>;\n    }\n    pub trait GameObjectMutExt {\n        unsafe fn set_matrix(&mut self, matrix: &crate::math::Matrix4);\n    }\n    impl<T: std::convert::AsRef<crate::game_object::GameObject>> GameObjectExt for T {\n        unsafe fn get_matrix(&self) -> Option<crate::math::Matrix4> {\n            let mut out = crate::math::Matrix4::default();\n            let set = unsafe { self.as_ref().get_matrix_raw(out.as_mut_ptr()) };\n            set.then_some(out)\n        }\n    }\n    impl<T: std::convert::AsMut<crate::game_object::GameObject>> GameObjectMutExt for T {\n        unsafe fn set_matrix(&mut self, matrix: &crate::math::Matrix4) {\n            unsafe { self.as_mut().set_matrix_raw(matrix.as_ptr()); }\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "game_objects::game_object::GameObject"
                 }
               }
             ]
@@ -23854,7 +24122,8 @@
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    pub trait PlayerExt {\n        unsafe fn get_character(&self) -> Option<&crate::game_objects::Character>;\n    }\n    impl<T: std::convert::AsRef<crate::game_objects::player::Player>> PlayerExt for T {\n        unsafe fn get_character(&self) -> Option<&crate::game_objects::Character> {\n            unsafe { self.as_ref().avatar.character.as_ref() }\n        }\n    }\n    pub trait PlayerMutExt {\n        unsafe fn get_character(&mut self) -> Option<&mut crate::game_objects::Character>;\n    }\n    impl<T: std::convert::AsMut<crate::game_objects::player::Player>> PlayerMutExt for T {\n        unsafe fn get_character(&mut self) -> Option<&mut crate::game_objects::Character> {\n            unsafe { self.as_mut().avatar.character.as_mut() }\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "game_objects::player::Player"
                 }
               }
             ]
@@ -24164,7 +24433,8 @@
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    impl HashString {\n        pub unsafe fn from_cstr(str: impl AsRef<std::ffi::CStr>) -> Self {\n            unsafe {\n                let mut instance = std::mem::MaybeUninit::<Self>::uninit();\n                (*instance.as_mut_ptr()).constructor(str.as_ref().as_ptr());\n                instance.assume_init()\n            }\n        }\n\n        pub const fn from_u32(hash: u32) -> Self {\n            Self { hash }\n        }\n    }\n\n    impl From<u32> for HashString {\n        fn from(hash: u32) -> Self {\n            Self { hash }\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::hash_string::HashString"
                 }
               }
             ]
@@ -24201,49 +24471,56 @@
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    #[cfg(feature = \"bevy_math\")]\n    impl From<Aabb3d> for Aabb {\n        fn from(aabb: Aabb3d) -> Self {\n            Self {\n                min: Vector3 {\n                    data: aabb.min.to_array(),\n                },\n                max: Vector3 {\n                    data: aabb.max.to_array(),\n                },\n            }\n        }\n    }\n    #[cfg(feature = \"bevy_math\")]\n    impl From<Aabb> for Aabb3d {\n        fn from(aabb: Aabb) -> Self {\n            Aabb3d {\n                min: bevy_math::Vec3A::from_array(aabb.min.data),\n                max: bevy_math::Vec3A::from_array(aabb.max.data),\n            }\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::math::Aabb"
                 }
               },
               {
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    #[cfg(feature = \"glam\")]\n    impl From<Mat3> for Matrix3 {\n        fn from(m: Mat3) -> Self {\n            Self {\n                data: m.to_cols_array(),\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Matrix3> for Mat3 {\n        fn from(m: Matrix3) -> Self {\n            Mat3::from_cols_array(&m.data)\n        }\n    }\n    impl Matrix3 {\n        pub fn as_ptr(&self) -> *const f32 {\n            self.data.as_ptr()\n        }\n\n        pub fn as_mut_ptr(&mut self) -> *mut f32 {\n            self.data.as_mut_ptr()\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::math::Matrix3"
                 }
               },
               {
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    #[cfg(feature = \"glam\")]\n    impl From<Mat4> for Matrix4 {\n        fn from(m: Mat4) -> Self {\n            Self {\n                data: m.to_cols_array(),\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Matrix4> for Mat4 {\n        fn from(m: Matrix4) -> Self {\n            Mat4::from_cols_array(&m.data)\n        }\n    }\n    impl Matrix4 {\n        pub fn as_ptr(&self) -> *const f32 {\n            self.data.as_ptr()\n        }\n\n        pub fn as_mut_ptr(&mut self) -> *mut f32 {\n            self.data.as_mut_ptr()\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::math::Matrix4"
                 }
               },
               {
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    #[cfg(feature = \"bevy_math\")]\n    impl From<Ray> for Ray3d {\n        fn from(r: Ray) -> Self {\n            Self::new(\n                bevy_math::Vec3::from(r.origin),\n                bevy_math::Vec3::from(r.direction),\n            )\n        }\n    }\n    #[cfg(feature = \"bevy_math\")]\n    impl From<Ray3d> for Ray {\n        fn from(r: Ray3d) -> Self {\n            Self::new(r.origin.into(), (*r.direction).into())\n        }\n    }\n    impl Ray {\n        fn new(origin: Vector3, direction: Vector3) -> Self {\n            Self {\n                origin,\n                direction,\n            }\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::math::Ray"
                 }
               },
               {
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    #[cfg(feature = \"glam\")]\n    impl From<Vec2> for Vector2 {\n        fn from(v: Vec2) -> Self {\n            Self {\n                data: [v.x, v.y],\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Vector2> for Vec2 {\n        fn from(v: Vector2) -> Self {\n            Vec2::new(v.data[0], v.data[1])\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::math::Vector2"
                 }
               },
               {
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    #[cfg(feature = \"glam\")]\n    impl From<Vec3> for Vector3 {\n        fn from(v: Vec3) -> Self {\n            Self {\n                data: [v.x, v.y, v.z],\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Vector3> for Vec3 {\n        fn from(v: Vector3) -> Self {\n            Vec3::new(v.data[0], v.data[1], v.data[2])\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::math::Vector3"
                 }
               },
               {
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    #[cfg(feature = \"glam\")]\n    impl From<Vec4> for Vector4 {\n        fn from(v: Vec4) -> Self {\n            Self {\n                data: [v.x, v.y, v.z, v.w],\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Vector4> for Vec4 {\n        fn from(v: Vector4) -> Self {\n            Vec4::new(v.data[0], v.data[1], v.data[2], v.data[3])\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::math::Vector4"
                 }
               }
             ]
@@ -24308,35 +24585,40 @@
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    // SharedCountImpl\n    impl SharedCountImpl {\n        fn release(&mut self) {\n            let use_count = self.use_count.load(Ordering::SeqCst) - 1;\n            self.use_count.store(use_count, Ordering::SeqCst);\n            if use_count == 0 {\n                unsafe {\n                    self.dispose();\n                }\n                self.weak_release();\n            }\n        }\n\n        fn weak_release(&mut self) {\n            let weak_count = self.weak_count.load(Ordering::SeqCst) - 1;\n            self.weak_count.store(weak_count, Ordering::SeqCst);\n            if weak_count == 0 {\n                unsafe {\n                    self.destroy();\n                }\n            }\n        }\n\n        fn add_ref_copy(&mut self) {\n            let use_count = self.use_count.load(Ordering::SeqCst) + 1;\n            self.use_count.store(use_count, Ordering::SeqCst);\n        }\n\n        fn weak_add_ref(&mut self) {\n            let weak_count = self.weak_count.load(Ordering::SeqCst) + 1;\n            self.weak_count.store(weak_count, Ordering::SeqCst);\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::shared_ptr::SharedCountImpl"
                 }
               },
               {
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    // SharedCount\n    #[allow(dead_code)]\n    impl SharedCount {\n        fn swap(&mut self, rhs: &mut SharedCount) {\n            let lhs = self;\n            unsafe {\n                swap_unaligned(\n                    &raw mut lhs.count_impl,\n                    &raw mut rhs.count_impl,\n                );\n            }\n        }\n    }\n    impl Drop for SharedCount {\n        fn drop(&mut self) {\n            if !self.count_impl.is_null() {\n                unsafe {\n                    (*self.count_impl).release();\n                }\n            }\n        }\n    }\n    impl Clone for SharedCount {\n        fn clone(&self) -> SharedCount {\n            unsafe {\n                (*self.count_impl).add_ref_copy();\n            }\n            SharedCount {\n                count_impl: self.count_impl,\n            }\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::shared_ptr::SharedCount"
                 }
               },
               {
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    // WeakCount\n    impl WeakCount {\n        fn new_from_shared(shared: &SharedCount) -> WeakCount {\n            unsafe {\n                (*shared.count_impl).weak_add_ref();\n            }\n            WeakCount {\n                count_impl: shared.count_impl,\n            }\n        }\n    }\n    impl Drop for WeakCount {\n        fn drop(&mut self) {\n            if !self.count_impl.is_null() {\n                unsafe {\n                    (*self.count_impl).weak_release();\n                }\n            }\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::shared_ptr::WeakCount"
                 }
               },
               {
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    // SharedPtr\n    #[allow(dead_code)]\n    impl<T> SharedPtr<T> {\n        pub fn new() -> SharedPtr<T> {\n            SharedPtr {\n                px: ptr::null_mut(),\n                pn: SharedCount {\n                    count_impl: ptr::null_mut(),\n                },\n            }\n        }\n\n        pub unsafe fn as_ref(&self) -> Option<&T> {\n            self.exists().then(|| unsafe { &*self.px })\n        }\n\n        pub unsafe fn as_mut(&mut self) -> Option<&mut T> {\n            self.exists().then(|| unsafe { &mut *self.px })\n        }\n\n        pub fn exists(&self) -> bool {\n            !self.px.is_null()\n        }\n\n        pub fn refcount(&self) -> i32 {\n            unsafe { (*self.pn.count_impl).use_count.load(Ordering::SeqCst) }\n        }\n\n        pub fn is_only_owner(&self) -> bool {\n            self.refcount() == 1\n        }\n\n        pub unsafe fn swap(&mut self, rhs: &mut SharedPtr<T>) {\n            unsafe {\n                swap_unaligned(&raw mut self.px, &raw mut rhs.px);\n            }\n            self.pn.swap(&mut rhs.pn);\n        }\n\n        pub unsafe fn reset_with_empty(&mut self) {\n            unsafe {\n                self.swap(&mut SharedPtr::new());\n            }\n        }\n\n        /// Absolutely no verification on this - make sure that T can be casted to Y!\n        pub unsafe fn static_pointer_cast<Y>(self) -> SharedPtr<Y> {\n            SharedPtr {\n                px: self.px as *mut Y,\n                pn: self.pn,\n            }\n        }\n\n        /// Given a `SharedPtr<T>`, returns a `SharedPtr<Y>` if `T: AsMut<Y>`.\n        /// Pyxis defines `AsMut` conversions for inheritance, so this can be used\n        /// to convert a `SharedPtr<Derived>` to a `SharedPtr<Base>`.\n        ///\n        /// That being said, it's still somewhat unsafe, so use with caution.\n        pub unsafe fn as_mut_cast<Y>(self) -> SharedPtr<Y>\n        where\n            T: AsMut<Y>,\n        {\n            SharedPtr {\n                px: unsafe { (*self.px).as_mut() as *mut Y },\n                pn: self.pn,\n            }\n        }\n    }\n    impl<T> Clone for SharedPtr<T> {\n        fn clone(&self) -> SharedPtr<T> {\n            SharedPtr {\n                px: self.px,\n                pn: self.pn.clone(),\n            }\n        }\n    }\n    impl<T> Default for SharedPtr<T> {\n        fn default() -> SharedPtr<T> {\n            SharedPtr::new()\n        }\n    }\n    impl<T> PartialEq for SharedPtr<T> {\n        fn eq(&self, other: &SharedPtr<T>) -> bool {\n            self.px == other.px\n        }\n    }\n    impl<T> Eq for SharedPtr<T> {}\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::shared_ptr::SharedPtr"
                 }
               },
               {
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    // WeakPtr\n    #[allow(dead_code)]\n    impl<T> WeakPtr<T> {\n        pub unsafe fn new_from_shared(shared: SharedPtr<T>) -> WeakPtr<T> {\n            WeakPtr {\n                px: shared.px,\n                pn: WeakCount::new_from_shared(&shared.pn),\n            }\n        }\n    }\n\n    unsafe fn swap_unaligned<T>(p1: *mut T, p2: *mut T) {\n        unsafe {\n            let p1_val = ptr::read_unaligned(p1);\n            let p2_val = ptr::read_unaligned(p2);\n\n            ptr::write_unaligned(p1, p2_val);\n            ptr::write_unaligned(p2, p1_val);\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::shared_ptr::WeakPtr"
                 }
               }
             ]

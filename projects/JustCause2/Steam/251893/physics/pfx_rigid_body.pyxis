@@ -68,7 +68,7 @@ impl PfxRigidBody {
     pub fn make_heap(rigid_body: *mut HkpRigidBody) -> *mut PfxRigidBody;
 }
 
-backend rust epilogue r#"
+backend rust epilogue for PfxRigidBody r#"
     impl PfxRigidBody {
         pub unsafe fn new(rigid_body: *mut crate::havok::rigid_body::HkpRigidBody) -> std::pin::Pin<std::boxed::Box<Self>> {
             unsafe {
@@ -85,7 +85,7 @@ backend rust epilogue r#"
     }
 "#;
 
-backend cpp epilogue definition r#"
+backend cpp epilogue definition for PfxRigidBody r#"
 PfxRigidBody* PfxRigidBody::make_heap(::physics::havok::rigid_body::HkpRigidBody* rigid_body) {
     auto* instance = new PfxRigidBody{};
     auto empty = ::types::shared_ptr::SharedPtr<::std::uint32_t>::make();

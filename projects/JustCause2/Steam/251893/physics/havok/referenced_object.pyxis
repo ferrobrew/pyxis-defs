@@ -21,7 +21,7 @@ impl HkReferencedObject {
     pub fn remove_reference(&mut self);
 }
 
-backend rust epilogue r#"
+backend rust epilogue for HkReferencedObject r#"
     impl HkReferencedObject {
         pub unsafe fn allocation_size(&self) -> u32 {
             (self.mem_size_and_flags & 0x7FFF) as u32
@@ -103,7 +103,7 @@ backend cpp prologue r#"
 #include "physics/havok/memory.hpp"
 "#;
 
-backend cpp epilogue definition r#"
+backend cpp epilogue definition for HkReferencedObject r#"
 ::std::uint32_t HkReferencedObject::allocation_size() const {
     return static_cast<::std::uint32_t>(mem_size_and_flags & 0x7FFF);
 }

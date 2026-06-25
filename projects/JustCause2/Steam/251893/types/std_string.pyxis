@@ -39,7 +39,7 @@ impl StdString {
     pub fn new() -> StdString;
 }
 
-backend rust epilogue r#"
+backend rust epilogue for StdString r#"
     struct StringFunctions {
         ctor_default: extern "thiscall" fn(*mut StdString) -> *mut c_void,
         ctor_cstr: extern "thiscall" fn(*mut StdString, *const c_char) -> *mut c_void,
@@ -110,7 +110,7 @@ backend cpp {
     prologue definition r#"
         #include <windows.h>
     "#;
-    epilogue definition r#"
+    epilogue definition for StdString r#"
 // JC2 ships against MSVCP80's `std::basic_string` ABI; we resolve the
 // constructors / destructor / copy by mangled name from the loaded DLL on
 // first use (mirrors the Rust impl). The mangled names target the 32-bit

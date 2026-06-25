@@ -111,7 +111,7 @@ impl GenericRenderBlock {
     pub fn make() -> GenericRenderBlock;
 }
 
-backend rust epilogue r#"
+backend rust epilogue for GenericRenderBlock r#"
     impl GenericRenderBlock {
         pub unsafe fn new() -> GenericRenderBlock {
             unsafe {
@@ -130,7 +130,7 @@ backend rust epilogue r#"
     }
 "#;
 
-backend cpp epilogue definition r#"
+backend cpp epilogue definition for GenericRenderBlock r#"
 GenericRenderBlock GenericRenderBlock::make() {
     GenericRenderBlock self{};
     self.constructor();
@@ -176,7 +176,7 @@ impl RenderBlockLine {
     pub fn make() -> RenderBlockLine;
 }
 
-backend rust epilogue r#"
+backend rust epilogue for RenderBlockLine r#"
     impl RenderBlockLine {
         pub unsafe fn new() -> RenderBlockLine {
             unsafe {
@@ -193,7 +193,7 @@ backend rust epilogue r#"
     }
 "#;
 
-backend cpp epilogue definition r#"
+backend cpp epilogue definition for RenderBlockLine r#"
 RenderBlockLine RenderBlockLine::make() {
     RenderBlockLine self{};
     self.constructor();
@@ -231,7 +231,7 @@ impl RenderBlockTriangle {
     pub fn make() -> RenderBlockTriangle;
 }
 
-backend rust epilogue r#"
+backend rust epilogue for RenderBlockTriangle r#"
     impl RenderBlockTriangle {
         pub unsafe fn new() -> RenderBlockTriangle {
             unsafe {
@@ -248,7 +248,7 @@ backend rust epilogue r#"
     }
 "#;
 
-backend cpp epilogue definition r#"
+backend cpp epilogue definition for RenderBlockTriangle r#"
 RenderBlockTriangle RenderBlockTriangle::make() {
     RenderBlockTriangle self{};
     self.constructor();
@@ -302,7 +302,7 @@ impl RenderBlockGeneral {
     pub fn make() -> RenderBlockGeneral;
 }
 
-backend rust epilogue r#"
+backend rust epilogue for RenderBlockGeneral r#"
     impl RenderBlockGeneral {
         pub unsafe fn new() -> RenderBlockGeneral {
             unsafe {
@@ -319,7 +319,7 @@ backend rust epilogue r#"
     }
 "#;
 
-backend cpp epilogue definition r#"
+backend cpp epilogue definition for RenderBlockGeneral r#"
 RenderBlockGeneral RenderBlockGeneral::make() {
     RenderBlockGeneral self{};
     self.constructor();
@@ -398,7 +398,7 @@ impl RenderBlock3DText {
     pub fn make() -> RenderBlock3DText;
 }
 
-backend rust epilogue r#"
+backend rust epilogue for RenderBlock3DText r#"
     impl RenderBlock3DText {
         pub unsafe fn new() -> RenderBlock3DText {
             unsafe {
@@ -421,7 +421,7 @@ backend rust epilogue r#"
     }
 "#;
 
-backend cpp epilogue definition r#"
+backend cpp epilogue definition for RenderBlock3DText r#"
 RenderBlock3DText RenderBlock3DText::make() {
     RenderBlock3DText self{};
     self.render_block.vftable = reinterpret_cast<const RenderBlockVftable*>(0xF23584);

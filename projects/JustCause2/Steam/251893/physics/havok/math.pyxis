@@ -8,7 +8,7 @@ pub type HkMatrix3 {
     pub data: [HkVector4; 3],
 }
 
-backend rust epilogue r#"
+backend rust epilogue for HkMatrix3 r#"
     #[cfg(feature = "glam")]
     impl From<Mat3> for HkMatrix3 {
         fn from(m: Mat3) -> Self {
@@ -34,7 +34,7 @@ pub type HkVector4 {
     pub data: [f32; 4],
 }
 
-backend rust epilogue r#"
+backend rust epilogue for HkVector4 r#"
     #[cfg(feature = "glam")]
     impl From<Vec3> for HkVector4 {
         fn from(v: Vec3) -> Self {

@@ -58,7 +58,7 @@ impl GameObject {
     pub fn set_matrix(&mut self, matrix: *const Matrix4);
 }
 
-backend rust epilogue r#"
+backend rust epilogue for GameObject r#"
     pub trait GameObjectExt {
         unsafe fn get_matrix(&self) -> Option<crate::math::Matrix4>;
     }
@@ -79,7 +79,7 @@ backend rust epilogue r#"
     }
 "#;
 
-backend cpp epilogue definition r#"
+backend cpp epilogue definition for GameObject r#"
 bool GameObject::try_get_matrix(::types::math::Matrix4* out) const {
     return this->get_matrix_raw(out->data);
 }

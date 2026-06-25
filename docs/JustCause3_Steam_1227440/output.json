@@ -1,5 +1,6 @@
 {
-  "schema_version": 5,
+  "schema_version": 7,
+  "pyxis_version": "0.1.0",
   "pointer_size": 8,
   "project_name": "Just Cause 3 (Steam 1227440)",
   "items": {
@@ -7014,7 +7015,68 @@
             }
           }
         ],
-        "associated_functions": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "as_ptr",
+            "doc": " Raw pointer to the row-major data, for passing to engine APIs.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              }
+            ],
+            "return_type": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              }
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 15,
+              "line": 9
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "as_mut_ptr",
+            "doc": " Mutable raw pointer to the row-major data.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              }
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 15,
+              "line": 12
+            }
+          }
+        ],
         "vftable": null,
         "singleton": null,
         "copyable": true,
@@ -7055,11 +7117,72 @@
             "is_base": false,
             "source": {
               "file_index": 15,
-              "line": 34
+              "line": 43
             }
           }
         ],
-        "associated_functions": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "as_ptr",
+            "doc": " Raw pointer to the row-major data, for passing to engine APIs.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              }
+            ],
+            "return_type": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              }
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 15,
+              "line": 49
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "as_mut_ptr",
+            "doc": " Mutable raw pointer to the row-major data.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              }
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 15,
+              "line": 52
+            }
+          }
+        ],
         "vftable": null,
         "singleton": null,
         "copyable": true,
@@ -7069,7 +7192,7 @@
       },
       "source": {
         "file_index": 15,
-        "line": 33
+        "line": 42
       }
     },
     "types::math::Plane": {
@@ -7096,7 +7219,7 @@
             "is_base": false,
             "source": {
               "file_index": 15,
-              "line": 131
+              "line": 149
             }
           },
           {
@@ -7113,7 +7236,7 @@
             "is_base": false,
             "source": {
               "file_index": 15,
-              "line": 132
+              "line": 150
             }
           }
         ],
@@ -7127,7 +7250,7 @@
       },
       "source": {
         "file_index": 15,
-        "line": 130
+        "line": 148
       }
     },
     "types::math::Vector2": {
@@ -7158,7 +7281,7 @@
             "is_base": false,
             "source": {
               "file_index": 15,
-              "line": 65
+              "line": 83
             }
           }
         ],
@@ -7172,7 +7295,7 @@
       },
       "source": {
         "file_index": 15,
-        "line": 64
+        "line": 82
       }
     },
     "types::math::Vector3": {
@@ -7203,7 +7326,7 @@
             "is_base": false,
             "source": {
               "file_index": 15,
-              "line": 87
+              "line": 105
             }
           }
         ],
@@ -7217,7 +7340,7 @@
       },
       "source": {
         "file_index": 15,
-        "line": 86
+        "line": 104
       }
     },
     "types::math::Vector4": {
@@ -7248,7 +7371,7 @@
             "is_base": false,
             "source": {
               "file_index": 15,
-              "line": 109
+              "line": 127
             }
           }
         ],
@@ -7262,7 +7385,7 @@
       },
       "source": {
         "file_index": 15,
-        "line": 108
+        "line": 126
       }
     },
     "types::vector_math::AlignedQuat": {
@@ -7888,35 +8011,40 @@
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    #[cfg(feature = \"glam\")]\n    impl From<glam::Mat3> for Matrix3 {\n        fn from(m: glam::Mat3) -> Self {\n            Self {\n                data: m.to_cols_array(),\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Matrix3> for glam::Mat3 {\n        fn from(m: Matrix3) -> Self {\n            glam::Mat3::from_cols_array(&m.data)\n        }\n    }\n    impl Matrix3 {\n        pub fn as_ptr(&self) -> *const f32 {\n            self.data.as_ptr()\n        }\n\n        pub fn as_mut_ptr(&mut self) -> *mut f32 {\n            self.data.as_mut_ptr()\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::math::Matrix3"
                 }
               },
               {
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    #[cfg(feature = \"glam\")]\n    impl From<glam::Mat4> for Matrix4 {\n        fn from(m: glam::Mat4) -> Self {\n            Self {\n                data: m.to_cols_array(),\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Matrix4> for glam::Mat4 {\n        fn from(m: Matrix4) -> Self {\n            glam::Mat4::from_cols_array(&m.data)\n        }\n    }\n    impl Matrix4 {\n        pub fn as_ptr(&self) -> *const f32 {\n            self.data.as_ptr()\n        }\n\n        pub fn as_mut_ptr(&mut self) -> *mut f32 {\n            self.data.as_mut_ptr()\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::math::Matrix4"
                 }
               },
               {
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    #[cfg(feature = \"glam\")]\n    impl From<glam::Vec2> for Vector2 {\n        fn from(v: glam::Vec2) -> Self {\n            Self {\n                data: [v.x, v.y],\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Vector2> for glam::Vec2 {\n        fn from(v: Vector2) -> Self {\n            glam::Vec2::new(v.data[0], v.data[1])\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::math::Vector2"
                 }
               },
               {
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    #[cfg(feature = \"glam\")]\n    impl From<glam::Vec3> for Vector3 {\n        fn from(v: glam::Vec3) -> Self {\n            Self {\n                data: [v.x, v.y, v.z],\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Vector3> for glam::Vec3 {\n        fn from(v: Vector3) -> Self {\n            glam::Vec3::new(v.data[0], v.data[1], v.data[2])\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::math::Vector3"
                 }
               },
               {
                 "prologue": null,
                 "epilogue": {
                   "header": "\n    #[cfg(feature = \"glam\")]\n    impl From<glam::Vec4> for Vector4 {\n        fn from(v: glam::Vec4) -> Self {\n            Self {\n                data: [v.x, v.y, v.z, v.w],\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Vector4> for glam::Vec4 {\n        fn from(v: Vector4) -> Self {\n            glam::Vec4::new(v.data[0], v.data[1], v.data[2], v.data[3])\n        }\n    }\n",
-                  "definition": null
+                  "definition": null,
+                  "for_type": "types::math::Vector4"
                 }
               }
             ]
