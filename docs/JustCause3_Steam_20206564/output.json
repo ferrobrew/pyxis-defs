@@ -10994,6 +10994,13 @@
             "visibility": "public",
             "name": "DrawRenderPassRange",
             "doc": " Draws every render block in the half-open pass-index range `[first, last)`: for each pass it\n walks the [`RenderPass`] list and vtable-dispatches each block.",
+            "doc_links": [
+              {
+                "text": "RenderPass",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPass"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5370308096
