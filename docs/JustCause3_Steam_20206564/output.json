@@ -18747,13 +18747,43 @@
     "ui::ui_manager::UIManager": {
       "path": "ui::ui_manager::UIManager",
       "visibility": "public",
-      "size": 5264,
+      "size": 5280,
       "alignment": 8,
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": " The Scaleform-backed UI manager, the single concrete instance behind `IUIManager`. It renders the\n HUD into the engine surface; [`InitPlatformRT`](UIManager::InitPlatformRT) rebinds its render\n target.",
+        "doc": " The Scaleform-backed UI manager, the single concrete instance behind `IUIManager`. It renders the\n HUD into the engine surface. Redirecting the HUD to an independent resolution and aspect takes\n four coordinated steps: set the movie render rectangle ([`m_MovieScaleWidth`](UIManager::m_MovieScaleWidth)\n / [`m_MovieScaleHeight`](UIManager::m_MovieScaleHeight)), set the cached viewport\n ([`m_CachedViewportWidth`](UIManager::m_CachedViewportWidth) /\n [`m_CachedViewportHeight`](UIManager::m_CachedViewportHeight)) and recompute the safe area so the\n UI reflows to the new aspect, set the Scaleform movie viewport\n ([`SetMovieViewport`](UIManager::SetMovieViewport)), and rebind the render buffer\n ([`InitPlatformRT`](UIManager::InitPlatformRT)).",
         "doc_links": [
+          {
+            "text": "UIManager::m_MovieScaleWidth",
+            "target_kind": "item",
+            "path": "ui::ui_manager::UIManager",
+            "anchor": "field-m_MovieScaleWidth"
+          },
+          {
+            "text": "UIManager::m_MovieScaleHeight",
+            "target_kind": "item",
+            "path": "ui::ui_manager::UIManager",
+            "anchor": "field-m_MovieScaleHeight"
+          },
+          {
+            "text": "UIManager::m_CachedViewportWidth",
+            "target_kind": "item",
+            "path": "ui::ui_manager::UIManager",
+            "anchor": "field-m_CachedViewportWidth"
+          },
+          {
+            "text": "UIManager::m_CachedViewportHeight",
+            "target_kind": "item",
+            "path": "ui::ui_manager::UIManager",
+            "anchor": "field-m_CachedViewportHeight"
+          },
+          {
+            "text": "UIManager::SetMovieViewport",
+            "target_kind": "item",
+            "path": "ui::ui_manager::UIManager",
+            "anchor": "func-SetMovieViewport"
+          },
           {
             "text": "UIManager::InitPlatformRT",
             "target_kind": "item",
@@ -18772,15 +18802,92 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 5008
+              "size": 52
             },
             "offset": 0,
-            "size": 5008,
+            "size": 52,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 42
+              "line": 51
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_MovieScaleWidth",
+            "doc": " The movie render rectangle's width, part of the engine's `MovieScaleInfo`. The HUD movie is\n rendered into a `m_MovieScaleWidth` x `m_MovieScaleHeight` rectangle, centered within the\n viewport set by [`SetMovieViewport`](UIManager::SetMovieViewport). Setting it equal to the\n render target's dimensions (and matching the viewport) makes the movie fill the target with a\n zero centering offset. [`ComputeMovieSizeOnViewSize`](UIManager::ComputeMovieSizeOnViewSize)\n overwrites it from the device resolution, so the HUD redirect sets it directly instead.",
+            "doc_links": [
+              {
+                "text": "UIManager::SetMovieViewport",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-SetMovieViewport"
+              },
+              {
+                "text": "UIManager::ComputeMovieSizeOnViewSize",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-ComputeMovieSizeOnViewSize"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 52,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 32,
+              "line": 51
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_MovieScaleHeight",
+            "doc": " The movie render rectangle's height; see [`m_MovieScaleWidth`](UIManager::m_MovieScaleWidth).",
+            "doc_links": [
+              {
+                "text": "UIManager::m_MovieScaleWidth",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "field-m_MovieScaleWidth"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 56,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 32,
+              "line": 55
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_3c",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 4948
+            },
+            "offset": 60,
+            "size": 4948,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 32,
+              "line": 61
             }
           },
           {
@@ -18814,7 +18921,7 @@
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 42
+              "line": 61
             }
           },
           {
@@ -18835,13 +18942,13 @@
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 47
+              "line": 67
             }
           },
           {
             "visibility": "public",
-            "name": "m_ViewWidth",
-            "doc": " The viewport width that the world-to-screen mapping\n ([`Convert3DCoords`](UIManager::Convert3DCoords)) maps NDC into.",
+            "name": "m_CachedStageWidth",
+            "doc": " The movie stage's authored width (`m_CachedStageSize.x`), refreshed every frame from the loaded\n movie. The world-to-screen mapping ([`Convert3DCoords`](UIManager::Convert3DCoords)) maps NDC\n into this. Read-only for the redirect.",
             "doc_links": [
               {
                 "text": "UIManager::Convert3DCoords",
@@ -18860,13 +18967,21 @@
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 47
+              "line": 67
             }
           },
           {
             "visibility": "public",
-            "name": "m_ViewHeight",
-            "doc": null,
+            "name": "m_CachedStageHeight",
+            "doc": " The movie stage's authored height; see [`m_CachedStageWidth`](UIManager::m_CachedStageWidth).",
+            "doc_links": [
+              {
+                "text": "UIManager::m_CachedStageWidth",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "field-m_CachedStageWidth"
+              }
+            ],
             "type_ref": {
               "type": "raw",
               "path": "f32"
@@ -18877,7 +18992,7 @@
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 50
+              "line": 71
             }
           },
           {
@@ -18890,15 +19005,65 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 4
+              "size": 12
             },
             "offset": 5260,
-            "size": 4,
+            "size": 12,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 33
+              "line": 78
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_CachedViewportWidth",
+            "doc": " The cached viewport width (`m_CachedViewportSize.x`), refreshed every frame from the graphics\n device's display resolution. [`ComputeSafeArea`](UIManager::ComputeSafeArea) reads it to expand\n the UI safe area to the viewport's aspect (the HUD's reflow mechanism), so the redirect\n overrides it to the render target's dimensions before recomputing the safe area.",
+            "doc_links": [
+              {
+                "text": "UIManager::ComputeSafeArea",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-ComputeSafeArea"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 5272,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 32,
+              "line": 78
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_CachedViewportHeight",
+            "doc": " The cached viewport height; see [`m_CachedViewportWidth`](UIManager::m_CachedViewportWidth).",
+            "doc_links": [
+              {
+                "text": "UIManager::m_CachedViewportWidth",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "field-m_CachedViewportWidth"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 5276,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 32,
+              "line": 82
             }
           }
         ],
@@ -18906,7 +19071,7 @@
           {
             "visibility": "public",
             "name": "InitPlatformRT",
-            "doc": " Binds the UI render target: builds a [`RenderTargetData`] from the engine surface's\n render-target and depth-stencil views via [`RenderTargetData::UpdateData`]. Called at startup\n and on every device or resolution reset; `a2` carries the target dimensions.",
+            "doc": " Binds the UI render target: builds a [`RenderTargetData`] from the engine surface's\n render-target and depth-stencil views via [`RenderTargetData::UpdateData`]. Called at startup\n and on every device or resolution reset; `a2` carries the target side length (the buffer is\n square: width = height = a2). This only creates the render buffer -- the Scaleform movie's\n viewport is set separately by [`SetMovieViewport`](UIManager::SetMovieViewport).",
             "doc_links": [
               {
                 "text": "RenderTargetData",
@@ -18918,6 +19083,12 @@
                 "target_kind": "item",
                 "path": "ui::ui_manager::RenderTargetData",
                 "anchor": "func-UpdateData"
+              },
+              {
+                "text": "UIManager::SetMovieViewport",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-SetMovieViewport"
               }
             ],
             "body": {
@@ -18941,13 +19112,13 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 57
+              "line": 91
             }
           },
           {
             "visibility": "public",
             "name": "RestoreAfterReset",
-            "doc": " Re-runs [`InitPlatformRT`](UIManager::InitPlatformRT) after a device or resolution reset (`a2`\n is the new width; the dimensions otherwise track the engine surface).",
+            "doc": " Re-runs [`InitPlatformRT`](UIManager::InitPlatformRT) after a device or resolution reset. Also\n recomputes the movie size, sets the movie viewport, and recomputes the safe area. Gated by an\n internal reset counter, so a direct call may no-op if the counter is not at 1.",
             "doc_links": [
               {
                 "text": "UIManager::InitPlatformRT",
@@ -18963,10 +19134,102 @@
             "arguments": [
               {
                 "type": "mut_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 32,
+              "line": 97
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "ComputeMovieSizeOnViewSize",
+            "doc": " Recomputes the movie render rectangle ([`m_MovieScaleWidth`](UIManager::m_MovieScaleWidth) /\n [`m_MovieScaleHeight`](UIManager::m_MovieScaleHeight)). It first refreshes the cached stage and\n viewport sizes from the live device resolution (via an internal `UpdateCachedValues`), then\n sizes the movie rectangle from them -- so it always forces the device's aspect and cannot be\n steered by writing the cached fields beforehand. The HUD redirect therefore avoids it and sets\n the movie rectangle directly; it is used only by the restore path to return the rectangle to\n the engine-native device size.",
+            "doc_links": [
+              {
+                "text": "UIManager::m_MovieScaleWidth",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "field-m_MovieScaleWidth"
+              },
+              {
+                "text": "UIManager::m_MovieScaleHeight",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "field-m_MovieScaleHeight"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5384726576
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
               },
               {
                 "type": "field",
                 "name": "a2",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "bool"
+                }
+              },
+              {
+                "type": "field",
+                "name": "a3",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "bool"
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 32,
+              "line": 107
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "SetMovieViewport",
+            "doc": " Sets the Scaleform movie's viewport to `width` x `height`, centering the movie (of size\n [`m_MovieScaleWidth`](UIManager::m_MovieScaleWidth) x\n [`m_MovieScaleHeight`](UIManager::m_MovieScaleHeight)) within it at offset\n `((width - m_MovieScaleWidth) / 2, (height - m_MovieScaleHeight) / 2)`. This is the viewport the\n Scaleform HAL uses for rendering, so it must match the render target's dimensions; passing the\n movie rectangle's own dimensions yields a zero offset (the movie fills the target).",
+            "doc_links": [
+              {
+                "text": "UIManager::m_MovieScaleWidth",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "field-m_MovieScaleWidth"
+              },
+              {
+                "text": "UIManager::m_MovieScaleHeight",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "field-m_MovieScaleHeight"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5384548960
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "width",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "i32"
+                }
+              },
+              {
+                "type": "field",
+                "name": "height",
                 "type_ref": {
                   "type": "raw",
                   "path": "i32"
@@ -18977,7 +19240,47 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 62
+              "line": 116
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "ComputeSafeArea",
+            "doc": " Computes the safe-area rectangle from the current movie viewport.",
+            "body": {
+              "type": "address",
+              "address": 5385001776
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 32,
+              "line": 120
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "ComputeGameViewArea",
+            "doc": " Computes the game view area from the current movie viewport.",
+            "body": {
+              "type": "address",
+              "address": 5385002160
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 32,
+              "line": 124
             }
           },
           {
@@ -19044,7 +19347,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 67
+              "line": 129
             }
           },
           {
@@ -19176,7 +19479,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 73
+              "line": 135
             }
           },
           {
@@ -19258,7 +19561,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 78
+              "line": 140
             }
           },
           {
@@ -19289,7 +19592,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 82
+              "line": 144
             }
           },
           {
@@ -19309,7 +19612,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 86
+              "line": 148
             }
           },
           {
@@ -19329,7 +19632,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 90
+              "line": 152
             }
           },
           {
@@ -19349,7 +19652,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 94
+              "line": 156
             }
           },
           {
@@ -19383,7 +19686,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 98
+              "line": 160
             }
           },
           {
@@ -19406,7 +19709,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 102
+              "line": 164
             }
           }
         ],
@@ -19419,7 +19722,7 @@
       },
       "source": {
         "file_index": 32,
-        "line": 37
+        "line": 43
       }
     },
     "void": {
@@ -21523,7 +21826,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 32,
-                "line": 107
+                "line": 169
               }
             }
           ],
