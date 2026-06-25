@@ -101,7 +101,7 @@ impl PhysicsSystem {
     #[address(0x9AB_EA0)]
     pub fn new_filter_info(&mut self) -> u16;
 
-    #[calling_convention("stdcall"), address(0x9B2_540)]
+    #[calling_convention(stdcall), address(0x9B2_540)]
     pub fn assign_material(material: u32, shape: *mut HkpShape);
 }
 

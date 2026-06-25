@@ -384,7 +384,7 @@ impl RenderBlock3DText {
     #[address(0x962_D50)]
     fn destructor(&mut self, free: bool);
 
-    #[calling_convention("cdecl"), address(0x939_810)]
+    #[calling_convention(cdecl), address(0x939_810)]
     pub fn set_text(render_block: *mut RenderBlock3DText, description: *const RenderBlock3DTextDesc);
 }
 
