@@ -18529,21 +18529,162 @@
     "ui::ui_manager::RenderTargetData": {
       "path": "ui::ui_manager::RenderTargetData",
       "visibility": "public",
-      "size": 0,
+      "size": 64,
       "alignment": 8,
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": " A Scaleform render buffer: what [`UIManager::m_RenderBuffer`] points at. Pointing its bound views\n at an offscreen render-target view redirects where the UI HAL renders, and the rebind is not tied\n to startup, so it can happen at any time.",
+        "doc": " A Scaleform render buffer: what [`UIManager::m_RenderBuffer`] points at. It holds the\n render-target and depth-stencil views the UI HAL renders into; [`UpdateData`](RenderTargetData::UpdateData)\n rebinds those views, and is not tied to startup.",
         "doc_links": [
           {
             "text": "UIManager::m_RenderBuffer",
             "target_kind": "item",
             "path": "ui::ui_manager::UIManager",
             "anchor": "field-m_RenderBuffer"
+          },
+          {
+            "text": "RenderTargetData::UpdateData",
+            "target_kind": "item",
+            "path": "ui::ui_manager::RenderTargetData",
+            "anchor": "func-UpdateData"
           }
         ],
-        "fields": [],
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 40
+            },
+            "offset": 0,
+            "size": 40,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 32,
+              "line": 29
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_BufferWidth",
+            "doc": " The render-target buffer width. [`InitPlatformRT`](UIManager::InitPlatformRT) builds the\n buffer square, setting width = height = its side argument.",
+            "doc_links": [
+              {
+                "text": "UIManager::InitPlatformRT",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-InitPlatformRT"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 40,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 32,
+              "line": 29
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_BufferHeight",
+            "doc": " The render-target buffer height; [`InitPlatformRT`](UIManager::InitPlatformRT) sets it equal to\n the width (a square buffer).",
+            "doc_links": [
+              {
+                "text": "UIManager::InitPlatformRT",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-InitPlatformRT"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 44,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 32,
+              "line": 34
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_30",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 8
+            },
+            "offset": 48,
+            "size": 8,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 32,
+              "line": 38
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_ViewRectRight",
+            "doc": " The view rectangle's right edge (x2 = width).",
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 56,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 32,
+              "line": 38
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_ViewRectBottom",
+            "doc": " The view rectangle's bottom edge (y2); [`InitPlatformRT`](UIManager::InitPlatformRT) sets it\n equal to the width.",
+            "doc_links": [
+              {
+                "text": "UIManager::InitPlatformRT",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-InitPlatformRT"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 60,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 32,
+              "line": 43
+            }
+          }
+        ],
         "associated_functions": [
           {
             "visibility": "public",
@@ -18603,7 +18744,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 30
+              "line": 50
             }
           }
         ],
@@ -18616,7 +18757,7 @@
       },
       "source": {
         "file_index": 32,
-        "line": 24
+        "line": 25
       }
     },
     "ui::ui_manager::ScreenPos": {
@@ -18747,36 +18888,24 @@
     "ui::ui_manager::UIManager": {
       "path": "ui::ui_manager::UIManager",
       "visibility": "public",
-      "size": 5280,
+      "size": 5288,
       "alignment": 8,
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": " The Scaleform-backed UI manager, the single concrete instance behind `IUIManager`. It renders the\n HUD into the engine surface. Redirecting the HUD to an independent resolution and aspect takes\n four coordinated steps: set the movie render rectangle ([`m_MovieScaleWidth`](UIManager::m_MovieScaleWidth)\n / [`m_MovieScaleHeight`](UIManager::m_MovieScaleHeight)), set the cached viewport\n ([`m_CachedViewportWidth`](UIManager::m_CachedViewportWidth) /\n [`m_CachedViewportHeight`](UIManager::m_CachedViewportHeight)) and recompute the safe area so the\n UI reflows to the new aspect, set the Scaleform movie viewport\n ([`SetMovieViewport`](UIManager::SetMovieViewport)), and rebind the render buffer\n ([`InitPlatformRT`](UIManager::InitPlatformRT)).",
+        "doc": " The Scaleform-backed UI manager, the single concrete instance behind `IUIManager`. It renders the\n HUD into the engine surface. [`InitPlatformRT`](UIManager::InitPlatformRT) builds its render\n buffer, [`ComputeMovieSizeOnViewSize`](UIManager::ComputeMovieSizeOnViewSize) sizes the movie\n render rectangle, [`SetMovieViewport`](UIManager::SetMovieViewport) sets the Scaleform movie\n viewport, and [`ComputeSafeArea`](UIManager::ComputeSafeArea) derives the UI safe area.",
         "doc_links": [
           {
-            "text": "UIManager::m_MovieScaleWidth",
+            "text": "UIManager::InitPlatformRT",
             "target_kind": "item",
             "path": "ui::ui_manager::UIManager",
-            "anchor": "field-m_MovieScaleWidth"
+            "anchor": "func-InitPlatformRT"
           },
           {
-            "text": "UIManager::m_MovieScaleHeight",
+            "text": "UIManager::ComputeMovieSizeOnViewSize",
             "target_kind": "item",
             "path": "ui::ui_manager::UIManager",
-            "anchor": "field-m_MovieScaleHeight"
-          },
-          {
-            "text": "UIManager::m_CachedViewportWidth",
-            "target_kind": "item",
-            "path": "ui::ui_manager::UIManager",
-            "anchor": "field-m_CachedViewportWidth"
-          },
-          {
-            "text": "UIManager::m_CachedViewportHeight",
-            "target_kind": "item",
-            "path": "ui::ui_manager::UIManager",
-            "anchor": "field-m_CachedViewportHeight"
+            "anchor": "func-ComputeMovieSizeOnViewSize"
           },
           {
             "text": "UIManager::SetMovieViewport",
@@ -18785,10 +18914,10 @@
             "anchor": "func-SetMovieViewport"
           },
           {
-            "text": "UIManager::InitPlatformRT",
+            "text": "UIManager::ComputeSafeArea",
             "target_kind": "item",
             "path": "ui::ui_manager::UIManager",
-            "anchor": "func-InitPlatformRT"
+            "anchor": "func-ComputeSafeArea"
           }
         ],
         "fields": [
@@ -18810,13 +18939,13 @@
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 51
+              "line": 66
             }
           },
           {
             "visibility": "public",
             "name": "m_MovieScaleWidth",
-            "doc": " The movie render rectangle's width, part of the engine's `MovieScaleInfo`. The HUD movie is\n rendered into a `m_MovieScaleWidth` x `m_MovieScaleHeight` rectangle, centered within the\n viewport set by [`SetMovieViewport`](UIManager::SetMovieViewport). Setting it equal to the\n render target's dimensions (and matching the viewport) makes the movie fill the target with a\n zero centering offset. [`ComputeMovieSizeOnViewSize`](UIManager::ComputeMovieSizeOnViewSize)\n overwrites it from the device resolution, so the HUD redirect sets it directly instead.",
+            "doc": " The movie render rectangle's width, from the engine's `MovieScaleInfo`. The movie is rendered\n into a `m_MovieScaleWidth` x `m_MovieScaleHeight` rectangle, centered within the viewport\n passed to [`SetMovieViewport`](UIManager::SetMovieViewport).\n [`ComputeMovieSizeOnViewSize`](UIManager::ComputeMovieSizeOnViewSize) recomputes it from the\n device resolution and the movie stage size.",
             "doc_links": [
               {
                 "text": "UIManager::SetMovieViewport",
@@ -18841,7 +18970,7 @@
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 51
+              "line": 66
             }
           },
           {
@@ -18866,7 +18995,7 @@
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 55
+              "line": 70
             }
           },
           {
@@ -18887,13 +19016,13 @@
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 61
+              "line": 76
             }
           },
           {
             "visibility": "public",
             "name": "m_RenderBuffer",
-            "doc": " The Scaleform render buffer the UI HAL renders into, set up by\n [`InitPlatformRT`](UIManager::InitPlatformRT). Pass it to [`RenderTargetData::UpdateData`] to\n rebind where the HUD renders.",
+            "doc": " The Scaleform render buffer the UI HAL renders into, set up by\n [`InitPlatformRT`](UIManager::InitPlatformRT). [`RenderTargetData::UpdateData`] rebinds which\n views it renders into.",
             "doc_links": [
               {
                 "text": "UIManager::InitPlatformRT",
@@ -18921,7 +19050,7 @@
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 61
+              "line": 76
             }
           },
           {
@@ -18942,13 +19071,13 @@
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 67
+              "line": 82
             }
           },
           {
             "visibility": "public",
             "name": "m_CachedStageWidth",
-            "doc": " The movie stage's authored width (`m_CachedStageSize.x`), refreshed every frame from the loaded\n movie. The world-to-screen mapping ([`Convert3DCoords`](UIManager::Convert3DCoords)) maps NDC\n into this. Read-only for the redirect.",
+            "doc": " The movie stage's authored width (`m_CachedStageSize.x`), refreshed every frame from the loaded\n movie. The world-to-screen mapping ([`Convert3DCoords`](UIManager::Convert3DCoords)) maps NDC\n into this.",
             "doc_links": [
               {
                 "text": "UIManager::Convert3DCoords",
@@ -18967,7 +19096,7 @@
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 67
+              "line": 82
             }
           },
           {
@@ -18992,7 +19121,7 @@
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 71
+              "line": 86
             }
           },
           {
@@ -19013,13 +19142,13 @@
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 78
+              "line": 92
             }
           },
           {
             "visibility": "public",
             "name": "m_CachedViewportWidth",
-            "doc": " The cached viewport width (`m_CachedViewportSize.x`), refreshed every frame from the graphics\n device's display resolution. [`ComputeSafeArea`](UIManager::ComputeSafeArea) reads it to expand\n the UI safe area to the viewport's aspect (the HUD's reflow mechanism), so the redirect\n overrides it to the render target's dimensions before recomputing the safe area.",
+            "doc": " The cached viewport width (`m_CachedViewportSize.x`), refreshed every frame from the graphics\n device's display resolution. [`ComputeSafeArea`](UIManager::ComputeSafeArea) reads it to expand\n the UI safe area to the viewport's aspect.",
             "doc_links": [
               {
                 "text": "UIManager::ComputeSafeArea",
@@ -19038,7 +19167,7 @@
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 78
+              "line": 92
             }
           },
           {
@@ -19063,7 +19192,53 @@
             "is_base": false,
             "source": {
               "file_index": 32,
-              "line": 82
+              "line": 96
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_CachedViewportRatio",
+            "doc": " The cached viewport aspect ratio (`m_CachedViewportSize.y / .x`, i.e. device height / width),\n refreshed every frame from the graphics device. [`Convert3DCoords`](UIManager::Convert3DCoords)\n uses it -- not the width/height fields -- to aspect-correct world-to-screen.",
+            "doc_links": [
+              {
+                "text": "UIManager::Convert3DCoords",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-Convert3DCoords"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 5280,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 32,
+              "line": 102
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_14a4",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 4
+            },
+            "offset": 5284,
+            "size": 4,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 32,
+              "line": 53
             }
           }
         ],
@@ -19112,7 +19287,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 91
+              "line": 111
             }
           },
           {
@@ -19140,13 +19315,13 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 97
+              "line": 117
             }
           },
           {
             "visibility": "public",
             "name": "ComputeMovieSizeOnViewSize",
-            "doc": " Recomputes the movie render rectangle ([`m_MovieScaleWidth`](UIManager::m_MovieScaleWidth) /\n [`m_MovieScaleHeight`](UIManager::m_MovieScaleHeight)). It first refreshes the cached stage and\n viewport sizes from the live device resolution (via an internal `UpdateCachedValues`), then\n sizes the movie rectangle from them -- so it always forces the device's aspect and cannot be\n steered by writing the cached fields beforehand. The HUD redirect therefore avoids it and sets\n the movie rectangle directly; it is used only by the restore path to return the rectangle to\n the engine-native device size.",
+            "doc": " Recomputes the movie render rectangle ([`m_MovieScaleWidth`](UIManager::m_MovieScaleWidth) /\n [`m_MovieScaleHeight`](UIManager::m_MovieScaleHeight)). It first refreshes the cached stage and\n viewport sizes from the live device resolution (via an internal `UpdateCachedValues`), then\n sizes the movie rectangle from them, so the rectangle always reflects the device aspect.",
             "doc_links": [
               {
                 "text": "UIManager::m_MovieScaleWidth",
@@ -19190,13 +19365,13 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 107
+              "line": 124
             }
           },
           {
             "visibility": "public",
             "name": "SetMovieViewport",
-            "doc": " Sets the Scaleform movie's viewport to `width` x `height`, centering the movie (of size\n [`m_MovieScaleWidth`](UIManager::m_MovieScaleWidth) x\n [`m_MovieScaleHeight`](UIManager::m_MovieScaleHeight)) within it at offset\n `((width - m_MovieScaleWidth) / 2, (height - m_MovieScaleHeight) / 2)`. This is the viewport the\n Scaleform HAL uses for rendering, so it must match the render target's dimensions; passing the\n movie rectangle's own dimensions yields a zero offset (the movie fills the target).",
+            "doc": " Sets the Scaleform movie's viewport to `width` x `height`, centering the movie (of size\n [`m_MovieScaleWidth`](UIManager::m_MovieScaleWidth) x\n [`m_MovieScaleHeight`](UIManager::m_MovieScaleHeight)) within it at offset\n `((width - m_MovieScaleWidth) / 2, (height - m_MovieScaleHeight) / 2)`. This is the viewport the\n Scaleform HAL renders into.",
             "doc_links": [
               {
                 "text": "UIManager::m_MovieScaleWidth",
@@ -19240,7 +19415,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 116
+              "line": 132
             }
           },
           {
@@ -19260,7 +19435,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 120
+              "line": 136
             }
           },
           {
@@ -19280,7 +19455,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 124
+              "line": 140
             }
           },
           {
@@ -19347,7 +19522,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 129
+              "line": 145
             }
           },
           {
@@ -19479,7 +19654,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 135
+              "line": 151
             }
           },
           {
@@ -19561,7 +19736,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 140
+              "line": 156
             }
           },
           {
@@ -19592,7 +19767,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 144
+              "line": 160
             }
           },
           {
@@ -19612,7 +19787,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 148
+              "line": 164
             }
           },
           {
@@ -19632,7 +19807,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 152
+              "line": 168
             }
           },
           {
@@ -19652,7 +19827,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 156
+              "line": 172
             }
           },
           {
@@ -19686,7 +19861,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 160
+              "line": 176
             }
           },
           {
@@ -19709,7 +19884,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 164
+              "line": 180
             }
           }
         ],
@@ -19722,7 +19897,7 @@
       },
       "source": {
         "file_index": 32,
-        "line": 43
+        "line": 59
       }
     },
     "void": {
@@ -21826,7 +22001,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 32,
-                "line": 169
+                "line": 185
               }
             }
           ],
