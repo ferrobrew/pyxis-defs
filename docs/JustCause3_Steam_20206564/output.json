@@ -7745,7 +7745,7 @@
       },
       "source": {
         "file_index": 17,
-        "line": 96
+        "line": 104
       }
     },
     "graphics_engine::graphics_engine::EffectInfo": {
@@ -8255,15 +8255,67 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 144
+              "size": 134
             },
             "offset": 4664,
-            "size": 144,
+            "size": 134,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 73
+              "line": 77
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_DrawScene",
+            "doc": " Whether [`HandleDrawThreadTask`](GraphicsEngine::HandleDrawThreadTask) renders the 3D scene\n this frame (GBuffer, world, post-effects) rather than only the UI. [`Draw`](GraphicsEngine::Draw)\n sets it from the game state and the UI's static-background grab: it is cleared while a\n full-screen UI with a static background is shown (pause / map / menus), in which case the draw\n thread clears the target to transparent instead of rendering the scene.",
+            "doc_links": [
+              {
+                "text": "GraphicsEngine::HandleDrawThreadTask",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-HandleDrawThreadTask"
+              },
+              {
+                "text": "GraphicsEngine::Draw",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-Draw"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 4798,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 17,
+              "line": 77
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_12bf",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 9
+            },
+            "offset": 4799,
+            "size": 9,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 17,
+              "line": 81
             }
           },
           {
@@ -8280,7 +8332,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 73
+              "line": 81
             }
           },
           {
@@ -8323,7 +8375,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 17,
-              "line": 99
+              "line": 107
             }
           },
           {
@@ -8351,7 +8403,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 17,
-              "line": 104
+              "line": 112
             }
           },
           {
@@ -8371,7 +8423,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 17,
-              "line": 108
+              "line": 116
             }
           },
           {
@@ -8391,7 +8443,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 17,
-              "line": 112
+              "line": 120
             }
           },
           {
@@ -8425,7 +8477,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 17,
-              "line": 116
+              "line": 124
             }
           },
           {
@@ -8472,7 +8524,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 17,
-              "line": 122
+              "line": 130
             }
           }
         ],
@@ -8515,7 +8567,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 131
+              "line": 139
             }
           },
           {
@@ -8536,7 +8588,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 132
+              "line": 140
             }
           },
           {
@@ -8553,7 +8605,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 133
+              "line": 141
             }
           },
           {
@@ -8570,7 +8622,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 134
+              "line": 142
             }
           },
           {
@@ -8587,7 +8639,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 135
+              "line": 143
             }
           },
           {
@@ -8604,7 +8656,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 136
+              "line": 144
             }
           },
           {
@@ -8621,7 +8673,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 137
+              "line": 145
             }
           },
           {
@@ -8638,7 +8690,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 138
+              "line": 146
             }
           },
           {
@@ -8655,7 +8707,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 139
+              "line": 147
             }
           },
           {
@@ -8676,7 +8728,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 142
+              "line": 150
             }
           },
           {
@@ -8693,7 +8745,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 142
+              "line": 150
             }
           },
           {
@@ -8710,7 +8762,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 143
+              "line": 151
             }
           },
           {
@@ -8727,7 +8779,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 144
+              "line": 152
             }
           },
           {
@@ -8748,7 +8800,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 147
+              "line": 155
             }
           },
           {
@@ -8765,7 +8817,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 147
+              "line": 155
             }
           },
           {
@@ -8782,7 +8834,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 148
+              "line": 156
             }
           },
           {
@@ -8799,7 +8851,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 149
+              "line": 157
             }
           },
           {
@@ -8820,7 +8872,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 129
+              "line": 137
             }
           }
         ],
@@ -8834,7 +8886,7 @@
       },
       "source": {
         "file_index": 17,
-        "line": 130
+        "line": 138
       }
     },
     "graphics_engine::graphics_engine::HContext_t": {
@@ -8857,7 +8909,7 @@
       },
       "source": {
         "file_index": 17,
-        "line": 78
+        "line": 86
       }
     },
     "graphics_engine::graphics_engine::HDevice_t": {
@@ -8880,7 +8932,7 @@
       },
       "source": {
         "file_index": 17,
-        "line": 81
+        "line": 89
       }
     },
     "graphics_engine::graphics_engine::HICON": {
@@ -8929,7 +8981,7 @@
       },
       "source": {
         "file_index": 17,
-        "line": 84
+        "line": 92
       }
     },
     "graphics_engine::graphics_engine::HTexture_t": {
@@ -8952,7 +9004,7 @@
       },
       "source": {
         "file_index": 17,
-        "line": 87
+        "line": 95
       }
     },
     "graphics_engine::graphics_engine::HWND": {
@@ -9009,7 +9061,7 @@
       },
       "source": {
         "file_index": 17,
-        "line": 92
+        "line": 100
       }
     },
     "graphics_engine::graphics_engine::RenderFrameCounters": {
@@ -9044,7 +9096,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 160
+              "line": 168
             }
           },
           {
@@ -9061,7 +9113,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 161
+              "line": 169
             }
           },
           {
@@ -9078,7 +9130,7 @@
             "is_base": false,
             "source": {
               "file_index": 17,
-              "line": 162
+              "line": 170
             }
           }
         ],
@@ -9092,7 +9144,7 @@
       },
       "source": {
         "file_index": 17,
-        "line": 159
+        "line": 167
       }
     },
     "graphics_engine::post_effects::AAMode": {
@@ -21338,7 +21390,7 @@
               "doc": null,
               "source": {
                 "file_index": 17,
-                "line": 153
+                "line": 161
               }
             },
             {
@@ -21352,7 +21404,7 @@
               "doc": null,
               "source": {
                 "file_index": 17,
-                "line": 166
+                "line": 174
               }
             }
           ],
@@ -21385,7 +21437,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 17,
-                "line": 127
+                "line": 135
               }
             }
           ],
