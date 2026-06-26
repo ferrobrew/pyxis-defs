@@ -68,6 +68,14 @@ pub type GraphicsEngine {
     #[address(0x1_230)]
     pub m_BackBufferLinear: *mut Texture,
 
+    /// Whether [`HandleDrawThreadTask`](GraphicsEngine::HandleDrawThreadTask) renders the 3D scene
+    /// this frame (GBuffer, world, post-effects) rather than only the UI. [`Draw`](GraphicsEngine::Draw)
+    /// sets it from the game state and the UI's static-background grab: it is cleared while a
+    /// full-screen UI with a static background is shown (pause / map / menus), in which case the draw
+    /// thread clears the target to transparent instead of rendering the scene.
+    #[address(0x1_2BE)]
+    pub m_DrawScene: bool,
+
     /// Index of the reflection-proxy slot picked this frame.
     #[address(0x1_2C8)]
     pub m_EffectInfoIndex: u32,
