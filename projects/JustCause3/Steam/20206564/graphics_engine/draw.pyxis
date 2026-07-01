@@ -1,4 +1,5 @@
 use graphics_engine::graphics_engine::HContext_t;
+use graphics_engine::graphics_engine::HDevice_t;
 
 /// The primitive topology passed to the draw wrappers. The patchlist variants are tessellation
 /// control-point counts.
@@ -87,3 +88,22 @@ pub fn GetRTVFromSurface(surface: *mut void) -> *mut void;
 /// Returns the surface's depth-stencil view.
 #[address(0x141_956_250)]
 pub fn GetDSVFromSurface(surface: *mut void) -> *mut void;
+
+// Shader creation.
+
+/// Parameters to [`CreateFragmentProgram`]: the compiled DXBC bytecode (`m_Code`) and its byte length
+/// (`m_Size`), passed straight through to `ID3D11Device::CreatePixelShader`. `m_Size` is read as a
+/// pointer-width value (the bytecode length argument to `CreatePixelShader`).
+pub type CreateFragmentProgramParams {
+    pub m_Code: *const u8,
+
+    #[address(0x8)]
+    pub m_Size: u64,
+}
+
+/// The leaf fragment-program creator: it wraps `ID3D11Device::CreatePixelShader` over
+/// `params.m_Code`/`params.m_Size`. `CreatePixelShader` copies the bytecode, so a hook may substitute a
+/// patched copy that only has to outlive the call. Static (no `this`); the first argument is the
+/// graphics device.
+#[address(0x141_953_470)]
+pub fn CreateFragmentProgram(device: *mut HDevice_t, params: *mut CreateFragmentProgramParams) -> *mut void;

@@ -1,0 +1,28 @@
+/// The light-propagation-volume solver: RSM inject + LPV propagation for the global-illumination pass.
+/// `CGISolver::Execute` refreshes one of the two LPV cascades each dispatch and toggles
+/// [`m_CascadeToUpdate`](GISolver::m_CascadeToUpdate) afterward, so the cascades are refreshed in
+/// alternation across frames.
+#[size(0x3E0)]
+pub type GISolver {
+    /// Selects which of the two LPV cascades is freshly injected + propagated this dispatch. Toggles
+    /// `0 <-> 1` once per `Execute` (i.e. once per `Draw`).
+    #[address(0x3D8)]
+    pub m_CascadeToUpdate: u32,
+}
+
+/// The global-illumination render pass (`RP_GLOBAL_ILLUMINATION`), owning the LPV [`GISolver`].
+#[min_size(0x8C8)]
+pub type GIPass {
+    /// The LPV solver the pass delegates its GI work to.
+    #[address(0x8C0)]
+    pub m_pGISolver: *mut GISolver,
+}
+
+/// The scene light manager, owning the global-illumination pass. The singleton address holds a pointer
+/// to the manager, which is null until the light system initializes.
+#[singleton(0x142_ED0_E70), min_size(0x1BE910)]
+pub type LightManager {
+    /// The global-illumination render pass.
+    #[address(0x1BE_908)]
+    pub m_GIPass: *mut GIPass,
+}

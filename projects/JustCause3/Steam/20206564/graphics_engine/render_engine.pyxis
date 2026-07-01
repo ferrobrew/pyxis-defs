@@ -179,6 +179,12 @@ pub type RenderEngine {
     /// this.
     #[address(0x80)]
     pub m_RenderPasses: [Vector<*mut RenderPass>; 157],
+
+    /// The per-Draw constant-buffer ring index (feeding `CalculateConstantBufferIndices`): each `Draw`
+    /// selects a constant-buffer pool slot from this and advances it, wrapping at the limit in the `u32`
+    /// immediately after. It advances independently of the engine frame counters.
+    #[address(0x1_6C0)]
+    pub m_ConstantBufferRingIndex: u32,
 }
 impl RenderEngine {
     /// The late render-pass step: finalizes and copies render targets under the context mutex.

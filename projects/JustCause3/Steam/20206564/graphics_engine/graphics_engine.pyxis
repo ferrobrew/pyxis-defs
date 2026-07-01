@@ -1,6 +1,6 @@
 use graphics_engine::device::Device;
 use graphics_engine::texture::Texture;
-use types::math::Matrix4;
+use types::math::{Matrix4, Vector4};
 
 #[size(8), align(8), rust_name = "windows::Win32::UI::WindowsAndMessaging::HICON", cpp_header = "<windows.h>", cpp_name = "::HICON"]
 extern type HICON;
@@ -33,6 +33,15 @@ pub type EffectInfo {
 pub type GraphicsEngine {
     #[address(0x18)]
     pub m_CPUFinishedDrawingEvent: u32,
+
+    /// Completion signal for the async draw-dispatch CPU fragment that
+    /// [`DispatchDraw`](GraphicsEngine::DispatchDraw) kicks to run the render passes. The fragment sets
+    /// it non-zero on completion; the engine waits on it (via
+    /// `cpu_fragment::CpuFragmentWaitUntilSignalIsNonZero`, gated by `CpuPrimaryCount() > 1`) only at the
+    /// *next* [`Draw`](GraphicsEngine::Draw)'s entry.
+    /// [`WaitForCPUDrawToFinish`](GraphicsEngine::WaitForCPUDrawToFinish) does *not* wait on it.
+    #[address(0x30)]
+    pub m_DrawThreadWorkSignal: u32,
 
     #[address(0x128)]
     pub m_ActiveCursor: ActiveCursor,
@@ -94,10 +103,42 @@ pub type HRenderSetup_t;
 /// A GPU texture handle.
 pub type HTexture_t;
 
+/// The cascaded sun-shadow constants for the forward-material resolve: the cascade transform plus the
+/// per-cascade box-test parameters, staged into cb0 by `RenderEngine::SetGlobalShaderConstants`.
+#[size(0x120), align(4)]
+pub type ShadowCascades {
+    /// Maps a camera-relative world position into cascade/texture space (row-major, row-vector; its
+    /// columns are `cb0[45..47]` in the GlobalConstants, the translation `cb0[48]`). The
+    /// forward-material shadow resolve evaluates `(worldPos - cameraPos) * M + translation`, with the
+    /// camera position from `cb0[4]`; `CShadowManager::UpdateCascade` bakes the transform relative to
+    /// the active camera's position.
+    pub m_Transform: Matrix4,
+    pub m_TextureSize: Vector4,
+    pub m_Params: Vector4,
+    /// Per-cascade scale + blend-band (`.w`), one per cascade.
+    pub m_ScaleBlend: [Vector4; 6],
+    /// Per-cascade offset + texture-array slice (`.w`), one per cascade.
+    pub m_OffsetRadius: [Vector4; 6],
+}
+
 /// The per-view render context the render passes read: the camera matrices (view, projection, the
 /// translation-free offset view-projection, and the separate camera world position), shadow data, and
 /// per-frame flags. Filled each dispatch by [`RenderPass::SetRenderContextCamera`].
-pub type RenderContext;
+#[min_size(0x778)]
+pub type RenderContext {
+    /// The 8 cascade shadow matrices -- an alternate center-relative shadow transform set some
+    /// terrain/deferred sun-shadow shaders sample instead of [`m_ShadowCascades`](RenderContext::m_ShadowCascades).
+    #[address(0x454)]
+    pub m_ShadowMatrices: [Matrix4; 8],
+
+    /// The forward-material cascaded sun-shadow transform + cascade box-test parameters.
+    #[address(0x654)]
+    pub m_ShadowCascades: ShadowCascades,
+
+    /// The number of active cascades this frame.
+    #[address(0x774)]
+    pub m_ActiveCascadeCount: u32,
+}
 
 /// The opaque parameter block passed to
 /// [`HandleDrawThreadTask`](GraphicsEngine::HandleDrawThreadTask).
@@ -128,6 +169,15 @@ impl GraphicsEngine {
     /// runs the per-frame texture-cache update under the context lock.
     #[address(0x140_0C4_6D0)]
     pub fn TextureCachePlatformUpdate(&mut self, ctx: *mut HContext_t, dt: f32);
+
+    /// Loads (or reloads) the named shader bundle and re-creates every shader holder from it, but only
+    /// if `name` differs from the currently-loaded bundle name (an `std::string` at `+0x1300`, its
+    /// length at `+0x1310`). Re-creating the holders routes every shader through
+    /// `Graphics::CreateFragmentProgram`. The bundle names are `"Shaders"` / `"ShadersLowShadows"`
+    /// (and the Intel `"ShadersConstMath*"` variants), selected by shadow quality in
+    /// `CSettingsManager::UpdateSettings`. `name` is a NUL-terminated C string.
+    #[address(0x140_0DE_9A0)]
+    pub fn LoadShaderBundle(&mut self, name: *const u8) -> bool;
 }
 
 /// The low-level present.
