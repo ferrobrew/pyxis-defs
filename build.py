@@ -31,6 +31,8 @@ def install_pyxis(
     print("Installing pyxis...")
     try:
         cmd = ["cargo", "install"]
+        # The pyxis repo contains multiple binary crates; install pyxis-driver
+        # specifically so cargo doesn't refuse with "multiple packages found".
         if path:
             cmd.extend(["--path", path])
             print(f"Installing pyxis from path: {path}")
@@ -45,6 +47,7 @@ def install_pyxis(
             elif rev:
                 cmd.extend(["--rev", rev])
                 print(f"Installing pyxis from revision: {rev}")
+        cmd.append("pyxis-driver")
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError as e:
         print(f"Error installing pyxis: {e}", file=sys.stderr)
