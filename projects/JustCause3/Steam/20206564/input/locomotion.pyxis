@@ -1,4 +1,5 @@
 use character::character::Character;
+use state::StateContext;
 
 pub type InstanceProperties;
 
@@ -11,4 +12,56 @@ impl NStateTask_InputLocoSetTargetDirTask {
     /// blackboard.
     #[address(0x140_81E_130)]
     pub fn SetupTargetDir(&mut self, character: *mut Character, props: *mut InstanceProperties) -> f64;
+}
+
+/// The locomotion move task active when the character is on foot and *not* holding an aim. Its
+/// [`Update`](NStateTask_InputLocoMoveTask::Update) reads [`Character::m_AimFlags`] and dispatches
+/// to run/steer versus strafe locomotion.
+pub type NStateTask_InputLocoMoveTask;
+impl NStateTask_InputLocoMoveTask {
+    /// The per-frame update. Reads the blackboard move direction and speed, then branches on
+    /// [`Character::m_AimFlags`] ([`m_AimingWeapon`](character::character::AimState::m_AimingWeapon) /
+    /// [`m_AimingGrapple`](character::character::AimState::m_AimingGrapple)): with neither set it queues
+    /// [`QueueMoveActions`](NStateTask_LocoUtil::QueueMoveActions) (run — the body steers toward the
+    /// movement vector), otherwise it queues the aim-relative (strafe) acts. This branch is the
+    /// concrete point where on-foot movement becomes third-person steer instead of FPS-style strafe.
+    #[address(0x140_812_5E0)]
+    pub fn Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
+}
+
+/// The locomotion move task active while the character is aim-relative (strafing). Mirrors
+/// [`NStateTask_InputLocoMoveTask`] but stays in the aim-relative acts as long as an aim bit is set.
+pub type NStateTask_InputLocoAimRelativeTask;
+impl NStateTask_InputLocoAimRelativeTask {
+    /// The per-frame update. Like [`NStateTask_InputLocoMoveTask::Update`] it re-reads
+    /// [`Character::m_AimFlags`] each frame and dispatches to the strafe or run acts, so dropping the
+    /// aim bits here falls back to run/steer.
+    #[address(0x140_836_500)]
+    pub fn Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
+}
+
+/// Free helpers that queue the concrete locomotion animation acts. The queued act encodes the
+/// movement style: [`QueueMoveActions`](NStateTask_LocoUtil::QueueMoveActions) steers the body
+/// toward the movement direction, while the aim-relative variants keep the body facing the aim and
+/// play directional strafe animations.
+pub type NStateTask_LocoUtil;
+impl NStateTask_LocoUtil {
+    /// Queues the run/steer acts (`ACT_MOVE_NO_AIM` and friends). The body turns to face the
+    /// movement direction, so directional input rotates the whole character — the third-person
+    /// on-foot behavior that reads as a "tank turn" in VR.
+    #[address(0x140_832_C00)]
+    pub fn QueueMoveActions(character: *mut Character) -> bool;
+
+    /// Queues the aim-relative (strafe) acts. It derives the facing reference from the weapon-aim
+    /// target when [`m_AimingWeapon`](character::character::AimState::m_AimingWeapon) is set (or the
+    /// grapple target for [`m_AimingGrapple`](character::character::AimState::m_AimingGrapple)),
+    /// and falls back to the character's own current forward when neither is set — so this alone
+    /// does not turn the body toward the camera without an aim reference.
+    #[address(0x140_832_6B0)]
+    pub fn QueueAimRelativeMoveActions(character: *mut Character) -> bool;
+
+    /// Queues the one-shot transition into the aim-relative (strafe) acts, played on the frame the
+    /// character starts aiming.
+    #[address(0x140_832_1A0)]
+    pub fn QueueTransitionToAimRelativeMoveActions(character: *mut Character) -> bool;
 }

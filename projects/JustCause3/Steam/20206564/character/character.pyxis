@@ -3,10 +3,28 @@ use types::math::Vector3;
 use types::vector_math::AlignedVector3;
 use types::vector_math::AlignedQuat;
 
+/// The character's aiming state, written each frame by
+/// [`HandleAimingInputPlayer`](Character::HandleAimingInputPlayer) for the player. The locomotion
+/// state machine reads it to choose aim-relative (strafe) movement over run/steer:
+/// `m_AimingWeapon` (or `m_AimingGrapple`) is the switch that makes the body face the aim direction
+/// and turns the directional keys into strafes. `m_WasAiming` reflects the state as of the start of
+/// this frame. Bits `0x01`/`0x02` and `0x40`/`0x80` are unmapped.
+#[copyable]
+pub bitflags AimState: u8 {
+    m_AimingEnabled = 0b0000_0100,
+    m_AimingWeapon = 0b0000_1000,
+    m_AimingGrapple = 0b0001_0000,
+    m_WasAiming = 0b0010_0000,
+}
+
 #[size(0x3540)]
 pub type Character {
     #[address(0x1_780)]
     pub m_AnimatedModel: AnimatedModel,
+
+    /// Packed aiming-state bit-flags; see [`AimState`].
+    #[address(0x2_0F1)]
+    pub m_AimFlags: AimState,
 
     #[address(0x2_62A)]
     pub m_IsLocalCharacter: bool,
@@ -14,6 +32,14 @@ pub type Character {
     #[address(0x2_7F0)]
     pub m_WorldMatrixT0: Matrix4,
     pub m_WorldMatrixT1: Matrix4,
+
+    /// The weapon-aim countdown timer, in seconds. It is refreshed while an aim input is held and
+    /// decremented by the frame delta otherwise; a positive value keeps
+    /// [`m_AimingWeapon`](AimState::m_AimingWeapon) set in [`m_AimFlags`](Character::m_AimFlags),
+    /// so the character stays in aim/strafe locomotion for a short tail after the aim button is
+    /// released.
+    #[address(0x2_A00)]
+    pub m_AimTimer: f32,
 }
 impl Character {
     #[address(0x140_7D5_B00)]
@@ -31,6 +57,26 @@ impl Character {
     /// The per-frame update of the character's attached prop visual effects.
     #[address(0x140_7C2_380)]
     pub fn UpdatePropEffects(&mut self, dt: f32);
+
+    /// The per-frame player aiming-input update. Resolves whether the player is aiming a weapon or
+    /// grapple from the equipped weapon and [`m_AimTimer`](Character::m_AimTimer), then writes the
+    /// result into [`m_AimFlags`](Character::m_AimFlags)
+    /// ([`m_AimingWeapon`](AimState::m_AimingWeapon) / [`m_AimingGrapple`](AimState::m_AimingGrapple)).
+    /// The locomotion tasks read those flags to select aim-relative (strafe) movement. NPCs use a
+    /// separate `HandleAimingInputNPC`; this variant is player-only and is the single point that
+    /// decides the on-foot aim/strafe state.
+    #[address(0x140_7F0_530)]
+    pub fn HandleAimingInputPlayer(&mut self, dt: f32);
+
+    /// Whether the character is currently permitted to aim a weapon (an aimable weapon is equipped
+    /// and the character state allows it). Gates the aim path in the locomotion tasks.
+    #[address(0x140_7F2_B90)]
+    pub fn IsAimingWeaponPossible(&self) -> bool;
+
+    /// Whether the character is the local player. Used by the locomotion queue helpers to restrict
+    /// the aim-relative movement path to the player.
+    #[address(0x140_75F_A60)]
+    pub fn IsPlayer(&self) -> bool;
 }
 
 #[size(0x240)]
