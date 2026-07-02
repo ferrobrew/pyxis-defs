@@ -3959,7 +3959,56 @@
             }
           }
         ],
-        "associated_functions": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "TryAct",
+            "doc": " Tests whether the animation state machine would accept the act from its current state,\n without queuing it. `CCharacter`'s vtable slot 37 forwards to this on\n [`Character::m_AnimatedModel`]; the game's own act dispatchers call it before\n [`Character::QueueAct`] to pick a supported act.",
+            "doc_links": [
+              {
+                "text": "Character::m_AnimatedModel",
+                "target_kind": "item",
+                "path": "character::character::Character",
+                "anchor": "field-m_AnimatedModel"
+              },
+              {
+                "text": "Character::QueueAct",
+                "target_kind": "item",
+                "path": "character::character::Character",
+                "anchor": "func-QueueAct"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5373636096
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "act",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "u32"
+                  }
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 12,
+              "line": 99
+            }
+          }
+        ],
         "vftable": null,
         "singleton": null,
         "copyable": false,
@@ -4012,7 +4061,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 12,
-              "line": 97
+              "line": 105
             }
           },
           {
@@ -4051,7 +4100,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 12,
-              "line": 100
+              "line": 108
             }
           },
           {
@@ -4090,7 +4139,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 12,
-              "line": 103
+              "line": 111
             }
           },
           {
@@ -4129,7 +4178,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 12,
-              "line": 106
+              "line": 114
             }
           }
         ],
@@ -4143,7 +4192,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 94
+        "line": 102
       }
     },
     "character::character::Character": {
@@ -4733,7 +4782,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 111
+              "line": 119
             }
           },
           {
@@ -4750,7 +4799,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 112
+              "line": 120
             }
           },
           {
@@ -4767,7 +4816,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 113
+              "line": 121
             }
           }
         ],
@@ -4782,7 +4831,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 110
+        "line": 118
       }
     },
     "character::character::SafeBoneIndex": {
@@ -4805,7 +4854,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 125
+              "line": 133
             }
           },
           {
@@ -4814,7 +4863,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 126
+              "line": 134
             }
           },
           {
@@ -4823,7 +4872,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 127
+              "line": 135
             }
           },
           {
@@ -4832,7 +4881,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 128
+              "line": 136
             }
           },
           {
@@ -4841,7 +4890,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 129
+              "line": 137
             }
           },
           {
@@ -4850,7 +4899,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 130
+              "line": 138
             }
           },
           {
@@ -4859,7 +4908,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 131
+              "line": 139
             }
           },
           {
@@ -4868,7 +4917,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 132
+              "line": 140
             }
           },
           {
@@ -4877,7 +4926,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 133
+              "line": 141
             }
           },
           {
@@ -4886,7 +4935,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 134
+              "line": 142
             }
           },
           {
@@ -4895,7 +4944,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 135
+              "line": 143
             }
           },
           {
@@ -4904,7 +4953,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 136
+              "line": 144
             }
           },
           {
@@ -4913,7 +4962,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 137
+              "line": 145
             }
           },
           {
@@ -4922,7 +4971,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 138
+              "line": 146
             }
           },
           {
@@ -4931,7 +4980,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 139
+              "line": 147
             }
           },
           {
@@ -4940,7 +4989,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 140
+              "line": 148
             }
           },
           {
@@ -4949,7 +4998,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 141
+              "line": 149
             }
           },
           {
@@ -4958,7 +5007,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 142
+              "line": 150
             }
           },
           {
@@ -4967,7 +5016,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 143
+              "line": 151
             }
           },
           {
@@ -4976,7 +5025,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 144
+              "line": 152
             }
           },
           {
@@ -4985,7 +5034,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 145
+              "line": 153
             }
           },
           {
@@ -4994,7 +5043,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 146
+              "line": 154
             }
           },
           {
@@ -5003,7 +5052,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 147
+              "line": 155
             }
           },
           {
@@ -5012,7 +5061,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 148
+              "line": 156
             }
           },
           {
@@ -5021,7 +5070,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 149
+              "line": 157
             }
           },
           {
@@ -5030,7 +5079,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 150
+              "line": 158
             }
           },
           {
@@ -5039,7 +5088,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 151
+              "line": 159
             }
           },
           {
@@ -5048,7 +5097,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 152
+              "line": 160
             }
           },
           {
@@ -5057,7 +5106,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 153
+              "line": 161
             }
           },
           {
@@ -5066,7 +5115,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 154
+              "line": 162
             }
           },
           {
@@ -5075,7 +5124,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 155
+              "line": 163
             }
           },
           {
@@ -5084,7 +5133,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 156
+              "line": 164
             }
           },
           {
@@ -5093,7 +5142,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 157
+              "line": 165
             }
           },
           {
@@ -5102,7 +5151,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 158
+              "line": 166
             }
           },
           {
@@ -5111,7 +5160,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 159
+              "line": 167
             }
           },
           {
@@ -5120,7 +5169,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 160
+              "line": 168
             }
           },
           {
@@ -5129,7 +5178,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 161
+              "line": 169
             }
           },
           {
@@ -5138,7 +5187,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 162
+              "line": 170
             }
           },
           {
@@ -5147,7 +5196,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 163
+              "line": 171
             }
           },
           {
@@ -5156,7 +5205,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 164
+              "line": 172
             }
           },
           {
@@ -5165,7 +5214,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 165
+              "line": 173
             }
           },
           {
@@ -5174,7 +5223,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 166
+              "line": 174
             }
           },
           {
@@ -5183,7 +5232,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 167
+              "line": 175
             }
           },
           {
@@ -5192,7 +5241,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 168
+              "line": 176
             }
           },
           {
@@ -5201,7 +5250,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 169
+              "line": 177
             }
           },
           {
@@ -5210,7 +5259,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 170
+              "line": 178
             }
           },
           {
@@ -5219,7 +5268,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 171
+              "line": 179
             }
           },
           {
@@ -5228,7 +5277,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 172
+              "line": 180
             }
           },
           {
@@ -5237,7 +5286,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 173
+              "line": 181
             }
           },
           {
@@ -5246,7 +5295,7 @@
             "doc": null,
             "source": {
               "file_index": 12,
-              "line": 174
+              "line": 182
             }
           }
         ],
@@ -5259,7 +5308,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 124
+        "line": 132
       }
     },
     "clock::Clock": {
@@ -19551,6 +19600,30 @@
         "line": 4
       }
     },
+    "input::locomotion::CharacterMovementSettings": {
+      "path": "input::locomotion::CharacterMovementSettings",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " `SCharacterMovementSettings`: the per-character movement tuning block. Only passed through\n opaquely so far; its first float is the walk/run speed threshold the start-act selection\n compares against.",
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 31,
+        "line": 11
+      }
+    },
     "input::locomotion::InstanceProperties": {
       "path": "input::locomotion::InstanceProperties",
       "visibility": "public",
@@ -19654,7 +19727,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 47
+              "line": 52
             }
           }
         ],
@@ -19668,7 +19741,7 @@
       },
       "source": {
         "file_index": 31,
-        "line": 41
+        "line": 46
       }
     },
     "input::locomotion::NStateTask_InputLocoMoveTask": {
@@ -19769,7 +19842,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 36
+              "line": 41
             }
           }
         ],
@@ -19783,7 +19856,7 @@
       },
       "source": {
         "file_index": 31,
-        "line": 27
+        "line": 32
       }
     },
     "input::locomotion::NStateTask_InputLocoSetTargetDirTask": {
@@ -19839,7 +19912,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 21
+              "line": 26
             }
           }
         ],
@@ -19853,7 +19926,7 @@
       },
       "source": {
         "file_index": 31,
-        "line": 12
+        "line": 17
       }
     },
     "input::locomotion::NStateTask_LocoUtil": {
@@ -19903,7 +19976,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 60
+              "line": 65
             }
           },
           {
@@ -19948,7 +20021,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 68
+              "line": 73
             }
           },
           {
@@ -19979,7 +20052,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 73
+              "line": 78
             }
           },
           {
@@ -20072,7 +20145,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 86
+              "line": 91
             }
           },
           {
@@ -20157,7 +20230,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 93
+              "line": 98
             }
           },
           {
@@ -20264,13 +20337,13 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 103
+              "line": 108
             }
           },
           {
             "visibility": "public",
             "name": "EvaluateCharacterSpeed",
-            "doc": " Computes this frame's movement speed for the character (from the movement settings and the\n blackboard speed value, not the animation), multiplied onto the normalized displacement\n direction by the movement task.",
+            "doc": " Computes this frame's movement speed for the character: the magnitude of the animation\n control's raw root velocity -- so the speed envelope, including the ramp-up through the\n start acts, comes from the animation clips themselves. With `use_blackboard_override` set,\n the blackboard float id `1707123197` replaces the result when present. Multiplied onto the\n normalized displacement direction by the movement task.",
             "body": {
               "type": "address",
               "address": 5377207056
@@ -20289,7 +20362,7 @@
               },
               {
                 "type": "field",
-                "name": "p2",
+                "name": "use_blackboard_override",
                 "type_ref": {
                   "type": "raw",
                   "path": "bool"
@@ -20303,7 +20376,57 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 109
+              "line": 116
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "QueueStarts",
+            "doc": " Queues the directional run-start (wind-up) acts: measures the XZ angle from the body\n forward to the blackboard move direction, writes the residual angle correction, and queues\n the matching start act (forward/left/right/180, with stunt variants), choosing the\n walk-versus-run flavor by comparing `speed` against the settings' threshold. The start\n clips' root velocity ramping from zero is the on-foot acceleration.",
+            "body": {
+              "type": "address",
+              "address": 5377212160
+            },
+            "arguments": [
+              {
+                "type": "field",
+                "name": "character",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "character::character::Character"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "settings",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "input::locomotion::CharacterMovementSettings"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "speed",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "f32"
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 31,
+              "line": 124
             }
           },
           {
@@ -20334,7 +20457,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 114
+              "line": 129
             }
           },
           {
@@ -20373,7 +20496,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 119
+              "line": 134
             }
           }
         ],
@@ -20387,7 +20510,7 @@
       },
       "source": {
         "file_index": 31,
-        "line": 54
+        "line": 59
       }
     },
     "input::locomotion::NStateTask_MovementLocomotionTask": {
@@ -20456,7 +20579,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 130
+              "line": 145
             }
           }
         ],
@@ -20470,7 +20593,7 @@
       },
       "source": {
         "file_index": 31,
-        "line": 126
+        "line": 141
       }
     },
     "state::StateContext": {
@@ -21348,64 +21471,30 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": " A node in the display tree returned by `Movie::GetDisplayObjectsTree`. Inherits from\n `Scaleform::RefCountImpl` (vtable + refcount) and embeds a `Scaleform::String` for the name\n and a `Scaleform::ArrayDataBase<Ptr<AmpMovieObjectDesc>>` for children.\n\n Layout verified from `GetChildDescTree` at `0x141_A30_410`.",
+        "doc": " A node in the display tree returned by `Movie::GetDisplayObjectsTree`. Inherits from\n [`RefCountImpl`] and embeds a `Scaleform::String` for the name and a\n `Scaleform::ArrayDataBase<Ptr<AmpMovieObjectDesc>>` for children.\n\n Layout verified from `GetChildDescTree` at `0x141_A30_410`.",
+        "doc_links": [
+          {
+            "text": "RefCountImpl",
+            "target_kind": "item",
+            "path": "ui::scaleform::RefCountImpl"
+          }
+        ],
         "fields": [
           {
             "visibility": "public",
-            "name": "vtable",
-            "doc": " `RefCountImpl` vtable pointer.",
-            "type_ref": {
-              "type": "mut_pointer",
-              "inner": {
-                "type": "raw",
-                "path": "void"
-              }
-            },
-            "offset": 0,
-            "size": 8,
-            "alignment": 8,
-            "is_base": false,
-            "source": {
-              "file_index": 36,
-              "line": 57
-            }
-          },
-          {
-            "visibility": "public",
-            "name": "ref_count",
-            "doc": " Reference count (inherited from `RefCountImpl`).",
-            "type_ref": {
-              "type": "raw",
-              "path": "u32"
-            },
-            "offset": 8,
-            "size": 4,
-            "alignment": 4,
-            "is_base": false,
-            "source": {
-              "file_index": 36,
-              "line": 61
-            }
-          },
-          {
-            "visibility": "private",
-            "name": "_field_c",
+            "name": "ref_count_impl",
             "doc": null,
             "type_ref": {
-              "type": "array",
-              "inner": {
-                "type": "raw",
-                "path": "u8"
-              },
-              "size": 4
+              "type": "raw",
+              "path": "ui::scaleform::RefCountImpl"
             },
-            "offset": 12,
-            "size": 4,
-            "alignment": 1,
-            "is_base": false,
+            "offset": 0,
+            "size": 16,
+            "alignment": 8,
+            "is_base": true,
             "source": {
               "file_index": 36,
-              "line": 66
+              "line": 67
             }
           },
           {
@@ -21425,7 +21514,7 @@
             "is_base": false,
             "source": {
               "file_index": 36,
-              "line": 66
+              "line": 72
             }
           },
           {
@@ -21448,7 +21537,7 @@
             "is_base": false,
             "source": {
               "file_index": 36,
-              "line": 71
+              "line": 77
             }
           },
           {
@@ -21473,7 +21562,7 @@
             "is_base": false,
             "source": {
               "file_index": 36,
-              "line": 75
+              "line": 81
             }
           },
           {
@@ -21498,12 +21587,86 @@
             "is_base": false,
             "source": {
               "file_index": 36,
-              "line": 79
+              "line": 85
             }
           }
         ],
-        "associated_functions": [],
-        "vftable": null,
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "AddRef",
+            "doc": " Increments the reference count atomically.",
+            "body": {
+              "type": "field",
+              "field": "ref_count_impl",
+              "function_name": "AddRef"
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 36,
+              "line": 18
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "Release",
+            "doc": " Decrements the reference count atomically. When it reaches zero, calls the virtual\n destructor (vtable slot 0).",
+            "body": {
+              "type": "field",
+              "field": "ref_count_impl",
+              "function_name": "Release"
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 36,
+              "line": 23
+            }
+          }
+        ],
+        "vftable": {
+          "functions": [
+            {
+              "visibility": "public",
+              "name": "destructor",
+              "doc": " Virtual destructor, slot 0. Called by `Release` when the refcount reaches zero.",
+              "body": {
+                "type": "vftable",
+                "function_name": "destructor"
+              },
+              "arguments": [
+                {
+                  "type": "mut_self"
+                },
+                {
+                  "type": "field",
+                  "name": "flags",
+                  "type_ref": {
+                    "type": "raw",
+                    "path": "u32"
+                  }
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system",
+              "source": {
+                "file_index": 36,
+                "line": 8
+              }
+            }
+          ]
+        },
         "singleton": null,
         "copyable": false,
         "cloneable": false,
@@ -21513,68 +21676,45 @@
       },
       "source": {
         "file_index": 36,
-        "line": 54
+        "line": 65
       }
     },
     "ui::scaleform::Movie": {
       "path": "ui::scaleform::Movie",
       "visibility": "public",
-      "size": 0,
+      "size": 8,
       "alignment": 8,
       "category": "defined",
       "kind": {
         "type": "type",
         "doc": " Scaleform `GFx::Movie` -- the public interface backed by `MovieRoot` (AS3). The vtable is\n `MovieRoot`'s at `0x142_621_780`.",
-        "fields": [],
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "vftable",
+            "doc": null,
+            "type_ref": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "ui::scaleform::MovieVftable"
+              }
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 29
+            }
+          }
+        ],
         "associated_functions": [
           {
             "visibility": "public",
-            "name": "GetDisplayObjectsTree",
-            "doc": " Recursively walks the runtime display tree starting from the root movie clip. Returns a\n tree of [`AmpMovieObjectDesc`] nodes, each carrying the clip's instance name (or\n `\"Unnamed\"`) and a child array. Calls `DisplayObject::GetName` on every child and\n recurses into containers.\n\n The `heap` parameter is a Scaleform `MemoryHeap*` used for allocations.\n\n Vtable slot 9 (offset `0x48`). Address: `0x141_BED_530`.",
-            "doc_links": [
-              {
-                "text": "AmpMovieObjectDesc",
-                "target_kind": "item",
-                "path": "ui::scaleform::AmpMovieObjectDesc"
-              }
-            ],
-            "body": {
-              "type": "address",
-              "address": 5397992752
-            },
-            "arguments": [
-              {
-                "type": "const_self"
-              },
-              {
-                "type": "field",
-                "name": "heap",
-                "type_ref": {
-                  "type": "mut_pointer",
-                  "inner": {
-                    "type": "raw",
-                    "path": "void"
-                  }
-                }
-              }
-            ],
-            "return_type": {
-              "type": "mut_pointer",
-              "inner": {
-                "type": "raw",
-                "path": "ui::scaleform::AmpMovieObjectDesc"
-              }
-            },
-            "calling_convention": "system",
-            "source": {
-              "file_index": 36,
-              "line": 15
-            }
-          },
-          {
-            "visibility": "public",
             "name": "SetVariable",
-            "doc": " Sets an AS3 variable by clip path. The path is a dot-separated string like\n `\"root.MCI_hud.MCI_poi_stage._visible\"`. The value is a `GFx::Value` (a tagged union for\n bool/int/float/string/object). `SetVarType` controls search scope (0 = full path).\n\n Address: `0x141_C47_FA0`.",
+            "doc": " Sets an AS3 variable by clip path. The path is a dot-separated string like\n `\"root.MCI_hud.MCI_poi_stage._visible\"`. The value is a `GFx::Value` (a tagged union for\n bool/int/float/string/object). `SetVarType` controls search scope (0 = full path).",
             "body": {
               "type": "address",
               "address": 5398364064
@@ -21621,13 +21761,13 @@
             "calling_convention": "system",
             "source": {
               "file_index": 36,
-              "line": 23
+              "line": 44
             }
           },
           {
             "visibility": "public",
             "name": "GetVariable",
-            "doc": " Reads an AS3 variable by clip path into a `GFx::Value`. Returns false if the path is not\n found.\n\n Address: `0x141_C47_DF0`.",
+            "doc": " Reads an AS3 variable by clip path into a `GFx::Value`. Returns false if the path is not\n found.",
             "body": {
               "type": "address",
               "address": 5398363632
@@ -21666,16 +21806,16 @@
             "calling_convention": "system",
             "source": {
               "file_index": 36,
-              "line": 30
+              "line": 49
             }
           },
           {
             "visibility": "public",
             "name": "Invoke",
-            "doc": " Invokes an AS3 method on the movie's root timeline by name. This is the call path used by\n the engine's `CUIBase::Invoke`. The `args` are a `GFx::Value` array; `result` receives\n the return value (or null).\n\n Address: `0x141_C4_920`.",
+            "doc": " Invokes an AS3 method on the movie's root timeline by name. This is the call path used by\n the engine's `CUIBase::Invoke`. The `args` are a `GFx::Value` array; `result` receives the\n return value (or null). Note the parameter order: `result` comes *before* `args`, unlike\n the engine's `CUIBase::Invoke` wrapper (which also adds a timeout).",
             "body": {
               "type": "address",
-              "address": 337398048
+              "address": 5398371536
             },
             "arguments": [
               {
@@ -21689,6 +21829,17 @@
                   "inner": {
                     "type": "raw",
                     "path": "u8"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "result",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "void"
                   }
                 }
               },
@@ -21710,25 +21861,6 @@
                   "type": "raw",
                   "path": "u32"
                 }
-              },
-              {
-                "type": "field",
-                "name": "result",
-                "type_ref": {
-                  "type": "mut_pointer",
-                  "inner": {
-                    "type": "raw",
-                    "path": "void"
-                  }
-                }
-              },
-              {
-                "type": "field",
-                "name": "timeout",
-                "type_ref": {
-                  "type": "raw",
-                  "path": "f32"
-                }
               }
             ],
             "return_type": {
@@ -21738,10 +21870,585 @@
             "calling_convention": "system",
             "source": {
               "file_index": 36,
-              "line": 38
+              "line": 56
             }
           }
         ],
+        "vftable": {
+          "functions": [
+            {
+              "visibility": "private",
+              "name": "_vfunc_0",
+              "doc": null,
+              "body": {
+                "type": "vftable",
+                "function_name": "_vfunc_0"
+              },
+              "arguments": [
+                {
+                  "type": "mut_self"
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system",
+              "source": {
+                "file_index": 36,
+                "line": 29
+              }
+            },
+            {
+              "visibility": "private",
+              "name": "_vfunc_1",
+              "doc": null,
+              "body": {
+                "type": "vftable",
+                "function_name": "_vfunc_1"
+              },
+              "arguments": [
+                {
+                  "type": "mut_self"
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system",
+              "source": {
+                "file_index": 36,
+                "line": 29
+              }
+            },
+            {
+              "visibility": "private",
+              "name": "_vfunc_2",
+              "doc": null,
+              "body": {
+                "type": "vftable",
+                "function_name": "_vfunc_2"
+              },
+              "arguments": [
+                {
+                  "type": "mut_self"
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system",
+              "source": {
+                "file_index": 36,
+                "line": 29
+              }
+            },
+            {
+              "visibility": "private",
+              "name": "_vfunc_3",
+              "doc": null,
+              "body": {
+                "type": "vftable",
+                "function_name": "_vfunc_3"
+              },
+              "arguments": [
+                {
+                  "type": "mut_self"
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system",
+              "source": {
+                "file_index": 36,
+                "line": 29
+              }
+            },
+            {
+              "visibility": "private",
+              "name": "_vfunc_4",
+              "doc": null,
+              "body": {
+                "type": "vftable",
+                "function_name": "_vfunc_4"
+              },
+              "arguments": [
+                {
+                  "type": "mut_self"
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system",
+              "source": {
+                "file_index": 36,
+                "line": 29
+              }
+            },
+            {
+              "visibility": "private",
+              "name": "_vfunc_5",
+              "doc": null,
+              "body": {
+                "type": "vftable",
+                "function_name": "_vfunc_5"
+              },
+              "arguments": [
+                {
+                  "type": "mut_self"
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system",
+              "source": {
+                "file_index": 36,
+                "line": 29
+              }
+            },
+            {
+              "visibility": "private",
+              "name": "_vfunc_6",
+              "doc": null,
+              "body": {
+                "type": "vftable",
+                "function_name": "_vfunc_6"
+              },
+              "arguments": [
+                {
+                  "type": "mut_self"
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system",
+              "source": {
+                "file_index": 36,
+                "line": 29
+              }
+            },
+            {
+              "visibility": "private",
+              "name": "_vfunc_7",
+              "doc": null,
+              "body": {
+                "type": "vftable",
+                "function_name": "_vfunc_7"
+              },
+              "arguments": [
+                {
+                  "type": "mut_self"
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system",
+              "source": {
+                "file_index": 36,
+                "line": 29
+              }
+            },
+            {
+              "visibility": "private",
+              "name": "_vfunc_8",
+              "doc": null,
+              "body": {
+                "type": "vftable",
+                "function_name": "_vfunc_8"
+              },
+              "arguments": [
+                {
+                  "type": "mut_self"
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system",
+              "source": {
+                "file_index": 36,
+                "line": 29
+              }
+            },
+            {
+              "visibility": "public",
+              "name": "GetDisplayObjectsTree",
+              "doc": " Recursively walks the runtime display tree from the root movie clip: returns a tree of\n [`AmpMovieObjectDesc`] nodes, each carrying the clip's instance name (or `\"Unnamed\"`)\n and a child array, calling `DisplayObject::GetName` on every child and recursing into\n containers. `heap` is the Scaleform `MemoryHeap*` used for the allocations. Slot 9\n (offset `0x48`); the implementation is at `0x141_BED_530`.",
+              "doc_links": [
+                {
+                  "text": "AmpMovieObjectDesc",
+                  "target_kind": "item",
+                  "path": "ui::scaleform::AmpMovieObjectDesc"
+                }
+              ],
+              "body": {
+                "type": "vftable",
+                "function_name": "GetDisplayObjectsTree"
+              },
+              "arguments": [
+                {
+                  "type": "const_self"
+                },
+                {
+                  "type": "field",
+                  "name": "heap",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "void"
+                    }
+                  }
+                }
+              ],
+              "return_type": {
+                "type": "mut_pointer",
+                "inner": {
+                  "type": "raw",
+                  "path": "ui::scaleform::AmpMovieObjectDesc"
+                }
+              },
+              "calling_convention": "system",
+              "source": {
+                "file_index": 36,
+                "line": 36
+              }
+            }
+          ]
+        },
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 36,
+        "line": 28
+      }
+    },
+    "ui::scaleform::MovieVftable": {
+      "path": "ui::scaleform::MovieVftable",
+      "visibility": "public",
+      "size": 80,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_vfunc_0",
+            "doc": null,
+            "type_ref": {
+              "type": "function",
+              "calling_convention": "system",
+              "arguments": [
+                {
+                  "name": "this",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "ui::scaleform::Movie"
+                    }
+                  }
+                }
+              ],
+              "return_type": null
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 29
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_vfunc_1",
+            "doc": null,
+            "type_ref": {
+              "type": "function",
+              "calling_convention": "system",
+              "arguments": [
+                {
+                  "name": "this",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "ui::scaleform::Movie"
+                    }
+                  }
+                }
+              ],
+              "return_type": null
+            },
+            "offset": 8,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 29
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_vfunc_2",
+            "doc": null,
+            "type_ref": {
+              "type": "function",
+              "calling_convention": "system",
+              "arguments": [
+                {
+                  "name": "this",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "ui::scaleform::Movie"
+                    }
+                  }
+                }
+              ],
+              "return_type": null
+            },
+            "offset": 16,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 29
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_vfunc_3",
+            "doc": null,
+            "type_ref": {
+              "type": "function",
+              "calling_convention": "system",
+              "arguments": [
+                {
+                  "name": "this",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "ui::scaleform::Movie"
+                    }
+                  }
+                }
+              ],
+              "return_type": null
+            },
+            "offset": 24,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 29
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_vfunc_4",
+            "doc": null,
+            "type_ref": {
+              "type": "function",
+              "calling_convention": "system",
+              "arguments": [
+                {
+                  "name": "this",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "ui::scaleform::Movie"
+                    }
+                  }
+                }
+              ],
+              "return_type": null
+            },
+            "offset": 32,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 29
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_vfunc_5",
+            "doc": null,
+            "type_ref": {
+              "type": "function",
+              "calling_convention": "system",
+              "arguments": [
+                {
+                  "name": "this",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "ui::scaleform::Movie"
+                    }
+                  }
+                }
+              ],
+              "return_type": null
+            },
+            "offset": 40,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 29
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_vfunc_6",
+            "doc": null,
+            "type_ref": {
+              "type": "function",
+              "calling_convention": "system",
+              "arguments": [
+                {
+                  "name": "this",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "ui::scaleform::Movie"
+                    }
+                  }
+                }
+              ],
+              "return_type": null
+            },
+            "offset": 48,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 29
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_vfunc_7",
+            "doc": null,
+            "type_ref": {
+              "type": "function",
+              "calling_convention": "system",
+              "arguments": [
+                {
+                  "name": "this",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "ui::scaleform::Movie"
+                    }
+                  }
+                }
+              ],
+              "return_type": null
+            },
+            "offset": 56,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 29
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_vfunc_8",
+            "doc": null,
+            "type_ref": {
+              "type": "function",
+              "calling_convention": "system",
+              "arguments": [
+                {
+                  "name": "this",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "ui::scaleform::Movie"
+                    }
+                  }
+                }
+              ],
+              "return_type": null
+            },
+            "offset": 64,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 29
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "GetDisplayObjectsTree",
+            "doc": " Recursively walks the runtime display tree from the root movie clip: returns a tree of\n [`AmpMovieObjectDesc`] nodes, each carrying the clip's instance name (or `\"Unnamed\"`)\n and a child array, calling `DisplayObject::GetName` on every child and recursing into\n containers. `heap` is the Scaleform `MemoryHeap*` used for the allocations. Slot 9\n (offset `0x48`); the implementation is at `0x141_BED_530`.",
+            "doc_links": [
+              {
+                "text": "AmpMovieObjectDesc",
+                "target_kind": "item",
+                "path": "ui::scaleform::AmpMovieObjectDesc"
+              }
+            ],
+            "type_ref": {
+              "type": "function",
+              "calling_convention": "system",
+              "arguments": [
+                {
+                  "name": "this",
+                  "type_ref": {
+                    "type": "const_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "ui::scaleform::Movie"
+                    }
+                  }
+                },
+                {
+                  "name": "heap",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "void"
+                    }
+                  }
+                }
+              ],
+              "return_type": {
+                "type": "mut_pointer",
+                "inner": {
+                  "type": "raw",
+                  "path": "ui::scaleform::AmpMovieObjectDesc"
+                }
+              }
+            },
+            "offset": 72,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 36
+            }
+          }
+        ],
+        "associated_functions": [],
         "vftable": null,
         "singleton": null,
         "copyable": false,
@@ -21752,7 +22459,224 @@
       },
       "source": {
         "file_index": 36,
-        "line": 3
+        "line": 29
+      }
+    },
+    "ui::scaleform::RefCountImpl": {
+      "path": "ui::scaleform::RefCountImpl",
+      "visibility": "public",
+      "size": 16,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " Scaleform `RefCountImpl` -- the base class for reference-counted Scaleform objects. Provides\n a vtable pointer at +0 and an atomic refcount at +8. `AddRef`/`Release` are non-virtual;\n the vtable's slot 0 is the destructor, called when the refcount reaches zero.",
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "vftable",
+            "doc": null,
+            "type_ref": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "ui::scaleform::RefCountImplVftable"
+              }
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 8
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "ref_count",
+            "doc": " Atomic reference count. Incremented by `AddRef`, decremented by `Release`.",
+            "type_ref": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "offset": 8,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 13
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_c",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 4
+            },
+            "offset": 12,
+            "size": 4,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 1
+            }
+          }
+        ],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "AddRef",
+            "doc": " Increments the reference count atomically.",
+            "body": {
+              "type": "address",
+              "address": 5395547184
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 36,
+              "line": 18
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "Release",
+            "doc": " Decrements the reference count atomically. When it reaches zero, calls the virtual\n destructor (vtable slot 0).",
+            "body": {
+              "type": "address",
+              "address": 5395547200
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 36,
+              "line": 23
+            }
+          }
+        ],
+        "vftable": {
+          "functions": [
+            {
+              "visibility": "public",
+              "name": "destructor",
+              "doc": " Virtual destructor, slot 0. Called by `Release` when the refcount reaches zero.",
+              "body": {
+                "type": "vftable",
+                "function_name": "destructor"
+              },
+              "arguments": [
+                {
+                  "type": "mut_self"
+                },
+                {
+                  "type": "field",
+                  "name": "flags",
+                  "type_ref": {
+                    "type": "raw",
+                    "path": "u32"
+                  }
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system",
+              "source": {
+                "file_index": 36,
+                "line": 8
+              }
+            }
+          ]
+        },
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 36,
+        "line": 5
+      }
+    },
+    "ui::scaleform::RefCountImplVftable": {
+      "path": "ui::scaleform::RefCountImplVftable",
+      "visibility": "public",
+      "size": 8,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "destructor",
+            "doc": " Virtual destructor, slot 0. Called by `Release` when the refcount reaches zero.",
+            "type_ref": {
+              "type": "function",
+              "calling_convention": "system",
+              "arguments": [
+                {
+                  "name": "this",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "ui::scaleform::RefCountImpl"
+                    }
+                  }
+                },
+                {
+                  "name": "flags",
+                  "type_ref": {
+                    "type": "raw",
+                    "path": "u32"
+                  }
+                }
+              ],
+              "return_type": null
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 8
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 36,
+        "line": 8
       }
     },
     "ui::scaleform::ScaleformInfo": {
@@ -21776,7 +22700,7 @@
       },
       "source": {
         "file_index": 36,
-        "line": 107
+        "line": 113
       }
     },
     "ui::ui_manager::RenderTargetData": {
@@ -23614,7 +24538,7 @@
               "doc": null,
               "source": {
                 "file_index": 12,
-                "line": 119
+                "line": 127
               }
             },
             {
@@ -23628,7 +24552,7 @@
               "doc": null,
               "source": {
                 "file_index": 12,
-                "line": 122
+                "line": 130
               }
             }
           ],
@@ -25336,6 +26260,7 @@
         "locomotion": {
           "doc": null,
           "items": [
+            "input::locomotion::CharacterMovementSettings",
             "input::locomotion::InstanceProperties",
             "input::locomotion::NStateTask_InputLocoAimRelativeTask",
             "input::locomotion::NStateTask_InputLocoMoveTask",
@@ -25356,7 +26281,7 @@
               "doc": null,
               "source": {
                 "file_index": 31,
-                "line": 134
+                "line": 149
               }
             },
             {
@@ -25370,7 +26295,7 @@
               "doc": null,
               "source": {
                 "file_index": 31,
-                "line": 137
+                "line": 152
               }
             },
             {
@@ -25384,7 +26309,7 @@
               "doc": null,
               "source": {
                 "file_index": 31,
-                "line": 140
+                "line": 155
               }
             }
           ],
@@ -25570,6 +26495,9 @@
           "items": [
             "ui::scaleform::AmpMovieObjectDesc",
             "ui::scaleform::Movie",
+            "ui::scaleform::MovieVftable",
+            "ui::scaleform::RefCountImpl",
+            "ui::scaleform::RefCountImplVftable",
             "ui::scaleform::ScaleformInfo"
           ],
           "submodules": {},
