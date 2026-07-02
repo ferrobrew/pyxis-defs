@@ -21340,6 +21340,445 @@
       },
       "source": null
     },
+    "ui::scaleform::AmpMovieObjectDesc": {
+      "path": "ui::scaleform::AmpMovieObjectDesc",
+      "visibility": "public",
+      "size": 48,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " A node in the display tree returned by `Movie::GetDisplayObjectsTree`. Inherits from\n `Scaleform::RefCountImpl` (vtable + refcount) and embeds a `Scaleform::String` for the name\n and a `Scaleform::ArrayDataBase<Ptr<AmpMovieObjectDesc>>` for children.\n\n Layout verified from `GetChildDescTree` at `0x141_A30_410`.",
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "vtable",
+            "doc": " `RefCountImpl` vtable pointer.",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "void"
+              }
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 57
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "ref_count",
+            "doc": " Reference count (inherited from `RefCountImpl`).",
+            "type_ref": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "offset": 8,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 61
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_c",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 4
+            },
+            "offset": 12,
+            "size": 4,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 66
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "name",
+            "doc": " The clip's instance name, or `\"Unnamed\"`. A `Scaleform::String` (heap-allocated with SSO);\n the first 8 bytes are a `*const c_char` pointing into the internal buffer.",
+            "type_ref": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              }
+            },
+            "offset": 16,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 66
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "children",
+            "doc": " Pointer to the child array. Each element is a `Ptr<AmpMovieObjectDesc>` (a raw pointer\n to another `AmpMovieObjectDesc`).",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "mut_pointer",
+                "inner": {
+                  "type": "raw",
+                  "path": "ui::scaleform::AmpMovieObjectDesc"
+                }
+              }
+            },
+            "offset": 24,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 71
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "child_count",
+            "doc": " Number of children in [`children`](AmpMovieObjectDesc::children).",
+            "doc_links": [
+              {
+                "text": "AmpMovieObjectDesc::children",
+                "target_kind": "item",
+                "path": "ui::scaleform::AmpMovieObjectDesc",
+                "anchor": "field-children"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "offset": 32,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 75
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "child_capacity",
+            "doc": " Allocated capacity of [`children`](AmpMovieObjectDesc::children).",
+            "doc_links": [
+              {
+                "text": "AmpMovieObjectDesc::children",
+                "target_kind": "item",
+                "path": "ui::scaleform::AmpMovieObjectDesc",
+                "anchor": "field-children"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "offset": 40,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 36,
+              "line": 79
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 36,
+        "line": 54
+      }
+    },
+    "ui::scaleform::Movie": {
+      "path": "ui::scaleform::Movie",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " Scaleform `GFx::Movie` -- the public interface backed by `MovieRoot` (AS3). The vtable is\n `MovieRoot`'s at `0x142_621_780`.",
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "GetDisplayObjectsTree",
+            "doc": " Recursively walks the runtime display tree starting from the root movie clip. Returns a\n tree of [`AmpMovieObjectDesc`] nodes, each carrying the clip's instance name (or\n `\"Unnamed\"`) and a child array. Calls `DisplayObject::GetName` on every child and\n recurses into containers.\n\n The `heap` parameter is a Scaleform `MemoryHeap*` used for allocations.\n\n Vtable slot 9 (offset `0x48`). Address: `0x141_BED_530`.",
+            "doc_links": [
+              {
+                "text": "AmpMovieObjectDesc",
+                "target_kind": "item",
+                "path": "ui::scaleform::AmpMovieObjectDesc"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5397992752
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "heap",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "void"
+                  }
+                }
+              }
+            ],
+            "return_type": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "ui::scaleform::AmpMovieObjectDesc"
+              }
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 36,
+              "line": 15
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "SetVariable",
+            "doc": " Sets an AS3 variable by clip path. The path is a dot-separated string like\n `\"root.MCI_hud.MCI_poi_stage._visible\"`. The value is a `GFx::Value` (a tagged union for\n bool/int/float/string/object). `SetVarType` controls search scope (0 = full path).\n\n Address: `0x141_C47_FA0`.",
+            "body": {
+              "type": "address",
+              "address": 5398364064
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "path",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "u8"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "value",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "void"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "set_var_type",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 36,
+              "line": 23
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "GetVariable",
+            "doc": " Reads an AS3 variable by clip path into a `GFx::Value`. Returns false if the path is not\n found.\n\n Address: `0x141_C47_DF0`.",
+            "body": {
+              "type": "address",
+              "address": 5398363632
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "value",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "void"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "path",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "u8"
+                  }
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 36,
+              "line": 30
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "Invoke",
+            "doc": " Invokes an AS3 method on the movie's root timeline by name. This is the call path used by\n the engine's `CUIBase::Invoke`. The `args` are a `GFx::Value` array; `result` receives\n the return value (or null).\n\n Address: `0x141_C4_920`.",
+            "body": {
+              "type": "address",
+              "address": 337398048
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "method_name",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "u8"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "args",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "void"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "num_args",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              },
+              {
+                "type": "field",
+                "name": "result",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "void"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "timeout",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "f32"
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 36,
+              "line": 38
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 36,
+        "line": 3
+      }
+    },
+    "ui::scaleform::ScaleformInfo": {
+      "path": "ui::scaleform::ScaleformInfo",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " Static clip names placed on the root timeline of `ui/hud.gfx` via PlaceObject2 tags. The root\n movie (`ui/root.gfx`) creates its clips entirely through ActionScript, so it has no static\n PlaceObject2 tags; `hud.gfx` uses a mix of static placement and dynamic creation.\n\n | Instance name | Depth | Char ID |\n |---|---|---|\n | `MCI_hud` | 1432 | 1548 |\n | `MCI_poi_stage` | 180 | 1066 |\n | `MCI_weapon_selection_wheel` | 182 | 1078 |\n | `MCI_safe_area_center` | 1 | 1065 |\n | `MCI_safe_area_top_left` | 839 | 1538 |\n | `MCI_safe_area_top_middle` | 636 | 1532 |\n | `MCI_safe_area_top_right` | 562 | 1395 |\n | `MCI_safe_area_bottom_left` | 450 | 1330 |\n | `MCI_safe_area_bottom_middle` | 307 | 1286 |\n | `MCI_safe_area_bottom_right` | 246 | 1161 |\n\n UI movie registry from `root.gfx` maps each `CUIBase` subclass to its `.gfx` file:\n `CSharedLibUI` -> `shared_lib`, `COverlayUI` -> `overlay`, `CHUDUI` -> `hud`, `CIntroUI` ->\n `intro`, `CTitleUI` -> `title`, `CPauseUI` -> `pause`, `CTutorialsUI` -> `tutorials`,\n `CCreditsUI` -> `credits`, `CLobbyUI` -> `lobby`, `CMainUI` -> `main`, `CCommLinkUI` ->\n `comm_link`, `CCommCollectiblesUI` -> `comm_collectibles`, `CCommCommunityUI` ->\n `comm_community`, `CCommMapUI` -> `comm_map`, `CCommSkillUI` -> `comm_skill`,\n `CCommStatsUI` -> `comm_stats`, `CCommBragsFeatsUI` -> `comm_brags_feats`,\n `CCommStoreUI` -> `comm_store`, `CRewardUI` -> `reward`, `CROMUI` -> (none).",
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 36,
+        "line": 107
+      }
+    },
     "ui::ui_manager::RenderTargetData": {
       "path": "ui::ui_manager::RenderTargetData",
       "visibility": "public",
@@ -21381,8 +21820,8 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 36,
-              "line": 29
+              "file_index": 37,
+              "line": 30
             }
           },
           {
@@ -21406,8 +21845,8 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 36,
-              "line": 29
+              "file_index": 37,
+              "line": 30
             }
           },
           {
@@ -21431,8 +21870,8 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 36,
-              "line": 34
+              "file_index": 37,
+              "line": 35
             }
           },
           {
@@ -21452,8 +21891,8 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 36,
-              "line": 38
+              "file_index": 37,
+              "line": 39
             }
           },
           {
@@ -21469,8 +21908,8 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 36,
-              "line": 38
+              "file_index": 37,
+              "line": 39
             }
           },
           {
@@ -21494,8 +21933,8 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 36,
-              "line": 43
+              "file_index": 37,
+              "line": 44
             }
           }
         ],
@@ -21557,8 +21996,8 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 36,
-              "line": 50
+              "file_index": 37,
+              "line": 51
             }
           }
         ],
@@ -21571,8 +22010,8 @@
         "pinned": false
       },
       "source": {
-        "file_index": 36,
-        "line": 25
+        "file_index": 37,
+        "line": 26
       }
     },
     "ui::ui_manager::ScreenPos": {
@@ -21594,8 +22033,8 @@
             "value": 0,
             "doc": null,
             "source": {
-              "file_index": 36,
-              "line": 8
+              "file_index": 37,
+              "line": 9
             }
           },
           {
@@ -21603,8 +22042,8 @@
             "value": 1,
             "doc": null,
             "source": {
-              "file_index": 36,
-              "line": 9
+              "file_index": 37,
+              "line": 10
             }
           },
           {
@@ -21612,8 +22051,8 @@
             "value": 2,
             "doc": null,
             "source": {
-              "file_index": 36,
-              "line": 10
+              "file_index": 37,
+              "line": 11
             }
           },
           {
@@ -21621,8 +22060,8 @@
             "value": 3,
             "doc": null,
             "source": {
-              "file_index": 36,
-              "line": 11
+              "file_index": 37,
+              "line": 12
             }
           },
           {
@@ -21630,8 +22069,8 @@
             "value": 4,
             "doc": null,
             "source": {
-              "file_index": 36,
-              "line": 12
+              "file_index": 37,
+              "line": 13
             }
           },
           {
@@ -21639,8 +22078,8 @@
             "value": 5,
             "doc": null,
             "source": {
-              "file_index": 36,
-              "line": 13
+              "file_index": 37,
+              "line": 14
             }
           },
           {
@@ -21648,8 +22087,8 @@
             "value": 6,
             "doc": null,
             "source": {
-              "file_index": 36,
-              "line": 14
+              "file_index": 37,
+              "line": 15
             }
           },
           {
@@ -21657,8 +22096,8 @@
             "value": 7,
             "doc": null,
             "source": {
-              "file_index": 36,
-              "line": 15
+              "file_index": 37,
+              "line": 16
             }
           },
           {
@@ -21666,8 +22105,8 @@
             "value": 8,
             "doc": null,
             "source": {
-              "file_index": 36,
-              "line": 16
+              "file_index": 37,
+              "line": 17
             }
           },
           {
@@ -21675,8 +22114,8 @@
             "value": 9,
             "doc": null,
             "source": {
-              "file_index": 36,
-              "line": 17
+              "file_index": 37,
+              "line": 18
             }
           },
           {
@@ -21684,8 +22123,8 @@
             "value": 10,
             "doc": null,
             "source": {
-              "file_index": 36,
-              "line": 18
+              "file_index": 37,
+              "line": 19
             }
           }
         ],
@@ -21697,8 +22136,8 @@
         "pinned": false
       },
       "source": {
-        "file_index": 36,
-        "line": 7
+        "file_index": 37,
+        "line": 8
       }
     },
     "ui::ui_manager::UIManager": {
@@ -21754,8 +22193,8 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 36,
-              "line": 66
+              "file_index": 37,
+              "line": 67
             }
           },
           {
@@ -21785,8 +22224,8 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 36,
-              "line": 66
+              "file_index": 37,
+              "line": 67
             }
           },
           {
@@ -21810,8 +22249,8 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 36,
-              "line": 70
+              "file_index": 37,
+              "line": 71
             }
           },
           {
@@ -21824,15 +22263,96 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 4948
+              "size": 4748
             },
             "offset": 60,
-            "size": 4948,
+            "size": 4748,
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 36,
+              "file_index": 37,
               "line": 76
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Loader",
+            "doc": " The Scaleform `GFx::Loader`, created in `InitializeSystem`. Loads `.gfx` files via\n `Loader::CreateMovie`.",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "void"
+              }
+            },
+            "offset": 4808,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 37,
+              "line": 76
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_MovieDef",
+            "doc": " The `GFx::MovieDef` for `ui/root.gfx` -- the definition object, not the live instance.",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "void"
+              }
+            },
+            "offset": 4816,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 37,
+              "line": 80
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Movie",
+            "doc": " The live `GFx::Movie` instance (a `MovieRoot` under the hood), created by\n `MovieDef::CreateInstance` in `InitializeSystem`. All `CUIBase` subclasses share this\n single movie.",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "ui::scaleform::Movie"
+              }
+            },
+            "offset": 4824,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 37,
+              "line": 86
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_12e0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 176
+            },
+            "offset": 4832,
+            "size": 176,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 37,
+              "line": 92
             }
           },
           {
@@ -21865,8 +22385,8 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 36,
-              "line": 76
+              "file_index": 37,
+              "line": 92
             }
           },
           {
@@ -21886,8 +22406,8 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 36,
-              "line": 82
+              "file_index": 37,
+              "line": 98
             }
           },
           {
@@ -21911,8 +22431,8 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 36,
-              "line": 82
+              "file_index": 37,
+              "line": 98
             }
           },
           {
@@ -21936,8 +22456,8 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 36,
-              "line": 86
+              "file_index": 37,
+              "line": 102
             }
           },
           {
@@ -21957,8 +22477,8 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 36,
-              "line": 92
+              "file_index": 37,
+              "line": 108
             }
           },
           {
@@ -21982,8 +22502,8 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 36,
-              "line": 92
+              "file_index": 37,
+              "line": 108
             }
           },
           {
@@ -22007,8 +22527,8 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 36,
-              "line": 96
+              "file_index": 37,
+              "line": 112
             }
           },
           {
@@ -22032,8 +22552,8 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 36,
-              "line": 102
+              "file_index": 37,
+              "line": 118
             }
           },
           {
@@ -22053,8 +22573,8 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 36,
-              "line": 53
+              "file_index": 37,
+              "line": 54
             }
           }
         ],
@@ -22102,8 +22622,8 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 36,
-              "line": 111
+              "file_index": 37,
+              "line": 127
             }
           },
           {
@@ -22130,8 +22650,8 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 36,
-              "line": 117
+              "file_index": 37,
+              "line": 133
             }
           },
           {
@@ -22180,8 +22700,8 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 36,
-              "line": 124
+              "file_index": 37,
+              "line": 140
             }
           },
           {
@@ -22230,8 +22750,8 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 36,
-              "line": 132
+              "file_index": 37,
+              "line": 148
             }
           },
           {
@@ -22250,8 +22770,8 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 36,
-              "line": 136
+              "file_index": 37,
+              "line": 152
             }
           },
           {
@@ -22270,8 +22790,8 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 36,
-              "line": 140
+              "file_index": 37,
+              "line": 156
             }
           },
           {
@@ -22337,8 +22857,8 @@
             },
             "calling_convention": "system",
             "source": {
-              "file_index": 36,
-              "line": 145
+              "file_index": 37,
+              "line": 161
             }
           },
           {
@@ -22469,8 +22989,8 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 36,
-              "line": 151
+              "file_index": 37,
+              "line": 167
             }
           },
           {
@@ -22551,8 +23071,8 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 36,
-              "line": 156
+              "file_index": 37,
+              "line": 172
             }
           },
           {
@@ -22582,8 +23102,8 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 36,
-              "line": 160
+              "file_index": 37,
+              "line": 176
             }
           },
           {
@@ -22602,8 +23122,8 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 36,
-              "line": 164
+              "file_index": 37,
+              "line": 180
             }
           },
           {
@@ -22622,8 +23142,8 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 36,
-              "line": 168
+              "file_index": 37,
+              "line": 184
             }
           },
           {
@@ -22642,8 +23162,8 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 36,
-              "line": 172
+              "file_index": 37,
+              "line": 188
             }
           },
           {
@@ -22676,8 +23196,8 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 36,
-              "line": 176
+              "file_index": 37,
+              "line": 192
             }
           },
           {
@@ -22699,8 +23219,8 @@
             },
             "calling_convention": "system",
             "source": {
-              "file_index": 36,
-              "line": 180
+              "file_index": 37,
+              "line": 196
             }
           }
         ],
@@ -22713,8 +23233,8 @@
         "pinned": false
       },
       "source": {
-        "file_index": 36,
-        "line": 59
+        "file_index": 37,
+        "line": 60
       }
     },
     "void": {
@@ -25045,6 +25565,22 @@
       "doc": null,
       "items": [],
       "submodules": {
+        "scaleform": {
+          "doc": null,
+          "items": [
+            "ui::scaleform::AmpMovieObjectDesc",
+            "ui::scaleform::Movie",
+            "ui::scaleform::ScaleformInfo"
+          ],
+          "submodules": {},
+          "extern_values": [],
+          "functions": [],
+          "backends": {},
+          "source": {
+            "file_index": 36,
+            "line": 1
+          }
+        },
         "ui_manager": {
           "doc": null,
           "items": [
@@ -25080,14 +25616,14 @@
               },
               "calling_convention": "system",
               "source": {
-                "file_index": 36,
-                "line": 185
+                "file_index": 37,
+                "line": 201
               }
             }
           ],
           "backends": {},
           "source": {
-            "file_index": 36,
+            "file_index": 37,
             "line": 1
           }
         }
@@ -25154,14 +25690,14 @@
           },
           "calling_convention": "system",
           "source": {
-            "file_index": 37,
+            "file_index": 38,
             "line": 3
           }
         }
       ],
       "backends": {},
       "source": {
-        "file_index": 37,
+        "file_index": 38,
         "line": 3
       }
     }
@@ -25203,6 +25739,7 @@
     "types/math.pyxis",
     "types/std_vector.pyxis",
     "types/vector_math.pyxis",
+    "ui/scaleform.pyxis",
     "ui/ui_manager.pyxis"
   ]
 }

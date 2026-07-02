@@ -1,7 +1,6 @@
 /// Scaleform `GFx::Movie` -- the public interface backed by `MovieRoot` (AS3). The vtable is
 /// `MovieRoot`'s at `0x142_621_780`.
 pub type Movie;
-
 impl Movie {
     /// Recursively walks the runtime display tree starting from the root movie clip. Returns a
     /// tree of [`AmpMovieObjectDesc`] nodes, each carrying the clip's instance name (or
@@ -34,15 +33,8 @@ impl Movie {
     /// the return value (or null).
     ///
     /// Address: `0x141_C4_920`.
-    #[address(0x141_C4_920)]
-    pub fn Invoke(
-        &self,
-        method_name: *const u8,
-        args: *const void,
-        num_args: u32,
-        result: *mut void,
-        timeout: f32,
-    ) -> bool;
+    #[address(0x14_1C4_920)]
+    pub fn Invoke(&self, method_name: *const u8, args: *const void, num_args: u32, result: *mut void, timeout: f32) -> bool;
 }
 
 /// A node in the display tree returned by `Movie::GetDisplayObjectsTree`. Inherits from
@@ -53,11 +45,11 @@ impl Movie {
 #[size(0x30)]
 pub type AmpMovieObjectDesc {
     /// `RefCountImpl` vtable pointer.
-    #[address(0x00)]
+    #[address(0x0)]
     pub vtable: *mut void,
 
     /// Reference count (inherited from `RefCountImpl`).
-    #[address(0x08)]
+    #[address(0x8)]
     pub ref_count: u32,
 
     /// The clip's instance name, or `"Unnamed"`. A `Scaleform::String` (heap-allocated with SSO);
