@@ -5,6 +5,11 @@ use types::math::Vector3;
 
 pub type InstanceProperties;
 
+/// `SCharacterMovementSettings`: the per-character movement tuning block. Only passed through
+/// opaquely so far; its first float is the walk/run speed threshold the start-act selection
+/// compares against.
+pub type CharacterMovementSettings;
+
 /// The locomotion task that reads the movement effectors and writes the move direction to the
 /// character blackboard. Like the other `NStateTask` functions, `self` is the *character* -- the
 /// task types are namespaces over free functions that take the character as `this` (the blackboard
@@ -102,11 +107,21 @@ impl NStateTask_LocoUtil {
     #[address(0x140_81A_B90)]
     pub fn EvaluateCharacterDisplacement(character: *mut Character, orientation: *const Matrix4, p3: bool, p4: bool, p5: bool, p6: f32, out_secondary: *mut Vector3, out_direction: *mut Vector3);
 
-    /// Computes this frame's movement speed for the character (from the movement settings and the
-    /// blackboard speed value, not the animation), multiplied onto the normalized displacement
-    /// direction by the movement task.
+    /// Computes this frame's movement speed for the character: the magnitude of the animation
+    /// control's raw root velocity -- so the speed envelope, including the ramp-up through the
+    /// start acts, comes from the animation clips themselves. With `use_blackboard_override` set,
+    /// the blackboard float id `1707123197` replaces the result when present. Multiplied onto the
+    /// normalized displacement direction by the movement task.
     #[address(0x140_81A_B10)]
-    pub fn EvaluateCharacterSpeed(character: *mut Character, p2: bool) -> f32;
+    pub fn EvaluateCharacterSpeed(character: *mut Character, use_blackboard_override: bool) -> f32;
+
+    /// Queues the directional run-start (wind-up) acts: measures the XZ angle from the body
+    /// forward to the blackboard move direction, writes the residual angle correction, and queues
+    /// the matching start act (forward/left/right/180, with stunt variants), choosing the
+    /// walk-versus-run flavor by comparing `speed` against the settings' threshold. The start
+    /// clips' root velocity ramping from zero is the on-foot acceleration.
+    #[address(0x140_81B_F00)]
+    pub fn QueueStarts(character: *mut Character, settings: *const CharacterMovementSettings, speed: f32) -> bool;
 
     /// Queues the stop acts for run-mode locomotion; taken by the input tasks when the blackboard
     /// speed is not positive or the stop validation triggers.
