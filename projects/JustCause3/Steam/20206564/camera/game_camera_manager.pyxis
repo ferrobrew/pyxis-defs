@@ -1,4 +1,5 @@
 use camera::camera_context::CameraControlContext;
+use types::math::Matrix4;
 
 #[singleton(0x142_F18_6B0), size(0x758)]
 pub type GameCameraManager {
@@ -26,6 +27,12 @@ impl GameCameraManager {
     /// Whether the alternate-aim (aim-down-sights) transform is in use.
     #[address(0x140_75C_820)]
     pub fn IsAlternateAimTransformUsed(&self) -> bool;
+
+    /// Writes the camera matrix used for mapping player input to world space — the same matrix the
+    /// locomotion input task reads to make the move direction camera-relative (its negated third
+    /// row is the camera forward on the ground plane).
+    #[address(0x140_75C_7A0)]
+    pub fn GetInputMatrix(&self, matrix: *mut Matrix4);
 
     /// The per-frame render update: runs the camera tree via
     /// [`CameraTree::UpdateRenderContexts`], pushes the render context, then updates the lighting and

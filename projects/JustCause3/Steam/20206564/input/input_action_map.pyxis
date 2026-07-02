@@ -328,6 +328,14 @@ impl InputActionMap {
 #[singleton(0x142_F38_740)]
 pub type LocalPlayerActionMap;
 impl LocalPlayerActionMap {
+    /// The single-argument `CInputActionMap::GetActionEffector(int)` overload the wrapper's own
+    /// setters use: resolves an action to its effector without a device index. The singleton
+    /// pointer is the underlying `CInputActionMap` itself (established from `ForceSetPressed`,
+    /// which passes it straight to the map's effector lookup), so the read-side lookup is exposed
+    /// here. Returns the shared null-effector sentinel for invalid ids; callers null-check anyway.
+    #[address(0x140_2F4_3C0)]
+    pub fn GetActionEffector(&mut self, action: Action) -> *mut InputDeviceEffector;
+
     /// Drives an analog or held action: sets the effector's value and presses it.
     #[address(0x140_C12_4B0)]
     pub fn ForceSetPressed(&mut self, action: Action, value: f32);

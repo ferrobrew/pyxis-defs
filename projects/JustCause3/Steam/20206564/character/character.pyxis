@@ -77,6 +77,12 @@ impl Character {
     /// the aim-relative movement path to the player.
     #[address(0x140_75F_A60)]
     pub fn IsPlayer(&self) -> bool;
+
+    /// Queues an animation act by id (`act` points at the runtime `idstring` value, e.g. the
+    /// `ACT_*` id globals initialized at startup). Acts drive the animation state machine's
+    /// transitions; unmatched acts are dropped at the end of the frame.
+    #[address(0x140_75D_F10)]
+    pub fn QueueAct(&mut self, act: *const u32);
 }
 
 #[size(0x240)]
@@ -111,6 +117,9 @@ pub type Joint {
 
 #[address(0x142_F2F_301)]
 pub extern Character_GoreEnabled: bool;
+
+#[address(0x142_F2F_300)]
+pub extern Character_EnableLocoStrafing: bool;
 
 pub enum SafeBoneIndex: u32 {
     REFERENCE = 0x8EB2FD7C,
