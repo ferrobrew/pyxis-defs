@@ -49,10 +49,11 @@ impl Movie {
     pub fn GetVariable(&self, value: *mut void, path: *const u8) -> bool;
 
     /// Invokes an AS3 method on the movie's root timeline by name. This is the call path used by
-    /// the engine's `CUIBase::Invoke`. The `args` are a `GFx::Value` array; `result` receives
-    /// the return value (or null).
-    #[address(0x14_1C4_920)]
-    pub fn Invoke(&self, method_name: *const u8, args: *const void, num_args: u32, result: *mut void, timeout: f32) -> bool;
+    /// the engine's `CUIBase::Invoke`. The `args` are a `GFx::Value` array; `result` receives the
+    /// return value (or null). Note the parameter order: `result` comes *before* `args`, unlike
+    /// the engine's `CUIBase::Invoke` wrapper (which also adds a timeout).
+    #[address(0x141_C49_CD0)]
+    pub fn Invoke(&self, method_name: *const u8, result: *mut void, args: *const void, num_args: u32) -> bool;
 }
 
 /// A node in the display tree returned by `Movie::GetDisplayObjectsTree`. Inherits from
