@@ -1,56 +1,69 @@
+/// Scaleform `RefCountImpl` -- the base class for reference-counted Scaleform objects. Provides
+/// a vtable pointer at +0 and an atomic refcount at +8. `AddRef`/`Release` are non-virtual;
+/// the vtable's slot 0 is the destructor, called when the refcount reaches zero.
+#[size(0x10)]
+pub type RefCountImpl {
+    vftable {
+        /// Virtual destructor, slot 0. Called by `Release` when the refcount reaches zero.
+        pub fn destructor(&mut self, flags: u32);
+    },
+
+    /// Atomic reference count. Incremented by `AddRef`, decremented by `Release`.
+    #[address(0x8)]
+    pub ref_count: u32,
+}
+impl RefCountImpl {
+    /// Increments the reference count atomically.
+    #[address(0x141_998_430)]
+    pub fn AddRef(&self);
+
+    /// Decrements the reference count atomically. When it reaches zero, calls the virtual
+    /// destructor (vtable slot 0).
+    #[address(0x141_998_440)]
+    pub fn Release(&self);
+}
+
 /// Scaleform `GFx::Movie` -- the public interface backed by `MovieRoot` (AS3). The vtable is
 /// `MovieRoot`'s at `0x142_621_780`.
-pub type Movie;
+pub type Movie {
+    vftable {
+        /// Recursively walks the runtime display tree from the root movie clip: returns a tree of
+        /// [`AmpMovieObjectDesc`] nodes, each carrying the clip's instance name (or `"Unnamed"`)
+        /// and a child array, calling `DisplayObject::GetName` on every child and recursing into
+        /// containers. `heap` is the Scaleform `MemoryHeap*` used for the allocations. Slot 9
+        /// (offset `0x48`); the implementation is at `0x141_BED_530`.
+        #[index(9)]
+        pub fn GetDisplayObjectsTree(&self, heap: *mut void) -> *mut AmpMovieObjectDesc;
+    },
+}
 impl Movie {
-    /// Recursively walks the runtime display tree starting from the root movie clip. Returns a
-    /// tree of [`AmpMovieObjectDesc`] nodes, each carrying the clip's instance name (or
-    /// `"Unnamed"`) and a child array. Calls `DisplayObject::GetName` on every child and
-    /// recurses into containers.
-    ///
-    /// The `heap` parameter is a Scaleform `MemoryHeap*` used for allocations.
-    ///
-    /// Vtable slot 9 (offset `0x48`). Address: `0x141_BED_530`.
-    #[address(0x141_BED_530)]
-    pub fn GetDisplayObjectsTree(&self, heap: *mut void) -> *mut AmpMovieObjectDesc;
-
     /// Sets an AS3 variable by clip path. The path is a dot-separated string like
     /// `"root.MCI_hud.MCI_poi_stage._visible"`. The value is a `GFx::Value` (a tagged union for
     /// bool/int/float/string/object). `SetVarType` controls search scope (0 = full path).
-    ///
-    /// Address: `0x141_C47_FA0`.
     #[address(0x141_C47_FA0)]
     pub fn SetVariable(&self, path: *const u8, value: *const void, set_var_type: u32) -> bool;
 
     /// Reads an AS3 variable by clip path into a `GFx::Value`. Returns false if the path is not
     /// found.
-    ///
-    /// Address: `0x141_C47_DF0`.
     #[address(0x141_C47_DF0)]
     pub fn GetVariable(&self, value: *mut void, path: *const u8) -> bool;
 
     /// Invokes an AS3 method on the movie's root timeline by name. This is the call path used by
     /// the engine's `CUIBase::Invoke`. The `args` are a `GFx::Value` array; `result` receives
     /// the return value (or null).
-    ///
-    /// Address: `0x141_C4_920`.
     #[address(0x14_1C4_920)]
     pub fn Invoke(&self, method_name: *const u8, args: *const void, num_args: u32, result: *mut void, timeout: f32) -> bool;
 }
 
 /// A node in the display tree returned by `Movie::GetDisplayObjectsTree`. Inherits from
-/// `Scaleform::RefCountImpl` (vtable + refcount) and embeds a `Scaleform::String` for the name
-/// and a `Scaleform::ArrayDataBase<Ptr<AmpMovieObjectDesc>>` for children.
+/// [`RefCountImpl`] and embeds a `Scaleform::String` for the name and a
+/// `Scaleform::ArrayDataBase<Ptr<AmpMovieObjectDesc>>` for children.
 ///
 /// Layout verified from `GetChildDescTree` at `0x141_A30_410`.
 #[size(0x30)]
 pub type AmpMovieObjectDesc {
-    /// `RefCountImpl` vtable pointer.
-    #[address(0x0)]
-    pub vtable: *mut void,
-
-    /// Reference count (inherited from `RefCountImpl`).
-    #[address(0x8)]
-    pub ref_count: u32,
+    #[base]
+    pub ref_count_impl: RefCountImpl,
 
     /// The clip's instance name, or `"Unnamed"`. A `Scaleform::String` (heap-allocated with SSO);
     /// the first 8 bytes are a `*const c_char` pointing into the internal buffer.
