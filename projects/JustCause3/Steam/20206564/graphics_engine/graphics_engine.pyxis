@@ -131,8 +131,11 @@ pub type ShadowCascades {
 /// per-frame flags. Filled each dispatch by [`RenderPass::SetRenderContextCamera`].
 #[min_size(0x778)]
 pub type RenderContext {
-    /// The 8 cascade shadow matrices -- an alternate center-relative shadow transform set some
-    /// terrain/deferred sun-shadow shaders sample instead of [`m_ShadowCascades`](RenderContext::m_ShadowCascades).
+    /// The 8 per-atlas-slice projective shadow transforms, copied per dispatch from the shadow
+    /// manager's parity storage. The deferred lighting shaders index them dynamically by a light's
+    /// packed slice index (`cb0[63 + 4*slice .. 66 + 4*slice]` in the GlobalConstants) to project a
+    /// light-relative position into its shadow-atlas slice; the sun resolve uses
+    /// [`m_ShadowCascades`](RenderContext::m_ShadowCascades) instead.
     #[address(0x454)]
     pub m_ShadowMatrices: [Matrix4; 8],
 
@@ -140,9 +143,10 @@ pub type RenderContext {
     #[address(0x654)]
     pub m_ShadowCascades: ShadowCascades,
 
-    /// The number of active cascades this frame.
+    /// The number of active cascades this frame, copied per dispatch from the shadow manager's
+    /// parity storage (a byte store in [`RenderPass::SetRenderContextCamera`]).
     #[address(0x774)]
-    pub m_ActiveCascadeCount: u32,
+    pub m_ActiveCascadeCount: u8,
 }
 
 /// The opaque parameter block passed to
