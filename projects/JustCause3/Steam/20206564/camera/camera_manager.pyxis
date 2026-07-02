@@ -5,6 +5,9 @@ use types::math::Matrix4;
 pub type CameraManager {
     #[address(0x10)]
     pub m_DefaultCamera: Camera,
+    /// The camera gameplay drives. Sim-side systems read it -- the sun-shadow fit
+    /// ([`ShadowManager::UpdateRender`](graphics_engine::shadow_manager::ShadowManager::UpdateRender))
+    /// among them.
     pub m_ActiveCamera: *mut Camera,
     pub m_RenderCamera: *mut Camera,
 

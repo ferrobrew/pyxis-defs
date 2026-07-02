@@ -1,0 +1,56 @@
+use graphics_engine::graphics_engine::RenderContext;
+use graphics_engine::render_pass::RenderPass;
+
+/// One cascade's bookkeeping in [`ShadowManager`]: the render passes that draw its atlas slice,
+/// followed by the per-parity fit state.
+#[min_size(0x460)]
+pub type CascadeData {
+    /// The pair of render passes that draw this cascade's atlas slice (dynamic and static
+    /// geometry). [`ShadowManager::CommitRenderPassSettings`] gates them per dispatch via
+    /// [`RenderPassState::m_Enabled`](graphics_engine::render_pass::RenderPassState::m_Enabled).
+    pub m_Passes: [*mut RenderPass; 2],
+}
+
+/// The cascaded sun-shadow system. Each sim frame, [`UpdateRender`](ShadowManager::UpdateRender)
+/// fits the scheduled cascades to the active camera and writes the parity-buffered fit data; each
+/// dispatch, [`CommitRenderPassSettings`](ShadowManager::CommitRenderPassSettings) enables the
+/// scheduled atlas passes. Cascade re-renders are amortised across frames by an update pattern, so
+/// an unscheduled cascade keeps its previous fit and contents.
+#[min_size(0x6200)]
+pub type ShadowManager {
+    /// The settings-side enable flag. The per-frame [`UpdateRender`](ShadowManager::UpdateRender)
+    /// syncs the engine to it via [`SetEnabled`](ShadowManager::SetEnabled) whenever it differs
+    /// from the live state -- the graphics-menu path for toggling shadows.
+    #[address(0x4)]
+    pub m_Enabled: bool,
+
+    /// The per-cascade slots (passes plus fit bookkeeping).
+    #[address(0x130)]
+    pub m_Cascades: [CascadeData; 8],
+}
+impl ShadowManager {
+    /// The global sun-shadow fade factor staged into the shader constants.
+    #[address(0x140_177_940)]
+    pub fn GetShadowFade(&self) -> f32;
+
+    /// The per-dispatch pass gate: clears every shadow pass's
+    /// [`m_Enabled`](graphics_engine::render_pass::RenderPassState::m_Enabled) flag, then
+    /// re-enables the passes the update pattern scheduled this frame and re-points their render
+    /// targets by the frame parity.
+    #[address(0x140_177_9C0)]
+    pub fn CommitRenderPassSettings(&mut self, ctx: *mut RenderContext);
+
+    /// Creates or destroys the shadow render targets and passes; the settings path behind
+    /// [`m_Enabled`](ShadowManager::m_Enabled).
+    #[address(0x140_19E_E50)]
+    pub fn SetEnabled(&mut self, enabled: bool);
+
+    /// The sim-side per-frame update: syncs [`m_Enabled`](ShadowManager::m_Enabled) via
+    /// [`SetEnabled`](ShadowManager::SetEnabled), fits the scheduled cascades to
+    /// [`CameraManager::m_ActiveCamera`](camera::camera_manager::CameraManager::m_ActiveCamera)
+    /// (the fit frustum comes from that camera's `m_ProjectionF`), copies the unscheduled
+    /// cascades' previous fits forward, writes the parity-indexed cascade transforms and per-slice
+    /// matrices the draw side reads, and regenerates the cull planes.
+    #[address(0x140_1C7_370)]
+    pub fn UpdateRender(&mut self, dt: f32, dtf: f32);
+}

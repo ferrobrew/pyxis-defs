@@ -1,4 +1,5 @@
 use graphics_engine::device::Device;
+use graphics_engine::shadow_manager::ShadowManager;
 use graphics_engine::texture::Texture;
 use types::math::{Matrix4, Vector4};
 
@@ -45,6 +46,10 @@ pub type GraphicsEngine {
 
     #[address(0x128)]
     pub m_ActiveCursor: ActiveCursor,
+
+    /// The cascaded sun-shadow system.
+    #[address(0x158)]
+    pub m_ShadowManager: *mut ShadowManager,
 
     #[address(0xEB0)]
     pub m_Device: *mut Device,
