@@ -1,0 +1,13 @@
+/// The animation-system event-id (act) symbol table: maps act names (`ACT_*`) to the sequential
+/// runtime ids that the animation state machines and [`Character::QueueAct`](character::character::Character::QueueAct)
+/// use. Ids are assigned in registration order as names are first encountered (by loaded animation
+/// data or the `NCharacter` id globals), so an act's id is only resolvable at runtime.
+#[singleton(0x142_F16_308)]
+pub type EventIdSymbolTable;
+impl EventIdSymbolTable {
+    /// Resolves an act name to its runtime id. Registers the name with a fresh id when it is not
+    /// yet present (asserting if the table has been locked), so resolving a name that no loaded
+    /// animation data uses yields an id that no queued act will ever carry.
+    #[address(0x140_413_020)]
+    pub fn string_to_id(&mut self, name: *const u8) -> i32;
+}
