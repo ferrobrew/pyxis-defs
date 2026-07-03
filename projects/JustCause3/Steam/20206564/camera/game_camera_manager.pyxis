@@ -30,9 +30,23 @@ impl GameCameraManager {
 
     /// Writes the camera matrix used for mapping player input to world space — the same matrix the
     /// locomotion input task reads to make the move direction camera-relative (its negated third
-    /// row is the camera forward on the ground plane).
+    /// row is the camera forward on the ground plane). Reads
+    /// [`CameraControlContext::m_NextRenderContext`](camera::camera_context::CameraControlContext::m_NextRenderContext)'s camera transform.
     #[address(0x140_75C_7A0)]
     pub fn GetInputMatrix(&self, matrix: *mut Matrix4);
+
+    /// Writes the sim-phase camera matrix: [`CameraControlContext::m_NextCameraContext`](camera::camera_context::CameraControlContext::m_NextCameraContext)'s camera
+    /// transform, as opposed to [`GetInputMatrix`](GameCameraManager::GetInputMatrix)'s next *render* context. Read by the player aim
+    /// control (raycast start position, adjusted camera matrix, target visibility casts), weapon
+    /// aim-target queries, melee and grapple state tasks, and other sim-side camera consumers.
+    #[address(0x140_75C_7C0)]
+    pub fn GetCameraMatrix(&self, matrix: *mut Matrix4);
+
+    /// Writes the alternate-aim (aim-down-sights) matrix:
+    /// [`CameraControlContext::m_NextRenderContext`](camera::camera_context::CameraControlContext::m_NextRenderContext)'s alternate aim transform. The player aim
+    /// control prefers it over [`GetCameraMatrix`](GameCameraManager::GetCameraMatrix) when [`IsAlternateAimTransformUsed`](GameCameraManager::IsAlternateAimTransformUsed) is set.
+    #[address(0x140_75C_830)]
+    pub fn GetAlternateAimMatrix(&self, matrix: *mut Matrix4);
 
     /// The per-frame render update: runs the camera tree via
     /// [`CameraTree::UpdateRenderContexts`], pushes the render context, then updates the lighting and
