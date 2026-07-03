@@ -20224,6 +20224,62 @@
               "file_index": 31,
               "line": 134
             }
+          },
+          {
+            "visibility": "public",
+            "name": "GetAimMoveAngle",
+            "doc": " The XZ angle (degrees) from `move_dir` to the aim reference direction: the vector from the\n character to the player's aim-target position (or the camera forward while planting an\n explosive), both rotated into the character's local frame when the relevant state flag is\n set. Consumed by the aim-relative act dispatchers\n ([`QueueAimRelativeMoveActions`](NStateTask_LocoUtil::QueueAimRelativeMoveActions),\n [`QueueStopTurns`](NStateTask_LocoUtil::QueueStopTurns), and the on-spot turn queuers) to\n select directional acts and on-spot turns. `move_dir` is a by-value `CVector3f` in the\n source, passed by pointer under the x64 ABI.",
+            "doc_links": [
+              {
+                "text": "NStateTask_LocoUtil::QueueAimRelativeMoveActions",
+                "target_kind": "item",
+                "path": "input::locomotion::NStateTask_LocoUtil",
+                "anchor": "func-QueueAimRelativeMoveActions"
+              },
+              {
+                "text": "NStateTask_LocoUtil::QueueStopTurns",
+                "target_kind": "item",
+                "path": "input::locomotion::NStateTask_LocoUtil",
+                "anchor": "func-QueueStopTurns"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5377300608
+            },
+            "arguments": [
+              {
+                "type": "field",
+                "name": "character",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "character::character::Character"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "move_dir",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "types::math::Vector3"
+                  }
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 31,
+              "line": 145
+            }
           }
         ],
         "vftable": null,
@@ -20305,7 +20361,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 145
+              "line": 156
             }
           }
         ],
@@ -20319,7 +20375,7 @@
       },
       "source": {
         "file_index": 31,
-        "line": 141
+        "line": 152
       }
     },
     "state::StateContext": {
@@ -25881,7 +25937,7 @@
               "doc": null,
               "source": {
                 "file_index": 31,
-                "line": 149
+                "line": 160
               }
             },
             {
@@ -25895,7 +25951,7 @@
               "doc": null,
               "source": {
                 "file_index": 31,
-                "line": 152
+                "line": 163
               }
             },
             {
@@ -25909,7 +25965,7 @@
               "doc": null,
               "source": {
                 "file_index": 31,
-                "line": 155
+                "line": 166
               }
             }
           ],
