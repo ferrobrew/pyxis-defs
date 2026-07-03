@@ -132,6 +132,17 @@ impl NStateTask_LocoUtil {
     /// that settle the body toward the aim.
     #[address(0x140_832_060)]
     pub fn QueueStopTurns(character: *mut Character) -> bool;
+
+    /// The XZ angle (degrees) from `move_dir` to the aim reference direction: the vector from the
+    /// character to the player's aim-target position (or the camera forward while planting an
+    /// explosive), both rotated into the character's local frame when the relevant state flag is
+    /// set. Consumed by the aim-relative act dispatchers
+    /// ([`QueueAimRelativeMoveActions`](NStateTask_LocoUtil::QueueAimRelativeMoveActions),
+    /// [`QueueStopTurns`](NStateTask_LocoUtil::QueueStopTurns), and the on-spot turn queuers) to
+    /// select directional acts and on-spot turns. `move_dir` is a by-value `CVector3f` in the
+    /// source, passed by pointer under the x64 ABI.
+    #[address(0x140_831_880)]
+    pub fn GetAimMoveAngle(character: *mut Character, move_dir: *const Vector3) -> f32;
 }
 
 /// The movement actuator task: applies this frame's locomotion to the character, computing the
