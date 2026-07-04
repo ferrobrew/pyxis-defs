@@ -1,7 +1,7 @@
 use graphics_engine::device::CRITICAL_SECTION;
 use graphics_engine::graphics_engine::HContext_t;
 use types::math::{Vector2, Vector3, Matrix4};
-use ui::scaleform::MovieImpl;
+use ui::scaleform::{MovieImpl, RenderHAL};
 
 /// The screen-position code returned by the UI world-to-screen and marker placement: on-screen, an
 /// off-screen clamped edge or corner, off-screen in front (no clamp), or off-screen behind.
@@ -111,6 +111,10 @@ pub type UIManager {
     /// [`MovieImpl::pASMovieRoot`].
     #[address(0x1_2E8)]
     pub m_Movie: *mut MovieImpl,
+
+    /// The Scaleform `Render::D3D1x::HAL` the UI render worker draws through.
+    #[address(0x1_328)]
+    pub m_RenderHAL: *mut RenderHAL,
 
     /// The Scaleform render buffer the UI HAL renders into, set up by
     /// [`InitPlatformRT`](UIManager::InitPlatformRT). [`RenderTargetData::UpdateData`] rebinds which
