@@ -1,5 +1,16 @@
-use graphics_engine::graphics_engine::RenderContext;
+use graphics_engine::graphics_engine::{HContext_t, RenderContext};
 use types::math::Matrix4;
+
+/// A 3x4 skinning-palette bone matrix. The layout differs per render block (empirically, by the
+/// block's vertex format/shader variant): some blocks store four 3-float columns with the
+/// translation in the final three floats, others three 4-float rows with the translation in each
+/// row's fourth element. The 3x3 rotation is orthonormal under the correct reading, which is how
+/// a consumer can detect the layout. The skinning palette is an array of these, one per skeleton
+/// bone, built per frame by `CPoseProducer::MakeSkinningPalette`.
+#[size(0x30), copyable]
+pub type Matrix3x4 {
+    pub m: [f32; 12],
+}
 
 /// A skinned draw batch within a character render block. The vertex data references palette slots;
 /// `BatchToSkeletonLookup` maps each slot to its skeleton bone index when the palette is built
@@ -49,6 +60,12 @@ impl RenderBlockCharacter {
     /// Draws the block for the Z/velocity prepass.
     #[address(0x140_139_CD0)]
     pub fn DrawZ(&self, rc: *mut RenderContext, info: *const RBIInfo);
+
+    /// Uploads one batch's bone matrices to the vertex-program palette constants: for each batch
+    /// slot, copies `matrices[BatchToSkeletonLookup[slot]]` into the constant registers starting
+    /// at `register`. Called from the block's internal `DrawBatches` before each batch's draw.
+    #[address(0x140_108_200)]
+    pub fn SetMatrixPalette(&self, ctx: *mut HContext_t, matrices: *const Matrix3x4, batch: *const SkinBatch, register: u32);
 }
 
 /// The skinned character skin render block (the `CharacterSkin` RBMDL block type): the skin-shaded
@@ -69,4 +86,8 @@ impl RenderBlockCharacterSkin {
     /// Draws the block for the Z/velocity prepass.
     #[address(0x140_13A_F60)]
     pub fn DrawZ(&self, rc: *mut RenderContext, info: *const RBIInfo);
+
+    /// See [`RenderBlockCharacter::SetMatrixPalette`].
+    #[address(0x140_108_DD0)]
+    pub fn SetMatrixPalette(&self, ctx: *mut HContext_t, matrices: *const Matrix3x4, batch: *const SkinBatch, register: u32);
 }
