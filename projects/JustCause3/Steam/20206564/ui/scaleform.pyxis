@@ -80,7 +80,7 @@ impl Movie {
 /// into the pending snapshot; `RTHandle::NextCapture` (render thread) consumes the pending
 /// snapshot into the displaying one, at most once per HAL frame. Only the fields the payload
 /// touches are modeled; the declared size covers just the modeled prefix.
-#[size(0xA0)]
+#[size(0x118)]
 pub type RenderContext {
     /// The once-a-frame consumption latch: while set, `RTHandle::NextCapture` keeps the current
     /// displaying snapshot instead of consuming the pending one. Set by the first `NextCapture`
@@ -88,6 +88,13 @@ pub type RenderContext {
     /// `CUIManager::Render` call every draw sees the same snapshot.
     #[address(0x99)]
     pub NextCaptureCalledInFrame: bool,
+
+    /// The per-slot snapshot frame ids, indexed like `pSnapshots`: `[0]` the active snapshot
+    /// (incremented by every `Capture`), `[1]` pending, `[2]` displaying, `[3]` finalizing. The
+    /// gap between `[0]` and `[2]` is how far the displayed UI trails the update thread -- a
+    /// growing gap means the render side is not consuming captures.
+    #[address(0xF0)]
+    pub SnapshotFrameIds: [u64; 4],
 }
 impl RenderContext {
     /// Creates a fresh [`TreeRoot`] entry in this context (`Context::CreateEntry<TreeRoot>`):
