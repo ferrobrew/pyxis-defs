@@ -75,13 +75,23 @@ pub type LandscapeManager {
     pub m_Atmosphere: *mut Atmosphere,
 }
 
-pub type WeatherController;
+pub type WeatherController {
+    /// Pins clear weather (severity `0.1`).
+    pub const EVENT_SUNNY: str = "weather_sunny";
+    /// Pins rain (severity `4.0`, rain intensity `1.0`, snow `0`).
+    pub const EVENT_RAIN: str = "weather_rain";
+    /// Pins snow (severity `4.0`, snow ratio `1.0`).
+    pub const EVENT_SNOW: str = "weather_snow";
+    /// Hands control back to the ambient weather system.
+    pub const EVENT_RESTORE: str = "weather_restore";
+    /// Applies the pinned state instantly rather than blending toward it.
+    pub const EVENT_INSTANT: str = "weather_instant";
+}
 impl WeatherController {
-    /// Subscribes the named weather events (`weather_sunny`, `weather_rain`, `weather_snow`,
-    /// `weather_restore`, `weather_instant`, plus `cloud_base` and `cloud_height`). Firing one via the
-    /// engine's event send is the robust way to hold a weather state, since the controller's per-frame
-    /// update otherwise overwrites the [`Weather`] scalars. Event severities: rain is severity `4.0` /
-    /// intensity `1.0` / snow `0`; snow is severity `4.0` / snow `1.0`; sunny is severity `0.1`.
+    /// Subscribes the named weather events (the `EVENT_*` constants, plus `cloud_base` and
+    /// `cloud_height`). Firing one via the engine's event send is the robust way to hold a weather
+    /// state, since the controller's per-frame update otherwise overwrites the [`Weather`]
+    /// scalars.
     #[address(0x140_3A2_4F0)]
     pub fn Init(&mut self);
 }

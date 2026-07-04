@@ -1,7 +1,9 @@
+use camera::camera::Camera;
 use graphics_engine::device::Device;
 use graphics_engine::shadow_manager::ShadowManager;
 use graphics_engine::texture::Texture;
 use types::math::{Matrix4, Vector4};
+use types::std_string::String;
 
 #[size(8), align(8), rust_name = "windows::Win32::UI::WindowsAndMessaging::HICON", cpp_header = "<windows.h>", cpp_name = "::HICON"]
 extern type HICON;
@@ -51,6 +53,14 @@ pub type GraphicsEngine {
     #[address(0x158)]
     pub m_ShadowManager: *mut ShadowManager,
 
+    /// The engine-owned scene render camera: a by-value copy rebuilt each
+    /// [`Draw`](GraphicsEngine::Draw) by `Camera::SetupRenderCamera` (reverse-Z + jitter, then the
+    /// view-projection products from `m_View`). This is the camera the render passes consume;
+    /// distinct from the `CameraManager`'s camera objects, which are pointers to the gameplay
+    /// cameras.
+    #[address(0x170)]
+    pub m_RenderCamera: Camera,
+
     #[address(0xEB0)]
     pub m_Device: *mut Device,
 
@@ -93,6 +103,13 @@ pub type GraphicsEngine {
     /// Index of the reflection-proxy slot picked this frame.
     #[address(0x1_2C8)]
     pub m_EffectInfoIndex: u32,
+
+    /// The currently-loaded shader bundle name, compared by
+    /// [`LoadShaderBundle`](GraphicsEngine::LoadShaderBundle) to skip a same-name reload. The
+    /// bundle names are `"Shaders"` / `"ShadersLowShadows"` (and the Intel `"ShadersConstMath*"`
+    /// variants).
+    #[address(0x1_300)]
+    pub m_CurrentBundleName: String,
 }
 
 // Opaque graphics handles, used behind pointers.
@@ -192,8 +209,8 @@ impl GraphicsEngine {
     pub fn TextureCachePlatformUpdate(&mut self, ctx: *mut HContext_t, dt: f32);
 
     /// Loads (or reloads) the named shader bundle and re-creates every shader holder from it, but only
-    /// if `name` differs from the currently-loaded bundle name (an `std::string` at `+0x1300`, its
-    /// length at `+0x1310`). Re-creating the holders routes every shader through
+    /// if `name` differs from [`m_CurrentBundleName`](GraphicsEngine::m_CurrentBundleName).
+    /// Re-creating the holders routes every shader through
     /// `Graphics::CreateFragmentProgram`. The bundle names are `"Shaders"` / `"ShadersLowShadows"`
     /// (and the Intel `"ShadersConstMath*"` variants), selected by shadow quality in
     /// `CSettingsManager::UpdateSettings`. `name` is a NUL-terminated C string.
