@@ -110,6 +110,7 @@ impl GenericRenderBlock {
     #[external_body]
     pub fn make() -> GenericRenderBlock;
 }
+
 #[cfg(backend = "rust")]
 impl GenericRenderBlock {
     /// Construct a `GenericRenderBlock` via the native constructor.
@@ -181,6 +182,7 @@ impl RenderBlockLine {
     #[external_body]
     pub fn make() -> RenderBlockLine;
 }
+
 #[cfg(backend = "rust")]
 impl RenderBlockLine {
     /// Construct a `RenderBlockLine` via the native constructor.
@@ -242,6 +244,7 @@ impl RenderBlockTriangle {
     #[external_body]
     pub fn make() -> RenderBlockTriangle;
 }
+
 #[cfg(backend = "rust")]
 impl RenderBlockTriangle {
     /// Construct a `RenderBlockTriangle` via the native constructor.
@@ -319,6 +322,7 @@ impl RenderBlockGeneral {
     #[external_body]
     pub fn make() -> RenderBlockGeneral;
 }
+
 #[cfg(backend = "rust")]
 impl RenderBlockGeneral {
     /// Construct a `RenderBlockGeneral` via the native constructor.
@@ -390,10 +394,10 @@ pub type RenderBlock3DTextDesc {
 
 #[min_size(0x48), align(16)]
 pub type RenderBlock3DText {
-    pub const VFTABLE: u64 = 0xF23584;
-    pub const DEFAULT_RENDER_STYLE: u8 = 2;
-    pub const DEFAULT_FONT_SIZE: u8 = 16;
-    pub const SENTINEL_HASH: u32 = 0xFFFFFFFF;
+    pub const VFTABLE: u64 = 0xF23584,
+    pub const DEFAULT_RENDER_STYLE: u8 = 2,
+    pub const DEFAULT_FONT_SIZE: u8 = 16,
+    pub const SENTINEL_HASH: u32 = 0xFFFFFFFF,
 
     #[base]
     pub render_block: RenderBlock,
@@ -426,6 +430,7 @@ impl RenderBlock3DText {
     #[external_body]
     pub fn make() -> RenderBlock3DText;
 }
+
 #[cfg(backend = "rust")]
 impl RenderBlock3DText {
     /// Construct a `RenderBlock3DText` by zeroing the struct and

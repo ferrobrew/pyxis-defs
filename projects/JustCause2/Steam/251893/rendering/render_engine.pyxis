@@ -9,7 +9,7 @@ extern default_render_block_info: RenderBlockInstanceInfo;
 
 #[size(0xB0)]
 pub type RenderBlockInstanceInfo {
-    pub const OPAQUE_WHITE: u32 = 0xFFFFFFFF;
+    pub const OPAQUE_WHITE: u32 = 0xFFFFFFFF,
 
     #[address(0x8)]
     pub colors: [u32; 4],
@@ -35,6 +35,7 @@ impl RenderBlockInstanceInfo {
     #[external_body]
     pub fn make() -> RenderBlockInstanceInfo;
 }
+
 #[cfg(backend = "rust")]
 impl RenderBlockInstanceInfo {
     /// Construct a `RenderBlockInstanceInfo` with `colors[0]` and

@@ -20,6 +20,7 @@ impl HkReferencedObject {
     #[external_body]
     pub fn remove_reference(&mut self);
 }
+
 #[cfg(backend = "rust")]
 impl HkReferencedObject {
     /// Packed allocation size: low 15 bits of `mem_size_and_flags`.

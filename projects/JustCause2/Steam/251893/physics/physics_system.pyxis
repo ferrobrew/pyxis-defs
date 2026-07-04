@@ -21,6 +21,7 @@ impl AIRayCastFilter {
     #[external_body]
     pub fn make() -> AIRayCastFilter;
 }
+
 #[cfg(backend = "rust")]
 impl AIRayCastFilter {
     /// Construct an `AIRayCastFilter` via the native constructor.
@@ -50,7 +51,7 @@ AIRayCastFilter AIRayCastFilter::make() {
 
 #[size(0x2C)]
 pub type RayCastResult {
-    pub const SENTINEL: u32 = 0xFFFFFFFF;
+    pub const SENTINEL: u32 = 0xFFFFFFFF,
 
     game_object: *mut u32,
     pub normal: Vector3,
@@ -67,6 +68,7 @@ impl RayCastResult {
     #[external_body]
     pub fn make() -> RayCastResult;
 }
+
 #[cfg(backend = "rust")]
 impl RayCastResult {
     /// Default-constructed `RayCastResult`: forward-pointing normal,

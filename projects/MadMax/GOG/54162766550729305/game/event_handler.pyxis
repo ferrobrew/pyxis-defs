@@ -12,23 +12,23 @@ impl EventSystem {
 #[size(0x8), align(0x4)]
 pub type EventID {
     /// Type ID for `()` (null/void) event arguments.
-    pub const TYPE_ID_NULL: u64 = 0xFF;
+    pub const TYPE_ID_NULL: u64 = 0xFF,
     /// Type ID for `i32` event arguments.
-    pub const TYPE_ID_I32: u64 = 0x01;
+    pub const TYPE_ID_I32: u64 = 0x1,
     /// Type ID for `f32` event arguments.
-    pub const TYPE_ID_F32: u64 = 0x02;
+    pub const TYPE_ID_F32: u64 = 0x2,
     /// Type ID for `CString` event arguments.
-    pub const TYPE_ID_CSTRING: u64 = 0x03;
+    pub const TYPE_ID_CSTRING: u64 = 0x3,
     /// Type ID for `Matrix4` event arguments.
-    pub const TYPE_ID_MATRIX4: u64 = 0x04;
+    pub const TYPE_ID_MATRIX4: u64 = 0x4,
     /// Type ID for `u32` event arguments.
-    pub const TYPE_ID_U32: u64 = 0x05;
+    pub const TYPE_ID_U32: u64 = 0x5,
     /// Type ID for `GameObject` event arguments.
-    pub const TYPE_ID_GAME_OBJECT: u64 = 0x0B;
+    pub const TYPE_ID_GAME_OBJECT: u64 = 0xB,
     /// Type ID for `Character` event arguments.
-    pub const TYPE_ID_CHARACTER: u64 = 0x0C;
+    pub const TYPE_ID_CHARACTER: u64 = 0xC,
     /// Bitwise OR mask for `Option<T>` event arguments.
-    pub const TYPE_ID_OPTION_MASK: u64 = 0x80;
+    pub const TYPE_ID_OPTION_MASK: u64 = 0x80,
 
     hash: HashString,
     namespace: HashString,

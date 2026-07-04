@@ -32,6 +32,7 @@ impl SharedCountImpl {
     #[external_body]
     pub fn weak_add_ref(&mut self);
 }
+
 #[cfg(backend = "rust")]
 impl SharedCountImpl {
     /// Decrement the strong count; on reaching zero, call `dispose`

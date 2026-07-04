@@ -56,6 +56,7 @@ impl SpawnManager {
     #[external_body]
     pub fn is_vehicle_loaded(&self, id: u32) -> bool;
 }
+
 #[cfg(backend = "rust")]
 impl SpawnManager {
     /// Returns true once any entry in `vehicle_types.loaded_models`
