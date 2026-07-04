@@ -22331,7 +22331,10 @@
                 "type": "const_self"
               }
             ],
-            "return_type": null,
+            "return_type": {
+              "type": "raw",
+              "path": "u64"
+            },
             "calling_convention": "system",
             "cfg": {
               "type": "any",
@@ -27695,7 +27698,7 @@
               {
                 "prologue": null,
                 "epilogue": {
-                  "header": "\ntemplate <class T>\ninline ::std::size_t Vector<T>::len() const {\n    if (begin == nullptr) {\n        return 0;\n    }\n    return static_cast<::std::size_t>(reinterpret_cast<const char*>(end) - reinterpret_cast<const char*>(begin)) / sizeof(T);\n}\n\ntemplate <class T>\ninline bool Vector<T>::is_empty() const {\n    return len() == 0;\n}\n",
+                  "header": "\ntemplate <class T>\ninline ::std::uint64_t Vector<T>::len() const {\n    if (begin == nullptr) {\n        return 0;\n    }\n    return static_cast<::std::uint64_t>(reinterpret_cast<const char*>(end) - reinterpret_cast<const char*>(begin)) / sizeof(T);\n}\n\ntemplate <class T>\ninline bool Vector<T>::is_empty() const {\n    return len() == 0;\n}\n",
                   "definition": null,
                   "for_type": "types::std_vector::Vector"
                 }
