@@ -21,6 +21,12 @@ impl AIRayCastFilter {
     #[external_body]
     pub fn make() -> AIRayCastFilter;
 }
+#[cfg(backend = "rust")]
+impl AIRayCastFilter {
+    /// Construct an `AIRayCastFilter` via the native constructor.
+    #[external_body]
+    pub fn new() -> AIRayCastFilter;
+}
 
 backend rust epilogue for AIRayCastFilter r#"
     impl AIRayCastFilter {
@@ -44,6 +50,8 @@ AIRayCastFilter AIRayCastFilter::make() {
 
 #[size(0x2C)]
 pub type RayCastResult {
+    pub const SENTINEL: u32 = 0xFFFFFFFF;
+
     game_object: *mut u32,
     pub normal: Vector3,
     pub distance: f32,
@@ -59,6 +67,13 @@ impl RayCastResult {
     #[external_body]
     pub fn make() -> RayCastResult;
 }
+#[cfg(backend = "rust")]
+impl RayCastResult {
+    /// Default-constructed `RayCastResult`: forward-pointing normal,
+    /// `distance = 1`, sentinel `0xFFFFFFFF` in every `unknown` slot.
+    #[external_body]
+    pub fn new() -> RayCastResult;
+}
 
 backend rust epilogue for RayCastResult r#"
     impl RayCastResult {
@@ -67,7 +82,7 @@ backend rust epilogue for RayCastResult r#"
                 let mut instance: RayCastResult = std::mem::zeroed();
                 instance.normal = crate::math::Vector3 { data: [1., 0., 0.] };
                 instance.distance = 1.;
-                instance.unknown = [u32::MAX; 4];
+                instance.unknown = [RayCastResult::SENTINEL; 4];
                 instance
             }
         }
@@ -84,10 +99,10 @@ RayCastResult RayCastResult::make() {
     RayCastResult self{};
     self.normal = ::types::math::Vector3{{1.0f, 0.0f, 0.0f}};
     self.distance = 1.0f;
-    self.unknown[0] = 0xFFFFFFFFu;
-    self.unknown[1] = 0xFFFFFFFFu;
-    self.unknown[2] = 0xFFFFFFFFu;
-    self.unknown[3] = 0xFFFFFFFFu;
+    self.unknown[0] = RayCastResult::SENTINEL;
+    self.unknown[1] = RayCastResult::SENTINEL;
+    self.unknown[2] = RayCastResult::SENTINEL;
+    self.unknown[3] = RayCastResult::SENTINEL;
     return self;
 }
 "#;

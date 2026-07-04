@@ -11,6 +11,25 @@ impl EventSystem {
 
 #[size(0x8), align(0x4)]
 pub type EventID {
+    /// Type ID for `()` (null/void) event arguments.
+    pub const TYPE_ID_NULL: u64 = 0xFF;
+    /// Type ID for `i32` event arguments.
+    pub const TYPE_ID_I32: u64 = 0x01;
+    /// Type ID for `f32` event arguments.
+    pub const TYPE_ID_F32: u64 = 0x02;
+    /// Type ID for `CString` event arguments.
+    pub const TYPE_ID_CSTRING: u64 = 0x03;
+    /// Type ID for `Matrix4` event arguments.
+    pub const TYPE_ID_MATRIX4: u64 = 0x04;
+    /// Type ID for `u32` event arguments.
+    pub const TYPE_ID_U32: u64 = 0x05;
+    /// Type ID for `GameObject` event arguments.
+    pub const TYPE_ID_GAME_OBJECT: u64 = 0x0B;
+    /// Type ID for `Character` event arguments.
+    pub const TYPE_ID_CHARACTER: u64 = 0x0C;
+    /// Bitwise OR mask for `Option<T>` event arguments.
+    pub const TYPE_ID_OPTION_MASK: u64 = 0x80;
+
     hash: HashString,
     namespace: HashString,
 }
@@ -157,47 +176,47 @@ backend rust epilogue r#"
 
     impl EventArgument for () {
         type Type = *const std::ffi::c_void;
-        const TYPE_ID: u64 = 0xFF;
+        const TYPE_ID: u64 = EventID::TYPE_ID_NULL;
     }
 
     impl EventArgument for i32 {
         type Type = *const i32;
-        const TYPE_ID: u64 = 0x01;
+        const TYPE_ID: u64 = EventID::TYPE_ID_I32;
     }
 
     impl EventArgument for f32 {
         type Type = *const f32;
-        const TYPE_ID: u64 = 0x02;
+        const TYPE_ID: u64 = EventID::TYPE_ID_F32;
     }
 
     impl EventArgument for std::ffi::CString {
         type Type = *const i8;
-        const TYPE_ID: u64 = 0x03;
+        const TYPE_ID: u64 = EventID::TYPE_ID_CSTRING;
     }
 
     impl EventArgument for crate::types::math::Matrix4 {
         type Type = *const crate::types::math::Matrix4;
-        const TYPE_ID: u64 = 0x04;
+        const TYPE_ID: u64 = EventID::TYPE_ID_MATRIX4;
     }
 
     impl EventArgument for u32 {
         type Type = *const u32;
-        const TYPE_ID: u64 = 0x05;
+        const TYPE_ID: u64 = EventID::TYPE_ID_U32;
     }
 
     impl EventArgument for crate::game_objects::Character {
         type Type = *const *mut crate::game_objects::Character;
-        const TYPE_ID: u64 = 0x0C;
+        const TYPE_ID: u64 = EventID::TYPE_ID_CHARACTER;
     }
 
     impl EventArgument for crate::game_objects::GameObject {
         type Type = *const *mut crate::game_objects::GameObject;
-        const TYPE_ID: u64 = 0x0B;
+        const TYPE_ID: u64 = EventID::TYPE_ID_GAME_OBJECT;
     }
 
     impl<T: EventArgument> EventArgument for Option<T> {
         type Type = <T as EventArgument>::Type;
-        const TYPE_ID: u64 = <T as EventArgument>::TYPE_ID | 0x80;
+        const TYPE_ID: u64 = <T as EventArgument>::TYPE_ID | EventID::TYPE_ID_OPTION_MASK;
     }
 
     pub trait EventPayload<

@@ -700,6 +700,29 @@
               "file_index": 2,
               "line": 38
             }
+          },
+          {
+            "visibility": "public",
+            "name": "new",
+            "doc": " Construct a `Camera` via the native constructor.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [],
+            "return_type": {
+              "type": "raw",
+              "path": "camera::camera::Camera"
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 2,
+              "line": 44
+            }
           }
         ],
         "vftable": null,
@@ -38438,6 +38461,108 @@
               "file_index": 28,
               "line": 21
             }
+          },
+          {
+            "visibility": "public",
+            "name": "allocation_size",
+            "doc": " Packed allocation size: low 15 bits of `mem_size_and_flags`.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "calling_convention": "thiscall",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 28,
+              "line": 27
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "reference_count",
+            "doc": " Current reference count. Named `reference_count` in Rust (no\n field/method collision); C++ uses `refcount` to avoid the clash.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "u16"
+            },
+            "calling_convention": "thiscall",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 28,
+              "line": 31
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "add_reference",
+            "doc": null,
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "thiscall",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 28,
+              "line": 33
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "remove_reference",
+            "doc": null,
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "thiscall",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 28,
+              "line": 35
+            }
           }
         ],
         "vftable": null,
@@ -39893,7 +40018,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 158
+              "line": 164
             }
           },
           {
@@ -39914,7 +40039,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 156
+              "line": 162
             }
           }
         ],
@@ -39955,7 +40080,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 30,
-              "line": 162
+              "line": 168
             }
           },
           {
@@ -39983,7 +40108,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 30,
-              "line": 165
+              "line": 171
             }
           },
           {
@@ -40013,7 +40138,7 @@
             },
             "source": {
               "file_index": 30,
-              "line": 171
+              "line": 177
             }
           },
           {
@@ -40037,7 +40162,7 @@
             },
             "source": {
               "file_index": 30,
-              "line": 173
+              "line": 179
             }
           }
         ],
@@ -40051,7 +40176,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 157
+        "line": 163
       }
     },
     "physics::havok::rigid_body::HkpCapsule": {
@@ -40078,7 +40203,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 305
+              "line": 311
             }
           },
           {
@@ -40099,7 +40224,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 303
+              "line": 309
             }
           }
         ],
@@ -40151,7 +40276,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 30,
-              "line": 309
+              "line": 315
             }
           },
           {
@@ -40179,7 +40304,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 30,
-              "line": 312
+              "line": 318
             }
           },
           {
@@ -40209,7 +40334,7 @@
             },
             "source": {
               "file_index": 30,
-              "line": 318
+              "line": 324
             }
           },
           {
@@ -40233,7 +40358,7 @@
             },
             "source": {
               "file_index": 30,
-              "line": 320
+              "line": 326
             }
           }
         ],
@@ -40247,7 +40372,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 304
+        "line": 310
       }
     },
     "physics::havok::rigid_body::HkpCylinderShape": {
@@ -40274,7 +40399,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 379
+              "line": 385
             }
           },
           {
@@ -40295,7 +40420,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 377
+              "line": 383
             }
           }
         ],
@@ -40355,7 +40480,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 30,
-              "line": 383
+              "line": 389
             }
           },
           {
@@ -40383,7 +40508,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 30,
-              "line": 386
+              "line": 392
             }
           },
           {
@@ -40413,7 +40538,7 @@
             },
             "source": {
               "file_index": 30,
-              "line": 392
+              "line": 398
             }
           },
           {
@@ -40437,7 +40562,7 @@
             },
             "source": {
               "file_index": 30,
-              "line": 394
+              "line": 400
             }
           }
         ],
@@ -40451,7 +40576,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 378
+        "line": 384
       }
     },
     "physics::havok::rigid_body::HkpRigidBody": {
@@ -40478,7 +40603,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 66
+              "line": 72
             }
           },
           {
@@ -40499,7 +40624,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 64
+              "line": 70
             }
           }
         ],
@@ -40532,7 +40657,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 30,
-              "line": 70
+              "line": 76
             }
           },
           {
@@ -40560,7 +40685,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 30,
-              "line": 73
+              "line": 79
             }
           },
           {
@@ -40590,7 +40715,7 @@
             },
             "source": {
               "file_index": 30,
-              "line": 84
+              "line": 90
             }
           },
           {
@@ -40614,7 +40739,7 @@
             },
             "source": {
               "file_index": 30,
-              "line": 89
+              "line": 95
             }
           }
         ],
@@ -40628,7 +40753,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 65
+        "line": 71
       }
     },
     "physics::havok::rigid_body::HkpRigidBodyCInfo": {
@@ -41023,6 +41148,29 @@
               "file_index": 30,
               "line": 41
             }
+          },
+          {
+            "visibility": "public",
+            "name": "new",
+            "doc": " Construct an `HkpRigidBodyCInfo` via the native constructor.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [],
+            "return_type": {
+              "type": "raw",
+              "path": "physics::havok::rigid_body::HkpRigidBodyCInfo"
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 30,
+              "line": 47
+            }
           }
         ],
         "vftable": null,
@@ -41062,7 +41210,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 153
+              "line": 159
             }
           },
           {
@@ -41083,7 +41231,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 151
+              "line": 157
             }
           }
         ],
@@ -41098,7 +41246,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 152
+        "line": 158
       }
     },
     "physics::havok::rigid_body::HkpSphereShape": {
@@ -41125,7 +41273,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 232
+              "line": 238
             }
           },
           {
@@ -41146,7 +41294,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 230
+              "line": 236
             }
           }
         ],
@@ -41176,7 +41324,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 30,
-              "line": 236
+              "line": 242
             }
           },
           {
@@ -41204,7 +41352,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 30,
-              "line": 239
+              "line": 245
             }
           },
           {
@@ -41234,7 +41382,7 @@
             },
             "source": {
               "file_index": 30,
-              "line": 245
+              "line": 251
             }
           },
           {
@@ -41258,7 +41406,7 @@
             },
             "source": {
               "file_index": 30,
-              "line": 247
+              "line": 253
             }
           }
         ],
@@ -41272,7 +41420,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 231
+        "line": 237
       }
     },
     "physics::pfx_airplane::PfxAirPlane": {
@@ -46158,6 +46306,29 @@
               "file_index": 41,
               "line": 22
             }
+          },
+          {
+            "visibility": "public",
+            "name": "new",
+            "doc": " Construct an `AIRayCastFilter` via the native constructor.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [],
+            "return_type": {
+              "type": "raw",
+              "path": "physics::physics_system::AIRayCastFilter"
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 41,
+              "line": 28
+            }
           }
         ],
         "vftable": null,
@@ -46201,7 +46372,7 @@
             "is_base": false,
             "source": {
               "file_index": 41,
-              "line": 95
+              "line": 110
             }
           }
         ],
@@ -46299,7 +46470,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 41,
-              "line": 99
+              "line": 114
             }
           },
           {
@@ -46322,7 +46493,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 41,
-              "line": 102
+              "line": 117
             }
           },
           {
@@ -46358,7 +46529,7 @@
             "calling_convention": "stdcall",
             "source": {
               "file_index": 41,
-              "line": 105
+              "line": 120
             }
           }
         ],
@@ -46372,7 +46543,7 @@
       },
       "source": {
         "file_index": 41,
-        "line": 96
+        "line": 111
       }
     },
     "physics::physics_system::RayCastFilter": {
@@ -46448,7 +46619,7 @@
             "is_base": false,
             "source": {
               "file_index": 41,
-              "line": 47
+              "line": 55
             }
           },
           {
@@ -46465,7 +46636,7 @@
             "is_base": false,
             "source": {
               "file_index": 41,
-              "line": 48
+              "line": 56
             }
           },
           {
@@ -46482,7 +46653,7 @@
             "is_base": false,
             "source": {
               "file_index": 41,
-              "line": 49
+              "line": 57
             }
           },
           {
@@ -46502,7 +46673,7 @@
             "is_base": false,
             "source": {
               "file_index": 41,
-              "line": 50
+              "line": 58
             }
           },
           {
@@ -46522,7 +46693,7 @@
             "is_base": false,
             "source": {
               "file_index": 41,
-              "line": 51
+              "line": 59
             }
           },
           {
@@ -46543,7 +46714,7 @@
             "is_base": false,
             "source": {
               "file_index": 41,
-              "line": 52
+              "line": 60
             }
           }
         ],
@@ -46568,7 +46739,30 @@
             },
             "source": {
               "file_index": 41,
-              "line": 60
+              "line": 68
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "new",
+            "doc": " Default-constructed `RayCastResult`: forward-pointing normal,\n `distance = 1`, sentinel `0xFFFFFFFF` in every `unknown` slot.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [],
+            "return_type": {
+              "type": "raw",
+              "path": "physics::physics_system::RayCastResult"
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 41,
+              "line": 75
             }
           }
         ],
@@ -46578,11 +46772,37 @@
         "cloneable": false,
         "defaultable": false,
         "packed": false,
-        "pinned": false
+        "pinned": false,
+        "nested_items": [
+          "physics::physics_system::RayCastResult::SENTINEL"
+        ]
       },
       "source": {
         "file_index": 41,
-        "line": 46
+        "line": 52
+      }
+    },
+    "physics::physics_system::RayCastResult::SENTINEL": {
+      "path": "physics::physics_system::RayCastResult::SENTINEL",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": null,
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 4294967295
+        }
+      },
+      "source": {
+        "file_index": 41,
+        "line": 53
       }
     },
     "rendering::graphics_engine::ActiveCursor": {
@@ -48233,6 +48453,29 @@
               "file_index": 44,
               "line": 111
             }
+          },
+          {
+            "visibility": "public",
+            "name": "new",
+            "doc": " Construct a `GenericRenderBlock` via the native constructor.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [],
+            "return_type": {
+              "type": "raw",
+              "path": "rendering::render_block::GenericRenderBlock"
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 44,
+              "line": 117
+            }
           }
         ],
         "vftable": null,
@@ -48879,7 +49122,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 141
+              "line": 147
             }
           },
           {
@@ -48900,7 +49143,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 146
+              "line": 152
             }
           },
           {
@@ -48917,7 +49160,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 146
+              "line": 152
             }
           },
           {
@@ -48938,7 +49181,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 141
+              "line": 147
             }
           }
         ],
@@ -48955,7 +49198,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 142
+        "line": 148
       }
     },
     "rendering::render_block::RenderBlock3DText": {
@@ -48982,7 +49225,7 @@
             "is_base": true,
             "source": {
               "file_index": 44,
-              "line": 370
+              "line": 399
             }
           },
           {
@@ -48999,7 +49242,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 371
+              "line": 400
             }
           },
           {
@@ -49016,7 +49259,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 372
+              "line": 401
             }
           },
           {
@@ -49037,7 +49280,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 375
+              "line": 404
             }
           },
           {
@@ -49054,7 +49297,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 375
+              "line": 404
             }
           },
           {
@@ -49071,7 +49314,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 376
+              "line": 405
             }
           },
           {
@@ -49088,7 +49331,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 379
+              "line": 408
             }
           },
           {
@@ -49105,7 +49348,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 380
+              "line": 409
             }
           },
           {
@@ -49122,7 +49365,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 381
+              "line": 410
             }
           },
           {
@@ -49143,7 +49386,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 367
+              "line": 391
             }
           }
         ],
@@ -49173,7 +49416,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 44,
-              "line": 385
+              "line": 414
             }
           },
           {
@@ -49212,7 +49455,7 @@
             "calling_convention": "cdecl",
             "source": {
               "file_index": 44,
-              "line": 388
+              "line": 417
             }
           },
           {
@@ -49235,7 +49478,30 @@
             },
             "source": {
               "file_index": 44,
-              "line": 398
+              "line": 427
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "new",
+            "doc": " Construct a `RenderBlock3DText` by zeroing the struct and\n assigning the known-good vftable, sentinel hashes, and defaults.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [],
+            "return_type": {
+              "type": "raw",
+              "path": "rendering::render_block::RenderBlock3DText"
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 44,
+              "line": 434
             }
           }
         ],
@@ -49247,11 +49513,109 @@
         "cloneable": false,
         "defaultable": false,
         "packed": false,
-        "pinned": false
+        "pinned": false,
+        "nested_items": [
+          "rendering::render_block::RenderBlock3DText::VFTABLE",
+          "rendering::render_block::RenderBlock3DText::DEFAULT_RENDER_STYLE",
+          "rendering::render_block::RenderBlock3DText::DEFAULT_FONT_SIZE",
+          "rendering::render_block::RenderBlock3DText::SENTINEL_HASH"
+        ]
       },
       "source": {
         "file_index": 44,
-        "line": 368
+        "line": 392
+      }
+    },
+    "rendering::render_block::RenderBlock3DText::DEFAULT_FONT_SIZE": {
+      "path": "rendering::render_block::RenderBlock3DText::DEFAULT_FONT_SIZE",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": null,
+        "value_type": {
+          "type": "raw",
+          "path": "u8"
+        },
+        "value": {
+          "kind": "int",
+          "value": 16
+        }
+      },
+      "source": {
+        "file_index": 44,
+        "line": 395
+      }
+    },
+    "rendering::render_block::RenderBlock3DText::DEFAULT_RENDER_STYLE": {
+      "path": "rendering::render_block::RenderBlock3DText::DEFAULT_RENDER_STYLE",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": null,
+        "value_type": {
+          "type": "raw",
+          "path": "u8"
+        },
+        "value": {
+          "kind": "int",
+          "value": 2
+        }
+      },
+      "source": {
+        "file_index": 44,
+        "line": 394
+      }
+    },
+    "rendering::render_block::RenderBlock3DText::SENTINEL_HASH": {
+      "path": "rendering::render_block::RenderBlock3DText::SENTINEL_HASH",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": null,
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 4294967295
+        }
+      },
+      "source": {
+        "file_index": 44,
+        "line": 396
+      }
+    },
+    "rendering::render_block::RenderBlock3DText::VFTABLE": {
+      "path": "rendering::render_block::RenderBlock3DText::VFTABLE",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": null,
+        "value_type": {
+          "type": "raw",
+          "path": "u64"
+        },
+        "value": {
+          "kind": "int",
+          "value": 15873412
+        }
+      },
+      "source": {
+        "file_index": 44,
+        "line": 393
       }
     },
     "rendering::render_block::RenderBlock3DTextDesc": {
@@ -49278,7 +49642,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 355
+              "line": 379
             }
           },
           {
@@ -49295,7 +49659,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 356
+              "line": 380
             }
           },
           {
@@ -49312,7 +49676,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 357
+              "line": 381
             }
           },
           {
@@ -49329,7 +49693,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 358
+              "line": 382
             }
           },
           {
@@ -49346,7 +49710,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 359
+              "line": 383
             }
           },
           {
@@ -49363,7 +49727,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 360
+              "line": 384
             }
           },
           {
@@ -49380,7 +49744,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 361
+              "line": 385
             }
           },
           {
@@ -49397,7 +49761,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 362
+              "line": 386
             }
           },
           {
@@ -49414,7 +49778,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 363
+              "line": 387
             }
           },
           {
@@ -49431,7 +49795,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 364
+              "line": 388
             }
           },
           {
@@ -49452,7 +49816,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 353
+              "line": 377
             }
           }
         ],
@@ -49467,7 +49831,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 354
+        "line": 378
       }
     },
     "rendering::render_block::RenderBlockGeneral": {
@@ -49494,7 +49858,7 @@
             "is_base": true,
             "source": {
               "file_index": 44,
-              "line": 280
+              "line": 298
             }
           },
           {
@@ -49515,7 +49879,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 283
+              "line": 301
             }
           },
           {
@@ -49532,7 +49896,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 283
+              "line": 301
             }
           },
           {
@@ -49553,7 +49917,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 286
+              "line": 304
             }
           },
           {
@@ -49570,7 +49934,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 286
+              "line": 304
             }
           }
         ],
@@ -49592,7 +49956,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 44,
-              "line": 290
+              "line": 308
             }
           },
           {
@@ -49620,7 +49984,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 44,
-              "line": 293
+              "line": 311
             }
           },
           {
@@ -49654,7 +50018,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 44,
-              "line": 296
+              "line": 314
             }
           },
           {
@@ -49677,7 +50041,30 @@
             },
             "source": {
               "file_index": 44,
-              "line": 302
+              "line": 320
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "new",
+            "doc": " Construct a `RenderBlockGeneral` via the native constructor.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [],
+            "return_type": {
+              "type": "raw",
+              "path": "rendering::render_block::RenderBlockGeneral"
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 44,
+              "line": 326
             }
           }
         ],
@@ -49693,7 +50080,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 278
+        "line": 296
       }
     },
     "rendering::render_block::RenderBlockGeneralAttributes": {
@@ -49724,7 +50111,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 271
+              "line": 289
             }
           },
           {
@@ -49741,7 +50128,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 271
+              "line": 289
             }
           },
           {
@@ -49758,7 +50145,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 272
+              "line": 290
             }
           },
           {
@@ -49775,7 +50162,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 273
+              "line": 291
             }
           },
           {
@@ -49792,7 +50179,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 274
+              "line": 292
             }
           }
         ],
@@ -49807,7 +50194,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 269
+        "line": 287
       }
     },
     "rendering::render_block::RenderBlockLine": {
@@ -49834,7 +50221,7 @@
             "is_base": true,
             "source": {
               "file_index": 44,
-              "line": 152
+              "line": 158
             }
           },
           {
@@ -49855,7 +50242,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 155
+              "line": 161
             }
           },
           {
@@ -49872,7 +50259,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 155
+              "line": 161
             }
           },
           {
@@ -49889,7 +50276,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 156
+              "line": 162
             }
           },
           {
@@ -49906,7 +50293,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 157
+              "line": 163
             }
           },
           {
@@ -49927,7 +50314,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 160
+              "line": 166
             }
           },
           {
@@ -49944,7 +50331,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 160
+              "line": 166
             }
           },
           {
@@ -49965,7 +50352,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 149
+              "line": 155
             }
           }
         ],
@@ -49987,7 +50374,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 44,
-              "line": 164
+              "line": 170
             }
           },
           {
@@ -50015,7 +50402,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 44,
-              "line": 167
+              "line": 173
             }
           },
           {
@@ -50049,7 +50436,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 44,
-              "line": 170
+              "line": 176
             }
           },
           {
@@ -50072,7 +50459,30 @@
             },
             "source": {
               "file_index": 44,
-              "line": 176
+              "line": 182
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "new",
+            "doc": " Construct a `RenderBlockLine` via the native constructor.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [],
+            "return_type": {
+              "type": "raw",
+              "path": "rendering::render_block::RenderBlockLine"
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 44,
+              "line": 188
             }
           }
         ],
@@ -50088,7 +50498,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 150
+        "line": 156
       }
     },
     "rendering::render_block::RenderBlockPacking": {
@@ -50115,7 +50525,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 261
+              "line": 279
             }
           },
           {
@@ -50132,7 +50542,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 262
+              "line": 280
             }
           },
           {
@@ -50153,7 +50563,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 263
+              "line": 281
             }
           },
           {
@@ -50170,7 +50580,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 264
+              "line": 282
             }
           },
           {
@@ -50187,7 +50597,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 265
+              "line": 283
             }
           }
         ],
@@ -50202,7 +50612,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 260
+        "line": 278
       }
     },
     "rendering::render_block::RenderBlockTopology": {
@@ -50346,7 +50756,7 @@
             "is_base": true,
             "source": {
               "file_index": 44,
-              "line": 207
+              "line": 219
             }
           },
           {
@@ -50367,7 +50777,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 210
+              "line": 222
             }
           },
           {
@@ -50384,7 +50794,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 210
+              "line": 222
             }
           },
           {
@@ -50401,7 +50811,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 211
+              "line": 223
             }
           },
           {
@@ -50418,7 +50828,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 212
+              "line": 224
             }
           },
           {
@@ -50439,7 +50849,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 215
+              "line": 227
             }
           },
           {
@@ -50456,7 +50866,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 215
+              "line": 227
             }
           }
         ],
@@ -50478,7 +50888,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 44,
-              "line": 219
+              "line": 231
             }
           },
           {
@@ -50506,7 +50916,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 44,
-              "line": 222
+              "line": 234
             }
           },
           {
@@ -50540,7 +50950,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 44,
-              "line": 225
+              "line": 237
             }
           },
           {
@@ -50563,7 +50973,30 @@
             },
             "source": {
               "file_index": 44,
-              "line": 231
+              "line": 243
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "new",
+            "doc": " Construct a `RenderBlockTriangle` via the native constructor.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [],
+            "return_type": {
+              "type": "raw",
+              "path": "rendering::render_block::RenderBlockTriangle"
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 44,
+              "line": 249
             }
           }
         ],
@@ -50579,7 +51012,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 205
+        "line": 217
       }
     },
     "rendering::render_block::RenderBlockVftable": {
@@ -50603,7 +51036,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 141
+        "line": 147
       }
     },
     "rendering::render_block::TextHorizontalAlignment": {
@@ -50626,7 +51059,7 @@
             "doc": null,
             "source": {
               "file_index": 44,
-              "line": 340
+              "line": 364
             }
           },
           {
@@ -50635,7 +51068,7 @@
             "doc": null,
             "source": {
               "file_index": 44,
-              "line": 341
+              "line": 365
             }
           },
           {
@@ -50644,7 +51077,7 @@
             "doc": null,
             "source": {
               "file_index": 44,
-              "line": 342
+              "line": 366
             }
           }
         ],
@@ -50657,7 +51090,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 338
+        "line": 362
       }
     },
     "rendering::render_block::TextType": {
@@ -50680,7 +51113,7 @@
             "doc": null,
             "source": {
               "file_index": 44,
-              "line": 333
+              "line": 357
             }
           },
           {
@@ -50689,7 +51122,7 @@
             "doc": null,
             "source": {
               "file_index": 44,
-              "line": 334
+              "line": 358
             }
           }
         ],
@@ -50702,7 +51135,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 331
+        "line": 355
       }
     },
     "rendering::render_block::TextVerticalAlignment": {
@@ -50725,7 +51158,7 @@
             "doc": null,
             "source": {
               "file_index": 44,
-              "line": 348
+              "line": 372
             }
           },
           {
@@ -50734,7 +51167,7 @@
             "doc": null,
             "source": {
               "file_index": 44,
-              "line": 349
+              "line": 373
             }
           },
           {
@@ -50743,7 +51176,7 @@
             "doc": null,
             "source": {
               "file_index": 44,
-              "line": 350
+              "line": 374
             }
           }
         ],
@@ -50756,7 +51189,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 346
+        "line": 370
       }
     },
     "rendering::render_engine::HANDLE": {
@@ -50814,7 +51247,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 62
+              "line": 71
             }
           },
           {
@@ -50831,7 +51264,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 62
+              "line": 71
             }
           },
           {
@@ -50852,7 +51285,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 65
+              "line": 74
             }
           },
           {
@@ -50869,7 +51302,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 65
+              "line": 74
             }
           },
           {
@@ -50886,7 +51319,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 66
+              "line": 75
             }
           },
           {
@@ -50903,7 +51336,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 67
+              "line": 76
             }
           },
           {
@@ -50920,7 +51353,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 68
+              "line": 77
             }
           }
         ],
@@ -50935,7 +51368,7 @@
       },
       "source": {
         "file_index": 45,
-        "line": 60
+        "line": 69
       }
     },
     "rendering::render_engine::RenderBlockInstanceInfo": {
@@ -50966,7 +51399,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 13
+              "line": 15
             }
           },
           {
@@ -50987,7 +51420,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 13
+              "line": 15
             }
           },
           {
@@ -51008,7 +51441,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 16
+              "line": 18
             }
           },
           {
@@ -51029,7 +51462,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 16
+              "line": 18
             }
           },
           {
@@ -51050,7 +51483,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 17
+              "line": 19
             }
           }
         ],
@@ -51083,7 +51516,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 45,
-              "line": 21
+              "line": 23
             }
           },
           {
@@ -51114,7 +51547,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 45,
-              "line": 24
+              "line": 26
             }
           },
           {
@@ -51137,7 +51570,30 @@
             },
             "source": {
               "file_index": 45,
-              "line": 34
+              "line": 36
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "new",
+            "doc": " Construct a `RenderBlockInstanceInfo` with `colors[0]` and\n `colors[1]` primed to opaque white; remaining fields are zeroed.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [],
+            "return_type": {
+              "type": "raw",
+              "path": "rendering::render_engine::RenderBlockInstanceInfo"
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 45,
+              "line": 43
             }
           }
         ],
@@ -51147,11 +51603,37 @@
         "cloneable": false,
         "defaultable": false,
         "packed": false,
-        "pinned": false
+        "pinned": false,
+        "nested_items": [
+          "rendering::render_engine::RenderBlockInstanceInfo::OPAQUE_WHITE"
+        ]
       },
       "source": {
         "file_index": 45,
         "line": 11
+      }
+    },
+    "rendering::render_engine::RenderBlockInstanceInfo::OPAQUE_WHITE": {
+      "path": "rendering::render_engine::RenderBlockInstanceInfo::OPAQUE_WHITE",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": null,
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 4294967295
+        }
+      },
+      "source": {
+        "file_index": 45,
+        "line": 12
       }
     },
     "rendering::render_engine::RenderEngine": {
@@ -51181,7 +51663,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 84
+              "line": 93
             }
           },
           {
@@ -51202,7 +51684,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 91
+              "line": 100
             }
           },
           {
@@ -51219,7 +51701,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 91
+              "line": 100
             }
           },
           {
@@ -51240,7 +51722,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 94
+              "line": 103
             }
           },
           {
@@ -51261,7 +51743,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 94
+              "line": 103
             }
           },
           {
@@ -51282,7 +51764,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 95
+              "line": 104
             }
           },
           {
@@ -51303,7 +51785,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 96
+              "line": 105
             }
           },
           {
@@ -51324,7 +51806,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 97
+              "line": 106
             }
           },
           {
@@ -51345,7 +51827,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 98
+              "line": 107
             }
           },
           {
@@ -51366,7 +51848,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 99
+              "line": 108
             }
           },
           {
@@ -51383,7 +51865,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 100
+              "line": 109
             }
           },
           {
@@ -51400,7 +51882,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 101
+              "line": 110
             }
           },
           {
@@ -51421,7 +51903,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 104
+              "line": 113
             }
           },
           {
@@ -51441,7 +51923,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 104
+              "line": 113
             }
           },
           {
@@ -51458,7 +51940,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 105
+              "line": 114
             }
           },
           {
@@ -51475,7 +51957,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 106
+              "line": 115
             }
           },
           {
@@ -51496,7 +51978,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 109
+              "line": 118
             }
           },
           {
@@ -51513,7 +51995,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 109
+              "line": 118
             }
           },
           {
@@ -51534,7 +52016,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 81
+              "line": 90
             }
           }
         ],
@@ -51594,7 +52076,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 45,
-              "line": 113
+              "line": 122
             }
           }
         ],
@@ -51617,7 +52099,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 84
+                "line": 93
               }
             },
             {
@@ -51637,7 +52119,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -51657,7 +52139,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -51677,7 +52159,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -51697,7 +52179,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -51717,7 +52199,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -51737,7 +52219,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -51757,7 +52239,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -51777,7 +52259,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -51797,7 +52279,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -51817,7 +52299,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -51837,7 +52319,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -51857,7 +52339,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -51877,7 +52359,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -51897,7 +52379,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -51917,7 +52399,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -51937,7 +52419,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -51957,7 +52439,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -51977,7 +52459,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -51997,7 +52479,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -52017,7 +52499,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -52037,7 +52519,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -52057,7 +52539,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -52077,7 +52559,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -52097,7 +52579,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 83
+                "line": 92
               }
             },
             {
@@ -52123,7 +52605,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 87
+                "line": 96
               }
             }
           ]
@@ -52137,7 +52619,7 @@
       },
       "source": {
         "file_index": 45,
-        "line": 82
+        "line": 91
       }
     },
     "rendering::render_engine::RenderEngineVftable": {
@@ -52177,7 +52659,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 84
+              "line": 93
             }
           },
           {
@@ -52207,7 +52689,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52237,7 +52719,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52267,7 +52749,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52297,7 +52779,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52327,7 +52809,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52357,7 +52839,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52387,7 +52869,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52417,7 +52899,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52447,7 +52929,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52477,7 +52959,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52507,7 +52989,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52537,7 +53019,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52567,7 +53049,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52597,7 +53079,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52627,7 +53109,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52657,7 +53139,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52687,7 +53169,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52717,7 +53199,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52747,7 +53229,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52777,7 +53259,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52807,7 +53289,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52837,7 +53319,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52867,7 +53349,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52897,7 +53379,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 83
+              "line": 92
             }
           },
           {
@@ -52933,7 +53415,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 87
+              "line": 96
             }
           }
         ],
@@ -52948,7 +53430,7 @@
       },
       "source": {
         "file_index": 45,
-        "line": 84
+        "line": 93
       }
     },
     "rendering::render_engine::RenderPass": {
@@ -52978,7 +53460,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 74
+              "line": 83
             }
           },
           {
@@ -52999,7 +53481,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 71
+              "line": 80
             }
           }
         ],
@@ -53023,7 +53505,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 74
+                "line": 83
               }
             },
             {
@@ -53043,7 +53525,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 73
+                "line": 82
               }
             },
             {
@@ -53063,7 +53545,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 73
+                "line": 82
               }
             },
             {
@@ -53083,7 +53565,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 73
+                "line": 82
               }
             },
             {
@@ -53103,7 +53585,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 73
+                "line": 82
               }
             },
             {
@@ -53123,7 +53605,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 73
+                "line": 82
               }
             },
             {
@@ -53143,7 +53625,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 73
+                "line": 82
               }
             },
             {
@@ -53163,7 +53645,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 73
+                "line": 82
               }
             },
             {
@@ -53183,7 +53665,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 73
+                "line": 82
               }
             },
             {
@@ -53203,7 +53685,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 73
+                "line": 82
               }
             },
             {
@@ -53223,7 +53705,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 73
+                "line": 82
               }
             },
             {
@@ -53243,7 +53725,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 73
+                "line": 82
               }
             },
             {
@@ -53263,7 +53745,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 73
+                "line": 82
               }
             },
             {
@@ -53283,7 +53765,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 73
+                "line": 82
               }
             },
             {
@@ -53303,7 +53785,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 73
+                "line": 82
               }
             },
             {
@@ -53323,7 +53805,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 73
+                "line": 82
               }
             },
             {
@@ -53365,7 +53847,7 @@
               "calling_convention": "thiscall",
               "source": {
                 "file_index": 45,
-                "line": 77
+                "line": 86
               }
             }
           ]
@@ -53379,7 +53861,7 @@
       },
       "source": {
         "file_index": 45,
-        "line": 72
+        "line": 81
       }
     },
     "rendering::render_engine::RenderPassVftable": {
@@ -53419,7 +53901,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 74
+              "line": 83
             }
           },
           {
@@ -53449,7 +53931,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 73
+              "line": 82
             }
           },
           {
@@ -53479,7 +53961,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 73
+              "line": 82
             }
           },
           {
@@ -53509,7 +53991,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 73
+              "line": 82
             }
           },
           {
@@ -53539,7 +54021,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 73
+              "line": 82
             }
           },
           {
@@ -53569,7 +54051,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 73
+              "line": 82
             }
           },
           {
@@ -53599,7 +54081,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 73
+              "line": 82
             }
           },
           {
@@ -53629,7 +54111,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 73
+              "line": 82
             }
           },
           {
@@ -53659,7 +54141,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 73
+              "line": 82
             }
           },
           {
@@ -53689,7 +54171,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 73
+              "line": 82
             }
           },
           {
@@ -53719,7 +54201,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 73
+              "line": 82
             }
           },
           {
@@ -53749,7 +54231,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 73
+              "line": 82
             }
           },
           {
@@ -53779,7 +54261,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 73
+              "line": 82
             }
           },
           {
@@ -53809,7 +54291,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 73
+              "line": 82
             }
           },
           {
@@ -53839,7 +54321,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 73
+              "line": 82
             }
           },
           {
@@ -53869,7 +54351,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 73
+              "line": 82
             }
           },
           {
@@ -53919,7 +54401,7 @@
             "is_base": false,
             "source": {
               "file_index": 45,
-              "line": 77
+              "line": 86
             }
           }
         ],
@@ -53934,7 +54416,7 @@
       },
       "source": {
         "file_index": 45,
-        "line": 74
+        "line": 83
       }
     },
     "rendering::shadow_manager::ShadowManager": {
@@ -54963,9 +55445,19 @@
             },
             "calling_convention": "thiscall",
             "cfg": {
-              "type": "key_value",
-              "key": "backend",
-              "value": "rust"
+              "type": "any",
+              "predicates": [
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "rust"
+                },
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "cpp"
+                }
+              ]
             },
             "source": {
               "file_index": 48,
@@ -54993,9 +55485,19 @@
             },
             "calling_convention": "thiscall",
             "cfg": {
-              "type": "key_value",
-              "key": "backend",
-              "value": "rust"
+              "type": "any",
+              "predicates": [
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "rust"
+                },
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "cpp"
+                }
+              ]
             },
             "source": {
               "file_index": 48,
@@ -55070,9 +55572,19 @@
             },
             "calling_convention": "thiscall",
             "cfg": {
-              "type": "key_value",
-              "key": "backend",
-              "value": "rust"
+              "type": "any",
+              "predicates": [
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "rust"
+                },
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "cpp"
+                }
+              ]
             },
             "source": {
               "file_index": 48,
@@ -55100,9 +55612,19 @@
             },
             "calling_convention": "thiscall",
             "cfg": {
-              "type": "key_value",
-              "key": "backend",
-              "value": "rust"
+              "type": "any",
+              "predicates": [
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "rust"
+                },
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "cpp"
+                }
+              ]
             },
             "source": {
               "file_index": 48,
@@ -55609,7 +56131,7 @@
             "is_base": false,
             "source": {
               "file_index": 50,
-              "line": 105
+              "line": 121
             }
           }
         ],
@@ -55635,7 +56157,7 @@
             },
             "source": {
               "file_index": 50,
-              "line": 110
+              "line": 126
             }
           },
           {
@@ -55662,7 +56184,7 @@
             },
             "source": {
               "file_index": 50,
-              "line": 115
+              "line": 131
             }
           }
         ],
@@ -55676,7 +56198,7 @@
       },
       "source": {
         "file_index": 50,
-        "line": 104
+        "line": 120
       }
     },
     "types::shared_ptr::SharedCountImpl": {
@@ -55839,6 +56361,102 @@
             "source": {
               "file_index": 50,
               "line": 33
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "release",
+            "doc": " Decrement the strong count; on reaching zero, call `dispose`\n then `weak_release`.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "thiscall",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 50,
+              "line": 40
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "weak_release",
+            "doc": " Decrement the weak count; on reaching zero, call `destroy`.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "thiscall",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 50,
+              "line": 43
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "add_ref_copy",
+            "doc": " Increment the strong count.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "thiscall",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 50,
+              "line": 46
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "weak_add_ref",
+            "doc": " Increment the weak count.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "thiscall",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 50,
+              "line": 49
             }
           }
         ],
@@ -56063,7 +56681,7 @@
             "is_base": false,
             "source": {
               "file_index": 50,
-              "line": 227
+              "line": 243
             }
           },
           {
@@ -56080,7 +56698,7 @@
             "is_base": false,
             "source": {
               "file_index": 50,
-              "line": 228
+              "line": 244
             }
           }
         ],
@@ -56119,7 +56737,7 @@
             },
             "source": {
               "file_index": 50,
-              "line": 239
+              "line": 255
             }
           },
           {
@@ -56156,7 +56774,7 @@
             },
             "source": {
               "file_index": 50,
-              "line": 242
+              "line": 258
             }
           },
           {
@@ -56193,7 +56811,7 @@
             },
             "source": {
               "file_index": 50,
-              "line": 245
+              "line": 261
             }
           },
           {
@@ -56217,7 +56835,7 @@
             },
             "source": {
               "file_index": 50,
-              "line": 251
+              "line": 267
             }
           },
           {
@@ -56246,7 +56864,7 @@
             },
             "source": {
               "file_index": 50,
-              "line": 253
+              "line": 269
             }
           },
           {
@@ -56279,7 +56897,7 @@
             },
             "source": {
               "file_index": 50,
-              "line": 255
+              "line": 271
             }
           },
           {
@@ -56315,7 +56933,7 @@
             },
             "source": {
               "file_index": 50,
-              "line": 267
+              "line": 283
             }
           },
           {
@@ -56351,7 +56969,7 @@
             },
             "source": {
               "file_index": 50,
-              "line": 280
+              "line": 296
             }
           },
           {
@@ -56380,7 +56998,7 @@
             },
             "source": {
               "file_index": 50,
-              "line": 289
+              "line": 305
             }
           }
         ],
@@ -56394,7 +57012,7 @@
       },
       "source": {
         "file_index": 50,
-        "line": 226
+        "line": 242
       }
     },
     "types::shared_ptr::WeakCount": {
@@ -56424,7 +57042,7 @@
             "is_base": false,
             "source": {
               "file_index": 50,
-              "line": 174
+              "line": 190
             }
           }
         ],
@@ -56450,7 +57068,7 @@
             },
             "source": {
               "file_index": 50,
-              "line": 179
+              "line": 195
             }
           },
           {
@@ -56485,7 +57103,7 @@
             },
             "source": {
               "file_index": 50,
-              "line": 184
+              "line": 200
             }
           }
         ],
@@ -56499,7 +57117,7 @@
       },
       "source": {
         "file_index": 50,
-        "line": 173
+        "line": 189
       }
     },
     "types::shared_ptr::WeakPtr": {
@@ -56532,7 +57150,7 @@
             "is_base": false,
             "source": {
               "file_index": 50,
-              "line": 430
+              "line": 446
             }
           },
           {
@@ -56549,7 +57167,7 @@
             "is_base": false,
             "source": {
               "file_index": 50,
-              "line": 431
+              "line": 447
             }
           }
         ],
@@ -56598,7 +57216,7 @@
             },
             "source": {
               "file_index": 50,
-              "line": 438
+              "line": 454
             }
           }
         ],
@@ -56612,7 +57230,7 @@
       },
       "source": {
         "file_index": 50,
-        "line": 429
+        "line": 445
       }
     },
     "types::std_string::StdString": {
@@ -58235,6 +58853,41 @@
               "file_index": 57,
               "line": 57
             }
+          },
+          {
+            "visibility": "public",
+            "name": "is_vehicle_loaded",
+            "doc": " Returns true once any entry in `vehicle_types.loaded_models`\n matches `id` and is in load state 2 (loaded). Walks up to\n `vehicle_types.hash_edacd65b_likely_max_models` entries.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "id",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "calling_convention": "thiscall",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 57,
+              "line": 65
+            }
           }
         ],
         "vftable": null,
@@ -59855,7 +60508,7 @@
                 "prologue": null,
                 "epilogue": {
                   "header": null,
-                  "definition": "\nRayCastResult RayCastResult::make() {\n    RayCastResult self{};\n    self.normal = ::types::math::Vector3{{1.0f, 0.0f, 0.0f}};\n    self.distance = 1.0f;\n    self.unknown[0] = 0xFFFFFFFFu;\n    self.unknown[1] = 0xFFFFFFFFu;\n    self.unknown[2] = 0xFFFFFFFFu;\n    self.unknown[3] = 0xFFFFFFFFu;\n    return self;\n}\n",
+                  "definition": "\nRayCastResult RayCastResult::make() {\n    RayCastResult self{};\n    self.normal = ::types::math::Vector3{{1.0f, 0.0f, 0.0f}};\n    self.distance = 1.0f;\n    self.unknown[0] = RayCastResult::SENTINEL;\n    self.unknown[1] = RayCastResult::SENTINEL;\n    self.unknown[2] = RayCastResult::SENTINEL;\n    self.unknown[3] = RayCastResult::SENTINEL;\n    return self;\n}\n",
                   "for_type": "physics::physics_system::RayCastResult"
                 }
               }
@@ -59872,7 +60525,7 @@
               {
                 "prologue": null,
                 "epilogue": {
-                  "header": "\n    impl RayCastResult {\n        pub unsafe fn new() -> RayCastResult {\n            unsafe {\n                let mut instance: RayCastResult = std::mem::zeroed();\n                instance.normal = crate::math::Vector3 { data: [1., 0., 0.] };\n                instance.distance = 1.;\n                instance.unknown = [u32::MAX; 4];\n                instance\n            }\n        }\n    }\n    impl Default for RayCastResult {\n        fn default() -> Self {\n            unsafe { Self::new() }\n        }\n    }\n",
+                  "header": "\n    impl RayCastResult {\n        pub unsafe fn new() -> RayCastResult {\n            unsafe {\n                let mut instance: RayCastResult = std::mem::zeroed();\n                instance.normal = crate::math::Vector3 { data: [1., 0., 0.] };\n                instance.distance = 1.;\n                instance.unknown = [RayCastResult::SENTINEL; 4];\n                instance\n            }\n        }\n    }\n    impl Default for RayCastResult {\n        fn default() -> Self {\n            unsafe { Self::new() }\n        }\n    }\n",
                   "definition": null,
                   "for_type": "physics::physics_system::RayCastResult"
                 }
@@ -60137,7 +60790,7 @@
                 "prologue": null,
                 "epilogue": {
                   "header": null,
-                  "definition": "\nRenderBlock3DText RenderBlock3DText::make() {\n    RenderBlock3DText self{};\n    self.render_block.vftable = reinterpret_cast<const RenderBlockVftable*>(0xF23584);\n    self.text_hash = 0xFFFFFFFFu;\n    self.font_hash = 0xFFFFFFFFu;\n    self.render_style = 2;\n    self.font_size = 16;\n    return self;\n}\n",
+                  "definition": "\nRenderBlock3DText RenderBlock3DText::make() {\n    RenderBlock3DText self{};\n    self.render_block.vftable = reinterpret_cast<const RenderBlockVftable*>(RenderBlock3DText::VFTABLE);\n    self.text_hash = RenderBlock3DText::SENTINEL_HASH;\n    self.font_hash = RenderBlock3DText::SENTINEL_HASH;\n    self.render_style = RenderBlock3DText::DEFAULT_RENDER_STYLE;\n    self.font_size = RenderBlock3DText::DEFAULT_FONT_SIZE;\n    return self;\n}\n",
                   "for_type": "rendering::render_block::RenderBlock3DText"
                 }
               }
@@ -60185,7 +60838,7 @@
               {
                 "prologue": null,
                 "epilogue": {
-                  "header": "\n    impl RenderBlock3DText {\n        pub unsafe fn new() -> RenderBlock3DText {\n            unsafe {\n                let mut instance: RenderBlock3DText = std::mem::zeroed();\n                instance.render_block.vftable = 0xF23584 as *const _;\n                instance.text_hash = u32::MAX;\n                instance.font_hash = u32::MAX;\n                instance.render_style = 2;\n                instance.font_size = 16;\n                instance\n            }\n        }\n    }\n    impl std::ops::Drop for RenderBlock3DText {\n        fn drop(&mut self) {\n            unsafe {\n                self.destructor(false);\n            }\n        }\n    }\n",
+                  "header": "\n    impl RenderBlock3DText {\n        pub unsafe fn new() -> RenderBlock3DText {\n            unsafe {\n                let mut instance: RenderBlock3DText = std::mem::zeroed();\n                instance.render_block.vftable = RenderBlock3DText::VFTABLE as *const _;\n                instance.text_hash = RenderBlock3DText::SENTINEL_HASH;\n                instance.font_hash = RenderBlock3DText::SENTINEL_HASH;\n                instance.render_style = RenderBlock3DText::DEFAULT_RENDER_STYLE;\n                instance.font_size = RenderBlock3DText::DEFAULT_FONT_SIZE;\n                instance\n            }\n        }\n    }\n    impl std::ops::Drop for RenderBlock3DText {\n        fn drop(&mut self) {\n            unsafe {\n                self.destructor(false);\n            }\n        }\n    }\n",
                   "definition": null,
                   "for_type": "rendering::render_block::RenderBlock3DText"
                 }
@@ -60232,7 +60885,7 @@
                 "prologue": null,
                 "epilogue": {
                   "header": null,
-                  "definition": "\nRenderBlockInstanceInfo RenderBlockInstanceInfo::make() {\n    RenderBlockInstanceInfo self{};\n    self.colors[0] = 0xFFFFFFFFu;\n    self.colors[1] = 0xFFFFFFFFu;\n    return self;\n}\n",
+                  "definition": "\nRenderBlockInstanceInfo RenderBlockInstanceInfo::make() {\n    RenderBlockInstanceInfo self{};\n    self.colors[0] = RenderBlockInstanceInfo::OPAQUE_WHITE;\n    self.colors[1] = RenderBlockInstanceInfo::OPAQUE_WHITE;\n    return self;\n}\n",
                   "for_type": "rendering::render_engine::RenderBlockInstanceInfo"
                 }
               }
@@ -60241,7 +60894,7 @@
               {
                 "prologue": null,
                 "epilogue": {
-                  "header": "\n    impl RenderBlockInstanceInfo {\n        pub unsafe fn new() -> RenderBlockInstanceInfo {\n            unsafe {\n                let mut instance: RenderBlockInstanceInfo = std::mem::zeroed();\n                instance.colors[0] = 0xFFFFFFFF;\n                instance.colors[1] = 0xFFFFFFFF;\n                instance\n            }\n        }\n    }\n",
+                  "header": "\n    impl RenderBlockInstanceInfo {\n        pub unsafe fn new() -> RenderBlockInstanceInfo {\n            unsafe {\n                let mut instance: RenderBlockInstanceInfo = std::mem::zeroed();\n                instance.colors[0] = RenderBlockInstanceInfo::OPAQUE_WHITE;\n                instance.colors[1] = RenderBlockInstanceInfo::OPAQUE_WHITE;\n                instance\n            }\n        }\n    }\n",
                   "definition": null,
                   "for_type": "rendering::render_engine::RenderBlockInstanceInfo"
                 }
@@ -60316,6 +60969,24 @@
           "extern_values": [],
           "functions": [],
           "backends": {
+            "cpp": [
+              {
+                "prologue": null,
+                "epilogue": {
+                  "header": "\ninline const float* Matrix3::as_ptr() const { return data; }\ninline float* Matrix3::as_mut_ptr() { return data; }\n",
+                  "definition": null,
+                  "for_type": "types::math::Matrix3"
+                }
+              },
+              {
+                "prologue": null,
+                "epilogue": {
+                  "header": "\ninline const float* Matrix4::as_ptr() const { return data; }\ninline float* Matrix4::as_mut_ptr() { return data; }\n",
+                  "definition": null,
+                  "for_type": "types::math::Matrix4"
+                }
+              }
+            ],
             "rust": [
               {
                 "prologue": {

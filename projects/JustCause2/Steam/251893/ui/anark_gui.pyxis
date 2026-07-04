@@ -29,7 +29,7 @@ impl AnarkState {
 }
 "#;
 
-#[singleton(0x1_18F_C20), size(0x620 /* actually 0x61C */), align(16)]
+#[singleton(0x1_18F_C20), min_size(0x61C), align(16)]
 pub type AnarkGui {
     vftable {},
 

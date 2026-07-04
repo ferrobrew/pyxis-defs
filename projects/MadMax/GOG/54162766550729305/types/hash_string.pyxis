@@ -7,7 +7,7 @@ impl HashString {
     fn constructor(&mut self, value: *const i8) -> *mut HashString;
 }
 
-#[cfg(backend = "rust")]
+#[cfg(any(backend = "rust", backend = "cpp"))]
 impl HashString {
     /// Wrap a precomputed hash value.
     #[external_body]
@@ -34,4 +34,10 @@ backend rust epilogue for HashString r#"
             Self { hash }
         }
     }
+"#;
+
+backend cpp epilogue for HashString r#"
+inline HashString HashString::from_u32(::std::uint32_t hash) {
+    return HashString{hash};
+}
 "#;

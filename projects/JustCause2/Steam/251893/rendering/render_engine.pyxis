@@ -9,6 +9,8 @@ extern default_render_block_info: RenderBlockInstanceInfo;
 
 #[size(0xB0)]
 pub type RenderBlockInstanceInfo {
+    pub const OPAQUE_WHITE: u32 = 0xFFFFFFFF;
+
     #[address(0x8)]
     pub colors: [u32; 4],
 
@@ -33,14 +35,21 @@ impl RenderBlockInstanceInfo {
     #[external_body]
     pub fn make() -> RenderBlockInstanceInfo;
 }
+#[cfg(backend = "rust")]
+impl RenderBlockInstanceInfo {
+    /// Construct a `RenderBlockInstanceInfo` with `colors[0]` and
+    /// `colors[1]` primed to opaque white; remaining fields are zeroed.
+    #[external_body]
+    pub fn new() -> RenderBlockInstanceInfo;
+}
 
 backend rust epilogue for RenderBlockInstanceInfo r#"
     impl RenderBlockInstanceInfo {
         pub unsafe fn new() -> RenderBlockInstanceInfo {
             unsafe {
                 let mut instance: RenderBlockInstanceInfo = std::mem::zeroed();
-                instance.colors[0] = 0xFFFFFFFF;
-                instance.colors[1] = 0xFFFFFFFF;
+                instance.colors[0] = RenderBlockInstanceInfo::OPAQUE_WHITE;
+                instance.colors[1] = RenderBlockInstanceInfo::OPAQUE_WHITE;
                 instance
             }
         }
@@ -50,8 +59,8 @@ backend rust epilogue for RenderBlockInstanceInfo r#"
 backend cpp epilogue definition for RenderBlockInstanceInfo r#"
 RenderBlockInstanceInfo RenderBlockInstanceInfo::make() {
     RenderBlockInstanceInfo self{};
-    self.colors[0] = 0xFFFFFFFFu;
-    self.colors[1] = 0xFFFFFFFFu;
+    self.colors[0] = RenderBlockInstanceInfo::OPAQUE_WHITE;
+    self.colors[1] = RenderBlockInstanceInfo::OPAQUE_WHITE;
     return self;
 }
 "#;

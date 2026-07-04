@@ -110,6 +110,12 @@ impl GenericRenderBlock {
     #[external_body]
     pub fn make() -> GenericRenderBlock;
 }
+#[cfg(backend = "rust")]
+impl GenericRenderBlock {
+    /// Construct a `GenericRenderBlock` via the native constructor.
+    #[external_body]
+    pub fn new() -> GenericRenderBlock;
+}
 
 backend rust epilogue for GenericRenderBlock r#"
     impl GenericRenderBlock {
@@ -146,7 +152,7 @@ pub type RenderBlock {
     pub topology: i16,
 }
 
-#[size(0x20), align(16)] // size = 0x1C
+#[min_size(0x1C), align(16)]
 pub type RenderBlockLine {
     #[base]
     pub render_block: RenderBlock,
@@ -174,6 +180,12 @@ impl RenderBlockLine {
 impl RenderBlockLine {
     #[external_body]
     pub fn make() -> RenderBlockLine;
+}
+#[cfg(backend = "rust")]
+impl RenderBlockLine {
+    /// Construct a `RenderBlockLine` via the native constructor.
+    #[external_body]
+    pub fn new() -> RenderBlockLine;
 }
 
 backend rust epilogue for RenderBlockLine r#"
@@ -229,6 +241,12 @@ impl RenderBlockTriangle {
 impl RenderBlockTriangle {
     #[external_body]
     pub fn make() -> RenderBlockTriangle;
+}
+#[cfg(backend = "rust")]
+impl RenderBlockTriangle {
+    /// Construct a `RenderBlockTriangle` via the native constructor.
+    #[external_body]
+    pub fn new() -> RenderBlockTriangle;
 }
 
 backend rust epilogue for RenderBlockTriangle r#"
@@ -301,6 +319,12 @@ impl RenderBlockGeneral {
     #[external_body]
     pub fn make() -> RenderBlockGeneral;
 }
+#[cfg(backend = "rust")]
+impl RenderBlockGeneral {
+    /// Construct a `RenderBlockGeneral` via the native constructor.
+    #[external_body]
+    pub fn new() -> RenderBlockGeneral;
+}
 
 backend rust epilogue for RenderBlockGeneral r#"
     impl RenderBlockGeneral {
@@ -364,8 +388,13 @@ pub type RenderBlock3DTextDesc {
     pub wrapping: bool,
 }
 
-#[size(0x50), align(16)] // size = 0x48
+#[min_size(0x48), align(16)]
 pub type RenderBlock3DText {
+    pub const VFTABLE: u64 = 0xF23584;
+    pub const DEFAULT_RENDER_STYLE: u8 = 2;
+    pub const DEFAULT_FONT_SIZE: u8 = 16;
+    pub const SENTINEL_HASH: u32 = 0xFFFFFFFF;
+
     #[base]
     pub render_block: RenderBlock,
     pub texture: ManuallyDrop<SharedPtr<u32>>,
@@ -397,17 +426,24 @@ impl RenderBlock3DText {
     #[external_body]
     pub fn make() -> RenderBlock3DText;
 }
+#[cfg(backend = "rust")]
+impl RenderBlock3DText {
+    /// Construct a `RenderBlock3DText` by zeroing the struct and
+    /// assigning the known-good vftable, sentinel hashes, and defaults.
+    #[external_body]
+    pub fn new() -> RenderBlock3DText;
+}
 
 backend rust epilogue for RenderBlock3DText r#"
     impl RenderBlock3DText {
         pub unsafe fn new() -> RenderBlock3DText {
             unsafe {
                 let mut instance: RenderBlock3DText = std::mem::zeroed();
-                instance.render_block.vftable = 0xF23584 as *const _;
-                instance.text_hash = u32::MAX;
-                instance.font_hash = u32::MAX;
-                instance.render_style = 2;
-                instance.font_size = 16;
+                instance.render_block.vftable = RenderBlock3DText::VFTABLE as *const _;
+                instance.text_hash = RenderBlock3DText::SENTINEL_HASH;
+                instance.font_hash = RenderBlock3DText::SENTINEL_HASH;
+                instance.render_style = RenderBlock3DText::DEFAULT_RENDER_STYLE;
+                instance.font_size = RenderBlock3DText::DEFAULT_FONT_SIZE;
                 instance
             }
         }
@@ -424,11 +460,11 @@ backend rust epilogue for RenderBlock3DText r#"
 backend cpp epilogue definition for RenderBlock3DText r#"
 RenderBlock3DText RenderBlock3DText::make() {
     RenderBlock3DText self{};
-    self.render_block.vftable = reinterpret_cast<const RenderBlockVftable*>(0xF23584);
-    self.text_hash = 0xFFFFFFFFu;
-    self.font_hash = 0xFFFFFFFFu;
-    self.render_style = 2;
-    self.font_size = 16;
+    self.render_block.vftable = reinterpret_cast<const RenderBlockVftable*>(RenderBlock3DText::VFTABLE);
+    self.text_hash = RenderBlock3DText::SENTINEL_HASH;
+    self.font_hash = RenderBlock3DText::SENTINEL_HASH;
+    self.render_style = RenderBlock3DText::DEFAULT_RENDER_STYLE;
+    self.font_size = RenderBlock3DText::DEFAULT_FONT_SIZE;
     return self;
 }
 "#;

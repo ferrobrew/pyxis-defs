@@ -56,6 +56,14 @@ impl SpawnManager {
     #[external_body]
     pub fn is_vehicle_loaded(&self, id: u32) -> bool;
 }
+#[cfg(backend = "rust")]
+impl SpawnManager {
+    /// Returns true once any entry in `vehicle_types.loaded_models`
+    /// matches `id` and is in load state 2 (loaded). Walks up to
+    /// `vehicle_types.hash_edacd65b_likely_max_models` entries.
+    #[external_body]
+    pub fn is_vehicle_loaded(&self, id: u32) -> bool;
+}
 
 backend rust epilogue for SpawnManager r#"
     impl SpawnManager {

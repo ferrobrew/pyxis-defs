@@ -20,6 +20,20 @@ impl HkReferencedObject {
     #[external_body]
     pub fn remove_reference(&mut self);
 }
+#[cfg(backend = "rust")]
+impl HkReferencedObject {
+    /// Packed allocation size: low 15 bits of `mem_size_and_flags`.
+    #[external_body]
+    pub fn allocation_size(&self) -> u32;
+    /// Current reference count. Named `reference_count` in Rust (no
+    /// field/method collision); C++ uses `refcount` to avoid the clash.
+    #[external_body]
+    pub fn reference_count(&self) -> u16;
+    #[external_body]
+    pub fn add_reference(&mut self);
+    #[external_body]
+    pub fn remove_reference(&mut self);
+}
 
 backend rust epilogue for HkReferencedObject r#"
     impl HkReferencedObject {

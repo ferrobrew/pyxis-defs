@@ -40,6 +40,12 @@ impl HkpRigidBodyCInfo {
     #[external_body]
     pub fn make() -> HkpRigidBodyCInfo;
 }
+#[cfg(backend = "rust")]
+impl HkpRigidBodyCInfo {
+    /// Construct an `HkpRigidBodyCInfo` via the native constructor.
+    #[external_body]
+    pub fn new() -> HkpRigidBodyCInfo;
+}
 
 backend rust epilogue for HkpRigidBodyCInfo r#"
     impl HkpRigidBodyCInfo {

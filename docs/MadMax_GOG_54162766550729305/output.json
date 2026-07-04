@@ -304,7 +304,7 @@
             "is_base": false,
             "source": {
               "file_index": 2,
-              "line": 41
+              "line": 60
             }
           }
         ],
@@ -319,7 +319,7 @@
       },
       "source": {
         "file_index": 2,
-        "line": 40
+        "line": 59
       }
     },
     "game::event_handler::EventBase": {
@@ -349,7 +349,7 @@
             "is_base": false,
             "source": {
               "file_index": 2,
-              "line": 36
+              "line": 55
             }
           }
         ],
@@ -364,7 +364,7 @@
       },
       "source": {
         "file_index": 2,
-        "line": 35
+        "line": 54
       }
     },
     "game::event_handler::EventHandler": {
@@ -394,7 +394,7 @@
             "is_base": false,
             "source": {
               "file_index": 2,
-              "line": 29
+              "line": 48
             }
           },
           {
@@ -415,7 +415,7 @@
             "is_base": false,
             "source": {
               "file_index": 2,
-              "line": 29
+              "line": 48
             }
           }
         ],
@@ -432,7 +432,7 @@
       },
       "source": {
         "file_index": 2,
-        "line": 30
+        "line": 49
       }
     },
     "game::event_handler::EventHandlerVftable": {
@@ -456,7 +456,7 @@
       },
       "source": {
         "file_index": 2,
-        "line": 29
+        "line": 48
       }
     },
     "game::event_handler::EventID": {
@@ -483,7 +483,7 @@
             "is_base": false,
             "source": {
               "file_index": 2,
-              "line": 14
+              "line": 33
             }
           },
           {
@@ -500,7 +500,7 @@
             "is_base": false,
             "source": {
               "file_index": 2,
-              "line": 15
+              "line": 34
             }
           }
         ],
@@ -511,11 +511,229 @@
         "cloneable": false,
         "defaultable": false,
         "packed": false,
-        "pinned": false
+        "pinned": false,
+        "nested_items": [
+          "game::event_handler::EventID::TYPE_ID_NULL",
+          "game::event_handler::EventID::TYPE_ID_I32",
+          "game::event_handler::EventID::TYPE_ID_F32",
+          "game::event_handler::EventID::TYPE_ID_CSTRING",
+          "game::event_handler::EventID::TYPE_ID_MATRIX4",
+          "game::event_handler::EventID::TYPE_ID_U32",
+          "game::event_handler::EventID::TYPE_ID_GAME_OBJECT",
+          "game::event_handler::EventID::TYPE_ID_CHARACTER",
+          "game::event_handler::EventID::TYPE_ID_OPTION_MASK"
+        ]
       },
       "source": {
         "file_index": 2,
         "line": 13
+      }
+    },
+    "game::event_handler::EventID::TYPE_ID_CHARACTER": {
+      "path": "game::event_handler::EventID::TYPE_ID_CHARACTER",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " Type ID for `Character` event arguments.",
+        "value_type": {
+          "type": "raw",
+          "path": "u64"
+        },
+        "value": {
+          "kind": "int",
+          "value": 12
+        }
+      },
+      "source": {
+        "file_index": 2,
+        "line": 29
+      }
+    },
+    "game::event_handler::EventID::TYPE_ID_CSTRING": {
+      "path": "game::event_handler::EventID::TYPE_ID_CSTRING",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " Type ID for `CString` event arguments.",
+        "value_type": {
+          "type": "raw",
+          "path": "u64"
+        },
+        "value": {
+          "kind": "int",
+          "value": 3
+        }
+      },
+      "source": {
+        "file_index": 2,
+        "line": 21
+      }
+    },
+    "game::event_handler::EventID::TYPE_ID_F32": {
+      "path": "game::event_handler::EventID::TYPE_ID_F32",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " Type ID for `f32` event arguments.",
+        "value_type": {
+          "type": "raw",
+          "path": "u64"
+        },
+        "value": {
+          "kind": "int",
+          "value": 2
+        }
+      },
+      "source": {
+        "file_index": 2,
+        "line": 19
+      }
+    },
+    "game::event_handler::EventID::TYPE_ID_GAME_OBJECT": {
+      "path": "game::event_handler::EventID::TYPE_ID_GAME_OBJECT",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " Type ID for `GameObject` event arguments.",
+        "value_type": {
+          "type": "raw",
+          "path": "u64"
+        },
+        "value": {
+          "kind": "int",
+          "value": 11
+        }
+      },
+      "source": {
+        "file_index": 2,
+        "line": 27
+      }
+    },
+    "game::event_handler::EventID::TYPE_ID_I32": {
+      "path": "game::event_handler::EventID::TYPE_ID_I32",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " Type ID for `i32` event arguments.",
+        "value_type": {
+          "type": "raw",
+          "path": "u64"
+        },
+        "value": {
+          "kind": "int",
+          "value": 1
+        }
+      },
+      "source": {
+        "file_index": 2,
+        "line": 17
+      }
+    },
+    "game::event_handler::EventID::TYPE_ID_MATRIX4": {
+      "path": "game::event_handler::EventID::TYPE_ID_MATRIX4",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " Type ID for `Matrix4` event arguments.",
+        "value_type": {
+          "type": "raw",
+          "path": "u64"
+        },
+        "value": {
+          "kind": "int",
+          "value": 4
+        }
+      },
+      "source": {
+        "file_index": 2,
+        "line": 23
+      }
+    },
+    "game::event_handler::EventID::TYPE_ID_NULL": {
+      "path": "game::event_handler::EventID::TYPE_ID_NULL",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " Type ID for `()` (null/void) event arguments.",
+        "value_type": {
+          "type": "raw",
+          "path": "u64"
+        },
+        "value": {
+          "kind": "int",
+          "value": 255
+        }
+      },
+      "source": {
+        "file_index": 2,
+        "line": 15
+      }
+    },
+    "game::event_handler::EventID::TYPE_ID_OPTION_MASK": {
+      "path": "game::event_handler::EventID::TYPE_ID_OPTION_MASK",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " Bitwise OR mask for `Option<T>` event arguments.",
+        "value_type": {
+          "type": "raw",
+          "path": "u64"
+        },
+        "value": {
+          "kind": "int",
+          "value": 128
+        }
+      },
+      "source": {
+        "file_index": 2,
+        "line": 31
+      }
+    },
+    "game::event_handler::EventID::TYPE_ID_U32": {
+      "path": "game::event_handler::EventID::TYPE_ID_U32",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " Type ID for `u32` event arguments.",
+        "value_type": {
+          "type": "raw",
+          "path": "u64"
+        },
+        "value": {
+          "kind": "int",
+          "value": 5
+        }
+      },
+      "source": {
+        "file_index": 2,
+        "line": 25
       }
     },
     "game::event_handler::EventSystem": {
@@ -19818,9 +20036,19 @@
             },
             "calling_convention": "system",
             "cfg": {
-              "type": "key_value",
-              "key": "backend",
-              "value": "rust"
+              "type": "any",
+              "predicates": [
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "rust"
+                },
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "cpp"
+                }
+              ]
             },
             "source": {
               "file_index": 24,
@@ -19954,9 +20182,19 @@
             },
             "calling_convention": "system",
             "cfg": {
-              "type": "key_value",
-              "key": "backend",
-              "value": "rust"
+              "type": "any",
+              "predicates": [
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "rust"
+                },
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "cpp"
+                }
+              ]
             },
             "source": {
               "file_index": 25,
@@ -19984,9 +20222,19 @@
             },
             "calling_convention": "system",
             "cfg": {
-              "type": "key_value",
-              "key": "backend",
-              "value": "rust"
+              "type": "any",
+              "predicates": [
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "rust"
+                },
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "cpp"
+                }
+              ]
             },
             "source": {
               "file_index": 25,
@@ -20061,9 +20309,19 @@
             },
             "calling_convention": "system",
             "cfg": {
-              "type": "key_value",
-              "key": "backend",
-              "value": "rust"
+              "type": "any",
+              "predicates": [
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "rust"
+                },
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "cpp"
+                }
+              ]
             },
             "source": {
               "file_index": 25,
@@ -20091,9 +20349,19 @@
             },
             "calling_convention": "system",
             "cfg": {
-              "type": "key_value",
-              "key": "backend",
-              "value": "rust"
+              "type": "any",
+              "predicates": [
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "rust"
+                },
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "cpp"
+                }
+              ]
             },
             "source": {
               "file_index": 25,
@@ -24027,7 +24295,7 @@
               {
                 "prologue": null,
                 "epilogue": {
-                  "header": "\n    #[repr(C, align(8))]\n    pub struct EventData<\n        Arg1: EventArgument,\n        Arg2: EventArgument,\n        Arg3: EventArgument,\n        Arg4: EventArgument,\n        Arg5: EventArgument,\n    > {\n        pub type_id: u64,\n        pub arg1: <Arg1 as EventArgument>::Type,\n        pub arg2: <Arg2 as EventArgument>::Type,\n        pub arg3: <Arg3 as EventArgument>::Type,\n        pub arg4: <Arg4 as EventArgument>::Type,\n        pub arg5: <Arg5 as EventArgument>::Type,\n    }\n\n    impl<\n            Arg1: EventArgument,\n            Arg2: EventArgument,\n            Arg3: EventArgument,\n            Arg4: EventArgument,\n            Arg5: EventArgument,\n        > EventData<Arg1, Arg2, Arg3, Arg4, Arg5>\n    where\n        (Arg1, Arg2, Arg3, Arg4, Arg5): EventPayload<Arg1, Arg2, Arg3, Arg4, Arg5>,\n    {\n        pub fn new<\n            AsArg1: AsEventArgument<Arg1>,\n            AsArg2: AsEventArgument<Arg2>,\n            AsArg3: AsEventArgument<Arg3>,\n            AsArg4: AsEventArgument<Arg4>,\n            AsArg5: AsEventArgument<Arg5>,\n        >(\n            arg1: AsArg1,\n            arg2: AsArg2,\n            arg3: AsArg3,\n            arg4: AsArg4,\n            arg5: AsArg5,\n        ) -> Self {\n            Self {\n                type_id: <(Arg1, Arg2, Arg3, Arg4, Arg5) as EventPayload<\n                    Arg1,\n                    Arg2,\n                    Arg3,\n                    Arg4,\n                    Arg5,\n                >>::TYPE_ID,\n                arg1: <AsArg1 as AsEventArgument<Arg1>>::as_arg(arg1),\n                arg2: <AsArg2 as AsEventArgument<Arg2>>::as_arg(arg2),\n                arg3: <AsArg3 as AsEventArgument<Arg3>>::as_arg(arg3),\n                arg4: <AsArg4 as AsEventArgument<Arg4>>::as_arg(arg4),\n                arg5: <AsArg5 as AsEventArgument<Arg5>>::as_arg(arg5),\n            }\n        }\n    }\n\n    impl<T: EventArgument<Type = *const T>> AsEventArgument<T> for &T {\n        fn as_arg(arg: Self) -> <T as EventArgument>::Type {\n            arg as *const T\n        }\n    }\n\n    impl<T: EventArgument<Type = *const T>> AsEventArgument<T> for *const T {\n        fn as_arg(arg: Self) -> <T as EventArgument>::Type {\n            arg as *const T\n        }\n    }\n\n    impl<T: EventArgument<Type = *const *mut T>> AsEventArgument<T> for &*mut T {\n        fn as_arg(arg: Self) -> <T as EventArgument>::Type {\n            arg as *const *mut T\n        }\n    }\n\n    impl<T: EventArgument<Type = *const T>> AsEventArgument<Option<T>> for Option<&T> {\n        fn as_arg(arg: Self) -> <Option<T> as EventArgument>::Type {\n            if let Some(arg) = arg {\n                arg as *const T\n            } else {\n                std::ptr::null()\n            }\n        }\n    }\n\n    impl<T: EventArgument<Type = *const T>> AsEventArgument<Option<T>> for Option<*const T> {\n        fn as_arg(arg: Self) -> <Option<T> as EventArgument>::Type {\n            if let Some(arg) = arg {\n                arg as *const T\n            } else {\n                std::ptr::null()\n            }\n        }\n    }\n\n    impl<T: EventArgument<Type = *const *mut T>> AsEventArgument<Option<T>> for Option<&*mut T> {\n        fn as_arg(arg: Self) -> <Option<T> as EventArgument>::Type {\n            if let Some(arg) = arg {\n                arg as *const *mut T\n            } else {\n                std::ptr::null()\n            }\n        }\n    }\n\n    pub trait EventArgument {\n        type Type;\n        const TYPE_ID: u64;\n    }\n\n    impl EventArgument for () {\n        type Type = *const std::ffi::c_void;\n        const TYPE_ID: u64 = 0xFF;\n    }\n\n    impl EventArgument for i32 {\n        type Type = *const i32;\n        const TYPE_ID: u64 = 0x01;\n    }\n\n    impl EventArgument for f32 {\n        type Type = *const f32;\n        const TYPE_ID: u64 = 0x02;\n    }\n\n    impl EventArgument for std::ffi::CString {\n        type Type = *const i8;\n        const TYPE_ID: u64 = 0x03;\n    }\n\n    impl EventArgument for crate::types::math::Matrix4 {\n        type Type = *const crate::types::math::Matrix4;\n        const TYPE_ID: u64 = 0x04;\n    }\n\n    impl EventArgument for u32 {\n        type Type = *const u32;\n        const TYPE_ID: u64 = 0x05;\n    }\n\n    impl EventArgument for crate::game_objects::Character {\n        type Type = *const *mut crate::game_objects::Character;\n        const TYPE_ID: u64 = 0x0C;\n    }\n\n    impl EventArgument for crate::game_objects::GameObject {\n        type Type = *const *mut crate::game_objects::GameObject;\n        const TYPE_ID: u64 = 0x0B;\n    }\n\n    impl<T: EventArgument> EventArgument for Option<T> {\n        type Type = <T as EventArgument>::Type;\n        const TYPE_ID: u64 = <T as EventArgument>::TYPE_ID | 0x80;\n    }\n\n    pub trait EventPayload<\n        Arg1: EventArgument,\n        Arg2: EventArgument,\n        Arg3: EventArgument,\n        Arg4: EventArgument,\n        Arg5: EventArgument,\n    >\n    {\n        const TYPE_ID: u64 = Arg1::TYPE_ID\n            | (Arg2::TYPE_ID << 8)\n            | (Arg3::TYPE_ID << 16)\n            | (Arg4::TYPE_ID << 24)\n            | (Arg5::TYPE_ID << 32);\n    }\n\n    impl<\n            Arg1: EventArgument,\n            Arg2: EventArgument,\n            Arg3: EventArgument,\n            Arg4: EventArgument,\n            Arg5: EventArgument,\n        > EventPayload<Arg1, Arg2, Arg3, Arg4, Arg5> for (Arg1, Arg2, Arg3, Arg4, Arg5)\n    {\n    }\n\n    pub trait AsEventArgument<Arg: EventArgument + ?Sized> {\n        fn as_arg(arg: Self) -> <Arg as EventArgument>::Type;\n    }\n\n    impl AsEventArgument<()> for () {\n        fn as_arg(_arg: Self) -> *const std::ffi::c_void {\n            std::ptr::null()\n        }\n    }\n\n    impl AsEventArgument<std::ffi::CString> for &std::ffi::CStr {\n        fn as_arg(arg: Self) -> *const i8 {\n            arg.as_ptr()\n        }\n    }\n\n    impl AsEventArgument<std::ffi::CString> for &std::ffi::CString {\n        fn as_arg(arg: Self) -> *const i8 {\n            arg.as_ptr()\n        }\n    }\n\n    impl AsEventArgument<std::ffi::CString> for *const i8 {\n        fn as_arg(arg: Self) -> *const i8 {\n            arg\n        }\n    }\n\n    pub unsafe fn send_event(event_hash: crate::hash_string::HashString) {\n        if let Some(es) = unsafe { EventSystem::get() } {\n            let event_id = EventID::new(event_hash, crate::hash_string::HashString { hash: 0u32 });\n            let data = EventData::new((), (), (), (), ());\n\n            unsafe {\n                es.send_event(&event_id as _, 1, &data as *const _ as *const u8);\n            }\n        }\n    }\n\n    pub unsafe fn send_event_with_arg<Arg1: EventArgument, AsArg1: AsEventArgument<Arg1>>(\n        event_hash: crate::hash_string::HashString,\n        arg1: AsArg1,\n    ) {\n        unsafe {\n            send_event_with_args(event_hash, arg1, (), (), (), ());\n        }\n    }\n\n    pub unsafe fn send_event_with_args<\n        Arg1: EventArgument,\n        Arg2: EventArgument,\n        Arg3: EventArgument,\n        Arg4: EventArgument,\n        Arg5: EventArgument,\n        AsArg1: AsEventArgument<Arg1>,\n        AsArg2: AsEventArgument<Arg2>,\n        AsArg3: AsEventArgument<Arg3>,\n        AsArg4: AsEventArgument<Arg4>,\n        AsArg5: AsEventArgument<Arg5>,\n    >(\n        event_hash: crate::hash_string::HashString,\n        arg1: AsArg1,\n        arg2: AsArg2,\n        arg3: AsArg3,\n        arg4: AsArg4,\n        arg5: AsArg5,\n    ) {\n        if let Some(es) = unsafe { EventSystem::get() } {\n            let event_id = EventID::new(event_hash, crate::hash_string::HashString { hash: 0u32 });\n            let data = EventData::new(arg1, arg2, arg3, arg4, arg5);\n\n            unsafe {\n                es.send_event(&event_id as _, 1, &data as *const _ as *const u8);\n            }\n        }\n    }\n",
+                  "header": "\n    #[repr(C, align(8))]\n    pub struct EventData<\n        Arg1: EventArgument,\n        Arg2: EventArgument,\n        Arg3: EventArgument,\n        Arg4: EventArgument,\n        Arg5: EventArgument,\n    > {\n        pub type_id: u64,\n        pub arg1: <Arg1 as EventArgument>::Type,\n        pub arg2: <Arg2 as EventArgument>::Type,\n        pub arg3: <Arg3 as EventArgument>::Type,\n        pub arg4: <Arg4 as EventArgument>::Type,\n        pub arg5: <Arg5 as EventArgument>::Type,\n    }\n\n    impl<\n            Arg1: EventArgument,\n            Arg2: EventArgument,\n            Arg3: EventArgument,\n            Arg4: EventArgument,\n            Arg5: EventArgument,\n        > EventData<Arg1, Arg2, Arg3, Arg4, Arg5>\n    where\n        (Arg1, Arg2, Arg3, Arg4, Arg5): EventPayload<Arg1, Arg2, Arg3, Arg4, Arg5>,\n    {\n        pub fn new<\n            AsArg1: AsEventArgument<Arg1>,\n            AsArg2: AsEventArgument<Arg2>,\n            AsArg3: AsEventArgument<Arg3>,\n            AsArg4: AsEventArgument<Arg4>,\n            AsArg5: AsEventArgument<Arg5>,\n        >(\n            arg1: AsArg1,\n            arg2: AsArg2,\n            arg3: AsArg3,\n            arg4: AsArg4,\n            arg5: AsArg5,\n        ) -> Self {\n            Self {\n                type_id: <(Arg1, Arg2, Arg3, Arg4, Arg5) as EventPayload<\n                    Arg1,\n                    Arg2,\n                    Arg3,\n                    Arg4,\n                    Arg5,\n                >>::TYPE_ID,\n                arg1: <AsArg1 as AsEventArgument<Arg1>>::as_arg(arg1),\n                arg2: <AsArg2 as AsEventArgument<Arg2>>::as_arg(arg2),\n                arg3: <AsArg3 as AsEventArgument<Arg3>>::as_arg(arg3),\n                arg4: <AsArg4 as AsEventArgument<Arg4>>::as_arg(arg4),\n                arg5: <AsArg5 as AsEventArgument<Arg5>>::as_arg(arg5),\n            }\n        }\n    }\n\n    impl<T: EventArgument<Type = *const T>> AsEventArgument<T> for &T {\n        fn as_arg(arg: Self) -> <T as EventArgument>::Type {\n            arg as *const T\n        }\n    }\n\n    impl<T: EventArgument<Type = *const T>> AsEventArgument<T> for *const T {\n        fn as_arg(arg: Self) -> <T as EventArgument>::Type {\n            arg as *const T\n        }\n    }\n\n    impl<T: EventArgument<Type = *const *mut T>> AsEventArgument<T> for &*mut T {\n        fn as_arg(arg: Self) -> <T as EventArgument>::Type {\n            arg as *const *mut T\n        }\n    }\n\n    impl<T: EventArgument<Type = *const T>> AsEventArgument<Option<T>> for Option<&T> {\n        fn as_arg(arg: Self) -> <Option<T> as EventArgument>::Type {\n            if let Some(arg) = arg {\n                arg as *const T\n            } else {\n                std::ptr::null()\n            }\n        }\n    }\n\n    impl<T: EventArgument<Type = *const T>> AsEventArgument<Option<T>> for Option<*const T> {\n        fn as_arg(arg: Self) -> <Option<T> as EventArgument>::Type {\n            if let Some(arg) = arg {\n                arg as *const T\n            } else {\n                std::ptr::null()\n            }\n        }\n    }\n\n    impl<T: EventArgument<Type = *const *mut T>> AsEventArgument<Option<T>> for Option<&*mut T> {\n        fn as_arg(arg: Self) -> <Option<T> as EventArgument>::Type {\n            if let Some(arg) = arg {\n                arg as *const *mut T\n            } else {\n                std::ptr::null()\n            }\n        }\n    }\n\n    pub trait EventArgument {\n        type Type;\n        const TYPE_ID: u64;\n    }\n\n    impl EventArgument for () {\n        type Type = *const std::ffi::c_void;\n        const TYPE_ID: u64 = EventID::TYPE_ID_NULL;\n    }\n\n    impl EventArgument for i32 {\n        type Type = *const i32;\n        const TYPE_ID: u64 = EventID::TYPE_ID_I32;\n    }\n\n    impl EventArgument for f32 {\n        type Type = *const f32;\n        const TYPE_ID: u64 = EventID::TYPE_ID_F32;\n    }\n\n    impl EventArgument for std::ffi::CString {\n        type Type = *const i8;\n        const TYPE_ID: u64 = EventID::TYPE_ID_CSTRING;\n    }\n\n    impl EventArgument for crate::types::math::Matrix4 {\n        type Type = *const crate::types::math::Matrix4;\n        const TYPE_ID: u64 = EventID::TYPE_ID_MATRIX4;\n    }\n\n    impl EventArgument for u32 {\n        type Type = *const u32;\n        const TYPE_ID: u64 = EventID::TYPE_ID_U32;\n    }\n\n    impl EventArgument for crate::game_objects::Character {\n        type Type = *const *mut crate::game_objects::Character;\n        const TYPE_ID: u64 = EventID::TYPE_ID_CHARACTER;\n    }\n\n    impl EventArgument for crate::game_objects::GameObject {\n        type Type = *const *mut crate::game_objects::GameObject;\n        const TYPE_ID: u64 = EventID::TYPE_ID_GAME_OBJECT;\n    }\n\n    impl<T: EventArgument> EventArgument for Option<T> {\n        type Type = <T as EventArgument>::Type;\n        const TYPE_ID: u64 = <T as EventArgument>::TYPE_ID | EventID::TYPE_ID_OPTION_MASK;\n    }\n\n    pub trait EventPayload<\n        Arg1: EventArgument,\n        Arg2: EventArgument,\n        Arg3: EventArgument,\n        Arg4: EventArgument,\n        Arg5: EventArgument,\n    >\n    {\n        const TYPE_ID: u64 = Arg1::TYPE_ID\n            | (Arg2::TYPE_ID << 8)\n            | (Arg3::TYPE_ID << 16)\n            | (Arg4::TYPE_ID << 24)\n            | (Arg5::TYPE_ID << 32);\n    }\n\n    impl<\n            Arg1: EventArgument,\n            Arg2: EventArgument,\n            Arg3: EventArgument,\n            Arg4: EventArgument,\n            Arg5: EventArgument,\n        > EventPayload<Arg1, Arg2, Arg3, Arg4, Arg5> for (Arg1, Arg2, Arg3, Arg4, Arg5)\n    {\n    }\n\n    pub trait AsEventArgument<Arg: EventArgument + ?Sized> {\n        fn as_arg(arg: Self) -> <Arg as EventArgument>::Type;\n    }\n\n    impl AsEventArgument<()> for () {\n        fn as_arg(_arg: Self) -> *const std::ffi::c_void {\n            std::ptr::null()\n        }\n    }\n\n    impl AsEventArgument<std::ffi::CString> for &std::ffi::CStr {\n        fn as_arg(arg: Self) -> *const i8 {\n            arg.as_ptr()\n        }\n    }\n\n    impl AsEventArgument<std::ffi::CString> for &std::ffi::CString {\n        fn as_arg(arg: Self) -> *const i8 {\n            arg.as_ptr()\n        }\n    }\n\n    impl AsEventArgument<std::ffi::CString> for *const i8 {\n        fn as_arg(arg: Self) -> *const i8 {\n            arg\n        }\n    }\n\n    pub unsafe fn send_event(event_hash: crate::hash_string::HashString) {\n        if let Some(es) = unsafe { EventSystem::get() } {\n            let event_id = EventID::new(event_hash, crate::hash_string::HashString { hash: 0u32 });\n            let data = EventData::new((), (), (), (), ());\n\n            unsafe {\n                es.send_event(&event_id as _, 1, &data as *const _ as *const u8);\n            }\n        }\n    }\n\n    pub unsafe fn send_event_with_arg<Arg1: EventArgument, AsArg1: AsEventArgument<Arg1>>(\n        event_hash: crate::hash_string::HashString,\n        arg1: AsArg1,\n    ) {\n        unsafe {\n            send_event_with_args(event_hash, arg1, (), (), (), ());\n        }\n    }\n\n    pub unsafe fn send_event_with_args<\n        Arg1: EventArgument,\n        Arg2: EventArgument,\n        Arg3: EventArgument,\n        Arg4: EventArgument,\n        Arg5: EventArgument,\n        AsArg1: AsEventArgument<Arg1>,\n        AsArg2: AsEventArgument<Arg2>,\n        AsArg3: AsEventArgument<Arg3>,\n        AsArg4: AsEventArgument<Arg4>,\n        AsArg5: AsEventArgument<Arg5>,\n    >(\n        event_hash: crate::hash_string::HashString,\n        arg1: AsArg1,\n        arg2: AsArg2,\n        arg3: AsArg3,\n        arg4: AsArg4,\n        arg5: AsArg5,\n    ) {\n        if let Some(es) = unsafe { EventSystem::get() } {\n            let event_id = EventID::new(event_hash, crate::hash_string::HashString { hash: 0u32 });\n            let data = EventData::new(arg1, arg2, arg3, arg4, arg5);\n\n            unsafe {\n                es.send_event(&event_id as _, 1, &data as *const _ as *const u8);\n            }\n        }\n    }\n",
                   "definition": null
                 }
               }
@@ -24533,6 +24801,16 @@
           "extern_values": [],
           "functions": [],
           "backends": {
+            "cpp": [
+              {
+                "prologue": null,
+                "epilogue": {
+                  "header": "\ninline HashString HashString::from_u32(::std::uint32_t hash) {\n    return HashString{hash};\n}\n",
+                  "definition": null,
+                  "for_type": "types::hash_string::HashString"
+                }
+              }
+            ],
             "rust": [
               {
                 "prologue": null,
@@ -24564,6 +24842,24 @@
           "extern_values": [],
           "functions": [],
           "backends": {
+            "cpp": [
+              {
+                "prologue": null,
+                "epilogue": {
+                  "header": "\ninline const float* Matrix3::as_ptr() const { return data; }\ninline float* Matrix3::as_mut_ptr() { return data; }\n",
+                  "definition": null,
+                  "for_type": "types::math::Matrix3"
+                }
+              },
+              {
+                "prologue": null,
+                "epilogue": {
+                  "header": "\ninline const float* Matrix4::as_ptr() const { return data; }\ninline float* Matrix4::as_mut_ptr() { return data; }\n",
+                  "definition": null,
+                  "for_type": "types::math::Matrix4"
+                }
+              }
+            ],
             "rust": [
               {
                 "prologue": {

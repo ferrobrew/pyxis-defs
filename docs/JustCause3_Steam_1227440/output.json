@@ -7117,9 +7117,19 @@
             },
             "calling_convention": "system",
             "cfg": {
-              "type": "key_value",
-              "key": "backend",
-              "value": "rust"
+              "type": "any",
+              "predicates": [
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "rust"
+                },
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "cpp"
+                }
+              ]
             },
             "source": {
               "file_index": 15,
@@ -7147,9 +7157,19 @@
             },
             "calling_convention": "system",
             "cfg": {
-              "type": "key_value",
-              "key": "backend",
-              "value": "rust"
+              "type": "any",
+              "predicates": [
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "rust"
+                },
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "cpp"
+                }
+              ]
             },
             "source": {
               "file_index": 15,
@@ -7224,9 +7244,19 @@
             },
             "calling_convention": "system",
             "cfg": {
-              "type": "key_value",
-              "key": "backend",
-              "value": "rust"
+              "type": "any",
+              "predicates": [
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "rust"
+                },
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "cpp"
+                }
+              ]
             },
             "source": {
               "file_index": 15,
@@ -7254,9 +7284,19 @@
             },
             "calling_convention": "system",
             "cfg": {
-              "type": "key_value",
-              "key": "backend",
-              "value": "rust"
+              "type": "any",
+              "predicates": [
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "rust"
+                },
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "cpp"
+                }
+              ]
             },
             "source": {
               "file_index": 15,
@@ -7301,7 +7341,7 @@
             "is_base": false,
             "source": {
               "file_index": 15,
-              "line": 149
+              "line": 159
             }
           },
           {
@@ -7318,7 +7358,7 @@
             "is_base": false,
             "source": {
               "file_index": 15,
-              "line": 150
+              "line": 160
             }
           }
         ],
@@ -7333,7 +7373,7 @@
       },
       "source": {
         "file_index": 15,
-        "line": 148
+        "line": 158
       }
     },
     "types::math::Vector2": {
@@ -8075,6 +8115,24 @@
           "extern_values": [],
           "functions": [],
           "backends": {
+            "cpp": [
+              {
+                "prologue": null,
+                "epilogue": {
+                  "header": "\ninline const float* Matrix3::as_ptr() const { return data; }\ninline float* Matrix3::as_mut_ptr() { return data; }\n",
+                  "definition": null,
+                  "for_type": "types::math::Matrix3"
+                }
+              },
+              {
+                "prologue": null,
+                "epilogue": {
+                  "header": "\ninline const float* Matrix4::as_ptr() const { return data; }\ninline float* Matrix4::as_mut_ptr() { return data; }\n",
+                  "definition": null,
+                  "for_type": "types::math::Matrix4"
+                }
+              }
+            ],
             "rust": [
               {
                 "prologue": null,

@@ -32,6 +32,22 @@ impl SharedCountImpl {
     #[external_body]
     pub fn weak_add_ref(&mut self);
 }
+#[cfg(backend = "rust")]
+impl SharedCountImpl {
+    /// Decrement the strong count; on reaching zero, call `dispose`
+    /// then `weak_release`.
+    #[external_body]
+    pub fn release(&mut self);
+    /// Decrement the weak count; on reaching zero, call `destroy`.
+    #[external_body]
+    pub fn weak_release(&mut self);
+    /// Increment the strong count.
+    #[external_body]
+    pub fn add_ref_copy(&mut self);
+    /// Increment the weak count.
+    #[external_body]
+    pub fn weak_add_ref(&mut self);
+}
 
 backend rust epilogue for SharedCountImpl r#"
     // SharedCountImpl

@@ -2,7 +2,7 @@
 pub type Matrix3 {
     pub data: [f32; 9],
 }
-#[cfg(backend = "rust")]
+#[cfg(any(backend = "rust", backend = "cpp"))]
 impl Matrix3 {
     /// Raw pointer to the row-major data, for passing to engine APIs.
     #[external_body]
@@ -53,7 +53,7 @@ backend rust epilogue for Matrix3 r#"
 pub type Matrix4 {
     pub data: [f32; 16],
 }
-#[cfg(backend = "rust")]
+#[cfg(any(backend = "rust", backend = "cpp"))]
 impl Matrix4 {
     /// Raw pointer to the row-major data, for passing to engine APIs.
     #[external_body]
@@ -203,6 +203,16 @@ backend rust epilogue for Vector4 r#"
             glam::Vec4::new(v.data[0], v.data[1], v.data[2], v.data[3])
         }
     }
+"#;
+
+backend cpp epilogue for Matrix3 r#"
+inline const float* Matrix3::as_ptr() const { return data; }
+inline float* Matrix3::as_mut_ptr() { return data; }
+"#;
+
+backend cpp epilogue for Matrix4 r#"
+inline const float* Matrix4::as_ptr() const { return data; }
+inline float* Matrix4::as_mut_ptr() { return data; }
 "#;
 
 #[copyable, defaultable, align(4)]

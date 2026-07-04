@@ -21769,9 +21769,19 @@
             },
             "calling_convention": "system",
             "cfg": {
-              "type": "key_value",
-              "key": "backend",
-              "value": "rust"
+              "type": "any",
+              "predicates": [
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "rust"
+                },
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "cpp"
+                }
+              ]
             },
             "source": {
               "file_index": 36,
@@ -21799,9 +21809,19 @@
             },
             "calling_convention": "system",
             "cfg": {
-              "type": "key_value",
-              "key": "backend",
-              "value": "rust"
+              "type": "any",
+              "predicates": [
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "rust"
+                },
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "cpp"
+                }
+              ]
             },
             "source": {
               "file_index": 36,
@@ -21883,9 +21903,19 @@
             },
             "calling_convention": "system",
             "cfg": {
-              "type": "key_value",
-              "key": "backend",
-              "value": "rust"
+              "type": "any",
+              "predicates": [
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "rust"
+                },
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "cpp"
+                }
+              ]
             },
             "source": {
               "file_index": 36,
@@ -21913,9 +21943,19 @@
             },
             "calling_convention": "system",
             "cfg": {
-              "type": "key_value",
-              "key": "backend",
-              "value": "rust"
+              "type": "any",
+              "predicates": [
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "rust"
+                },
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "cpp"
+                }
+              ]
             },
             "source": {
               "file_index": 36,
@@ -22010,7 +22050,7 @@
             "is_base": false,
             "source": {
               "file_index": 36,
-              "line": 210
+              "line": 220
             }
           },
           {
@@ -22027,7 +22067,7 @@
             "is_base": false,
             "source": {
               "file_index": 36,
-              "line": 211
+              "line": 221
             }
           }
         ],
@@ -22042,7 +22082,7 @@
       },
       "source": {
         "file_index": 36,
-        "line": 209
+        "line": 219
       }
     },
     "types::math::Vector2": {
@@ -22294,9 +22334,19 @@
             "return_type": null,
             "calling_convention": "system",
             "cfg": {
-              "type": "key_value",
-              "key": "backend",
-              "value": "rust"
+              "type": "any",
+              "predicates": [
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "rust"
+                },
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "cpp"
+                }
+              ]
             },
             "source": {
               "file_index": 37,
@@ -22321,9 +22371,19 @@
             },
             "calling_convention": "system",
             "cfg": {
-              "type": "key_value",
-              "key": "backend",
-              "value": "rust"
+              "type": "any",
+              "predicates": [
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "rust"
+                },
+                {
+                  "type": "key_value",
+                  "key": "backend",
+                  "value": "cpp"
+                }
+              ]
             },
             "source": {
               "file_index": 37,
@@ -27556,6 +27616,24 @@
           "extern_values": [],
           "functions": [],
           "backends": {
+            "cpp": [
+              {
+                "prologue": null,
+                "epilogue": {
+                  "header": "\ninline const float* Matrix3::as_ptr() const { return data; }\ninline float* Matrix3::as_mut_ptr() { return data; }\n",
+                  "definition": null,
+                  "for_type": "types::math::Matrix3"
+                }
+              },
+              {
+                "prologue": null,
+                "epilogue": {
+                  "header": "\ninline const float* Matrix4::as_ptr() const { return data; }\ninline float* Matrix4::as_mut_ptr() { return data; }\n",
+                  "definition": null,
+                  "for_type": "types::math::Matrix4"
+                }
+              }
+            ],
             "rust": [
               {
                 "prologue": null,
@@ -27613,6 +27691,16 @@
           "extern_values": [],
           "functions": [],
           "backends": {
+            "cpp": [
+              {
+                "prologue": null,
+                "epilogue": {
+                  "header": "\ntemplate <class T>\ninline ::std::size_t Vector<T>::len() const {\n    if (begin == nullptr) {\n        return 0;\n    }\n    return static_cast<::std::size_t>(reinterpret_cast<const char*>(end) - reinterpret_cast<const char*>(begin)) / sizeof(T);\n}\n\ntemplate <class T>\ninline bool Vector<T>::is_empty() const {\n    return len() == 0;\n}\n",
+                  "definition": null,
+                  "for_type": "types::std_vector::Vector"
+                }
+              }
+            ],
             "rust": [
               {
                 "prologue": null,
