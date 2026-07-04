@@ -1,0 +1,72 @@
+use graphics_engine::graphics_engine::RenderContext;
+use types::math::Matrix4;
+
+/// A skinned draw batch within a character render block. The vertex data references palette slots;
+/// `BatchToSkeletonLookup` maps each slot to its skeleton bone index when the palette is built
+/// (`SetMatrixPalette`), so the batch's lookup table enumerates exactly the bones its geometry is
+/// weighted to.
+#[size(0x18), copyable]
+pub type SkinBatch {
+    pub BatchToSkeletonLookup: *mut i16,
+    pub BatchSize: i32,
+    /// The batch's index count (indices, not triangles; `DrawBatches` divides by 3).
+    pub Size: i32,
+    /// The batch's start offset in the block's index buffer.
+    pub Offset: i32,
+}
+
+/// The per-draw render block instance info: the instance's constant buffers, LOD state, and world
+/// transforms.
+pub type RBIInfo;
+impl RBIInfo {
+    /// Writes the instance world transform for the given transform slot into `out` (also returned).
+    /// The render blocks pass [`RenderContext::m_TransformIndex`](graphics_engine::graphics_engine::RenderContext::m_TransformIndex)
+    /// as the slot for the current dispatch.
+    #[address(0x140_0B1_850)]
+    pub fn GetMatrix(&self, out: *mut Matrix4, index: i32) -> *mut Matrix4;
+}
+
+/// The skinned character render block (the `Character` RBMDL block type). A character model is
+/// composed of one block per material; the same block objects are drawn for every pass, branching
+/// internally on [`RenderContext::m_RenderStatus`](graphics_engine::graphics_engine::RenderContext::m_RenderStatus)
+/// to select the shadow/depth-only path versus the full material path.
+#[min_size(0x250)]
+pub type RenderBlockCharacter {
+    /// The `std::vector<CSkinBatch>` begin pointer.
+    #[address(0x248)]
+    pub m_SkinBatchesBegin: *mut SkinBatch,
+    /// The `std::vector<CSkinBatch>` end pointer.
+    pub m_SkinBatchesEnd: *mut SkinBatch,
+}
+impl RenderBlockCharacter {
+    /// Draws the block for the current pass. Shadow passes
+    /// ([`RenderContext::m_RenderStatus`](graphics_engine::graphics_engine::RenderContext::m_RenderStatus) `& 6`)
+    /// take a depth-only path with the depth vertex shaders; other passes run the full material
+    /// setup.
+    #[address(0x140_13A_310)]
+    pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
+
+    /// Draws the block for the Z/velocity prepass.
+    #[address(0x140_139_CD0)]
+    pub fn DrawZ(&self, rc: *mut RenderContext, info: *const RBIInfo);
+}
+
+/// The skinned character skin render block (the `CharacterSkin` RBMDL block type): the skin-shaded
+/// variant of [`RenderBlockCharacter`], with the same batch and pass structure.
+#[min_size(0x1C8)]
+pub type RenderBlockCharacterSkin {
+    /// The `std::vector<CSkinBatch>` begin pointer.
+    #[address(0x1C0)]
+    pub m_SkinBatchesBegin: *mut SkinBatch,
+    /// The `std::vector<CSkinBatch>` end pointer.
+    pub m_SkinBatchesEnd: *mut SkinBatch,
+}
+impl RenderBlockCharacterSkin {
+    /// Draws the block for the current pass; see [`RenderBlockCharacter::Draw`].
+    #[address(0x140_13B_580)]
+    pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
+
+    /// Draws the block for the Z/velocity prepass.
+    #[address(0x140_13A_F60)]
+    pub fn DrawZ(&self, rc: *mut RenderContext, info: *const RBIInfo);
+}
