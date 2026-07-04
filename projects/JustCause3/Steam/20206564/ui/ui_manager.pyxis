@@ -197,6 +197,14 @@ impl UIManager {
     #[address(0x140_F69_A70)]
     pub fn Convert3DCoords(&self, world: *const Vector3, out_x: *mut f32, out_y: *mut f32, vp: *const Matrix4) -> bool;
 
+    /// The default-VP world-to-screen wrapper `CHUDUI::UpdateGrappleReticle` uses for the grapple
+    /// reticle (its only callers): fetches the render camera's view-projection internally and
+    /// forwards to [`Convert3DCoords`](UIManager::Convert3DCoords). Because the VP is not a
+    /// parameter, the grapple reticle bypasses the floating panel's marker reprojection unless
+    /// this wrapper is hooked.
+    #[address(0x140_F89_9A0)]
+    pub fn Convert3DCoordsDefault(&mut self, world: *const Vector3, out_x: *mut f32, out_y: *mut f32) -> bool;
+
     /// Marker placement: [`Convert3DCoords`](UIManager::Convert3DCoords) with the supplied `vp`, plus
     /// an on-screen test and an off-screen edge-clamp via [`ClampToScreen`](UIManager::ClampToScreen).
     /// Gameplay markers route through here.
