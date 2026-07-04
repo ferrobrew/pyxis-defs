@@ -89,6 +89,13 @@ impl Character {
 pub type AnimatedModel {
     #[address(0x178)]
     pub m_AnimationController: *mut AnimationController,
+
+    /// The model-instance slots (`NModelSystem::CModelInstance*`, null when unused): the base
+    /// body model plus attachments and variants. `CAnimatedModel::GetModel`/`SetModel` index this
+    /// array directly. Each instance embeds its render-block-instance info (`CRBIInfo`) at
+    /// instance + 0x50, which is the `info` pointer its render blocks are drawn with.
+    #[address(0x200)]
+    pub m_ModelInstances: [u64; 8],
 }
 impl AnimatedModel {
     /// Tests whether the animation state machine would accept the act from its current state,
