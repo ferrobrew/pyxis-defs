@@ -3,6 +3,29 @@ use graphics_engine::graphics_engine::HContext_t;
 use types::math::{Vector2, Vector3, Matrix4};
 use ui::scaleform::{MovieImpl, RenderHAL};
 
+/// The `CUiThreadCommandQueue`: commands queued for execution on the UI render worker.
+#[min_size(0xA0)]
+pub type UiThreadCommandQueue {
+    /// The thread id the queue's render interfaces report; `CUIManager::Render` sets it to the
+    /// calling thread before executing.
+    #[address(0x98)]
+    pub m_RenderThreadId: u32,
+}
+impl UiThreadCommandQueue {
+    /// Executes the queued render-thread commands. UI render worker only.
+    #[address(0x140_FFA_D30)]
+    pub fn Execute(&mut self);
+}
+
+/// The Scaleform `Render::D3D1x::TextureManager` behind the UI (only the render-thread id is
+/// modeled).
+#[min_size(0x50)]
+pub type UITextureManager {
+    /// The render thread id; `CUIManager::Render` sets it to the calling thread each call.
+    #[address(0x48)]
+    pub RenderThreadId: u32,
+}
+
 /// The screen-position code returned by the UI world-to-screen and marker placement: on-screen, an
 /// off-screen clamped edge or corner, off-screen in front (no clamp), or off-screen behind.
 #[copyable]
@@ -115,6 +138,16 @@ pub type UIManager {
     /// The Scaleform `Render::D3D1x::HAL` the UI render worker draws through.
     #[address(0x1_328)]
     pub m_RenderHAL: *mut RenderHAL,
+
+    /// The UI render worker's command queue; `Render` executes it (and stamps its
+    /// [`m_RenderThreadId`](UiThreadCommandQueue::m_RenderThreadId)) at the top of every call.
+    #[address(0x1_368)]
+    pub m_ThreadCommandQueue: *mut UiThreadCommandQueue,
+
+    /// The Scaleform `D3D1x::TextureManager`; `Render` stamps its
+    /// [`RenderThreadId`](UITextureManager::RenderThreadId) at the top of every call.
+    #[address(0x1_370)]
+    pub m_TextureManager: *mut UITextureManager,
 
     /// The Scaleform render buffer the UI HAL renders into, set up by
     /// [`InitPlatformRT`](UIManager::InitPlatformRT). [`RenderTargetData::UpdateData`] rebinds which

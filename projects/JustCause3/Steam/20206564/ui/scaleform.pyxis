@@ -89,6 +89,156 @@ pub type RenderContext {
     #[address(0x99)]
     pub NextCaptureCalledInFrame: bool,
 }
+impl RenderContext {
+    /// Creates a fresh [`TreeRoot`] entry in this context (`Context::CreateEntry<TreeRoot>`):
+    /// allocates its `NodeData` from the context heap and registers the entry. The root starts
+    /// parentless with no viewport; give it one via [`TreeRoot::SetViewport`] and a stage matrix
+    /// via [`TreeNode::SetMatrix`] before drawing it. Call on the capture (game update) thread.
+    #[address(0x141_994_560)]
+    pub fn CreateEntryTreeRoot(&mut self) -> *mut TreeRoot;
+
+    /// Creates a fresh empty [`TreeContainer`] entry in this context
+    /// (`Context::CreateEntry<TreeContainer>`). Call on the capture (game update) thread.
+    #[address(0x141_990_AF0)]
+    pub fn CreateEntryTreeContainer(&mut self) -> *mut TreeContainer;
+}
+
+/// A Scaleform render-tree node: a `Render::ContextImpl::Entry` (a 56-byte slot in a
+/// 0x1000-aligned entry page) whose per-snapshot `NodeData` carries the transform, visibility,
+/// and bounds. [`TreeContainer`] and [`TreeRoot`] share this header; a pointer to either casts to
+/// this freely.
+#[size(0x38)]
+pub type TreeNode {
+    /// The entry's reference count. [`TreeContainer::Insert`] increments it and
+    /// [`TreeContainer::Remove`] decrements it (destroying the entry at zero), so moving a node
+    /// between containers must hold an extra count across the remove.
+    #[address(0x8)]
+    pub RefCount: u64,
+
+    /// The displaying-snapshot `EntryData` the renderer reads (low bit carries a flag).
+    #[address(0x10)]
+    pub pNative: *mut void,
+
+    /// The renderer's `TreeCacheNode` for this entry, once drawn.
+    #[address(0x18)]
+    pub pRenderer: *mut void,
+
+    /// The parent container entry, or null while detached. [`TreeContainer::Remove`] nulls it;
+    /// a null parent on a node the display side owned means the display list dropped it.
+    #[address(0x20)]
+    pub pParent: *mut TreeNode,
+}
+impl TreeNode {
+    /// Writes the node's 2D transform (`Matrix2x4<float>`, 8 floats) through the entry-change
+    /// protocol. Call on the capture (game update) thread.
+    #[address(0x141_9E7_230)]
+    pub fn SetMatrix(&mut self, matrix: *const f32);
+
+    /// Destroys the entry (`Entry::destroyHelper`): queues its `NodeData` on the context's
+    /// destroyed-nodes list (freed at the next capture) and frees the slot. Call only when
+    /// [`RefCount`](TreeNode::RefCount) reached zero, on the capture (game update) thread.
+    #[address(0x141_9A6_110)]
+    pub fn DestroyHelper(&mut self);
+}
+
+/// A render-tree container node (`Render::TreeContainer`): a [`TreeNode`] whose `NodeData` holds
+/// a child `TreeNodeArray`. The display side mirrors every `DisplayObjContainer` into one, and
+/// addresses children by *cached numeric index* (`GFx::DisplayList`'s `TreeIndex`) -- so removing
+/// a child behind the display list's back shifts its siblings' cached indices; swap in a
+/// placeholder node instead when a child must leave without the display list knowing.
+#[size(0x38)]
+pub type TreeContainer;
+impl TreeContainer {
+    /// Inserts `node` at `index` (entry-change bit 0x100): refcounts the node, sets its
+    /// [`pParent`](TreeNode::pParent), and propagates. Capture (game update) thread only.
+    #[address(0x141_9E6_720)]
+    pub fn Insert(&mut self, index: u64, node: *mut TreeNode) -> bool;
+
+    /// Removes `count` children starting at `index` (entry-change bit 0x200): nulls each child's
+    /// [`pParent`](TreeNode::pParent) and drops its refcount (destroying it at zero). Capture
+    /// (game update) thread only.
+    #[address(0x141_9E6_790)]
+    pub fn Remove(&mut self, index: u64, count: u64);
+
+    /// The child at `index` of the active snapshot's child array, or null out of range.
+    #[address(0x141_9EA_460)]
+    pub fn GetAt(&self, index: u64) -> *mut TreeNode;
+
+    /// The active snapshot's child count.
+    #[address(0x141_97D_A10)]
+    pub fn GetSize(&self) -> u64;
+}
+
+/// A render-tree root (`Render::TreeRoot`): a [`TreeContainer`] whose `NodeData` adds the
+/// viewport and background color. `HAL::Draw` takes one; the engine draws several per frame
+/// through the same HAL (the UI movie, the off-screen movies, the debug text).
+#[size(0x38)]
+pub type TreeRoot;
+impl TreeRoot {
+    /// Writes the root's viewport (entry-change bit 0x1000, self-comparing). `viewport` is a
+    /// `GFx::Viewport` (e.g. [`MovieImpl::Viewport`]); the 0x2C `Render::Viewport` prefix is
+    /// copied. Capture (game update) thread only.
+    #[address(0x141_9E6_860)]
+    pub fn SetViewport(&mut self, viewport: *const u8);
+}
+
+/// A Scaleform `GFx::DisplayObjectBase`: the display-side object behind a display-list entry.
+/// Reached from a managed display-object [`Value`] at `mValue + 0x88` (guarded by the traits
+/// check `GetDisplayInfo` performs on `mValue + 0x28`).
+#[min_size(1)]
+pub type DisplayObjectBase;
+impl DisplayObjectBase {
+    /// The object's render-tree node, created lazily. Capture (game update) thread only.
+    #[address(0x141_9EB_6F0)]
+    pub fn GetRenderNode(&self) -> *mut TreeNode;
+}
+
+/// A pinned `DisplayHandle<TreeRoot>` as returned by
+/// [`GetDisplayHandle`](MovieImpl::GetDisplayHandle): one refcounted `HandleData` pointer.
+#[size(0x8)]
+pub type DisplayHandle {
+    /// The refcounted `RTHandle::HandleData` (starts with `RefCountImpl`, so
+    /// [`RefCountImpl::AddRef`] pins a copied handle).
+    #[address(0x0)]
+    pub pData: *mut RefCountImpl,
+}
+
+/// A stack `Render::ContextImpl::RTHandle` over a copied
+/// [`DisplayHandle::pData`] (AddRef'd first, destructed after use).
+#[size(0x8)]
+pub type RTHandle {
+    /// The shared, refcounted handle data.
+    #[address(0x0)]
+    pub pData: *mut RefCountImpl,
+}
+impl RTHandle {
+    /// Consumes the context's pending snapshot into the displaying one (at most once per HAL
+    /// frame: the context's [`NextCaptureCalledInFrame`](RenderContext::NextCaptureCalledInFrame)
+    /// latch short-circuits repeats). Returns whether the handle is valid to draw. `notify` is
+    /// the HAL's context notify ([`RenderHAL::GetContextNotify`]); `frame_id` is 0.
+    #[address(0x141_9A7_970)]
+    pub fn NextCapture(&mut self, notify: *mut void, frame_id: u64) -> bool;
+
+    /// The handle's root entry in the current displaying snapshot, for `HAL::Draw`.
+    #[address(0x141_9A4_620)]
+    pub fn GetRenderEntry(&self) -> *mut TreeRoot;
+
+    /// The RTHandle destructor (releases the handle data).
+    #[address(0x141_9A4_600)]
+    pub fn Destruct(&mut self);
+}
+
+/// A Scaleform `Render::RenderTarget`: the target wrapper `SetRenderTarget`/`PushRenderTarget`
+/// take. `RenderOffScreenTextures` creates one per draw from D3D views
+/// ([`RenderHAL::CreateRenderTarget`]) and releases it after the pop.
+#[min_size(0x18)]
+pub type RenderTarget {
+    vftable {
+        /// Releases the target (refcounted; slot 2).
+        #[index(2)]
+        pub fn Release(&mut self);
+    },
+}
 
 /// The `GFx::MovieImpl` behind [`UIManager::m_Movie`](ui::ui_manager::UIManager::m_Movie): the
 /// `GFx::Movie` instance. The rendering-side virtuals live on its own vtable; the AS3 side
@@ -108,6 +258,12 @@ pub type MovieImpl {
         /// (`RenderOffScreenTextures` does exactly this per frame).
         #[index(27)]
         pub fn SetCaptureThread(&mut self, thread_id: u32);
+
+        /// Returns the movie's display handle (`GFx::Movie` vtable slot 26): the pinned
+        /// `DisplayHandle<TreeRoot>` whose `pData` the renderer copies (with an `AddRef`) into a
+        /// stack [`RTHandle`] before consuming the frame's capture.
+        #[index(26)]
+        pub fn GetDisplayHandle(&mut self) -> *mut DisplayHandle;
     },
 
     /// The AS3 `MovieRoot` (the [`Movie`] interface): SetVariable, Invoke, and the display tree.
@@ -126,6 +282,23 @@ pub type MovieImpl {
     /// The root `DisplayObjContainer` (the main movie clip).
     #[address(0x50)]
     pub pMainMovie: *mut void,
+
+    /// The movie's render-tree root ([`TreeRoot`]): the entry `CUIManager::Render` draws via the
+    /// display handle. The whole display tree's render nodes hang off it.
+    #[address(0x88)]
+    pub pRenderRoot: *mut TreeRoot,
+
+    /// The movie's `GFx::Viewport` (0x34 bytes: buffer size, view rectangle, scissor, flags,
+    /// scale, and aspect). [`TreeRoot::SetViewport`] takes it directly (copying the 0x2C
+    /// `Render::Viewport` prefix).
+    #[address(0xA0)]
+    pub Viewport: [u8; 0x34],
+
+    /// The stage-to-viewport matrix (`Matrix2x4<float>`: two rows of `[sx, shx, shy, sy? tx, ty]`
+    /// layout) the movie sets on [`pRenderRoot`](MovieImpl::pRenderRoot) via `TreeNode::SetMatrix`
+    /// whenever the viewport changes.
+    #[address(0x110)]
+    pub ViewportMatrix: [f32; 8],
 
     /// The movie's embedded `Render::Context` (the snapshot pipeline: active/pending/displaying
     /// snapshots, the capture locks, and the once-a-frame consumption latch).
@@ -153,6 +326,46 @@ pub type MemoryHeap;
 /// backend the UI render worker draws through.
 #[min_size(0x473B8)]
 pub type RenderHAL {
+    vftable {
+        /// Binds `target` as the frame's display render target (slot 3). `CUIManager::Render`
+        /// calls it with `m_RenderBuffer` before `BeginFrame`, paired with a trailing
+        /// [`PopRenderTarget`](RenderHAL::PopRenderTarget).
+        #[index(3)]
+        pub fn SetRenderTarget(&mut self, target: *mut RenderTarget, set_state: bool);
+
+        /// Pushes `target` for nested rendering within a frame (slot 4), as
+        /// `RenderOffScreenTextures` does per off-screen movie. `frame_rect` is `[x0, y0, x1,
+        /// y1]` floats; `clear_color` points at a packed color (0 = transparent).
+        #[index(4)]
+        pub fn PushRenderTarget(&mut self, target: *mut RenderTarget, flags: u64, frame_rect: *const f32, clear_color: *const u32);
+
+        /// Pops the pushed (or set) render target (slot 5).
+        #[index(5)]
+        pub fn PopRenderTarget(&mut self, flags: u32);
+
+        /// Begins the HAL frame (slot 11). `EndFrame` clears every context's once-a-frame
+        /// consumption latch via `EndFrameContextNotify`.
+        #[index(11)]
+        pub fn BeginFrame(&mut self) -> bool;
+
+        /// Ends the HAL frame (slot 12).
+        #[index(12)]
+        pub fn EndFrame(&mut self);
+
+        /// Begins a scene (draw batch) within the frame (slot 15).
+        #[index(15)]
+        pub fn BeginScene(&mut self) -> bool;
+
+        /// Ends the scene (slot 16).
+        #[index(16)]
+        pub fn EndScene(&mut self);
+
+        /// The HAL's `Render::ContextImpl::RenderNotify` (slot 19), passed to
+        /// [`RTHandle::NextCapture`].
+        #[index(19)]
+        pub fn GetContextNotify(&mut self) -> *mut void;
+    },
+
     /// The `ID3D11Device` the HAL was initialized with.
     #[address(0x473A8)]
     pub pDevice: *mut void,
@@ -162,6 +375,19 @@ pub type RenderHAL {
     /// ordered with the HAL's own draws.
     #[address(0x473B0)]
     pub pDeviceContext: *mut void,
+}
+impl RenderHAL {
+    /// Builds a [`RenderTarget`] from D3D color/depth views (`ID3D11RenderTargetView*` /
+    /// `ID3D11DepthStencilView*`); the concrete implementation behind vtable slot 111.
+    /// `RenderOffScreenTextures` creates one per off-screen draw and releases it afterwards.
+    /// Render thread only.
+    #[address(0x141_DE1_110)]
+    pub fn CreateRenderTarget(&mut self, color: *mut void, depth: *mut void) -> *mut RenderTarget;
+
+    /// Draws a [`TreeRoot`]'s displaying-snapshot subtree into the bound target
+    /// (`Scaleform::Render::HAL::Draw`). Render thread only, within `BeginFrame`/`BeginScene`.
+    #[address(0x141_9B4_850)]
+    pub fn Draw(&mut self, root: *mut TreeRoot);
 }
 
 /// A Scaleform `GFx::Value`: the tagged union the AS3 interface traffics in. Starts with a
