@@ -35,16 +35,18 @@ pub type Movie {
         /// [`AmpMovieObjectDesc`] nodes, each carrying the clip's instance name (or `"Unnamed"`)
         /// and a child array, calling `DisplayObject::GetName` on every child and recursing into
         /// containers. `heap` is the Scaleform `MemoryHeap*` used for the allocations (e.g.
-        /// [`MovieImpl::pHeap`]); the tree is freed by releasing the root node. Slot 9 (offset
-        /// `0x48`); the implementation is at `0x141_BED_530`. Call on the capture (game update)
-        /// thread, where the display tree is stable.
-        #[index(9)]
+        /// [`MovieImpl::pHeap`]); the tree is freed by releasing the root node. Slot 35 of the
+        /// `ASMovieRootBase` vtable; the implementation is at `0x141_BED_530`. Call on the capture
+        /// (game update) thread, where the display tree is stable.
+        #[index(35)]
         pub fn GetDisplayObjectsTree(&self, heap: *mut MemoryHeap) -> *mut AmpMovieObjectDesc;
     },
 
-    /// The `MovieRoot` vtable address. The payload checks a live object against it before
-    /// trusting the vtable-indexed calls, since `m_Movie`'s dynamic type is load-bearing here.
-    pub const VFTABLE: u64 = 0x142621780,
+    /// The `AS3::MovieRoot` vtable address (the `ASMovieRootBase` layout: slot 35 is
+    /// [`GetDisplayObjectsTree`](Movie::GetDisplayObjectsTree), slots 49/50/57 are the bound
+    /// SetVariable/GetVariable/Invoke). The payload checks a live object against it before
+    /// trusting the vtable-indexed calls, since the object's dynamic type is load-bearing here.
+    pub const VFTABLE: u64 = 0x1426216B0,
 
     /// The backing `GFx::MovieImpl` (`GetDisplayObjectsTree` reads `pMovieImpl->pMainMovie`
     /// through it).
@@ -73,10 +75,30 @@ impl Movie {
     pub fn Invoke(&self, method_name: *const u8, result: *mut void, args: *const void, num_args: u32) -> bool;
 }
 
-/// The `GFx::MovieImpl` behind a [`Movie`]: the movie instance state, including the heap all of
-/// its allocations come from.
+/// The `GFx::MovieImpl` behind [`UIManager::m_Movie`](ui::ui_manager::UIManager::m_Movie): the
+/// `GFx::Movie` instance. The rendering-side virtuals live on its own vtable; the AS3 side
+/// (SetVariable, Invoke, the display tree) lives on [`pASMovieRoot`](MovieImpl::pASMovieRoot).
 #[min_size(0x58)]
 pub type MovieImpl {
+    vftable {
+        /// Snapshots the display tree for the render thread (`GFx::Movie` vtable slot 25). Must be
+        /// called from the current capture thread (see
+        /// [`SetCaptureThread`](MovieImpl::SetCaptureThread)); `if_changed = false` forces a fresh
+        /// snapshot. The next `RTHandle::NextCapture` on the render side picks it up.
+        #[index(25)]
+        pub fn Capture(&mut self, if_changed: bool) -> u64;
+
+        /// Reassigns which thread owns the capture (`GFx::Movie` vtable slot 27). The engine hands
+        /// ownership between the update thread and the render thread this way
+        /// (`RenderOffScreenTextures` does exactly this per frame).
+        #[index(27)]
+        pub fn SetCaptureThread(&mut self, thread_id: u32);
+    },
+
+    /// The AS3 `MovieRoot` (the [`Movie`] interface): SetVariable, Invoke, and the display tree.
+    #[address(0x18)]
+    pub pASMovieRoot: *mut Movie,
+
     /// The `GFx::Value::ObjectInterface` for this movie: the dispatcher every `GFx::Value`
     /// display-object/member operation goes through.
     #[address(0x38)]
