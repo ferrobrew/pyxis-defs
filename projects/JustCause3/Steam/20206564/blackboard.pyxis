@@ -8,21 +8,21 @@ pub type ObjectBlackboard {
     /// The id of the target face direction (`CVector3f`): the desired body facing the orientation
     /// executor yaws toward in its tracking mode. Written per-state by the game's
     /// `SetUpTargetFaceDir` tasks.
-    pub const TARGET_FACE_DIR_ID: u32 = 736589998;
+    pub const TARGET_FACE_DIR_ID: u32 = 736589998,
     /// The id of the camera-relative world-space move direction (`CVector3f`), written each frame
     /// by `NStateTask_InputLocoSetTargetDirTask::SetupTargetDir`.
-    pub const MOVE_DIR_ID: u32 = 2113030792;
+    pub const MOVE_DIR_ID: u32 = 2113030792,
     /// The id of the constrained-ground movement direction (`CVector3f`), present on slopes (and
     /// other surface-constrained locomotion): when set, the movement task blends its displacement
     /// direction toward it instead of using the primary displacement output.
-    pub const CONSTRAINED_DIR_ID: u32 = 2485695409;
+    pub const CONSTRAINED_DIR_ID: u32 = 2485695409,
     /// The id of the float speed value the input locomotion tasks branch on (`<= 0` routes into
     /// the stop acts).
-    pub const SPEED_ID: u32 = 3396837917;
+    pub const SPEED_ID: u32 = 3396837917,
     /// The id of the second float the input move task reads alongside
     /// [`SPEED_ID`](ObjectBlackboard::SPEED_ID); semantics unmapped, a candidate input-strength
     /// signal.
-    pub const AUX_FLOAT_ID: u32 = 2217900102;
+    pub const AUX_FLOAT_ID: u32 = 2217900102,
 }
 impl ObjectBlackboard {
     /// The `GetBlackboardValue<CVector3f>` template instantiation. Returns whether the id was

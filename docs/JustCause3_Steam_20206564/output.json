@@ -512,7 +512,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 4,
-              "line": 12
+              "line": 18
             }
           }
         ],
@@ -522,11 +522,68 @@
         "cloneable": false,
         "defaultable": false,
         "packed": false,
-        "pinned": false
+        "pinned": false,
+        "nested_items": [
+          "animation::symbol_table::EventIdSymbolTable::ACT_REVERSE",
+          "animation::symbol_table::EventIdSymbolTable::ACT_REVERSE_MOTORBIKE"
+        ]
       },
       "source": {
         "file_index": 4,
         "line": 6
+      }
+    },
+    "animation::symbol_table::EventIdSymbolTable::ACT_REVERSE": {
+      "path": "animation::symbol_table::EventIdSymbolTable::ACT_REVERSE",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " The on-foot / land-vehicle reversing act: drives the `S_REVERSE_*` states in\n `rico_base.afsmb`, where Rico turns to look over his shoulder while backing up.",
+        "value_type": {
+          "type": "raw",
+          "path": "str"
+        },
+        "value": {
+          "kind": "string",
+          "value": "ACT_REVERSE"
+        }
+      },
+      "source": {
+        "file_index": 4,
+        "line": 9
+      }
+    },
+    "animation::symbol_table::EventIdSymbolTable::ACT_REVERSE_MOTORBIKE": {
+      "path": "animation::symbol_table::EventIdSymbolTable::ACT_REVERSE_MOTORBIKE",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " The motorbike variant of [`ACT_REVERSE`](EventIdSymbolTable::ACT_REVERSE).",
+        "doc_links": [
+          {
+            "text": "EventIdSymbolTable::ACT_REVERSE",
+            "target_kind": "item",
+            "path": "animation::symbol_table::EventIdSymbolTable::ACT_REVERSE"
+          }
+        ],
+        "value_type": {
+          "type": "raw",
+          "path": "str"
+        },
+        "value": {
+          "kind": "string",
+          "value": "ACT_REVERSE_MOTORBIKE"
+        }
+      },
+      "source": {
+        "file_index": 4,
+        "line": 11
       }
     },
     "blackboard::ObjectBlackboard": {
@@ -579,7 +636,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 6,
-              "line": 12
+              "line": 31
             }
           },
           {
@@ -621,7 +678,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 6,
-              "line": 16
+              "line": 35
             }
           },
           {
@@ -682,7 +739,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 6,
-              "line": 23
+              "line": 42
             }
           }
         ],
@@ -692,11 +749,140 @@
         "cloneable": false,
         "defaultable": false,
         "packed": false,
-        "pinned": false
+        "pinned": false,
+        "nested_items": [
+          "blackboard::ObjectBlackboard::TARGET_FACE_DIR_ID",
+          "blackboard::ObjectBlackboard::MOVE_DIR_ID",
+          "blackboard::ObjectBlackboard::CONSTRAINED_DIR_ID",
+          "blackboard::ObjectBlackboard::SPEED_ID",
+          "blackboard::ObjectBlackboard::AUX_FLOAT_ID"
+        ]
       },
       "source": {
         "file_index": 6,
         "line": 7
+      }
+    },
+    "blackboard::ObjectBlackboard::AUX_FLOAT_ID": {
+      "path": "blackboard::ObjectBlackboard::AUX_FLOAT_ID",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " The id of the second float the input move task reads alongside\n [`SPEED_ID`](ObjectBlackboard::SPEED_ID); semantics unmapped, a candidate input-strength\n signal.",
+        "doc_links": [
+          {
+            "text": "ObjectBlackboard::SPEED_ID",
+            "target_kind": "item",
+            "path": "blackboard::ObjectBlackboard::SPEED_ID"
+          }
+        ],
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 2217900102
+        }
+      },
+      "source": {
+        "file_index": 6,
+        "line": 25
+      }
+    },
+    "blackboard::ObjectBlackboard::CONSTRAINED_DIR_ID": {
+      "path": "blackboard::ObjectBlackboard::CONSTRAINED_DIR_ID",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " The id of the constrained-ground movement direction (`CVector3f`), present on slopes (and\n other surface-constrained locomotion): when set, the movement task blends its displacement\n direction toward it instead of using the primary displacement output.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 2485695409
+        }
+      },
+      "source": {
+        "file_index": 6,
+        "line": 18
+      }
+    },
+    "blackboard::ObjectBlackboard::MOVE_DIR_ID": {
+      "path": "blackboard::ObjectBlackboard::MOVE_DIR_ID",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " The id of the camera-relative world-space move direction (`CVector3f`), written each frame\n by `NStateTask_InputLocoSetTargetDirTask::SetupTargetDir`.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 2113030792
+        }
+      },
+      "source": {
+        "file_index": 6,
+        "line": 14
+      }
+    },
+    "blackboard::ObjectBlackboard::SPEED_ID": {
+      "path": "blackboard::ObjectBlackboard::SPEED_ID",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " The id of the float speed value the input locomotion tasks branch on (`<= 0` routes into\n the stop acts).",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 3396837917
+        }
+      },
+      "source": {
+        "file_index": 6,
+        "line": 21
+      }
+    },
+    "blackboard::ObjectBlackboard::TARGET_FACE_DIR_ID": {
+      "path": "blackboard::ObjectBlackboard::TARGET_FACE_DIR_ID",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " The id of the target face direction (`CVector3f`): the desired body facing the orientation\n executor yaws toward in its tracking mode. Written per-state by the game's\n `SetUpTargetFaceDir` tasks.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 736589998
+        }
+      },
+      "source": {
+        "file_index": 6,
+        "line": 11
       }
     },
     "bool": {
@@ -4015,7 +4201,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 14
+              "line": 15
             }
           },
           {
@@ -4024,7 +4210,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 15
+              "line": 16
             }
           },
           {
@@ -4033,7 +4219,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 16
+              "line": 17
             }
           },
           {
@@ -4042,7 +4228,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 17
+              "line": 18
             }
           }
         ],
@@ -4054,7 +4240,7 @@
       },
       "source": {
         "file_index": 13,
-        "line": 13
+        "line": 14
       }
     },
     "character::character::AnimatedModel": {
@@ -4085,7 +4271,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 91
+              "line": 112
             }
           },
           {
@@ -4105,7 +4291,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 91
+              "line": 112
             }
           },
           {
@@ -4126,7 +4312,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 98
+              "line": 119
             }
           },
           {
@@ -4147,7 +4333,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 98
+              "line": 119
             }
           }
         ],
@@ -4197,7 +4383,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 13,
-              "line": 106
+              "line": 127
             }
           }
         ],
@@ -4207,11 +4393,101 @@
         "cloneable": false,
         "defaultable": false,
         "packed": false,
-        "pinned": false
+        "pinned": false,
+        "nested_items": [
+          "character::character::AnimatedModel::MODEL_INSTANCE_SLOTS",
+          "character::character::AnimatedModel::BODY_MODEL_SLOT",
+          "character::character::AnimatedModel::MODEL_INSTANCE_RBI_INFO_OFFSET"
+        ]
       },
       "source": {
         "file_index": 13,
-        "line": 89
+        "line": 96
+      }
+    },
+    "character::character::AnimatedModel::BODY_MODEL_SLOT": {
+      "path": "character::character::AnimatedModel::BODY_MODEL_SLOT",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " The [`m_ModelInstances`](AnimatedModel::m_ModelInstances) slot holding the character's\n *body* model -- the one whose skeleton the character's bone indices belong to. The other\n slots are attachments with their own skeletons (the parachute among them), where the same\n numeric indices land on arbitrary bones.",
+        "doc_links": [
+          {
+            "text": "AnimatedModel::m_ModelInstances",
+            "target_kind": "item",
+            "path": "character::character::AnimatedModel",
+            "anchor": "field-m_ModelInstances"
+          }
+        ],
+        "value_type": {
+          "type": "raw",
+          "path": "u64"
+        },
+        "value": {
+          "kind": "int",
+          "value": 0
+        }
+      },
+      "source": {
+        "file_index": 13,
+        "line": 104
+      }
+    },
+    "character::character::AnimatedModel::MODEL_INSTANCE_RBI_INFO_OFFSET": {
+      "path": "character::character::AnimatedModel::MODEL_INSTANCE_RBI_INFO_OFFSET",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " The offset of a model instance's embedded render-block-instance info (`CRBIInfo`) within\n `NModelSystem::CModelInstance` (`CModelInstance::AddToPass` passes `this + 0x50` to\n `ForEachRb`); that pointer is the `info` every one of its block draws receives. A constant\n rather than a field because the instance type itself is unmapped.",
+        "value_type": {
+          "type": "raw",
+          "path": "u64"
+        },
+        "value": {
+          "kind": "int",
+          "value": 80
+        }
+      },
+      "source": {
+        "file_index": 13,
+        "line": 109
+      }
+    },
+    "character::character::AnimatedModel::MODEL_INSTANCE_SLOTS": {
+      "path": "character::character::AnimatedModel::MODEL_INSTANCE_SLOTS",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " The number of [`m_ModelInstances`](AnimatedModel::m_ModelInstances) slots. Keep in sync\n with that array's length.",
+        "doc_links": [
+          {
+            "text": "AnimatedModel::m_ModelInstances",
+            "target_kind": "item",
+            "path": "character::character::AnimatedModel",
+            "anchor": "field-m_ModelInstances"
+          }
+        ],
+        "value_type": {
+          "type": "raw",
+          "path": "u64"
+        },
+        "value": {
+          "kind": "int",
+          "value": 8
+        }
+      },
+      "source": {
+        "file_index": 13,
+        "line": 99
       }
     },
     "character::character::AnimationController": {
@@ -4253,7 +4529,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 13,
-              "line": 112
+              "line": 133
             }
           },
           {
@@ -4292,7 +4568,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 13,
-              "line": 115
+              "line": 136
             }
           },
           {
@@ -4331,7 +4607,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 13,
-              "line": 118
+              "line": 139
             }
           },
           {
@@ -4370,7 +4646,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 13,
-              "line": 121
+              "line": 142
             }
           }
         ],
@@ -4384,7 +4660,7 @@
       },
       "source": {
         "file_index": 13,
-        "line": 109
+        "line": 130
       }
     },
     "character::character::Character": {
@@ -4415,7 +4691,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 23
+              "line": 24
             }
           },
           {
@@ -4432,7 +4708,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 23
+              "line": 24
             }
           },
           {
@@ -4445,15 +4721,60 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 1841
+              "size": 1696
             },
             "offset": 6592,
-            "size": 1841,
+            "size": 1696,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 27
+              "line": 30
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Blackboard",
+            "doc": " The character's embedded [`ObjectBlackboard`] (`lea rcx, [character+2060h]` at every\n blackboard call site in the loco tasks). The blackboard type is opaque, so this zero-size\n field only anchors the offset: take its address to obtain the blackboard pointer.",
+            "doc_links": [
+              {
+                "text": "ObjectBlackboard",
+                "target_kind": "item",
+                "path": "blackboard::ObjectBlackboard"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "blackboard::ObjectBlackboard"
+            },
+            "offset": 8288,
+            "size": 0,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 13,
+              "line": 30
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_2060",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 145
+            },
+            "offset": 8288,
+            "size": 145,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 13,
+              "line": 34
             }
           },
           {
@@ -4477,7 +4798,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 27
+              "line": 34
             }
           },
           {
@@ -4498,7 +4819,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 30
+              "line": 37
             }
           },
           {
@@ -4515,7 +4836,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 30
+              "line": 37
             }
           },
           {
@@ -4536,7 +4857,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 33
+              "line": 40
             }
           },
           {
@@ -4553,7 +4874,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 33
+              "line": 40
             }
           },
           {
@@ -4570,7 +4891,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 34
+              "line": 41
             }
           },
           {
@@ -4591,7 +4912,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 42
+              "line": 49
             }
           },
           {
@@ -4622,7 +4943,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 42
+              "line": 49
             }
           },
           {
@@ -4643,7 +4964,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 20
+              "line": 21
             }
           }
         ],
@@ -4667,7 +4988,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 13,
-              "line": 46
+              "line": 53
             }
           },
           {
@@ -4704,7 +5025,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 13,
-              "line": 49
+              "line": 56
             }
           },
           {
@@ -4735,7 +5056,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 13,
-              "line": 52
+              "line": 59
             }
           },
           {
@@ -4774,7 +5095,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 13,
-              "line": 55
+              "line": 62
             }
           },
           {
@@ -4802,7 +5123,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 13,
-              "line": 59
+              "line": 66
             }
           },
           {
@@ -4856,7 +5177,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 13,
-              "line": 69
+              "line": 76
             }
           },
           {
@@ -4879,7 +5200,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 13,
-              "line": 74
+              "line": 81
             }
           },
           {
@@ -4902,7 +5223,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 13,
-              "line": 79
+              "line": 86
             }
           },
           {
@@ -4933,7 +5254,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 13,
-              "line": 85
+              "line": 92
             }
           }
         ],
@@ -4947,7 +5268,7 @@
       },
       "source": {
         "file_index": 13,
-        "line": 21
+        "line": 22
       }
     },
     "character::character::Joint": {
@@ -4974,7 +5295,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 126
+              "line": 147
             }
           },
           {
@@ -4991,7 +5312,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 127
+              "line": 148
             }
           },
           {
@@ -5008,7 +5329,7 @@
             "is_base": false,
             "source": {
               "file_index": 13,
-              "line": 128
+              "line": 149
             }
           }
         ],
@@ -5023,7 +5344,7 @@
       },
       "source": {
         "file_index": 13,
-        "line": 125
+        "line": 146
       }
     },
     "character::character::SafeBoneIndex": {
@@ -5046,7 +5367,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 140
+              "line": 161
             }
           },
           {
@@ -5055,7 +5376,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 141
+              "line": 162
             }
           },
           {
@@ -5064,7 +5385,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 142
+              "line": 163
             }
           },
           {
@@ -5073,7 +5394,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 143
+              "line": 164
             }
           },
           {
@@ -5082,7 +5403,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 144
+              "line": 165
             }
           },
           {
@@ -5091,7 +5412,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 145
+              "line": 166
             }
           },
           {
@@ -5100,7 +5421,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 146
+              "line": 167
             }
           },
           {
@@ -5109,7 +5430,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 147
+              "line": 168
             }
           },
           {
@@ -5118,7 +5439,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 148
+              "line": 169
             }
           },
           {
@@ -5127,7 +5448,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 149
+              "line": 170
             }
           },
           {
@@ -5136,7 +5457,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 150
+              "line": 171
             }
           },
           {
@@ -5145,7 +5466,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 151
+              "line": 172
             }
           },
           {
@@ -5154,7 +5475,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 152
+              "line": 173
             }
           },
           {
@@ -5163,7 +5484,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 153
+              "line": 174
             }
           },
           {
@@ -5172,7 +5493,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 154
+              "line": 175
             }
           },
           {
@@ -5181,7 +5502,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 155
+              "line": 176
             }
           },
           {
@@ -5190,7 +5511,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 156
+              "line": 177
             }
           },
           {
@@ -5199,7 +5520,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 157
+              "line": 178
             }
           },
           {
@@ -5208,7 +5529,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 158
+              "line": 179
             }
           },
           {
@@ -5217,7 +5538,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 159
+              "line": 180
             }
           },
           {
@@ -5226,7 +5547,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 160
+              "line": 181
             }
           },
           {
@@ -5235,7 +5556,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 161
+              "line": 182
             }
           },
           {
@@ -5244,7 +5565,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 162
+              "line": 183
             }
           },
           {
@@ -5253,7 +5574,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 163
+              "line": 184
             }
           },
           {
@@ -5262,7 +5583,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 164
+              "line": 185
             }
           },
           {
@@ -5271,7 +5592,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 165
+              "line": 186
             }
           },
           {
@@ -5280,7 +5601,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 166
+              "line": 187
             }
           },
           {
@@ -5289,7 +5610,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 167
+              "line": 188
             }
           },
           {
@@ -5298,7 +5619,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 168
+              "line": 189
             }
           },
           {
@@ -5307,7 +5628,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 169
+              "line": 190
             }
           },
           {
@@ -5316,7 +5637,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 170
+              "line": 191
             }
           },
           {
@@ -5325,7 +5646,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 171
+              "line": 192
             }
           },
           {
@@ -5334,7 +5655,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 172
+              "line": 193
             }
           },
           {
@@ -5343,7 +5664,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 173
+              "line": 194
             }
           },
           {
@@ -5352,7 +5673,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 174
+              "line": 195
             }
           },
           {
@@ -5361,7 +5682,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 175
+              "line": 196
             }
           },
           {
@@ -5370,7 +5691,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 176
+              "line": 197
             }
           },
           {
@@ -5379,7 +5700,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 177
+              "line": 198
             }
           },
           {
@@ -5388,7 +5709,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 178
+              "line": 199
             }
           },
           {
@@ -5397,7 +5718,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 179
+              "line": 200
             }
           },
           {
@@ -5406,7 +5727,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 180
+              "line": 201
             }
           },
           {
@@ -5415,7 +5736,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 181
+              "line": 202
             }
           },
           {
@@ -5424,7 +5745,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 182
+              "line": 203
             }
           },
           {
@@ -5433,7 +5754,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 183
+              "line": 204
             }
           },
           {
@@ -5442,7 +5763,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 184
+              "line": 205
             }
           },
           {
@@ -5451,7 +5772,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 185
+              "line": 206
             }
           },
           {
@@ -5460,7 +5781,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 186
+              "line": 207
             }
           },
           {
@@ -5469,7 +5790,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 187
+              "line": 208
             }
           },
           {
@@ -5478,7 +5799,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 188
+              "line": 209
             }
           },
           {
@@ -5487,7 +5808,7 @@
             "doc": null,
             "source": {
               "file_index": 13,
-              "line": 189
+              "line": 210
             }
           }
         ],
@@ -5500,7 +5821,7 @@
       },
       "source": {
         "file_index": 13,
-        "line": 139
+        "line": 160
       }
     },
     "clock::Clock": {
@@ -6176,7 +6497,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 16,
-              "line": 94
+              "line": 104
             }
           }
         ],
@@ -6190,7 +6511,7 @@
       },
       "source": {
         "file_index": 16,
-        "line": 89
+        "line": 99
       }
     },
     "environment::LandscapeManager": {
@@ -6541,7 +6862,7 @@
           {
             "visibility": "public",
             "name": "Init",
-            "doc": " Subscribes the named weather events (`weather_sunny`, `weather_rain`, `weather_snow`,\n `weather_restore`, `weather_instant`, plus `cloud_base` and `cloud_height`). Firing one via the\n engine's event send is the robust way to hold a weather state, since the controller's per-frame\n update otherwise overwrites the [`Weather`] scalars. Event severities: rain is severity `4.0` /\n intensity `1.0` / snow `0`; snow is severity `4.0` / snow `1.0`; sunny is severity `0.1`.",
+            "doc": " Subscribes the named weather events (the `EVENT_*` constants, plus `cloud_base` and\n `cloud_height`). Firing one via the engine's event send is the robust way to hold a weather\n state, since the controller's per-frame update otherwise overwrites the [`Weather`]\n scalars.",
             "doc_links": [
               {
                 "text": "Weather",
@@ -6562,7 +6883,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 16,
-              "line": 86
+              "line": 96
             }
           }
         ],
@@ -6572,11 +6893,133 @@
         "cloneable": false,
         "defaultable": false,
         "packed": false,
-        "pinned": false
+        "pinned": false,
+        "nested_items": [
+          "environment::WeatherController::EVENT_SUNNY",
+          "environment::WeatherController::EVENT_RAIN",
+          "environment::WeatherController::EVENT_SNOW",
+          "environment::WeatherController::EVENT_RESTORE",
+          "environment::WeatherController::EVENT_INSTANT"
+        ]
       },
       "source": {
         "file_index": 16,
         "line": 78
+      }
+    },
+    "environment::WeatherController::EVENT_INSTANT": {
+      "path": "environment::WeatherController::EVENT_INSTANT",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " Applies the pinned state instantly rather than blending toward it.",
+        "value_type": {
+          "type": "raw",
+          "path": "str"
+        },
+        "value": {
+          "kind": "string",
+          "value": "weather_instant"
+        }
+      },
+      "source": {
+        "file_index": 16,
+        "line": 88
+      }
+    },
+    "environment::WeatherController::EVENT_RAIN": {
+      "path": "environment::WeatherController::EVENT_RAIN",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " Pins rain (severity `4.0`, rain intensity `1.0`, snow `0`).",
+        "value_type": {
+          "type": "raw",
+          "path": "str"
+        },
+        "value": {
+          "kind": "string",
+          "value": "weather_rain"
+        }
+      },
+      "source": {
+        "file_index": 16,
+        "line": 82
+      }
+    },
+    "environment::WeatherController::EVENT_RESTORE": {
+      "path": "environment::WeatherController::EVENT_RESTORE",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " Hands control back to the ambient weather system.",
+        "value_type": {
+          "type": "raw",
+          "path": "str"
+        },
+        "value": {
+          "kind": "string",
+          "value": "weather_restore"
+        }
+      },
+      "source": {
+        "file_index": 16,
+        "line": 86
+      }
+    },
+    "environment::WeatherController::EVENT_SNOW": {
+      "path": "environment::WeatherController::EVENT_SNOW",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " Pins snow (severity `4.0`, snow ratio `1.0`).",
+        "value_type": {
+          "type": "raw",
+          "path": "str"
+        },
+        "value": {
+          "kind": "string",
+          "value": "weather_snow"
+        }
+      },
+      "source": {
+        "file_index": 16,
+        "line": 84
+      }
+    },
+    "environment::WeatherController::EVENT_SUNNY": {
+      "path": "environment::WeatherController::EVENT_SUNNY",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " Pins clear weather (severity `0.1`).",
+        "value_type": {
+          "type": "raw",
+          "path": "str"
+        },
+        "value": {
+          "kind": "string",
+          "value": "weather_sunny"
+        }
+      },
+      "source": {
+        "file_index": 16,
+        "line": 80
       }
     },
     "environment::WorldTime": {
@@ -8774,7 +9217,7 @@
             "doc": null,
             "source": {
               "file_index": 22,
-              "line": 14
+              "line": 16
             }
           },
           {
@@ -8783,7 +9226,7 @@
             "doc": null,
             "source": {
               "file_index": 22,
-              "line": 15
+              "line": 17
             }
           },
           {
@@ -8792,7 +9235,7 @@
             "doc": null,
             "source": {
               "file_index": 22,
-              "line": 16
+              "line": 18
             }
           },
           {
@@ -8801,7 +9244,7 @@
             "doc": null,
             "source": {
               "file_index": 22,
-              "line": 17
+              "line": 19
             }
           },
           {
@@ -8810,7 +9253,7 @@
             "doc": null,
             "source": {
               "file_index": 22,
-              "line": 18
+              "line": 20
             }
           }
         ],
@@ -8823,7 +9266,7 @@
       },
       "source": {
         "file_index": 22,
-        "line": 13
+        "line": 15
       }
     },
     "graphics_engine::graphics_engine::DrawThreadTaskParam": {
@@ -8855,7 +9298,7 @@
       },
       "source": {
         "file_index": 22,
-        "line": 166
+        "line": 183
       }
     },
     "graphics_engine::graphics_engine::EffectInfo": {
@@ -8885,7 +9328,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 26
+              "line": 28
             }
           },
           {
@@ -8902,7 +9345,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 27
+              "line": 29
             }
           },
           {
@@ -8919,7 +9362,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 30
+              "line": 32
             }
           },
           {
@@ -8940,7 +9383,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 21
+              "line": 23
             }
           }
         ],
@@ -8955,7 +9398,7 @@
       },
       "source": {
         "file_index": 22,
-        "line": 24
+        "line": 26
       }
     },
     "graphics_engine::graphics_engine::GraphicsEngine": {
@@ -8986,7 +9429,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 36
+              "line": 38
             }
           },
           {
@@ -9003,7 +9446,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 36
+              "line": 38
             }
           },
           {
@@ -9024,7 +9467,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 45
+              "line": 47
             }
           },
           {
@@ -9061,7 +9504,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 45
+              "line": 47
             }
           },
           {
@@ -9082,7 +9525,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 48
+              "line": 50
             }
           },
           {
@@ -9099,7 +9542,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 48
+              "line": 50
             }
           },
           {
@@ -9120,7 +9563,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 52
+              "line": 54
             }
           },
           {
@@ -9140,7 +9583,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 52
+              "line": 54
             }
           },
           {
@@ -9153,15 +9596,61 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 3408
+              "size": 16
             },
             "offset": 352,
-            "size": 3408,
+            "size": 16,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 55
+              "line": 62
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_RenderCamera",
+            "doc": " The engine-owned scene render camera: a by-value copy rebuilt each\n [`Draw`](GraphicsEngine::Draw) by `Camera::SetupRenderCamera` (reverse-Z + jitter, then the\n view-projection products from `m_View`). This is the camera the render passes consume;\n distinct from the `CameraManager`'s camera objects, which are pointers to the gameplay\n cameras.",
+            "doc_links": [
+              {
+                "text": "GraphicsEngine::Draw",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-Draw"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "camera::camera::Camera"
+            },
+            "offset": 368,
+            "size": 1456,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 22,
+              "line": 62
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_720",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 1936
+            },
+            "offset": 1824,
+            "size": 1936,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 22,
+              "line": 65
             }
           },
           {
@@ -9181,7 +9670,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 55
+              "line": 65
             }
           },
           {
@@ -9202,7 +9691,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 59
+              "line": 69
             }
           },
           {
@@ -9226,7 +9715,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 59
+              "line": 69
             }
           },
           {
@@ -9247,7 +9736,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 63
+              "line": 73
             }
           },
           {
@@ -9267,7 +9756,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 63
+              "line": 73
             }
           },
           {
@@ -9288,7 +9777,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 67
+              "line": 77
             }
           },
           {
@@ -9308,7 +9797,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 67
+              "line": 77
             }
           },
           {
@@ -9329,7 +9818,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 71
+              "line": 81
             }
           },
           {
@@ -9349,7 +9838,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 71
+              "line": 81
             }
           },
           {
@@ -9370,7 +9859,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 75
+              "line": 85
             }
           },
           {
@@ -9390,7 +9879,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 75
+              "line": 85
             }
           },
           {
@@ -9411,7 +9900,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 79
+              "line": 89
             }
           },
           {
@@ -9432,7 +9921,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 79
+              "line": 89
             }
           },
           {
@@ -9452,7 +9941,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 83
+              "line": 93
             }
           },
           {
@@ -9473,7 +9962,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 91
+              "line": 101
             }
           },
           {
@@ -9504,7 +9993,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 91
+              "line": 101
             }
           },
           {
@@ -9525,7 +10014,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 95
+              "line": 105
             }
           },
           {
@@ -9542,7 +10031,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 95
+              "line": 105
             }
           },
           {
@@ -9555,15 +10044,61 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 3140
+              "size": 52
             },
             "offset": 4812,
-            "size": 3140,
+            "size": 52,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 33
+              "line": 112
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_CurrentBundleName",
+            "doc": " The currently-loaded shader bundle name, compared by\n [`LoadShaderBundle`](GraphicsEngine::LoadShaderBundle) to skip a same-name reload. The\n bundle names are `\"Shaders\"` / `\"ShadersLowShadows\"` (and the Intel `\"ShadersConstMath*\"`\n variants).",
+            "doc_links": [
+              {
+                "text": "GraphicsEngine::LoadShaderBundle",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-LoadShaderBundle"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "types::std_string::String"
+            },
+            "offset": 4864,
+            "size": 32,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 22,
+              "line": 112
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_1320",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 3056
+            },
+            "offset": 4896,
+            "size": 3056,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 22,
+              "line": 35
             }
           }
         ],
@@ -9585,7 +10120,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 22,
-              "line": 169
+              "line": 186
             }
           },
           {
@@ -9613,7 +10148,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 22,
-              "line": 174
+              "line": 191
             }
           },
           {
@@ -9633,7 +10168,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 22,
-              "line": 178
+              "line": 195
             }
           },
           {
@@ -9653,7 +10188,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 22,
-              "line": 182
+              "line": 199
             }
           },
           {
@@ -9687,7 +10222,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 22,
-              "line": 186
+              "line": 203
             }
           },
           {
@@ -9734,13 +10269,21 @@
             "calling_convention": "system",
             "source": {
               "file_index": 22,
-              "line": 192
+              "line": 209
             }
           },
           {
             "visibility": "public",
             "name": "LoadShaderBundle",
-            "doc": " Loads (or reloads) the named shader bundle and re-creates every shader holder from it, but only\n if `name` differs from the currently-loaded bundle name (an `std::string` at `+0x1300`, its\n length at `+0x1310`). Re-creating the holders routes every shader through\n `Graphics::CreateFragmentProgram`. The bundle names are `\"Shaders\"` / `\"ShadersLowShadows\"`\n (and the Intel `\"ShadersConstMath*\"` variants), selected by shadow quality in\n `CSettingsManager::UpdateSettings`. `name` is a NUL-terminated C string.",
+            "doc": " Loads (or reloads) the named shader bundle and re-creates every shader holder from it, but only\n if `name` differs from [`m_CurrentBundleName`](GraphicsEngine::m_CurrentBundleName).\n Re-creating the holders routes every shader through\n `Graphics::CreateFragmentProgram`. The bundle names are `\"Shaders\"` / `\"ShadersLowShadows\"`\n (and the Intel `\"ShadersConstMath*\"` variants), selected by shadow quality in\n `CSettingsManager::UpdateSettings`. `name` is a NUL-terminated C string.",
+            "doc_links": [
+              {
+                "text": "GraphicsEngine::m_CurrentBundleName",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "field-m_CurrentBundleName"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5369620896
@@ -9768,7 +10311,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 22,
-              "line": 201
+              "line": 218
             }
           }
         ],
@@ -9782,7 +10325,7 @@
       },
       "source": {
         "file_index": 22,
-        "line": 34
+        "line": 36
       }
     },
     "graphics_engine::graphics_engine::GraphicsParams": {
@@ -9812,7 +10355,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 210
+              "line": 227
             }
           },
           {
@@ -9833,7 +10376,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 211
+              "line": 228
             }
           },
           {
@@ -9850,7 +10393,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 212
+              "line": 229
             }
           },
           {
@@ -9867,7 +10410,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 213
+              "line": 230
             }
           },
           {
@@ -9884,7 +10427,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 214
+              "line": 231
             }
           },
           {
@@ -9901,7 +10444,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 215
+              "line": 232
             }
           },
           {
@@ -9918,7 +10461,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 216
+              "line": 233
             }
           },
           {
@@ -9935,7 +10478,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 217
+              "line": 234
             }
           },
           {
@@ -9952,7 +10495,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 218
+              "line": 235
             }
           },
           {
@@ -9973,7 +10516,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 221
+              "line": 238
             }
           },
           {
@@ -9990,7 +10533,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 221
+              "line": 238
             }
           },
           {
@@ -10007,7 +10550,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 222
+              "line": 239
             }
           },
           {
@@ -10024,7 +10567,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 223
+              "line": 240
             }
           },
           {
@@ -10045,7 +10588,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 226
+              "line": 243
             }
           },
           {
@@ -10062,7 +10605,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 226
+              "line": 243
             }
           },
           {
@@ -10079,7 +10622,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 227
+              "line": 244
             }
           },
           {
@@ -10096,7 +10639,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 228
+              "line": 245
             }
           },
           {
@@ -10117,7 +10660,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 208
+              "line": 225
             }
           }
         ],
@@ -10132,7 +10675,7 @@
       },
       "source": {
         "file_index": 22,
-        "line": 209
+        "line": 226
       }
     },
     "graphics_engine::graphics_engine::HContext_t": {
@@ -10156,7 +10699,7 @@
       },
       "source": {
         "file_index": 22,
-        "line": 100
+        "line": 117
       }
     },
     "graphics_engine::graphics_engine::HDevice_t": {
@@ -10180,7 +10723,7 @@
       },
       "source": {
         "file_index": 22,
-        "line": 103
+        "line": 120
       }
     },
     "graphics_engine::graphics_engine::HICON": {
@@ -10207,7 +10750,7 @@
       },
       "source": {
         "file_index": 22,
-        "line": 7
+        "line": 9
       }
     },
     "graphics_engine::graphics_engine::HRenderSetup_t": {
@@ -10231,7 +10774,7 @@
       },
       "source": {
         "file_index": 22,
-        "line": 106
+        "line": 123
       }
     },
     "graphics_engine::graphics_engine::HTexture_t": {
@@ -10255,7 +10798,7 @@
       },
       "source": {
         "file_index": 22,
-        "line": 109
+        "line": 126
       }
     },
     "graphics_engine::graphics_engine::HWND": {
@@ -10282,7 +10825,7 @@
       },
       "source": {
         "file_index": 22,
-        "line": 10
+        "line": 12
       }
     },
     "graphics_engine::graphics_engine::RenderContext": {
@@ -10321,7 +10864,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 143
+              "line": 160
             }
           },
           {
@@ -10352,7 +10895,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 143
+              "line": 160
             }
           },
           {
@@ -10373,7 +10916,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 146
+              "line": 163
             }
           },
           {
@@ -10394,7 +10937,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 146
+              "line": 163
             }
           },
           {
@@ -10411,7 +10954,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 150
+              "line": 167
             }
           },
           {
@@ -10436,7 +10979,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 155
+              "line": 172
             }
           },
           {
@@ -10457,7 +11000,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 161
+              "line": 178
             }
           },
           {
@@ -10474,7 +11017,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 161
+              "line": 178
             }
           },
           {
@@ -10495,7 +11038,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 129
+              "line": 146
             }
           }
         ],
@@ -10510,7 +11053,7 @@
       },
       "source": {
         "file_index": 22,
-        "line": 133
+        "line": 150
       }
     },
     "graphics_engine::graphics_engine::RenderFrameCounters": {
@@ -10545,7 +11088,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 239
+              "line": 256
             }
           },
           {
@@ -10562,7 +11105,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 240
+              "line": 257
             }
           },
           {
@@ -10579,7 +11122,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 241
+              "line": 258
             }
           }
         ],
@@ -10594,7 +11137,7 @@
       },
       "source": {
         "file_index": 22,
-        "line": 238
+        "line": 255
       }
     },
     "graphics_engine::graphics_engine::ShadowCascades": {
@@ -10621,7 +11164,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 120
+              "line": 137
             }
           },
           {
@@ -10638,7 +11181,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 121
+              "line": 138
             }
           },
           {
@@ -10655,7 +11198,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 122
+              "line": 139
             }
           },
           {
@@ -10676,7 +11219,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 124
+              "line": 141
             }
           },
           {
@@ -10697,7 +11240,7 @@
             "is_base": false,
             "source": {
               "file_index": 22,
-              "line": 126
+              "line": 143
             }
           }
         ],
@@ -10712,7 +11255,7 @@
       },
       "source": {
         "file_index": 22,
-        "line": 114
+        "line": 131
       }
     },
     "graphics_engine::post_effects::AAMode": {
@@ -22223,6 +22766,94 @@
         "line": 187
       }
     },
+    "types::std_string::String": {
+      "path": "types::std_string::String",
+      "visibility": "public",
+      "size": 32,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " A `std::string` in the MSVC layout: the small-string-optimization buffer/pointer union\n (`_Bx`), then the length (`_Mysize`) and capacity (`_Myres`). The string is stored inline in\n [`buffer`](String::buffer) while `capacity < 16`; otherwise the first eight bytes of the\n buffer are a heap pointer to the character data.",
+        "doc_links": [
+          {
+            "text": "String::buffer",
+            "target_kind": "item",
+            "path": "types::std_string::String",
+            "anchor": "field-buffer"
+          }
+        ],
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "buffer",
+            "doc": " `_Bx`: the inline character buffer, or (heap case) a `char*` in the first eight bytes.",
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 16
+            },
+            "offset": 0,
+            "size": 16,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 37,
+              "line": 8
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "size",
+            "doc": " `_Mysize`: the length in bytes, excluding the NUL terminator.",
+            "type_ref": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "offset": 16,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 37,
+              "line": 12
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "capacity",
+            "doc": " `_Myres`: the allocated capacity in bytes, excluding the NUL terminator. `>= 16` means the\n data lives on the heap.",
+            "type_ref": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "offset": 24,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 37,
+              "line": 17
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 37,
+        "line": 6
+      }
+    },
     "types::std_vector::Vector": {
       "path": "types::std_vector::Vector",
       "visibility": "public",
@@ -22252,7 +22883,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 37,
+              "file_index": 38,
               "line": 7
             }
           },
@@ -22272,7 +22903,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 37,
+              "file_index": 38,
               "line": 11
             }
           },
@@ -22292,7 +22923,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 37,
+              "file_index": 38,
               "line": 15
             }
           },
@@ -22313,7 +22944,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 37,
+              "file_index": 38,
               "line": 1
             }
           }
@@ -22352,7 +22983,7 @@
               ]
             },
             "source": {
-              "file_index": 37,
+              "file_index": 38,
               "line": 21
             }
           },
@@ -22389,7 +23020,7 @@
               ]
             },
             "source": {
-              "file_index": 37,
+              "file_index": 38,
               "line": 24
             }
           }
@@ -22403,7 +23034,7 @@
         "pinned": false
       },
       "source": {
-        "file_index": 37,
+        "file_index": 38,
         "line": 5
       }
     },
@@ -22434,7 +23065,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 38,
+              "file_index": 39,
               "line": 9
             }
           }
@@ -22449,7 +23080,7 @@
         "pinned": false
       },
       "source": {
-        "file_index": 38,
+        "file_index": 39,
         "line": 8
       }
     },
@@ -22480,7 +23111,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 38,
+              "file_index": 39,
               "line": 3
             }
           },
@@ -22497,7 +23128,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 38,
+              "file_index": 39,
               "line": 4
             }
           }
@@ -22512,7 +23143,7 @@
         "pinned": false
       },
       "source": {
-        "file_index": 38,
+        "file_index": 39,
         "line": 2
       }
     },
@@ -22651,7 +23282,7 @@
             "alignment": 8,
             "is_base": true,
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 67
             }
           },
@@ -22671,7 +23302,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 72
             }
           },
@@ -22694,7 +23325,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 77
             }
           },
@@ -22719,7 +23350,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 81
             }
           },
@@ -22744,7 +23375,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 85
             }
           }
@@ -22767,7 +23398,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 18
             }
           },
@@ -22788,7 +23419,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 23
             }
           }
@@ -22819,7 +23450,7 @@
               "return_type": null,
               "calling_convention": "system",
               "source": {
-                "file_index": 39,
+                "file_index": 40,
                 "line": 8
               }
             }
@@ -22833,7 +23464,7 @@
         "pinned": false
       },
       "source": {
-        "file_index": 39,
+        "file_index": 40,
         "line": 65
       }
     },
@@ -22863,7 +23494,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 29
             }
           }
@@ -22918,7 +23549,7 @@
             },
             "calling_convention": "system",
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 44
             }
           },
@@ -22963,7 +23594,7 @@
             },
             "calling_convention": "system",
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 49
             }
           },
@@ -23027,7 +23658,7 @@
             },
             "calling_convention": "system",
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 56
             }
           }
@@ -23050,7 +23681,7 @@
               "return_type": null,
               "calling_convention": "system",
               "source": {
-                "file_index": 39,
+                "file_index": 40,
                 "line": 29
               }
             },
@@ -23070,7 +23701,7 @@
               "return_type": null,
               "calling_convention": "system",
               "source": {
-                "file_index": 39,
+                "file_index": 40,
                 "line": 29
               }
             },
@@ -23090,7 +23721,7 @@
               "return_type": null,
               "calling_convention": "system",
               "source": {
-                "file_index": 39,
+                "file_index": 40,
                 "line": 29
               }
             },
@@ -23110,7 +23741,7 @@
               "return_type": null,
               "calling_convention": "system",
               "source": {
-                "file_index": 39,
+                "file_index": 40,
                 "line": 29
               }
             },
@@ -23130,7 +23761,7 @@
               "return_type": null,
               "calling_convention": "system",
               "source": {
-                "file_index": 39,
+                "file_index": 40,
                 "line": 29
               }
             },
@@ -23150,7 +23781,7 @@
               "return_type": null,
               "calling_convention": "system",
               "source": {
-                "file_index": 39,
+                "file_index": 40,
                 "line": 29
               }
             },
@@ -23170,7 +23801,7 @@
               "return_type": null,
               "calling_convention": "system",
               "source": {
-                "file_index": 39,
+                "file_index": 40,
                 "line": 29
               }
             },
@@ -23190,7 +23821,7 @@
               "return_type": null,
               "calling_convention": "system",
               "source": {
-                "file_index": 39,
+                "file_index": 40,
                 "line": 29
               }
             },
@@ -23210,7 +23841,7 @@
               "return_type": null,
               "calling_convention": "system",
               "source": {
-                "file_index": 39,
+                "file_index": 40,
                 "line": 29
               }
             },
@@ -23254,7 +23885,7 @@
               },
               "calling_convention": "system",
               "source": {
-                "file_index": 39,
+                "file_index": 40,
                 "line": 36
               }
             }
@@ -23268,7 +23899,7 @@
         "pinned": false
       },
       "source": {
-        "file_index": 39,
+        "file_index": 40,
         "line": 28
       }
     },
@@ -23308,7 +23939,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 29
             }
           },
@@ -23338,7 +23969,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 29
             }
           },
@@ -23368,7 +23999,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 29
             }
           },
@@ -23398,7 +24029,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 29
             }
           },
@@ -23428,7 +24059,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 29
             }
           },
@@ -23458,7 +24089,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 29
             }
           },
@@ -23488,7 +24119,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 29
             }
           },
@@ -23518,7 +24149,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 29
             }
           },
@@ -23548,7 +24179,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 29
             }
           },
@@ -23601,7 +24232,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 36
             }
           }
@@ -23616,7 +24247,7 @@
         "pinned": false
       },
       "source": {
-        "file_index": 39,
+        "file_index": 40,
         "line": 29
       }
     },
@@ -23646,7 +24277,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 8
             }
           },
@@ -23663,7 +24294,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 13
             }
           },
@@ -23684,7 +24315,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 1
             }
           }
@@ -23706,7 +24337,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 18
             }
           },
@@ -23726,7 +24357,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 23
             }
           }
@@ -23757,7 +24388,7 @@
               "return_type": null,
               "calling_convention": "system",
               "source": {
-                "file_index": 39,
+                "file_index": 40,
                 "line": 8
               }
             }
@@ -23771,7 +24402,7 @@
         "pinned": false
       },
       "source": {
-        "file_index": 39,
+        "file_index": 40,
         "line": 5
       }
     },
@@ -23818,7 +24449,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 39,
+              "file_index": 40,
               "line": 8
             }
           }
@@ -23833,7 +24464,7 @@
         "pinned": false
       },
       "source": {
-        "file_index": 39,
+        "file_index": 40,
         "line": 8
       }
     },
@@ -23857,7 +24488,7 @@
         "pinned": false
       },
       "source": {
-        "file_index": 39,
+        "file_index": 40,
         "line": 113
       }
     },
@@ -23902,7 +24533,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 30
             }
           },
@@ -23927,7 +24558,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 30
             }
           },
@@ -23952,7 +24583,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 35
             }
           },
@@ -23973,7 +24604,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 39
             }
           },
@@ -23990,7 +24621,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 39
             }
           },
@@ -24015,7 +24646,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 44
             }
           }
@@ -24078,7 +24709,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 51
             }
           }
@@ -24092,7 +24723,7 @@
         "pinned": false
       },
       "source": {
-        "file_index": 40,
+        "file_index": 41,
         "line": 26
       }
     },
@@ -24115,7 +24746,7 @@
             "value": 0,
             "doc": null,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 9
             }
           },
@@ -24124,7 +24755,7 @@
             "value": 1,
             "doc": null,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 10
             }
           },
@@ -24133,7 +24764,7 @@
             "value": 2,
             "doc": null,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 11
             }
           },
@@ -24142,7 +24773,7 @@
             "value": 3,
             "doc": null,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 12
             }
           },
@@ -24151,7 +24782,7 @@
             "value": 4,
             "doc": null,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 13
             }
           },
@@ -24160,7 +24791,7 @@
             "value": 5,
             "doc": null,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 14
             }
           },
@@ -24169,7 +24800,7 @@
             "value": 6,
             "doc": null,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 15
             }
           },
@@ -24178,7 +24809,7 @@
             "value": 7,
             "doc": null,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 16
             }
           },
@@ -24187,7 +24818,7 @@
             "value": 8,
             "doc": null,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 17
             }
           },
@@ -24196,7 +24827,7 @@
             "value": 9,
             "doc": null,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 18
             }
           },
@@ -24205,7 +24836,7 @@
             "value": 10,
             "doc": null,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 19
             }
           }
@@ -24218,7 +24849,7 @@
         "pinned": false
       },
       "source": {
-        "file_index": 40,
+        "file_index": 41,
         "line": 8
       }
     },
@@ -24275,7 +24906,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 67
             }
           },
@@ -24306,7 +24937,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 67
             }
           },
@@ -24331,7 +24962,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 71
             }
           },
@@ -24352,7 +24983,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 76
             }
           },
@@ -24372,7 +25003,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 76
             }
           },
@@ -24392,7 +25023,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 80
             }
           },
@@ -24412,7 +25043,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 86
             }
           },
@@ -24433,7 +25064,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 92
             }
           },
@@ -24467,7 +25098,7 @@
             "alignment": 8,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 92
             }
           },
@@ -24488,7 +25119,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 98
             }
           },
@@ -24513,7 +25144,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 98
             }
           },
@@ -24538,7 +25169,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 102
             }
           },
@@ -24559,7 +25190,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 108
             }
           },
@@ -24584,7 +25215,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 108
             }
           },
@@ -24609,7 +25240,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 112
             }
           },
@@ -24634,7 +25265,7 @@
             "alignment": 4,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 118
             }
           },
@@ -24655,7 +25286,7 @@
             "alignment": 1,
             "is_base": false,
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 54
             }
           }
@@ -24704,7 +25335,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 127
             }
           },
@@ -24732,7 +25363,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 133
             }
           },
@@ -24782,7 +25413,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 140
             }
           },
@@ -24832,7 +25463,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 148
             }
           },
@@ -24852,7 +25483,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 152
             }
           },
@@ -24872,7 +25503,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 156
             }
           },
@@ -24939,7 +25570,7 @@
             },
             "calling_convention": "system",
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 161
             }
           },
@@ -25071,7 +25702,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 167
             }
           },
@@ -25153,7 +25784,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 172
             }
           },
@@ -25184,7 +25815,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 176
             }
           },
@@ -25204,7 +25835,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 180
             }
           },
@@ -25224,7 +25855,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 184
             }
           },
@@ -25244,7 +25875,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 188
             }
           },
@@ -25278,7 +25909,7 @@
             "return_type": null,
             "calling_convention": "system",
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 192
             }
           },
@@ -25301,7 +25932,7 @@
             },
             "calling_convention": "system",
             "source": {
-              "file_index": 40,
+              "file_index": 41,
               "line": 196
             }
           }
@@ -25315,7 +25946,7 @@
         "pinned": false
       },
       "source": {
-        "file_index": 40,
+        "file_index": 41,
         "line": 60
       }
     },
@@ -25710,7 +26341,7 @@
               "doc": null,
               "source": {
                 "file_index": 13,
-                "line": 134
+                "line": 155
               }
             },
             {
@@ -25724,7 +26355,7 @@
               "doc": null,
               "source": {
                 "file_index": 13,
-                "line": 137
+                "line": 158
               }
             }
           ],
@@ -26994,7 +27625,7 @@
               "doc": null,
               "source": {
                 "file_index": 22,
-                "line": 232
+                "line": 249
               }
             },
             {
@@ -27008,7 +27639,7 @@
               "doc": null,
               "source": {
                 "file_index": 22,
-                "line": 245
+                "line": 262
               }
             }
           ],
@@ -27041,7 +27672,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 22,
-                "line": 206
+                "line": 223
               }
             }
           ],
@@ -27685,6 +28316,31 @@
             "line": 1
           }
         },
+        "std_string": {
+          "doc": null,
+          "items": [
+            "types::std_string::String"
+          ],
+          "submodules": {},
+          "extern_values": [],
+          "functions": [],
+          "backends": {
+            "rust": [
+              {
+                "prologue": null,
+                "epilogue": {
+                  "header": "\n    #[allow(dead_code)]\n    impl String {\n        /// The string bytes, resolving the small-string optimization.\n        ///\n        /// # Safety\n        /// The string must be live and unmodified for the borrow: in the heap case the returned\n        /// slice aliases the allocation the first eight buffer bytes point to.\n        pub unsafe fn as_bytes(&self) -> &[u8] {\n            let data: *const u8 = if self.capacity < 16 {\n                self.buffer.as_ptr()\n            } else {\n                unsafe { ::core::ptr::read_unaligned(self.buffer.as_ptr() as *const *const u8) }\n            };\n            unsafe { ::core::slice::from_raw_parts(data, self.size as usize) }\n        }\n    }\n",
+                  "definition": null,
+                  "for_type": "types::std_string::String"
+                }
+              }
+            ]
+          },
+          "source": {
+            "file_index": 37,
+            "line": 1
+          }
+        },
         "std_vector": {
           "doc": null,
           "items": [
@@ -27716,7 +28372,7 @@
             ]
           },
           "source": {
-            "file_index": 37,
+            "file_index": 38,
             "line": 1
           }
         },
@@ -27731,7 +28387,7 @@
           "functions": [],
           "backends": {},
           "source": {
-            "file_index": 38,
+            "file_index": 39,
             "line": 1
           }
         }
@@ -27760,7 +28416,7 @@
           "functions": [],
           "backends": {},
           "source": {
-            "file_index": 39,
+            "file_index": 40,
             "line": 1
           }
         },
@@ -27799,14 +28455,14 @@
               },
               "calling_convention": "system",
               "source": {
-                "file_index": 40,
+                "file_index": 41,
                 "line": 201
               }
             }
           ],
           "backends": {},
           "source": {
-            "file_index": 40,
+            "file_index": 41,
             "line": 1
           }
         }
@@ -27873,14 +28529,14 @@
           },
           "calling_convention": "system",
           "source": {
-            "file_index": 41,
+            "file_index": 42,
             "line": 3
           }
         }
       ],
       "backends": {},
       "source": {
-        "file_index": 41,
+        "file_index": 42,
         "line": 3
       }
     }
@@ -27923,6 +28579,7 @@
     "input/locomotion.pyxis",
     "state.pyxis",
     "types/math.pyxis",
+    "types/std_string.pyxis",
     "types/std_vector.pyxis",
     "types/vector_math.pyxis",
     "ui/scaleform.pyxis",

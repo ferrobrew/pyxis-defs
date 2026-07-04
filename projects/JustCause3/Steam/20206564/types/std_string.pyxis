@@ -16,6 +16,7 @@ pub type String {
     #[address(0x18)]
     pub capacity: u64,
 }
+
 backend rust epilogue for String r#"
     #[allow(dead_code)]
     impl String {
