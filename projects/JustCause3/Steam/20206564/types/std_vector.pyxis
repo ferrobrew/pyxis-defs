@@ -18,7 +18,7 @@ pub type Vector<T> {
 impl<T> Vector<T> {
     /// Number of live elements.
     #[external_body]
-    pub fn len(&self) -> usize;
+    pub fn len(&self) -> u64;
     /// `true` if there are no live elements.
     #[external_body]
     pub fn is_empty(&self) -> bool;
@@ -56,11 +56,11 @@ backend rust epilogue for Vector r#"
 
 backend cpp epilogue for Vector r#"
 template <class T>
-inline ::std::size_t Vector<T>::len() const {
+inline ::std::uint64_t Vector<T>::len() const {
     if (begin == nullptr) {
         return 0;
     }
-    return static_cast<::std::size_t>(reinterpret_cast<const char*>(end) - reinterpret_cast<const char*>(begin)) / sizeof(T);
+    return static_cast<::std::uint64_t>(reinterpret_cast<const char*>(end) - reinterpret_cast<const char*>(begin)) / sizeof(T);
 }
 
 template <class T>
