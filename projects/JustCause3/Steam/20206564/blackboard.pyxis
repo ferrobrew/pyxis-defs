@@ -7,7 +7,6 @@ use types::math::Vector3;
 pub type ObjectBlackboardKeyInfo {
     /// The key hash the accessors look up by.
     pub m_KeyHash: u32,
-
     /// The value's type tag (`SObjectBlackboardKeyInfo::EValueType`, stored narrow): `0` none,
     /// `1` float, `2` vector, `3` u32, `4` i32, `5` hash (aliases to u32 on read), `6` u64,
     /// `7` u8.
@@ -17,7 +16,6 @@ pub type ObjectBlackboardKeyInfo {
     /// `1` local frame, `2` global frame.
     #[address(0x8)]
     pub m_PersistenceType: u32,
-
     /// The value's byte offset within [`ObjectBlackboard::m_Data`].
     pub m_DataOffset: u16,
 
@@ -66,7 +64,6 @@ pub type ObjectBlackboard {
 
     #[address(0x18)]
     pub m_DataCapacity: u16,
-
     /// The arena's bump-allocation cursor.
     pub m_CurrentOffset: u16,
 
