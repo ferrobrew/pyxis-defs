@@ -24,8 +24,7 @@ pub type Character {
     pub m_AnimatedModel: AnimatedModel,
 
     /// The character's embedded [`ObjectBlackboard`] (`lea rcx, [character+2060h]` at every
-    /// blackboard call site in the loco tasks). The blackboard type is opaque, so this zero-size
-    /// field only anchors the offset: take its address to obtain the blackboard pointer.
+    /// blackboard call site in the loco tasks).
     #[address(0x2_060)]
     pub m_Blackboard: ObjectBlackboard,
 
