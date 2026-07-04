@@ -253,17 +253,17 @@ pub type MovieImpl {
         #[index(25)]
         pub fn Capture(&mut self, if_changed: bool) -> u64;
 
-        /// Reassigns which thread owns the capture (`GFx::Movie` vtable slot 27). The engine hands
-        /// ownership between the update thread and the render thread this way
-        /// (`RenderOffScreenTextures` does exactly this per frame).
-        #[index(27)]
-        pub fn SetCaptureThread(&mut self, thread_id: u32);
-
         /// Returns the movie's display handle (`GFx::Movie` vtable slot 26): the pinned
         /// `DisplayHandle<TreeRoot>` whose `pData` the renderer copies (with an `AddRef`) into a
         /// stack [`RTHandle`] before consuming the frame's capture.
         #[index(26)]
         pub fn GetDisplayHandle(&mut self) -> *mut DisplayHandle;
+
+        /// Reassigns which thread owns the capture (`GFx::Movie` vtable slot 27). The engine hands
+        /// ownership between the update thread and the render thread this way
+        /// (`RenderOffScreenTextures` does exactly this per frame).
+        #[index(27)]
+        pub fn SetCaptureThread(&mut self, thread_id: u32);
     },
 
     /// The AS3 `MovieRoot` (the [`Movie`] interface): SetVariable, Invoke, and the display tree.
