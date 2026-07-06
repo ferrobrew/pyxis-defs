@@ -51,6 +51,12 @@ impl Character {
     #[address(0x140_7D5_B00)]
     pub fn GetLocalPlayerCharacter() -> *mut Character;
 
+    /// Whether the character is attached to a vehicle (riding, or in the mount/dismount
+    /// transitions), read from the animation rule system's current state. The state machine
+    /// pointers it walks are game-thread data; call on the game update thread.
+    #[address(0x140_77F_080)]
+    pub fn IsInVehicleAttachState(&self) -> bool;
+
     #[address(0x140_7AF_550)]
     pub fn GetHeadPosition(&self, position: *mut Vector3) -> *mut Vector3;
 
