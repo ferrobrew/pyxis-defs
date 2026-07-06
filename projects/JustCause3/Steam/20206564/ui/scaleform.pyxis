@@ -23,12 +23,6 @@ impl RefCountImpl {
     pub fn Release(&self);
 }
 
-/// The `AS3::MovieRoot` vtable address (the `ASMovieRootBase` layout: slot 35 is
-/// [`GetDisplayObjectsTree`](Movie::GetDisplayObjectsTree), slots 49/50/57 are the bound
-/// SetVariable/GetVariable/Invoke). The payload checks a live object against it before
-/// trusting the vtable-indexed calls, since the object's dynamic type is load-bearing here.
-pub const MOVIE_VFTABLE: u64 = 0x1426216B0;
-
 /// The Scaleform AS3 `MovieRoot` (the `ASMovieRootBase` interface), which `CUIManager::m_Movie`
 /// points at. The engine drives the movie through this interface's virtuals; the bound
 /// [`SetVariable`](Movie::SetVariable) / [`GetVariable`](Movie::GetVariable) /
@@ -36,6 +30,12 @@ pub const MOVIE_VFTABLE: u64 = 0x1426216B0;
 /// `0x142_621_780`.
 #[min_size(0x18)]
 pub type Movie {
+    /// The `AS3::MovieRoot` vtable address (the `ASMovieRootBase` layout: slot 35 is
+    /// [`GetDisplayObjectsTree`](Movie::GetDisplayObjectsTree), slots 49/50/57 are the bound
+    /// SetVariable/GetVariable/Invoke). The payload checks a live object against it before
+    /// trusting the vtable-indexed calls, since the object's dynamic type is load-bearing here.
+    pub const VFTABLE: u64 = 0x1426216B0,
+
     vftable {
         /// Recursively walks the runtime display tree from the root movie clip: returns a tree of
         /// [`AmpMovieObjectDesc`] nodes, each carrying the clip's instance name (or `"Unnamed"`)
