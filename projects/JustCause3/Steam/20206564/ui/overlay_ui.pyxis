@@ -1,0 +1,44 @@
+use ui::scaleform::Value;
+
+/// The overlay UI (`COverlayUI`): the `CUIBase` hosting the `MCI_cursor` mouse-cursor clip, the
+/// `MCI_black` fade, and the FPS readout inside the shared UI movie. The cursor is doubled:
+/// while visible the engine both shows the OS arrow cursor (via `CGraphicsEngine::SetCursor`)
+/// and repositions the movie's `MCI_cursor` clip every mouse move
+/// ([`SetMouseCursorPosition`](OverlayUI::SetMouseCursorPosition)), so a cursor is also drawn
+/// into the movie's own render target.
+#[singleton(0x142_F38_858), min_size(0x154)]
+pub type OverlayUI {
+    /// The `CUIBase` activation state; `2` is active. [`SetMouseCursorPosition`](OverlayUI::SetMouseCursorPosition)
+    /// and `CUIManager::MousePointerVisibility` no-op unless it is `2`.
+    #[address(0x14)]
+    pub m_Current: u32,
+
+    /// The managed [`Value`] for the movie's `MCI_cursor` clip, bound by `GetMember` when the
+    /// overlay activates.
+    #[address(0x120)]
+    pub m_MouseCursor: Value,
+
+    /// The cursor-visibility refcount. [`ShowMouseCursor`](OverlayUI::ShowMouseCursor) increments
+    /// it, [`HideMouseCursor`](OverlayUI::HideMouseCursor) decrements it; the 0-to-1 and 1-to-0
+    /// transitions switch `CGraphicsEngine`'s active cursor between `Arrow` and `None` (which also
+    /// controls the cursor clip to the client rect).
+    #[address(0x150)]
+    pub m_MouseCursorShowRefCount: i32,
+}
+impl OverlayUI {
+    /// Increments [`m_MouseCursorShowRefCount`](OverlayUI::m_MouseCursorShowRefCount); the 0-to-1
+    /// transition sets `CGraphicsEngine::SetCursor(Arrow)`.
+    #[address(0x140_DFB_960)]
+    pub fn ShowMouseCursor(&mut self);
+
+    /// Decrements [`m_MouseCursorShowRefCount`](OverlayUI::m_MouseCursorShowRefCount) (warning if
+    /// already zero); at zero it sets `CGraphicsEngine::SetCursor(None)`.
+    #[address(0x140_DFB_920)]
+    pub fn HideMouseCursor(&mut self);
+
+    /// Moves the `MCI_cursor` clip to `(x, y)` in movie stage coordinates (the space
+    /// `CUIManager::GetMovieSpaceMouseCursor` produces) via a `DisplayInfo` X/Y write. No-ops
+    /// unless the overlay is active.
+    #[address(0x140_E4F_260)]
+    pub fn SetMouseCursorPosition(&mut self, x: f32, y: f32);
+}

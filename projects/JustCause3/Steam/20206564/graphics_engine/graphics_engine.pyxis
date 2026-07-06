@@ -216,6 +216,21 @@ impl GraphicsEngine {
     /// `CSettingsManager::UpdateSettings`. `name` is a NUL-terminated C string.
     #[address(0x140_0DE_9A0)]
     pub fn LoadShaderBundle(&mut self, name: *const u8) -> bool;
+
+    /// Sets [`m_ActiveCursor`](GraphicsEngine::m_ActiveCursor) and, when it changed, posts
+    /// `WM_SETCURSOR` to the game window so `WndProc` runs
+    /// [`UpdateCursor`](GraphicsEngine::UpdateCursor). `COverlayUI` drives it: `Arrow` when the
+    /// overlay cursor becomes visible, `None` when it hides.
+    #[address(0x140_0A1_AB0)]
+    pub fn SetCursor(&mut self, cursor: ActiveCursor);
+
+    /// Applies [`m_ActiveCursor`](GraphicsEngine::m_ActiveCursor) to the OS: for `None` it sets a
+    /// null `HCURSOR` and clips the cursor to the client rect (when the window is foreground);
+    /// otherwise it unclips and sets `GraphicsParams::m_Cursors[cursor]`. The four entries are
+    /// loaded at startup as the system `IDC_ARROW`, `IDC_CROSS`, `IDC_HAND`, and `IDC_NO`
+    /// cursors. Called from `WndProc` on `WM_SETCURSOR`.
+    #[address(0x140_0A1_AF0)]
+    pub fn UpdateCursor(&mut self);
 }
 
 /// The low-level present.

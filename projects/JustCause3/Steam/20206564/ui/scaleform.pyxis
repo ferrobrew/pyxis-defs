@@ -23,6 +23,12 @@ impl RefCountImpl {
     pub fn Release(&self);
 }
 
+/// The `AS3::MovieRoot` vtable address (the `ASMovieRootBase` layout: slot 35 is
+/// [`GetDisplayObjectsTree`](Movie::GetDisplayObjectsTree), slots 49/50/57 are the bound
+/// SetVariable/GetVariable/Invoke). The payload checks a live object against it before
+/// trusting the vtable-indexed calls, since the object's dynamic type is load-bearing here.
+pub const MOVIE_VFTABLE: u64 = 0x1426216B0;
+
 /// The Scaleform AS3 `MovieRoot` (the `ASMovieRootBase` interface), which `CUIManager::m_Movie`
 /// points at. The engine drives the movie through this interface's virtuals; the bound
 /// [`SetVariable`](Movie::SetVariable) / [`GetVariable`](Movie::GetVariable) /
@@ -30,12 +36,6 @@ impl RefCountImpl {
 /// `0x142_621_780`.
 #[min_size(0x18)]
 pub type Movie {
-    /// The `AS3::MovieRoot` vtable address (the `ASMovieRootBase` layout: slot 35 is
-    /// [`GetDisplayObjectsTree`](Movie::GetDisplayObjectsTree), slots 49/50/57 are the bound
-    /// SetVariable/GetVariable/Invoke). The payload checks a live object against it before
-    /// trusting the vtable-indexed calls, since the object's dynamic type is load-bearing here.
-    pub const VFTABLE: u64 = 0x1426216B0,
-
     vftable {
         /// Recursively walks the runtime display tree from the root movie clip: returns a tree of
         /// [`AmpMovieObjectDesc`] nodes, each carrying the clip's instance name (or `"Unnamed"`)
@@ -247,6 +247,40 @@ pub type RenderTarget {
     },
 }
 
+/// A `GFx::MouseEvent` (a `GFx::Event` with the mouse payload): the argument
+/// `CUIManager::SendMouseEvents` builds for [`MovieImpl::HandleEvent`]. `x` and `y` are in
+/// movie-viewport pixels: window-client pixels minus the centering offset
+/// `(cached viewport size - movie rectangle size) / 2`, i.e. relative to the top-left corner of
+/// the centered movie rectangle (see
+/// [`UIManager::m_MovieScaleWidth`](ui::ui_manager::UIManager::m_MovieScaleWidth)).
+#[copyable, size(0x1C), align(4)]
+pub type MouseEvent {
+    /// The [`Type`](MouseEvent::Type) of a mouse-move event.
+    pub const TYPE_MOUSE_MOVE: u32 = 1,
+    /// The [`Type`](MouseEvent::Type) of a button-press event.
+    pub const TYPE_MOUSE_DOWN: u32 = 2,
+    /// The [`Type`](MouseEvent::Type) of a button-release event.
+    pub const TYPE_MOUSE_UP: u32 = 3,
+    /// The [`Type`](MouseEvent::Type) of a wheel event ([`ScrollDelta`](MouseEvent::ScrollDelta)
+    /// carries the amount).
+    pub const TYPE_MOUSE_WHEEL: u32 = 4,
+
+    /// The `GFx::Event::Type` tag (`TYPE_MOUSE_*`).
+    pub Type: u32,
+    /// `GFx::KeyModifiers::States` (ctrl/alt/shift bits); the engine always sends 0.
+    pub Modifiers: u8,
+
+    #[address(0x8)]
+    pub x: f32,
+    pub y: f32,
+    /// The wheel amount in Flash line units; the engine sends `lZ / 120 * 3` from the DirectInput
+    /// mouse's z axis.
+    pub ScrollDelta: f32,
+    /// The button index for down/up events: `0` left, `1` right.
+    pub Button: u32,
+    pub MouseIndex: u32,
+}
+
 /// The `GFx::MovieImpl` behind [`UIManager::m_Movie`](ui::ui_manager::UIManager::m_Movie): the
 /// `GFx::Movie` instance. The rendering-side virtuals live on its own vtable; the AS3 side
 /// (SetVariable, Invoke, the display tree) lives on [`pASMovieRoot`](MovieImpl::pASMovieRoot).
@@ -271,6 +305,28 @@ pub type MovieImpl {
         /// (`RenderOffScreenTextures` does exactly this per frame).
         #[index(27)]
         pub fn SetCaptureThread(&mut self, thread_id: u32);
+
+        /// Routes a `GFx::Event` to the movie (`GFx::Movie` vtable slot 35). For a
+        /// [`MouseEvent`] the movie records the new mouse state, which the next `Advance`
+        /// processes into AS3 mouse events (hover, press, release). Call on the capture (game
+        /// update) thread. `CUIManager::SendMouseEvents` is the engine's only mouse feeder, and
+        /// only emits a move event on frames where the DirectInput mouse reported a non-zero
+        /// delta.
+        #[index(35)]
+        pub fn HandleEvent(&mut self, event: *const MouseEvent) -> u32;
+
+        /// Directly overwrites one mouse's state (`GFx::Movie` vtable slot 37): position in
+        /// movie-viewport pixels (the same space as [`MouseEvent`]) plus a button bitmask (bit 0
+        /// left, bit 1 right), bypassing the event objects. Processed on the next `Advance`, like
+        /// [`HandleEvent`](MovieImpl::HandleEvent).
+        #[index(37)]
+        pub fn NotifyMouseState(&mut self, x: f32, y: f32, buttons: u32, mouse_index: u32);
+
+        /// Sets how many mice the movie tracks (`GFx::Movie` vtable slot 43); `0` disables mouse
+        /// processing entirely. `CUIManager::RestoreAfterReset` sets `1` when a DirectInput mouse
+        /// device exists and `0` otherwise.
+        #[index(43)]
+        pub fn SetMouseCursorCount(&mut self, count: u32);
     },
 
     /// The AS3 `MovieRoot` (the [`Movie`] interface): SetVariable, Invoke, and the display tree.

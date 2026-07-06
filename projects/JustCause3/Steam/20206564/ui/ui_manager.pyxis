@@ -82,6 +82,29 @@ impl RenderTargetData {
 /// viewport, and [`ComputeSafeArea`](UIManager::ComputeSafeArea) derives the UI safe area.
 #[singleton(0x142_E5B_620), size(0x14A8)]
 pub type UIManager {
+    /// The horizontal mouse letterbox offset from the engine's `MovieScaleInfo`
+    /// (`m_MouseDeltaX`), in movie-viewport pixels.
+    /// [`GetMovieSpaceMouseCursor`](UIManager::GetMovieSpaceMouseCursor) maps a movie-viewport
+    /// mouse position into stage coordinates as `(pos - delta) * scale`.
+    /// [`ComputeMovieSizeOnViewSize`](UIManager::ComputeMovieSizeOnViewSize) writes it: always
+    /// zero today (only the non-clipping path computes a non-trivial
+    /// [`m_MouseDeltaY`](UIManager::m_MouseDeltaY)).
+    #[address(0x28)]
+    pub m_MouseDeltaX: i32,
+
+    /// The vertical mouse letterbox offset from the engine's `MovieScaleInfo` (`m_MouseDeltaY`),
+    /// in movie-viewport pixels. In `ComputeMovieSizeOnViewSize`'s non-clipping path it is half
+    /// the vertical letterbox, `(movie height - stage height * movie width / stage width) / 2`;
+    /// in the clipping path it is zero.
+    #[address(0x2C)]
+    pub m_MouseDeltaY: i32,
+
+    /// The movie-viewport-pixels-to-stage-coordinates mouse scale from the engine's
+    /// `MovieScaleInfo` (`m_MouseScaleFac`): `stage width / movie rectangle width` in the
+    /// non-clipping path of `ComputeMovieSizeOnViewSize`, `1.0` in the clipping path.
+    #[address(0x30)]
+    pub m_MouseScaleFac: f32,
+
     /// The movie render rectangle's width, from the engine's `MovieScaleInfo`. The movie is rendered
     /// into a `m_MovieScaleWidth` x `m_MovieScaleHeight` rectangle, centered within the viewport
     /// passed to [`SetMovieViewport`](UIManager::SetMovieViewport).
@@ -103,6 +126,18 @@ pub type UIManager {
     #[address(0x44)]
     pub m_CurrentCaptureThread: u32,
 
+    /// The last mouse position's x, in window-client pixels. `WndProc` writes it on every
+    /// `WM_MOUSEMOVE` via [`SetMousePos`](UIManager::SetMousePos) -- the only writer, so the OS
+    /// message stream is the sole source of the UI mouse position (the DirectInput mouse device
+    /// only contributes deltas, buttons, and the wheel).
+    #[address(0xB4)]
+    pub m_MouseX: i32,
+
+    /// The last mouse position's y, in window-client pixels; see
+    /// [`m_MouseX`](UIManager::m_MouseX).
+    #[address(0xB8)]
+    pub m_MouseY: i32,
+
     /// Whether the render system is initialized. One of the three gates `Render` checks before
     /// drawing.
     #[address(0x212)]
@@ -111,6 +146,11 @@ pub type UIManager {
     /// Whether rendering is active (cleared during device resets). The second `Render` gate.
     #[address(0x213)]
     pub m_RenderActive: bool,
+
+    /// The active `CSteering`, whose action map [`SendMouseEvents`](UIManager::SendMouseEvents)
+    /// polls for the mouse-button actions (`MOUSE1` = 249, `MOUSE2` = 250).
+    #[address(0x220)]
+    pub m_Steering: *mut void,
 
     /// The lock serializing the UI update (`PreRender`: `Advance` + `Capture`) against the UI
     /// render (`Render`, `RenderOffScreenTextures`). A Win32 critical section, so re-entrant on
@@ -154,6 +194,13 @@ pub type UIManager {
     /// views it renders into.
     #[address(0x1_390)]
     pub m_RenderBuffer: *mut RenderTargetData,
+
+    /// Whether the player is currently driving the UI with a gamepad. While set,
+    /// [`SendMouseEvents`](UIManager::SendMouseEvents) parks the Scaleform mouse at
+    /// `(-1000, -1000)` and [`MousePointerVisibility`](UIManager::MousePointerVisibility) hides
+    /// the overlay cursor.
+    #[address(0x1_47D)]
+    pub m_IsUsingGamepad: bool,
 
     /// The third `Render` gate: whether UI rendering is enabled at all.
     #[address(0x1_47F)]
@@ -279,6 +326,60 @@ impl UIManager {
     /// Whether a static background is being shown.
     #[address(0x140_F1B_4C0)]
     pub fn IsUsingStaticBackGround(&self) -> bool;
+
+    /// The per-frame UI input step: computes gamepad use, runs
+    /// [`MousePointerVisibility`](UIManager::MousePointerVisibility), dispatches the
+    /// highest-input-priority `CUIBase`'s input management, then calls
+    /// [`SendMouseEvents`](UIManager::SendMouseEvents) and drains the queued key events.
+    #[address(0x141_049_000)]
+    pub fn PreUpdate(&mut self, dt: f32);
+
+    /// Stores a window-client-pixel mouse position into [`m_MouseX`](UIManager::m_MouseX) /
+    /// [`m_MouseY`](UIManager::m_MouseY) and immediately runs
+    /// [`SendMouseEvents`](UIManager::SendMouseEvents). Called by `WndProc` on `WM_MOUSEMOVE`
+    /// with the `lParam` client coordinates.
+    #[address(0x140_F46_810)]
+    pub fn SetMousePos(&mut self, x: i32, y: i32);
+
+    /// Reads back [`m_MouseX`](UIManager::m_MouseX) / [`m_MouseY`](UIManager::m_MouseY).
+    #[address(0x140_F1B_1F0)]
+    pub fn GetMousePos(&self, x: *mut i32, y: *mut i32);
+
+    /// Feeds the frame's mouse state to the Scaleform movie. Converts
+    /// [`m_MouseX`](UIManager::m_MouseX) / [`m_MouseY`](UIManager::m_MouseY) to movie-viewport
+    /// pixels by subtracting the centering offset
+    /// `(m_CachedViewportSize - m_MovieScale size) / 2`, then sends
+    /// [`MouseEvent`](ui::scaleform::MouseEvent)s through
+    /// [`MovieImpl::HandleEvent`](ui::scaleform::MovieImpl::HandleEvent): a move event only when
+    /// the DirectInput mouse reported a non-zero x or y delta this frame (also repositioning the
+    /// overlay cursor sprite via `COverlayUI::SetMouseCursorPosition`), a wheel event from the z
+    /// delta, and down/up events from the steering action map's `MOUSE1` (249) / `MOUSE2` (250)
+    /// effector states (2 = pressed edge, 4 = released edge). When
+    /// [`m_IsUsingGamepad`](UIManager::m_IsUsingGamepad) is set it instead parks the mouse at
+    /// `(-1000, -1000)`. Returns false without the movie, the steering, or a mouse device.
+    #[address(0x140_F1B_A60)]
+    pub fn SendMouseEvents(&mut self, steering: *mut void) -> bool;
+
+    /// Maps a movie-viewport-pixel mouse position into movie stage coordinates:
+    /// `out = (pos - m_MouseDelta) * m_MouseScaleFac` per axis (see
+    /// [`m_MouseDeltaX`](UIManager::m_MouseDeltaX)).
+    #[address(0x140_F1B_A30)]
+    pub fn GetMovieSpaceMouseCursor(&self, viewport_x: f32, viewport_y: f32, out: *mut Vector2);
+
+    /// Shows or hides the overlay mouse cursor from the frame's UI state: visible only when the
+    /// overlay UI is active, no gamepad is in use, and no cursor-hiding HUD state or message box
+    /// applies (via `COverlayUI::ShowMouseCursor` / `HideMouseCursor`).
+    #[address(0x140_F46_E60)]
+    pub fn MousePointerVisibility(&mut self);
+
+    /// Refreshes [`m_CachedStageWidth`](UIManager::m_CachedStageWidth) /
+    /// [`m_CachedStageHeight`](UIManager::m_CachedStageHeight) from the loaded movie and
+    /// [`m_CachedViewportWidth`](UIManager::m_CachedViewportWidth) /
+    /// [`m_CachedViewportHeight`](UIManager::m_CachedViewportHeight) /
+    /// [`m_CachedViewportRatio`](UIManager::m_CachedViewportRatio) from the graphics device.
+    /// First step of [`ComputeMovieSizeOnViewSize`](UIManager::ComputeMovieSizeOnViewSize).
+    #[address(0x140_F1A_EA0)]
+    pub fn UpdateCachedValues(&mut self);
 }
 
 /// Returns the single [`UIManager`] instance.
