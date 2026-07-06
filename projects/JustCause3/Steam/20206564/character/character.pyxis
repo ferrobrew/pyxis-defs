@@ -1,3 +1,4 @@
+use animation::ik::HumanIK;
 use blackboard::ObjectBlackboard;
 use types::math::Matrix4;
 use types::math::Vector3;
@@ -20,6 +21,13 @@ pub bitflags AimState: u8 {
 
 #[size(0x3540)]
 pub type Character {
+    /// The character's embedded HumanIK solver. Driven each frame in
+    /// [`UpdatePassFinalizePose_Parallel`](Character::UpdatePassFinalizePose_Parallel), after the
+    /// animation graph finalizes the local pose and before the model-space pose is computed. See
+    /// [`HumanIK`] for the per-pass lifecycle.
+    #[address(0x1_0E0)]
+    pub m_HIK: HumanIK,
+
     #[address(0x1_780)]
     pub m_AnimatedModel: AnimatedModel,
 
@@ -66,7 +74,18 @@ impl Character {
     #[address(0x140_79A_C30)]
     pub fn GetSafeBoneMatrix(&self, safe_index: SafeBoneIndex, matrix: *mut Matrix4);
 
-    /// The per-frame update of the character's attached prop visual effects.
+    /// The character's SIM-phase pose-finalization pass. After the animation graph has finalized the
+    /// local pose, this drives the [`HumanIK`](Character::m_HIK) solve (the `MAIN` body pass, gated
+    /// on [`HumanIK::HasTargets`], followed by the `SECONDARY` hand pass), then computes the
+    /// model-space pose (`CalculateModelSpacePose`), and finally calls
+    /// [`UpdatePropEffects`](Character::UpdatePropEffects). Effector targets queued before this runs
+    /// are solved into the pose the same frame.
+    #[address(0x140_7F9_B10)]
+    pub fn UpdatePassFinalizePose_Parallel(&mut self, context: *mut void);
+
+    /// The per-frame update of the character's attached prop visual effects. Runs last in
+    /// [`UpdatePassFinalizePose_Parallel`](Character::UpdatePassFinalizePose_Parallel), after the IK
+    /// solve and the model-space pose computation.
     #[address(0x140_7C2_380)]
     pub fn UpdatePropEffects(&mut self, dt: f32);
 
