@@ -1,5 +1,5 @@
 use camera::camera::Camera;
-use graphics_engine::device::Device;
+use graphics_engine::device::{Device, DeviceInfo};
 use graphics_engine::shadow_manager::ShadowManager;
 use graphics_engine::texture::Texture;
 use types::math::{Matrix4, Vector4};
@@ -34,6 +34,11 @@ pub type EffectInfo {
 
 #[singleton(0x142_E2B_6F0), min_size(0x1F10)]
 pub type GraphicsEngine {
+    /// Whether the engine has finished its system initialisation. [`ResizeBuffers`](GraphicsEngine::ResizeBuffers)
+    /// only applies a resize inline once this is set.
+    #[address(0x8)]
+    pub m_HasBeenInitialized: bool,
+
     #[address(0x18)]
     pub m_CPUFinishedDrawingEvent: u32,
 
@@ -45,6 +50,37 @@ pub type GraphicsEngine {
     /// [`WaitForCPUDrawToFinish`](GraphicsEngine::WaitForCPUDrawToFinish) does *not* wait on it.
     #[address(0x30)]
     pub m_DrawThreadWorkSignal: u32,
+
+    /// The display-mode state machine serviced once per frame by
+    /// [`HandleModeChange`](GraphicsEngine::HandleModeChange): while idle it applies a deferred
+    /// window resize, and while a mode change is pending it applies the fullscreen/adapter change.
+    #[address(0x108)]
+    pub m_DisplayModeChangeState: u32,
+
+    /// Set at the tail of [`ApplyResize`](GraphicsEngine::ApplyResize) once a resize has been applied
+    /// and a valid display mode is in effect.
+    #[address(0x118)]
+    pub m_HasNewValidDisplayMode: bool,
+
+    /// The pending deferred-resize width, stashed by [`ResizeBuffers`](GraphicsEngine::ResizeBuffers)
+    /// and consumed by [`HandleModeChange`](GraphicsEngine::HandleModeChange).
+    #[address(0x11C)]
+    pub m_WindowWidth: u32,
+
+    /// The pending deferred-resize height.
+    #[address(0x120)]
+    pub m_WindowHeight: u32,
+
+    /// When set, [`ResizeBuffers`](GraphicsEngine::ResizeBuffers) applies a resize inline rather than
+    /// deferring it; the fullscreen/adapter path sets it around its device reset.
+    #[address(0x124)]
+    pub m_SynchronousResize: bool,
+
+    /// Set when a deferred resize is pending in [`m_WindowWidth`](GraphicsEngine::m_WindowWidth)/
+    /// [`m_WindowHeight`](GraphicsEngine::m_WindowHeight), consumed by
+    /// [`HandleModeChange`](GraphicsEngine::HandleModeChange).
+    #[address(0x125)]
+    pub m_HasNewWindowSettings: bool,
 
     #[address(0x128)]
     pub m_ActiveCursor: ActiveCursor,
@@ -71,6 +107,13 @@ pub type GraphicsEngine {
     /// Motion-blur velocity buffer.
     #[address(0xFA0)]
     pub m_VelocityBufferTexture: *mut Texture,
+
+    /// The final composite render setup: colour → [`m_BackBufferLinear`](GraphicsEngine::m_BackBufferLinear),
+    /// depth → the main depth surface. Built by
+    /// [`CreateRenderSetups`](GraphicsEngine::CreateRenderSetups) against the live swapchain back
+    /// buffer and stored as the render context's setup; the HUD and the scene resolve target it.
+    #[address(0x1_050)]
+    pub m_BackBufferRenderSetup: *mut HRenderSetup_t,
 
     /// Main scene depth ("MainDepthBuffer").
     #[address(0x1_058)]
@@ -207,6 +250,57 @@ impl GraphicsEngine {
     /// runs the per-frame texture-cache update under the context lock.
     #[address(0x140_0C4_6D0)]
     pub fn TextureCachePlatformUpdate(&mut self, ctx: *mut HContext_t, dt: f32);
+
+    /// Creates every scene render target and render setup. Each scene target
+    /// (main depth/colour, the four GBuffers, velocity, downsampled depth, the reflection-proxy
+    /// targets, the AO volume, and the `VfxDepthCopy_%d` slots) is sized from
+    /// `device_info`'s [`m_DisplayWidth`](graphics_engine::device::DeviceInfo::m_DisplayWidth)/
+    /// [`m_DisplayHeight`](graphics_engine::device::DeviceInfo::m_DisplayHeight) (some at half
+    /// resolution), so it can be re-run at any size by passing a modified copy. The final
+    /// `BackBufferLinear` alias plus [`m_BackBufferRenderSetup`](GraphicsEngine::m_BackBufferRenderSetup)
+    /// and the post-effect setup are instead built against the live swapchain surface via
+    /// `GetDeviceSurface(BackBuffer)`, independent of
+    /// `device_info`. Per-pass viewports follow the bound target's size, so no per-pass viewport
+    /// changes are needed. Assumes the previously created setups have been torn down
+    /// ([`DestroyRenderSetups`](GraphicsEngine::DestroyRenderSetups)) and that no draw is in flight.
+    #[address(0x140_0CE_930)]
+    pub fn CreateRenderSetups(&mut self, device_info: *const DeviceInfo) -> bool;
+
+    /// Destroys every scene render target, surface, and render setup created by
+    /// [`CreateRenderSetups`](GraphicsEngine::CreateRenderSetups), including the `BackBufferLinear`
+    /// alias, after first unbinding the active setup. The swapchain back buffer itself is not touched.
+    /// Pass-owned render targets (post-effect, SSAO, SSR, anti-aliasing pools) are not freed here — the
+    /// registered resize callbacks re-allocate those.
+    #[address(0x140_0C4_090)]
+    pub fn DestroyRenderSetups(&mut self);
+
+    /// Applies a resize: tears down the render setups, has the UI drop its references, resizes the
+    /// swapchain (the device-level `ResizeBuffers`), re-creates the render
+    /// setups at the new size ([`CreateRenderSetups`](GraphicsEngine::CreateRenderSetups)), runs every
+    /// registered resize callback (which re-sizes the pass-owned pools), restores the UI, and updates
+    /// the camera aspect and window params. Called from
+    /// [`HandleModeChange`](GraphicsEngine::HandleModeChange) in the [`Draw`](GraphicsEngine::Draw)
+    /// prologue, so it runs on the main thread with no draw in flight.
+    #[address(0x140_0CF_A90)]
+    pub fn ApplyResize(&mut self, width: u32, height: u32);
+
+    /// The resize request entry. Applies the resize inline via
+    /// [`ApplyResize`](GraphicsEngine::ApplyResize) when
+    /// [`m_SynchronousResize`](GraphicsEngine::m_SynchronousResize) and
+    /// [`m_HasBeenInitialized`](GraphicsEngine::m_HasBeenInitialized) are set; otherwise it stashes the
+    /// dimensions in [`m_WindowWidth`](GraphicsEngine::m_WindowWidth)/
+    /// [`m_WindowHeight`](GraphicsEngine::m_WindowHeight) and defers to the next
+    /// [`HandleModeChange`](GraphicsEngine::HandleModeChange).
+    #[address(0x140_0D4_3C0)]
+    pub fn ResizeBuffers(&mut self, width: u32, height: u32);
+
+    /// Services the display-mode state machine once per frame from the [`Draw`](GraphicsEngine::Draw)
+    /// prologue: applies a deferred resize ([`ApplyResize`](GraphicsEngine::ApplyResize)) when one is
+    /// pending, or the fullscreen/adapter change when a mode change is pending, then reconciles the
+    /// flip interval. It runs after the previous frame's draw dispatch has drained and before the
+    /// current frame is dispatched.
+    #[address(0x140_0F4_0C0)]
+    pub fn HandleModeChange(&mut self);
 
     /// Loads (or reloads) the named shader bundle and re-creates every shader holder from it, but only
     /// if `name` differs from [`m_CurrentBundleName`](GraphicsEngine::m_CurrentBundleName).

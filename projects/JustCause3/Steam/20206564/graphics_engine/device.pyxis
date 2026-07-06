@@ -16,6 +16,42 @@ extern type IDXGISwapChain;
 #[size(8), align(8), rust_name = "windows::Win32::Graphics::Dxgi::IDXGIOutput", cpp_header = "<dxgi.h>", cpp_name = "::IDXGIOutput*"]
 extern type IDXGIOutput;
 
+/// The device's cached mode/capability descriptor. `GetDeviceInfo` returns a copy of the device's own
+/// instance ([`Device::m_DeviceInfo`]), and [`CreateRenderSetups`](graphics_engine::graphics_engine::GraphicsEngine::CreateRenderSetups)
+/// sizes every scene render target from a caller-supplied copy's
+/// [`m_DisplayWidth`](DeviceInfo::m_DisplayWidth)/[`m_DisplayHeight`](DeviceInfo::m_DisplayHeight).
+#[copyable, size(0x38)]
+pub type DeviceInfo {
+    // 0x00 device type, 0x04 vendor, 0x08 group, 0x0C model.
+
+    /// The display width in pixels. The source of every scene render target's width.
+    #[address(0x10)]
+    pub m_DisplayWidth: u32,
+    /// The display height in pixels. The source of every scene render target's height.
+    pub m_DisplayHeight: u32,
+    /// The display aspect ratio (`m_DisplayWidth / m_DisplayHeight`).
+    pub m_DisplayRatio: f32,
+    /// The present sync interval (0 disables vsync).
+    pub m_DisplayPresentationInterval: u32,
+    // 0x20 flip-immediate threshold, 0x24 multisample format, 0x28 video memory, 0x2C flag bitfield,
+    // 0x30 / 0x34 vertex / fragment shader-program versions.
+}
+
+/// The surface a device exposes to `GetDeviceSurface`. The presentable back buffer is
+/// [`BackBuffer`](DeviceSurface::BackBuffer); the eye-specific variants are for stereo output devices.
+#[copyable]
+pub enum DeviceSurface: i32 {
+    FrontBuffer = 0x0,
+    BackBuffer = 0x1,
+    SecondBackBuffer = 0x2,
+    FrontBufferLeftEye = 0x3,
+    FrontBufferRightEye = 0x4,
+    BackBufferLeftEye = 0x5,
+    BackBufferRightEye = 0x6,
+    SecondBackBufferLeftEye = 0x7,
+    SecondBackBufferRightEye = 0x8,
+}
+
 #[size(0x8CF0)]
 pub type Context {
     #[address(0x8_020)]
@@ -28,6 +64,9 @@ pub type Context {
 #[size(0x8D80)]
 pub type Device {
     pub m_Context: *mut Context,
+    /// The presentable back-buffer surface owned by the DXGI swapchain, returned by
+    /// `GetDeviceSurface``(BackBuffer)`. `ResizeBuffers` recreates its RTV/SRV/texture on a
+    /// swapchain resize.
     pub m_BackBuffer: *mut Texture,
 
     #[address(0x20)]
@@ -36,8 +75,40 @@ pub type Device {
 
     #[address(0x38)]
     pub m_DXGIOutput: IDXGIOutput,
+
+    /// The device's live mode descriptor. `ResizeBuffers` writes its display dimensions/ratio on a
+    /// swapchain resize; `GetDeviceInfo` returns a copy of it. Subsystems that re-size their own
+    /// render targets read their dimensions from here (via `GetDeviceInfo`), so it is the
+    /// device-side source of the display size independent of the [`CreateRenderSetups`](graphics_engine::graphics_engine::GraphicsEngine::CreateRenderSetups)
+    /// parameter.
+    #[address(0x190)]
+    pub m_DeviceInfo: DeviceInfo,
+
+    /// Set when the swapchain has been resized since the last time the flag was consumed.
+    #[address(0x220)]
+    pub m_WasResized: bool,
 }
 
 /// Returns the master context, the wrapper around the D3D11 immediate context. `device` is unused.
 #[address(0x141_955_0D0)]
 pub fn GetMasterContext(this: *mut void, device: *mut HDevice_t) -> *mut Context;
+
+/// Copies the device's [`m_DeviceInfo`](Device::m_DeviceInfo) into `out` (a plain `memcpy` of the
+/// `0x38`-byte descriptor).
+#[address(0x141_952_5F0)]
+pub fn GetDeviceInfo(device: *mut HDevice_t, out: *mut DeviceInfo);
+
+/// Returns one of the device's presentable surfaces. Only [`BackBuffer`](DeviceSurface::BackBuffer)
+/// resolves (to [`Device::m_BackBuffer`]); the other selectors return null on this non-stereo device.
+/// [`CreateRenderSetups`](graphics_engine::graphics_engine::GraphicsEngine::CreateRenderSetups) uses it
+/// to alias `BackBufferLinear` and the back-buffer render setups onto the live swapchain surface.
+#[address(0x141_956_260)]
+pub fn GetDeviceSurface(device: *mut HDevice_t, surface: DeviceSurface) -> *mut Texture;
+
+/// Resizes the DXGI swapchain's buffers. Unbinds render targets, releases and recreates the back
+/// buffer's texture/RTV/SRV via `IDXGISwapChain::ResizeBuffers`, and updates
+/// [`Device::m_DeviceInfo`]'s display dimensions and [`Device::m_WasResized`]. This is the swapchain
+/// half of a resize, distinct from re-creating the scene render targets in
+/// [`CreateRenderSetups`](graphics_engine::graphics_engine::GraphicsEngine::CreateRenderSetups).
+#[address(0x141_952_400)]
+pub fn ResizeBuffers(device: *mut HDevice_t, width: u32, height: u32) -> bool;
