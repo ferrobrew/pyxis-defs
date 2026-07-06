@@ -1,6 +1,5 @@
 #[address(0xF25_650)]
 pub extern hk_type_infos: *const HkTypeInfo;
-
 #[address(0xF25_CB0)]
 pub extern hk_classes: *const HkClass;
 

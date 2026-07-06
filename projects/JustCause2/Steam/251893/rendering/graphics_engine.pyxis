@@ -8,13 +8,10 @@ extern type HCURSOR;
 
 #[address(0x1_08C_598)]
 pub extern frame_number: u32;
-
 #[address(0x1_3C1_6F8)]
 pub extern frame_index: u32;
-
 #[address(0x1_3D9_C70)]
 extern raw_dxgi_swapchain: *mut u32;
-
 #[address(0x1_3D9_C74)]
 extern raw_d3d10_device: *mut u32;
 
@@ -49,7 +46,6 @@ pub type GraphicsGlobalSettings {
 
 #[address(0x1_08C_658)]
 pub extern graphics_global_settings: GraphicsGlobalSettings;
-
 #[address(0x1_191_EC4)]
 pub extern game_suspended: bool;
 

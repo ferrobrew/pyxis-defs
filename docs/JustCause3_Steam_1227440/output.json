@@ -1,5 +1,5 @@
 {
-  "schema_version": 8,
+  "schema_version": 9,
   "pyxis_version": "0.1.0",
   "pointer_size": 8,
   "project_name": "Just Cause 3 (Steam 1227440)",
@@ -3127,6 +3127,26 @@
       "source": {
         "file_index": 6,
         "line": 4
+      }
+    },
+    "character::character::Character_GoreEnabled": {
+      "path": "character::character::Character_GoreEnabled",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": null,
+        "value_type": {
+          "type": "raw",
+          "path": "bool"
+        },
+        "address": 5418185473
+      },
+      "source": {
+        "file_index": 6,
+        "line": 60
       }
     },
     "character::character::Joint": {
@@ -6373,6 +6393,26 @@
         "line": 7
       }
     },
+    "graphics_engine::graphics_engine::graphics_params": {
+      "path": "graphics_engine::graphics_engine::graphics_params",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": null,
+        "value_type": {
+          "type": "raw",
+          "path": "graphics_engine::graphics_engine::GraphicsParams"
+        },
+        "address": 5416134736
+      },
+      "source": {
+        "file_index": 10,
+        "line": 64
+      }
+    },
     "graphics_engine::render_engine::RenderEngine": {
       "path": "graphics_engine::render_engine::RenderEngine",
       "visibility": "public",
@@ -7763,7 +7803,6 @@
             "camera::camera::Corner"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -7780,7 +7819,6 @@
             "camera::camera_context::CameraEnvironmentPresetWeights"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -7794,7 +7832,6 @@
             "camera::camera_manager::CameraManager"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -7808,7 +7845,6 @@
             "camera::game_camera_manager::GameCameraManager"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -7817,7 +7853,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -7832,26 +7867,11 @@
             "character::character::AnimatedModel",
             "character::character::AnimationController",
             "character::character::Character",
+            "character::character::Character_GoreEnabled",
             "character::character::Joint",
             "character::character::SafeBoneIndex"
           ],
           "submodules": {},
-          "extern_values": [
-            {
-              "visibility": "public",
-              "name": "Character_GoreEnabled",
-              "type_ref": {
-                "type": "raw",
-                "path": "bool"
-              },
-              "address": 5418185473,
-              "doc": null,
-              "source": {
-                "file_index": 6,
-                "line": 60
-              }
-            }
-          ],
           "functions": [],
           "backends": {},
           "source": {
@@ -7860,7 +7880,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -7871,7 +7890,6 @@
         "clock::Clock"
       ],
       "submodules": {},
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": {
@@ -7890,7 +7908,6 @@
         "game::UpdateContexts"
       ],
       "submodules": {},
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": {
@@ -7914,7 +7931,6 @@
             "graphics_engine::device::IDXGISwapChain"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -7929,25 +7945,10 @@
             "graphics_engine::graphics_engine::GraphicsEngine",
             "graphics_engine::graphics_engine::GraphicsParams",
             "graphics_engine::graphics_engine::HICON",
-            "graphics_engine::graphics_engine::HWND"
+            "graphics_engine::graphics_engine::HWND",
+            "graphics_engine::graphics_engine::graphics_params"
           ],
           "submodules": {},
-          "extern_values": [
-            {
-              "visibility": "public",
-              "name": "graphics_params",
-              "type_ref": {
-                "type": "raw",
-                "path": "graphics_engine::graphics_engine::GraphicsParams"
-              },
-              "address": 5416134736,
-              "doc": null,
-              "source": {
-                "file_index": 10,
-                "line": 64
-              }
-            }
-          ],
           "functions": [],
           "backends": {},
           "source": {
@@ -7961,7 +7962,6 @@
             "graphics_engine::render_engine::RenderEngine"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -7979,7 +7979,6 @@
             "graphics_engine::texture::Texture"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -7988,7 +7987,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -7997,7 +7995,6 @@
       "doc": null,
       "items": [],
       "submodules": {},
-      "extern_values": [],
       "functions": [
         {
           "visibility": "private",
@@ -8074,7 +8071,6 @@
             "input::input_device_manager::InputDeviceManagerVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -8083,7 +8079,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -8092,7 +8087,6 @@
       "doc": null,
       "items": [],
       "submodules": {},
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -8112,7 +8106,6 @@
             "types::math::Vector4"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {
             "cpp": [
@@ -8188,7 +8181,6 @@
             "types::vector_math::AlignedVector3"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -8197,7 +8189,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null

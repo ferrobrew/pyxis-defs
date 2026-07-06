@@ -1,5 +1,5 @@
 {
-  "schema_version": 8,
+  "schema_version": 9,
   "pyxis_version": "0.1.0",
   "pointer_size": 8,
   "project_name": "Mad Max (1.0.3 / GOG 54162766550729305)",
@@ -949,6 +949,66 @@
       "source": {
         "file_index": 3,
         "line": 2
+      }
+    },
+    "game::game::decoupled_update": {
+      "path": "game::game::decoupled_update",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": null,
+        "value_type": {
+          "type": "raw",
+          "path": "bool"
+        },
+        "address": 5392592652
+      },
+      "source": {
+        "file_index": 3,
+        "line": 11
+      }
+    },
+    "game::game::requested_game_state": {
+      "path": "game::game::requested_game_state",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": null,
+        "value_type": {
+          "type": "raw",
+          "path": "game::game::GameState"
+        },
+        "address": 5392600804
+      },
+      "source": {
+        "file_index": 3,
+        "line": 17
+      }
+    },
+    "game::game::skip_front_end": {
+      "path": "game::game::skip_front_end",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": null,
+        "value_type": {
+          "type": "raw",
+          "path": "bool"
+        },
+        "address": 5392951208
+      },
+      "source": {
+        "file_index": 3,
+        "line": 14
       }
     },
     "game::save_manager::SaveDeviceStatus": {
@@ -19926,6 +19986,26 @@
         "line": 2
       }
     },
+    "rendering::graphics_engine::graphics_global_settings": {
+      "path": "rendering::graphics_engine::graphics_global_settings",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": null,
+        "value_type": {
+          "type": "raw",
+          "path": "rendering::graphics_engine::GraphicsGlobalSettings"
+        },
+        "address": 5392752048
+      },
+      "source": {
+        "file_index": 23,
+        "line": 55
+      }
+    },
     "str": {
       "path": "str",
       "visibility": "public",
@@ -24280,7 +24360,6 @@
             "game::event_handler::EventSystemVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {
             "rust": [
@@ -24309,53 +24388,12 @@
         "game": {
           "doc": null,
           "items": [
-            "game::game::GameState"
+            "game::game::GameState",
+            "game::game::decoupled_update",
+            "game::game::requested_game_state",
+            "game::game::skip_front_end"
           ],
           "submodules": {},
-          "extern_values": [
-            {
-              "visibility": "public",
-              "name": "decoupled_update",
-              "type_ref": {
-                "type": "raw",
-                "path": "bool"
-              },
-              "address": 5392592652,
-              "doc": null,
-              "source": {
-                "file_index": 3,
-                "line": 11
-              }
-            },
-            {
-              "visibility": "public",
-              "name": "skip_front_end",
-              "type_ref": {
-                "type": "raw",
-                "path": "bool"
-              },
-              "address": 5392951208,
-              "doc": null,
-              "source": {
-                "file_index": 3,
-                "line": 14
-              }
-            },
-            {
-              "visibility": "public",
-              "name": "requested_game_state",
-              "type_ref": {
-                "type": "raw",
-                "path": "game::game::GameState"
-              },
-              "address": 5392600804,
-              "doc": null,
-              "source": {
-                "file_index": 3,
-                "line": 17
-              }
-            }
-          ],
           "functions": [],
           "backends": {},
           "source": {
@@ -24374,7 +24412,6 @@
             "game::save_manager::SaveManagerState"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -24388,7 +24425,6 @@
             "game::video_manager::VideoManager"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -24397,7 +24433,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -24413,7 +24448,6 @@
             "game_objects::avatar::AvatarVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -24429,7 +24463,6 @@
             "game_objects::character::CharacterBaseVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -24444,7 +24477,6 @@
             "game_objects::character_manager::CharacterManagerVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -24458,7 +24490,6 @@
             "game_objects::damageable::Damageable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -24473,7 +24504,6 @@
             "game_objects::game_object::GameObjectVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {
             "rust": [
@@ -24498,7 +24528,6 @@
             "game_objects::physics_game_object::PhysicsGameObject"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -24512,7 +24541,6 @@
             "game_objects::player::Player"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {
             "rust": [
@@ -24538,7 +24566,6 @@
             "game_objects::vehicle::VehicleVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -24547,7 +24574,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -24562,7 +24588,6 @@
             "input::device_manager::DeviceManager"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -24578,7 +24603,6 @@
             "input::input_action_map::LockedGamepadState"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -24600,7 +24624,6 @@
             "input::input_device::Mouse"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {
             "rust": [
@@ -24624,7 +24647,6 @@
             "input::input_device_manager::InputDeviceManager"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -24633,7 +24655,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -24650,7 +24671,6 @@
             "physics::pfx_character::PfxCharacterVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -24665,7 +24685,6 @@
             "physics::pfx_game_object::PfxGameObjectVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -24681,7 +24700,6 @@
             "physics::pfx_instance::PfxInstanceVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -24695,7 +24713,6 @@
             "physics::pfx_rigid_body::PfxRigidBody"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -24709,7 +24726,6 @@
             "physics::pfx_vehicle::PfxVehicle"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -24718,7 +24734,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -24737,25 +24752,10 @@
             "rendering::graphics_engine::GraphicsEngine",
             "rendering::graphics_engine::GraphicsGlobalSettings",
             "rendering::graphics_engine::HCURSOR",
-            "rendering::graphics_engine::HWND"
+            "rendering::graphics_engine::HWND",
+            "rendering::graphics_engine::graphics_global_settings"
           ],
           "submodules": {},
-          "extern_values": [
-            {
-              "visibility": "public",
-              "name": "graphics_global_settings",
-              "type_ref": {
-                "type": "raw",
-                "path": "rendering::graphics_engine::GraphicsGlobalSettings"
-              },
-              "address": 5392752048,
-              "doc": null,
-              "source": {
-                "file_index": 23,
-                "line": 55
-              }
-            }
-          ],
           "functions": [],
           "backends": {
             "rust": [
@@ -24774,7 +24774,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -24783,7 +24782,6 @@
       "doc": null,
       "items": [],
       "submodules": {},
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -24798,7 +24796,6 @@
             "types::hash_string::HashString"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {
             "cpp": [
@@ -24839,7 +24836,6 @@
             "types::math::Vector4"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {
             "cpp": [
@@ -24937,7 +24933,6 @@
             "types::object_id::ObjectID"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -24952,7 +24947,6 @@
             "types::rtti::RttiVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -24971,7 +24965,6 @@
             "types::shared_ptr::WeakPtr"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {
             "rust": [
@@ -25030,7 +25023,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -25048,7 +25040,6 @@
             "ui::gui::GameGuiInitState"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -25057,7 +25048,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -25074,7 +25064,6 @@
             "world::game_world::TeleportUpdateState"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -25083,7 +25072,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null

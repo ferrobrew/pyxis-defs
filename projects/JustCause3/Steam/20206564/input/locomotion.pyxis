@@ -158,9 +158,7 @@ impl NStateTask_MovementLocomotionTask {
 
 #[address(0x142_D65_F90)]
 pub extern LocoUtil_NoAimStrafeMaxAngle: f32;
-
 #[address(0x142_D65_F94)]
 pub extern LocoUtil_NoAimStrafeMaxAngleAlt: f32;
-
 #[address(0x142_F2F_B64)]
 pub extern NCharacter_ActMoveNoAim: u32;

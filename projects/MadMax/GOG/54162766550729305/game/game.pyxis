@@ -9,9 +9,7 @@ pub enum GameState: u32 {
 
 #[address(0x141_6C6_F0C)]
 pub extern decoupled_update: bool;
-
 #[address(0x141_71E_7A8)]
 pub extern skip_front_end: bool;
-
 #[address(0x141_6C8_EE4)]
 pub extern requested_game_state: GameState;

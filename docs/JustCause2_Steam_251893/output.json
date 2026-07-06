@@ -1,5 +1,5 @@
 {
-  "schema_version": 8,
+  "schema_version": 9,
   "pyxis_version": "0.1.0",
   "pointer_size": 4,
   "project_name": "Just Cause 2 (1.0.0.2 / Steam 251893)",
@@ -38293,6 +38293,26 @@
         "line": 82
       }
     },
+    "physics::havok::memory::hk_thread_memory_tls_index": {
+      "path": "physics::havok::memory::hk_thread_memory_tls_index",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": null,
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "address": 20985688
+      },
+      "source": {
+        "file_index": 26,
+        "line": 79
+      }
+    },
     "physics::havok::referenced_object::HkReferencedObject": {
       "path": "physics::havok::referenced_object::HkReferencedObject",
       "visibility": "public",
@@ -39992,6 +40012,52 @@
       "source": {
         "file_index": 29,
         "line": 132
+      }
+    },
+    "physics::havok::reflection::hk_classes": {
+      "path": "physics::havok::reflection::hk_classes",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": null,
+        "value_type": {
+          "type": "const_pointer",
+          "inner": {
+            "type": "raw",
+            "path": "physics::havok::reflection::HkClass"
+          }
+        },
+        "address": 15883440
+      },
+      "source": {
+        "file_index": 29,
+        "line": 5
+      }
+    },
+    "physics::havok::reflection::hk_type_infos": {
+      "path": "physics::havok::reflection::hk_type_infos",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": null,
+        "value_type": {
+          "type": "const_pointer",
+          "inner": {
+            "type": "raw",
+            "path": "physics::havok::reflection::HkTypeInfo"
+          }
+        },
+        "address": 15881808
+      },
+      "source": {
+        "file_index": 29,
+        "line": 2
       }
     },
     "physics::havok::rigid_body::HkpBoxShape": {
@@ -47884,6 +47950,132 @@
         "line": 4
       }
     },
+    "rendering::graphics_engine::frame_index": {
+      "path": "rendering::graphics_engine::frame_index",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": null,
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "address": 20715256
+      },
+      "source": {
+        "file_index": 42,
+        "line": 13
+      }
+    },
+    "rendering::graphics_engine::frame_number": {
+      "path": "rendering::graphics_engine::frame_number",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": null,
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "address": 17352088
+      },
+      "source": {
+        "file_index": 42,
+        "line": 10
+      }
+    },
+    "rendering::graphics_engine::game_suspended": {
+      "path": "rendering::graphics_engine::game_suspended",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": null,
+        "value_type": {
+          "type": "raw",
+          "path": "bool"
+        },
+        "address": 18423492
+      },
+      "source": {
+        "file_index": 42,
+        "line": 54
+      }
+    },
+    "rendering::graphics_engine::graphics_global_settings": {
+      "path": "rendering::graphics_engine::graphics_global_settings",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": null,
+        "value_type": {
+          "type": "raw",
+          "path": "rendering::graphics_engine::GraphicsGlobalSettings"
+        },
+        "address": 17352280
+      },
+      "source": {
+        "file_index": 42,
+        "line": 51
+      }
+    },
+    "rendering::graphics_engine::raw_d3d10_device": {
+      "path": "rendering::graphics_engine::raw_d3d10_device",
+      "visibility": "private",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": null,
+        "value_type": {
+          "type": "mut_pointer",
+          "inner": {
+            "type": "raw",
+            "path": "u32"
+          }
+        },
+        "address": 20814964
+      },
+      "source": {
+        "file_index": 42,
+        "line": 19
+      }
+    },
+    "rendering::graphics_engine::raw_dxgi_swapchain": {
+      "path": "rendering::graphics_engine::raw_dxgi_swapchain",
+      "visibility": "private",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": null,
+        "value_type": {
+          "type": "mut_pointer",
+          "inner": {
+            "type": "raw",
+            "path": "u32"
+          }
+        },
+        "address": 20814960
+      },
+      "source": {
+        "file_index": 42,
+        "line": 16
+      }
+    },
     "rendering::model_instance_manager::ModelInstanceManager": {
       "path": "rendering::model_instance_manager::ModelInstanceManager",
       "visibility": "public",
@@ -51192,6 +51384,26 @@
         "line": 374
       }
     },
+    "rendering::render_block::render_block_memory": {
+      "path": "rendering::render_block::render_block_memory",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": null,
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "address": 20844192
+      },
+      "source": {
+        "file_index": 44,
+        "line": 25
+      }
+    },
     "rendering::render_engine::HANDLE": {
       "path": "rendering::render_engine::HANDLE",
       "visibility": "public",
@@ -54417,6 +54629,26 @@
       "source": {
         "file_index": 45,
         "line": 84
+      }
+    },
+    "rendering::render_engine::default_render_block_info": {
+      "path": "rendering::render_engine::default_render_block_info",
+      "visibility": "private",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": null,
+        "value_type": {
+          "type": "raw",
+          "path": "rendering::render_engine::RenderBlockInstanceInfo"
+        },
+        "address": 17354048
+      },
+      "source": {
+        "file_index": 45,
+        "line": 8
       }
     },
     "rendering::shadow_manager::ShadowManager": {
@@ -59536,7 +59768,6 @@
             "camera::camera::Camera"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {
             "rust": [
@@ -59561,7 +59792,6 @@
             "camera::camera_manager::CameraManager"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -59570,7 +59800,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -59586,7 +59815,6 @@
             "game::event_handler::EventHandlerVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -59600,7 +59828,6 @@
             "game::game::GameState"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -59609,7 +59836,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -59624,7 +59850,6 @@
             "game_objects::air_vehicle::AirVehicle"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -59638,7 +59863,6 @@
             "game_objects::airplane::AirPlane"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -59653,7 +59877,6 @@
             "game_objects::avatar::AvatarVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -59667,7 +59890,6 @@
             "game_objects::boat::Boat"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -59681,7 +59903,6 @@
             "game_objects::car::Car"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -59699,7 +59920,6 @@
             "game_objects::character::CharacterVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -59715,7 +59935,6 @@
             "game_objects::character_manager::CharacterManagerVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -59730,7 +59949,6 @@
             "game_objects::damageable::DamageableVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -59747,7 +59965,6 @@
             "game_objects::game_object::PropertyFile"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {
             "cpp": [
@@ -59786,7 +60003,6 @@
             "game_objects::helicopter::Helicopter"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -59800,7 +60016,6 @@
             "game_objects::land_vehicle::LandVehicle"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -59814,7 +60029,6 @@
             "game_objects::motorbike::MotorBike"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -59831,7 +60045,6 @@
             "game_objects::physics_game_object::PhysicsGameObjectVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -59845,7 +60058,6 @@
             "game_objects::player::Player"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {
             "rust": [
@@ -59870,7 +60082,6 @@
             "game_objects::sea_vehicle::SeaVehicle"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -59887,7 +60098,6 @@
             "game_objects::smart_object::SmartObjectVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -59905,7 +60115,6 @@
             "game_objects::vehicle::VehicleVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {
             "rust": [
@@ -59925,7 +60134,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -59940,7 +60148,6 @@
             "input::input_action::InputAction"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {
             "rust": [
@@ -59965,7 +60172,6 @@
             "input::input_device_manager::InputDeviceManager"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -59974,7 +60180,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -59994,7 +60199,6 @@
                 "physics::havok::math::HkVector4"
               ],
               "submodules": {},
-              "extern_values": [],
               "functions": [],
               "backends": {
                 "rust": [
@@ -60032,25 +60236,10 @@
               "doc": null,
               "items": [
                 "physics::havok::memory::HkMemoryClass",
-                "physics::havok::memory::HkThreadMemory"
+                "physics::havok::memory::HkThreadMemory",
+                "physics::havok::memory::hk_thread_memory_tls_index"
               ],
               "submodules": {},
-              "extern_values": [
-                {
-                  "visibility": "public",
-                  "name": "hk_thread_memory_tls_index",
-                  "type_ref": {
-                    "type": "raw",
-                    "path": "u32"
-                  },
-                  "address": 20985688,
-                  "doc": null,
-                  "source": {
-                    "file_index": 26,
-                    "line": 79
-                  }
-                }
-              ],
               "functions": [],
               "backends": {},
               "source": {
@@ -60064,7 +60253,6 @@
                 "physics::havok::referenced_object::HkReferencedObject"
               ],
               "submodules": {},
-              "extern_values": [],
               "functions": [],
               "backends": {
                 "cpp": [
@@ -60121,50 +60309,16 @@
                 "physics::havok::reflection::HkCustomAttribute",
                 "physics::havok::reflection::HkCustomAttributes",
                 "physics::havok::reflection::HkTypeInfo",
-                "physics::havok::reflection::HkVariant"
+                "physics::havok::reflection::HkVariant",
+                "physics::havok::reflection::hk_classes",
+                "physics::havok::reflection::hk_type_infos"
               ],
               "submodules": {},
-              "extern_values": [
-                {
-                  "visibility": "public",
-                  "name": "hk_type_infos",
-                  "type_ref": {
-                    "type": "const_pointer",
-                    "inner": {
-                      "type": "raw",
-                      "path": "physics::havok::reflection::HkTypeInfo"
-                    }
-                  },
-                  "address": 15881808,
-                  "doc": null,
-                  "source": {
-                    "file_index": 29,
-                    "line": 2
-                  }
-                },
-                {
-                  "visibility": "public",
-                  "name": "hk_classes",
-                  "type_ref": {
-                    "type": "const_pointer",
-                    "inner": {
-                      "type": "raw",
-                      "path": "physics::havok::reflection::HkClass"
-                    }
-                  },
-                  "address": 15883440,
-                  "doc": null,
-                  "source": {
-                    "file_index": 29,
-                    "line": 5
-                  }
-                }
-              ],
               "functions": [],
               "backends": {},
               "source": {
                 "file_index": 29,
-                "line": 2
+                "line": 1
               }
             },
             "rigid_body": {
@@ -60179,7 +60333,6 @@
                 "physics::havok::rigid_body::HkpSphereShape"
               ],
               "submodules": {},
-              "extern_values": [],
               "functions": [],
               "backends": {
                 "cpp": [
@@ -60296,7 +60449,6 @@
               }
             }
           },
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -60311,7 +60463,6 @@
             "physics::pfx_airplane::PfxAirPlaneInstance"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -60326,7 +60477,6 @@
             "physics::pfx_boat::PfxBoatInstance"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -60341,7 +60491,6 @@
             "physics::pfx_breakable::PfxBreakableInstance"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -60356,7 +60505,6 @@
             "physics::pfx_car::PfxCarInstance"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -60372,7 +60520,6 @@
             "physics::pfx_character::PfxCharacterVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -60387,7 +60534,6 @@
             "physics::pfx_helicopter::PfxHelicopterInstance"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -60404,7 +60550,6 @@
             "physics::pfx_instance::PfxInstanceVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -60419,7 +60564,6 @@
             "physics::pfx_motorbike::PfxMotorBikeInstance"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -60435,7 +60579,6 @@
             "physics::pfx_rigid_body::PfxRigidBodyInstance"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {
             "cpp": [
@@ -60475,7 +60618,6 @@
             "physics::pfx_vehicle::PfxVehicleInstance"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -60492,7 +60634,6 @@
             "physics::physics_system::RayCastResult"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {
             "cpp": [
@@ -60546,7 +60687,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -60563,101 +60703,15 @@
             "rendering::graphics_engine::GraphicsEngineVftable",
             "rendering::graphics_engine::GraphicsGlobalSettings",
             "rendering::graphics_engine::HCURSOR",
-            "rendering::graphics_engine::HWND"
+            "rendering::graphics_engine::HWND",
+            "rendering::graphics_engine::frame_index",
+            "rendering::graphics_engine::frame_number",
+            "rendering::graphics_engine::game_suspended",
+            "rendering::graphics_engine::graphics_global_settings",
+            "rendering::graphics_engine::raw_d3d10_device",
+            "rendering::graphics_engine::raw_dxgi_swapchain"
           ],
           "submodules": {},
-          "extern_values": [
-            {
-              "visibility": "public",
-              "name": "frame_number",
-              "type_ref": {
-                "type": "raw",
-                "path": "u32"
-              },
-              "address": 17352088,
-              "doc": null,
-              "source": {
-                "file_index": 42,
-                "line": 10
-              }
-            },
-            {
-              "visibility": "public",
-              "name": "frame_index",
-              "type_ref": {
-                "type": "raw",
-                "path": "u32"
-              },
-              "address": 20715256,
-              "doc": null,
-              "source": {
-                "file_index": 42,
-                "line": 13
-              }
-            },
-            {
-              "visibility": "private",
-              "name": "raw_dxgi_swapchain",
-              "type_ref": {
-                "type": "mut_pointer",
-                "inner": {
-                  "type": "raw",
-                  "path": "u32"
-                }
-              },
-              "address": 20814960,
-              "doc": null,
-              "source": {
-                "file_index": 42,
-                "line": 16
-              }
-            },
-            {
-              "visibility": "private",
-              "name": "raw_d3d10_device",
-              "type_ref": {
-                "type": "mut_pointer",
-                "inner": {
-                  "type": "raw",
-                  "path": "u32"
-                }
-              },
-              "address": 20814964,
-              "doc": null,
-              "source": {
-                "file_index": 42,
-                "line": 19
-              }
-            },
-            {
-              "visibility": "public",
-              "name": "graphics_global_settings",
-              "type_ref": {
-                "type": "raw",
-                "path": "rendering::graphics_engine::GraphicsGlobalSettings"
-              },
-              "address": 17352280,
-              "doc": null,
-              "source": {
-                "file_index": 42,
-                "line": 51
-              }
-            },
-            {
-              "visibility": "public",
-              "name": "game_suspended",
-              "type_ref": {
-                "type": "raw",
-                "path": "bool"
-              },
-              "address": 18423492,
-              "doc": null,
-              "source": {
-                "file_index": 42,
-                "line": 54
-              }
-            }
-          ],
           "functions": [],
           "backends": {
             "cpp": [
@@ -60697,7 +60751,6 @@
             "rendering::model_instance_manager::ModelInstanceManager"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -60725,25 +60778,10 @@
             "rendering::render_block::RenderBlockVftable",
             "rendering::render_block::TextHorizontalAlignment",
             "rendering::render_block::TextType",
-            "rendering::render_block::TextVerticalAlignment"
+            "rendering::render_block::TextVerticalAlignment",
+            "rendering::render_block::render_block_memory"
           ],
           "submodules": {},
-          "extern_values": [
-            {
-              "visibility": "public",
-              "name": "render_block_memory",
-              "type_ref": {
-                "type": "raw",
-                "path": "u32"
-              },
-              "address": 20844192,
-              "doc": null,
-              "source": {
-                "file_index": 44,
-                "line": 25
-              }
-            }
-          ],
           "functions": [],
           "backends": {
             "cpp": [
@@ -60859,25 +60897,10 @@
             "rendering::render_engine::RenderEngine",
             "rendering::render_engine::RenderEngineVftable",
             "rendering::render_engine::RenderPass",
-            "rendering::render_engine::RenderPassVftable"
+            "rendering::render_engine::RenderPassVftable",
+            "rendering::render_engine::default_render_block_info"
           ],
           "submodules": {},
-          "extern_values": [
-            {
-              "visibility": "private",
-              "name": "default_render_block_info",
-              "type_ref": {
-                "type": "raw",
-                "path": "rendering::render_engine::RenderBlockInstanceInfo"
-              },
-              "address": 17354048,
-              "doc": null,
-              "source": {
-                "file_index": 45,
-                "line": 8
-              }
-            }
-          ],
           "functions": [],
           "backends": {
             "cpp": [
@@ -60912,7 +60935,6 @@
             "rendering::shadow_manager::ShadowManager"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -60927,7 +60949,6 @@
             "rendering::texture_manager::TextureManagerVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -60936,7 +60957,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -60945,7 +60965,6 @@
       "doc": null,
       "items": [],
       "submodules": {},
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -60966,7 +60985,6 @@
             "types::math::Vector4"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {
             "cpp": [
@@ -61065,7 +61083,6 @@
             "types::rtti::RttiVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -61084,7 +61101,6 @@
             "types::shared_ptr::WeakPtr"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {
             "cpp": [
@@ -61190,7 +61206,6 @@
             "types::std_string::StdString"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {
             "cpp": [
@@ -61230,7 +61245,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -61247,7 +61261,6 @@
             "ui::anark_gui::AnarkState"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {
             "rust": [
@@ -61267,7 +61280,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
@@ -61276,7 +61288,6 @@
       "doc": null,
       "items": [],
       "submodules": {},
-      "extern_values": [],
       "functions": [],
       "backends": {
         "rust": [
@@ -61304,7 +61315,6 @@
             "world::atmosphere::Atmosphere"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -61319,7 +61329,6 @@
             "world::game_world::GameWorldVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -61333,7 +61342,6 @@
             "world::landscape_manager::LandscapeManager"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -61349,7 +61357,6 @@
             "world::spawn_manager::VehicleTypes"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {
             "cpp": [
@@ -61384,7 +61391,6 @@
             "world::weather::Weather"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -61398,7 +61404,6 @@
             "world::world_sim::WorldSim"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -61413,7 +61418,6 @@
             "world::world_time::WorldTimeVftable"
           ],
           "submodules": {},
-          "extern_values": [],
           "functions": [],
           "backends": {},
           "source": {
@@ -61422,7 +61426,6 @@
           }
         }
       },
-      "extern_values": [],
       "functions": [],
       "backends": {},
       "source": null
