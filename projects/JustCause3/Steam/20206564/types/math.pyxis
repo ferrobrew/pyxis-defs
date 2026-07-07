@@ -69,6 +69,16 @@ impl Matrix4 {
     /// `clip = p * View * Proj`. Static.
     #[address(0x140_034_530)]
     pub fn Multiply4x4(a: *const Matrix4, b: *const Matrix4, result: *mut Matrix4);
+
+    /// Builds the inverse of a symmetric perspective projection into `self` (also returned), from a
+    /// vertical field of view, an aspect ratio, and the far and near planes. The screen-space
+    /// reconstruction passes (SSR, deferred clustered lighting, SSAO, screen-space subsurface,
+    /// atmospheric scattering, depth of field) call it to recover a clip-to-view basis, then multiply
+    /// by the render context's camera transform to reach clip-to-world. The result is purely diagonal
+    /// (`[0][0] = aspect·tan(fov/2)`, `[1][1] = tan(fov/2)`, plus standard-depth `z` terms) and so
+    /// cannot represent an off-center (asymmetric) frustum.
+    #[address(0x140_039_0E0)]
+    pub fn PerspectiveFovInverse(&mut self, fov: f32, aspect: f32, far: f32, near: f32) -> *mut Matrix4;
 }
 
 backend rust epilogue for Matrix4 r#"
