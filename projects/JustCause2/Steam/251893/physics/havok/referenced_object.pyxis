@@ -54,7 +54,7 @@ backend rust epilogue for HkReferencedObject r#"
     pub unsafe trait HkReferencedObjectInstance {
         type ConstructorArgs;
         fn allocation_size() -> u32;
-        fn memory_class() -> crate::havok::memory::HkMemoryClass;
+        fn memory_class() -> crate::physics::havok::memory::HkMemoryClass;
         fn as_referenced_object(&self) -> &HkReferencedObject;
         fn as_referenced_object_mut(&mut self) -> &mut HkReferencedObject;
         fn construct(&mut self, args: Self::ConstructorArgs);
@@ -64,7 +64,7 @@ backend rust epilogue for HkReferencedObject r#"
     impl<T: HkReferencedObjectInstance> HkRefCounted<T> {
         pub unsafe fn new(args: T::ConstructorArgs) -> Self {
             unsafe {
-                let thread_memory = &mut *(windows::Win32::System::Threading::TlsGetValue(*crate::havok::memory::get_hk_thread_memory_tls_index()) as *mut crate::havok::memory::HkThreadMemory);
+                let thread_memory = &mut *(windows::Win32::System::Threading::TlsGetValue(*crate::physics::havok::memory::get_hk_thread_memory_tls_index()) as *mut crate::physics::havok::memory::HkThreadMemory);
                 let instance = std::mem::transmute::<*mut std::ffi::c_void, *mut T>(
                     thread_memory.allocate_chunk(
                         T::allocation_size(),

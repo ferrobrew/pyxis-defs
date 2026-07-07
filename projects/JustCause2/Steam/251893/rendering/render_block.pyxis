@@ -1,6 +1,6 @@
 use types::{math::{Vector2, Vector3, Vector4}, std_string::StdString};
 
-backend rust prologue "\n    use crate::shared_ptr::*;\n    use std::mem::ManuallyDrop;\n";
+backend rust prologue "\n    use crate::types::shared_ptr::*;\n    use std::mem::ManuallyDrop;\n";
 
 /// `ManuallyDrop<SharedPtr<u32>>` is used instead of `SharedPtr<u32>` to avoid
 /// the `Drop` implementation of `SharedPtr<u32>` being called when the `RenderBlock`

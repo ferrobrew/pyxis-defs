@@ -127,11 +127,11 @@ impl Vehicle {
 
 backend rust epilogue for Vehicle r#"
     pub trait VehicleMutExt {
-        unsafe fn get_pfx_vehicle(&mut self) -> crate::SharedPtr<crate::PfxVehicle>;
+        unsafe fn get_pfx_vehicle(&mut self) -> crate::types::shared_ptr::SharedPtr<crate::physics::pfx_vehicle::PfxVehicle>;
     }
     impl<T: std::convert::AsMut<crate::game_objects::vehicle::Vehicle>> VehicleMutExt for T {
-        unsafe fn get_pfx_vehicle(&mut self) -> crate::SharedPtr<crate::PfxVehicle> {
-            unsafe { (*self.as_mut().get_pfx_instance()).instance.clone().static_pointer_cast::<crate::PfxVehicle>() }
+        unsafe fn get_pfx_vehicle(&mut self) -> crate::types::shared_ptr::SharedPtr<crate::physics::pfx_vehicle::PfxVehicle> {
+            unsafe { (*self.as_mut().get_pfx_instance()).instance.clone().static_pointer_cast::<crate::physics::pfx_vehicle::PfxVehicle>() }
         }
     }
 "#;

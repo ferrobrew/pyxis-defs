@@ -82,7 +82,7 @@ backend rust epilogue for RayCastResult r#"
         pub unsafe fn new() -> RayCastResult {
             unsafe {
                 let mut instance: RayCastResult = std::mem::zeroed();
-                instance.normal = crate::math::Vector3 { data: [1., 0., 0.] };
+                instance.normal = crate::types::math::Vector3 { data: [1., 0., 0.] };
                 instance.distance = 1.;
                 instance.unknown = [RayCastResult::SENTINEL; 4];
                 instance
@@ -124,7 +124,7 @@ impl PhysicsSystem {
 
 backend rust epilogue for PhysicsSystem r#"
     impl PhysicsSystem {
-        pub fn ray_cast(&mut self, ray: &crate::math::Ray, start: f32, end: f32, ignored_pfx_types: u32) -> Option<RayCastResult> {
+        pub fn ray_cast(&mut self, ray: &crate::types::math::Ray, start: f32, end: f32, ignored_pfx_types: u32) -> Option<RayCastResult> {
             unsafe {
                 let mut result = RayCastResult::default();
                 let mut filter = AIRayCastFilter::new();

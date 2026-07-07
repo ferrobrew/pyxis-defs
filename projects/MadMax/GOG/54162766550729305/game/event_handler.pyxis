@@ -36,7 +36,7 @@ pub type EventID {
 
 backend rust epilogue for EventID r#"
     impl EventID {
-        pub fn new(hash: crate::hash_string::HashString, namespace: crate::hash_string::HashString) -> Self {
+        pub fn new(hash: crate::types::hash_string::HashString, namespace: crate::types::hash_string::HashString) -> Self {
             Self {
                 hash,
                 namespace
@@ -272,9 +272,9 @@ backend rust epilogue r#"
         }
     }
 
-    pub unsafe fn send_event(event_hash: crate::hash_string::HashString) {
+    pub unsafe fn send_event(event_hash: crate::types::hash_string::HashString) {
         if let Some(es) = unsafe { EventSystem::get() } {
-            let event_id = EventID::new(event_hash, crate::hash_string::HashString { hash: 0u32 });
+            let event_id = EventID::new(event_hash, crate::types::hash_string::HashString { hash: 0u32 });
             let data = EventData::new((), (), (), (), ());
 
             unsafe {
@@ -284,7 +284,7 @@ backend rust epilogue r#"
     }
 
     pub unsafe fn send_event_with_arg<Arg1: EventArgument, AsArg1: AsEventArgument<Arg1>>(
-        event_hash: crate::hash_string::HashString,
+        event_hash: crate::types::hash_string::HashString,
         arg1: AsArg1,
     ) {
         unsafe {
@@ -304,7 +304,7 @@ backend rust epilogue r#"
         AsArg4: AsEventArgument<Arg4>,
         AsArg5: AsEventArgument<Arg5>,
     >(
-        event_hash: crate::hash_string::HashString,
+        event_hash: crate::types::hash_string::HashString,
         arg1: AsArg1,
         arg2: AsArg2,
         arg3: AsArg3,
@@ -312,7 +312,7 @@ backend rust epilogue r#"
         arg5: AsArg5,
     ) {
         if let Some(es) = unsafe { EventSystem::get() } {
-            let event_id = EventID::new(event_hash, crate::hash_string::HashString { hash: 0u32 });
+            let event_id = EventID::new(event_hash, crate::types::hash_string::HashString { hash: 0u32 });
             let data = EventData::new(arg1, arg2, arg3, arg4, arg5);
 
             unsafe {

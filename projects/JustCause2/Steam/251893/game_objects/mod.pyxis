@@ -1,0 +1,5 @@
+//! Game object types.
+
+// Re-exported for convenience.
+pub use game_objects::character::Character;
+pub use game_objects::game_object::GameObject;

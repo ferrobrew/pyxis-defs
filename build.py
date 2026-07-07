@@ -283,12 +283,11 @@ def check_rust_build(
 
     src_dir = work_dir / "src"
     src_dir.mkdir(parents=True, exist_ok=True)
-    # Generate at the crate root (root module -> src/lib.rs) with child
-    # re-exports, matching how a consumer mounts the whole project.
+    # Generate at the crate root (root module -> src/lib.rs), matching how a
+    # consumer mounts the whole project.
     gen = subprocess.run(
         [
             "pyxis", "build", "--backend", "rust",
-            "--rust-reexport-children",
             str(input_dir), str(src_dir) + "/",
         ],
         capture_output=True, text=True, encoding="utf-8", errors="replace",

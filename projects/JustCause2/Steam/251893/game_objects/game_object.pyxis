@@ -60,20 +60,20 @@ impl GameObject {
 
 backend rust epilogue for GameObject r#"
     pub trait GameObjectExt {
-        unsafe fn get_matrix(&self) -> Option<crate::math::Matrix4>;
+        unsafe fn get_matrix(&self) -> Option<crate::types::math::Matrix4>;
     }
     pub trait GameObjectMutExt {
-        unsafe fn set_matrix(&mut self, matrix: &crate::math::Matrix4);
+        unsafe fn set_matrix(&mut self, matrix: &crate::types::math::Matrix4);
     }
-    impl<T: std::convert::AsRef<crate::game_object::GameObject>> GameObjectExt for T {
-        unsafe fn get_matrix(&self) -> Option<crate::math::Matrix4> {
-            let mut out = crate::math::Matrix4::default();
+    impl<T: std::convert::AsRef<crate::game_objects::GameObject>> GameObjectExt for T {
+        unsafe fn get_matrix(&self) -> Option<crate::types::math::Matrix4> {
+            let mut out = crate::types::math::Matrix4::default();
             let set = unsafe { self.as_ref().get_matrix_raw(out.as_mut_ptr()) };
             set.then_some(out)
         }
     }
-    impl<T: std::convert::AsMut<crate::game_object::GameObject>> GameObjectMutExt for T {
-        unsafe fn set_matrix(&mut self, matrix: &crate::math::Matrix4) {
+    impl<T: std::convert::AsMut<crate::game_objects::GameObject>> GameObjectMutExt for T {
+        unsafe fn set_matrix(&mut self, matrix: &crate::types::math::Matrix4) {
             unsafe { self.as_mut().set_matrix_raw(matrix.as_ptr()); }
         }
     }
