@@ -14717,6 +14717,100 @@
         "line": 12
       }
     },
+    "graphics_engine::graphics_engine::OccluderCollectionManager": {
+      "path": "graphics_engine::graphics_engine::OccluderCollectionManager",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " The scene occluder / beam-frustum-based-culling manager. Its cull frustum is built (and cached\n per camera and time) from a camera's `m_View` and `m_ProjectionF`, and every scene-geometry,\n terrain, streaming, and occlusion consumer reads it through\n [`GetBFBCFrustumParamsForCameraAndTime`](OccluderCollectionManager::GetBFBCFrustumParamsForCameraAndTime).",
+        "doc_links": [
+          {
+            "text": "OccluderCollectionManager::GetBFBCFrustumParamsForCameraAndTime",
+            "target_kind": "item",
+            "path": "graphics_engine::graphics_engine::OccluderCollectionManager",
+            "anchor": "func-GetBFBCFrustumParamsForCameraAndTime"
+          }
+        ],
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "GetBFBCFrustumParamsForCameraAndTime",
+            "doc": " Build or fetch the cached BFBC cull-frustum parameters for `camera` at `time`. The frustum is\n derived from `camera.m_View` combined with `camera.m_ProjectionF`, so overwriting the camera's\n `m_ProjectionF` before this runs widens the resulting cull frustum without touching the view.\n `out_params` and `out_state` receive pointers into the manager's per-camera cache slot.",
+            "body": {
+              "type": "address",
+              "address": 5369587888
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "camera",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "camera::camera::Camera"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "time",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "i32"
+                }
+              },
+              {
+                "type": "field",
+                "name": "out_params",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "u64"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "out_state",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "u64"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 22,
+              "line": 399
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 22,
+        "line": 392
+      }
+    },
     "graphics_engine::graphics_engine::RenderContext": {
       "path": "graphics_engine::graphics_engine::RenderContext",
       "visibility": "public",
@@ -17169,6 +17263,87 @@
         "line": 31
       }
     },
+    "graphics_engine::render_block::RenderBlockAtmosphericScattering": {
+      "path": "graphics_engine::render_block::RenderBlockAtmosphericScattering",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " The atmospheric-scattering / aerial-perspective render block. Its `Draw` reconstructs world\n position from depth via [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4) -- for the whole\n screen, sky included -- and then ray-marches the sun shadow cascade and aerial perspective over\n the reconstructed positions.",
+        "doc_links": [
+          {
+            "text": "types::math::Matrix4",
+            "target_kind": "item",
+            "path": "types::math::Matrix4"
+          }
+        ],
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "Draw",
+            "doc": " Draws the atmospheric-scattering pass. `rc` is the per-view render context; `info` the\n instance info. Reconstructs view rays from depth via\n [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4) and samples the sun cascade.",
+            "doc_links": [
+              {
+                "text": "types::math::Matrix4",
+                "target_kind": "item",
+                "path": "types::math::Matrix4"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5372291104
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "rc",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "info",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::render_block::RBIInfo"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 24,
+              "line": 81
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 24,
+        "line": 75
+      }
+    },
     "graphics_engine::render_block::RenderBlockCharacter": {
       "path": "graphics_engine::render_block::RenderBlockCharacter",
       "visibility": "public",
@@ -17452,7 +17627,7 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 107
+              "line": 120
             }
           },
           {
@@ -17472,7 +17647,7 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 107
+              "line": 120
             }
           },
           {
@@ -17492,7 +17667,7 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 109
+              "line": 122
             }
           }
         ],
@@ -17544,7 +17719,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 114
+              "line": 127
             }
           },
           {
@@ -17586,7 +17761,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 118
+              "line": 131
             }
           },
           {
@@ -17655,7 +17830,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 122
+              "line": 135
             }
           }
         ],
@@ -17669,7 +17844,7 @@
       },
       "source": {
         "file_index": 24,
-        "line": 104
+        "line": 117
       }
     },
     "graphics_engine::render_block::RenderBlockTypeTerrain": {
@@ -17708,7 +17883,7 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 86
+              "line": 99
             }
           },
           {
@@ -17737,7 +17912,7 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 86
+              "line": 99
             }
           }
         ],
@@ -17752,7 +17927,7 @@
       },
       "source": {
         "file_index": 24,
-        "line": 78
+        "line": 91
       }
     },
     "graphics_engine::render_block::RenderBlockTypeTerrainPatch": {
@@ -17790,7 +17965,7 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 98
+              "line": 111
             }
           },
           {
@@ -17819,7 +17994,7 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 98
+              "line": 111
             }
           }
         ],
@@ -17834,7 +18009,7 @@
       },
       "source": {
         "file_index": 24,
-        "line": 93
+        "line": 106
       }
     },
     "graphics_engine::render_block::SkinBatch": {
@@ -43733,6 +43908,7 @@
             "graphics_engine::graphics_engine::HRenderSetup_t",
             "graphics_engine::graphics_engine::HTexture_t",
             "graphics_engine::graphics_engine::HWND",
+            "graphics_engine::graphics_engine::OccluderCollectionManager",
             "graphics_engine::graphics_engine::RenderContext",
             "graphics_engine::graphics_engine::RenderFrameCounters",
             "graphics_engine::graphics_engine::ShadowCascades",
@@ -43812,6 +43988,7 @@
           "items": [
             "graphics_engine::render_block::Matrix3x4",
             "graphics_engine::render_block::RBIInfo",
+            "graphics_engine::render_block::RenderBlockAtmosphericScattering",
             "graphics_engine::render_block::RenderBlockCharacter",
             "graphics_engine::render_block::RenderBlockCharacterSkin",
             "graphics_engine::render_block::RenderBlockTypeTerrain",
