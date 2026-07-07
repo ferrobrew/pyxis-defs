@@ -68,6 +68,19 @@ impl RenderBlockCharacter {
     pub fn SetMatrixPalette(&self, ctx: *mut HContext_t, matrices: *const Matrix3x4, batch: *const SkinBatch, register: u32);
 }
 
+/// The atmospheric-scattering / aerial-perspective render block. Its `Draw` reconstructs world
+/// position from depth via [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4) -- for the whole
+/// screen, sky included -- and then ray-marches the sun shadow cascade and aerial perspective over
+/// the reconstructed positions.
+pub type RenderBlockAtmosphericScattering;
+impl RenderBlockAtmosphericScattering {
+    /// Draws the atmospheric-scattering pass. `rc` is the per-view render context; `info` the
+    /// instance info. Reconstructs view rays from depth via
+    /// [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4) and samples the sun cascade.
+    #[address(0x140_36A_820)]
+    pub fn Draw(&mut self, rc: *mut RenderContext, info: *const RBIInfo);
+}
+
 /// The terrain render block *type* (the `CRenderBlockTerrain::CRenderBlockTypeTerrain` singleton).
 /// Its `SetupConstantBuffers` uploads the per-LOD-slot hull/domain tessellation constant buffer —
 /// which bakes the dispatch's
