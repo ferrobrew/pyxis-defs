@@ -68,6 +68,36 @@ impl RenderBlockCharacter {
     pub fn SetMatrixPalette(&self, ctx: *mut HContext_t, matrices: *const Matrix3x4, batch: *const SkinBatch, register: u32);
 }
 
+/// The terrain render block *type* (the `CRenderBlockTerrain::CRenderBlockTypeTerrain` singleton).
+/// Its `SetupConstantBuffers` uploads the per-LOD-slot hull/domain tessellation constant buffer —
+/// which bakes the dispatch's
+/// [`RenderContext::m_OffsetViewProjection`](graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection),
+/// camera position, and tessellation factors — into `m_HDTypeConstants[slot]` (22 constant-buffer
+/// handles at `0x60`), caching it per slot keyed on the frame the upload was made for.
+#[singleton(0x142_EED_228), min_size(0x168)]
+pub type RenderBlockTypeTerrain {
+    /// Per-LOD-slot cache stamp: the
+    /// [`RenderContext::m_RenderFrameNo`](graphics_engine::graphics_engine::RenderContext::m_RenderFrameNo)
+    /// of the frame whose tessellation constants were last uploaded into that slot's constant buffer.
+    /// `SetupConstantBuffers` re-uploads a slot only when the current frame's stamp differs, so the
+    /// baked view-projection is written once per frame and reused for every draw of that slot within
+    /// the frame.
+    #[address(0x110)]
+    pub m_WasCBApplied: [u32; 22],
+}
+
+/// The volumetric-patch terrain render block *type* (the
+/// `NGraphicsEngine::CRenderBlockTerrainPatch::CRenderBlockTypeTerrainPatch` singleton): the tessellated
+/// cliff/overhang variant of [`RenderBlockTypeTerrain`], with the same per-slot constant-buffer caching.
+#[singleton(0x142_EED_238), min_size(0x178)]
+pub type RenderBlockTypeTerrainPatch {
+    /// Per-LOD-slot cache stamp; see [`RenderBlockTypeTerrain::m_WasCBApplied`]. The constant-buffer
+    /// handle array (`m_HDTypeConstants[22]`) sits at `0x70` for this variant, so the stamp array
+    /// follows at `0x120`.
+    #[address(0x120)]
+    pub m_WasCBApplied: [u32; 22],
+}
+
 /// The skinned character skin render block (the `CharacterSkin` RBMDL block type): the skin-shaded
 /// variant of [`RenderBlockCharacter`], with the same batch and pass structure.
 #[min_size(0x1C8)]
