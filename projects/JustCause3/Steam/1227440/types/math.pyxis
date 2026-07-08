@@ -12,7 +12,8 @@ impl Matrix3 {
     pub fn as_mut_ptr(&mut self) -> *mut f32;
 }
 
-backend rust epilogue for Matrix3 r#"
+#[cfg(backend = "rust")]
+epilogue for Matrix3 r#"
     #[cfg(feature = "glam")]
     impl From<glam::Mat3> for Matrix3 {
         fn from(m: glam::Mat3) -> Self {
@@ -52,7 +53,8 @@ impl Matrix4 {
     pub fn as_mut_ptr(&mut self) -> *mut f32;
 }
 
-backend rust epilogue for Matrix4 r#"
+#[cfg(backend = "rust")]
+epilogue for Matrix4 r#"
     #[cfg(feature = "glam")]
     impl From<glam::Mat4> for Matrix4 {
         fn from(m: glam::Mat4) -> Self {
@@ -83,7 +85,8 @@ pub type Vector2 {
     pub data: [f32; 2],
 }
 
-backend rust epilogue for Vector2 r#"
+#[cfg(backend = "rust")]
+epilogue for Vector2 r#"
     #[cfg(feature = "glam")]
     impl From<glam::Vec2> for Vector2 {
         fn from(v: glam::Vec2) -> Self {
@@ -105,7 +108,8 @@ pub type Vector3 {
     pub data: [f32; 3],
 }
 
-backend rust epilogue for Vector3 r#"
+#[cfg(backend = "rust")]
+epilogue for Vector3 r#"
     #[cfg(feature = "glam")]
     impl From<glam::Vec3> for Vector3 {
         fn from(v: glam::Vec3) -> Self {
@@ -127,7 +131,8 @@ pub type Vector4 {
     pub data: [f32; 4],
 }
 
-backend rust epilogue for Vector4 r#"
+#[cfg(backend = "rust")]
+epilogue for Vector4 r#"
     #[cfg(feature = "glam")]
     impl From<glam::Vec4> for Vector4 {
         fn from(v: glam::Vec4) -> Self {
@@ -144,12 +149,14 @@ backend rust epilogue for Vector4 r#"
     }
 "#;
 
-backend cpp epilogue for Matrix3 r#"
+#[cfg(backend = "cpp")]
+epilogue for Matrix3 r#"
 inline const float* Matrix3::as_ptr() const { return data; }
 inline float* Matrix3::as_mut_ptr() { return data; }
 "#;
 
-backend cpp epilogue for Matrix4 r#"
+#[cfg(backend = "cpp")]
+epilogue for Matrix4 r#"
 inline const float* Matrix4::as_ptr() const { return data; }
 inline float* Matrix4::as_mut_ptr() { return data; }
 "#;

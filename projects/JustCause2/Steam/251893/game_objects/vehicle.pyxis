@@ -125,7 +125,8 @@ impl Vehicle {
     pub fn quick_open_door(&mut self, door_slot: DoorSlot);
 }
 
-backend rust epilogue for Vehicle r#"
+#[cfg(backend = "rust")]
+epilogue for Vehicle r#"
     pub trait VehicleMutExt {
         unsafe fn get_pfx_vehicle(&mut self) -> crate::types::shared_ptr::SharedPtr<crate::physics::pfx_vehicle::PfxVehicle>;
     }

@@ -1,10 +1,8 @@
 use physics::pfx_rigid_body::PfxRigidBody;
 use types::{math::{Aabb, Matrix4}, rtti::Rtti};
 use types::shared_ptr::{SharedPtr, WeakPtr};
-
-backend cpp {
-    use types::math::Matrix4;
-}
+#[cfg(backend = "cpp")]
+use types::math::Matrix4;
 
 pub type PropertyFile;
 
@@ -58,7 +56,8 @@ impl GameObject {
     pub fn set_matrix(&mut self, matrix: *const Matrix4);
 }
 
-backend rust epilogue for GameObject r#"
+#[cfg(backend = "rust")]
+epilogue for GameObject r#"
     pub trait GameObjectExt {
         unsafe fn get_matrix(&self) -> Option<crate::types::math::Matrix4>;
     }
@@ -79,7 +78,8 @@ backend rust epilogue for GameObject r#"
     }
 "#;
 
-backend cpp epilogue definition for GameObject r#"
+#[cfg(backend = "cpp")]
+epilogue definition for GameObject r#"
 bool GameObject::try_get_matrix(::types::math::Matrix4* out) const {
     return this->get_matrix_raw(out->data);
 }

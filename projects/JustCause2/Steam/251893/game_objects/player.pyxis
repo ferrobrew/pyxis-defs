@@ -9,7 +9,8 @@ pub type Player {
     pub avatar: Avatar,
 }
 
-backend rust epilogue for Player r#"
+#[cfg(backend = "rust")]
+epilogue for Player r#"
     pub trait PlayerExt {
         unsafe fn get_character(&self) -> Option<&crate::game_objects::Character>;
     }

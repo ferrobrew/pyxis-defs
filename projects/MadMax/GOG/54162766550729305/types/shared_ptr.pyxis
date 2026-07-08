@@ -1,4 +1,5 @@
-backend rust prologue r#"
+#[cfg(backend = "rust")]
+prologue r#"
     use std::{
         clone::Clone,
         ptr,
@@ -18,7 +19,8 @@ type SharedCountImpl {
     weak_count: AtomicI32,
 }
 
-backend rust epilogue for SharedCountImpl r#"
+#[cfg(backend = "rust")]
+epilogue for SharedCountImpl r#"
     // SharedCountImpl
     impl SharedCountImpl {
         fn release(&mut self) {
@@ -59,7 +61,8 @@ type SharedCount {
     count_impl: *mut SharedCountImpl,
 }
 
-backend rust epilogue for SharedCount r#"
+#[cfg(backend = "rust")]
+epilogue for SharedCount r#"
     // SharedCount
     #[allow(dead_code)]
     impl SharedCount {
@@ -99,7 +102,8 @@ type WeakCount {
     count_impl: *mut SharedCountImpl,
 }
 
-backend rust epilogue for WeakCount r#"
+#[cfg(backend = "rust")]
+epilogue for WeakCount r#"
     // WeakCount
     impl WeakCount {
         fn new_from_shared(shared: &SharedCount) -> WeakCount {
@@ -146,7 +150,8 @@ impl<T> SharedPtr<T> {
     pub fn is_only_owner(&self) -> bool;
 }
 
-backend rust epilogue for SharedPtr r#"
+#[cfg(backend = "rust")]
+epilogue for SharedPtr r#"
     // SharedPtr
     #[allow(dead_code)]
     impl<T> SharedPtr<T> {
@@ -242,7 +247,8 @@ pub type WeakPtr<T> {
     pn: WeakCount,
 }
 
-backend rust epilogue for WeakPtr r#"
+#[cfg(backend = "rust")]
+epilogue for WeakPtr r#"
     // WeakPtr
     #[allow(dead_code)]
     impl<T> WeakPtr<T> {

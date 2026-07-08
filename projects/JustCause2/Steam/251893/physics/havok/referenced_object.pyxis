@@ -36,7 +36,8 @@ impl HkReferencedObject {
     pub fn remove_reference(&mut self);
 }
 
-backend rust epilogue for HkReferencedObject r#"
+#[cfg(backend = "rust")]
+epilogue for HkReferencedObject r#"
     impl HkReferencedObject {
         pub unsafe fn allocation_size(&self) -> u32 {
             (self.mem_size_and_flags & 0x7FFF) as u32
@@ -113,12 +114,14 @@ backend rust epilogue for HkReferencedObject r#"
     }
 "#;
 
-backend cpp prologue r#"
+#[cfg(backend = "cpp")]
+prologue r#"
 #include <windows.h>
 #include "physics/havok/memory.hpp"
 "#;
 
-backend cpp epilogue definition for HkReferencedObject r#"
+#[cfg(backend = "cpp")]
+epilogue definition for HkReferencedObject r#"
 ::std::uint32_t HkReferencedObject::allocation_size() const {
     return static_cast<::std::uint32_t>(mem_size_and_flags & 0x7FFF);
 }
@@ -138,7 +141,8 @@ void HkReferencedObject::remove_reference() {
 // type's factory, and template member-function definitions must be
 // header-visible at every instantiation site. The dep walker can't see
 // into the template body, so the helper rides along inline.
-backend cpp epilogue r#"
+#[cfg(backend = "cpp")]
+epilogue r#"
 // Get the Havok thread-local memory allocator from TLS. JC2 stores a
 // `HkThreadMemory*` in the TLS slot whose index is held in
 // `havok::memory::hk_thread_memory_tls_index` (an `extern u32`).

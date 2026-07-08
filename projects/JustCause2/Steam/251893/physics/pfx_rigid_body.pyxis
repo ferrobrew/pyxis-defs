@@ -1,10 +1,9 @@
 use physics::{havok::rigid_body::HkpRigidBody, pfx_instance::{PfxInstance, PfxInstanceInterface}};
 use types::{math::{Matrix4, Vector3}, shared_ptr::SharedPtr};
-
-backend cpp {
-    use types::shared_ptr::SharedPtr;
-    use physics::havok::rigid_body::HkpRigidBody;
-}
+#[cfg(backend = "cpp")]
+use types::shared_ptr::SharedPtr;
+#[cfg(backend = "cpp")]
+use physics::havok::rigid_body::HkpRigidBody;
 
 #[size(0x30)]
 pub type PfxRigidBody {
@@ -68,7 +67,8 @@ impl PfxRigidBody {
     pub fn make_heap(rigid_body: *mut HkpRigidBody) -> *mut PfxRigidBody;
 }
 
-backend rust epilogue for PfxRigidBody r#"
+#[cfg(backend = "rust")]
+epilogue for PfxRigidBody r#"
     impl PfxRigidBody {
         pub unsafe fn new(rigid_body: *mut crate::physics::havok::rigid_body::HkpRigidBody) -> std::pin::Pin<std::boxed::Box<Self>> {
             unsafe {
@@ -85,7 +85,8 @@ backend rust epilogue for PfxRigidBody r#"
     }
 "#;
 
-backend cpp epilogue definition for PfxRigidBody r#"
+#[cfg(backend = "cpp")]
+epilogue definition for PfxRigidBody r#"
 PfxRigidBody* PfxRigidBody::make_heap(::physics::havok::rigid_body::HkpRigidBody* rigid_body) {
     auto* instance = new PfxRigidBody{};
     auto empty = ::types::shared_ptr::SharedPtr<::std::uint32_t>::make();

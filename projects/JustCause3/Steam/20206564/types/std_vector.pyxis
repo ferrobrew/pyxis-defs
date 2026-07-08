@@ -24,7 +24,8 @@ impl<T> Vector<T> {
     pub fn is_empty(&self) -> bool;
 }
 
-backend rust epilogue for Vector r#"
+#[cfg(backend = "rust")]
+epilogue for Vector r#"
     #[allow(dead_code)]
     impl<T> Vector<T> {
         /// Number of live elements.
@@ -54,7 +55,8 @@ backend rust epilogue for Vector r#"
     }
 "#;
 
-backend cpp epilogue for Vector r#"
+#[cfg(backend = "cpp")]
+epilogue for Vector r#"
 template <class T>
 inline ::std::uint64_t Vector<T>::len() const {
     if (begin == nullptr) {

@@ -7,7 +7,8 @@
 #[address(0x140_071_9D0)]
 fn send_event_msg_impl(name: *const u8, data: *mut u8);
 
-backend rust epilogue r#"
+#[cfg(backend = "rust")]
+epilogue r#"
 /// Fire a named engine event with no payload.
 pub fn send_event_msg(name: &std::ffi::CStr) {
     unsafe { send_event_msg_impl(name.as_ptr() as *const u8, std::ptr::null_mut()) }

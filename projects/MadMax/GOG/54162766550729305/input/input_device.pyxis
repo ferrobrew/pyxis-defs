@@ -49,7 +49,8 @@ pub type GamepadDualshock4 {
     pub input_device: InputDevice,
 }
 
-backend rust epilogue r#"
+#[cfg(backend = "rust")]
+epilogue r#"
     macro_rules! impl_try_from_input_device {
         ($target:ty, $device_type:expr, $dualshock:expr) => {
             macro_rules! impl_try_from {

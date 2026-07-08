@@ -45,7 +45,8 @@ impl Camera {
     pub fn new() -> Camera;
 }
 
-backend rust epilogue for Camera r#"
+#[cfg(backend = "rust")]
+epilogue for Camera r#"
     impl Camera {
         pub unsafe fn new() -> Camera {
             unsafe {

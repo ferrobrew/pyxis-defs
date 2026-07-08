@@ -1,6 +1,10 @@
 use types::{math::{Vector2, Vector3, Vector4}, std_string::StdString};
 
-backend rust prologue "\n    use crate::types::shared_ptr::*;\n    use std::mem::ManuallyDrop;\n";
+#[cfg(backend = "rust")]
+prologue r#"
+    use crate::types::shared_ptr::*;
+    use std::mem::ManuallyDrop;
+"#;
 
 /// `ManuallyDrop<SharedPtr<u32>>` is used instead of `SharedPtr<u32>` to avoid
 /// the `Drop` implementation of `SharedPtr<u32>` being called when the `RenderBlock`
@@ -9,7 +13,8 @@ backend rust prologue "\n    use crate::types::shared_ptr::*;\n    use std::mem:
 #[size(8), align(4), cpp_name = "::pyxis::ManuallyDrop<::types::shared_ptr::SharedPtr<::std::uint32_t>>"]
 extern type ManuallyDrop<SharedPtr<u32>>;
 
-backend cpp prologue r#"
+#[cfg(backend = "cpp")]
+prologue r#"
 // `::pyxis::ManuallyDrop<T>` mirrors `core::mem::ManuallyDrop<T>` from Rust:
 // it suppresses T's destructor so callers can drive teardown manually. Same
 // layout as T (single-field union); accessing `.value` gives the wrapped value.
@@ -118,7 +123,8 @@ impl GenericRenderBlock {
     pub fn new() -> GenericRenderBlock;
 }
 
-backend rust epilogue for GenericRenderBlock r#"
+#[cfg(backend = "rust")]
+epilogue for GenericRenderBlock r#"
     impl GenericRenderBlock {
         pub unsafe fn new() -> GenericRenderBlock {
             unsafe {
@@ -137,7 +143,8 @@ backend rust epilogue for GenericRenderBlock r#"
     }
 "#;
 
-backend cpp epilogue definition for GenericRenderBlock r#"
+#[cfg(backend = "cpp")]
+epilogue definition for GenericRenderBlock r#"
 GenericRenderBlock GenericRenderBlock::make() {
     GenericRenderBlock self{};
     self.constructor();
@@ -190,7 +197,8 @@ impl RenderBlockLine {
     pub fn new() -> RenderBlockLine;
 }
 
-backend rust epilogue for RenderBlockLine r#"
+#[cfg(backend = "rust")]
+epilogue for RenderBlockLine r#"
     impl RenderBlockLine {
         pub unsafe fn new() -> RenderBlockLine {
             unsafe {
@@ -207,7 +215,8 @@ backend rust epilogue for RenderBlockLine r#"
     }
 "#;
 
-backend cpp epilogue definition for RenderBlockLine r#"
+#[cfg(backend = "cpp")]
+epilogue definition for RenderBlockLine r#"
 RenderBlockLine RenderBlockLine::make() {
     RenderBlockLine self{};
     self.constructor();
@@ -252,7 +261,8 @@ impl RenderBlockTriangle {
     pub fn new() -> RenderBlockTriangle;
 }
 
-backend rust epilogue for RenderBlockTriangle r#"
+#[cfg(backend = "rust")]
+epilogue for RenderBlockTriangle r#"
     impl RenderBlockTriangle {
         pub unsafe fn new() -> RenderBlockTriangle {
             unsafe {
@@ -269,7 +279,8 @@ backend rust epilogue for RenderBlockTriangle r#"
     }
 "#;
 
-backend cpp epilogue definition for RenderBlockTriangle r#"
+#[cfg(backend = "cpp")]
+epilogue definition for RenderBlockTriangle r#"
 RenderBlockTriangle RenderBlockTriangle::make() {
     RenderBlockTriangle self{};
     self.constructor();
@@ -330,7 +341,8 @@ impl RenderBlockGeneral {
     pub fn new() -> RenderBlockGeneral;
 }
 
-backend rust epilogue for RenderBlockGeneral r#"
+#[cfg(backend = "rust")]
+epilogue for RenderBlockGeneral r#"
     impl RenderBlockGeneral {
         pub unsafe fn new() -> RenderBlockGeneral {
             unsafe {
@@ -347,7 +359,8 @@ backend rust epilogue for RenderBlockGeneral r#"
     }
 "#;
 
-backend cpp epilogue definition for RenderBlockGeneral r#"
+#[cfg(backend = "cpp")]
+epilogue definition for RenderBlockGeneral r#"
 RenderBlockGeneral RenderBlockGeneral::make() {
     RenderBlockGeneral self{};
     self.constructor();
@@ -439,7 +452,8 @@ impl RenderBlock3DText {
     pub fn new() -> RenderBlock3DText;
 }
 
-backend rust epilogue for RenderBlock3DText r#"
+#[cfg(backend = "rust")]
+epilogue for RenderBlock3DText r#"
     impl RenderBlock3DText {
         pub unsafe fn new() -> RenderBlock3DText {
             unsafe {
@@ -462,7 +476,8 @@ backend rust epilogue for RenderBlock3DText r#"
     }
 "#;
 
-backend cpp epilogue definition for RenderBlock3DText r#"
+#[cfg(backend = "cpp")]
+epilogue definition for RenderBlock3DText r#"
 RenderBlock3DText RenderBlock3DText::make() {
     RenderBlock3DText self{};
     self.render_block.vftable = reinterpret_cast<const RenderBlockVftable*>(RenderBlock3DText::VFTABLE);

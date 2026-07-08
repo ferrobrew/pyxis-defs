@@ -818,7 +818,8 @@ pub type DisplayInfo {
     pub Visible: bool,
 }
 
-backend rust epilogue for Value r#"
+#[cfg(backend = "rust")]
+epilogue for Value r#"
     #[allow(dead_code)]
     impl Value {
         /// An unmanaged boolean value, safe to pass to `Movie::SetVariable` (the movie copies it;

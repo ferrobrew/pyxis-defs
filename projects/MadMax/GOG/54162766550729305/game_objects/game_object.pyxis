@@ -41,7 +41,8 @@ pub type GameObject {
     pub weak_this: WeakPtr<GameObject>,
 }
 
-backend rust epilogue for GameObject r#"
+#[cfg(backend = "rust")]
+epilogue for GameObject r#"
     pub trait GameObjectExt {
         unsafe fn get_matrix(&self) -> Option<crate::types::math::Matrix4>;
     }

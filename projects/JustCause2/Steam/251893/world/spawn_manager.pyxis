@@ -66,7 +66,8 @@ impl SpawnManager {
     pub fn is_vehicle_loaded(&self, id: u32) -> bool;
 }
 
-backend rust epilogue for SpawnManager r#"
+#[cfg(backend = "rust")]
+epilogue for SpawnManager r#"
     impl SpawnManager {
         pub unsafe fn is_vehicle_loaded(&self, id: u32) -> bool {
             (0..self.vehicle_types.hash_edacd65b_likely_max_models).any(|i| unsafe {
@@ -79,7 +80,8 @@ backend rust epilogue for SpawnManager r#"
     }
 "#;
 
-backend cpp epilogue definition for SpawnManager r#"
+#[cfg(backend = "cpp")]
+epilogue definition for SpawnManager r#"
 bool SpawnManager::is_vehicle_loaded(::std::uint32_t id) const {
     const auto count = vehicle_types.hash_edacd65b_likely_max_models;
     for (::std::int32_t i = 0; i < count; ++i) {

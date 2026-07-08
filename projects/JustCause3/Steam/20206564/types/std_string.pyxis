@@ -17,7 +17,8 @@ pub type String {
     pub capacity: u64,
 }
 
-backend rust epilogue for String r#"
+#[cfg(backend = "rust")]
+epilogue for String r#"
     #[allow(dead_code)]
     impl String {
         /// The string bytes, resolving the small-string optimization.

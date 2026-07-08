@@ -160,7 +160,8 @@ pub enum InputAction: u32 {
     Max = 256,
 }
 
-backend rust epilogue for InputAction r#"
+#[cfg(backend = "rust")]
+epilogue for InputAction r#"
 impl InputAction {
     pub fn is_gui(&self) -> bool {
         use InputAction::*;

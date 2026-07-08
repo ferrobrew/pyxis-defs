@@ -54,7 +54,8 @@ pub type GraphicsGlobalSettings {
 #[address(0x141_6ED_DB0)]
 pub extern graphics_global_settings: GraphicsGlobalSettings;
 
-backend rust epilogue r#"
+#[cfg(backend = "rust")]
+epilogue r#"
 pub unsafe fn get_d3d11_device() -> Option<windows::core::InterfaceRef<'static, windows::Win32::Graphics::Direct3D11::ID3D11Device>> {
     unsafe {
         GraphicsEngine::get()

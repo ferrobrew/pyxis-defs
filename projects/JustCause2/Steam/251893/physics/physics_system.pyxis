@@ -29,7 +29,8 @@ impl AIRayCastFilter {
     pub fn new() -> AIRayCastFilter;
 }
 
-backend rust epilogue for AIRayCastFilter r#"
+#[cfg(backend = "rust")]
+epilogue for AIRayCastFilter r#"
     impl AIRayCastFilter {
         pub unsafe fn new() -> Self {
             unsafe {
@@ -41,7 +42,8 @@ backend rust epilogue for AIRayCastFilter r#"
     }
 "#;
 
-backend cpp epilogue definition for AIRayCastFilter r#"
+#[cfg(backend = "cpp")]
+epilogue definition for AIRayCastFilter r#"
 AIRayCastFilter AIRayCastFilter::make() {
     AIRayCastFilter self{};
     self.constructor();
@@ -77,7 +79,8 @@ impl RayCastResult {
     pub fn new() -> RayCastResult;
 }
 
-backend rust epilogue for RayCastResult r#"
+#[cfg(backend = "rust")]
+epilogue for RayCastResult r#"
     impl RayCastResult {
         pub unsafe fn new() -> RayCastResult {
             unsafe {
@@ -96,7 +99,8 @@ backend rust epilogue for RayCastResult r#"
     }
 "#;
 
-backend cpp epilogue definition for RayCastResult r#"
+#[cfg(backend = "cpp")]
+epilogue definition for RayCastResult r#"
 RayCastResult RayCastResult::make() {
     RayCastResult self{};
     self.normal = ::types::math::Vector3{{1.0f, 0.0f, 0.0f}};
@@ -122,7 +126,8 @@ impl PhysicsSystem {
     pub fn assign_material(material: u32, shape: *mut HkpShape);
 }
 
-backend rust epilogue for PhysicsSystem r#"
+#[cfg(backend = "rust")]
+epilogue for PhysicsSystem r#"
     impl PhysicsSystem {
         pub fn ray_cast(&mut self, ray: &crate::types::math::Ray, start: f32, end: f32, ignored_pfx_types: u32) -> Option<RayCastResult> {
             unsafe {

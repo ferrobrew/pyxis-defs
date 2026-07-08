@@ -18,7 +18,8 @@ pub enum AnarkState: u32 {
     Unassigned,
 }
 
-backend rust epilogue for AnarkState r#"
+#[cfg(backend = "rust")]
+epilogue for AnarkState r#"
 impl AnarkState {
     pub fn in_game(&self) -> bool {
         matches!(

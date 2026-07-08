@@ -1,4 +1,5 @@
-backend rust prologue r#"
+#[cfg(backend = "rust")]
+prologue r#"
     use std::{ffi::c_void, os::raw::c_char, sync::OnceLock};
     use windows::Win32::System::LibraryLoader::{GetModuleHandleA, GetProcAddress};
 
@@ -39,7 +40,8 @@ impl StdString {
     pub fn new() -> StdString;
 }
 
-backend rust epilogue for StdString r#"
+#[cfg(backend = "rust")]
+epilogue for StdString r#"
     struct StringFunctions {
         ctor_default: extern "thiscall" fn(*mut StdString) -> *mut c_void,
         ctor_cstr: extern "thiscall" fn(*mut StdString, *const c_char) -> *mut c_void,
@@ -106,11 +108,13 @@ backend rust epilogue for StdString r#"
 // `<windows.h>` is only needed for the source-side DLL lookup; keeping
 // it out of the .hpp avoids leaking the full Windows API into every
 // header consumer.
-backend cpp {
-    prologue definition r#"
+#[cfg(backend = "cpp")]
+prologue definition r#"
         #include <windows.h>
     "#;
-    epilogue definition for StdString r#"
+
+#[cfg(backend = "cpp")]
+epilogue definition for StdString r#"
 // JC2 ships against MSVCP80's `std::basic_string` ABI; we resolve the
 // constructors / destructor / copy by mangled name from the loaded DLL on
 // first use (mirrors the Rust impl). The mangled names target the 32-bit
@@ -150,4 +154,3 @@ void StdString::ctor_cstr(const char* s) { std_string_functions().ctor_cstr(this
 void StdString::dtor() { std_string_functions().dtor(this); }
 void StdString::copy(const StdString* other) { std_string_functions().copy(this, other); }
 "#;
-}

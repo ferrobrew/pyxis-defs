@@ -30,12 +30,13 @@ When a type's method body is supplied by a backend prologue/epilogue rather than
 ```pyxis
 #[cfg(backend = "rust")]
 impl Widget {
-    /// Rust-only helper; body lives in the `backend rust epilogue` below.
+    /// Rust-only helper; body lives in the cfg-gated `epilogue` below.
     #[external_body]
     pub fn spin(&self) -> u32;
 }
 
-backend rust epilogue for Widget r#"
+#[cfg(backend = "rust")]
+epilogue for Widget r#"
     impl Widget {
         pub fn spin(&self) -> u32 { self.value * 2 }
     }
@@ -57,7 +58,8 @@ The function grammar only models plain inherent methods / associated functions â
 For those, leave the body in the epilogue as opaque text and tag it `for <Type>` so it renders on the type's page rather than the module page:
 
 ```pyxis
-backend rust epilogue for Widget r#"
+#[cfg(backend = "rust")]
+epilogue for Widget r#"
     impl Drop for Widget {
         fn drop(&mut self) { /* ... */ }
     }

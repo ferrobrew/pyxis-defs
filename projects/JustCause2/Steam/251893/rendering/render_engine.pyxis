@@ -44,7 +44,8 @@ impl RenderBlockInstanceInfo {
     pub fn new() -> RenderBlockInstanceInfo;
 }
 
-backend rust epilogue for RenderBlockInstanceInfo r#"
+#[cfg(backend = "rust")]
+epilogue for RenderBlockInstanceInfo r#"
     impl RenderBlockInstanceInfo {
         pub unsafe fn new() -> RenderBlockInstanceInfo {
             unsafe {
@@ -57,7 +58,8 @@ backend rust epilogue for RenderBlockInstanceInfo r#"
     }
 "#;
 
-backend cpp epilogue definition for RenderBlockInstanceInfo r#"
+#[cfg(backend = "cpp")]
+epilogue definition for RenderBlockInstanceInfo r#"
 RenderBlockInstanceInfo RenderBlockInstanceInfo::make() {
     RenderBlockInstanceInfo self{};
     self.colors[0] = RenderBlockInstanceInfo::OPAQUE_WHITE;
