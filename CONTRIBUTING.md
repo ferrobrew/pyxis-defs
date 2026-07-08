@@ -2,6 +2,8 @@
 
 This repo holds memory-structure definitions for applications, written in the [Pyxis DSL](https://github.com/ferrobrew/pyxis). Each project is a tree of `.pyxis` files plus a `pyxis.toml`; the generated JSON docs live under `docs/`.
 
+For the Pyxis language reference (syntax, types, attributes, cfg, splices), see [docs/language.md](https://github.com/ferrobrew/pyxis/blob/main/docs/language.md). For backend-specific docs, see the [docs directory](https://github.com/ferrobrew/pyxis/tree/main/docs). This file covers only conventions specific to this repo.
+
 ## Layout
 
 ```
@@ -17,58 +19,27 @@ projects/<App>/<Store>/<version-id>/
 
 ### Strip engine-specific type prefixes
 
-Many engines prefix struct types (e.g. `SVector3`) and classes (e.g. `CGameObject`). Drop these prefixes in pyxis: `Vector3`, `GameObject`, `SharedPtr`. Keep the prefix only when stripping would collide with another type — rare, but use your judgement.
+Many engines prefix struct types (e.g. `SVector3`) and classes (e.g. `CGameObject`). Drop these prefixes in pyxis: `Vector3`, `GameObject`, `SharedPtr`. Keep the prefix only when stripping would collide with another type - rare, but use your judgement.
 
 ### Module structure mirrors the source application
 
 One `.pyxis` file per module; folders nest. Use `use` to import cross-module types (same syntax as Rust: `use types::{math::Matrix4, rtti::Rtti};`). A folder that needs its own items gets a `mod.pyxis`.
 
-### Backend-provided methods: prefer `#[external_body]`
+### `#[external_body]` and backend-specific code
 
-When a type's method body is supplied by a backend prologue/epilogue rather than bound to a binary address, declare it as a backend-gated `#[external_body]` method so it shows up on the type's page:
+When a type's method body is supplied by a backend prologue/epilogue rather than bound to a binary address, declare it as a backend-gated `#[external_body]` method. The full syntax and semantics are in the [language reference](https://github.com/ferrobrew/pyxis/blob/main/docs/language.md#backend-splices); the key convention for this repo is:
 
-```pyxis
-#[cfg(backend = "rust")]
-impl Widget {
-    /// Rust-only helper; body lives in the cfg-gated `epilogue` below.
-    #[external_body]
-    pub fn spin(&self) -> u32;
-}
+- Declare `#[external_body]` methods under `#[cfg(backend = "...")]` impl blocks so each backend only sees its own declarations.
+- When a method exists for more than one backend, declare it once per backend under its own cfg-gated impl block.
+- For things the function grammar can't express (trait impls, `unsafe fn`, by-value `self`, `where`-clauses, extension traits), put the body in a `for <Type>` epilogue so it renders on the type's page.
 
-#[cfg(backend = "rust")]
-epilogue for Widget r#"
-    impl Widget {
-        pub fn spin(&self) -> u32 { self.value * 2 }
-    }
-"#;
-```
+### Cross-backend analogs in doc comments
 
-`#[external_body]` is backend-agnostic: the Rust backend skips emission (the epilogue's own `impl` is the sole source, so the two never conflict), the C++ backend routes the declaration to the header, and the JSON/docs surface it as an associated function with `body: external` and the `cfg` attached. Gate the impl block with `#[cfg(backend = "...")]` so each backend only sees its own declarations.
+When a method exists in one backend but has an analog in another, document the relationship in a doc comment so readers understand the mapping without cross-referencing epilogues.
 
-When a method exists for more than one backend (e.g. `SharedPtr::exists`), declare it once per backend under its own `#[cfg(backend = "...")]` impl block. Pyxis treats cfg-disjoint declarations (different `backend = "..."` values) as distinct methods, so both surface on the type page. Declarations whose cfgs could both be active in one build (e.g. two ungated, or two `backend = "cpp"`) are still rejected as duplicates.
+### `unknown<N>` for untyped regions
 
-The function grammar only models plain inherent methods / associated functions — `&self`/`&mut self`/named args, return type, method type params. It can't express:
-
-- trait impls (`impl Clone/Drop/Default/PartialEq for Foo`),
-- `unsafe fn`,
-- by-value `self`,
-- `where`-clauses,
-- free generic functions or `From`/`Into` conversions / extension traits.
-
-For those, leave the body in the epilogue as opaque text and tag it `for <Type>` so it renders on the type's page rather than the module page:
-
-```pyxis
-#[cfg(backend = "rust")]
-epilogue for Widget r#"
-    impl Drop for Widget {
-        fn drop(&mut self) { /* ... */ }
-    }
-"#;
-```
-
-### Attributes worth knowing
-
-`#[size(..)]` / `#[align(..)]` on types; `#[address(0x..)]` on functions and extern values; `#[base]` on a region for composition-based inheritance; `#[index(n)]` on vftable entries; `#[cfg(backend = "..")]` to gate per backend; `#[cpp_name]` / `#[cpp_header]` / `#[rust_name]` on `extern type`s to bind the opaque extern to a concrete backend type. Doc comments (`///`) become the docs.
+Use `unknown<N>` for padding, reserved fields, or data whose layout hasn't been mapped yet rather than inventing a fake type.
 
 ## Building and verifying
 
@@ -113,7 +84,7 @@ The C++ check needs a toolchain: native MSVC on Windows, or `clang-cl` + `xwin` 
 
 ## When changing defs
 
-- Run `pyxis fmt` on changed files (`pyxis fmt --check` to verify) — the pretty-printer is canonical; CI also runs it.
+- Run `pyxis fmt` on changed files (`pyxis fmt --check` to verify) - the pretty-printer is canonical; CI also runs it.
 - Run `python build.py --no-install` to confirm every project still builds.
 - Run `python build.py --no-install --check-builds rust` before pushing; the generated Rust must compile against the Windows targets.
 - Don't commit `docs/` by hand. CI (`.github/workflows/build-docs.yml`) regenerates and commits the `docs/` tree on push to `main` whenever `projects/**` or `build.py` changes; the checked-in `docs/` is what the viewer consumes.
