@@ -111,6 +111,52 @@ pub type RenderBlockTypeTerrainPatch {
     pub m_WasCBApplied: [u32; 22],
 }
 
+/// The fog-volume render block *type* (the
+/// `NGraphicsEngine::CRenderBlockFogVolume::CRenderBlockTypeFogVolume` singleton): owns the froxel
+/// volumetric-fog textures and recreates them when the scene render resolution changes.
+#[min_size(0x130)]
+pub type RenderBlockTypeFogVolume {
+    /// The full-resolution fog target width, in pixels, latched from the last
+    /// [`ResizeTextures`](RenderBlockTypeFogVolume::ResizeTextures) call.
+    #[address(0x128)]
+    pub m_HiResTextureWidth: u32,
+
+    /// The full-resolution fog target height, in pixels; see
+    /// [`m_HiResTextureWidth`](RenderBlockTypeFogVolume::m_HiResTextureWidth).
+    #[address(0x12C)]
+    pub m_HiResTextureHeight: u32,
+}
+impl RenderBlockTypeFogVolume {
+    /// Recreates the fog-volume textures for a `width` x `height` render target: the full-resolution
+    /// `fogvolume_texture_0` colour target and its volume texture, plus a coarse volumetric-depth
+    /// buffer that is resized to *half* of `width` x `height`. Invoked from the graphics engine's
+    /// registered resolution-change callback, so it re-runs whenever the scene render targets are
+    /// recreated (a resolution change), not per frame.
+    #[address(0x140_10C_5A0)]
+    pub fn ResizeTextures(&mut self, width: u32, height: u32) -> bool;
+}
+
+/// The particle render block *type* (the `CRenderBlockParticle::CRenderBlockTypeParticle` singleton):
+/// the shared state and shaders for every particle render block, including the flags that decide
+/// whether a particle draw is routed to the low-resolution particle pass.
+#[singleton(0x142_F17_128), min_size(0xA87)]
+pub type RenderBlockTypeParticle {
+    /// When set, a particle render block whose effect opts in and that falls below the low-resolution
+    /// distance threshold routes its draw to the low-resolution particle pass (later composited back
+    /// up by the low-res upsampling pass); when clear, that particle routes to the full-resolution
+    /// transparent pass instead. Set from the particle-quality graphics setting. The per-block routing
+    /// (`CRenderBlockParticle::GetRenderDetails`) selects the pass index from this flag ORed with
+    /// [`m_ForceLowResRendering`](RenderBlockTypeParticle::m_ForceLowResRendering).
+    #[address(0xA85)]
+    pub m_LowResRendering: bool,
+
+    /// Forces every particle render block onto the low-resolution particle pass regardless of the
+    /// per-effect opt-in or the distance threshold, ORed with
+    /// [`m_LowResRendering`](RenderBlockTypeParticle::m_LowResRendering).
+    #[address(0xA86)]
+    pub m_ForceLowResRendering: bool,
+}
+
 /// The skinned character skin render block (the `CharacterSkin` RBMDL block type): the skin-shaded
 /// variant of [`RenderBlockCharacter`], with the same batch and pass structure.
 #[min_size(0x1C8)]

@@ -93,6 +93,17 @@ pub fn CalculateOffsetViewProjectionMatrix(src: *const Matrix4, proj: *const Mat
 #[address(0x142_ED7_680)]
 pub extern current_add_buffer: u32;
 
+/// The low-resolution particle render pass: draws the particle render blocks routed to it (see
+/// `m_LowResRendering` on the particle block type) into a reduced-resolution target that the low-res
+/// upsampling pass later composites back up.
+pub type LRParticleRenderPass;
+impl LRParticleRenderPass {
+    /// Binds the reduced-resolution render setup, runs the base [`RenderPass::DoDraw`] over the routed
+    /// particle blocks, and restores the previously bound render setup.
+    #[address(0x140_0A4_170)]
+    pub fn Draw(&mut self);
+}
+
 /// The per-frame constant-buffer ring.
 pub type ConstantBufferPool;
 impl ConstantBufferPool {
