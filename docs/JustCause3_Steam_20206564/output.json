@@ -25632,7 +25632,7 @@
       },
       "source": {
         "file_index": 34,
-        "line": 160
+        "line": 191
       }
     },
     "input::locomotion::LocoUtil_NoAimStrafeMaxAngleAlt": {
@@ -25652,7 +25652,7 @@
       },
       "source": {
         "file_index": 34,
-        "line": 162
+        "line": 193
       }
     },
     "input::locomotion::NCharacter_ActMoveNoAim": {
@@ -25672,7 +25672,7 @@
       },
       "source": {
         "file_index": 34,
-        "line": 164
+        "line": 195
       }
     },
     "input::locomotion::NStateTask_InputLocoAimRelativeTask": {
@@ -26594,6 +26594,108 @@
       "source": {
         "file_index": 34,
         "line": 59
+      }
+    },
+    "input::locomotion::NStateTask_MovementJumpTask": {
+      "path": "input::locomotion::NStateTask_MovementJumpTask",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " The movement actuator task active during a jump's ascending phase — the airborne analogue of\n [`NStateTask_MovementLocomotionTask`], on a *separate* code path that does not route through\n [`EvaluateCharacterOrientation`](NStateTask_LocoUtil::EvaluateCharacterOrientation) or\n [`GetAimMoveAngle`](NStateTask_LocoUtil::GetAimMoveAngle).",
+        "doc_links": [
+          {
+            "text": "NStateTask_MovementLocomotionTask",
+            "target_kind": "item",
+            "path": "input::locomotion::NStateTask_MovementLocomotionTask"
+          },
+          {
+            "text": "NStateTask_LocoUtil::EvaluateCharacterOrientation",
+            "target_kind": "item",
+            "path": "input::locomotion::NStateTask_LocoUtil",
+            "anchor": "func-EvaluateCharacterOrientation"
+          },
+          {
+            "text": "NStateTask_LocoUtil::GetAimMoveAngle",
+            "target_kind": "item",
+            "path": "input::locomotion::NStateTask_LocoUtil",
+            "anchor": "func-GetAimMoveAngle"
+          }
+        ],
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "Update",
+            "doc": " The per-frame update. Computes a desired facing direction, rate-limits the body toward it,\n and writes the character orientation (the release inlines the `SetOrientation` writes). The\n desired facing has two head-derived sources: when\n [`m_AimingWeapon`](character::character::AimState::m_AimingWeapon) is set it faces the weapon\n aim target (`CPlayerAimControl`'s stored target world position — which follows the camera,\n and therefore the HMD gaze in VR), so head yaw turns the body mid-jump with no stick input;\n otherwise it falls back to the current world-forward plus the stick-gated camera-relative\n steer from `UpdateFallSteering`. Clearing `m_AimingWeapon` around this call routes it through\n the non-aiming fallback (the game's normal jump-while-not-aiming behavior).",
+            "doc_links": [
+              {
+                "text": "character::character::AimState::m_AimingWeapon",
+                "target_kind": "item",
+                "path": "character::character::AimState",
+                "anchor": "flag-m_AimingWeapon"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5377307200
+            },
+            "arguments": [
+              {
+                "type": "field",
+                "name": "ctx",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "state::StateContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "p1",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "void"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "p2",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "void"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 34,
+              "line": 175
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 34,
+        "line": 163
       }
     },
     "input::locomotion::NStateTask_MovementLocomotionTask": {
@@ -44374,10 +44476,117 @@
             "input::locomotion::NStateTask_InputLocoMoveTask",
             "input::locomotion::NStateTask_InputLocoSetTargetDirTask",
             "input::locomotion::NStateTask_LocoUtil",
+            "input::locomotion::NStateTask_MovementJumpTask",
             "input::locomotion::NStateTask_MovementLocomotionTask"
           ],
           "submodules": {},
-          "functions": [],
+          "functions": [
+            {
+              "visibility": "public",
+              "name": "UpdateFallSteering",
+              "doc": " Air-steer helper: computes the airborne desired facing and steered velocity for a character from\n its stick input and the camera input matrix. `out_facing` defaults to the character's current\n world-forward (`-m_WorldMatrixT1` third basis row) and is overwritten with the camera-relative\n steer direction only under meaningful stick input — so in VR, where the camera follows the HMD,\n pushing the stick while airborne steers the body toward the head. `out_velocity_norm` /\n `out_speed` carry the steered velocity. Called from\n [`NStateTask_MovementJumpTask::Update`](NStateTask_MovementJumpTask::Update) (jump ascent) and\n `NAirMovement::UpdateAirPhysics` (fall), so it governs body facing across the whole airborne arc.\n The return is a leaked `out_facing` pointer the callers discard.",
+              "doc_links": [
+                {
+                  "text": "NStateTask_MovementJumpTask::Update",
+                  "target_kind": "item",
+                  "path": "input::locomotion::NStateTask_MovementJumpTask",
+                  "anchor": "func-Update"
+                }
+              ],
+              "body": {
+                "type": "address",
+                "address": 5376644848
+              },
+              "arguments": [
+                {
+                  "type": "field",
+                  "name": "character",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "character::character::Character"
+                    }
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "dt",
+                  "type_ref": {
+                    "type": "raw",
+                    "path": "f32"
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "tuning",
+                  "type_ref": {
+                    "type": "const_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "void"
+                    }
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "processed_velocity",
+                  "type_ref": {
+                    "type": "const_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "types::math::Vector3"
+                    }
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "out_facing",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "types::math::Vector3"
+                    }
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "out_velocity_norm",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "types::math::Vector3"
+                    }
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "out_speed",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "f32"
+                    }
+                  }
+                }
+              ],
+              "return_type": {
+                "type": "mut_pointer",
+                "inner": {
+                  "type": "raw",
+                  "path": "types::math::Vector3"
+                }
+              },
+              "calling_convention": "system",
+              "source": {
+                "file_index": 34,
+                "line": 188
+              }
+            }
+          ],
           "splices": [],
           "source": {
             "file_index": 34,
