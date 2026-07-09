@@ -4549,6 +4549,45 @@
               "file_index": 7,
               "line": 95
             }
+          },
+          {
+            "visibility": "public",
+            "name": "UpdateFrustum",
+            "doc": " Rebuilds the 6 world-space frustum planes (`m_FrustumPlane`) and the AABB-test acceleration\n data from `m_ViewProjection`: it inverts the view-projection, transforms the NDC cube corners to\n world space (using `transform`'s translation for the apex), and derives the planes. Reads the\n standard-depth `m_ViewProjection` (not the reverse-Z `m_ViewProjectionF`) and asserts\n `!m_IsRenderCamera`. Called from [`UpdateRender`](Camera::UpdateRender) when the view is dirty;\n the frustum-cull consumers (terrain patches, occlusion) read these planes, not `m_ProjectionF`.",
+            "doc_links": [
+              {
+                "text": "Camera::UpdateRender",
+                "target_kind": "item",
+                "path": "camera::camera::Camera",
+                "anchor": "func-UpdateRender"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5369442240
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "transform",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "types::math::Matrix4"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 7,
+              "line": 104
+            }
           }
         ],
         "vftable": null,
