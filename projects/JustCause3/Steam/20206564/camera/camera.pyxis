@@ -93,4 +93,13 @@ impl Camera {
     /// `m_DirtyProjection`, and applies the reverse-Z remap only when `m_IsRenderCamera` is set.
     #[address(0x140_0B2_4F0)]
     pub fn RecalcProjection(&mut self);
+
+    /// Rebuilds the 6 world-space frustum planes (`m_FrustumPlane`) and the AABB-test acceleration
+    /// data from `m_ViewProjection`: it inverts the view-projection, transforms the NDC cube corners to
+    /// world space (using `transform`'s translation for the apex), and derives the planes. Reads the
+    /// standard-depth `m_ViewProjection` (not the reverse-Z `m_ViewProjectionF`) and asserts
+    /// `!m_IsRenderCamera`. Called from [`UpdateRender`](Camera::UpdateRender) when the view is dirty;
+    /// the frustum-cull consumers (terrain patches, occlusion) read these planes, not `m_ProjectionF`.
+    #[address(0x140_0B2_FC0)]
+    pub fn UpdateFrustum(&mut self, transform: *const Matrix4);
 }
