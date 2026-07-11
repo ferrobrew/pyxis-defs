@@ -162,11 +162,52 @@ pub type HContext_t;
 /// A GPU device handle.
 pub type HDevice_t;
 
-/// A render-target configuration a pass draws into.
-pub type HRenderSetup_t;
+/// A D3D11 rasterizer viewport (`D3D11_VIEWPORT`): the screen-space output rectangle the rasterizer
+/// maps NDC into and clips to, plus its depth range.
+#[size(0x18), align(4)]
+pub type D3D11Viewport {
+    #[address(0x0)]
+    pub TopLeftX: f32,
+    #[address(0x4)]
+    pub TopLeftY: f32,
+    #[address(0x8)]
+    pub Width: f32,
+    #[address(0xC)]
+    pub Height: f32,
+    #[address(0x10)]
+    pub MinDepth: f32,
+    #[address(0x14)]
+    pub MaxDepth: f32,
+}
+
+/// A render-target configuration a pass draws into: the output views bound via `OMSetRenderTargets`,
+/// and optionally a fixed viewport. Applied by [`SetRenderSetup`]. Partial: only the viewport fields
+/// are mapped; the type extends past them (`min_size` is the 8-aligned bound just past the last field).
+#[min_size(0xF8)]
+pub type HRenderSetup_t {
+    /// When set, [`SetRenderSetup`] applies [`m_Viewport`](HRenderSetup_t::m_Viewport) as the
+    /// rasterizer viewport; when clear, it synthesizes a viewport covering the full render target.
+    #[address(0xD8)]
+    pub m_HasCustomViewport: bool,
+
+    /// The fixed rasterizer viewport applied when
+    /// [`m_HasCustomViewport`](HRenderSetup_t::m_HasCustomViewport) is set.
+    #[address(0xDC)]
+    pub m_Viewport: D3D11Viewport,
+}
 
 /// A GPU texture handle.
 pub type HTexture_t;
+
+/// Binds a render setup as the active output on the context and sets the viewport. Applies the setup's
+/// render-target views and depth-stencil (`OMSetRenderTargets`), then sets the rasterizer viewport:
+/// [`HRenderSetup_t::m_Viewport`] when [`HRenderSetup_t::m_HasCustomViewport`] is set, otherwise a
+/// synthesized viewport covering the full render target (`0, 0, width, height, 0, 1`). It is the single
+/// viewport write on the render-setup path -- the passes that draw after it inherit this viewport.
+/// `force` re-applies the setup even when it matches the currently-bound one; its exact effect is
+/// unconfirmed.
+#[address(0x141_966_D20)]
+pub fn SetRenderSetup(context: *mut HContext_t, setup: *mut HRenderSetup_t, force: bool);
 
 /// The cascaded sun-shadow constants for the forward-material resolve: the cascade transform plus the
 /// per-cascade box-test parameters, staged into cb0 by `RenderEngine::SetGlobalShaderConstants`.
