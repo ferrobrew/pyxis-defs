@@ -188,9 +188,11 @@ pub type STerrainPatchSystem {
     /// clear, the previous frame's copy is kept.
     #[address(0x50)]
     pub m_UpdateCamera: bool,
+
     /// The camera-space distance at which terrain patches subdivide (tessellation LOD).
     #[address(0x54)]
     pub m_TessellationDistance: f32,
+
     /// A copy of the LOD camera (`CameraManager::m_ActiveCamera`) taken when
     /// [`m_UpdateCamera`](STerrainPatchSystem::m_UpdateCamera) is set. The terrain render passes point
     /// their frustum camera at this and cull patches against its
