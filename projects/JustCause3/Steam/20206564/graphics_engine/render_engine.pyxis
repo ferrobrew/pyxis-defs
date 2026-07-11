@@ -1,3 +1,4 @@
+use camera::camera::Camera;
 use graphics_engine::graphics_engine::{HContext_t, HRenderSetup_t, HTexture_t, RenderContext};
 use graphics_engine::render_pass::RenderPass;
 use types::math::Matrix4;
@@ -177,6 +178,33 @@ pub enum RenderPassId: i32 {
 /// [`RenderPassId`] values are verified against). Returns `"NONE"` for unnamed indices.
 #[address(0x140_175_080)]
 pub fn GetRenderPassName(pass: RenderPassId) -> *const u8;
+
+/// The terrain patch render system's per-frame state (partial: only the fields walked to
+/// `m_TerrainCamera` are mapped). Owned by `CLandscapeManager`; updated by
+/// [`TerrainPatchSystemUpdate`].
+pub type STerrainPatchSystem {
+    /// Whether [`TerrainPatchSystemUpdate`] refreshes
+    /// [`m_TerrainCamera`](STerrainPatchSystem::m_TerrainCamera) from the LOD camera this frame; when
+    /// clear, the previous frame's copy is kept.
+    #[address(0x50)]
+    pub m_UpdateCamera: bool,
+    /// The camera-space distance at which terrain patches subdivide (tessellation LOD).
+    #[address(0x54)]
+    pub m_TessellationDistance: f32,
+    /// A copy of the LOD camera (`CameraManager::m_ActiveCamera`) taken when
+    /// [`m_UpdateCamera`](STerrainPatchSystem::m_UpdateCamera) is set. The terrain render passes point
+    /// their frustum camera at this and cull patches against its
+    /// [`m_FrustumPlane`](camera::camera::Camera::m_FrustumPlane).
+    #[address(0x58)]
+    pub m_TerrainCamera: Camera,
+}
+
+/// The once-per-frame terrain patch system update (called from `CLandscapeManager::UpdateRender` in the
+/// sim phase). When [`STerrainPatchSystem::m_UpdateCamera`] is set it copies the LOD camera
+/// (`CameraManager::m_ActiveCamera`) into [`STerrainPatchSystem::m_TerrainCamera`] and points every
+/// terrain render pass's frustum camera at it. `ctx` carries the source camera.
+#[address(0x140_32F_780)]
+pub fn TerrainPatchSystemUpdate(handle: *mut STerrainPatchSystem, ctx: *mut void);
 
 #[singleton(0x142_ED0_E18), size(0x2220)]
 pub type RenderEngine {
