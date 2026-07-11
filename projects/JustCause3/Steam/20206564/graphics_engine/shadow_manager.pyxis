@@ -27,6 +27,16 @@ pub type ShadowManager {
     /// The per-cascade slots (passes plus fit bookkeeping).
     #[address(0x130)]
     pub m_Cascades: [CascadeData; 8],
+
+    /// The per-cascade shadow-map update level, indexed by cascade. A cascade re-fits and re-renders
+    /// only every `2^level` frames (level 0 = every frame); between refreshes its fit is copied
+    /// forward from the previous update. `CalculateUpdatePattern` assigns the levels (the default
+    /// pattern is `{0, 1, 2, 3}` -- the nearest cascade every frame, each further one half as often),
+    /// and [`SetActiveShadowPassCount`](ShadowManager::SetActiveShadowPassCount) reads them each frame,
+    /// gated against a rolling counter, to decide which cascades refresh. This is the mechanism that
+    /// amortises cascade re-renders across frames.
+    #[address(0x2468)]
+    pub m_CascadeUpdateLevels: [i32; 6],
 }
 impl ShadowManager {
     /// The global sun-shadow fade factor staged into the shader constants.
@@ -53,4 +63,14 @@ impl ShadowManager {
     /// matrices the draw side reads, and regenerates the cull planes.
     #[address(0x140_1C7_370)]
     pub fn UpdateRender(&mut self, dt: f32, dtf: f32);
+
+    /// Sets the number of active shadow passes (sun cascades plus spot shadows) and rebuilds the
+    /// per-frame cascade update schedule: it refreshes the amortisation pattern (recomputing
+    /// [`m_CascadeUpdateLevels`](ShadowManager::m_CascadeUpdateLevels) on a cascade/spot count change),
+    /// then marks each cascade as either refreshing this frame -- when
+    /// `((1 << m_CascadeUpdateLevels[c]) - 1) & rolling_counter == 0` -- or copying its previous fit
+    /// forward. Called from `CGameStateRun::UpdateShadows` before
+    /// [`UpdateRender`](ShadowManager::UpdateRender).
+    #[address(0x140_18A_7D0)]
+    pub fn SetActiveShadowPassCount(&mut self, count: i32);
 }
