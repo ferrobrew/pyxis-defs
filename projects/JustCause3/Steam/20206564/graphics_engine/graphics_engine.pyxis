@@ -167,11 +167,11 @@ pub type HContext_t {
     /// `StencilFunc`, bits11-18 `StencilReadMask`, bits19-26 `StencilWriteMask`, bits27-30
     /// `StencilFailOp`; high dword bits0-3 `StencilDepthFailOp`, bits4-7 `StencilPassOp`. The D3D enum
     /// values are stored verbatim (`D3D11_COMPARISON_*`, `D3D11_STENCIL_OP_*`).
-    #[address(0x8CC0)]
+    #[address(0x8_CC0)]
     pub m_DepthStencilStateIndex: u64,
 
     /// The stencil reference value bound alongside the depth-stencil state.
-    #[address(0x8CCC)]
+    #[address(0x8_CCC)]
     pub m_StencilRef: u32,
 }
 
