@@ -168,14 +168,19 @@ pub type HDevice_t;
 pub type D3D11Viewport {
     #[address(0x0)]
     pub TopLeftX: f32,
+
     #[address(0x4)]
     pub TopLeftY: f32,
+
     #[address(0x8)]
     pub Width: f32,
+
     #[address(0xC)]
     pub Height: f32,
+
     #[address(0x10)]
     pub MinDepth: f32,
+
     #[address(0x14)]
     pub MaxDepth: f32,
 }
