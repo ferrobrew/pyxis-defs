@@ -35,7 +35,7 @@ pub type ShadowManager {
     /// and [`SetActiveShadowPassCount`](ShadowManager::SetActiveShadowPassCount) reads them each frame,
     /// gated against a rolling counter, to decide which cascades refresh. This is the mechanism that
     /// amortises cascade re-renders across frames.
-    #[address(0x2468)]
+    #[address(0x2_468)]
     pub m_CascadeUpdateLevels: [i32; 6],
 }
 impl ShadowManager {

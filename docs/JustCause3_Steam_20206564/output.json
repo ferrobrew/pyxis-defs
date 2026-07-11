@@ -21922,10 +21922,60 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 15824
+              "size": 56
             },
             "offset": 9264,
-            "size": 15824,
+            "size": 56,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 28,
+              "line": 39
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_CascadeUpdateLevels",
+            "doc": " The per-cascade shadow-map update level, indexed by cascade. A cascade re-fits and re-renders\n only every `2^level` frames (level 0 = every frame); between refreshes its fit is copied\n forward from the previous update. `CalculateUpdatePattern` assigns the levels (the default\n pattern is `{0, 1, 2, 3}` -- the nearest cascade every frame, each further one half as often),\n and [`SetActiveShadowPassCount`](ShadowManager::SetActiveShadowPassCount) reads them each frame,\n gated against a rolling counter, to decide which cascades refresh. This is the mechanism that\n amortises cascade re-renders across frames.",
+            "doc_links": [
+              {
+                "text": "ShadowManager::SetActiveShadowPassCount",
+                "target_kind": "item",
+                "path": "graphics_engine::shadow_manager::ShadowManager",
+                "anchor": "func-SetActiveShadowPassCount"
+              }
+            ],
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "i32"
+              },
+              "size": 6
+            },
+            "offset": 9320,
+            "size": 24,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 28,
+              "line": 39
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_2480",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 15744
+            },
+            "offset": 9344,
+            "size": 15744,
             "alignment": 1,
             "is_base": false,
             "source": {
@@ -21955,7 +22005,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 28,
-              "line": 34
+              "line": 44
             }
           },
           {
@@ -21994,7 +22044,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 28,
-              "line": 41
+              "line": 51
             }
           },
           {
@@ -22030,7 +22080,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 28,
-              "line": 46
+              "line": 56
             }
           },
           {
@@ -22086,7 +22136,49 @@
             "calling_convention": "system",
             "source": {
               "file_index": 28,
-              "line": 55
+              "line": 65
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "SetActiveShadowPassCount",
+            "doc": " Sets the number of active shadow passes (sun cascades plus spot shadows) and rebuilds the\n per-frame cascade update schedule: it refreshes the amortisation pattern (recomputing\n [`m_CascadeUpdateLevels`](ShadowManager::m_CascadeUpdateLevels) on a cascade/spot count change),\n then marks each cascade as either refreshing this frame -- when\n `((1 << m_CascadeUpdateLevels[c]) - 1) & rolling_counter == 0` -- or copying its previous fit\n forward. Called from `CGameStateRun::UpdateShadows` before\n [`UpdateRender`](ShadowManager::UpdateRender).",
+            "doc_links": [
+              {
+                "text": "ShadowManager::m_CascadeUpdateLevels",
+                "target_kind": "item",
+                "path": "graphics_engine::shadow_manager::ShadowManager",
+                "anchor": "field-m_CascadeUpdateLevels"
+              },
+              {
+                "text": "ShadowManager::UpdateRender",
+                "target_kind": "item",
+                "path": "graphics_engine::shadow_manager::ShadowManager",
+                "anchor": "func-UpdateRender"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5370324944
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "count",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "i32"
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 28,
+              "line": 75
             }
           }
         ],
