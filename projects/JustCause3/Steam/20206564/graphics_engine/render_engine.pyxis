@@ -232,6 +232,18 @@ impl RenderEngine {
     #[address(0x140_186_600)]
     pub fn DrawRenderPassRange(&mut self, ctx: *mut HContext_t, setup: *mut HRenderSetup_t, first: RenderPassId, last: RenderPassId);
 
+    /// The pre-pass step: iterates the pre-pass categories (`1..=45` -- terrain-patch prep, the sky
+    /// lighting LUT, planar and environment reflections, cloud shadows, vegetation, the static and
+    /// dynamic sun-shadow cascade atlas, the reflective-shadow passes, the water-simulation compute, and
+    /// the rain occluder) and vtable-dispatches each [`RenderPass`]'s `Draw`, feeding it the render
+    /// context. Called from `HandleDrawThreadTask` before the GBuffer range. Each pass's
+    /// [`m_Enabled`](graphics_engine::render_pass::RenderPassState::m_Enabled) gates whether it draws;
+    /// the pre-pass cameras are the sun / reflection / world-space cameras (own camera, `RenderPass +
+    /// 0x870`), never the per-eye render camera, except terrain-patch prep (`1..=7`), which falls
+    /// through to the render camera.
+    #[address(0x140_186_760)]
+    pub fn PreDraw(&mut self, ctx: *mut HContext_t) -> u64;
+
     /// The GBuffer fill: binds two global textures, then draws the GBuffer pass range (the depth and
     /// velocity prefix, static and dynamic models, and decals).
     #[address(0x140_186_810)]
