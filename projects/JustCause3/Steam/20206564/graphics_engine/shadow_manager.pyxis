@@ -37,13 +37,6 @@ pub type ShadowManager {
     #[address(0x130)]
     pub m_Cascades: [CascadeData; 8],
 
-    /// The base atlas array slice for each frame parity (`m_SliceBase[render_frame_counters.m_FrameIndex
-    /// & 1]`). `CommitRenderPassSettings` points the parity's render passes at this half, and
-    /// `SetGlobalShaderConstants` stages it as the slice the material shaders sample. The two halves hold
-    /// the shadow maps rendered on alternate frames -- the source of the per-parity sampling difference.
-    #[address(0x61F0)]
-    pub m_SliceBase: [u32; 2],
-
     /// The per-cascade shadow-map update level, indexed by cascade. A cascade re-fits and re-renders
     /// only every `2^level` frames (level 0 = every frame); between refreshes its fit is copied
     /// forward from the previous update. `CalculateUpdatePattern` assigns the levels (the default
@@ -53,6 +46,13 @@ pub type ShadowManager {
     /// amortises cascade re-renders across frames.
     #[address(0x2_468)]
     pub m_CascadeUpdateLevels: [i32; 6],
+
+    /// The base atlas array slice for each frame parity (`m_SliceBase[render_frame_counters.m_FrameIndex
+    /// & 1]`). `CommitRenderPassSettings` points the parity's render passes at this half, and
+    /// `SetGlobalShaderConstants` stages it as the slice the material shaders sample. The two halves hold
+    /// the shadow maps rendered on alternate frames -- the source of the per-parity sampling difference.
+    #[address(0x61F0)]
+    pub m_SliceBase: [u32; 2],
 }
 impl ShadowManager {
     /// The global sun-shadow fade factor staged into the shader constants.
