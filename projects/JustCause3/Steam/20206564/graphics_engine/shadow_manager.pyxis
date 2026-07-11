@@ -1,5 +1,6 @@
 use graphics_engine::graphics_engine::RenderContext;
 use graphics_engine::render_pass::RenderPass;
+use graphics_engine::texture::Texture;
 
 /// One cascade's bookkeeping in [`ShadowManager`]: the render passes that draw its atlas slice,
 /// followed by the per-parity fit state.
@@ -24,9 +25,24 @@ pub type ShadowManager {
     #[address(0x4)]
     pub m_Enabled: bool,
 
+    /// The sun-shadow cascade atlas: a single depth `Texture2DArray` whose slices hold every cascade's
+    /// (and the spot shadows') fitted shadow map. Created by [`SetEnabled`](ShadowManager::SetEnabled)
+    /// (`CreateShadowDepthTexture`, one render target per array slice). The atlas is parity double-
+    /// buffered: [`m_SliceBase`](ShadowManager::m_SliceBase) gives the base slice for each parity, so the
+    /// scheduled cascades render into (and the material shaders sample) the parity's half of the array.
+    #[address(0x60)]
+    pub m_AtlasTexture: *mut Texture,
+
     /// The per-cascade slots (passes plus fit bookkeeping).
     #[address(0x130)]
     pub m_Cascades: [CascadeData; 8],
+
+    /// The base atlas array slice for each frame parity (`m_SliceBase[render_frame_counters.m_FrameIndex
+    /// & 1]`). `CommitRenderPassSettings` points the parity's render passes at this half, and
+    /// `SetGlobalShaderConstants` stages it as the slice the material shaders sample. The two halves hold
+    /// the shadow maps rendered on alternate frames -- the source of the per-parity sampling difference.
+    #[address(0x61F0)]
+    pub m_SliceBase: [u32; 2],
 
     /// The per-cascade shadow-map update level, indexed by cascade. A cascade re-fits and re-renders
     /// only every `2^level` frames (level 0 = every frame); between refreshes its fit is copied
