@@ -51,7 +51,7 @@ pub type ShadowManager {
     /// & 1]`). `CommitRenderPassSettings` points the parity's render passes at this half, and
     /// `SetGlobalShaderConstants` stages it as the slice the material shaders sample. The two halves hold
     /// the shadow maps rendered on alternate frames -- the source of the per-parity sampling difference.
-    #[address(0x61F0)]
+    #[address(0x6_1F0)]
     pub m_SliceBase: [u32; 2],
 }
 impl ShadowManager {

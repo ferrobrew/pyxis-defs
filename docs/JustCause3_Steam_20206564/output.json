@@ -21755,7 +21755,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 11
+              "line": 12
             }
           },
           {
@@ -21776,7 +21776,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 4
+              "line": 5
             }
           }
         ],
@@ -21791,7 +21791,7 @@
       },
       "source": {
         "file_index": 28,
-        "line": 7
+        "line": 8
       }
     },
     "graphics_engine::shadow_manager::ShadowManager": {
@@ -21836,7 +21836,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 25
+              "line": 26
             }
           },
           {
@@ -21867,7 +21867,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 25
+              "line": 26
             }
           },
           {
@@ -21880,15 +21880,70 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 299
+              "size": 91
             },
             "offset": 5,
-            "size": 299,
+            "size": 91,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 29
+              "line": 34
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_AtlasTexture",
+            "doc": " The sun-shadow cascade atlas: a single depth `Texture2DArray` whose slices hold every cascade's\n (and the spot shadows') fitted shadow map. Created by [`SetEnabled`](ShadowManager::SetEnabled)\n (`CreateShadowDepthTexture`, one render target per array slice). The atlas is parity double-\n buffered: [`m_SliceBase`](ShadowManager::m_SliceBase) gives the base slice for each parity, so the\n scheduled cascades render into (and the material shaders sample) the parity's half of the array.",
+            "doc_links": [
+              {
+                "text": "ShadowManager::SetEnabled",
+                "target_kind": "item",
+                "path": "graphics_engine::shadow_manager::ShadowManager",
+                "anchor": "func-SetEnabled"
+              },
+              {
+                "text": "ShadowManager::m_SliceBase",
+                "target_kind": "item",
+                "path": "graphics_engine::shadow_manager::ShadowManager",
+                "anchor": "field-m_SliceBase"
+              }
+            ],
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::texture::Texture"
+              }
+            },
+            "offset": 96,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 28,
+              "line": 34
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_68",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 200
+            },
+            "offset": 104,
+            "size": 200,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 28,
+              "line": 38
             }
           },
           {
@@ -21909,7 +21964,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 29
+              "line": 38
             }
           },
           {
@@ -21930,7 +21985,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 39
+              "line": 48
             }
           },
           {
@@ -21959,7 +22014,7 @@
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 39
+              "line": 48
             }
           },
           {
@@ -21972,15 +22027,57 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 15744
+              "size": 15728
             },
             "offset": 9344,
-            "size": 15744,
+            "size": 15728,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 28,
-              "line": 14
+              "line": 55
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_SliceBase",
+            "doc": " The base atlas array slice for each frame parity (`m_SliceBase[render_frame_counters.m_FrameIndex\n & 1]`). `CommitRenderPassSettings` points the parity's render passes at this half, and\n `SetGlobalShaderConstants` stages it as the slice the material shaders sample. The two halves hold\n the shadow maps rendered on alternate frames -- the source of the per-parity sampling difference.",
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u32"
+              },
+              "size": 2
+            },
+            "offset": 25072,
+            "size": 8,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 28,
+              "line": 55
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_61f8",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 8
+            },
+            "offset": 25080,
+            "size": 8,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 28,
+              "line": 15
             }
           }
         ],
@@ -22005,7 +22102,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 28,
-              "line": 44
+              "line": 60
             }
           },
           {
@@ -22044,7 +22141,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 28,
-              "line": 51
+              "line": 67
             }
           },
           {
@@ -22080,7 +22177,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 28,
-              "line": 56
+              "line": 72
             }
           },
           {
@@ -22136,7 +22233,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 28,
-              "line": 65
+              "line": 81
             }
           },
           {
@@ -22178,7 +22275,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 28,
-              "line": 75
+              "line": 91
             }
           }
         ],
@@ -22192,7 +22289,7 @@
       },
       "source": {
         "file_index": 28,
-        "line": 20
+        "line": 21
       }
     },
     "graphics_engine::ssao::SSAOPass": {
