@@ -200,6 +200,63 @@ impl DisplayObjectBase {
     pub fn GetRenderNode(&self) -> *mut TreeNode;
 }
 
+/// A Scaleform AS3 object (the managed payload behind a display-object [`Value::mValue`]): its type
+/// [`m_Traits`](Object::m_Traits) classify it, and for a display object its
+/// [`m_DisplayObject`](Object::m_DisplayObject) is the presentation-side [`DisplayObjectBase`].
+pub type Object {
+    /// The object's type traits (class metadata), used to check it really is a display object
+    /// before reaching [`m_DisplayObject`](Object::m_DisplayObject).
+    #[address(0x28)]
+    pub m_Traits: *mut Traits,
+
+    /// The presentation-side display object, valid once [`m_Traits`](Object::m_Traits) confirm a
+    /// display-object kind.
+    #[address(0x88)]
+    pub m_DisplayObject: *mut DisplayObjectBase,
+}
+
+/// A Scaleform AS3 object's type traits: the class metadata identifying an [`Object`]'s kind. The
+/// display-object type-id range and flag values are hard-coded magic in the engine too (the same
+/// constants appear inline in `Value::ObjectInterface::GetDisplayInfo`); their deeper AS3-builtin-type
+/// meaning is not recoverable from the stripped Scaleform code, so they are named here by role.
+#[min_size(0x80)]
+pub type Traits {
+    /// The first [`m_TypeId`](Traits::m_TypeId) of the display-object AS3 builtin-class range.
+    pub const DISPLAY_OBJECT_TYPE_ID_FIRST: u32 = 24,
+    /// The number of type ids in the display-object range (so display objects are
+    /// `FIRST..FIRST + COUNT`).
+    pub const DISPLAY_OBJECT_TYPE_ID_COUNT: u32 = 12,
+    /// A [`m_Flags`](Traits::m_Flags) bit marking a kind excluded from the display-object check.
+    pub const FLAG_NON_DISPLAY_OBJECT: u8 = 0x20,
+
+    /// Trait flags; see [`FLAG_NON_DISPLAY_OBJECT`](Traits::FLAG_NON_DISPLAY_OBJECT).
+    #[address(0x70)]
+    pub m_Flags: u8,
+
+    /// The traits' AS3 builtin-class type id; see [`is_display_object`](Traits::is_display_object).
+    #[address(0x78)]
+    pub m_TypeId: u32,
+}
+#[cfg(backend = "rust")]
+impl Traits {
+    /// Whether these traits identify a display object -- the guard `GetDisplayInfo` performs before
+    /// reaching an [`Object`](Object)'s [`DisplayObjectBase`](DisplayObjectBase): a
+    /// [`m_TypeId`](Traits::m_TypeId) in the display-object range and without the
+    /// [`FLAG_NON_DISPLAY_OBJECT`](Traits::FLAG_NON_DISPLAY_OBJECT) flag.
+    #[external_body]
+    pub fn is_display_object(&self) -> bool;
+}
+
+#[cfg(backend = "rust")]
+epilogue for Traits r#"
+    impl Traits {
+        pub fn is_display_object(&self) -> bool {
+            self.m_TypeId.wrapping_sub(Traits::DISPLAY_OBJECT_TYPE_ID_FIRST) < Traits::DISPLAY_OBJECT_TYPE_ID_COUNT
+                && self.m_Flags & Traits::FLAG_NON_DISPLAY_OBJECT == 0
+        }
+    }
+"#;
+
 /// A Scaleform `GFx::Viewport` (a `Render::Viewport` plus `Scale` and `AspectRatio`): the
 /// description [`MovieImpl::SetViewportImpl`] copies into [`MovieImpl::Viewport`]. `BufferWidth`
 /// and `BufferHeight` describe the whole output surface; `Left`/`Top`/`Width`/`Height` are the
@@ -739,6 +796,9 @@ pub type Value {
     /// The managed bit: set on values owned by the movie (which must be released through the
     /// object interface, never constructed by hand).
     pub const VTC_MANAGED_BIT: u32 = 0x40,
+    /// The mask isolating the base `VT_*` value-type tag in [`Type`](Value::Type) from the `VTC_*`
+    /// control bits (the game compares `Type & VT_TYPE_MASK` against the `VT_*` tags).
+    pub const VT_TYPE_MASK: u32 = 0x8F,
 
     /// `ListNode<Value>::pPrev`; null for unmanaged values.
     pub pPrev: *mut Value,
@@ -756,6 +816,48 @@ pub type Value {
     /// Auxiliary data (e.g. the closure's user pointer).
     pub DataAux: u64,
 }
+#[cfg(backend = "rust")]
+impl Value {
+    /// The base `VT_*` value-type tag, with the `VTC_*` control bits masked off. The `as_*` accessors
+    /// compare it against the `VT_*` tags.
+    #[external_body]
+    pub fn value_type(&self) -> u32;
+}
+
+#[cfg(backend = "rust")]
+epilogue for Value r#"
+    #[allow(dead_code)]
+    impl Value {
+        pub fn value_type(&self) -> u32 {
+            self.Type & Value::VT_TYPE_MASK
+        }
+
+        /// The boolean payload, or `None` if this is not a boolean value.
+        pub fn as_bool(&self) -> Option<bool> {
+            (self.value_type() == Value::VT_BOOLEAN).then_some(self.mValue & 0xFF != 0)
+        }
+
+        /// The 32-bit integer payload, or `None` if this is not an int value.
+        pub fn as_int(&self) -> Option<i32> {
+            (self.value_type() == Value::VT_INT).then_some(self.mValue as i32)
+        }
+
+        /// The `f64` payload, or `None` if this is not a number value.
+        pub fn as_number(&self) -> Option<f64> {
+            (self.value_type() == Value::VT_NUMBER).then_some(f64::from_bits(self.mValue))
+        }
+
+        /// The NUL-terminated string payload, or `None` if this is not a string value.
+        pub fn as_string(&self) -> Option<*const ::std::ffi::c_char> {
+            (self.value_type() == Value::VT_STRING).then_some(self.mValue as *const ::std::ffi::c_char)
+        }
+
+        /// The managed display object payload, or `None` if this is not a display-object value.
+        pub fn as_display_object(&self) -> Option<*mut Object> {
+            (self.value_type() == Value::VT_DISPLAY_OBJECT).then_some(self.mValue as *mut Object)
+        }
+    }
+"#;
 
 /// The `GFx::Value::ObjectInterface`: the dispatcher for operations on managed values (display
 /// objects, arrays). One per movie ([`MovieImpl::pObjectInterface`]); a managed [`Value`] carries
@@ -844,9 +946,8 @@ pub type AmpMovieObjectDesc {
     #[base]
     pub ref_count_impl: RefCountImpl,
 
-    /// The clip's instance name, or `"Unnamed"`: a `Scaleform::String`, i.e. a pointer to its
-    /// `DataDesc` header (`Size: u64`, `RefCount: i32`), with the NUL-terminated characters
-    /// inline at `+0xC`.
+    /// The clip's instance name, or `"Unnamed"`: a `Scaleform::String`, i.e. a pointer to a
+    /// [`StringDataDesc`] with heap flags packed into the pointer's low 3 bits (mask with `& !7`).
     #[address(0x10)]
     pub name: *const u8,
 
@@ -863,6 +964,46 @@ pub type AmpMovieObjectDesc {
     #[address(0x28)]
     pub child_capacity: u64,
 }
+
+/// The heap data descriptor behind a `Scaleform::String`: an 8-byte allocated size and a 4-byte
+/// refcount, followed by the NUL-terminated character data. Reached from the string's pointer after
+/// masking off the heap flags in its low 3 bits (`& !7`).
+#[min_size(0x10)]
+pub type StringDataDesc {
+    /// The first character of the NUL-terminated string data.
+    #[address(0xC)]
+    pub m_Data: c_char,
+}
+#[cfg(backend = "rust")]
+impl StringDataDesc {
+    /// A pointer to the NUL-terminated character data.
+    #[external_body]
+    pub fn as_ptr(&self) -> *const c_char;
+}
+
+#[cfg(backend = "rust")]
+epilogue for StringDataDesc r#"
+    impl StringDataDesc {
+        pub fn as_ptr(&self) -> *const ::std::ffi::c_char {
+            ::std::ptr::addr_of!(self.m_Data)
+        }
+    }
+"#;
+
+#[cfg(backend = "rust")]
+epilogue for AmpMovieObjectDesc r#"
+    #[allow(dead_code)]
+    impl AmpMovieObjectDesc {
+        /// The instance name's [`StringDataDesc`], with the heap flags masked off the string pointer's
+        /// low 3 bits, or `None` if the name is null.
+        ///
+        /// # Safety
+        /// The descriptor must outlive the borrow (true while the node is alive).
+        pub unsafe fn name_data(&self) -> Option<&StringDataDesc> {
+            unsafe { ((self.name as usize & !7) as *const StringDataDesc).as_ref() }
+        }
+    }
+"#;
 
 /// Static clip names placed on the root timeline of `ui/hud.gfx` via PlaceObject2 tags. The root
 /// movie (`ui/root.gfx`) creates its clips entirely through ActionScript, so it has no static

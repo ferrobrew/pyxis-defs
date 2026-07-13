@@ -137,7 +137,13 @@ impl PlayerDamageEffect {
 
 /// The sun halo. [`PreApply`](SunHaloEffect::PreApply) prepares it and sets the ready flag;
 /// [`Apply`](SunHaloEffect::Apply) composites it.
-pub type SunHaloEffect;
+#[min_size(0x118)]
+pub type SunHaloEffect {
+    /// The ready flag: [`PreApply`](SunHaloEffect::PreApply) sets it when the halo is prepared, and
+    /// [`Apply`](SunHaloEffect::Apply) early-outs when it is clear.
+    #[address(0x114)]
+    pub m_Ready: bool,
+}
 impl SunHaloEffect {
     #[address(0x140_118_450)]
     pub fn PreApply(&mut self, ctx: *mut HContext_t, a3: *mut void, mgr: *mut PostEffectsManager) -> u64;

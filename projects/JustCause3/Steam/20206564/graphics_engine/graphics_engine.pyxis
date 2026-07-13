@@ -462,6 +462,17 @@ pub type RenderFrameCounters {
 #[address(0x142_D3A_6AC)]
 pub extern render_frame_counters: RenderFrameCounters;
 
+/// The per-camera beam-frustum-based-culling parameters cached by
+/// [`GetBFBCFrustumParamsForCameraAndTime`](OccluderCollectionManager::GetBFBCFrustumParamsForCameraAndTime),
+/// pointed at by its `out_params`.
+#[min_size(0x1290)]
+pub type BFBCFrustumCullParameters {
+    /// The number of active cull frustums: the camera frustum plus one per active occluder
+    /// (`occluderCount + 1`), with up to 32 occluder slots (so `1..=33`; `1` = camera frustum only).
+    #[address(0x1_280)]
+    pub m_FrustumCount: u32,
+}
+
 /// The scene occluder / beam-frustum-based-culling manager. Its cull frustum is built (and cached
 /// per camera and time) from a camera's `m_View` and `m_ProjectionF`, and every scene-geometry,
 /// terrain, streaming, and occlusion consumer reads it through
@@ -471,7 +482,8 @@ impl OccluderCollectionManager {
     /// Build or fetch the cached BFBC cull-frustum parameters for `camera` at `time`. The frustum is
     /// derived from `camera.m_View` combined with `camera.m_ProjectionF`, so overwriting the camera's
     /// `m_ProjectionF` before this runs widens the resulting cull frustum without touching the view.
-    /// `out_params` and `out_state` receive pointers into the manager's per-camera cache slot.
+    /// `out_params` and `out_state` receive pointers into the manager's per-camera cache slot;
+    /// `*out_params` is the [`BFBCFrustumCullParameters`].
     #[address(0x140_0D6_8B0)]
-    pub fn GetBFBCFrustumParamsForCameraAndTime(&mut self, camera: *const Camera, time: i32, out_params: *mut u64, out_state: *mut u64);
+    pub fn GetBFBCFrustumParamsForCameraAndTime(&mut self, camera: *const Camera, time: i32, out_params: *mut *mut BFBCFrustumCullParameters, out_state: *mut u64);
 }

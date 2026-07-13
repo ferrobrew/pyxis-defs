@@ -22,6 +22,14 @@ pub bitflags AimState: u8 {
     m_WasAiming = 0b0010_0000,
 }
 
+/// Per-character LOD/update-gating flags. Checked before the SIM-phase animation and IK work:
+/// [`UpdatePassFinalizePose_Parallel`](Character::UpdatePassFinalizePose_Parallel) skips the
+/// HumanIK solve when [`REDUCED_LOD`](CharacterLodFlags::REDUCED_LOD) is set. Only that bit is mapped.
+#[copyable]
+pub bitflags CharacterLodFlags: u8 {
+    REDUCED_LOD = 0b0000_0010,
+}
+
 #[size(0x3540)]
 pub type Character {
     /// The character's embedded HumanIK solver. Driven each frame in
@@ -45,6 +53,10 @@ pub type Character {
 
     #[address(0x2_62A)]
     pub m_IsLocalCharacter: bool,
+
+    /// Per-character LOD/update-gating flags; see [`CharacterLodFlags`].
+    #[address(0x2_78C)]
+    pub m_LodFlags: CharacterLodFlags,
 
     #[address(0x2_7F0)]
     pub m_WorldMatrixT0: Matrix4,
@@ -208,6 +220,10 @@ pub type Joint {
 pub extern Character_GoreEnabled: bool;
 #[address(0x142_F2F_300)]
 pub extern Character_EnableLocoStrafing: bool;
+/// The global HumanIK enable (`CCharacter::m_EnableHIK`): the engine gates the whole IK pass in
+/// [`UpdatePassFinalizePose_Parallel`](Character::UpdatePassFinalizePose_Parallel) on it.
+#[address(0x142_D62_1C8)]
+pub extern Character_EnableHIK: bool;
 
 pub enum SafeBoneIndex: u32 {
     REFERENCE = 0x8EB2FD7C,
