@@ -10,7 +10,6 @@ pub type SharedPtr<T> {
     #[address(0x8)]
     pub pn: *mut void,
 }
-
 #[cfg(any(backend = "rust", backend = "cpp"))]
 impl<T> SharedPtr<T> {
     /// `true` if the owned pointer is non-null.
