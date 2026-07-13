@@ -1,0 +1,68 @@
+use camera::camera::Camera;
+use types::math::Vector3;
+
+/// The opaque BFBC context: the per-system beam-frustum-based-culling state that `BFBCProcess` reads
+/// and writes. Its layout is internal to the BFBC backend and not mapped here.
+pub type SBFBCContext;
+
+/// The opaque BFBC process parameter block: the per-camera cull-frustum parameters produced by
+/// [`GetBFBCFrustumParamsForCameraAndTime`](graphics_engine::graphics_engine::OccluderCollectionManager::GetBFBCFrustumParamsForCameraAndTime)
+/// and consumed by `BFBCProcess`. See
+/// [`BFBCFrustumCullParameters`](graphics_engine::graphics_engine::BFBCFrustumCullParameters) for the
+/// one mapped field (`m_FrustumCount`).
+pub type SBFBCProcessParameter;
+
+/// The opaque BFBC process state: the per-camera cache slot handle returned alongside the parameter
+/// block.
+pub type SBFBCProcessState;
+
+/// The spawn system: manages streaming (de)spawn of characters and vehicles around the player. Each
+/// frame, [`Update`](SpawnSystem::Update) builds a BFBC cull frustum from the camera manager's active
+/// camera and uses it as a "don't (de)spawn while visible" gate in `CSpawnFactoryImpl::CheckInternal`, so
+/// objects are not spawned or despawned inside the player's view. Its budgets are characters and
+/// vehicles, so it governs NPC/vehicle (de)spawns near the view edge, not buildings.
+#[singleton(0x142_F18_998)]
+pub type SpawnSystem {
+    /// The BFBC cull context the spawn system's visibility gate runs against.
+    #[address(0x168)]
+    pub m_SpawnBFBC: *mut SBFBCContext,
+
+    /// The BFBC cull-frustum parameters, populated each frame by
+    /// [`GetBFBCFrustumParamsForCameraAndTime`](graphics_engine::graphics_engine::OccluderCollectionManager::GetBFBCFrustumParamsForCameraAndTime)
+    /// against the active camera.
+    #[address(0x170)]
+    pub m_SpawnBFBCParams: *const SBFBCProcessParameter,
+
+    /// The BFBC cache-slot state handle, populated alongside the parameters.
+    #[address(0x178)]
+    pub m_SpawnBFBCState: *mut SBFBCProcessState,
+
+    /// The center position the spawn system streams around, set by
+    /// [`SetCenterPosition`](SpawnSystem::SetCenterPosition).
+    #[address(0x194)]
+    pub m_CenterPos: Vector3,
+
+    /// The view position for the spawn visibility gate, set by
+    /// [`SetCenterPosition`](SpawnSystem::SetCenterPosition).
+    #[address(0x1A0)]
+    pub m_ViewPos: Vector3,
+
+    /// The view direction for the spawn visibility gate, set by
+    /// [`SetCenterPosition`](SpawnSystem::SetCenterPosition).
+    #[address(0x1AC)]
+    pub m_ViewDir: Vector3,
+}
+impl SpawnSystem {
+    /// The per-frame spawn update: walks every resource definition, evaluates despawn ranks against the
+    /// view position, and at its tail builds a BFBC cull frustum from the camera manager's active camera
+    /// ([`CameraManager::m_ActiveCamera`](camera::camera_manager::CameraManager::m_ActiveCamera)) via
+    /// [`GetBFBCFrustumParamsForCameraAndTime`](graphics_engine::graphics_engine::OccluderCollectionManager::GetBFBCFrustumParamsForCameraAndTime),
+    /// storing the result in [`m_SpawnBFBCParams`](SpawnSystem::m_SpawnBFBCParams) and
+    /// [`m_SpawnBFBCState`](SpawnSystem::m_SpawnBFBCState) for the factory's visibility gate.
+    #[address(0x140_EFE_E90)]
+    pub fn Update(&mut self);
+
+    /// Sets the spawn center, view position, and view direction used by the visibility gate.
+    #[address(0x141_276_3B0)]
+    pub fn SetCenterPosition(&mut self, centerpos: *const Vector3, viewpos: *const Vector3, viewdir: *const Vector3);
+}
