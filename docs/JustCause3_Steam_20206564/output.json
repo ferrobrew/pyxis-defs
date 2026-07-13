@@ -7331,7 +7331,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 149
+              "line": 161
             }
           },
           {
@@ -7360,7 +7360,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 149
+              "line": 161
             }
           },
           {
@@ -7381,7 +7381,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 152
+              "line": 164
             }
           },
           {
@@ -7401,7 +7401,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 152
+              "line": 164
             }
           },
           {
@@ -7422,7 +7422,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 159
+              "line": 171
             }
           },
           {
@@ -7443,7 +7443,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 159
+              "line": 171
             }
           }
         ],
@@ -7493,7 +7493,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 167
+              "line": 179
             }
           }
         ],
@@ -7512,7 +7512,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 133
+        "line": 145
       }
     },
     "character::character::AnimatedModel::BODY_MODEL_SLOT": {
@@ -7543,7 +7543,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 141
+        "line": 153
       }
     },
     "character::character::AnimatedModel::MODEL_INSTANCE_RBI_INFO_OFFSET": {
@@ -7566,7 +7566,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 146
+        "line": 158
       }
     },
     "character::character::AnimatedModel::MODEL_INSTANCE_SLOTS": {
@@ -7597,7 +7597,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 136
+        "line": 148
       }
     },
     "character::character::AnimationController": {
@@ -7639,7 +7639,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 173
+              "line": 185
             }
           },
           {
@@ -7678,7 +7678,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 176
+              "line": 188
             }
           },
           {
@@ -7717,7 +7717,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 179
+              "line": 191
             }
           },
           {
@@ -7756,7 +7756,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 182
+              "line": 194
             }
           },
           {
@@ -7792,7 +7792,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 188
+              "line": 200
             }
           },
           {
@@ -7828,7 +7828,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 195
+              "line": 207
             }
           }
         ],
@@ -7842,7 +7842,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 170
+        "line": 182
       }
     },
     "character::character::Character": {
@@ -7873,7 +7873,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 32
+              "line": 40
             }
           },
           {
@@ -7903,7 +7903,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 32
+              "line": 40
             }
           },
           {
@@ -7920,7 +7920,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 35
+              "line": 43
             }
           },
           {
@@ -7941,7 +7941,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 40
+              "line": 48
             }
           },
           {
@@ -7965,7 +7965,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 40
+              "line": 48
             }
           },
           {
@@ -7986,7 +7986,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 44
+              "line": 52
             }
           },
           {
@@ -8010,7 +8010,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 44
+              "line": 52
             }
           },
           {
@@ -8031,7 +8031,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 47
+              "line": 55
             }
           },
           {
@@ -8048,7 +8048,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 47
+              "line": 55
             }
           },
           {
@@ -8061,15 +8061,60 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 453
+              "size": 353
             },
             "offset": 9771,
-            "size": 453,
+            "size": 353,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 50
+              "line": 59
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_LodFlags",
+            "doc": " Per-character LOD/update-gating flags; see [`CharacterLodFlags`].",
+            "doc_links": [
+              {
+                "text": "CharacterLodFlags",
+                "target_kind": "item",
+                "path": "character::character::CharacterLodFlags"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "character::character::CharacterLodFlags"
+            },
+            "offset": 10124,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 14,
+              "line": 59
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_278d",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 99
+            },
+            "offset": 10125,
+            "size": 99,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 14,
+              "line": 62
             }
           },
           {
@@ -8086,7 +8131,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 50
+              "line": 62
             }
           },
           {
@@ -8103,7 +8148,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 51
+              "line": 63
             }
           },
           {
@@ -8124,7 +8169,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 59
+              "line": 71
             }
           },
           {
@@ -8155,7 +8200,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 59
+              "line": 71
             }
           },
           {
@@ -8176,7 +8221,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 69
+              "line": 81
             }
           },
           {
@@ -8206,7 +8251,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 69
+              "line": 81
             }
           },
           {
@@ -8227,7 +8272,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 25
+              "line": 33
             }
           }
         ],
@@ -8251,7 +8296,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 73
+              "line": 85
             }
           },
           {
@@ -8274,7 +8319,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 79
+              "line": 91
             }
           },
           {
@@ -8311,7 +8356,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 82
+              "line": 94
             }
           },
           {
@@ -8342,7 +8387,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 85
+              "line": 97
             }
           },
           {
@@ -8381,7 +8426,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 88
+              "line": 100
             }
           },
           {
@@ -8432,7 +8477,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 97
+              "line": 109
             }
           },
           {
@@ -8468,7 +8513,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 103
+              "line": 115
             }
           },
           {
@@ -8522,7 +8567,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 113
+              "line": 125
             }
           },
           {
@@ -8545,7 +8590,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 118
+              "line": 130
             }
           },
           {
@@ -8568,7 +8613,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 123
+              "line": 135
             }
           },
           {
@@ -8599,7 +8644,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 14,
-              "line": 129
+              "line": 141
             }
           }
         ],
@@ -8613,7 +8658,84 @@
       },
       "source": {
         "file_index": 14,
-        "line": 26
+        "line": 34
+      }
+    },
+    "character::character::CharacterLodFlags": {
+      "path": "character::character::CharacterLodFlags",
+      "visibility": "public",
+      "size": 1,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "bitflags",
+        "doc": " Per-character LOD/update-gating flags. Checked before the SIM-phase animation and IK work:\n [`UpdatePassFinalizePose_Parallel`](Character::UpdatePassFinalizePose_Parallel) skips the\n HumanIK solve when [`REDUCED_LOD`](CharacterLodFlags::REDUCED_LOD) is set. Only that bit is mapped.",
+        "doc_links": [
+          {
+            "text": "Character::UpdatePassFinalizePose_Parallel",
+            "target_kind": "item",
+            "path": "character::character::Character",
+            "anchor": "func-UpdatePassFinalizePose_Parallel"
+          },
+          {
+            "text": "CharacterLodFlags::REDUCED_LOD",
+            "target_kind": "item",
+            "path": "character::character::CharacterLodFlags",
+            "anchor": "flag-REDUCED_LOD"
+          }
+        ],
+        "underlying_type": {
+          "type": "raw",
+          "path": "u8"
+        },
+        "flags": [
+          {
+            "name": "REDUCED_LOD",
+            "value": 2,
+            "doc": null,
+            "source": {
+              "file_index": 14,
+              "line": 30
+            }
+          }
+        ],
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "default": null,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 14,
+        "line": 29
+      }
+    },
+    "character::character::Character_EnableHIK": {
+      "path": "character::character::Character_EnableHIK",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": " The global HumanIK enable (`CCharacter::m_EnableHIK`): the engine gates the whole IK pass in\n [`UpdatePassFinalizePose_Parallel`](Character::UpdatePassFinalizePose_Parallel) on it.",
+        "doc_links": [
+          {
+            "text": "Character::UpdatePassFinalizePose_Parallel",
+            "target_kind": "item",
+            "path": "character::character::Character",
+            "anchor": "func-UpdatePassFinalizePose_Parallel"
+          }
+        ],
+        "value_type": {
+          "type": "raw",
+          "path": "bool"
+        },
+        "address": 5416296904
+      },
+      "source": {
+        "file_index": 14,
+        "line": 226
       }
     },
     "character::character::Character_EnableLocoStrafing": {
@@ -8633,7 +8755,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 210
+        "line": 222
       }
     },
     "character::character::Character_GoreEnabled": {
@@ -8653,7 +8775,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 208
+        "line": 220
       }
     },
     "character::character::Joint": {
@@ -8680,7 +8802,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 200
+              "line": 212
             }
           },
           {
@@ -8697,7 +8819,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 201
+              "line": 213
             }
           },
           {
@@ -8714,7 +8836,7 @@
             "is_base": false,
             "source": {
               "file_index": 14,
-              "line": 202
+              "line": 214
             }
           }
         ],
@@ -8729,7 +8851,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 199
+        "line": 211
       }
     },
     "character::character::SafeBoneIndex": {
@@ -8752,7 +8874,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 213
+              "line": 229
             }
           },
           {
@@ -8761,7 +8883,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 214
+              "line": 230
             }
           },
           {
@@ -8770,7 +8892,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 215
+              "line": 231
             }
           },
           {
@@ -8779,7 +8901,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 216
+              "line": 232
             }
           },
           {
@@ -8788,7 +8910,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 217
+              "line": 233
             }
           },
           {
@@ -8797,7 +8919,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 218
+              "line": 234
             }
           },
           {
@@ -8806,7 +8928,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 219
+              "line": 235
             }
           },
           {
@@ -8815,7 +8937,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 220
+              "line": 236
             }
           },
           {
@@ -8824,7 +8946,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 221
+              "line": 237
             }
           },
           {
@@ -8833,7 +8955,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 222
+              "line": 238
             }
           },
           {
@@ -8842,7 +8964,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 223
+              "line": 239
             }
           },
           {
@@ -8851,7 +8973,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 224
+              "line": 240
             }
           },
           {
@@ -8860,7 +8982,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 225
+              "line": 241
             }
           },
           {
@@ -8869,7 +8991,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 226
+              "line": 242
             }
           },
           {
@@ -8878,7 +9000,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 227
+              "line": 243
             }
           },
           {
@@ -8887,7 +9009,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 228
+              "line": 244
             }
           },
           {
@@ -8896,7 +9018,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 229
+              "line": 245
             }
           },
           {
@@ -8905,7 +9027,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 230
+              "line": 246
             }
           },
           {
@@ -8914,7 +9036,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 231
+              "line": 247
             }
           },
           {
@@ -8923,7 +9045,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 232
+              "line": 248
             }
           },
           {
@@ -8932,7 +9054,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 233
+              "line": 249
             }
           },
           {
@@ -8941,7 +9063,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 234
+              "line": 250
             }
           },
           {
@@ -8950,7 +9072,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 235
+              "line": 251
             }
           },
           {
@@ -8959,7 +9081,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 236
+              "line": 252
             }
           },
           {
@@ -8968,7 +9090,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 237
+              "line": 253
             }
           },
           {
@@ -8977,7 +9099,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 238
+              "line": 254
             }
           },
           {
@@ -8986,7 +9108,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 239
+              "line": 255
             }
           },
           {
@@ -8995,7 +9117,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 240
+              "line": 256
             }
           },
           {
@@ -9004,7 +9126,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 241
+              "line": 257
             }
           },
           {
@@ -9013,7 +9135,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 242
+              "line": 258
             }
           },
           {
@@ -9022,7 +9144,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 243
+              "line": 259
             }
           },
           {
@@ -9031,7 +9153,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 244
+              "line": 260
             }
           },
           {
@@ -9040,7 +9162,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 245
+              "line": 261
             }
           },
           {
@@ -9049,7 +9171,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 246
+              "line": 262
             }
           },
           {
@@ -9058,7 +9180,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 247
+              "line": 263
             }
           },
           {
@@ -9067,7 +9189,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 248
+              "line": 264
             }
           },
           {
@@ -9076,7 +9198,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 249
+              "line": 265
             }
           },
           {
@@ -9085,7 +9207,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 250
+              "line": 266
             }
           },
           {
@@ -9094,7 +9216,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 251
+              "line": 267
             }
           },
           {
@@ -9103,7 +9225,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 252
+              "line": 268
             }
           },
           {
@@ -9112,7 +9234,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 253
+              "line": 269
             }
           },
           {
@@ -9121,7 +9243,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 254
+              "line": 270
             }
           },
           {
@@ -9130,7 +9252,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 255
+              "line": 271
             }
           },
           {
@@ -9139,7 +9261,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 256
+              "line": 272
             }
           },
           {
@@ -9148,7 +9270,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 257
+              "line": 273
             }
           },
           {
@@ -9157,7 +9279,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 258
+              "line": 274
             }
           },
           {
@@ -9166,7 +9288,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 259
+              "line": 275
             }
           },
           {
@@ -9175,7 +9297,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 260
+              "line": 276
             }
           },
           {
@@ -9184,7 +9306,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 261
+              "line": 277
             }
           },
           {
@@ -9193,7 +9315,7 @@
             "doc": null,
             "source": {
               "file_index": 14,
-              "line": 262
+              "line": 278
             }
           }
         ],
@@ -9206,7 +9328,7 @@
       },
       "source": {
         "file_index": 14,
-        "line": 212
+        "line": 228
       }
     },
     "clock::Clock": {
@@ -13015,6 +13137,98 @@
         "line": 15
       }
     },
+    "graphics_engine::graphics_engine::BFBCFrustumCullParameters": {
+      "path": "graphics_engine::graphics_engine::BFBCFrustumCullParameters",
+      "visibility": "public",
+      "size": 4752,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " The per-camera beam-frustum-based-culling parameters cached by\n [`GetBFBCFrustumParamsForCameraAndTime`](OccluderCollectionManager::GetBFBCFrustumParamsForCameraAndTime),\n pointed at by its `out_params`.",
+        "doc_links": [
+          {
+            "text": "OccluderCollectionManager::GetBFBCFrustumParamsForCameraAndTime",
+            "target_kind": "item",
+            "path": "graphics_engine::graphics_engine::OccluderCollectionManager",
+            "anchor": "func-GetBFBCFrustumParamsForCameraAndTime"
+          }
+        ],
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 4736
+            },
+            "offset": 0,
+            "size": 4736,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 23,
+              "line": 473
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_FrustumCount",
+            "doc": " The number of active cull frustums: the camera frustum plus one per active occluder\n (`occluderCount + 1`), with up to 32 occluder slots (so `1..=33`; `1` = camera frustum only).",
+            "type_ref": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "offset": 4736,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 23,
+              "line": 473
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_1284",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 12
+            },
+            "offset": 4740,
+            "size": 12,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 23,
+              "line": 465
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 23,
+        "line": 469
+      }
+    },
     "graphics_engine::graphics_engine::D3D11Viewport": {
       "path": "graphics_engine::graphics_engine::D3D11Viewport",
       "visibility": "public",
@@ -15569,7 +15783,14 @@
           {
             "visibility": "public",
             "name": "GetBFBCFrustumParamsForCameraAndTime",
-            "doc": " Build or fetch the cached BFBC cull-frustum parameters for `camera` at `time`. The frustum is\n derived from `camera.m_View` combined with `camera.m_ProjectionF`, so overwriting the camera's\n `m_ProjectionF` before this runs widens the resulting cull frustum without touching the view.\n `out_params` and `out_state` receive pointers into the manager's per-camera cache slot.",
+            "doc": " Build or fetch the cached BFBC cull-frustum parameters for `camera` at `time`. The frustum is\n derived from `camera.m_View` combined with `camera.m_ProjectionF`, so overwriting the camera's\n `m_ProjectionF` before this runs widens the resulting cull frustum without touching the view.\n `out_params` and `out_state` receive pointers into the manager's per-camera cache slot;\n `*out_params` is the [`BFBCFrustumCullParameters`].",
+            "doc_links": [
+              {
+                "text": "BFBCFrustumCullParameters",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::BFBCFrustumCullParameters"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5369587888
@@ -15603,8 +15824,11 @@
                 "type_ref": {
                   "type": "mut_pointer",
                   "inner": {
-                    "type": "raw",
-                    "path": "u64"
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "graphics_engine::graphics_engine::BFBCFrustumCullParameters"
+                    }
                   }
                 }
               },
@@ -15624,7 +15848,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 23,
-              "line": 476
+              "line": 488
             }
           }
         ],
@@ -15638,7 +15862,7 @@
       },
       "source": {
         "file_index": 23,
-        "line": 469
+        "line": 480
       }
     },
     "graphics_engine::graphics_engine::RenderContext": {
@@ -16390,7 +16614,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 154
+              "line": 160
             }
           },
           {
@@ -16407,7 +16631,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 154
+              "line": 160
             }
           },
           {
@@ -16428,7 +16652,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 149
+              "line": 155
             }
           }
         ],
@@ -16497,7 +16721,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 25,
-              "line": 159
+              "line": 165
             }
           },
           {
@@ -16552,7 +16776,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 25,
-              "line": 164
+              "line": 170
             }
           },
           {
@@ -16599,7 +16823,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 25,
-              "line": 169
+              "line": 175
             }
           }
         ],
@@ -16613,7 +16837,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 152
+        "line": 158
       }
     },
     "graphics_engine::post_effects::BlurEffect": {
@@ -17939,7 +18163,7 @@
     "graphics_engine::post_effects::SunHaloEffect": {
       "path": "graphics_engine::post_effects::SunHaloEffect",
       "visibility": "public",
-      "size": 0,
+      "size": 280,
       "alignment": 8,
       "category": "defined",
       "kind": {
@@ -17959,7 +18183,81 @@
             "anchor": "func-Apply"
           }
         ],
-        "fields": [],
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 276
+            },
+            "offset": 0,
+            "size": 276,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 25,
+              "line": 145
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Ready",
+            "doc": " The ready flag: [`PreApply`](SunHaloEffect::PreApply) sets it when the halo is prepared, and\n [`Apply`](SunHaloEffect::Apply) early-outs when it is clear.",
+            "doc_links": [
+              {
+                "text": "SunHaloEffect::PreApply",
+                "target_kind": "item",
+                "path": "graphics_engine::post_effects::SunHaloEffect",
+                "anchor": "func-PreApply"
+              },
+              {
+                "text": "SunHaloEffect::Apply",
+                "target_kind": "item",
+                "path": "graphics_engine::post_effects::SunHaloEffect",
+                "anchor": "func-Apply"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 276,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 25,
+              "line": 145
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_115",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 3
+            },
+            "offset": 277,
+            "size": 3,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 25,
+              "line": 138
+            }
+          }
+        ],
         "associated_functions": [
           {
             "visibility": "public",
@@ -18014,7 +18312,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 25,
-              "line": 143
+              "line": 149
             }
           },
           {
@@ -18048,7 +18346,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 25,
-              "line": 146
+              "line": 152
             }
           }
         ],
@@ -18062,7 +18360,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 140
+        "line": 141
       }
     },
     "graphics_engine::render_block::Matrix3x4": {
@@ -29241,7 +29539,7 @@
             },
             "source": {
               "file_index": 39,
-              "line": 18
+              "line": 17
             }
           }
         ],
@@ -30044,13 +30342,20 @@
             "is_base": true,
             "source": {
               "file_index": 44,
-              "line": 845
+              "line": 947
             }
           },
           {
             "visibility": "public",
             "name": "name",
-            "doc": " The clip's instance name, or `\"Unnamed\"`: a `Scaleform::String`, i.e. a pointer to its\n `DataDesc` header (`Size: u64`, `RefCount: i32`), with the NUL-terminated characters\n inline at `+0xC`.",
+            "doc": " The clip's instance name, or `\"Unnamed\"`: a `Scaleform::String`, i.e. a pointer to a\n [`StringDataDesc`] with heap flags packed into the pointer's low 3 bits (mask with `& !7`).",
+            "doc_links": [
+              {
+                "text": "StringDataDesc",
+                "target_kind": "item",
+                "path": "ui::scaleform::StringDataDesc"
+              }
+            ],
             "type_ref": {
               "type": "const_pointer",
               "inner": {
@@ -30064,7 +30369,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 851
+              "line": 952
             }
           },
           {
@@ -30087,7 +30392,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 856
+              "line": 957
             }
           },
           {
@@ -30112,7 +30417,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 860
+              "line": 961
             }
           },
           {
@@ -30137,7 +30442,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 864
+              "line": 965
             }
           }
         ],
@@ -30226,7 +30531,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 843
+        "line": 945
       }
     },
     "ui::scaleform::DisplayHandle": {
@@ -30272,7 +30577,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 319
+              "line": 376
             }
           }
         ],
@@ -30287,7 +30592,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 315
+        "line": 372
       }
     },
     "ui::scaleform::DisplayInfo": {
@@ -30334,7 +30639,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 794
+              "line": 896
             }
           },
           {
@@ -30351,7 +30656,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 795
+              "line": 897
             }
           },
           {
@@ -30368,7 +30673,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 796
+              "line": 898
             }
           },
           {
@@ -30385,7 +30690,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 797
+              "line": 899
             }
           },
           {
@@ -30402,7 +30707,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 798
+              "line": 900
             }
           },
           {
@@ -30419,7 +30724,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 799
+              "line": 901
             }
           },
           {
@@ -30436,7 +30741,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 800
+              "line": 902
             }
           },
           {
@@ -30453,7 +30758,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 801
+              "line": 903
             }
           },
           {
@@ -30470,7 +30775,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 802
+              "line": 904
             }
           },
           {
@@ -30487,7 +30792,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 803
+              "line": 905
             }
           },
           {
@@ -30504,7 +30809,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 804
+              "line": 906
             }
           },
           {
@@ -30525,7 +30830,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 808
+              "line": 910
             }
           },
           {
@@ -30546,7 +30851,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 808
+              "line": 910
             }
           },
           {
@@ -30567,7 +30872,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 810
+              "line": 912
             }
           },
           {
@@ -30584,7 +30889,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 814
+              "line": 916
             }
           },
           {
@@ -30609,7 +30914,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 817
+              "line": 919
             }
           },
           {
@@ -30626,7 +30931,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 818
+              "line": 920
             }
           },
           {
@@ -30647,7 +30952,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 786
+              "line": 888
             }
           }
         ],
@@ -30665,7 +30970,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 790
+        "line": 892
       }
     },
     "ui::scaleform::DisplayInfo::V_VISIBLE": {
@@ -30702,7 +31007,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 792
+        "line": 894
       }
     },
     "ui::scaleform::DisplayObjectBase": {
@@ -30813,7 +31118,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 649
+              "line": 706
             }
           }
         ],
@@ -30828,7 +31133,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 652
+        "line": 709
       }
     },
     "ui::scaleform::MouseEvent": {
@@ -30869,7 +31174,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 378
+              "line": 435
             }
           },
           {
@@ -30886,7 +31191,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 380
+              "line": 437
             }
           },
           {
@@ -30907,7 +31212,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 383
+              "line": 440
             }
           },
           {
@@ -30924,7 +31229,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 383
+              "line": 440
             }
           },
           {
@@ -30941,7 +31246,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 384
+              "line": 441
             }
           },
           {
@@ -30958,7 +31263,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 387
+              "line": 444
             }
           },
           {
@@ -30975,7 +31280,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 389
+              "line": 446
             }
           },
           {
@@ -30992,7 +31297,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 390
+              "line": 447
             }
           }
         ],
@@ -31013,7 +31318,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 366
+        "line": 423
       }
     },
     "ui::scaleform::MouseEvent::TYPE_MOUSE_DOWN": {
@@ -31044,7 +31349,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 370
+        "line": 427
       }
     },
     "ui::scaleform::MouseEvent::TYPE_MOUSE_MOVE": {
@@ -31075,7 +31380,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 368
+        "line": 425
       }
     },
     "ui::scaleform::MouseEvent::TYPE_MOUSE_UP": {
@@ -31106,7 +31411,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 372
+        "line": 429
       }
     },
     "ui::scaleform::MouseEvent::TYPE_MOUSE_WHEEL": {
@@ -31143,7 +31448,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 375
+        "line": 432
       }
     },
     "ui::scaleform::MouseState": {
@@ -31210,7 +31515,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 261
+              "line": 318
             }
           },
           {
@@ -31230,7 +31535,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 265
+              "line": 322
             }
           },
           {
@@ -31250,7 +31555,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 269
+              "line": 326
             }
           },
           {
@@ -31271,7 +31576,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 274
+              "line": 331
             }
           },
           {
@@ -31296,7 +31601,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 280
+              "line": 337
             }
           },
           {
@@ -31313,7 +31618,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 284
+              "line": 341
             }
           },
           {
@@ -31348,7 +31653,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 293
+              "line": 350
             }
           },
           {
@@ -31365,7 +31670,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 297
+              "line": 354
             }
           },
           {
@@ -31382,7 +31687,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 301
+              "line": 358
             }
           },
           {
@@ -31399,7 +31704,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 305
+              "line": 362
             }
           },
           {
@@ -31416,7 +31721,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 309
+              "line": 366
             }
           },
           {
@@ -31437,7 +31742,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 232
+              "line": 289
             }
           }
         ],
@@ -31459,7 +31764,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 244
+        "line": 301
       }
     },
     "ui::scaleform::MouseState::FLAG_ACTIVATED": {
@@ -31490,7 +31795,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 256
+        "line": 313
       }
     },
     "ui::scaleform::MouseState::FLAG_MOUSE_INSIDE_ENTITY_LAST": {
@@ -31521,7 +31826,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 251
+        "line": 308
       }
     },
     "ui::scaleform::MouseState::FLAG_MOUSE_MOVED": {
@@ -31552,7 +31857,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 254
+        "line": 311
       }
     },
     "ui::scaleform::MouseState::FLAG_PREV_TOPMOST_ENTITY_WAS_NULL": {
@@ -31583,7 +31888,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 248
+        "line": 305
       }
     },
     "ui::scaleform::MouseState::FLAG_TOPMOST_ENTITY_IS_NULL": {
@@ -31614,7 +31919,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 246
+        "line": 303
       }
     },
     "ui::scaleform::Movie": {
@@ -32721,7 +33026,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -32742,7 +33047,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 474
+              "line": 531
             }
           },
           {
@@ -32769,7 +33074,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 474
+              "line": 531
             }
           },
           {
@@ -32790,7 +33095,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 479
+              "line": 536
             }
           },
           {
@@ -32810,7 +33115,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 479
+              "line": 536
             }
           },
           {
@@ -32830,7 +33135,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 483
+              "line": 540
             }
           },
           {
@@ -32858,7 +33163,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 489
+              "line": 546
             }
           },
           {
@@ -32878,7 +33183,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 493
+              "line": 550
             }
           },
           {
@@ -32899,7 +33204,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 498
+              "line": 555
             }
           },
           {
@@ -32926,7 +33231,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 498
+              "line": 555
             }
           },
           {
@@ -32947,7 +33252,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 504
+              "line": 561
             }
           },
           {
@@ -32983,7 +33288,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 504
+              "line": 561
             }
           },
           {
@@ -33008,7 +33313,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 509
+              "line": 566
             }
           },
           {
@@ -33039,7 +33344,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 515
+              "line": 572
             }
           },
           {
@@ -33064,7 +33369,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 519
+              "line": 576
             }
           },
           {
@@ -33089,7 +33394,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 523
+              "line": 580
             }
           },
           {
@@ -33114,7 +33419,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 527
+              "line": 584
             }
           },
           {
@@ -33138,7 +33443,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 533
+              "line": 590
             }
           },
           {
@@ -33155,7 +33460,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 538
+              "line": 595
             }
           },
           {
@@ -33196,7 +33501,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 545
+              "line": 602
             }
           },
           {
@@ -33217,7 +33522,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 562
+              "line": 619
             }
           },
           {
@@ -33264,7 +33569,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 562
+              "line": 619
             }
           },
           {
@@ -33285,7 +33590,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 567
+              "line": 624
             }
           },
           {
@@ -33319,7 +33624,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 567
+              "line": 624
             }
           },
           {
@@ -33344,7 +33649,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 573
+              "line": 630
             }
           },
           {
@@ -33365,7 +33670,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 578
+              "line": 635
             }
           },
           {
@@ -33382,7 +33687,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 578
+              "line": 635
             }
           }
         ],
@@ -33423,7 +33728,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 589
+              "line": 646
             }
           },
           {
@@ -33471,7 +33776,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 597
+              "line": 654
             }
           },
           {
@@ -33537,7 +33842,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 605
+              "line": 662
             }
           },
           {
@@ -33600,7 +33905,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 613
+              "line": 670
             }
           },
           {
@@ -33658,7 +33963,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 622
+              "line": 679
             }
           },
           {
@@ -33698,7 +34003,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 629
+              "line": 686
             }
           },
           {
@@ -33726,7 +34031,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 637
+              "line": 694
             }
           },
           {
@@ -33795,7 +34100,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 642
+              "line": 699
             }
           },
           {
@@ -33858,7 +34163,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 646
+              "line": 703
             }
           }
         ],
@@ -33881,7 +34186,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -33901,7 +34206,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -33921,7 +34226,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -33941,7 +34246,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -33961,7 +34266,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -33981,7 +34286,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34001,7 +34306,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34021,7 +34326,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34041,7 +34346,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34061,7 +34366,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34081,7 +34386,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34101,7 +34406,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34121,7 +34426,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34141,7 +34446,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34161,7 +34466,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34181,7 +34486,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34201,7 +34506,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34221,7 +34526,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34241,7 +34546,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34261,7 +34566,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34281,7 +34586,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34301,7 +34606,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34321,7 +34626,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34341,7 +34646,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34361,7 +34666,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34400,7 +34705,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 417
+                "line": 474
               }
             },
             {
@@ -34433,7 +34738,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 423
+                "line": 480
               }
             },
             {
@@ -34461,7 +34766,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 429
+                "line": 486
               }
             },
             {
@@ -34481,7 +34786,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34501,7 +34806,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34521,7 +34826,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34541,7 +34846,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34561,7 +34866,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34581,7 +34886,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34601,7 +34906,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34642,7 +34947,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 438
+                "line": 495
               }
             },
             {
@@ -34729,7 +35034,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 448
+                "line": 505
               }
             },
             {
@@ -34794,7 +35099,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 455
+                "line": 512
               }
             },
             {
@@ -34857,7 +35162,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 463
+                "line": 520
               }
             },
             {
@@ -34877,7 +35182,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34897,7 +35202,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34917,7 +35222,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34937,7 +35242,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 411
+                "line": 468
               }
             },
             {
@@ -34965,7 +35270,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 469
+                "line": 526
               }
             }
           ]
@@ -34985,7 +35290,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 397
+        "line": 454
       }
     },
     "ui::scaleform::MovieImpl::SM_EXACT_FIT": {
@@ -35016,7 +35321,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 406
+        "line": 463
       }
     },
     "ui::scaleform::MovieImpl::SM_NO_BORDER": {
@@ -35047,7 +35352,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 409
+        "line": 466
       }
     },
     "ui::scaleform::MovieImpl::SM_NO_SCALE": {
@@ -35084,7 +35389,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 400
+        "line": 457
       }
     },
     "ui::scaleform::MovieImpl::SM_SHOW_ALL": {
@@ -35115,7 +35420,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 403
+        "line": 460
       }
     },
     "ui::scaleform::MovieImplVftable": {
@@ -35155,7 +35460,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35185,7 +35490,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35215,7 +35520,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35245,7 +35550,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35275,7 +35580,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35305,7 +35610,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35335,7 +35640,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35365,7 +35670,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35395,7 +35700,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35425,7 +35730,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35455,7 +35760,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35485,7 +35790,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35515,7 +35820,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35545,7 +35850,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35575,7 +35880,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35605,7 +35910,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35635,7 +35940,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35665,7 +35970,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35695,7 +36000,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35725,7 +36030,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35755,7 +36060,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35785,7 +36090,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35815,7 +36120,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35845,7 +36150,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35875,7 +36180,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -35923,7 +36228,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 417
+              "line": 474
             }
           },
           {
@@ -35966,7 +36271,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 423
+              "line": 480
             }
           },
           {
@@ -36003,7 +36308,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 429
+              "line": 486
             }
           },
           {
@@ -36033,7 +36338,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -36063,7 +36368,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -36093,7 +36398,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -36123,7 +36428,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -36153,7 +36458,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -36183,7 +36488,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -36213,7 +36518,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -36263,7 +36568,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 438
+              "line": 495
             }
           },
           {
@@ -36356,7 +36661,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 448
+              "line": 505
             }
           },
           {
@@ -36427,7 +36732,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 455
+              "line": 512
             }
           },
           {
@@ -36496,7 +36801,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 463
+              "line": 520
             }
           },
           {
@@ -36526,7 +36831,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -36556,7 +36861,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -36586,7 +36891,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -36616,7 +36921,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 411
+              "line": 468
             }
           },
           {
@@ -36653,7 +36958,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 469
+              "line": 526
             }
           }
         ],
@@ -36668,7 +36973,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 411
+        "line": 468
       }
     },
     "ui::scaleform::MovieVftable": {
@@ -37805,6 +38110,154 @@
         "line": 39
       }
     },
+    "ui::scaleform::Object": {
+      "path": "ui::scaleform::Object",
+      "visibility": "public",
+      "size": 144,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " A Scaleform AS3 object (the managed payload behind a display-object [`Value::mValue`]): its type\n [`m_Traits`](Object::m_Traits) classify it, and for a display object its\n [`m_DisplayObject`](Object::m_DisplayObject) is the presentation-side [`DisplayObjectBase`].",
+        "doc_links": [
+          {
+            "text": "Value::mValue",
+            "target_kind": "item",
+            "path": "ui::scaleform::Value",
+            "anchor": "field-mValue"
+          },
+          {
+            "text": "Object::m_Traits",
+            "target_kind": "item",
+            "path": "ui::scaleform::Object",
+            "anchor": "field-m_Traits"
+          },
+          {
+            "text": "Object::m_DisplayObject",
+            "target_kind": "item",
+            "path": "ui::scaleform::Object",
+            "anchor": "field-m_DisplayObject"
+          },
+          {
+            "text": "DisplayObjectBase",
+            "target_kind": "item",
+            "path": "ui::scaleform::DisplayObjectBase"
+          }
+        ],
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 40
+            },
+            "offset": 0,
+            "size": 40,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 44,
+              "line": 210
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Traits",
+            "doc": " The object's type traits (class metadata), used to check it really is a display object\n before reaching [`m_DisplayObject`](Object::m_DisplayObject).",
+            "doc_links": [
+              {
+                "text": "Object::m_DisplayObject",
+                "target_kind": "item",
+                "path": "ui::scaleform::Object",
+                "anchor": "field-m_DisplayObject"
+              }
+            ],
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "ui::scaleform::Traits"
+              }
+            },
+            "offset": 40,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 44,
+              "line": 210
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_30",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 88
+            },
+            "offset": 48,
+            "size": 88,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 44,
+              "line": 215
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_DisplayObject",
+            "doc": " The presentation-side display object, valid once [`m_Traits`](Object::m_Traits) confirm a\n display-object kind.",
+            "doc_links": [
+              {
+                "text": "Object::m_Traits",
+                "target_kind": "item",
+                "path": "ui::scaleform::Object",
+                "anchor": "field-m_Traits"
+              }
+            ],
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "ui::scaleform::DisplayObjectBase"
+              }
+            },
+            "offset": 136,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 44,
+              "line": 215
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 44,
+        "line": 206
+      }
+    },
     "ui::scaleform::RTHandle": {
       "path": "ui::scaleform::RTHandle",
       "visibility": "public",
@@ -37840,7 +38293,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 328
+              "line": 385
             }
           }
         ],
@@ -37898,7 +38351,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 336
+              "line": 393
             }
           },
           {
@@ -37924,7 +38377,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 340
+              "line": 397
             }
           },
           {
@@ -37944,7 +38397,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 344
+              "line": 401
             }
           }
         ],
@@ -37958,7 +38411,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 325
+        "line": 382
       }
     },
     "ui::scaleform::RefCountImpl": {
@@ -38410,7 +38863,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 658
+              "line": 715
             }
           },
           {
@@ -38431,7 +38884,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 700
+              "line": 757
             }
           },
           {
@@ -38451,7 +38904,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 700
+              "line": 757
             }
           },
           {
@@ -38471,7 +38924,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 706
+              "line": 763
             }
           }
         ],
@@ -38528,7 +38981,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 714
+              "line": 771
             }
           },
           {
@@ -38566,7 +39019,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 719
+              "line": 776
             }
           }
         ],
@@ -38589,7 +39042,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 658
+                "line": 715
               }
             },
             {
@@ -38609,7 +39062,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 658
+                "line": 715
               }
             },
             {
@@ -38629,7 +39082,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 658
+                "line": 715
               }
             },
             {
@@ -38676,7 +39129,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 663
+                "line": 720
               }
             },
             {
@@ -38737,7 +39190,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 669
+                "line": 726
               }
             },
             {
@@ -38765,7 +39218,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 673
+                "line": 730
               }
             },
             {
@@ -38785,7 +39238,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 658
+                "line": 715
               }
             },
             {
@@ -38805,7 +39258,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 658
+                "line": 715
               }
             },
             {
@@ -38825,7 +39278,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 658
+                "line": 715
               }
             },
             {
@@ -38845,7 +39298,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 658
+                "line": 715
               }
             },
             {
@@ -38865,7 +39318,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 658
+                "line": 715
               }
             },
             {
@@ -38888,7 +39341,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 678
+                "line": 735
               }
             },
             {
@@ -38908,7 +39361,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 682
+                "line": 739
               }
             },
             {
@@ -38928,7 +39381,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 658
+                "line": 715
               }
             },
             {
@@ -38948,7 +39401,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 658
+                "line": 715
               }
             },
             {
@@ -38971,7 +39424,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 686
+                "line": 743
               }
             },
             {
@@ -38991,7 +39444,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 690
+                "line": 747
               }
             },
             {
@@ -39011,7 +39464,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 658
+                "line": 715
               }
             },
             {
@@ -39031,7 +39484,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 658
+                "line": 715
               }
             },
             {
@@ -39065,7 +39518,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 695
+                "line": 752
               }
             }
           ]
@@ -39079,7 +39532,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 657
+        "line": 714
       }
     },
     "ui::scaleform::RenderHALVftable": {
@@ -39119,7 +39572,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 658
+              "line": 715
             }
           },
           {
@@ -39149,7 +39602,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 658
+              "line": 715
             }
           },
           {
@@ -39179,7 +39632,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 658
+              "line": 715
             }
           },
           {
@@ -39234,7 +39687,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 663
+              "line": 720
             }
           },
           {
@@ -39301,7 +39754,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 669
+              "line": 726
             }
           },
           {
@@ -39338,7 +39791,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 673
+              "line": 730
             }
           },
           {
@@ -39368,7 +39821,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 658
+              "line": 715
             }
           },
           {
@@ -39398,7 +39851,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 658
+              "line": 715
             }
           },
           {
@@ -39428,7 +39881,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 658
+              "line": 715
             }
           },
           {
@@ -39458,7 +39911,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 658
+              "line": 715
             }
           },
           {
@@ -39488,7 +39941,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 658
+              "line": 715
             }
           },
           {
@@ -39521,7 +39974,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 678
+              "line": 735
             }
           },
           {
@@ -39551,7 +40004,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 682
+              "line": 739
             }
           },
           {
@@ -39581,7 +40034,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 658
+              "line": 715
             }
           },
           {
@@ -39611,7 +40064,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 658
+              "line": 715
             }
           },
           {
@@ -39644,7 +40097,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 686
+              "line": 743
             }
           },
           {
@@ -39674,7 +40127,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 690
+              "line": 747
             }
           },
           {
@@ -39704,7 +40157,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 658
+              "line": 715
             }
           },
           {
@@ -39734,7 +40187,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 658
+              "line": 715
             }
           },
           {
@@ -39778,7 +40231,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 695
+              "line": 752
             }
           }
         ],
@@ -39793,7 +40246,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 658
+        "line": 715
       }
     },
     "ui::scaleform::RenderTarget": {
@@ -39831,7 +40284,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 352
+              "line": 409
             }
           },
           {
@@ -39852,7 +40305,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 347
+              "line": 404
             }
           }
         ],
@@ -39876,7 +40329,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 352
+                "line": 409
               }
             },
             {
@@ -39896,7 +40349,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 352
+                "line": 409
               }
             },
             {
@@ -39916,7 +40369,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 355
+                "line": 412
               }
             }
           ]
@@ -39930,7 +40383,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 351
+        "line": 408
       }
     },
     "ui::scaleform::RenderTargetVftable": {
@@ -39970,7 +40423,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 352
+              "line": 409
             }
           },
           {
@@ -40000,7 +40453,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 352
+              "line": 409
             }
           },
           {
@@ -40030,7 +40483,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 355
+              "line": 412
             }
           }
         ],
@@ -40045,7 +40498,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 352
+        "line": 409
       }
     },
     "ui::scaleform::ScaleformInfo": {
@@ -40069,7 +40522,407 @@
       },
       "source": {
         "file_index": 44,
-        "line": 892
+        "line": 1033
+      }
+    },
+    "ui::scaleform::StringDataDesc": {
+      "path": "ui::scaleform::StringDataDesc",
+      "visibility": "public",
+      "size": 16,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " The heap data descriptor behind a `Scaleform::String`: an 8-byte allocated size and a 4-byte\n refcount, followed by the NUL-terminated character data. Reached from the string's pointer after\n masking off the heap flags in its low 3 bits (`& !7`).",
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 12
+            },
+            "offset": 0,
+            "size": 12,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 44,
+              "line": 975
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Data",
+            "doc": " The first character of the NUL-terminated string data.",
+            "type_ref": {
+              "type": "raw",
+              "path": "c_char"
+            },
+            "offset": 12,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 44,
+              "line": 975
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_d",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 3
+            },
+            "offset": 13,
+            "size": 3,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 44,
+              "line": 968
+            }
+          }
+        ],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "as_ptr",
+            "doc": " A pointer to the NUL-terminated character data.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              }
+            ],
+            "return_type": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "c_char"
+              }
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 44,
+              "line": 981
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 44,
+        "line": 972
+      }
+    },
+    "ui::scaleform::Traits": {
+      "path": "ui::scaleform::Traits",
+      "visibility": "public",
+      "size": 128,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " A Scaleform AS3 object's type traits: the class metadata identifying an [`Object`]'s kind. The\n display-object type-id range and flag values are hard-coded magic in the engine too (the same\n constants appear inline in `Value::ObjectInterface::GetDisplayInfo`); their deeper AS3-builtin-type\n meaning is not recoverable from the stripped Scaleform code, so they are named here by role.",
+        "doc_links": [
+          {
+            "text": "Object",
+            "target_kind": "item",
+            "path": "ui::scaleform::Object"
+          }
+        ],
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 112
+            },
+            "offset": 0,
+            "size": 112,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 44,
+              "line": 234
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Flags",
+            "doc": " Trait flags; see [`FLAG_NON_DISPLAY_OBJECT`](Traits::FLAG_NON_DISPLAY_OBJECT).",
+            "doc_links": [
+              {
+                "text": "Traits::FLAG_NON_DISPLAY_OBJECT",
+                "target_kind": "item",
+                "path": "ui::scaleform::Traits::FLAG_NON_DISPLAY_OBJECT"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "u8"
+            },
+            "offset": 112,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 44,
+              "line": 234
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_71",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 7
+            },
+            "offset": 113,
+            "size": 7,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 44,
+              "line": 238
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_TypeId",
+            "doc": " The traits' AS3 builtin-class type id; see [`is_display_object`](Traits::is_display_object).",
+            "doc_links": [
+              {
+                "text": "Traits::is_display_object",
+                "target_kind": "item",
+                "path": "ui::scaleform::Traits",
+                "anchor": "func-is_display_object"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "offset": 120,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 44,
+              "line": 238
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_7c",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 4
+            },
+            "offset": 124,
+            "size": 4,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 44,
+              "line": 218
+            }
+          }
+        ],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "is_display_object",
+            "doc": " Whether these traits identify a display object -- the guard `GetDisplayInfo` performs before\n reaching an [`Object`](Object)'s [`DisplayObjectBase`](DisplayObjectBase): a\n [`m_TypeId`](Traits::m_TypeId) in the display-object range and without the\n [`FLAG_NON_DISPLAY_OBJECT`](Traits::FLAG_NON_DISPLAY_OBJECT) flag.",
+            "doc_links": [
+              {
+                "text": "Object",
+                "target_kind": "item",
+                "path": "ui::scaleform::Object"
+              },
+              {
+                "text": "DisplayObjectBase",
+                "target_kind": "item",
+                "path": "ui::scaleform::DisplayObjectBase"
+              },
+              {
+                "text": "Traits::m_TypeId",
+                "target_kind": "item",
+                "path": "ui::scaleform::Traits",
+                "anchor": "field-m_TypeId"
+              },
+              {
+                "text": "Traits::FLAG_NON_DISPLAY_OBJECT",
+                "target_kind": "item",
+                "path": "ui::scaleform::Traits::FLAG_NON_DISPLAY_OBJECT"
+              }
+            ],
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 44,
+              "line": 247
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false,
+        "nested_items": [
+          "ui::scaleform::Traits::DISPLAY_OBJECT_TYPE_ID_FIRST",
+          "ui::scaleform::Traits::DISPLAY_OBJECT_TYPE_ID_COUNT",
+          "ui::scaleform::Traits::FLAG_NON_DISPLAY_OBJECT"
+        ]
+      },
+      "source": {
+        "file_index": 44,
+        "line": 223
+      }
+    },
+    "ui::scaleform::Traits::DISPLAY_OBJECT_TYPE_ID_COUNT": {
+      "path": "ui::scaleform::Traits::DISPLAY_OBJECT_TYPE_ID_COUNT",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " The number of type ids in the display-object range (so display objects are\n `FIRST..FIRST + COUNT`).",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 12
+        }
+      },
+      "source": {
+        "file_index": 44,
+        "line": 228
+      }
+    },
+    "ui::scaleform::Traits::DISPLAY_OBJECT_TYPE_ID_FIRST": {
+      "path": "ui::scaleform::Traits::DISPLAY_OBJECT_TYPE_ID_FIRST",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " The first [`m_TypeId`](Traits::m_TypeId) of the display-object AS3 builtin-class range.",
+        "doc_links": [
+          {
+            "text": "Traits::m_TypeId",
+            "target_kind": "item",
+            "path": "ui::scaleform::Traits",
+            "anchor": "field-m_TypeId"
+          }
+        ],
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 24
+        }
+      },
+      "source": {
+        "file_index": 44,
+        "line": 225
+      }
+    },
+    "ui::scaleform::Traits::FLAG_NON_DISPLAY_OBJECT": {
+      "path": "ui::scaleform::Traits::FLAG_NON_DISPLAY_OBJECT",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " A [`m_Flags`](Traits::m_Flags) bit marking a kind excluded from the display-object check.",
+        "doc_links": [
+          {
+            "text": "Traits::m_Flags",
+            "target_kind": "item",
+            "path": "ui::scaleform::Traits",
+            "anchor": "field-m_Flags"
+          }
+        ],
+        "value_type": {
+          "type": "raw",
+          "path": "u8"
+        },
+        "value": {
+          "kind": "int",
+          "value": 32
+        }
+      },
+      "source": {
+        "file_index": 44,
+        "line": 230
       }
     },
     "ui::scaleform::TreeContainer": {
@@ -40648,7 +41501,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 744
+              "line": 804
             }
           },
           {
@@ -40668,7 +41521,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 746
+              "line": 806
             }
           },
           {
@@ -40688,7 +41541,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 748
+              "line": 808
             }
           },
           {
@@ -40705,7 +41558,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 750
+              "line": 810
             }
           },
           {
@@ -40726,7 +41579,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 755
+              "line": 815
             }
           },
           {
@@ -40751,7 +41604,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 755
+              "line": 815
             }
           },
           {
@@ -40768,11 +41621,39 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 757
+              "line": 817
             }
           }
         ],
-        "associated_functions": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "value_type",
+            "doc": " The base `VT_*` value-type tag, with the `VTC_*` control bits masked off. The `as_*` accessors\n compare it against the `VT_*` tags.",
+            "body": {
+              "type": "external"
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "calling_convention": "system",
+            "cfg": {
+              "type": "key_value",
+              "key": "backend",
+              "value": "rust"
+            },
+            "source": {
+              "file_index": 44,
+              "line": 824
+            }
+          }
+        ],
         "vftable": null,
         "singleton": null,
         "copyable": false,
@@ -40786,12 +41667,13 @@
           "ui::scaleform::Value::VT_NUMBER",
           "ui::scaleform::Value::VT_STRING",
           "ui::scaleform::Value::VT_DISPLAY_OBJECT",
-          "ui::scaleform::Value::VTC_MANAGED_BIT"
+          "ui::scaleform::Value::VTC_MANAGED_BIT",
+          "ui::scaleform::Value::VT_TYPE_MASK"
         ]
       },
       "source": {
         "file_index": 44,
-        "line": 727
+        "line": 784
       }
     },
     "ui::scaleform::Value::VTC_MANAGED_BIT": {
@@ -40814,7 +41696,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 741
+        "line": 798
       }
     },
     "ui::scaleform::Value::VT_BOOLEAN": {
@@ -40845,7 +41727,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 730
+        "line": 787
       }
     },
     "ui::scaleform::Value::VT_DISPLAY_OBJECT": {
@@ -40868,7 +41750,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 738
+        "line": 795
       }
     },
     "ui::scaleform::Value::VT_INT": {
@@ -40891,7 +41773,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 732
+        "line": 789
       }
     },
     "ui::scaleform::Value::VT_NUMBER": {
@@ -40914,7 +41796,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 734
+        "line": 791
       }
     },
     "ui::scaleform::Value::VT_STRING": {
@@ -40937,7 +41819,38 @@
       },
       "source": {
         "file_index": 44,
-        "line": 736
+        "line": 793
+      }
+    },
+    "ui::scaleform::Value::VT_TYPE_MASK": {
+      "path": "ui::scaleform::Value::VT_TYPE_MASK",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " The mask isolating the base `VT_*` value-type tag in [`Type`](Value::Type) from the `VTC_*`\n control bits (the game compares `Type & VT_TYPE_MASK` against the `VT_*` tags).",
+        "doc_links": [
+          {
+            "text": "Value::Type",
+            "target_kind": "item",
+            "path": "ui::scaleform::Value",
+            "anchor": "field-Type"
+          }
+        ],
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 143
+        }
+      },
+      "source": {
+        "file_index": 44,
+        "line": 801
       }
     },
     "ui::scaleform::ValueObjectInterface": {
@@ -40987,7 +41900,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 760
+              "line": 862
             }
           }
         ],
@@ -41042,7 +41955,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 770
+              "line": 872
             }
           },
           {
@@ -41095,7 +42008,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 777
+              "line": 879
             }
           },
           {
@@ -41145,7 +42058,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 783
+              "line": 885
             }
           }
         ],
@@ -41159,7 +42072,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 764
+        "line": 866
       }
     },
     "ui::scaleform::Viewport": {
@@ -41200,7 +42113,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 213
+              "line": 270
             }
           },
           {
@@ -41217,7 +42130,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 214
+              "line": 271
             }
           },
           {
@@ -41234,7 +42147,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 215
+              "line": 272
             }
           },
           {
@@ -41251,7 +42164,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 216
+              "line": 273
             }
           },
           {
@@ -41268,7 +42181,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 217
+              "line": 274
             }
           },
           {
@@ -41285,7 +42198,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 218
+              "line": 275
             }
           },
           {
@@ -41302,7 +42215,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 219
+              "line": 276
             }
           },
           {
@@ -41319,7 +42232,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 220
+              "line": 277
             }
           },
           {
@@ -41336,7 +42249,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 221
+              "line": 278
             }
           },
           {
@@ -41353,7 +42266,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 222
+              "line": 279
             }
           },
           {
@@ -41370,7 +42283,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 224
+              "line": 281
             }
           },
           {
@@ -41387,7 +42300,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 226
+              "line": 283
             }
           },
           {
@@ -41412,7 +42325,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 229
+              "line": 286
             }
           }
         ],
@@ -41427,7 +42340,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 212
+        "line": 269
       }
     },
     "ui::ui_manager::RenderTargetData": {
@@ -44467,6 +45380,8 @@
             "character::character::AnimatedModel",
             "character::character::AnimationController",
             "character::character::Character",
+            "character::character::CharacterLodFlags",
+            "character::character::Character_EnableHIK",
             "character::character::Character_EnableLocoStrafing",
             "character::character::Character_GoreEnabled",
             "character::character::Joint",
@@ -45882,6 +46797,7 @@
           "doc": null,
           "items": [
             "graphics_engine::graphics_engine::ActiveCursor",
+            "graphics_engine::graphics_engine::BFBCFrustumCullParameters",
             "graphics_engine::graphics_engine::D3D11Viewport",
             "graphics_engine::graphics_engine::DrawThreadTaskParam",
             "graphics_engine::graphics_engine::EffectInfo",
@@ -46995,6 +47911,7 @@
             "ui::scaleform::MovieImpl",
             "ui::scaleform::MovieImplVftable",
             "ui::scaleform::MovieVftable",
+            "ui::scaleform::Object",
             "ui::scaleform::RTHandle",
             "ui::scaleform::RefCountImpl",
             "ui::scaleform::RefCountImplVftable",
@@ -47004,6 +47921,8 @@
             "ui::scaleform::RenderTarget",
             "ui::scaleform::RenderTargetVftable",
             "ui::scaleform::ScaleformInfo",
+            "ui::scaleform::StringDataDesc",
+            "ui::scaleform::Traits",
             "ui::scaleform::TreeContainer",
             "ui::scaleform::TreeNode",
             "ui::scaleform::TreeRoot",
@@ -47022,8 +47941,52 @@
                 "value": "rust"
               },
               "definition": false,
+              "for_type": "ui::scaleform::Traits",
+              "text": "\n    impl Traits {\n        pub fn is_display_object(&self) -> bool {\n            self.m_TypeId.wrapping_sub(Traits::DISPLAY_OBJECT_TYPE_ID_FIRST) < Traits::DISPLAY_OBJECT_TYPE_ID_COUNT\n                && self.m_Flags & Traits::FLAG_NON_DISPLAY_OBJECT == 0\n        }\n    }\n"
+            },
+            {
+              "kind": "epilogue",
+              "cfg": {
+                "type": "key_value",
+                "key": "backend",
+                "value": "rust"
+              },
+              "definition": false,
+              "for_type": "ui::scaleform::Value",
+              "text": "\n    #[allow(dead_code)]\n    impl Value {\n        pub fn value_type(&self) -> u32 {\n            self.Type & Value::VT_TYPE_MASK\n        }\n\n        /// The boolean payload, or `None` if this is not a boolean value.\n        pub fn as_bool(&self) -> Option<bool> {\n            (self.value_type() == Value::VT_BOOLEAN).then_some(self.mValue & 0xFF != 0)\n        }\n\n        /// The 32-bit integer payload, or `None` if this is not an int value.\n        pub fn as_int(&self) -> Option<i32> {\n            (self.value_type() == Value::VT_INT).then_some(self.mValue as i32)\n        }\n\n        /// The `f64` payload, or `None` if this is not a number value.\n        pub fn as_number(&self) -> Option<f64> {\n            (self.value_type() == Value::VT_NUMBER).then_some(f64::from_bits(self.mValue))\n        }\n\n        /// The NUL-terminated string payload, or `None` if this is not a string value.\n        pub fn as_string(&self) -> Option<*const ::std::ffi::c_char> {\n            (self.value_type() == Value::VT_STRING).then_some(self.mValue as *const ::std::ffi::c_char)\n        }\n\n        /// The managed display object payload, or `None` if this is not a display-object value.\n        pub fn as_display_object(&self) -> Option<*mut Object> {\n            (self.value_type() == Value::VT_DISPLAY_OBJECT).then_some(self.mValue as *mut Object)\n        }\n    }\n"
+            },
+            {
+              "kind": "epilogue",
+              "cfg": {
+                "type": "key_value",
+                "key": "backend",
+                "value": "rust"
+              },
+              "definition": false,
               "for_type": "ui::scaleform::Value",
               "text": "\n    #[allow(dead_code)]\n    impl Value {\n        /// An unmanaged boolean value, safe to pass to `Movie::SetVariable` (the movie copies it;\n        /// nothing needs releasing).\n        pub fn new_boolean(value: bool) -> Self {\n            // SAFETY: all-zero is the unmanaged null value; every field tolerates zero.\n            let mut v: Self = unsafe { ::core::mem::zeroed() };\n            v.Type = Self::VT_BOOLEAN;\n            v.mValue = value as u64;\n            v\n        }\n    }\n"
+            },
+            {
+              "kind": "epilogue",
+              "cfg": {
+                "type": "key_value",
+                "key": "backend",
+                "value": "rust"
+              },
+              "definition": false,
+              "for_type": "ui::scaleform::StringDataDesc",
+              "text": "\n    impl StringDataDesc {\n        pub fn as_ptr(&self) -> *const ::std::ffi::c_char {\n            ::std::ptr::addr_of!(self.m_Data)\n        }\n    }\n"
+            },
+            {
+              "kind": "epilogue",
+              "cfg": {
+                "type": "key_value",
+                "key": "backend",
+                "value": "rust"
+              },
+              "definition": false,
+              "for_type": "ui::scaleform::AmpMovieObjectDesc",
+              "text": "\n    #[allow(dead_code)]\n    impl AmpMovieObjectDesc {\n        /// The instance name's [`StringDataDesc`], with the heap flags masked off the string pointer's\n        /// low 3 bits, or `None` if the name is null.\n        ///\n        /// # Safety\n        /// The descriptor must outlive the borrow (true while the node is alive).\n        pub unsafe fn name_data(&self) -> Option<&StringDataDesc> {\n            unsafe { ((self.name as usize & !7) as *const StringDataDesc).as_ref() }\n        }\n    }\n"
             }
           ],
           "source": {
