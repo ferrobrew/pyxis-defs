@@ -28311,7 +28311,7 @@
           {
             "visibility": "public",
             "name": "PerspectiveFovInverse",
-            "doc": " Builds the inverse of a symmetric perspective projection into `self` (also returned), from a\n vertical field of view, an aspect ratio, and the far and near planes. The screen-space\n reconstruction passes (SSR, deferred clustered lighting, SSAO, screen-space subsurface,\n atmospheric scattering, depth of field) call it to recover a clip-to-view basis, then multiply\n by the render context's camera transform to reach clip-to-world. The result is purely diagonal\n (`[0][0] = aspect·tan(fov/2)`, `[1][1] = tan(fov/2)`, plus standard-depth `z` terms) and so\n cannot represent an off-center (asymmetric) frustum.",
+            "doc": " Builds the inverse of a symmetric perspective projection into `self` (also returned), from a\n vertical field of view, an aspect ratio, and the far and near planes. The screen-space\n reconstruction passes (SSR, deferred clustered lighting, SSAO, screen-space subsurface,\n atmospheric scattering, depth of field) call it to recover a clip-to-view basis, then multiply\n by the render context's camera transform to reach clip-to-world. Its `x`/`y` scale is diagonal\n (`[0][0] = aspect·tan(fov/2)`, `[1][1] = tan(fov/2)`) with no off-center shear, so it cannot\n represent an asymmetric frustum. Its depth block is **reverse-Z**, matching the reverse-Z depth\n buffer the engine renders: `[2][2] = 0`, `[2][3] = (far - near)/(far·near)`, `[3][2] = -1`, and\n `[3][3] = 1/far`, which reconstructs view depth from an NDC `z` of 1 at the near plane and 0 at\n the far plane.",
             "body": {
               "type": "address",
               "address": 5368942816
@@ -28363,7 +28363,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 82
+              "line": 85
             }
           }
         ],
@@ -28404,7 +28404,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 237
+              "line": 240
             }
           },
           {
@@ -28421,7 +28421,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 238
+              "line": 241
             }
           }
         ],
@@ -28436,7 +28436,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 236
+        "line": 239
       }
     },
     "types::math::Vector2": {
@@ -28467,7 +28467,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 156
+              "line": 159
             }
           }
         ],
@@ -28482,7 +28482,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 155
+        "line": 158
       }
     },
     "types::math::Vector3": {
@@ -28513,7 +28513,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 179
+              "line": 182
             }
           }
         ],
@@ -28528,7 +28528,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 178
+        "line": 181
       }
     },
     "types::math::Vector4": {
@@ -28559,7 +28559,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 202
+              "line": 205
             }
           }
         ],
@@ -28574,7 +28574,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 201
+        "line": 204
       }
     },
     "types::std_string::String": {
