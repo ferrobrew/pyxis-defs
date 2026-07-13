@@ -1,7 +1,10 @@
 use animation::ik::HumanIK;
+use animation::rule_system::AnimationRuleSystem;
 use blackboard::ObjectBlackboard;
 use types::math::Matrix4;
 use types::math::Vector3;
+use types::shared_ptr::SharedPtr;
+use types::std_vector::Vector;
 use types::vector_math::AlignedVector3;
 use types::vector_math::AlignedQuat;
 
@@ -54,6 +57,16 @@ pub type Character {
     /// released.
     #[address(0x2_A00)]
     pub m_AimTimer: f32,
+
+    /// The idle-variation countdown, in seconds, driven by
+    /// [`NStateTask_InputLocoIdleTask::Update`](input::locomotion::NStateTask_InputLocoIdleTask::Update):
+    /// while the character stands idle it is decremented by the frame delta, and once it goes
+    /// negative the task queues
+    /// [`ACT_TO_IDLE_ONE_OFF`](animation::symbol_table::EventIdSymbolTable::ACT_TO_IDLE_ONE_OFF) to
+    /// play a one-off idle break, then resets it to a random ~8.5-12 s the next time the character's
+    /// aim reference moves.
+    #[address(0x2_BB0)]
+    pub m_IdleFidgetTimer: f32,
 }
 impl Character {
     #[address(0x140_7D5_B00)]
@@ -132,6 +145,9 @@ pub type AnimatedModel {
     /// rather than a field because the instance type itself is unmapped.
     pub const MODEL_INSTANCE_RBI_INFO_OFFSET: u64 = 0x50,
 
+    #[address(0x98)]
+    pub m_RuleSystems: Vector<SharedPtr<AnimationRuleSystem>>,
+
     #[address(0x178)]
     pub m_AnimationController: *mut AnimationController,
 
@@ -164,6 +180,19 @@ impl AnimationController {
 
     #[address(0x140_43F_FF0)]
     pub fn SetJoint(&mut self, index: u32, joint: *mut Joint);
+
+    /// Advances the playback clocks of the controller's time-updatable blenders by `dt` (via
+    /// `CPoseProducer::UpdateBlendersTimeInRange`) without recomputing the pose. Runs each SIM frame
+    /// in the character's animation pass, before [`UpdateAnimations`](AnimationController::UpdateAnimations).
+    #[address(0x140_479_4D0)]
+    pub fn UpdateAnimationsTime(&mut self, dt: f32);
+
+    /// Recomputes the controller's pose from its pose producers: advances each blender's clock by
+    /// `dt` (`CPoseProducer::Update` -> `CBlender::UpdateTime`) and samples and blends the active
+    /// clips into the model-space pose over `num_of_bones` bones. Runs each SIM frame in the
+    /// character's animation pass. A `dt` of `0` holds the animation clocks, producing a static pose.
+    #[address(0x140_77E_200)]
+    pub fn UpdateAnimations(&mut self, dt: f32, num_of_bones: i32);
 }
 
 #[copyable, defaultable, align(16), size(0x30)]

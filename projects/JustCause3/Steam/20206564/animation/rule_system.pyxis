@@ -1,0 +1,30 @@
+use hash::HashString;
+use types::shared_ptr::SharedPtr;
+
+/// An animation state (`NAnimationSystem::CState`): one node of a character's animation state machine,
+/// i.e. an afsmb `S_*` rule state. Identified by its name hash.
+#[min_size(0x18)]
+pub type State {
+    /// The state's name hash (`hashlittle(state_name)`, e.g. `hashlittle("S_IDLE")`), identifying
+    /// which afsmb state this is. Read by `CCharacter::IsInVehicleAttachState` and the other
+    /// current-state checks.
+    #[address(0x10)]
+    pub m_HashID: HashString,
+}
+
+/// A running animation state machine (`NAnimationSystem::CStateMachineInstance`): tracks the current
+/// [`State`] for one [`AnimationRuleSystem`].
+pub type StateMachineInstance {
+    /// The state the machine is currently in.
+    #[address(0x18)]
+    pub m_CurrentState: *mut State,
+}
+
+/// An animation rule system (`CAnimationRuleSystem`): drives one afsmb state machine for a character.
+/// A character's [`AnimatedModel`](character::character::AnimatedModel) holds one per animated model,
+/// the first being the body's.
+pub type AnimationRuleSystem {
+    /// The running state machine instance this rule system drives.
+    #[address(0x48)]
+    pub m_StateMachineInstance: SharedPtr<StateMachineInstance>,
+}
