@@ -29077,7 +29077,7 @@
       },
       "source": {
         "file_index": 38,
-        "line": 6
+        "line": 7
       }
     },
     "spawn_system::SBFBCProcessParameter": {
@@ -29114,7 +29114,7 @@
       },
       "source": {
         "file_index": 38,
-        "line": 13
+        "line": 14
       }
     },
     "spawn_system::SBFBCProcessState": {
@@ -29138,7 +29138,91 @@
       },
       "source": {
         "file_index": 38,
-        "line": 17
+        "line": 18
+      }
+    },
+    "spawn_system::SpawnBudgetEntry": {
+      "path": "spawn_system::SpawnBudgetEntry",
+      "visibility": "public",
+      "size": 312,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " One per-tag spawn budget entry. `CSpawnSystem::Update` iterates these each frame; when the live\n count exceeds the budget, the highest-despawn-rank object is despawned. Partial: only the budget\n field is mapped.",
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 64
+            },
+            "offset": 0,
+            "size": 64,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 38,
+              "line": 29
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Budget",
+            "doc": " The maximum number of live objects for this spawn tag. When\n `count - unloading_count >= budget`, the spawn system despawns the object with the highest\n despawn rank.",
+            "type_ref": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "offset": 64,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 38,
+              "line": 29
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_44",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 244
+            },
+            "offset": 68,
+            "size": 244,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 38,
+              "line": 20
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 38,
+        "line": 24
       }
     },
     "spawn_system::SpawnSystem": {
@@ -29169,15 +29253,59 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 360
+              "size": 48
             },
             "offset": 0,
-            "size": 360,
+            "size": 48,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 38,
-              "line": 28
+              "line": 43
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_BudgetEntries",
+            "doc": " The per-tag spawn budget entries. Each entry tracks the max object count (budget), current\n count, and despawn-rank state for one spawn tag. When the count exceeds the budget, the\n highest-despawn-rank object is despawned.",
+            "type_ref": {
+              "type": "generic",
+              "base": "types::std_vector::Vector",
+              "args": [
+                {
+                  "type": "raw",
+                  "path": "spawn_system::SpawnBudgetEntry"
+                }
+              ]
+            },
+            "offset": 48,
+            "size": 32,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 38,
+              "line": 43
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_50",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 280
+            },
+            "offset": 80,
+            "size": 280,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 38,
+              "line": 47
             }
           },
           {
@@ -29197,7 +29325,7 @@
             "is_base": false,
             "source": {
               "file_index": 38,
-              "line": 28
+              "line": 47
             }
           },
           {
@@ -29225,7 +29353,7 @@
             "is_base": false,
             "source": {
               "file_index": 38,
-              "line": 34
+              "line": 53
             }
           },
           {
@@ -29245,7 +29373,7 @@
             "is_base": false,
             "source": {
               "file_index": 38,
-              "line": 38
+              "line": 57
             }
           },
           {
@@ -29266,7 +29394,7 @@
             "is_base": false,
             "source": {
               "file_index": 38,
-              "line": 43
+              "line": 62
             }
           },
           {
@@ -29291,7 +29419,7 @@
             "is_base": false,
             "source": {
               "file_index": 38,
-              "line": 43
+              "line": 62
             }
           },
           {
@@ -29316,7 +29444,7 @@
             "is_base": false,
             "source": {
               "file_index": 38,
-              "line": 48
+              "line": 67
             }
           },
           {
@@ -29341,7 +29469,7 @@
             "is_base": false,
             "source": {
               "file_index": 38,
-              "line": 53
+              "line": 72
             }
           }
         ],
@@ -29389,7 +29517,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 38,
-              "line": 63
+              "line": 82
             }
           },
           {
@@ -29442,7 +29570,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 38,
-              "line": 67
+              "line": 86
             }
           }
         ],
@@ -29456,7 +29584,7 @@
       },
       "source": {
         "file_index": 38,
-        "line": 25
+        "line": 38
       }
     },
     "state::StateContext": {
@@ -48298,6 +48426,7 @@
         "spawn_system::SBFBCContext",
         "spawn_system::SBFBCProcessParameter",
         "spawn_system::SBFBCProcessState",
+        "spawn_system::SpawnBudgetEntry",
         "spawn_system::SpawnSystem"
       ],
       "submodules": {},
