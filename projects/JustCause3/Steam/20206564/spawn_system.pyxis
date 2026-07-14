@@ -1,5 +1,6 @@
 use camera::camera::Camera;
 use types::math::Vector3;
+use types::std_vector::Vector;
 
 /// The opaque BFBC context: the per-system beam-frustum-based-culling state that `BFBCProcess` reads
 /// and writes. Its layout is internal to the BFBC backend and not mapped here.
@@ -16,6 +17,18 @@ pub type SBFBCProcessParameter;
 /// block.
 pub type SBFBCProcessState;
 
+/// One per-tag spawn budget entry. `CSpawnSystem::Update` iterates these each frame; when the live
+/// count exceeds the budget, the highest-despawn-rank object is despawned. Partial: only the budget
+/// field is mapped.
+#[min_size(0x138)]
+pub type SpawnBudgetEntry {
+    /// The maximum number of live objects for this spawn tag. When
+    /// `count - unloading_count >= budget`, the spawn system despawns the object with the highest
+    /// despawn rank.
+    #[address(0x40)]
+    pub m_Budget: u32,
+}
+
 /// The spawn system: manages streaming (de)spawn of characters and vehicles around the player. Each
 /// frame, [`Update`](SpawnSystem::Update) builds a BFBC cull frustum from the camera manager's active
 /// camera and uses it as a "don't (de)spawn while visible" gate in `CSpawnFactoryImpl::CheckInternal`, so
@@ -23,6 +36,12 @@ pub type SBFBCProcessState;
 /// vehicles, so it governs NPC/vehicle (de)spawns near the view edge, not buildings.
 #[singleton(0x142_F18_998)]
 pub type SpawnSystem {
+    /// The per-tag spawn budget entries. Each entry tracks the max object count (budget), current
+    /// count, and despawn-rank state for one spawn tag. When the count exceeds the budget, the
+    /// highest-despawn-rank object is despawned.
+    #[address(0x30)]
+    pub m_BudgetEntries: Vector<SpawnBudgetEntry>,
+
     /// The BFBC cull context the spawn system's visibility gate runs against.
     #[address(0x168)]
     pub m_SpawnBFBC: *mut SBFBCContext,
