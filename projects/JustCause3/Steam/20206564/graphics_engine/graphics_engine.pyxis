@@ -268,12 +268,48 @@ pub type ShadowCascades {
 /// per-frame flags. Filled each dispatch by [`RenderPass::SetRenderContextCamera`].
 #[min_size(0x780)]
 pub type RenderContext {
+    /// The projection matrix for this dispatch, copied from [`Camera::m_ProjectionF`] by
+    /// [`SetRenderContextCamera`](RenderPass::SetRenderContextCamera). The deferred-lighting
+    /// clustered pass reads it to build the geometry proxy transform (cb0) and the froxel tile
+    /// bounds (cb1).
+    #[address(0x58)]
+    pub m_ProjectionF: Matrix4,
+
     /// The translation-free view-projection for this dispatch (the rotation and projection without the
     /// camera world translation). The tessellation constant buffers bake it directly (e.g.
     /// [`RenderBlockTypeTerrain::SetupConstantBuffers`](graphics_engine::render_block::RenderBlockTypeTerrain)),
     /// so it carries the per-view (and, off-axis, per-eye) projection.
     #[address(0xD8)]
     pub m_OffsetViewProjection: Matrix4,
+
+    /// The vertical field of view in radians, copied from [`Camera::m_FOV`] by
+    /// [`SetRenderContextCamera`](RenderPass::SetRenderContextCamera).
+    #[address(0x2FC)]
+    pub CameraFOV: f32,
+
+    /// The near clip plane distance, copied from [`Camera::m_Near`] by
+    /// [`SetRenderContextCamera`](RenderPass::SetRenderContextCamera).
+    #[address(0x304)]
+    pub CameraNear: f32,
+
+    /// The far clip plane distance, copied from [`Camera::m_Far`] by
+    /// [`SetRenderContextCamera`](RenderPass::SetRenderContextCamera).
+    #[address(0x308)]
+    pub CameraFar: f32,
+
+    /// The display width in pixels. The clustered deferred-lighting pass derives the froxel tile
+    /// count from this (width / 64).
+    #[address(0x30C)]
+    pub m_DisplayWidth: i32,
+
+    /// The display height in pixels. The clustered deferred-lighting pass derives the froxel tile
+    /// count from this (height / 64).
+    #[address(0x310)]
+    pub m_DisplayHeight: i32,
+
+    /// The display aspect ratio (`m_DisplayWidth / m_DisplayHeight`).
+    #[address(0x314)]
+    pub m_DisplayRatio: f32,
 
     /// The per-real-frame stamp for this dispatch, set from [`render_frame_counters`]'s `m_FrameIndex`
     /// during render-context setup. Passes that cache per-frame state key on it — the terrain

@@ -1,4 +1,4 @@
-use graphics_engine::graphics_engine::{HContext_t, RenderContext};
+use graphics_engine::graphics_engine::{HContext_t, HTexture_t, RenderContext};
 use types::math::Matrix4;
 
 /// A 3x4 skinning-palette bone matrix. The layout differs per render block (empirically, by the
@@ -179,4 +179,15 @@ impl RenderBlockCharacterSkin {
     /// See [`RenderBlockCharacter::SetMatrixPalette`].
     #[address(0x140_108_DD0)]
     pub fn SetMatrixPalette(&self, ctx: *mut HContext_t, matrices: *const Matrix3x4, batch: *const SkinBatch, register: u32);
+}
+
+/// The deferred-lighting render block. Its `Draw` method dispatches either the clustered (tiled)
+/// lighting pass or a pass-through fallback.
+pub type RenderBlockDeferredLighting;
+impl RenderBlockDeferredLighting {
+    /// The clustered-lighting entry point: runs the "LightAssignment" pass (rasterizing light proxy
+    /// geometry into the froxel light-lookup target) and the "ClusteredLighting" pass (shading from
+    /// it). Called from `Draw` when wireframe is disabled.
+    #[address(0x140_13C_FD0)]
+    pub fn DrawClustered(&self, rc: *mut RenderContext, a3: *mut void, a4: *mut HTexture_t);
 }
