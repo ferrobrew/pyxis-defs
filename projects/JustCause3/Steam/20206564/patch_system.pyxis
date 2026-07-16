@@ -1,0 +1,109 @@
+use graphics_engine::render_block::RenderBlockTerrain;
+
+/// A patch's bookkeeping header within a patch map (the Avalanche `patchsystem` dependency
+/// library's grid-of-patches streaming, used by the landscape systems: the base VolumetricTerrain
+/// patch maps `terrain_patch_lod9..12`, water, and vegetation). Partial: only the fields the
+/// terrain patch-update fragment reads are mapped.
+#[min_size(0x2A)]
+pub type PatchHeader {
+    /// The patch's X coordinate in its map grid. The patch's world X derives as
+    /// `(m_PatchX << m_Lod) + world_origin_x`, scaled by the world context's inverse XZ scale.
+    #[address(0x10)]
+    pub m_PatchX: i16,
+
+    /// The patch's Z coordinate in its map grid; see [`m_PatchX`](PatchHeader::m_PatchX).
+    #[address(0x12)]
+    pub m_PatchZ: i16,
+
+    /// Patch lifecycle status bits: `0x1` = constructed, `0x2` = destruction pending, `0x4` =
+    /// construction pending, `0x8` = destruction complete, `0x10` = construction complete, `0x20` =
+    /// inside world.
+    #[address(0x14)]
+    pub m_StatusBits: u16,
+
+    /// A per-patch state counter the patch's update fragment advances during multi-step
+    /// construction or destruction.
+    #[address(0x19)]
+    pub m_UserState: u8,
+
+    /// The patch map's LOD level (9..=12 for the base terrain maps; the patch spans
+    /// `1 << m_Lod` world units per side before world scaling).
+    #[address(0x1A)]
+    pub m_Lod: u8,
+
+    /// Per-frustum visibility bits, written by the patch system's BFBC cull step each update: bit
+    /// `i` is set when the patch's AABB passed the cull for frustum entry `i` of the update's view
+    /// description ([`PatchViewDesc::m_FrustumIDs`] maps entries to frustum ids). The patch-update
+    /// fragments read these to decide which render passes receive the patch's render block.
+    #[address(0x1C)]
+    pub m_VisibilityBits: u16,
+
+    /// The patch's BFBC occludee handle, allocated by `BFBCAdd` when the patch map is created; the
+    /// patch's world AABB is pushed through `BFBCSetAABB` under this handle during construction.
+    #[address(0x28)]
+    pub m_BFBCOcludee: u16,
+}
+
+/// The per-update view description handed to the patch-update fragments: the set of cull frusta
+/// the patch system's BFBC step ran this update. For the landscape patch system
+/// (`CLandscapeManager::UpdatePatchSystem`) the entries are: entry 0 = the occluder manager's main
+/// cull camera (frustum id 0), entries 1..=N = the active shadow cascades (ids 1..=8), then two
+/// reflective-shadow frusta (ids 9..=10), and a final second run of the same main cull camera
+/// (id 12). Partial mapping.
+#[min_size(0x40)]
+pub type PatchViewDesc {
+    /// The frustum id for each entry, indexed by the same entry index as the patch's
+    /// [`PatchHeader::m_VisibilityBits`] bit.
+    #[address(0x30)]
+    pub m_FrustumIDs: *const u32,
+
+    /// The number of frustum entries this update (also the number of populated visibility bits).
+    #[address(0x38)]
+    pub m_FrustumCount: u32,
+}
+
+/// The argument block passed to a patch map's per-patch CPU update fragment. Partial: only the
+/// fields the base-terrain fragment ([`TerrainPatchUpdate`]) reads are mapped; `0x30` holds the
+/// patch map's type context (for the terrain maps, the render-pass pointer table the fragment
+/// submits into).
+#[min_size(0x50)]
+pub type PatchContext {
+    /// The view description for this update; see [`PatchViewDesc`].
+    #[address(0x8)]
+    pub m_ViewDesc: *const PatchViewDesc,
+
+    /// The patch's header; see [`PatchHeader`].
+    #[address(0x18)]
+    pub m_Header: *mut PatchHeader,
+
+    /// The patch's per-patch constant memory. For the base terrain maps this is the patch's
+    /// `CRenderBlockTerrain` instance, constructed in place when the map was created.
+    #[address(0x28)]
+    pub m_RenderBlock: *mut RenderBlockTerrain,
+}
+
+/// The per-patch CPU fragment for the base VolumetricTerrain patch maps (registered against the
+/// `TerrainPatchUpdate` hash by `OldTerrainPatchSystem::TerrainPatchSystemCreateLayers`). It
+/// advances patch construction and destruction (creating or destroying the patch's
+/// [`RenderBlockTerrain`](graphics_engine::render_block::RenderBlockTerrain) constant buffers,
+/// updating the global terrain mask, and adjusting per-LOD memory statistics), and for constructed
+/// patches it updates the block's alpha fade, sort id, and tessellated index count, then submits
+/// the block to one render pass per set [`PatchHeader::m_VisibilityBits`] bit: frustum id 0 routes
+/// to the color passes (the near-detail pass for base-LOD tiles within one tile of the camera, the
+/// near pass for other tiles at the context's high-detail LOD, and the far pass otherwise), ids
+/// 1..=8 to the static shadow passes (only when the terrain type renders to shadow maps), ids
+/// 9..=10 to the reflective shadow passes, and id 12 to the depth prepass.
+#[address(0x141_0C9_8A0)]
+pub fn TerrainPatchUpdate(patch_context: *mut PatchContext, fragment_context: *mut void);
+
+/// The per-patch CPU fragment for the volumetric-patch terrain maps (the
+/// `CRenderBlockTerrainPatch` system — the terrain renderer active in the retail world; the
+/// [`TerrainPatchUpdate`] maps are dormant there). Structurally parallel to [`TerrainPatchUpdate`]:
+/// it advances patch construction and destruction, and for constructed patches updates the block's
+/// alpha fade and tessellated index count, then submits the patch's render blocks to one render
+/// pass per set [`PatchHeader::m_VisibilityBits`] bit with the same frustum-id routing (id 0 →
+/// color passes, ids 1..=8 → shadow passes, ids 9..=11 → reflective shadow passes, id 12 → the
+/// depth prepass). Base-LOD (9) patches within the camera's 2×2 quadrant additionally submit
+/// per-quadrant sub-blocks to the near/tessellation passes.
+#[address(0x141_0CA_C50)]
+pub fn TerrainPatchSystemFragment(patch_context: *mut PatchContext, fragment_context: *mut void);
