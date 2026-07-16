@@ -19314,7 +19314,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 166
+              "line": 285
             }
           },
           {
@@ -19334,7 +19334,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 166
+              "line": 285
             }
           },
           {
@@ -19354,7 +19354,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 168
+              "line": 287
             }
           }
         ],
@@ -19406,7 +19406,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 173
+              "line": 292
             }
           },
           {
@@ -19448,7 +19448,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 177
+              "line": 296
             }
           },
           {
@@ -19517,7 +19517,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 181
+              "line": 300
             }
           }
         ],
@@ -19531,7 +19531,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 163
+        "line": 282
       }
     },
     "graphics_engine::render_block::RenderBlockDeferredLighting": {
@@ -19595,7 +19595,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 192
+              "line": 311
             }
           }
         ],
@@ -19609,7 +19609,66 @@
       },
       "source": {
         "file_index": 27,
-        "line": 186
+        "line": 305
+      }
+    },
+    "graphics_engine::render_block::RenderBlockTerrain": {
+      "path": "graphics_engine::render_block::RenderBlockTerrain",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " A base VolumetricTerrain render block instance (`CRenderBlockTerrain`): one per terrain tile/sector.",
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "HullClipType",
+            "doc": " Returns the hull-clip type (0, 1, or 2) that selects the hull program `Draw` binds for the\n current pass (`m_HullProgram[clip + 4*variant]`). The color pass (render-status bit 3) resolves\n to type 2 — the LOD-clipping hull that discards patches by their LOD against the tessellation\n metrics — while the depth prepass uses a non-clipping variant, so the depth and colour passes\n can disagree on which patches survive.",
+            "body": {
+              "type": "address",
+              "address": 5372032080
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "render_context",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "i64"
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 27,
+              "line": 169
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 27,
+        "line": 161
       }
     },
     "graphics_engine::render_block::RenderBlockTypeFogVolume": {
@@ -19640,7 +19699,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 122
+              "line": 241
             }
           },
           {
@@ -19665,7 +19724,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 122
+              "line": 241
             }
           },
           {
@@ -19690,7 +19749,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 127
+              "line": 246
             }
           }
         ],
@@ -19731,7 +19790,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 136
+              "line": 255
             }
           }
         ],
@@ -19745,7 +19804,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 118
+        "line": 237
       }
     },
     "graphics_engine::render_block::RenderBlockTypeParticle": {
@@ -19776,7 +19835,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 151
+              "line": 270
             }
           },
           {
@@ -19801,7 +19860,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 151
+              "line": 270
             }
           },
           {
@@ -19826,7 +19885,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 157
+              "line": 276
             }
           },
           {
@@ -19847,7 +19906,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 139
+              "line": 258
             }
           }
         ],
@@ -19862,13 +19921,13 @@
       },
       "source": {
         "file_index": 27,
-        "line": 143
+        "line": 262
       }
     },
     "graphics_engine::render_block::RenderBlockTypeTerrain": {
       "path": "graphics_engine::render_block::RenderBlockTypeTerrain",
       "visibility": "public",
-      "size": 360,
+      "size": 1216,
       "alignment": 8,
       "category": "defined",
       "kind": {
@@ -19932,6 +19991,242 @@
               "file_index": 27,
               "line": 99
             }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_168",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 812
+            },
+            "offset": 360,
+            "size": 812,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 107
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_EnableBackPatchCulling",
+            "doc": " Enables back-patch culling in the color pass. When set, `SetupConstantBuffers` bakes a cull flag\n (gated on the color-pass render-status bit) into the hull/domain constant buffer alongside the\n normalized forward vector of the camera manager's render camera and the\n [`m_BackPatchCullThreshold`](RenderBlockTypeTerrain::m_BackPatchCullThreshold), so the hull\n shader discards patches whose facing is beyond the threshold relative to that view direction.",
+            "doc_links": [
+              {
+                "text": "RenderBlockTypeTerrain::m_BackPatchCullThreshold",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockTypeTerrain",
+                "anchor": "field-m_BackPatchCullThreshold"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 1172,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 107
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_EnableFrustumPatchCulling",
+            "doc": " Enables frustum patch culling in the color pass. When set (and the active pass is not a shadow\n cascade or one of the passes 63..=64), `SetupConstantBuffers` bakes a cull flag into the\n hull/domain constant buffer so the hull shader discards patches outside the baked\n [`m_OffsetViewProjection`](graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection)\n frustum.",
+            "doc_links": [
+              {
+                "text": "graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::RenderContext",
+                "anchor": "field-m_OffsetViewProjection"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 1173,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 115
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_ShowDebugCulling",
+            "doc": " Debug flag: when set, `Setup` leaves the cull face at `NONE` in the color pass (rather than\n `BACK`), so patches the hull shader would otherwise cull are still rasterized — a visualization\n of what patch culling removes.",
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 1174,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 121
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_EnableCullByDetail",
+            "doc": " Enables the per-detail cull term baked into the hull/domain constant buffer by\n `SetupConstantBuffers`.",
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 1175,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 126
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_TessellationFactorInner",
+            "doc": " The inner tessellation factor baked into the hull/domain constant buffer.",
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 1176,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 130
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_TessellationFactorEdge",
+            "doc": " The edge tessellation factor baked into the hull/domain constant buffer. The hull shader scales\n each patch's edge tessellation from this by the patch's projected screen-space size; when the\n resulting factor falls to zero or below, the tessellator discards the patch.",
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 1180,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 136
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_TessellationFactorMinSpacing",
+            "doc": " The minimum screen-space spacing target for tessellation, baked as its reciprocal into the\n hull/domain constant buffer. Smaller values raise the tessellation factor a given projected\n patch size resolves to.",
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 1184,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 142
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_TessellationFactorSphere",
+            "doc": " The sphere (curvature) tessellation factor baked into the hull/domain constant buffer.",
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 1188,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 146
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_TessellationFactorNormalDiff",
+            "doc": " The normal-difference tessellation factor baked into the hull/domain constant buffer.",
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 1192,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 150
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_4ac",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 16
+            },
+            "offset": 1196,
+            "size": 16,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 157
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_BackPatchCullThreshold",
+            "doc": " The facing threshold for\n [`m_EnableBackPatchCulling`](RenderBlockTypeTerrain::m_EnableBackPatchCulling), baked into the\n hull/domain constant buffer. A patch is culled when its facing relative to the render camera's\n forward vector falls beyond this value.",
+            "doc_links": [
+              {
+                "text": "RenderBlockTypeTerrain::m_EnableBackPatchCulling",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockTypeTerrain",
+                "anchor": "field-m_EnableBackPatchCulling"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 1212,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 157
+            }
           }
         ],
         "associated_functions": [],
@@ -19951,7 +20246,7 @@
     "graphics_engine::render_block::RenderBlockTypeTerrainPatch": {
       "path": "graphics_engine::render_block::RenderBlockTypeTerrainPatch",
       "visibility": "public",
-      "size": 376,
+      "size": 1152,
       "alignment": 8,
       "category": "defined",
       "kind": {
@@ -19975,15 +20270,53 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 288
+              "size": 76
             },
             "offset": 0,
-            "size": 288,
+            "size": 76,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 111
+              "line": 181
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_DebugMode",
+            "doc": " The debug visualization mode. When `<= 0`, `Setup` selects the normal shading fragment\n programs; when `> 0`, it selects the debug fragment program at index `m_DebugMode + 60` instead\n (LOD colours, tessellation, and similar overlays).",
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 76,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 181
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_50",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 208
+            },
+            "offset": 80,
+            "size": 208,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 187
             }
           },
           {
@@ -20012,7 +20345,255 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 111
+              "line": 187
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_178",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 721
+            },
+            "offset": 376,
+            "size": 721,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 192
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_ShowMaterial",
+            "doc": " When set, `Setup` binds the material-inspection fragment program instead of the shading one,\n overriding the debug-mode and tint selection.",
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 1097,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 192
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_44a",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 1
+            },
+            "offset": 1098,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 196
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_NoDraw",
+            "doc": " When set, the render block's draw is suppressed.",
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 1099,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 196
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_44c",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 1
+            },
+            "offset": 1100,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 204
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_EnableBackPatchCulling",
+            "doc": " Enables back-patch culling in the color pass. When set, `SetupConstantBuffers` bakes a cull flag\n (gated on the color-pass render-status bit) into the hull/domain constant buffer alongside the\n normalized forward vector of the camera manager's render camera and the\n [`m_BackPatchCullThreshold`](RenderBlockTypeTerrainPatch::m_BackPatchCullThreshold), so the hull\n shader discards patches whose facing is beyond the threshold relative to that view direction.",
+            "doc_links": [
+              {
+                "text": "RenderBlockTypeTerrainPatch::m_BackPatchCullThreshold",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockTypeTerrainPatch",
+                "anchor": "field-m_BackPatchCullThreshold"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 1101,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 204
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_EnableFrustumPatchCulling",
+            "doc": " Enables frustum patch culling in the color pass. When set (and the active pass is not a shadow\n cascade or one of the passes 57..=60), `SetupConstantBuffers` bakes a cull flag into the\n hull/domain constant buffer so the hull shader discards patches outside the baked\n [`m_OffsetViewProjection`](graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection)\n frustum.",
+            "doc_links": [
+              {
+                "text": "graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::RenderContext",
+                "anchor": "field-m_OffsetViewProjection"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 1102,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 212
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_ShowDebugCulling",
+            "doc": " Debug flag: when set, `Setup` leaves the cull face at `NONE` in the color pass (rather than\n `BACK`), so patches the hull shader would otherwise cull are still rasterized — a visualization\n of what patch culling removes.",
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 1103,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 218
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_EnableCullByDetail",
+            "doc": " Enables the per-detail cull term baked into the hull/domain constant buffer by\n `SetupConstantBuffers`.",
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 1104,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 223
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_451",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 39
+            },
+            "offset": 1105,
+            "size": 39,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 230
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_BackPatchCullThreshold",
+            "doc": " The facing threshold for\n [`m_EnableBackPatchCulling`](RenderBlockTypeTerrainPatch::m_EnableBackPatchCulling), baked into\n the hull/domain constant buffer. A patch is culled when its facing relative to the render\n camera's forward vector falls beyond this value.",
+            "doc_links": [
+              {
+                "text": "RenderBlockTypeTerrainPatch::m_EnableBackPatchCulling",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockTypeTerrainPatch",
+                "anchor": "field-m_EnableBackPatchCulling"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 1144,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 230
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_47c",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 4
+            },
+            "offset": 1148,
+            "size": 4,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 172
             }
           }
         ],
@@ -20027,7 +20608,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 106
+        "line": 176
       }
     },
     "graphics_engine::render_block::SkinBatch": {
@@ -48228,6 +48809,7 @@
             "graphics_engine::render_block::RenderBlockCharacter",
             "graphics_engine::render_block::RenderBlockCharacterSkin",
             "graphics_engine::render_block::RenderBlockDeferredLighting",
+            "graphics_engine::render_block::RenderBlockTerrain",
             "graphics_engine::render_block::RenderBlockTypeFogVolume",
             "graphics_engine::render_block::RenderBlockTypeParticle",
             "graphics_engine::render_block::RenderBlockTypeTerrain",
