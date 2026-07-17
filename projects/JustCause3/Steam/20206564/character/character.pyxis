@@ -1,6 +1,8 @@
 use animation::ik::HumanIK;
 use animation::rule_system::AnimationRuleSystem;
 use blackboard::ObjectBlackboard;
+use character::inventory::Inventory;
+use equipment::grappling_hook::GrapplingHook;
 use types::math::Matrix4;
 use types::math::Vector3;
 use types::shared_ptr::SharedPtr;
@@ -32,6 +34,10 @@ pub bitflags CharacterLodFlags: u8 {
 
 #[size(0x3540)]
 pub type Character {
+    /// The character's embedded equipment inventory.
+    #[address(0x980)]
+    pub m_Inventory: Inventory,
+
     /// The character's embedded HumanIK solver. Driven each frame in
     /// [`UpdatePassFinalizePose_Parallel`](Character::UpdatePassFinalizePose_Parallel), after the
     /// animation graph finalizes the local pose and before the model-space pose is computed. See
@@ -92,6 +98,11 @@ impl Character {
 
     #[address(0x140_7AF_550)]
     pub fn GetHeadPosition(&self, position: *mut Vector3) -> *mut Vector3;
+
+    /// Returns a reference to the character's grappling-hook slot
+    /// ([`Inventory::m_GrapplingHook`](character::inventory::Inventory::m_GrapplingHook)).
+    #[address(0x140_760_830)]
+    pub fn GetGrapplingHook(&self) -> *const SharedPtr<GrapplingHook>;
 
     #[address(0x140_79A_B30)]
     pub fn GetSafeIndex(&self, safe_index: SafeBoneIndex) -> u32;

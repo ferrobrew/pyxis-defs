@@ -1,0 +1,64 @@
+use types::shared_ptr::SharedPtr;
+
+/// The grappling hook's high-level state machine (`CGrapplingHook::m_State`). `SetState` is the
+/// mutator; the reel tasks (`NStateTask_ReelIn`) and the reeled-in controller
+/// (`NReeledInController`) drive the transitions. A reel-to-target starts in
+/// [`GHS_REELING_IN`](GrapplingHookState::GHS_REELING_IN) -- during which
+/// `NReeledInController::RotateToGrappleTarget` rotates the character's root toward the target as
+/// the reel pulls them in -- and completes into one of the `GHS_REELED_*` attachment states
+/// depending on the landing surface and pose. `GHS_CUSTOM_ACTIVE_WIRE` is a wire held open outside
+/// the reel flow (tethers).
+#[copyable]
+pub enum GrapplingHookState: i32 {
+    GHS_INITIALIZING = 0x0,
+    GHS_INACTIVE = 0x1,
+    GHS_REELING_IN = 0x2,
+    GHS_REELED_ATTACHED = 0x3,
+    GHS_REELED_HANG = 0x4,
+    GHS_REELED_UPSIDEDOWN = 0x5,
+    GHS_REELED_STUNT = 0x6,
+    GHS_CUSTOM_ACTIVE_WIRE = 0x7,
+}
+
+/// A single grapple wire (`CGrapplingHookWire`, a `CGameObject`): two `CWireEnd`s (near/device and
+/// far/hook), the physics constraint, and the wire rendering. Only referenced through
+/// [`GrapplingHook::m_ActiveWire`] here; the layout is unmapped.
+pub type GrapplingHookWire;
+
+/// The grappling-hook equipment item (`CGrapplingHook`, a `CGameObject`): owns the wires, the
+/// reel/tether state machine, and the cached fire target. A character's hook is held by its
+/// inventory ([`Inventory::m_GrapplingHook`](character::inventory::Inventory::m_GrapplingHook)).
+pub type GrapplingHook {
+    /// The current state-machine state; see [`GrapplingHookState`]. The state records the *last*
+    /// reel outcome as much as the current one: leaving a `GHS_REELED_*` attachment does not
+    /// reliably return it to [`GHS_INACTIVE`](GrapplingHookState::GHS_INACTIVE) — readers such as
+    /// `IsHookAimingState` and `ShouldShowAttachedUI` therefore combine it with
+    /// [`m_ActiveWire`](GrapplingHook::m_ActiveWire) rather than trusting it alone.
+    #[address(0x234)]
+    pub m_State: GrapplingHookState,
+
+    /// The countdown (seconds) armed when a hook fire is committed, within which the fire
+    /// animation must emit its release track message before the fire is abandoned. Set to `2.0`
+    /// alongside [`m_WaitingForGrappleFire`](GrapplingHook::m_WaitingForGrappleFire) by the fire
+    /// dispatchers (`FireHookTowardsPos`, `TryFireHook`).
+    #[address(0x270)]
+    pub m_WaitForFireSignalTimeout: f32,
+
+    /// Whether a grapple-hook fire is committed and awaiting the fire animation's release track
+    /// message: set when the fire dispatches (before the fire act plays and the wire spawns),
+    /// cleared when the hook releases or the fire times out. The fire act's directional alignment
+    /// of the character runs within this window.
+    #[address(0x274)]
+    pub m_WaitingForGrappleFire: bool,
+
+    /// The dual-tether counterpart of
+    /// [`m_WaitingForGrappleFire`](GrapplingHook::m_WaitingForGrappleFire); the two are cleared
+    /// together as one word.
+    #[address(0x275)]
+    pub m_WaitingForTetherFire: bool,
+
+    /// The wire currently driving the reel/attach flow, or null when none is live. The state
+    /// readers null-check this before interpreting [`m_State`](GrapplingHook::m_State).
+    #[address(0x3C8)]
+    pub m_ActiveWire: SharedPtr<GrapplingHookWire>,
+}
