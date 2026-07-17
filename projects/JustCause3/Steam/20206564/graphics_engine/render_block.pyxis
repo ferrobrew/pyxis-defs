@@ -1,5 +1,5 @@
 use graphics_engine::graphics_engine::{HContext_t, HTexture_t, RenderContext};
-use types::math::Matrix4;
+use types::math::{Matrix4, Vector3};
 
 /// A 3x4 skinning-palette bone matrix. The layout differs per render block (empirically, by the
 /// block's vertex format/shader variant): some blocks store four 3-float columns with the
@@ -185,6 +185,50 @@ impl RenderBlockTerrain {
     /// The same selection runs in every pass (depth prepass and color alike).
     #[address(0x140_32B_450)]
     pub fn HullClipType(&self, render_context: *mut RenderContext) -> i64;
+}
+
+/// One volumetric-terrain patch instance (`NGraphicsEngine::CRenderBlockTerrainPatch`): the
+/// per-patch render block the terrain patch system enqueues onto the terrain basemesh passes, one
+/// per quadtree patch. Partial: only the placement and sort fields are mapped.
+#[min_size(0xF8)]
+pub type RenderBlockTerrainPatch {
+    /// The patch's world-space placement origin. Together with
+    /// [`m_Size`](RenderBlockTerrainPatch::m_Size) it spans the patch's footprint; the patch's
+    /// 512 m tile indices ([`m_TileX`](RenderBlockTerrainPatch::m_TileX)) derive from the same
+    /// placement.
+    #[address(0xC8)]
+    pub m_Position: Vector3,
+
+    /// The patch's world-space side length (quadtree level dependent).
+    #[address(0xD4)]
+    pub m_Size: f32,
+
+    /// The patch's quadtree LOD level.
+    #[address(0xD8)]
+    pub m_PatchLOD: u16,
+
+    /// The patch's 512 m world tile X index (offset by half the 32,768 m world).
+    #[address(0xE0)]
+    pub m_TileX: i16,
+
+    /// The patch's 512 m world tile Z index.
+    #[address(0xE2)]
+    pub m_TileZ: i16,
+
+    /// The block's sort identifier, rebuilt per frame by
+    /// [`UpdateSortID`](RenderBlockTerrainPatch::UpdateSortID): bits 32..47 carry the squared
+    /// camera tile distance (in 512 m tiles), bits 61+ a tessellation/LOD class, and the low 32
+    /// bits the block pointer. The block's `GetSortID` returns it verbatim, so terrain patches
+    /// sort by tessellation class, then tile distance.
+    #[address(0xF0)]
+    pub m_SortID: u64,
+}
+impl RenderBlockTerrainPatch {
+    /// Rebuilds [`m_SortID`](RenderBlockTerrainPatch::m_SortID) from the camera translation:
+    /// recomputes the camera-relative tile deltas and packs the squared tile distance and
+    /// tessellation class. Called by the terrain patch system's per-frame update.
+    #[address(0x141_0CA_030)]
+    pub fn UpdateSortID(&mut self, camera_translation: *const Vector3);
 }
 
 /// The volumetric-patch terrain render block *type* (the

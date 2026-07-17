@@ -1,13 +1,124 @@
 use graphics_engine::graphics_engine::RenderContext;
+use graphics_engine::render_engine::{RenderBlockTypeBase, RenderPassId};
 use camera::camera::Camera;
-use types::math::Matrix4;
+use types::math::{Matrix4, Vector3};
 
-/// One render block enqueued onto a draw list. Opaque; handled only behind pointers.
-pub type RenderBlock;
+/// One render block enqueued onto a draw list (`NGraphicsEngine::IRenderBlock`). Mapped by vtable
+/// only; instances are handled behind pointers.
+#[min_size(0x8)]
+pub type RenderBlock {
+    vftable {
+        /// Returns the block's [`RenderBlockTypeBase`]. [`RenderPass::DoDraw`] calls this per
+        /// entry to detect type runs and drive the type-level setup/restore.
+        #[index(12)]
+        pub fn GetType(&mut self) -> *mut RenderBlockTypeBase;
+
+        /// Returns the block's 64-bit sort identifier (typically derived from its shaders and
+        /// material so equal-state blocks batch together). The sort-ID computation passes store
+        /// the result in [`RenderInstance::m_SortID`].
+        #[index(26)]
+        pub fn GetSortID(&mut self, sc: *const SortContext, info: *const RBIInfo) -> u64;
+
+        /// Returns the squared distance from the instance's world translation
+        /// (`info.m_Transform[sc.m_RenderFrameIndex]`) to [`SortContext::m_CameraPosition`]. The
+        /// depth-aware sort-ID computations store the result (or its depth-bucket index) in
+        /// [`RenderInstance::m_Depth`].
+        #[index(27)]
+        pub fn GetSqDistanceToCamera(&mut self, sc: *const SortContext, info: *const RBIInfo) -> f32;
+
+        /// Per-block state setup for the colour path, called by [`RenderPass::DoDraw`] when the
+        /// block pointer changes within a type run.
+        #[index(28)]
+        pub fn Setup(&mut self, ctx: *mut RenderContext, sort_id: u64, a4: u64);
+
+        /// Per-block state setup for the depth-only path (the Z passes).
+        #[index(29)]
+        pub fn SetupZ(&mut self, ctx: *mut RenderContext, sort_id: u64, a4: u64);
+
+        /// Issues the block's draw calls for the colour path.
+        #[index(30)]
+        pub fn Draw(&mut self, ctx: *mut RenderContext, info: *const RBIInfo);
+
+        /// Issues the block's draw calls for the depth-only path (the Z passes).
+        #[index(31)]
+        pub fn DrawZ(&mut self, ctx: *mut RenderContext, info: *const RBIInfo);
+
+        /// Writes the block's local-space bounding box; returns whether one is available.
+        #[index(33)]
+        pub fn GetBoundingBox(&mut self, min: *mut Vector3, max: *mut Vector3) -> bool;
+    },
+}
 
 /// The per-item info accompanying a render block on a draw list (transform, sort key, and the like).
 /// Opaque; handled only behind pointers.
 pub type RBIInfo;
+
+/// The camera context a render pass sorts against (`NGraphicsEngine::IRenderBlock::SSortContext`).
+/// [`RenderPass::SortList`] receives it from either of its two callers:
+/// `CRenderEngine::SortRenderPasses` builds it from the pass's sort camera (its external camera if
+/// set, else the render camera), and [`RenderPass::DoDraw`]'s lazy call builds it from the render
+/// context's camera fields.
+#[size(0x18), copyable]
+pub type SortContext {
+    /// The [`RenderPassId`] of the pass being sorted.
+    pub m_RenderPassIndex: i32,
+    /// The `%3` render-frame ring index selecting which of the info's buffered world transforms
+    /// the distance query reads.
+    pub m_RenderFrameIndex: u32,
+    /// The sort camera's world position.
+    pub m_CameraPosition: Vector3,
+    /// The sort camera's near-plane distance.
+    pub m_CameraNear: f32,
+}
+
+/// One draw-list entry (`NGraphicsEngine::SRenderInstance`): a render block plus its per-instance
+/// info and the sort keys the per-frame sort orders it by.
+#[size(0x20), copyable]
+pub type RenderInstance {
+    /// The block's sort identifier, written per frame by the sort-ID computation in
+    /// [`RenderPass::SortList`] from [`GetSortID`](RenderBlock::GetSortID). The final ordering key
+    /// after depth and type.
+    pub m_SortID: u64,
+
+    /// The render block.
+    #[address(0x8)]
+    pub m_RenderBlock: *mut RenderBlock,
+
+    /// The per-instance info handed to the block's draw call.
+    #[address(0x10)]
+    pub m_Info: *mut RBIInfo,
+
+    /// The block's type index, the second ordering key. Written by [`RBILists::Add`].
+    #[address(0x18)]
+    pub m_RenderBlockType: i32,
+
+    /// The primary ordering key, written per frame by the sort-ID computation in
+    /// [`RenderPass::SortList`]: zero for non-depth sorts, the raw squared camera distance for
+    /// `FrontToBack`/`BackToFront`, or the depth-bucket index (see
+    /// [`RenderPass::m_DepthSqTable`]) for `FrontToBackBucketed`.
+    #[address(0x1C)]
+    pub m_Depth: f32,
+}
+
+/// How a render pass orders its draw list (`NGraphicsEngine::ERenderPassSortMethod`).
+#[copyable]
+pub enum RenderPassSortMethod: i32 {
+    /// Resolves at sort time to `FrontToBackBucketed`, or `BackToFront` if the pass renders
+    /// back-to-front (its alpha-blend render setting).
+    RenderPassSortMethod_Auto = 0x0,
+    RenderPassSortMethod_None = 0x1,
+    /// Order by type then sort ID only (no depth key).
+    RenderPassSortMethod_SortID = 0x2,
+    /// Order by descending raw squared camera distance, then type, then sort ID.
+    RenderPassSortMethod_BackToFront = 0x3,
+    /// Order by ascending raw squared camera distance, then type, then sort ID.
+    RenderPassSortMethod_FrontToBack = 0x4,
+    /// Order by ascending depth-bucket index (quantized through
+    /// [`RenderPass::m_DepthSqTable`]), then type, then sort ID — near-first while preserving
+    /// type batching within each bucket. With a single bucket (the default) this degenerates to
+    /// the `SortID` ordering with a zero depth key.
+    RenderPassSortMethod_FrontToBackBucketed = 0x5,
+}
 
 /// One of a render pass's double-buffered render-block-item lists.
 ///
@@ -17,7 +128,7 @@ pub type RBIInfo;
 #[min_size(0x10)]
 pub type RBILists {
     /// The array of entries.
-    pub m_List: *mut void,
+    pub m_List: *mut RenderInstance,
 
     /// The capacity.
     #[address(0x8)]
@@ -45,6 +156,20 @@ pub bitflags RenderPassState: u16 {
     m_Enabled = 0b0000_0000_0000_1000,
 }
 
+/// Pass list/sort state flags. Only the sorted latch is identified; the remaining bits are
+/// unmapped.
+#[copyable]
+pub bitflags RenderPassSortState: u16 {
+    /// Set by [`SortList`](RenderPass::SortList) once the current draw list is sorted; cleared by
+    /// [`SaveRenderFrameData`](RenderPass::SaveRenderFrameData) at the per-frame list rotation.
+    /// While set, further `SortList` calls return without re-sorting, so a draw list is sorted at
+    /// most once per rotation no matter how many times it is drawn.
+    m_Sorted = 0b0000_0100_0000_0000,
+}
+
+/// The base render pass (`NGraphicsEngine::CRenderPass`, 0x8C0 bytes in the release build).
+/// Specialized passes derive from it, so only the base extent is claimed here.
+#[min_size(0x8C0)]
 pub type RenderPass {
     /// The list that new render-block-items append to this frame. Each rotation,
     /// [`SaveRenderFrameData`](RenderPass::SaveRenderFrameData) re-points it at the new parity's list
@@ -52,11 +177,56 @@ pub type RenderPass {
     #[address(0x28)]
     pub m_CurrentAddList: *mut RBILists,
 
+    /// The list [`DoDraw`](RenderPass::DoDraw) draws this frame: the other parity's list, populated
+    /// by last rotation's adds. Re-pointed alongside
+    /// [`m_CurrentAddList`](RenderPass::m_CurrentAddList) by
+    /// [`SaveRenderFrameData`](RenderPass::SaveRenderFrameData).
+    #[address(0x30)]
+    pub m_CurrentDrawList: *mut RBILists,
+
+    /// Whether the pass renders back-to-front (the alpha-blend render setting). The `Auto` sort
+    /// method resolves to `BackToFront` when set, `FrontToBackBucketed` otherwise.
+    #[address(0x48)]
+    pub m_RenderBackToFront: i32,
+
     /// Pass state flags. [`m_Enabled`](RenderPassState::m_Enabled) gates whether the pass draws;
     /// [`ShadowManager::CommitRenderPassSettings`](graphics_engine::shadow_manager::ShadowManager::CommitRenderPassSettings)
     /// drives it per dispatch for the shadow passes.
     #[address(0x8E)]
     pub m_StateFlags: RenderPassState,
+
+    /// List/sort state flags; carries the [`m_Sorted`](RenderPassSortState::m_Sorted) latch.
+    #[address(0x9C)]
+    pub m_SortStateFlags: RenderPassSortState,
+
+    /// The pass's [`RenderPassId`], stored narrow.
+    #[address(0x9E)]
+    pub m_Index: i16,
+
+    /// The spinlock serializing [`SortList`](RenderPass::SortList) against concurrent callers
+    /// (the render-engine sort task and the lazy sort in [`DoDraw`](RenderPass::DoDraw)).
+    #[address(0x858)]
+    pub m_SortLock: *mut void,
+
+    /// How [`SortList`](RenderPass::SortList) orders the draw list. Most passes leave the
+    /// constructor default (`Auto`); passes that opt out set `None`.
+    #[address(0x878)]
+    pub m_SortMethod: RenderPassSortMethod,
+
+    /// The number of live entries in [`m_DepthSqTable`](RenderPass::m_DepthSqTable). The
+    /// constructor initializes a single zero bucket; with one bucket the bucketed sort computes no
+    /// depth keys.
+    #[address(0x87C)]
+    pub m_NumDepthBuckets: u16,
+
+    /// The depth-bucket boundary table for `FrontToBackBucketed` sorting: ascending *squared*
+    /// minimum distances, one per bucket, up to 16. An instance's bucket is the first entry its
+    /// squared camera distance is below. Boundaries are registered at pass creation by squaring
+    /// the boundary distance, appending it, and re-sorting the live prefix (the engine's
+    /// `AddDepthBucket`, inlined into `CRenderEngine::InitializeSystem` in the release build); the
+    /// only stock user is the Z-and-velocity pass, with boundaries at 40 and 120 metres.
+    #[address(0x880)]
+    pub m_DepthSqTable: [f32; 16],
 }
 impl RenderPass {
     /// Appends `count` render-block-items (`items`) to the active draw / add lists (`a3` holds the
@@ -79,9 +249,23 @@ impl RenderPass {
     pub fn SaveRenderFrameData(&mut self, parity: u32);
 
     /// Draws the current draw list, walking `min(m_ListSize, m_NumElements)` blocks and
-    /// vtable-dispatching each. Non-destructive -- never writes `m_NumElements`.
+    /// vtable-dispatching each. Non-destructive -- never writes `m_NumElements`. Calls
+    /// [`SortList`](RenderPass::SortList) lazily before drawing.
     #[address(0x140_1AC_7A0)]
     pub fn DoDraw(&mut self, ctx: *mut RenderContext, color_mask: u32) -> bool;
+
+    /// Sorts the current draw list by ([`m_Depth`](RenderInstance::m_Depth),
+    /// [`m_RenderBlockType`](RenderInstance::m_RenderBlockType),
+    /// [`m_SortID`](RenderInstance::m_SortID)) according to
+    /// [`m_SortMethod`](RenderPass::m_SortMethod), first recomputing each entry's depth and
+    /// sort-ID keys through the block vtable
+    /// ([`GetSortID`](RenderBlock::GetSortID) / [`GetSqDistanceToCamera`](RenderBlock::GetSqDistanceToCamera)).
+    /// Latches [`m_Sorted`](RenderPassSortState::m_Sorted) under [`m_SortLock`](RenderPass::m_SortLock),
+    /// so the sort runs at most once per list rotation; both the render-engine sort task
+    /// (`CRenderEngine::SortRenderPasses`) and the lazy call in [`DoDraw`](RenderPass::DoDraw)
+    /// funnel here.
+    #[address(0x140_1A8_7C0)]
+    pub fn SortList(&mut self, sc: *const SortContext);
 }
 
 /// Copies `src` (a view matrix), zeroes its translation row, and multiplies by `proj`, writing the

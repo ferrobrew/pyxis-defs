@@ -2,7 +2,7 @@ use camera::camera::Camera;
 use graphics_engine::device::{Device, DeviceInfo};
 use graphics_engine::shadow_manager::ShadowManager;
 use graphics_engine::texture::Texture;
-use types::math::{Matrix4, Vector4};
+use types::math::{Matrix4, Vector3, Vector4};
 use types::std_string::String;
 
 #[size(8), align(8), rust_name = "windows::Win32::UI::WindowsAndMessaging::HICON", cpp_header = "<windows.h>", cpp_name = "::HICON"]
@@ -282,6 +282,13 @@ pub type RenderContext {
     #[address(0xD8)]
     pub m_OffsetViewProjection: Matrix4,
 
+    /// The camera world position for this dispatch, copied from the camera's transform translation
+    /// by [`SetRenderContextCamera`](RenderPass::SetRenderContextCamera). Camera-relative geometry
+    /// subtracts it per object, and [`RenderPass::DoDraw`] hands it to
+    /// [`SortList`](RenderPass::SortList) as the sort camera position.
+    #[address(0x218)]
+    pub m_CameraPosition: Vector3,
+
     /// The vertical field of view in radians, copied from [`Camera::m_FOV`] by
     /// [`SetRenderContextCamera`](RenderPass::SetRenderContextCamera).
     #[address(0x2FC)]
@@ -310,6 +317,12 @@ pub type RenderContext {
     /// The display aspect ratio (`m_DisplayWidth / m_DisplayHeight`).
     #[address(0x314)]
     pub m_DisplayRatio: f32,
+
+    /// The id (`ERenderPass`, see `render_engine::RenderPassId`) of the pass currently drawing
+    /// through this context, written by `SetupRenderContext` from the pass's index. `RP_NONE` (0)
+    /// outside a pass body.
+    #[address(0x438)]
+    pub m_ActiveRenderPass: i32,
 
     /// The per-real-frame stamp for this dispatch, set from [`render_frame_counters`]'s `m_FrameIndex`
     /// during render-context setup. Passes that cache per-frame state key on it — the terrain

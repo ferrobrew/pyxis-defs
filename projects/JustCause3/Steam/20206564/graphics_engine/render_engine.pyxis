@@ -280,6 +280,15 @@ impl RenderEngine {
     /// not touch the per-pass draw lists.
     #[address(0x140_1A4_ED0)]
     pub fn EraseAllDeletedRenderBlocks(&mut self);
+
+    /// The render-thread sort task's body: walks every registered pass across all pass
+    /// categories, builds a sort context from the pass's sort camera (its external camera if set,
+    /// else the render camera), and calls
+    /// [`SortList`](graphics_engine::render_pass::RenderPass::SortList) on each. Because
+    /// `SortList` latches per rotation, passes drawn before the task reaches them are sorted
+    /// lazily by `DoDraw` instead and skipped here.
+    #[address(0x140_1AB_C40)]
+    pub fn SortRenderPasses(&mut self);
 }
 
 /// The opaque texture cache (`STextureCache`).
