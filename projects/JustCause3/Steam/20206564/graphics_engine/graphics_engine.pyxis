@@ -245,6 +245,90 @@ pub type HTexture_t;
 #[address(0x141_966_D20)]
 pub fn SetRenderSetup(context: *mut HContext_t, setup: *mut HRenderSetup_t, force: bool);
 
+/// A GPU timestamp query handle (an `ID3D11Query` of `D3D11_QUERY_TIMESTAMP`).
+pub type HTimeStampQuery_t;
+
+/// A GPU timestamp-disjoint query handle (an `ID3D11Query` of `D3D11_QUERY_TIMESTAMP_DISJOINT`):
+/// brackets an interval and yields the GPU tick frequency plus whether the interval's timestamps
+/// are reliable.
+pub type HTimeStampDisjointQuery_t;
+
+/// The result status of [`QueryTimeStampFrequency`].
+#[copyable]
+pub enum FrequencyStatus: i32 {
+    /// The result is available and the interval was continuous.
+    Ok = 0x0,
+    /// The result is available but the interval was disjoint; timestamps taken inside it are
+    /// unreliable.
+    Disjoint = 0x1,
+    /// The result is not yet available.
+    Pending = 0x2,
+}
+
+/// Creates a `D3D11_QUERY_TIMESTAMP` query on the device (device vtable `CreateQuery`); raises the
+/// graphics critical-error path on failure.
+#[address(0x141_955_850)]
+pub fn CreateTimeStampQuery(device: *mut HDevice_t) -> *mut HTimeStampQuery_t;
+
+/// Releases a timestamp query.
+#[address(0x141_955_8A0)]
+pub fn DestroyTimeStampQuery(device: *mut HDevice_t, query: *mut HTimeStampQuery_t);
+
+/// Records a timestamp on the context (`ID3D11DeviceContext::End` on the query), under the context
+/// mutex when present.
+#[address(0x141_955_8B0)]
+pub fn SetTimeStampQuery(context: *mut HContext_t, query: *mut HTimeStampQuery_t);
+
+/// Reads a timestamp query's tick value (`GetData`, non-blocking). Returns `0` while the result is
+/// still pending.
+#[address(0x141_955_920)]
+pub fn QueryTimeStamp(context: *mut HContext_t, query: *mut HTimeStampQuery_t) -> u64;
+
+/// Creates a `D3D11_QUERY_TIMESTAMP_DISJOINT` query on the device; raises the graphics
+/// critical-error path on failure.
+#[address(0x141_955_9C0)]
+pub fn CreateTimeStampDisjointQuery(device: *mut HDevice_t) -> *mut HTimeStampDisjointQuery_t;
+
+/// Releases a timestamp-disjoint query.
+#[address(0x141_955_A10)]
+pub fn DestroyTimeStampDisjointQuery(device: *mut HDevice_t, query: *mut HTimeStampDisjointQuery_t);
+
+/// Begins the disjoint interval (`ID3D11DeviceContext::Begin`), under the context mutex when
+/// present.
+#[address(0x141_955_A20)]
+pub fn BeginTimeStampDisjointQuery(context: *mut HContext_t, query: *mut HTimeStampDisjointQuery_t);
+
+/// Ends the disjoint interval (`ID3D11DeviceContext::End`). In the release build the body is
+/// identical-code-folded with [`SetTimeStampQuery`] (both call `End` under the context mutex), so
+/// this shares its address; the release symbol table's placement at `0x141954000` is an unrelated
+/// two-instruction stub.
+#[address(0x141_955_8B0)]
+pub fn EndTimeStampDisjointQuery(context: *mut HContext_t, query: *mut HTimeStampDisjointQuery_t);
+
+/// Reads a disjoint query's result (`GetData`, non-blocking): writes the GPU tick frequency to
+/// `out_frequency` (`0` while pending) and returns the interval's status.
+#[address(0x141_955_B00)]
+pub fn QueryTimeStampFrequency(context: *mut HContext_t, query: *mut HTimeStampDisjointQuery_t, out_frequency: *mut u64) -> FrequencyStatus;
+
+/// The developer scope-marker begin: opens a named instrumentation scope on the context. Compiled
+/// to an empty function in the release build, but its call sites and name strings survive
+/// throughout the renderer -- the frame stages in `CGraphicsEngine::HandleDrawThreadTask`
+/// (`"Frame setup"`, `"CopyEffectTextures"`, `"Debug UI"`), the post-effect stack (SMAA, FXAA,
+/// depth of field, motion blur, lens flare, glare, tone mapping), deferred lighting, SSAO, SSR,
+/// environment reflections, water, terrain restores, and the per-render-block-type runs opened by
+/// [`RenderPass::ChangeRenderBlockType`](graphics_engine::render_pass::RenderPass::ChangeRenderBlockType)
+/// (named by each type's
+/// [`GetTypeName`](graphics_engine::render_engine::RenderBlockTypeBase::GetTypeName)). Scopes nest
+/// per context and are closed by [`EndScopeMarker`]; the RAII wrapper `Graphics::CScopeMarker`
+/// calls the pair from its constructor and destructor.
+#[address(0x141_954_D10)]
+pub fn BeginScopeMarker(context: *mut HContext_t, name: *const u8);
+
+/// Closes the innermost scope opened by [`BeginScopeMarker`] on the context. Compiled to an empty
+/// function in the release build; the call sites survive.
+#[address(0x141_954_D20)]
+pub fn EndScopeMarker(context: *mut HContext_t);
+
 /// The cascaded sun-shadow constants for the forward-material resolve: the cascade transform plus the
 /// per-cascade box-test parameters, staged into cb0 by `RenderEngine::SetGlobalShaderConstants`.
 #[size(0x120), align(4)]
@@ -317,6 +401,11 @@ pub type RenderContext {
     /// The display aspect ratio (`m_DisplayWidth / m_DisplayHeight`).
     #[address(0x314)]
     pub m_DisplayRatio: f32,
+
+    /// The graphics context this dispatch draws through. The render blocks' draw paths and the
+    /// scope markers ([`BeginScopeMarker`] / [`EndScopeMarker`]) read it off the render context.
+    #[address(0x318)]
+    pub m_Context: *mut HContext_t,
 
     /// The id (`ERenderPass`, see `render_engine::RenderPassId`) of the pass currently drawing
     /// through this context, written by `SetupRenderContext` from the pass's index. `RP_NONE` (0)

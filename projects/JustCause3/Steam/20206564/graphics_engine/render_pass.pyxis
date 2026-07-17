@@ -250,9 +250,23 @@ impl RenderPass {
 
     /// Draws the current draw list, walking `min(m_ListSize, m_NumElements)` blocks and
     /// vtable-dispatching each. Non-destructive -- never writes `m_NumElements`. Calls
-    /// [`SortList`](RenderPass::SortList) lazily before drawing.
+    /// [`SortList`](RenderPass::SortList) lazily before drawing. Consecutive blocks of one type
+    /// form a type run: [`ChangeRenderBlockType`](RenderPass::ChangeRenderBlockType) switches
+    /// between runs, and the tail closes the final run (its type-level restore and its scope
+    /// marker).
     #[address(0x140_1AC_7A0)]
     pub fn DoDraw(&mut self, ctx: *mut RenderContext, color_mask: u32) -> bool;
+
+    /// Switches the active render-block type between type runs in [`DoDraw`](RenderPass::DoDraw):
+    /// restores `prev` (dispatching the Z, colour, or glint restore variant selected by the pass
+    /// id) and closes its scope marker (`Graphics::EndScopeMarker`), then re-applies the
+    /// pass render states, sets up `next`, and opens a scope marker (`Graphics::BeginScopeMarker`)
+    /// named by its
+    /// [`GetTypeName`](graphics_engine::render_engine::RenderBlockTypeBase::GetTypeName). Either
+    /// pointer may be null at a run boundary. `inout_count` is the pass's running drawn-block
+    /// counter, zeroed on a type switch.
+    #[address(0x140_187_310)]
+    pub fn ChangeRenderBlockType(&mut self, ctx: *mut RenderContext, prev: *mut RenderBlockTypeBase, next: *mut RenderBlockTypeBase, inout_count: *mut u32);
 
     /// Sorts the current draw list by ([`m_Depth`](RenderInstance::m_Depth),
     /// [`m_RenderBlockType`](RenderInstance::m_RenderBlockType),

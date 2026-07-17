@@ -1,0 +1,69 @@
+/// The fixed frame-phase ids of the engine's CPU profiler ([`CpuProfiler`]). Each phase is one
+/// slot in the profiler's per-frame time and counter arrays; the names come from the static table
+/// behind [`GetScopeName`](CpuProfiler::GetScopeName).
+#[copyable]
+pub enum CpuScopeId: i32 {
+    CPU_SCOPE_ID_FRAME = 0x0,
+    CPU_SCOPE_ID_DRAW = 0x1,
+    CPU_SCOPE_ID_UPDATE_ALL = 0x2,
+    CPU_SCOPE_ID_RENDER_ALL = 0x3,
+    CPU_SCOPE_ID_PREUPDATE = 0x4,
+    CPU_SCOPE_ID_PRESIM_SYSTEMS = 0x5,
+    CPU_SCOPE_ID_PRESIM_OBJECTS = 0x6,
+    CPU_SCOPE_ID_PHYSICS_UPDATE = 0x7,
+    CPU_SCOPE_ID_POSTSIM_UPDATE = 0x8,
+    CPU_SCOPE_ID_POSTSIM_SYSTEMS = 0x9,
+    CPU_SCOPE_ID_WAIT_FRAME = 0xA,
+    CPU_SCOPE_ID_RENDER_UPDATE = 0xB,
+    CPU_SCOPE_ID_RENDER_SYSTEMS = 0xC,
+    CPU_SCOPE_ID_WAIT_FLIP = 0xD,
+    CPU_SCOPE_ID_WAIT_UI = 0xE,
+    CPU_SCOPE_ID_COUNT = 0xF,
+}
+
+/// The engine's fixed 15-phase CPU frame profiler (`g_CpuProfiler`): phase brackets record QPC
+/// begin/end pairs into a triple-buffered counter ring, and a once-per-frame update converts the
+/// completed ring slot into per-phase milliseconds with a rolling 30-frame peak.
+///
+/// In the release build the machinery is dead: [`Update`](CpuProfiler::Update) is compiled to an
+/// empty function, and the phase brackets that write [`m_Counters`](CpuProfiler::m_Counters) are
+/// compiled out of `CGame::Update` and the game states, so every field stays zero. The consumers
+/// remain -- `CBorkReport`'s telemetry serialises [`m_Time`](CpuProfiler::m_Time) via
+/// [`GetScopeName`](CpuProfiler::GetScopeName), and `CGraphicsEngine::DispatchDraw` forwards
+/// [`m_Index`](CpuProfiler::m_Index) to the draw task -- but they only ever read zeros.
+#[singleton(0x142_E5A_DF0), size(0x390), align(8)]
+pub type CpuProfiler {
+    /// The last completed frame's milliseconds per phase, converted from
+    /// [`m_Counters`](CpuProfiler::m_Counters) by [`Update`](CpuProfiler::Update).
+    #[address(0x0)]
+    pub m_Time: [f32; 15],
+
+    /// The rolling peak per phase over the 30-frame peak window.
+    #[address(0x3C)]
+    pub m_Peak: [f32; 15],
+
+    /// The counter ring position; [`Update`](CpuProfiler::Update) reads slot `(m_Index + 1) % 3`.
+    #[address(0x78)]
+    pub m_Index: i32,
+
+    /// QPC begin/end pairs, per phase, per ring slot: `[phase][ring slot][begin, end]`.
+    #[address(0x80)]
+    pub m_Counters: [[[u64; 2]; 3]; 15],
+
+    /// The running peak within the current 30-frame window, promoted into
+    /// [`m_Peak`](CpuProfiler::m_Peak) when the window rolls.
+    #[address(0x350)]
+    pub m_LocalPeak: [f32; 15],
+}
+impl CpuProfiler {
+    /// Converts the completed ring slot's QPC deltas into [`m_Time`](CpuProfiler::m_Time)
+    /// milliseconds and rolls the peak window. Compiled to an empty function in the release build;
+    /// the once-per-frame call at the top of [`Update`](game::Game::Update) remains.
+    #[address(0x140_062_490)]
+    pub fn Update(&mut self);
+
+    /// The phase's display name from the static 15-entry name table at `0x142D3A150`
+    /// (`"FRAME"`, `"DRAW"`, `"UPDATE_ALL"`, ...). Does not read `self`.
+    #[address(0x140_062_4A0)]
+    pub fn GetScopeName(&self, id: CpuScopeId) -> *const u8;
+}

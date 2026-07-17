@@ -34,6 +34,12 @@ impl Game {
     /// Builds the per-frame update contexts and drives rendering.
     #[address(0x140_95A_4E0)]
     pub fn UpdateRender(&mut self, update_contexts: *mut UpdateContexts);
+
+    /// One sim tick: advances the game clock, updates the FPS counter, and dispatches to the
+    /// active game state's update (install, init, frontend, load, or run). Called zero or more
+    /// times per [`Update`](Game::Update) according to the frame-pacing mode.
+    #[address(0x140_952_1F0)]
+    pub fn UpdateGame(&mut self, update_contexts: *mut UpdateContexts);
 }
 
 // Opaque engine context types carried by the per-frame update contexts.

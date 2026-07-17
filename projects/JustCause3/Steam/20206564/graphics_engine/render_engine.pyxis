@@ -179,6 +179,16 @@ pub enum RenderPassId: i32 {
 #[address(0x140_175_080)]
 pub fn GetRenderPassName(pass: RenderPassId) -> *const u8;
 
+/// Maps a render-pass id to its coarse category (`ERenderPassCategory`, 30 values: terrain,
+/// shadows, GBuffer, lighting, water, particles, post effects, UI, ...). The crash-telemetry
+/// metrics aggregate per-pass GPU times by this grouping.
+#[address(0x140_175_0B0)]
+pub fn GetRenderPassCategory(pass: RenderPassId) -> i32;
+
+/// The display name for a render-pass category, or null for out-of-range values.
+#[address(0x140_175_0E0)]
+pub fn GetRenderPassCategoryName(category: i32) -> *const u8;
+
 /// The terrain patch render system's per-frame state (partial: only the fields walked to
 /// `m_TerrainCamera` are mapped). Owned by `CLandscapeManager`; updated by
 /// [`TerrainPatchSystemUpdate`].
