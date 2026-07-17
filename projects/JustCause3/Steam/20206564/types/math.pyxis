@@ -101,7 +101,28 @@ epilogue for Matrix4 r#"
             glam::Mat4::from_cols_array(&m.data)
         }
     }
+    impl std::fmt::Debug for Matrix4 {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            let mut list = f.debug_list();
+            for row in self.data.chunks_exact(4) {
+                list.entry(&row);
+            }
+            list.finish()
+        }
+    }
     impl Matrix4 {
+        /// All elements zero.
+        pub const ZERO: Self = Self { data: [0.0; 16] };
+        /// The identity matrix; identical under either the row-major or the column-major reading.
+        pub const IDENTITY: Self = Self {
+            data: [
+                1.0, 0.0, 0.0, 0.0, //
+                0.0, 1.0, 0.0, 0.0, //
+                0.0, 0.0, 1.0, 0.0, //
+                0.0, 0.0, 0.0, 1.0,
+            ],
+        };
+
         pub fn as_ptr(&self) -> *const f32 {
             self.data.as_ptr()
         }
