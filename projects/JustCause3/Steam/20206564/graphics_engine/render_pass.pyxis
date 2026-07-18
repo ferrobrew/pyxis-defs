@@ -248,6 +248,19 @@ impl RenderPass {
     #[address(0x140_194_480)]
     pub fn SaveRenderFrameData(&mut self, parity: u32);
 
+    /// The virtual per-pass draw entry (vtable slot 0): when the pass has work, it runs
+    /// `SetupRenderContext`, selects the pass camera (the pass's external camera if set, else the
+    /// render camera) into the context via
+    /// [`SetRenderContextCamera`](RenderPass::SetRenderContextCamera), refreshes and uploads the
+    /// global constant buffers
+    /// ([`SetGlobalShaderProgramCameraConstants`](graphics_engine::render_engine::RenderEngine::SetGlobalShaderProgramCameraConstants)
+    /// then
+    /// [`SetAllGlobalShaderProgramConstants`](graphics_engine::render_engine::RenderEngine::SetAllGlobalShaderProgramConstants),
+    /// under the `"SetGlobals"` marker), binds the pass's render setup and the global textures,
+    /// and vtable-dispatches the pass body (slots 1 and 2).
+    #[address(0x140_194_540)]
+    pub fn Draw(&mut self);
+
     /// Draws the current draw list, walking `min(m_ListSize, m_NumElements)` blocks and
     /// vtable-dispatching each. Non-destructive -- never writes `m_NumElements`. Calls
     /// [`SortList`](RenderPass::SortList) lazily before drawing. Consecutive blocks of one type

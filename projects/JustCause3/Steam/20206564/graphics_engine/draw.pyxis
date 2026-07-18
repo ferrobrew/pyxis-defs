@@ -108,6 +108,26 @@ pub type CreateFragmentProgramParams {
 #[address(0x141_953_470)]
 pub fn CreateFragmentProgram(device: *mut HDevice_t, params: *mut CreateFragmentProgramParams) -> *mut void;
 
+/// Parameters to [`CreateVertexProgram`]: the compiled DXBC bytecode, its byte length, and a debug
+/// name (attached to the D3D object and used to size the retained bytecode copy).
+pub type CreateVertexProgramParams {
+    pub m_Code: *const u8,
+
+    #[address(0x8)]
+    pub m_Size: u64,
+
+    #[address(0x10)]
+    pub m_Name: *const u8,
+}
+
+/// The leaf vertex-program creator: it wraps `ID3D11Device::CreateVertexShader` over
+/// `params.m_Code`/`params.m_Size`. Unlike [`CreateFragmentProgram`], the returned holder also
+/// retains a heap copy of the bytecode (used later for input-layout creation), so both the D3D
+/// object and the retained copy reflect whatever bytecode was passed in. Static (no `this`); the
+/// first argument is the graphics device.
+#[address(0x141_953_320)]
+pub fn CreateVertexProgram(device: *mut HDevice_t, params: *const CreateVertexProgramParams) -> *mut void;
+
 /// Stages `count` float4 constants into the given fragment constant buffer slot, starting at
 /// `start_offset`, writing to the context's per-slot staging buffer and setting the dirty flag. The
 /// actual GPU upload happens at the next state flush.
