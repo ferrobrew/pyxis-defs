@@ -39,8 +39,26 @@ pub type GraphicsEngine {
     #[address(0x8)]
     pub m_HasBeenInitialized: bool,
 
+    /// Set by the tail of [`HandleDrawThreadTask`](GraphicsEngine::HandleDrawThreadTask) once the
+    /// frame's CPU draw has completed (just before
+    /// [`m_CPUFinishedDrawingEvent`](GraphicsEngine::m_CPUFinishedDrawingEvent) is signalled).
+    /// [`WaitForCPUDrawToFinish`](GraphicsEngine::WaitForCPUDrawToFinish) returns immediately when
+    /// set and otherwise waits on the event.
+    #[address(0x14)]
+    pub m_CPUDrawFinished: bool,
+
+    /// The Win32 event `HandleDrawThreadTask` signals at its tail;
+    /// [`WaitForCPUDrawToFinish`](GraphicsEngine::WaitForCPUDrawToFinish) waits on it (infinite)
+    /// while [`m_CPUDrawFinished`](GraphicsEngine::m_CPUDrawFinished) is clear.
     #[address(0x18)]
-    pub m_CPUFinishedDrawingEvent: u32,
+    pub m_CPUFinishedDrawingEvent: *mut void,
+
+    /// When a draw fragment is outstanding, points at its completion signal (a `u32` that the
+    /// fragment sets non-zero); null otherwise.
+    /// [`WaitForCPUDrawToFinish`](GraphicsEngine::WaitForCPUDrawToFinish) drains it first, via the
+    /// work-stealing `cpu_fragment::CpuFragmentWaitUntilSignalIsNonZero`.
+    #[address(0x20)]
+    pub m_DrawFragmentSignal: *mut u32,
 
     /// Completion signal for the async draw-dispatch CPU fragment that
     /// [`DispatchDraw`](GraphicsEngine::DispatchDraw) kicks to run the render passes. The fragment sets
@@ -455,6 +473,13 @@ pub type RenderContext {
 /// [`HandleDrawThreadTask`](GraphicsEngine::HandleDrawThreadTask).
 pub type DrawThreadTaskParam;
 impl GraphicsEngine {
+    /// Blocks until the frame's CPU draw has completed: first drains an outstanding draw
+    /// fragment via [`m_DrawFragmentSignal`](GraphicsEngine::m_DrawFragmentSignal) (a
+    /// work-stealing wait -- see
+    /// `cpu_fragment::CpuFragmentWaitUntilSignalIsNonZero`),
+    /// then waits on [`m_CPUFinishedDrawingEvent`](GraphicsEngine::m_CPUFinishedDrawingEvent)
+    /// unless [`m_CPUDrawFinished`](GraphicsEngine::m_CPUDrawFinished) is already set. Because of
+    /// the work-stealing drain, only threads the fragment system knows may call it.
     #[address(0x140_0C4_690)]
     pub fn WaitForCPUDrawToFinish(&mut self);
 
