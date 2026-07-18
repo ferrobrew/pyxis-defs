@@ -13987,6 +13987,96 @@
         "line": 97
       }
     },
+    "graphics_engine::draw::CreateVertexProgramParams": {
+      "path": "graphics_engine::draw::CreateVertexProgramParams",
+      "visibility": "public",
+      "size": 24,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " Parameters to [`CreateVertexProgram`]: the compiled DXBC bytecode, its byte length, and a debug\n name (attached to the D3D object and used to size the retained bytecode copy).",
+        "doc_links": [
+          {
+            "text": "CreateVertexProgram",
+            "target_kind": "module",
+            "path": "graphics_engine::draw",
+            "anchor": "func-CreateVertexProgram"
+          }
+        ],
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_Code",
+            "doc": null,
+            "type_ref": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              }
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 25,
+              "line": 114
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Size",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "offset": 8,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 25,
+              "line": 117
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Name",
+            "doc": null,
+            "type_ref": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              }
+            },
+            "offset": 16,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 25,
+              "line": 120
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 25,
+        "line": 113
+      }
+    },
     "graphics_engine::draw::PrimitiveType": {
       "path": "graphics_engine::draw::PrimitiveType",
       "visibility": "public",
@@ -22582,7 +22672,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 329
+              "line": 380
             }
           }
         ],
@@ -22606,7 +22696,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 329
+                "line": 380
               }
             },
             {
@@ -22637,7 +22727,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 334
+                "line": 385
               }
             },
             {
@@ -22668,7 +22758,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 338
+                "line": 389
               }
             },
             {
@@ -22713,7 +22803,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 347
+                "line": 398
               }
             },
             {
@@ -22739,7 +22829,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 351
+                "line": 402
               }
             },
             {
@@ -22762,7 +22852,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 355
+                "line": 406
               }
             },
             {
@@ -22782,7 +22872,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 329
+                "line": 380
               }
             },
             {
@@ -22802,7 +22892,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 329
+                "line": 380
               }
             },
             {
@@ -22822,7 +22912,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 329
+                "line": 380
               }
             },
             {
@@ -22842,7 +22932,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 329
+                "line": 380
               }
             },
             {
@@ -22862,7 +22952,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 329
+                "line": 380
               }
             },
             {
@@ -22882,7 +22972,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 329
+                "line": 380
               }
             },
             {
@@ -22902,7 +22992,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 329
+                "line": 380
               }
             },
             {
@@ -22922,7 +23012,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 329
+                "line": 380
               }
             },
             {
@@ -22942,7 +23032,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 329
+                "line": 380
               }
             },
             {
@@ -22962,7 +23052,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 329
+                "line": 380
               }
             },
             {
@@ -22982,7 +23072,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 329
+                "line": 380
               }
             },
             {
@@ -23002,7 +23092,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 329
+                "line": 380
               }
             },
             {
@@ -23025,7 +23115,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 361
+                "line": 412
               }
             },
             {
@@ -23045,7 +23135,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 366
+                "line": 417
               }
             },
             {
@@ -23073,7 +23163,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 31,
-                "line": 372
+                "line": 423
               }
             }
           ]
@@ -23087,7 +23177,7 @@
       },
       "source": {
         "file_index": 31,
-        "line": 328
+        "line": 379
       }
     },
     "graphics_engine::render_engine::RenderBlockTypeBaseVftable": {
@@ -23127,7 +23217,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 329
+              "line": 380
             }
           },
           {
@@ -23167,7 +23257,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 334
+              "line": 385
             }
           },
           {
@@ -23207,7 +23297,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 338
+              "line": 389
             }
           },
           {
@@ -23261,7 +23351,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 347
+              "line": 398
             }
           },
           {
@@ -23297,7 +23387,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 351
+              "line": 402
             }
           },
           {
@@ -23330,7 +23420,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 355
+              "line": 406
             }
           },
           {
@@ -23360,7 +23450,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 329
+              "line": 380
             }
           },
           {
@@ -23390,7 +23480,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 329
+              "line": 380
             }
           },
           {
@@ -23420,7 +23510,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 329
+              "line": 380
             }
           },
           {
@@ -23450,7 +23540,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 329
+              "line": 380
             }
           },
           {
@@ -23480,7 +23570,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 329
+              "line": 380
             }
           },
           {
@@ -23510,7 +23600,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 329
+              "line": 380
             }
           },
           {
@@ -23540,7 +23630,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 329
+              "line": 380
             }
           },
           {
@@ -23570,7 +23660,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 329
+              "line": 380
             }
           },
           {
@@ -23600,7 +23690,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 329
+              "line": 380
             }
           },
           {
@@ -23630,7 +23720,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 329
+              "line": 380
             }
           },
           {
@@ -23660,7 +23750,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 329
+              "line": 380
             }
           },
           {
@@ -23690,7 +23780,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 329
+              "line": 380
             }
           },
           {
@@ -23723,7 +23813,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 361
+              "line": 412
             }
           },
           {
@@ -23753,7 +23843,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 366
+              "line": 417
             }
           },
           {
@@ -23791,7 +23881,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 372
+              "line": 423
             }
           }
         ],
@@ -23806,7 +23896,7 @@
       },
       "source": {
         "file_index": 31,
-        "line": 329
+        "line": 380
       }
     },
     "graphics_engine::render_engine::RenderBlockTypeEntry": {
@@ -23833,7 +23923,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 380
+              "line": 431
             }
           },
           {
@@ -23854,7 +23944,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 383
+              "line": 434
             }
           },
           {
@@ -23874,7 +23964,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 383
+              "line": 434
             }
           }
         ],
@@ -23889,7 +23979,7 @@
       },
       "source": {
         "file_index": 31,
-        "line": 379
+        "line": 430
       }
     },
     "graphics_engine::render_engine::RenderBlockTypeRegistry": {
@@ -23929,7 +24019,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 412
+              "line": 463
             }
           }
         ],
@@ -23944,7 +24034,7 @@
       },
       "source": {
         "file_index": 31,
-        "line": 411
+        "line": 462
       }
     },
     "graphics_engine::render_engine::RenderEngine": {
@@ -24126,10 +24216,112 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 2352
+              "size": 44
             },
             "offset": 6384,
-            "size": 2352,
+            "size": 44,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 31,
+              "line": 255
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_VPGlobalConstData",
+            "doc": " The CPU staging copy of the global vertex-program constant buffer (the shaders'\n `GlobalConstants` cbuffer at vertex slot 0, `VP_GLOBAL_SIZE` = 49 float4 rows).\n [`SetGlobalShaderProgramCameraConstants`](RenderEngine::SetGlobalShaderProgramCameraConstants)\n fills the per-view rows from a [`RenderContext`], the fog and atmosphere setters fill rows\n 14--24, and [`SetAllGlobalShaderProgramConstants`](RenderEngine::SetAllGlobalShaderProgramConstants)\n uploads the whole block to the GPU. Row layout (row = float4 index): 0--3 the full\n (translation-bearing) view-projection, 4 the camera world position, 5 the camera forward\n axis, 9 the camera world position with `w = 1`, 14--24 fog and atmospheric scattering,\n 29--32 the translation-free\n [`m_OffsetViewProjection`](graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection)\n (the matrix camera-relative opaque geometry multiplies by), 33--36 the previous\n view-projection, 37 frame time and dt, 38--43 the frustum planes, 44--47 the previous\n offset view-projection, and 48 the previous camera position.",
+            "doc_links": [
+              {
+                "text": "RenderEngine::SetGlobalShaderProgramCameraConstants",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::RenderEngine",
+                "anchor": "func-SetGlobalShaderProgramCameraConstants"
+              },
+              {
+                "text": "RenderContext",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::RenderContext"
+              },
+              {
+                "text": "RenderEngine::SetAllGlobalShaderProgramConstants",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::RenderEngine",
+                "anchor": "func-SetAllGlobalShaderProgramConstants"
+              },
+              {
+                "text": "graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::RenderContext",
+                "anchor": "field-m_OffsetViewProjection"
+              }
+            ],
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "types::math::Vector4"
+              },
+              "size": 49
+            },
+            "offset": 6428,
+            "size": 784,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 31,
+              "line": 255
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_FPGlobalConstData",
+            "doc": " The CPU staging copy of the global fragment-program constant buffer (the shaders'\n `GlobalConstants` cbuffer at fragment slot 0, `FP_GLOBAL_SIZE` = 95 float4 rows): lighting,\n wetness, shadow, and per-view camera rows filled by\n [`SetGlobalShaderConstants`](RenderEngine::SetGlobalShaderConstants), uploaded by\n [`SetAllGlobalShaderProgramConstants`](RenderEngine::SetAllGlobalShaderProgramConstants).",
+            "doc_links": [
+              {
+                "text": "RenderEngine::SetGlobalShaderConstants",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::RenderEngine",
+                "anchor": "func-SetGlobalShaderConstants"
+              },
+              {
+                "text": "RenderEngine::SetAllGlobalShaderProgramConstants",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::RenderEngine",
+                "anchor": "func-SetAllGlobalShaderProgramConstants"
+              }
+            ],
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "types::math::Vector4"
+              },
+              "size": 95
+            },
+            "offset": 7212,
+            "size": 1520,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 31,
+              "line": 263
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_221c",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 4
+            },
+            "offset": 8732,
+            "size": 4,
             "alignment": 1,
             "is_base": false,
             "source": {
@@ -24167,7 +24359,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 244
+              "line": 268
             }
           },
           {
@@ -24232,7 +24424,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 249
+              "line": 273
             }
           },
           {
@@ -24279,7 +24471,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 261
+              "line": 285
             }
           },
           {
@@ -24329,7 +24521,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 266
+              "line": 290
             }
           },
           {
@@ -24363,7 +24555,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 271
+              "line": 295
             }
           },
           {
@@ -24413,7 +24605,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 276
+              "line": 300
             }
           },
           {
@@ -24444,7 +24636,169 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 282
+              "line": 306
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "SetGlobalShaderProgramCameraConstants",
+            "doc": " Refreshes the per-view rows of [`m_VPGlobalConstData`](RenderEngine::m_VPGlobalConstData)\n from a [`RenderContext`]: the full view-projection (rows 0--3), the camera world position\n and forward axis (rows 4, 5, 9), the offset view-projection (rows 29--32), the previous\n view-projection (rows 33--36), the frustum planes (rows 38--43), the previous offset\n view-projection (rows 44--47), and the previous camera position (row 48), then falls\n through to `SetFog`. Called by [`RenderPass::Draw`](graphics_engine::render_pass::RenderPass::Draw)\n after `SetRenderContextCamera`, so every pass re-derives the global rows from its own\n context before drawing.",
+            "doc_links": [
+              {
+                "text": "RenderEngine::m_VPGlobalConstData",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::RenderEngine",
+                "anchor": "field-m_VPGlobalConstData"
+              },
+              {
+                "text": "RenderContext",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::RenderContext"
+              },
+              {
+                "text": "graphics_engine::render_pass::RenderPass::Draw",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPass",
+                "anchor": "func-Draw"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5370307440
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "ctx",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 31,
+              "line": 317
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "SetAllGlobalShaderProgramConstants",
+            "doc": " Uploads both global constant-buffer staging blocks\n ([`m_VPGlobalConstData`](RenderEngine::m_VPGlobalConstData) and\n [`m_FPGlobalConstData`](RenderEngine::m_FPGlobalConstData)) into the context's global\n constant buffers via lock/memcpy/unlock. Called per pass by\n [`RenderPass::Draw`](graphics_engine::render_pass::RenderPass::Draw) and once per dispatch\n from `HandleDrawThreadTask`.",
+            "doc_links": [
+              {
+                "text": "RenderEngine::m_VPGlobalConstData",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::RenderEngine",
+                "anchor": "field-m_VPGlobalConstData"
+              },
+              {
+                "text": "RenderEngine::m_FPGlobalConstData",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::RenderEngine",
+                "anchor": "field-m_FPGlobalConstData"
+              },
+              {
+                "text": "graphics_engine::render_pass::RenderPass::Draw",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPass",
+                "anchor": "func-Draw"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5370230864
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "ctx",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 31,
+              "line": 326
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "SetGlobalVertexProgramConstants",
+            "doc": " Writes `count` float4 rows into [`m_VPGlobalConstData`](RenderEngine::m_VPGlobalConstData)\n starting at row `index` (bounds-asserted against `VP_GLOBAL_SIZE` = 49). The staging copy\n only; the GPU upload happens in\n [`SetAllGlobalShaderProgramConstants`](RenderEngine::SetAllGlobalShaderProgramConstants).",
+            "doc_links": [
+              {
+                "text": "RenderEngine::m_VPGlobalConstData",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::RenderEngine",
+                "anchor": "field-m_VPGlobalConstData"
+              },
+              {
+                "text": "RenderEngine::SetAllGlobalShaderProgramConstants",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::RenderEngine",
+                "anchor": "func-SetAllGlobalShaderProgramConstants"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5370231024
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "index",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              },
+              {
+                "type": "field",
+                "name": "data",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "f32"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "count",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 31,
+              "line": 333
             }
           },
           {
@@ -24499,7 +24853,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 287
+              "line": 338
             }
           },
           {
@@ -24519,7 +24873,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 292
+              "line": 343
             }
           },
           {
@@ -24547,7 +24901,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 31,
-              "line": 301
+              "line": 352
             }
           }
         ],
@@ -26057,7 +26411,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 317
+              "line": 368
             }
           },
           {
@@ -26077,7 +26431,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 318
+              "line": 369
             }
           },
           {
@@ -26097,7 +26451,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 319
+              "line": 370
             }
           },
           {
@@ -26114,7 +26468,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 321
+              "line": 372
             }
           },
           {
@@ -26135,7 +26489,7 @@
             "is_base": false,
             "source": {
               "file_index": 31,
-              "line": 311
+              "line": 362
             }
           }
         ],
@@ -26150,7 +26504,7 @@
       },
       "source": {
         "file_index": 31,
-        "line": 316
+        "line": 367
       }
     },
     "graphics_engine::render_engine::STerrainPatchSystem": {
@@ -26328,7 +26682,7 @@
       },
       "source": {
         "file_index": 31,
-        "line": 309
+        "line": 360
       }
     },
     "graphics_engine::render_engine::TerrainDetailBudgetPatchSites": {
@@ -26359,7 +26713,7 @@
       },
       "source": {
         "file_index": 31,
-        "line": 392
+        "line": 443
       }
     },
     "graphics_engine::render_engine::TerrainDetailBudgetPatchSites::DEBUG_VERTEX_COUNT": {
@@ -26382,7 +26736,7 @@
       },
       "source": {
         "file_index": 31,
-        "line": 396
+        "line": 447
       }
     },
     "graphics_engine::render_engine::TerrainDetailBudgetPatchSites::INDEX_BYTES": {
@@ -26405,7 +26759,7 @@
       },
       "source": {
         "file_index": 31,
-        "line": 398
+        "line": 449
       }
     },
     "graphics_engine::render_engine::TerrainDetailBudgetPatchSites::INDEX_VIEW_COUNT": {
@@ -26428,7 +26782,7 @@
       },
       "source": {
         "file_index": 31,
-        "line": 403
+        "line": 454
       }
     },
     "graphics_engine::render_engine::TerrainDetailBudgetPatchSites::TEXEL_COUNT": {
@@ -26451,7 +26805,7 @@
       },
       "source": {
         "file_index": 31,
-        "line": 400
+        "line": 451
       }
     },
     "graphics_engine::render_engine::TerrainDetailBudgetPatchSites::VERTEX_COUNT": {
@@ -26474,7 +26828,7 @@
       },
       "source": {
         "file_index": 31,
-        "line": 394
+        "line": 445
       }
     },
     "graphics_engine::render_engine::TextureCache": {
@@ -26498,7 +26852,7 @@
       },
       "source": {
         "file_index": 31,
-        "line": 305
+        "line": 356
       }
     },
     "graphics_engine::render_pass::ConstantBufferPool": {
@@ -26529,7 +26883,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 310
+              "line": 323
             }
           }
         ],
@@ -26543,7 +26897,7 @@
       },
       "source": {
         "file_index": 32,
-        "line": 306
+        "line": 319
       }
     },
     "graphics_engine::render_pass::LRParticleRenderPass": {
@@ -26582,7 +26936,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 302
+              "line": 315
             }
           }
         ],
@@ -26596,7 +26950,7 @@
       },
       "source": {
         "file_index": 32,
-        "line": 297
+        "line": 310
       }
     },
     "graphics_engine::render_pass::RBIInfo": {
@@ -29711,6 +30065,46 @@
           },
           {
             "visibility": "public",
+            "name": "Draw",
+            "doc": " The virtual per-pass draw entry (vtable slot 0): when the pass has work, it runs\n `SetupRenderContext`, selects the pass camera (the pass's external camera if set, else the\n render camera) into the context via\n [`SetRenderContextCamera`](RenderPass::SetRenderContextCamera), refreshes and uploads the\n global constant buffers\n ([`SetGlobalShaderProgramCameraConstants`](graphics_engine::render_engine::RenderEngine::SetGlobalShaderProgramCameraConstants)\n then\n [`SetAllGlobalShaderProgramConstants`](graphics_engine::render_engine::RenderEngine::SetAllGlobalShaderProgramConstants),\n under the `\"SetGlobals\"` marker), binds the pass's render setup and the global textures,\n and vtable-dispatches the pass body (slots 1 and 2).",
+            "doc_links": [
+              {
+                "text": "RenderPass::SetRenderContextCamera",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPass",
+                "anchor": "func-SetRenderContextCamera"
+              },
+              {
+                "text": "graphics_engine::render_engine::RenderEngine::SetGlobalShaderProgramCameraConstants",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::RenderEngine",
+                "anchor": "func-SetGlobalShaderProgramCameraConstants"
+              },
+              {
+                "text": "graphics_engine::render_engine::RenderEngine::SetAllGlobalShaderProgramConstants",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::RenderEngine",
+                "anchor": "func-SetAllGlobalShaderProgramConstants"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5370365248
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 32,
+              "line": 262
+            }
+          },
+          {
+            "visibility": "public",
             "name": "DoDraw",
             "doc": " Draws the current draw list, walking `min(m_ListSize, m_NumElements)` blocks and\n vtable-dispatching each. Non-destructive -- never writes `m_NumElements`. Calls\n [`SortList`](RenderPass::SortList) lazily before drawing. Consecutive blocks of one type\n form a type run: [`ChangeRenderBlockType`](RenderPass::ChangeRenderBlockType) switches\n between runs, and the tail closes the final run (its type-level restore and its scope\n marker).",
             "doc_links": [
@@ -29762,7 +30156,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 258
+              "line": 271
             }
           },
           {
@@ -29840,7 +30234,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 269
+              "line": 282
             }
           },
           {
@@ -29927,7 +30321,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 32,
-              "line": 282
+              "line": 295
             }
           }
         ],
@@ -30248,7 +30642,7 @@
       },
       "source": {
         "file_index": 32,
-        "line": 292
+        "line": 305
       }
     },
     "graphics_engine::render_pass::render_block_overflow_count": {
@@ -54821,6 +55215,7 @@
           "doc": null,
           "items": [
             "graphics_engine::draw::CreateFragmentProgramParams",
+            "graphics_engine::draw::CreateVertexProgramParams",
             "graphics_engine::draw::PrimitiveType"
           ],
           "submodules": {},
@@ -55763,6 +56158,59 @@
             },
             {
               "visibility": "public",
+              "name": "CreateVertexProgram",
+              "doc": " The leaf vertex-program creator: it wraps `ID3D11Device::CreateVertexShader` over\n `params.m_Code`/`params.m_Size`. Unlike [`CreateFragmentProgram`], the returned holder also\n retains a heap copy of the bytecode (used later for input-layout creation), so both the D3D\n object and the retained copy reflect whatever bytecode was passed in. Static (no `this`); the\n first argument is the graphics device.",
+              "doc_links": [
+                {
+                  "text": "CreateFragmentProgram",
+                  "target_kind": "module",
+                  "path": "graphics_engine::draw",
+                  "anchor": "func-CreateFragmentProgram"
+                }
+              ],
+              "body": {
+                "type": "address",
+                "address": 5395264288
+              },
+              "arguments": [
+                {
+                  "type": "field",
+                  "name": "device",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "graphics_engine::graphics_engine::HDevice_t"
+                    }
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "params",
+                  "type_ref": {
+                    "type": "const_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "graphics_engine::draw::CreateVertexProgramParams"
+                    }
+                  }
+                }
+              ],
+              "return_type": {
+                "type": "mut_pointer",
+                "inner": {
+                  "type": "raw",
+                  "path": "void"
+                }
+              },
+              "calling_convention": "system",
+              "source": {
+                "file_index": 25,
+                "line": 129
+              }
+            },
+            {
+              "visibility": "public",
               "name": "SetFragmentProgramConstants",
               "doc": " Stages `count` float4 constants into the given fragment constant buffer slot, starting at\n `start_offset`, writing to the context's per-slot staging buffer and setting the dirty flag. The\n actual GPU upload happens at the next state flush.",
               "body": {
@@ -55821,7 +56269,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 25,
-                "line": 115
+                "line": 135
               }
             }
           ],
@@ -56865,7 +57313,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 32,
-                "line": 289
+                "line": 302
               }
             }
           ],
