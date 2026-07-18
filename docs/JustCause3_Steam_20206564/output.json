@@ -14452,7 +14452,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 611
+              "line": 636
             }
           },
           {
@@ -14469,7 +14469,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 611
+              "line": 636
             }
           },
           {
@@ -14490,7 +14490,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 603
+              "line": 628
             }
           }
         ],
@@ -14505,7 +14505,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 607
+        "line": 632
       }
     },
     "graphics_engine::graphics_engine::D3D11Viewport": {
@@ -14532,7 +14532,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 201
+              "line": 219
             }
           },
           {
@@ -14549,7 +14549,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 204
+              "line": 222
             }
           },
           {
@@ -14566,7 +14566,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 207
+              "line": 225
             }
           },
           {
@@ -14583,7 +14583,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 210
+              "line": 228
             }
           },
           {
@@ -14600,7 +14600,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 213
+              "line": 231
             }
           },
           {
@@ -14617,7 +14617,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 216
+              "line": 234
             }
           }
         ],
@@ -14632,7 +14632,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 199
+        "line": 217
       }
     },
     "graphics_engine::graphics_engine::DrawThreadTaskParam": {
@@ -14664,7 +14664,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 456
+        "line": 474
       }
     },
     "graphics_engine::graphics_engine::EffectInfo": {
@@ -14795,7 +14795,7 @@
             "doc": " The result is available and the interval was continuous.",
             "source": {
               "file_index": 27,
-              "line": 260
+              "line": 278
             }
           },
           {
@@ -14804,7 +14804,7 @@
             "doc": " The result is available but the interval was disjoint; timestamps taken inside it are\n unreliable.",
             "source": {
               "file_index": 27,
-              "line": 263
+              "line": 281
             }
           },
           {
@@ -14813,7 +14813,7 @@
             "doc": " The result is not yet available.",
             "source": {
               "file_index": 27,
-              "line": 265
+              "line": 283
             }
           }
         ],
@@ -14826,7 +14826,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 258
+        "line": 276
       }
     },
     "graphics_engine::graphics_engine::GraphicsEngine": {
@@ -14895,37 +14895,57 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 15
+              "size": 11
             },
             "offset": 9,
-            "size": 15,
+            "size": 11,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 43
+              "line": 48
             }
           },
           {
             "visibility": "public",
-            "name": "m_CPUFinishedDrawingEvent",
-            "doc": null,
+            "name": "m_CPUDrawFinished",
+            "doc": " Set by the tail of [`HandleDrawThreadTask`](GraphicsEngine::HandleDrawThreadTask) once the\n frame's CPU draw has completed (just before\n [`m_CPUFinishedDrawingEvent`](GraphicsEngine::m_CPUFinishedDrawingEvent) is signalled).\n [`WaitForCPUDrawToFinish`](GraphicsEngine::WaitForCPUDrawToFinish) returns immediately when\n set and otherwise waits on the event.",
+            "doc_links": [
+              {
+                "text": "GraphicsEngine::HandleDrawThreadTask",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-HandleDrawThreadTask"
+              },
+              {
+                "text": "GraphicsEngine::m_CPUFinishedDrawingEvent",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "field-m_CPUFinishedDrawingEvent"
+              },
+              {
+                "text": "GraphicsEngine::WaitForCPUDrawToFinish",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-WaitForCPUDrawToFinish"
+              }
+            ],
             "type_ref": {
               "type": "raw",
-              "path": "u32"
+              "path": "bool"
             },
-            "offset": 24,
-            "size": 4,
-            "alignment": 4,
+            "offset": 20,
+            "size": 1,
+            "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 43
+              "line": 48
             }
           },
           {
             "visibility": "private",
-            "name": "_field_1c",
+            "name": "_field_15",
             "doc": null,
             "type_ref": {
               "type": "array",
@@ -14933,15 +14953,98 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 20
+              "size": 3
             },
-            "offset": 28,
-            "size": 20,
+            "offset": 21,
+            "size": 3,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 52
+              "line": 54
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_CPUFinishedDrawingEvent",
+            "doc": " The Win32 event `HandleDrawThreadTask` signals at its tail;\n [`WaitForCPUDrawToFinish`](GraphicsEngine::WaitForCPUDrawToFinish) waits on it (infinite)\n while [`m_CPUDrawFinished`](GraphicsEngine::m_CPUDrawFinished) is clear.",
+            "doc_links": [
+              {
+                "text": "GraphicsEngine::WaitForCPUDrawToFinish",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-WaitForCPUDrawToFinish"
+              },
+              {
+                "text": "GraphicsEngine::m_CPUDrawFinished",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "field-m_CPUDrawFinished"
+              }
+            ],
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "void"
+              }
+            },
+            "offset": 24,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 54
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_DrawFragmentSignal",
+            "doc": " When a draw fragment is outstanding, points at its completion signal (a `u32` that the\n fragment sets non-zero); null otherwise.\n [`WaitForCPUDrawToFinish`](GraphicsEngine::WaitForCPUDrawToFinish) drains it first, via the\n work-stealing `cpu_fragment::CpuFragmentWaitUntilSignalIsNonZero`.",
+            "doc_links": [
+              {
+                "text": "GraphicsEngine::WaitForCPUDrawToFinish",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-WaitForCPUDrawToFinish"
+              }
+            ],
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "u32"
+              }
+            },
+            "offset": 32,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 61
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_28",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 8
+            },
+            "offset": 40,
+            "size": 8,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 70
             }
           },
           {
@@ -14978,7 +15081,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 52
+              "line": 70
             }
           },
           {
@@ -14999,7 +15102,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 58
+              "line": 76
             }
           },
           {
@@ -15024,7 +15127,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 58
+              "line": 76
             }
           },
           {
@@ -15045,7 +15148,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 63
+              "line": 81
             }
           },
           {
@@ -15070,7 +15173,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 63
+              "line": 81
             }
           },
           {
@@ -15091,7 +15194,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 68
+              "line": 86
             }
           },
           {
@@ -15122,7 +15225,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 68
+              "line": 86
             }
           },
           {
@@ -15139,7 +15242,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 72
+              "line": 90
             }
           },
           {
@@ -15164,7 +15267,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 77
+              "line": 95
             }
           },
           {
@@ -15201,7 +15304,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 83
+              "line": 101
             }
           },
           {
@@ -15222,7 +15325,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 86
+              "line": 104
             }
           },
           {
@@ -15239,7 +15342,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 86
+              "line": 104
             }
           },
           {
@@ -15260,7 +15363,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 90
+              "line": 108
             }
           },
           {
@@ -15280,7 +15383,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 90
+              "line": 108
             }
           },
           {
@@ -15301,7 +15404,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 98
+              "line": 116
             }
           },
           {
@@ -15326,7 +15429,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 98
+              "line": 116
             }
           },
           {
@@ -15347,7 +15450,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 101
+              "line": 119
             }
           },
           {
@@ -15367,7 +15470,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 101
+              "line": 119
             }
           },
           {
@@ -15388,7 +15491,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 105
+              "line": 123
             }
           },
           {
@@ -15412,7 +15515,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 105
+              "line": 123
             }
           },
           {
@@ -15433,7 +15536,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 109
+              "line": 127
             }
           },
           {
@@ -15453,7 +15556,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 109
+              "line": 127
             }
           },
           {
@@ -15474,7 +15577,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 116
+              "line": 134
             }
           },
           {
@@ -15508,7 +15611,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 116
+              "line": 134
             }
           },
           {
@@ -15528,7 +15631,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 120
+              "line": 138
             }
           },
           {
@@ -15549,7 +15652,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 124
+              "line": 142
             }
           },
           {
@@ -15569,7 +15672,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 124
+              "line": 142
             }
           },
           {
@@ -15590,7 +15693,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 128
+              "line": 146
             }
           },
           {
@@ -15610,7 +15713,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 128
+              "line": 146
             }
           },
           {
@@ -15631,7 +15734,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 132
+              "line": 150
             }
           },
           {
@@ -15652,7 +15755,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 132
+              "line": 150
             }
           },
           {
@@ -15672,7 +15775,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 136
+              "line": 154
             }
           },
           {
@@ -15693,7 +15796,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 144
+              "line": 162
             }
           },
           {
@@ -15724,7 +15827,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 144
+              "line": 162
             }
           },
           {
@@ -15745,7 +15848,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 148
+              "line": 166
             }
           },
           {
@@ -15762,7 +15865,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 148
+              "line": 166
             }
           },
           {
@@ -15783,7 +15886,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 155
+              "line": 173
             }
           },
           {
@@ -15808,7 +15911,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 155
+              "line": 173
             }
           },
           {
@@ -15837,7 +15940,27 @@
           {
             "visibility": "public",
             "name": "WaitForCPUDrawToFinish",
-            "doc": null,
+            "doc": " Blocks until the frame's CPU draw has completed: first drains an outstanding draw\n fragment via [`m_DrawFragmentSignal`](GraphicsEngine::m_DrawFragmentSignal) (a\n work-stealing wait -- see\n `cpu_fragment::CpuFragmentWaitUntilSignalIsNonZero`),\n then waits on [`m_CPUFinishedDrawingEvent`](GraphicsEngine::m_CPUFinishedDrawingEvent)\n unless [`m_CPUDrawFinished`](GraphicsEngine::m_CPUDrawFinished) is already set. Because of\n the work-stealing drain, only threads the fragment system knows may call it.",
+            "doc_links": [
+              {
+                "text": "GraphicsEngine::m_DrawFragmentSignal",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "field-m_DrawFragmentSignal"
+              },
+              {
+                "text": "GraphicsEngine::m_CPUFinishedDrawingEvent",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "field-m_CPUFinishedDrawingEvent"
+              },
+              {
+                "text": "GraphicsEngine::m_CPUDrawFinished",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "field-m_CPUDrawFinished"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5369513616
@@ -15851,7 +15974,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 459
+              "line": 484
             }
           },
           {
@@ -15879,7 +16002,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 464
+              "line": 489
             }
           },
           {
@@ -15899,7 +16022,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 468
+              "line": 493
             }
           },
           {
@@ -15919,7 +16042,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 472
+              "line": 497
             }
           },
           {
@@ -15953,7 +16076,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 476
+              "line": 501
             }
           },
           {
@@ -16000,7 +16123,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 482
+              "line": 507
             }
           },
           {
@@ -16060,7 +16183,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 497
+              "line": 522
             }
           },
           {
@@ -16088,7 +16211,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 505
+              "line": 530
             }
           },
           {
@@ -16144,7 +16267,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 515
+              "line": 540
             }
           },
           {
@@ -16218,7 +16341,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 525
+              "line": 550
             }
           },
           {
@@ -16252,7 +16375,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 533
+              "line": 558
             }
           },
           {
@@ -16294,7 +16417,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 542
+              "line": 567
             }
           },
           {
@@ -16336,7 +16459,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 549
+              "line": 574
             }
           },
           {
@@ -16364,7 +16487,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 557
+              "line": 582
             }
           }
         ],
@@ -16408,7 +16531,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 566
+              "line": 591
             }
           },
           {
@@ -16429,7 +16552,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 567
+              "line": 592
             }
           },
           {
@@ -16446,7 +16569,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 568
+              "line": 593
             }
           },
           {
@@ -16463,7 +16586,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 569
+              "line": 594
             }
           },
           {
@@ -16480,7 +16603,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 570
+              "line": 595
             }
           },
           {
@@ -16497,7 +16620,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 571
+              "line": 596
             }
           },
           {
@@ -16514,7 +16637,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 572
+              "line": 597
             }
           },
           {
@@ -16531,7 +16654,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 573
+              "line": 598
             }
           },
           {
@@ -16548,7 +16671,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 574
+              "line": 599
             }
           },
           {
@@ -16569,7 +16692,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 577
+              "line": 602
             }
           },
           {
@@ -16586,7 +16709,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 577
+              "line": 602
             }
           },
           {
@@ -16603,7 +16726,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 578
+              "line": 603
             }
           },
           {
@@ -16620,7 +16743,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 579
+              "line": 604
             }
           },
           {
@@ -16641,7 +16764,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 582
+              "line": 607
             }
           },
           {
@@ -16658,7 +16781,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 582
+              "line": 607
             }
           },
           {
@@ -16675,7 +16798,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 583
+              "line": 608
             }
           },
           {
@@ -16692,7 +16815,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 584
+              "line": 609
             }
           },
           {
@@ -16713,7 +16836,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 564
+              "line": 589
             }
           }
         ],
@@ -16728,7 +16851,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 565
+        "line": 590
       }
     },
     "graphics_engine::graphics_engine::HContext_t": {
@@ -16767,7 +16890,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 171
+              "line": 189
             }
           },
           {
@@ -16792,7 +16915,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 171
+              "line": 189
             }
           },
           {
@@ -16813,7 +16936,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 175
+              "line": 193
             }
           },
           {
@@ -16830,7 +16953,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 175
+              "line": 193
             }
           }
         ],
@@ -16845,7 +16968,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 163
+        "line": 181
       }
     },
     "graphics_engine::graphics_engine::HDevice_t": {
@@ -16869,7 +16992,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 194
+        "line": 212
       }
     },
     "graphics_engine::graphics_engine::HICON": {
@@ -16935,7 +17058,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 227
+              "line": 245
             }
           },
           {
@@ -16966,7 +17089,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 227
+              "line": 245
             }
           },
           {
@@ -16987,7 +17110,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 232
+              "line": 250
             }
           },
           {
@@ -17012,7 +17135,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 232
+              "line": 250
             }
           },
           {
@@ -17033,7 +17156,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 219
+              "line": 237
             }
           }
         ],
@@ -17048,7 +17171,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 223
+        "line": 241
       }
     },
     "graphics_engine::graphics_engine::HTexture_t": {
@@ -17072,7 +17195,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 236
+        "line": 254
       }
     },
     "graphics_engine::graphics_engine::HTimeStampDisjointQuery_t": {
@@ -17096,7 +17219,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 254
+        "line": 272
       }
     },
     "graphics_engine::graphics_engine::HTimeStampQuery_t": {
@@ -17120,7 +17243,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 249
+        "line": 267
       }
     },
     "graphics_engine::graphics_engine::HWND": {
@@ -17237,7 +17360,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 626
+              "line": 651
             }
           }
         ],
@@ -17251,7 +17374,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 618
+        "line": 643
       }
     },
     "graphics_engine::graphics_engine::RenderContext": {
@@ -17290,7 +17413,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 360
+              "line": 378
             }
           },
           {
@@ -17321,7 +17444,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 360
+              "line": 378
             }
           },
           {
@@ -17342,7 +17465,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 367
+              "line": 385
             }
           },
           {
@@ -17366,7 +17489,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 367
+              "line": 385
             }
           },
           {
@@ -17387,7 +17510,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 374
+              "line": 392
             }
           },
           {
@@ -17424,7 +17547,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 374
+              "line": 392
             }
           },
           {
@@ -17445,7 +17568,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 379
+              "line": 397
             }
           },
           {
@@ -17476,7 +17599,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 379
+              "line": 397
             }
           },
           {
@@ -17497,7 +17620,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 384
+              "line": 402
             }
           },
           {
@@ -17528,7 +17651,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 384
+              "line": 402
             }
           },
           {
@@ -17559,7 +17682,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 389
+              "line": 407
             }
           },
           {
@@ -17576,7 +17699,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 394
+              "line": 412
             }
           },
           {
@@ -17593,7 +17716,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 399
+              "line": 417
             }
           },
           {
@@ -17610,7 +17733,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 403
+              "line": 421
             }
           },
           {
@@ -17644,7 +17767,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 408
+              "line": 426
             }
           },
           {
@@ -17665,7 +17788,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 414
+              "line": 432
             }
           },
           {
@@ -17682,7 +17805,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 414
+              "line": 432
             }
           },
           {
@@ -17703,7 +17826,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 422
+              "line": 440
             }
           },
           {
@@ -17733,7 +17856,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 422
+              "line": 440
             }
           },
           {
@@ -17764,7 +17887,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 433
+              "line": 451
             }
           },
           {
@@ -17785,7 +17908,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 436
+              "line": 454
             }
           },
           {
@@ -17806,7 +17929,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 436
+              "line": 454
             }
           },
           {
@@ -17823,7 +17946,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 440
+              "line": 458
             }
           },
           {
@@ -17848,7 +17971,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 445
+              "line": 463
             }
           },
           {
@@ -17869,7 +17992,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 451
+              "line": 469
             }
           },
           {
@@ -17886,7 +18009,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 451
+              "line": 469
             }
           },
           {
@@ -17907,7 +18030,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 350
+              "line": 368
             }
           }
         ],
@@ -17922,7 +18045,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 354
+        "line": 372
       }
     },
     "graphics_engine::graphics_engine::RenderFrameCounters": {
@@ -17957,7 +18080,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 595
+              "line": 620
             }
           },
           {
@@ -17974,7 +18097,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 596
+              "line": 621
             }
           },
           {
@@ -17991,7 +18114,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 597
+              "line": 622
             }
           }
         ],
@@ -18006,7 +18129,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 594
+        "line": 619
       }
     },
     "graphics_engine::graphics_engine::ShadowCascades": {
@@ -18033,7 +18156,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 341
+              "line": 359
             }
           },
           {
@@ -18050,7 +18173,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 342
+              "line": 360
             }
           },
           {
@@ -18067,7 +18190,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 343
+              "line": 361
             }
           },
           {
@@ -18088,7 +18211,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 345
+              "line": 363
             }
           },
           {
@@ -18109,7 +18232,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 347
+              "line": 365
             }
           }
         ],
@@ -18124,7 +18247,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 335
+        "line": 353
       }
     },
     "graphics_engine::graphics_engine::graphics_params": {
@@ -18144,7 +18267,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 588
+        "line": 613
       }
     },
     "graphics_engine::graphics_engine::render_frame_counters": {
@@ -18164,7 +18287,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 601
+        "line": 626
       }
     },
     "graphics_engine::light_manager::LightManager": {
@@ -54237,7 +54360,7 @@
         {
           "visibility": "public",
           "name": "CpuFragmentWaitUntilSignalIsNonZero",
-          "doc": " Spin-wait (pumping other ready fragments) until `*signal` is non-zero -- one of Avalanche's CPU\n job-fragment primitives, the engine's drain for an outstanding async fragment. For example the\n draw-dispatch fragment signals completion at `GraphicsEngine::m_DrawThreadWorkSignal` (`+0x30`). It\n returns immediately when the signal is already non-zero, so it is only safe to call when the\n matching fragment was actually kicked: below two primary threads the work runs inline and the signal\n is never raised, so guard the call with [`CpuPrimaryCount`] to avoid spinning forever.",
+          "doc": " Spin-wait (pumping other ready fragments) until `*signal` is non-zero -- one of Avalanche's CPU\n job-fragment primitives, the engine's drain for an outstanding async fragment. For example the\n draw-dispatch fragment signals completion at `GraphicsEngine::m_DrawThreadWorkSignal` (`+0x30`). It\n returns immediately when the signal is already non-zero, so it is only safe to call when the\n matching fragment was actually kicked: below two primary threads the work runs inline and the signal\n is never raised, so guard the call with [`CpuPrimaryCount`] to avoid spinning forever.\n\n The wait is **work-stealing**: while the signal is zero, the underlying `CpuFragmentWait` loop\n pops queued fragments off the global sync queue and runs them (`CpuFragmentRun`) on the\n *calling* thread, so the caller must be a thread the fragment system knows (a registered\n worker or the primary thread) — fragments executed on a foreign thread fault on the fragment\n system's per-thread state.",
           "doc_links": [
             {
               "text": "CpuPrimaryCount",
@@ -54267,7 +54390,7 @@
           "calling_convention": "system",
           "source": {
             "file_index": 17,
-            "line": 8
+            "line": 14
           }
         },
         {
@@ -54286,14 +54409,14 @@
           "calling_convention": "system",
           "source": {
             "file_index": 17,
-            "line": 14
+            "line": 20
           }
         }
       ],
       "splices": [],
       "source": {
         "file_index": 17,
-        "line": 8
+        "line": 14
       }
     },
     "cpu_profiler": {
@@ -55807,7 +55930,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 27,
-                "line": 185
+                "line": 203
               }
             },
             {
@@ -55860,7 +55983,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 27,
-                "line": 191
+                "line": 209
               }
             },
             {
@@ -55921,7 +56044,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 27,
-                "line": 246
+                "line": 264
               }
             },
             {
@@ -55955,7 +56078,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 27,
-                "line": 271
+                "line": 289
               }
             },
             {
@@ -55994,7 +56117,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 27,
-                "line": 275
+                "line": 293
               }
             },
             {
@@ -56033,7 +56156,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 27,
-                "line": 280
+                "line": 298
               }
             },
             {
@@ -56075,7 +56198,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 27,
-                "line": 285
+                "line": 303
               }
             },
             {
@@ -56109,7 +56232,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 27,
-                "line": 290
+                "line": 308
               }
             },
             {
@@ -56148,7 +56271,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 27,
-                "line": 294
+                "line": 312
               }
             },
             {
@@ -56187,7 +56310,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 27,
-                "line": 299
+                "line": 317
               }
             },
             {
@@ -56234,7 +56357,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 27,
-                "line": 306
+                "line": 324
               }
             },
             {
@@ -56287,7 +56410,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 27,
-                "line": 311
+                "line": 329
               }
             },
             {
@@ -56346,7 +56469,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 27,
-                "line": 325
+                "line": 343
               }
             },
             {
@@ -56382,7 +56505,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 27,
-                "line": 330
+                "line": 348
               }
             },
             {
@@ -56413,7 +56536,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 27,
-                "line": 562
+                "line": 587
               }
             }
           ],
