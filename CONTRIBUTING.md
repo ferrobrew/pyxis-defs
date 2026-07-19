@@ -33,9 +33,13 @@ When a type's method body is supplied by a backend prologue/epilogue rather than
 - When a method exists for more than one backend, declare it once per backend under its own cfg-gated impl block.
 - For things the function grammar can't express (trait impls, `unsafe fn`, by-value `self`, `where`-clauses, extension traits), put the body in a `for <Type>` epilogue so it renders on the type's page.
 
-### Cross-backend analogs in doc comments
+### Doc comments are backend-agnostic
 
-When a method exists in one backend but has an analog in another, document the relationship in a doc comment so readers understand the mapping without cross-referencing epilogues.
+Doc comments (`///`) outside of prologue/epilogue blocks must not reference backend-specific implementation details — no crate names (`glam`, `bevy_math`, `windows`), no Rust traits or types (`Clone`, `Default`, `Pin<Box<T>>`), no backend comparison language ("the Rust side does X", "C++ uses Y"), and no references to function names that only exist inside epilogues. The definitions describe the target binary's memory layout and API surface, not how a particular backend chooses to implement them.
+
+If a backend-specific detail is worth documenting (e.g., why a method returns `bool` instead of an optional, or how a conversion bridges two conventions), put that comment inside the prologue/epilogue block where the implementation lives. The general doc comment should describe what the type/method *is*, not how any one backend *implements* it.
+
+Similarly, the definitions should not mention downstream use cases — how a consumer might use a type or what library they'll pass it to. Describe the type itself; consumers can read the prologue/epilogue for integration notes.
 
 ### `unknown<N>` for untyped regions
 
