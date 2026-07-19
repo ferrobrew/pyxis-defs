@@ -77,15 +77,15 @@ pub type LandscapeManager {
 
 pub type WeatherController {
     /// Pins clear weather (severity `0.1`).
-    pub const EVENT_SUNNY: str = "weather_sunny",
+    pub const EVENT_SUNNY: cstr = c"weather_sunny",
     /// Pins rain (severity `4.0`, rain intensity `1.0`, snow `0`).
-    pub const EVENT_RAIN: str = "weather_rain",
+    pub const EVENT_RAIN: cstr = c"weather_rain",
     /// Pins snow (severity `4.0`, snow ratio `1.0`).
-    pub const EVENT_SNOW: str = "weather_snow",
+    pub const EVENT_SNOW: cstr = c"weather_snow",
     /// Hands control back to the ambient weather system.
-    pub const EVENT_RESTORE: str = "weather_restore",
+    pub const EVENT_RESTORE: cstr = c"weather_restore",
     /// Applies the pinned state instantly rather than blending toward it.
-    pub const EVENT_INSTANT: str = "weather_instant",
+    pub const EVENT_INSTANT: cstr = c"weather_instant",
 }
 impl WeatherController {
     /// Subscribes the named weather events (the `EVENT_*` constants, plus `cloud_base` and

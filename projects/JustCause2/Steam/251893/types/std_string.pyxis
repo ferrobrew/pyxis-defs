@@ -8,6 +8,15 @@ prologue r#"
 
 #[defaultable, size(28)]
 pub type StdString {
+    /// Mangled symbol for MSVCP80's `std::basic_string::basic_string()`.
+    pub const CTOR_DEFAULT: cstr = c"??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@XZ",
+    /// Mangled symbol for `std::basic_string::basic_string(const char*)`.
+    pub const CTOR_CSTR: cstr = c"??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@PBD@Z",
+    /// Mangled symbol for `std::basic_string::~basic_string()`.
+    pub const DTOR: cstr = c"??1?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@XZ",
+    /// Mangled symbol for `std::basic_string::operator=(const basic_string&)`.
+    pub const COPY: cstr = c"??4?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAEAAV01@ABV01@@Z",
+
     #[address(0x4)]
     buffer: unknown<0x10>,
     size: u32,
@@ -49,15 +58,6 @@ epilogue for StdString r#"
         copy: extern "thiscall" fn(*mut StdString, *const StdString) -> *mut c_void,
     }
     impl StringFunctions {
-        const CTOR_DEFAULT: &'static std::ffi::CStr =
-            c"??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@XZ";
-        const CTOR_CSTR: &'static std::ffi::CStr =
-            c"??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@PBD@Z";
-        const DTOR: &'static std::ffi::CStr =
-            c"??1?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@XZ";
-        const COPY: &'static std::ffi::CStr =
-            c"??4?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAEAAV01@ABV01@@Z";
-
         pub fn get() -> &'static Self {
             static STRING_FUNCTIONS: OnceLock<StringFunctions> = OnceLock::new();
             #[allow(clippy::missing_transmute_annotations)]
@@ -65,10 +65,10 @@ epilogue for StdString r#"
                 use std::mem::transmute;
                 let module = GetModuleHandleA(pcstr(c"MSVCP80")).unwrap();
                 StringFunctions {
-                    ctor_default: transmute(GetProcAddress(module, pcstr(Self::CTOR_DEFAULT))),
-                    ctor_cstr: transmute(GetProcAddress(module, pcstr(Self::CTOR_CSTR))),
-                    dtor: transmute(GetProcAddress(module, pcstr(Self::DTOR))),
-                    copy: transmute(GetProcAddress(module, pcstr(Self::COPY))),
+                    ctor_default: transmute(GetProcAddress(module, pcstr(StdString::CTOR_DEFAULT))),
+                    ctor_cstr: transmute(GetProcAddress(module, pcstr(StdString::CTOR_CSTR))),
+                    dtor: transmute(GetProcAddress(module, pcstr(StdString::DTOR))),
+                    copy: transmute(GetProcAddress(module, pcstr(StdString::COPY))),
                 }
             })
         }
@@ -136,13 +136,13 @@ namespace {
             };
             StdStringFunctions out{};
             out.ctor_default = reinterpret_cast<decltype(out.ctor_default)>(
-                resolve("??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@XZ"));
+                resolve(StdString::CTOR_DEFAULT));
             out.ctor_cstr = reinterpret_cast<decltype(out.ctor_cstr)>(
-                resolve("??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@PBD@Z"));
+                resolve(StdString::CTOR_CSTR));
             out.dtor = reinterpret_cast<decltype(out.dtor)>(
-                resolve("??1?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@XZ"));
+                resolve(StdString::DTOR));
             out.copy = reinterpret_cast<decltype(out.copy)>(
-                resolve("??4?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAEAAV01@ABV01@@Z"));
+                resolve(StdString::COPY));
             return out;
         }();
         return fns;

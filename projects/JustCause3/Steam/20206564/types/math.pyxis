@@ -52,6 +52,11 @@ epilogue for Matrix3 r#"
 /// (right, up, -forward, translation) and use `to_cols_array`.
 #[copyable, defaultable, align(4)]
 pub type Matrix4 {
+    /// All elements zero.
+    pub const ZERO: Matrix4 = Matrix4 { data: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] },
+    /// The identity matrix; identical under either the row-major or the column-major reading.
+    pub const IDENTITY: Matrix4 = Matrix4 { data: [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0] },
+
     pub data: [f32; 16],
 }
 #[cfg(any(backend = "rust", backend = "cpp"))]
@@ -111,18 +116,6 @@ epilogue for Matrix4 r#"
         }
     }
     impl Matrix4 {
-        /// All elements zero.
-        pub const ZERO: Self = Self { data: [0.0; 16] };
-        /// The identity matrix; identical under either the row-major or the column-major reading.
-        pub const IDENTITY: Self = Self {
-            data: [
-                1.0, 0.0, 0.0, 0.0, //
-                0.0, 1.0, 0.0, 0.0, //
-                0.0, 0.0, 1.0, 0.0, //
-                0.0, 0.0, 0.0, 1.0,
-            ],
-        };
-
         pub fn as_ptr(&self) -> *const f32 {
             self.data.as_ptr()
         }
