@@ -271,11 +271,12 @@ def rust_target_for_pointer_size(pointer_size: int) -> str:
     return "i686-pc-windows-msvc" if pointer_size == 4 else "x86_64-pc-windows-msvc"
 
 
-def check_rust_build(
-    rel_path: str, input_dir: Path, work_dir: Path, target_dir: Path
-) -> bool:
-    """Generate a project's Rust output into a throwaway crate and
-    `cargo check` it against the matching Windows target."""
+def generate_rust_crate(
+    rel_path: str, input_dir: Path, work_dir: Path
+) -> Optional[Dict[str, Any]]:
+    """Generate a project's Rust output into a crate directory and write its
+    Cargo.toml. Returns the crate metadata (name, target, features to enable)
+    for later checking, or None if generation failed."""
     pointer_size = read_pointer_size(input_dir / "pyxis.toml")
     target = rust_target_for_pointer_size(pointer_size)
     config = RUST_CHECK_OVERRIDES.get(rel_path, _DEFAULT_RUST_CONFIG)
@@ -294,18 +295,43 @@ def check_rust_build(
     )
     if gen.returncode != 0:
         print(gen.stderr, file=sys.stderr, end="")
-        return False
+        return None
     (work_dir / "Cargo.toml").write_text(
         rust_check_cargo_toml(crate_name, config), encoding="utf-8"
     )
+    return {"crate_name": crate_name, "target": target, "enable": config["enable"]}
 
+
+def check_rust_crate(
+    workspace_dir: Path, crate_meta: Dict[str, Any], target_dir: Path
+) -> bool:
+    """`cargo check` a single crate from within the workspace. The workspace
+    root is used as the cwd so Cargo resolves against the virtual workspace
+    Cargo.toml rather than walking up the directory tree."""
     env = os.environ.copy()
     env["CARGO_TARGET_DIR"] = str(target_dir)
-    cmd = ["cargo", "check", "--target", target]
-    if config["enable"]:
-        cmd += ["--features", ",".join(config["enable"])]
-    check = subprocess.run(cmd, cwd=work_dir, env=env)
+    cmd = [
+        "cargo", "check",
+        "--target", crate_meta["target"],
+        "-p", crate_meta["crate_name"],
+    ]
+    if crate_meta["enable"]:
+        cmd += ["--features", ",".join(crate_meta["enable"])]
+    check = subprocess.run(cmd, cwd=workspace_dir, env=env)
     return check.returncode == 0
+
+
+def workspace_cargo_toml(members: List[str]) -> str:
+    """Assemble a virtual workspace Cargo.toml listing all member crates.
+    This prevents Cargo from walking up the directory tree to find a parent
+    workspace, which could cause conflicts when the check temp directory
+    happens to live inside another Cargo workspace."""
+    members_str = ", ".join(f'"{m}"' for m in members)
+    return (
+        "[workspace]\n"
+        f"members = [{members_str}]\n"
+        'resolver = "2"\n'
+    )
 
 
 def check_cpp_build(input_dir: Path, work_dir: Path) -> Optional[bool]:
@@ -353,39 +379,88 @@ def check_cpp_build(input_dir: Path, work_dir: Path) -> Optional[bool]:
     return built.returncode == 0
 
 
-def check_all_builds(repo_root: Path, backends: List[str]) -> None:
+def check_all_builds(
+    repo_root: Path, backends: List[str], output_dir: Optional[Path] = None
+) -> None:
     """Compile-check the generated output for every project. Exits non-zero
-    if any project fails to build."""
+    if any project fails to build. If output_dir is provided, artifacts are
+    persisted there; otherwise a temp directory is used and deleted on exit."""
     import tempfile
+    import shutil
 
     project_dir = repo_root / "projects"
     toml_files = sorted(find_pyxis_toml_files(project_dir))
     failures: List[str] = []
 
-    with tempfile.TemporaryDirectory(prefix="pyxis-defs-check-") as tmp:
-        tmp_path = Path(tmp)
+    if output_dir is not None:
+        output_dir.mkdir(parents=True, exist_ok=True)
+        for child in output_dir.iterdir():
+            if child.is_dir():
+                shutil.rmtree(child)
+            else:
+                child.unlink()
+        tmp_path = output_dir
+        cleanup = False
+    else:
+        tmp_ctx = tempfile.TemporaryDirectory(prefix="pyxis-defs-check-")
+        tmp_path = Path(tmp_ctx.__enter__())
+        cleanup = True
+
+    try:
         target_dir = tmp_path / "target"
-        for toml_file in toml_files:
-            input_dir = toml_file.parent
-            rel_path = input_dir.relative_to(project_dir).as_posix()
-            name = rel_path.replace("/", "_")
-            if "rust" in backends:
-                print(f"== checking Rust build: {name} ==")
+
+        # --- Rust: generate all crates first, then check as a workspace ---
+        # Generating first lets us write a virtual workspace Cargo.toml that
+        # pins every member explicitly, preventing Cargo from walking up the
+        # tree and resolving against an unrelated parent workspace.
+        rust_crates: List[Dict[str, Any]] = []
+        if "rust" in backends:
+            for toml_file in toml_files:
+                input_dir = toml_file.parent
+                rel_path = input_dir.relative_to(project_dir).as_posix()
+                name = rel_path.replace("/", "_")
                 work_dir = tmp_path / f"{name}-rust"
-                if not check_rust_build(rel_path, input_dir, work_dir, target_dir):
+                print(f"== generating Rust crate: {name} ==")
+                crate_meta = generate_rust_crate(rel_path, input_dir, work_dir)
+                if crate_meta is None:
                     failures.append(f"{name} (rust)")
-            if "cpp" in backends:
+                else:
+                    rust_crates.append({**crate_meta, "name": name})
+
+            if rust_crates:
+                member_dirs = [f"{c['name']}-rust" for c in rust_crates]
+                (tmp_path / "Cargo.toml").write_text(
+                    workspace_cargo_toml(member_dirs), encoding="utf-8"
+                )
+                for crate in rust_crates:
+                    print(f"== checking Rust build: {crate['name']} ==")
+                    if not check_rust_crate(tmp_path, crate, target_dir):
+                        failures.append(f"{crate['name']} (rust)")
+
+        # --- C++: check each project independently (no workspace concept) ---
+        if "cpp" in backends:
+            for toml_file in toml_files:
+                input_dir = toml_file.parent
+                rel_path = input_dir.relative_to(project_dir).as_posix()
+                name = rel_path.replace("/", "_")
                 print(f"== checking C++ build: {name} ==")
                 work_dir = tmp_path / f"{name}-cpp"
                 if check_cpp_build(input_dir, work_dir) is False:
                     failures.append(f"{name} (cpp)")
 
-    if failures:
-        print("\nBuild check failures:", file=sys.stderr)
-        for f in failures:
-            print(f"  - {f}", file=sys.stderr)
-        sys.exit(1)
-    print("\nAll build checks passed.")
+        if failures:
+            print("\nBuild check failures:", file=sys.stderr)
+            for f in failures:
+                print(f"  - {f}", file=sys.stderr)
+            if output_dir is not None:
+                print(f"\nOutput preserved at: {output_dir}", file=sys.stderr)
+            sys.exit(1)
+        print("\nAll build checks passed.")
+        if output_dir is not None:
+            print(f"Output preserved at: {output_dir}")
+    finally:
+        if cleanup:
+            tmp_ctx.__exit__(None, None, None)
 
 
 def main():
@@ -434,6 +509,14 @@ def main():
         help="Instead of generating docs, compile-check the generated output "
         "for every project. Comma-separated list of backends (e.g. `rust`).",
     )
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default=None,
+        metavar="DIR",
+        help="When used with --check-builds, persist generated output and build "
+        "artifacts to this directory instead of a temp dir that's deleted on exit.",
+    )
     args = parser.parse_args()
 
     specified = sum(
@@ -457,7 +540,8 @@ def main():
     # Build-verification mode: compile-check generated output and exit.
     if args.check_builds:
         backends = [b.strip() for b in args.check_builds.split(",") if b.strip()]
-        check_all_builds(repo_root, backends)
+        output_dir = Path(args.output_dir) if args.output_dir else None
+        check_all_builds(repo_root, backends, output_dir)
         return
 
     backend = args.backend
