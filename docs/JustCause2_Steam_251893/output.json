@@ -1,5 +1,5 @@
 {
-  "schema_version": 10,
+  "schema_version": 11,
   "pyxis_version": "0.1.0",
   "pointer_size": 4,
   "project_name": "Just Cause 2 (1.0.0.2 / Steam 251893)",
@@ -954,6 +954,27 @@
         "line": 5
       }
     },
+    "cstr": {
+      "path": "cstr",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false,
+        "pinned": false
+      },
+      "source": null
+    },
     "f32": {
       "path": "f32",
       "visibility": "public",
@@ -1212,7 +1233,7 @@
           {
             "visibility": "public",
             "name": "try_get_matrix",
-            "doc": " Cpp analog of rust's `GameObjectExt::get_matrix`. Reach is the same\n (every derived type has an implicit `operator GameObject&()` so a\n derived `obj.try_get_matrix(&m)` works without an explicit cast).\n Returns `bool` rather than `std::optional<Matrix4>` to keep the\n `<optional>` include out of the public surface.",
+            "doc": " Gets the world matrix, writing it to `out`. Returns `false` if the object has\n no transform. Reach is the same (every derived type has an implicit\n `operator GameObject&()` so a derived `obj.try_get_matrix(&m)` works without\n an explicit cast). Returns `bool` rather than an optional to keep the\n `<optional>` include out of the public surface.",
             "body": {
               "type": "field",
               "field": "vehicle",
@@ -1252,7 +1273,7 @@
           {
             "visibility": "public",
             "name": "set_matrix",
-            "doc": " Cpp analog of rust's `GameObjectMutExt::set_matrix`.",
+            "doc": " Sets the world matrix.",
             "body": {
               "type": "field",
               "field": "vehicle",
@@ -3639,7 +3660,7 @@
           {
             "visibility": "public",
             "name": "try_get_matrix",
-            "doc": " Cpp analog of rust's `GameObjectExt::get_matrix`. Reach is the same\n (every derived type has an implicit `operator GameObject&()` so a\n derived `obj.try_get_matrix(&m)` works without an explicit cast).\n Returns `bool` rather than `std::optional<Matrix4>` to keep the\n `<optional>` include out of the public surface.",
+            "doc": " Gets the world matrix, writing it to `out`. Returns `false` if the object has\n no transform. Reach is the same (every derived type has an implicit\n `operator GameObject&()` so a derived `obj.try_get_matrix(&m)` works without\n an explicit cast). Returns `bool` rather than an optional to keep the\n `<optional>` include out of the public surface.",
             "body": {
               "type": "field",
               "field": "air_vehicle",
@@ -3679,7 +3700,7 @@
           {
             "visibility": "public",
             "name": "set_matrix",
-            "doc": " Cpp analog of rust's `GameObjectMutExt::set_matrix`.",
+            "doc": " Sets the world matrix.",
             "body": {
               "type": "field",
               "field": "air_vehicle",
@@ -6277,7 +6298,7 @@
           {
             "visibility": "public",
             "name": "try_get_matrix",
-            "doc": " Cpp analog of rust's `GameObjectExt::get_matrix`. Reach is the same\n (every derived type has an implicit `operator GameObject&()` so a\n derived `obj.try_get_matrix(&m)` works without an explicit cast).\n Returns `bool` rather than `std::optional<Matrix4>` to keep the\n `<optional>` include out of the public surface.",
+            "doc": " Gets the world matrix, writing it to `out`. Returns `false` if the object has\n no transform. Reach is the same (every derived type has an implicit\n `operator GameObject&()` so a derived `obj.try_get_matrix(&m)` works without\n an explicit cast). Returns `bool` rather than an optional to keep the\n `<optional>` include out of the public surface.",
             "body": {
               "type": "field",
               "field": "sea_vehicle",
@@ -6317,7 +6338,7 @@
           {
             "visibility": "public",
             "name": "set_matrix",
-            "doc": " Cpp analog of rust's `GameObjectMutExt::set_matrix`.",
+            "doc": " Sets the world matrix.",
             "body": {
               "type": "field",
               "field": "sea_vehicle",
@@ -8704,7 +8725,7 @@
           {
             "visibility": "public",
             "name": "try_get_matrix",
-            "doc": " Cpp analog of rust's `GameObjectExt::get_matrix`. Reach is the same\n (every derived type has an implicit `operator GameObject&()` so a\n derived `obj.try_get_matrix(&m)` works without an explicit cast).\n Returns `bool` rather than `std::optional<Matrix4>` to keep the\n `<optional>` include out of the public surface.",
+            "doc": " Gets the world matrix, writing it to `out`. Returns `false` if the object has\n no transform. Reach is the same (every derived type has an implicit\n `operator GameObject&()` so a derived `obj.try_get_matrix(&m)` works without\n an explicit cast). Returns `bool` rather than an optional to keep the\n `<optional>` include out of the public surface.",
             "body": {
               "type": "field",
               "field": "land_vehicle",
@@ -8744,7 +8765,7 @@
           {
             "visibility": "public",
             "name": "set_matrix",
-            "doc": " Cpp analog of rust's `GameObjectMutExt::set_matrix`.",
+            "doc": " Sets the world matrix.",
             "body": {
               "type": "field",
               "field": "land_vehicle",
@@ -11252,7 +11273,7 @@
           {
             "visibility": "public",
             "name": "try_get_matrix",
-            "doc": " Cpp analog of rust's `GameObjectExt::get_matrix`. Reach is the same\n (every derived type has an implicit `operator GameObject&()` so a\n derived `obj.try_get_matrix(&m)` works without an explicit cast).\n Returns `bool` rather than `std::optional<Matrix4>` to keep the\n `<optional>` include out of the public surface.",
+            "doc": " Gets the world matrix, writing it to `out`. Returns `false` if the object has\n no transform. Reach is the same (every derived type has an implicit\n `operator GameObject&()` so a derived `obj.try_get_matrix(&m)` works without\n an explicit cast). Returns `bool` rather than an optional to keep the\n `<optional>` include out of the public surface.",
             "body": {
               "type": "field",
               "field": "damageable",
@@ -11292,7 +11313,7 @@
           {
             "visibility": "public",
             "name": "set_matrix",
-            "doc": " Cpp analog of rust's `GameObjectMutExt::set_matrix`.",
+            "doc": " Sets the world matrix.",
             "body": {
               "type": "field",
               "field": "damageable",
@@ -13433,7 +13454,7 @@
           {
             "visibility": "public",
             "name": "try_get_matrix",
-            "doc": " Cpp analog of rust's `GameObjectExt::get_matrix`. Reach is the same\n (every derived type has an implicit `operator GameObject&()` so a\n derived `obj.try_get_matrix(&m)` works without an explicit cast).\n Returns `bool` rather than `std::optional<Matrix4>` to keep the\n `<optional>` include out of the public surface.",
+            "doc": " Gets the world matrix, writing it to `out`. Returns `false` if the object has\n no transform. Reach is the same (every derived type has an implicit\n `operator GameObject&()` so a derived `obj.try_get_matrix(&m)` works without\n an explicit cast). Returns `bool` rather than an optional to keep the\n `<optional>` include out of the public surface.",
             "body": {
               "type": "field",
               "field": "physics_game_object",
@@ -13473,7 +13494,7 @@
           {
             "visibility": "public",
             "name": "set_matrix",
-            "doc": " Cpp analog of rust's `GameObjectMutExt::set_matrix`.",
+            "doc": " Sets the world matrix.",
             "body": {
               "type": "field",
               "field": "physics_game_object",
@@ -14448,7 +14469,7 @@
           {
             "visibility": "public",
             "name": "try_get_matrix",
-            "doc": " Cpp analog of rust's `GameObjectExt::get_matrix`. Reach is the same\n (every derived type has an implicit `operator GameObject&()` so a\n derived `obj.try_get_matrix(&m)` works without an explicit cast).\n Returns `bool` rather than `std::optional<Matrix4>` to keep the\n `<optional>` include out of the public surface.",
+            "doc": " Gets the world matrix, writing it to `out`. Returns `false` if the object has\n no transform. Reach is the same (every derived type has an implicit\n `operator GameObject&()` so a derived `obj.try_get_matrix(&m)` works without\n an explicit cast). Returns `bool` rather than an optional to keep the\n `<optional>` include out of the public surface.",
             "body": {
               "type": "external"
             },
@@ -14486,7 +14507,7 @@
           {
             "visibility": "public",
             "name": "set_matrix",
-            "doc": " Cpp analog of rust's `GameObjectMutExt::set_matrix`.",
+            "doc": " Sets the world matrix.",
             "body": {
               "type": "external"
             },
@@ -16749,7 +16770,7 @@
           {
             "visibility": "public",
             "name": "try_get_matrix",
-            "doc": " Cpp analog of rust's `GameObjectExt::get_matrix`. Reach is the same\n (every derived type has an implicit `operator GameObject&()` so a\n derived `obj.try_get_matrix(&m)` works without an explicit cast).\n Returns `bool` rather than `std::optional<Matrix4>` to keep the\n `<optional>` include out of the public surface.",
+            "doc": " Gets the world matrix, writing it to `out`. Returns `false` if the object has\n no transform. Reach is the same (every derived type has an implicit\n `operator GameObject&()` so a derived `obj.try_get_matrix(&m)` works without\n an explicit cast). Returns `bool` rather than an optional to keep the\n `<optional>` include out of the public surface.",
             "body": {
               "type": "field",
               "field": "air_vehicle",
@@ -16789,7 +16810,7 @@
           {
             "visibility": "public",
             "name": "set_matrix",
-            "doc": " Cpp analog of rust's `GameObjectMutExt::set_matrix`.",
+            "doc": " Sets the world matrix.",
             "body": {
               "type": "field",
               "field": "air_vehicle",
@@ -19176,7 +19197,7 @@
           {
             "visibility": "public",
             "name": "try_get_matrix",
-            "doc": " Cpp analog of rust's `GameObjectExt::get_matrix`. Reach is the same\n (every derived type has an implicit `operator GameObject&()` so a\n derived `obj.try_get_matrix(&m)` works without an explicit cast).\n Returns `bool` rather than `std::optional<Matrix4>` to keep the\n `<optional>` include out of the public surface.",
+            "doc": " Gets the world matrix, writing it to `out`. Returns `false` if the object has\n no transform. Reach is the same (every derived type has an implicit\n `operator GameObject&()` so a derived `obj.try_get_matrix(&m)` works without\n an explicit cast). Returns `bool` rather than an optional to keep the\n `<optional>` include out of the public surface.",
             "body": {
               "type": "field",
               "field": "vehicle",
@@ -19216,7 +19237,7 @@
           {
             "visibility": "public",
             "name": "set_matrix",
-            "doc": " Cpp analog of rust's `GameObjectMutExt::set_matrix`.",
+            "doc": " Sets the world matrix.",
             "body": {
               "type": "field",
               "field": "vehicle",
@@ -21603,7 +21624,7 @@
           {
             "visibility": "public",
             "name": "try_get_matrix",
-            "doc": " Cpp analog of rust's `GameObjectExt::get_matrix`. Reach is the same\n (every derived type has an implicit `operator GameObject&()` so a\n derived `obj.try_get_matrix(&m)` works without an explicit cast).\n Returns `bool` rather than `std::optional<Matrix4>` to keep the\n `<optional>` include out of the public surface.",
+            "doc": " Gets the world matrix, writing it to `out`. Returns `false` if the object has\n no transform. Reach is the same (every derived type has an implicit\n `operator GameObject&()` so a derived `obj.try_get_matrix(&m)` works without\n an explicit cast). Returns `bool` rather than an optional to keep the\n `<optional>` include out of the public surface.",
             "body": {
               "type": "field",
               "field": "land_vehicle",
@@ -21643,7 +21664,7 @@
           {
             "visibility": "public",
             "name": "set_matrix",
-            "doc": " Cpp analog of rust's `GameObjectMutExt::set_matrix`.",
+            "doc": " Sets the world matrix.",
             "body": {
               "type": "field",
               "field": "land_vehicle",
@@ -24139,7 +24160,7 @@
           {
             "visibility": "public",
             "name": "try_get_matrix",
-            "doc": " Cpp analog of rust's `GameObjectExt::get_matrix`. Reach is the same\n (every derived type has an implicit `operator GameObject&()` so a\n derived `obj.try_get_matrix(&m)` works without an explicit cast).\n Returns `bool` rather than `std::optional<Matrix4>` to keep the\n `<optional>` include out of the public surface.",
+            "doc": " Gets the world matrix, writing it to `out`. Returns `false` if the object has\n no transform. Reach is the same (every derived type has an implicit\n `operator GameObject&()` so a derived `obj.try_get_matrix(&m)` works without\n an explicit cast). Returns `bool` rather than an optional to keep the\n `<optional>` include out of the public surface.",
             "body": {
               "type": "field",
               "field": "game_object",
@@ -24179,7 +24200,7 @@
           {
             "visibility": "public",
             "name": "set_matrix",
-            "doc": " Cpp analog of rust's `GameObjectMutExt::set_matrix`.",
+            "doc": " Sets the world matrix.",
             "body": {
               "type": "field",
               "field": "game_object",
@@ -25137,7 +25158,7 @@
           {
             "visibility": "public",
             "name": "try_get_matrix",
-            "doc": " Cpp analog of rust's `GameObjectExt::get_matrix`. Reach is the same\n (every derived type has an implicit `operator GameObject&()` so a\n derived `obj.try_get_matrix(&m)` works without an explicit cast).\n Returns `bool` rather than `std::optional<Matrix4>` to keep the\n `<optional>` include out of the public surface.",
+            "doc": " Gets the world matrix, writing it to `out`. Returns `false` if the object has\n no transform. Reach is the same (every derived type has an implicit\n `operator GameObject&()` so a derived `obj.try_get_matrix(&m)` works without\n an explicit cast). Returns `bool` rather than an optional to keep the\n `<optional>` include out of the public surface.",
             "body": {
               "type": "field",
               "field": "vehicle",
@@ -25177,7 +25198,7 @@
           {
             "visibility": "public",
             "name": "set_matrix",
-            "doc": " Cpp analog of rust's `GameObjectMutExt::set_matrix`.",
+            "doc": " Sets the world matrix.",
             "body": {
               "type": "field",
               "field": "vehicle",
@@ -27802,7 +27823,7 @@
           {
             "visibility": "public",
             "name": "try_get_matrix",
-            "doc": " Cpp analog of rust's `GameObjectExt::get_matrix`. Reach is the same\n (every derived type has an implicit `operator GameObject&()` so a\n derived `obj.try_get_matrix(&m)` works without an explicit cast).\n Returns `bool` rather than `std::optional<Matrix4>` to keep the\n `<optional>` include out of the public surface.",
+            "doc": " Gets the world matrix, writing it to `out`. Returns `false` if the object has\n no transform. Reach is the same (every derived type has an implicit\n `operator GameObject&()` so a derived `obj.try_get_matrix(&m)` works without\n an explicit cast). Returns `bool` rather than an optional to keep the\n `<optional>` include out of the public surface.",
             "body": {
               "type": "field",
               "field": "physics_game_object",
@@ -27842,7 +27863,7 @@
           {
             "visibility": "public",
             "name": "set_matrix",
-            "doc": " Cpp analog of rust's `GameObjectMutExt::set_matrix`.",
+            "doc": " Sets the world matrix.",
             "body": {
               "type": "field",
               "field": "physics_game_object",
@@ -30714,7 +30735,7 @@
           {
             "visibility": "public",
             "name": "try_get_matrix",
-            "doc": " Cpp analog of rust's `GameObjectExt::get_matrix`. Reach is the same\n (every derived type has an implicit `operator GameObject&()` so a\n derived `obj.try_get_matrix(&m)` works without an explicit cast).\n Returns `bool` rather than `std::optional<Matrix4>` to keep the\n `<optional>` include out of the public surface.",
+            "doc": " Gets the world matrix, writing it to `out`. Returns `false` if the object has\n no transform. Reach is the same (every derived type has an implicit\n `operator GameObject&()` so a derived `obj.try_get_matrix(&m)` works without\n an explicit cast). Returns `bool` rather than an optional to keep the\n `<optional>` include out of the public surface.",
             "body": {
               "type": "field",
               "field": "damageable",
@@ -30754,7 +30775,7 @@
           {
             "visibility": "public",
             "name": "set_matrix",
-            "doc": " Cpp analog of rust's `GameObjectMutExt::set_matrix`.",
+            "doc": " Sets the world matrix.",
             "body": {
               "type": "field",
               "field": "damageable",
@@ -38512,7 +38533,7 @@
           {
             "visibility": "public",
             "name": "reference_count",
-            "doc": " Current reference count. Named `reference_count` in Rust (no\n field/method collision); C++ uses `refcount` to avoid the clash.",
+            "doc": " Current reference count.",
             "body": {
               "type": "external"
             },
@@ -38533,7 +38554,7 @@
             },
             "source": {
               "file_index": 29,
-              "line": 32
+              "line": 31
             }
           },
           {
@@ -38557,7 +38578,7 @@
             },
             "source": {
               "file_index": 29,
-              "line": 34
+              "line": 33
             }
           },
           {
@@ -38581,7 +38602,7 @@
             },
             "source": {
               "file_index": 29,
-              "line": 36
+              "line": 35
             }
           }
         ],
@@ -45040,7 +45061,7 @@
             "is_base": false,
             "source": {
               "file_index": 40,
-              "line": 105
+              "line": 104
             }
           }
         ],
@@ -45055,7 +45076,7 @@
       },
       "source": {
         "file_index": 40,
-        "line": 104
+        "line": 103
       }
     },
     "physics::pfx_rigid_body::PfxRigidBody": {
@@ -45591,7 +45612,7 @@
           {
             "visibility": "public",
             "name": "make_heap",
-            "doc": " Heap-allocates a `PfxRigidBody` and runs the native ctor against\n the provided `HkpRigidBody`. Caller takes ownership; tear down\n via `destructor(false)` + `delete` or wrap in a smart-pointer.\n Mirrors rust's `unsafe fn new() -> Pin<Box<Self>>`.",
+            "doc": " Heap-allocates a `PfxRigidBody` and runs the native ctor against\n the provided `HkpRigidBody`. Caller takes ownership; tear down\n via `destructor(false)` + `delete` or wrap in a smart-pointer.",
             "body": {
               "type": "external"
             },
@@ -45623,7 +45644,7 @@
             },
             "source": {
               "file_index": 40,
-              "line": 67
+              "line": 66
             }
           }
         ],
@@ -45666,7 +45687,7 @@
             "is_base": true,
             "source": {
               "file_index": 40,
-              "line": 100
+              "line": 99
             }
           }
         ],
@@ -45716,7 +45737,7 @@
       },
       "source": {
         "file_index": 40,
-        "line": 98
+        "line": 97
       }
     },
     "physics::pfx_vehicle::PfxVehicle": {
@@ -46438,7 +46459,7 @@
             "is_base": false,
             "source": {
               "file_index": 42,
-              "line": 116
+              "line": 115
             }
           }
         ],
@@ -46536,7 +46557,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 42,
-              "line": 120
+              "line": 119
             }
           },
           {
@@ -46559,7 +46580,7 @@
             "calling_convention": "thiscall",
             "source": {
               "file_index": 42,
-              "line": 123
+              "line": 122
             }
           },
           {
@@ -46595,7 +46616,7 @@
             "calling_convention": "stdcall",
             "source": {
               "file_index": 42,
-              "line": 126
+              "line": 125
             }
           }
         ],
@@ -46609,7 +46630,7 @@
       },
       "source": {
         "file_index": 42,
-        "line": 117
+        "line": 116
       }
     },
     "physics::physics_system::RayCastFilter": {
@@ -46788,7 +46809,7 @@
           {
             "visibility": "public",
             "name": "make",
-            "doc": " Default-constructed `RayCastResult`: forward-pointing normal,\n `distance = 1`, sentinel `0xFFFFFFFF` in every `unknown` slot.\n Matches the shape rust's `Default` impl produces.",
+            "doc": " Default-constructed `RayCastResult`: forward-pointing normal,\n `distance = 1`, sentinel `0xFFFFFFFF` in every `unknown` slot.",
             "body": {
               "type": "external"
             },
@@ -46805,7 +46826,7 @@
             },
             "source": {
               "file_index": 42,
-              "line": 71
+              "line": 70
             }
           },
           {
@@ -46828,7 +46849,7 @@
             },
             "source": {
               "file_index": 42,
-              "line": 79
+              "line": 78
             }
           }
         ],
@@ -56395,7 +56416,7 @@
           {
             "visibility": "public",
             "name": "clone_",
-            "doc": " Bumps `count_impl`'s use_count and returns a fresh `SharedCount`\n over the same refcount block. Cpp-only because the rust side\n gets the same effect via `Clone`.",
+            "doc": " Bumps `count_impl`'s use_count and returns a fresh `SharedCount`\n over the same refcount block.",
             "body": {
               "type": "external"
             },
@@ -56416,7 +56437,7 @@
             },
             "source": {
               "file_index": 51,
-              "line": 135
+              "line": 134
             }
           }
         ],
@@ -56913,7 +56934,7 @@
             "is_base": false,
             "source": {
               "file_index": 51,
-              "line": 251
+              "line": 249
             }
           },
           {
@@ -56930,7 +56951,7 @@
             "is_base": false,
             "source": {
               "file_index": 51,
-              "line": 252
+              "line": 250
             }
           }
         ],
@@ -56969,7 +56990,7 @@
             },
             "source": {
               "file_index": 51,
-              "line": 263
+              "line": 261
             }
           },
           {
@@ -57006,7 +57027,7 @@
             },
             "source": {
               "file_index": 51,
-              "line": 266
+              "line": 264
             }
           },
           {
@@ -57043,7 +57064,7 @@
             },
             "source": {
               "file_index": 51,
-              "line": 269
+              "line": 267
             }
           },
           {
@@ -57067,7 +57088,7 @@
             },
             "source": {
               "file_index": 51,
-              "line": 275
+              "line": 273
             }
           },
           {
@@ -57096,7 +57117,7 @@
             },
             "source": {
               "file_index": 51,
-              "line": 277
+              "line": 275
             }
           },
           {
@@ -57129,7 +57150,7 @@
             },
             "source": {
               "file_index": 51,
-              "line": 279
+              "line": 277
             }
           },
           {
@@ -57165,13 +57186,13 @@
             },
             "source": {
               "file_index": 51,
-              "line": 291
+              "line": 289
             }
           },
           {
             "visibility": "public",
             "name": "static_pointer_cast",
-            "doc": " Bit-cast to `SharedPtr<Y>` while preserving the refcount block.\n Caller asserts that T can be reinterpreted as Y.\n\n MOVE semantics: the Rust implementation consumes `self`. The\n original `SharedPtr<T>` is invalidated; the returned `SharedPtr<Y>`\n inherits its refcount block with no atomic increment. If you need\n to keep the `T` view alongside the `Y` view, call `.clone()` first.",
+            "doc": " Bit-cast to `SharedPtr<Y>` while preserving the refcount block.\n Caller asserts that T can be reinterpreted as Y.\n\n MOVE semantics: consumes the source. The original `SharedPtr<T>` is\n invalidated; the returned `SharedPtr<Y>` inherits its refcount\n block with no atomic increment. If you need to keep the `T` view\n alongside the `Y` view, clone first.",
             "body": {
               "type": "external"
             },
@@ -57201,7 +57222,7 @@
             },
             "source": {
               "file_index": 51,
-              "line": 304
+              "line": 302
             }
           },
           {
@@ -57230,7 +57251,7 @@
             },
             "source": {
               "file_index": 51,
-              "line": 313
+              "line": 311
             }
           }
         ],
@@ -57244,7 +57265,7 @@
       },
       "source": {
         "file_index": 51,
-        "line": 250
+        "line": 248
       }
     },
     "types::shared_ptr::WeakCount": {
@@ -57274,7 +57295,7 @@
             "is_base": false,
             "source": {
               "file_index": 51,
-              "line": 196
+              "line": 195
             }
           }
         ],
@@ -57300,13 +57321,13 @@
             },
             "source": {
               "file_index": 51,
-              "line": 201
+              "line": 200
             }
           },
           {
             "visibility": "public",
             "name": "from_shared",
-            "doc": " Static factory: bumps `shared`'s weak_count and wraps its\n count_impl in a `WeakCount`. No-self method - mirrors the rust\n `WeakCount::new_from_shared` associated fn shape.",
+            "doc": " Static factory: bumps `shared`'s weak_count and wraps its\n count_impl in a `WeakCount`.",
             "body": {
               "type": "external"
             },
@@ -57335,7 +57356,7 @@
             },
             "source": {
               "file_index": 51,
-              "line": 206
+              "line": 204
             }
           }
         ],
@@ -57349,7 +57370,7 @@
       },
       "source": {
         "file_index": 51,
-        "line": 195
+        "line": 194
       }
     },
     "types::shared_ptr::WeakPtr": {
@@ -57382,7 +57403,7 @@
             "is_base": false,
             "source": {
               "file_index": 51,
-              "line": 456
+              "line": 454
             }
           },
           {
@@ -57399,7 +57420,7 @@
             "is_base": false,
             "source": {
               "file_index": 51,
-              "line": 457
+              "line": 455
             }
           }
         ],
@@ -57448,7 +57469,7 @@
             },
             "source": {
               "file_index": 51,
-              "line": 464
+              "line": 462
             }
           }
         ],
@@ -57462,7 +57483,7 @@
       },
       "source": {
         "file_index": 51,
-        "line": 455
+        "line": 453
       }
     },
     "types::std_string::StdString": {
@@ -57493,7 +57514,7 @@
             "is_base": false,
             "source": {
               "file_index": 52,
-              "line": 12
+              "line": 21
             }
           },
           {
@@ -57514,7 +57535,7 @@
             "is_base": false,
             "source": {
               "file_index": 52,
-              "line": 12
+              "line": 21
             }
           },
           {
@@ -57531,7 +57552,7 @@
             "is_base": false,
             "source": {
               "file_index": 52,
-              "line": 13
+              "line": 22
             }
           },
           {
@@ -57548,7 +57569,7 @@
             "is_base": false,
             "source": {
               "file_index": 52,
-              "line": 14
+              "line": 23
             }
           }
         ],
@@ -57574,7 +57595,7 @@
             },
             "source": {
               "file_index": 52,
-              "line": 20
+              "line": 29
             }
           },
           {
@@ -57609,7 +57630,7 @@
             },
             "source": {
               "file_index": 52,
-              "line": 24
+              "line": 33
             }
           },
           {
@@ -57633,7 +57654,7 @@
             },
             "source": {
               "file_index": 52,
-              "line": 27
+              "line": 36
             }
           },
           {
@@ -57668,7 +57689,7 @@
             },
             "source": {
               "file_index": 52,
-              "line": 30
+              "line": 39
             }
           },
           {
@@ -57691,7 +57712,7 @@
             },
             "source": {
               "file_index": 52,
-              "line": 40
+              "line": 49
             }
           }
         ],
@@ -57701,11 +57722,109 @@
         "cloneable": false,
         "defaultable": true,
         "packed": false,
-        "pinned": false
+        "pinned": false,
+        "nested_items": [
+          "types::std_string::StdString::CTOR_DEFAULT",
+          "types::std_string::StdString::CTOR_CSTR",
+          "types::std_string::StdString::DTOR",
+          "types::std_string::StdString::COPY"
+        ]
       },
       "source": {
         "file_index": 52,
         "line": 10
+      }
+    },
+    "types::std_string::StdString::COPY": {
+      "path": "types::std_string::StdString::COPY",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " Mangled symbol for `std::basic_string::operator=(const basic_string&)`.",
+        "value_type": {
+          "type": "raw",
+          "path": "cstr"
+        },
+        "value": {
+          "kind": "c_string",
+          "value": "??4?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAEAAV01@ABV01@@Z"
+        }
+      },
+      "source": {
+        "file_index": 52,
+        "line": 18
+      }
+    },
+    "types::std_string::StdString::CTOR_CSTR": {
+      "path": "types::std_string::StdString::CTOR_CSTR",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " Mangled symbol for `std::basic_string::basic_string(const char*)`.",
+        "value_type": {
+          "type": "raw",
+          "path": "cstr"
+        },
+        "value": {
+          "kind": "c_string",
+          "value": "??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@PBD@Z"
+        }
+      },
+      "source": {
+        "file_index": 52,
+        "line": 14
+      }
+    },
+    "types::std_string::StdString::CTOR_DEFAULT": {
+      "path": "types::std_string::StdString::CTOR_DEFAULT",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " Mangled symbol for MSVCP80's `std::basic_string::basic_string()`.",
+        "value_type": {
+          "type": "raw",
+          "path": "cstr"
+        },
+        "value": {
+          "kind": "c_string",
+          "value": "??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@XZ"
+        }
+      },
+      "source": {
+        "file_index": 52,
+        "line": 12
+      }
+    },
+    "types::std_string::StdString::DTOR": {
+      "path": "types::std_string::StdString::DTOR",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " Mangled symbol for `std::basic_string::~basic_string()`.",
+        "value_type": {
+          "type": "raw",
+          "path": "cstr"
+        },
+        "value": {
+          "kind": "c_string",
+          "value": "??1?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@XZ"
+        }
+      },
+      "source": {
+        "file_index": 52,
+        "line": 16
       }
     },
     "u128": {
@@ -61447,7 +61566,7 @@
               },
               "definition": false,
               "for_type": "types::std_string::StdString",
-              "text": "\n    struct StringFunctions {\n        ctor_default: extern \"thiscall\" fn(*mut StdString) -> *mut c_void,\n        ctor_cstr: extern \"thiscall\" fn(*mut StdString, *const c_char) -> *mut c_void,\n        dtor: extern \"thiscall\" fn(*mut StdString) -> *mut c_void,\n        copy: extern \"thiscall\" fn(*mut StdString, *const StdString) -> *mut c_void,\n    }\n    impl StringFunctions {\n        const CTOR_DEFAULT: &'static std::ffi::CStr =\n            c\"??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@XZ\";\n        const CTOR_CSTR: &'static std::ffi::CStr =\n            c\"??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@PBD@Z\";\n        const DTOR: &'static std::ffi::CStr =\n            c\"??1?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@XZ\";\n        const COPY: &'static std::ffi::CStr =\n            c\"??4?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAEAAV01@ABV01@@Z\";\n\n        pub fn get() -> &'static Self {\n            static STRING_FUNCTIONS: OnceLock<StringFunctions> = OnceLock::new();\n            #[allow(clippy::missing_transmute_annotations)]\n            STRING_FUNCTIONS.get_or_init(|| unsafe {\n                use std::mem::transmute;\n                let module = GetModuleHandleA(pcstr(c\"MSVCP80\")).unwrap();\n                StringFunctions {\n                    ctor_default: transmute(GetProcAddress(module, pcstr(Self::CTOR_DEFAULT))),\n                    ctor_cstr: transmute(GetProcAddress(module, pcstr(Self::CTOR_CSTR))),\n                    dtor: transmute(GetProcAddress(module, pcstr(Self::DTOR))),\n                    copy: transmute(GetProcAddress(module, pcstr(Self::COPY))),\n                }\n            })\n        }\n    }\n\n    #[allow(dead_code)]\n    impl StdString {\n        pub fn new() -> StdString {\n            let mut ret = StdString::default();\n            (StringFunctions::get().ctor_default)(&mut ret);\n            ret\n        }\n\n        pub fn new_from_str(s: &str) -> Result<Self, std::ffi::NulError> {\n            let tmp = std::ffi::CString::new(s)?;\n            Ok(unsafe { Self::new_from_c_str(tmp.as_c_str().as_ptr()) })\n        }\n\n        pub unsafe fn new_from_c_str(s: *const c_char) -> StdString {\n            let mut ret = StdString::default();\n            (StringFunctions::get().ctor_cstr)(&mut ret, s);\n            ret\n        }\n\n        pub unsafe fn copy_from(&mut self, s: *mut StdString) {\n            (StringFunctions::get().copy)(self, s);\n        }\n    }\n\n    impl Drop for StdString {\n        fn drop(&mut self) {\n            (StringFunctions::get().dtor)(self);\n        }\n    }\n"
+              "text": "\n    struct StringFunctions {\n        ctor_default: extern \"thiscall\" fn(*mut StdString) -> *mut c_void,\n        ctor_cstr: extern \"thiscall\" fn(*mut StdString, *const c_char) -> *mut c_void,\n        dtor: extern \"thiscall\" fn(*mut StdString) -> *mut c_void,\n        copy: extern \"thiscall\" fn(*mut StdString, *const StdString) -> *mut c_void,\n    }\n    impl StringFunctions {\n        pub fn get() -> &'static Self {\n            static STRING_FUNCTIONS: OnceLock<StringFunctions> = OnceLock::new();\n            #[allow(clippy::missing_transmute_annotations)]\n            STRING_FUNCTIONS.get_or_init(|| unsafe {\n                use std::mem::transmute;\n                let module = GetModuleHandleA(pcstr(c\"MSVCP80\")).unwrap();\n                StringFunctions {\n                    ctor_default: transmute(GetProcAddress(module, pcstr(StdString::CTOR_DEFAULT))),\n                    ctor_cstr: transmute(GetProcAddress(module, pcstr(StdString::CTOR_CSTR))),\n                    dtor: transmute(GetProcAddress(module, pcstr(StdString::DTOR))),\n                    copy: transmute(GetProcAddress(module, pcstr(StdString::COPY))),\n                }\n            })\n        }\n    }\n\n    #[allow(dead_code)]\n    impl StdString {\n        pub fn new() -> StdString {\n            let mut ret = StdString::default();\n            (StringFunctions::get().ctor_default)(&mut ret);\n            ret\n        }\n\n        pub fn new_from_str(s: &str) -> Result<Self, std::ffi::NulError> {\n            let tmp = std::ffi::CString::new(s)?;\n            Ok(unsafe { Self::new_from_c_str(tmp.as_c_str().as_ptr()) })\n        }\n\n        pub unsafe fn new_from_c_str(s: *const c_char) -> StdString {\n            let mut ret = StdString::default();\n            (StringFunctions::get().ctor_cstr)(&mut ret, s);\n            ret\n        }\n\n        pub unsafe fn copy_from(&mut self, s: *mut StdString) {\n            (StringFunctions::get().copy)(self, s);\n        }\n    }\n\n    impl Drop for StdString {\n        fn drop(&mut self) {\n            (StringFunctions::get().dtor)(self);\n        }\n    }\n"
             },
             {
               "kind": "prologue",
@@ -61468,7 +61587,7 @@
               },
               "definition": true,
               "for_type": "types::std_string::StdString",
-              "text": "\n// JC2 ships against MSVCP80's `std::basic_string` ABI; we resolve the\n// constructors / destructor / copy by mangled name from the loaded DLL on\n// first use (mirrors the Rust impl). The mangled names target the 32-bit\n// __thiscall variants from MSVCP80, which is what the game binary links\n// against.\nnamespace {\n    struct StdStringFunctions {\n        void (PYXIS_THISCALL *ctor_default)(StdString*);\n        void (PYXIS_THISCALL *ctor_cstr)(StdString*, const char*);\n        void (PYXIS_THISCALL *dtor)(StdString*);\n        void (PYXIS_THISCALL *copy)(StdString*, const StdString*);\n    };\n\n    const StdStringFunctions& std_string_functions() {\n        static const StdStringFunctions fns = []() -> StdStringFunctions {\n            HMODULE module = ::GetModuleHandleA(\"MSVCP80\");\n            auto resolve = [&](const char* mangled) -> FARPROC {\n                return module ? ::GetProcAddress(module, mangled) : nullptr;\n            };\n            StdStringFunctions out{};\n            out.ctor_default = reinterpret_cast<decltype(out.ctor_default)>(\n                resolve(\"??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@XZ\"));\n            out.ctor_cstr = reinterpret_cast<decltype(out.ctor_cstr)>(\n                resolve(\"??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@PBD@Z\"));\n            out.dtor = reinterpret_cast<decltype(out.dtor)>(\n                resolve(\"??1?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@XZ\"));\n            out.copy = reinterpret_cast<decltype(out.copy)>(\n                resolve(\"??4?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAEAAV01@ABV01@@Z\"));\n            return out;\n        }();\n        return fns;\n    }\n}\n\nvoid StdString::ctor() { std_string_functions().ctor_default(this); }\nvoid StdString::ctor_cstr(const char* s) { std_string_functions().ctor_cstr(this, s); }\nvoid StdString::dtor() { std_string_functions().dtor(this); }\nvoid StdString::copy(const StdString* other) { std_string_functions().copy(this, other); }\n"
+              "text": "\n// JC2 ships against MSVCP80's `std::basic_string` ABI; we resolve the\n// constructors / destructor / copy by mangled name from the loaded DLL on\n// first use (mirrors the Rust impl). The mangled names target the 32-bit\n// __thiscall variants from MSVCP80, which is what the game binary links\n// against.\nnamespace {\n    struct StdStringFunctions {\n        void (PYXIS_THISCALL *ctor_default)(StdString*);\n        void (PYXIS_THISCALL *ctor_cstr)(StdString*, const char*);\n        void (PYXIS_THISCALL *dtor)(StdString*);\n        void (PYXIS_THISCALL *copy)(StdString*, const StdString*);\n    };\n\n    const StdStringFunctions& std_string_functions() {\n        static const StdStringFunctions fns = []() -> StdStringFunctions {\n            HMODULE module = ::GetModuleHandleA(\"MSVCP80\");\n            auto resolve = [&](const char* mangled) -> FARPROC {\n                return module ? ::GetProcAddress(module, mangled) : nullptr;\n            };\n            StdStringFunctions out{};\n            out.ctor_default = reinterpret_cast<decltype(out.ctor_default)>(\n                resolve(StdString::CTOR_DEFAULT));\n            out.ctor_cstr = reinterpret_cast<decltype(out.ctor_cstr)>(\n                resolve(StdString::CTOR_CSTR));\n            out.dtor = reinterpret_cast<decltype(out.dtor)>(\n                resolve(StdString::DTOR));\n            out.copy = reinterpret_cast<decltype(out.copy)>(\n                resolve(StdString::COPY));\n            return out;\n        }();\n        return fns;\n    }\n}\n\nvoid StdString::ctor() { std_string_functions().ctor_default(this); }\nvoid StdString::ctor_cstr(const char* s) { std_string_functions().ctor_cstr(this, s); }\nvoid StdString::dtor() { std_string_functions().dtor(this); }\nvoid StdString::copy(const StdString* other) { std_string_functions().copy(this, other); }\n"
             }
           ],
           "source": {

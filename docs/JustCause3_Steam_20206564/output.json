@@ -1,5 +1,5 @@
 {
-  "schema_version": 10,
+  "schema_version": 11,
   "pyxis_version": "0.1.0",
   "pointer_size": 8,
   "project_name": "Just Cause 3 (Steam 20206564)",
@@ -3142,10 +3142,10 @@
         "doc": " The on-foot / land-vehicle reversing act: drives the `S_REVERSE_*` states in\n `rico_base.afsmb`, where Rico turns to look over his shoulder while backing up.",
         "value_type": {
           "type": "raw",
-          "path": "str"
+          "path": "cstr"
         },
         "value": {
-          "kind": "string",
+          "kind": "c_string",
           "value": "ACT_REVERSE"
         }
       },
@@ -3172,10 +3172,10 @@
         ],
         "value_type": {
           "type": "raw",
-          "path": "str"
+          "path": "cstr"
         },
         "value": {
-          "kind": "string",
+          "kind": "c_string",
           "value": "ACT_REVERSE_MOTORBIKE"
         }
       },
@@ -3203,10 +3203,10 @@
         ],
         "value_type": {
           "type": "raw",
-          "path": "str"
+          "path": "cstr"
         },
         "value": {
-          "kind": "string",
+          "kind": "c_string",
           "value": "ACT_TO_IDLE_ONE_OFF"
         }
       },
@@ -10521,6 +10521,27 @@
         "line": 5
       }
     },
+    "cstr": {
+      "path": "cstr",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false,
+        "pinned": false
+      },
+      "source": null
+    },
     "environment::Atmosphere": {
       "path": "environment::Atmosphere",
       "visibility": "public",
@@ -11071,10 +11092,10 @@
         "doc": " Applies the pinned state instantly rather than blending toward it.",
         "value_type": {
           "type": "raw",
-          "path": "str"
+          "path": "cstr"
         },
         "value": {
-          "kind": "string",
+          "kind": "c_string",
           "value": "weather_instant"
         }
       },
@@ -11094,10 +11115,10 @@
         "doc": " Pins rain (severity `4.0`, rain intensity `1.0`, snow `0`).",
         "value_type": {
           "type": "raw",
-          "path": "str"
+          "path": "cstr"
         },
         "value": {
-          "kind": "string",
+          "kind": "c_string",
           "value": "weather_rain"
         }
       },
@@ -11117,10 +11138,10 @@
         "doc": " Hands control back to the ambient weather system.",
         "value_type": {
           "type": "raw",
-          "path": "str"
+          "path": "cstr"
         },
         "value": {
-          "kind": "string",
+          "kind": "c_string",
           "value": "weather_restore"
         }
       },
@@ -11140,10 +11161,10 @@
         "doc": " Pins snow (severity `4.0`, snow ratio `1.0`).",
         "value_type": {
           "type": "raw",
-          "path": "str"
+          "path": "cstr"
         },
         "value": {
-          "kind": "string",
+          "kind": "c_string",
           "value": "weather_snow"
         }
       },
@@ -11163,10 +11184,10 @@
         "doc": " Pins clear weather (severity `0.1`).",
         "value_type": {
           "type": "raw",
-          "path": "str"
+          "path": "cstr"
         },
         "value": {
-          "kind": "string",
+          "kind": "c_string",
           "value": "weather_sunny"
         }
       },
@@ -38331,14 +38352,7 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": " The engine's 4x4 matrix, in the D3D convention: row-major storage with row vectors (a point is a\n row vector left-multiplied by the matrix, `clip = p * M`).\n\n The 16 floats are four rows; a world or camera transform's rows are its basis vectors:\n `data[0..2]` is right (+X), `data[4..6]` is up (+Y), `data[8..10]` is the +Z basis (so forward is\n `-data[8..10]`), and `data[12..14]` is the translation. Right-handed, Y-up.\n\n The glam conversions below bridge to glam's column-vector convention by transposing (row-major rows\n become glam columns), so glam matrix math on a converted [`Matrix4`] works without an explicit\n transpose. To build an engine transform in glam, set the basis vectors as the glam *columns*\n (right, up, -forward, translation) and use `to_cols_array`.",
-        "doc_links": [
-          {
-            "text": "Matrix4",
-            "target_kind": "item",
-            "path": "types::math::Matrix4"
-          }
-        ],
+        "doc": " The engine's 4x4 matrix, in the D3D convention: row-major storage with row vectors (a point is a\n row vector left-multiplied by the matrix, `clip = p * M`).\n\n The 16 floats are four rows; a world or camera transform's rows are its basis vectors:\n `data[0..2]` is right (+X), `data[4..6]` is up (+Y), `data[8..10]` is the +Z basis (so forward is\n `-data[8..10]`), and `data[12..14]` is the translation. Right-handed, Y-up.\n\n When converting to a column-major math library, transpose the data and place basis vectors as\n columns (right, up, -forward, translation).",
         "fields": [
           {
             "visibility": "public",
@@ -38358,7 +38372,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 55
+              "line": 58
             }
           }
         ],
@@ -38400,7 +38414,7 @@
             },
             "source": {
               "file_index": 44,
-              "line": 61
+              "line": 64
             }
           },
           {
@@ -38440,7 +38454,7 @@
             },
             "source": {
               "file_index": 44,
-              "line": 64
+              "line": 67
             }
           },
           {
@@ -38490,7 +38504,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 72
+              "line": 75
             }
           },
           {
@@ -38548,7 +38562,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 85
+              "line": 88
             }
           }
         ],
@@ -38558,7 +38572,203 @@
         "cloneable": true,
         "defaultable": true,
         "packed": false,
-        "pinned": false
+        "pinned": false,
+        "nested_items": [
+          "types::math::Matrix4::ZERO",
+          "types::math::Matrix4::IDENTITY"
+        ]
+      },
+      "source": {
+        "file_index": 44,
+        "line": 52
+      }
+    },
+    "types::math::Matrix4::IDENTITY": {
+      "path": "types::math::Matrix4::IDENTITY",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " The identity matrix; identical under either the row-major or the column-major reading.",
+        "value_type": {
+          "type": "raw",
+          "path": "types::math::Matrix4"
+        },
+        "value": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "data",
+              "value": {
+                "kind": "array",
+                "elements": [
+                  {
+                    "kind": "float",
+                    "value": 1.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 1.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 1.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 1.0
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "source": {
+        "file_index": 44,
+        "line": 56
+      }
+    },
+    "types::math::Matrix4::ZERO": {
+      "path": "types::math::Matrix4::ZERO",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " All elements zero.",
+        "value_type": {
+          "type": "raw",
+          "path": "types::math::Matrix4"
+        },
+        "value": {
+          "kind": "struct",
+          "fields": [
+            {
+              "name": "data",
+              "value": {
+                "kind": "array",
+                "elements": [
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  },
+                  {
+                    "kind": "float",
+                    "value": 0.0
+                  }
+                ]
+              }
+            }
+          ]
+        }
       },
       "source": {
         "file_index": 44,
@@ -38589,7 +38799,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 315
+              "line": 306
             }
           },
           {
@@ -38606,7 +38816,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 316
+              "line": 307
             }
           }
         ],
@@ -38621,7 +38831,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 314
+        "line": 305
       }
     },
     "types::math::Vector2": {
@@ -38652,7 +38862,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 234
+              "line": 225
             }
           }
         ],
@@ -38667,7 +38877,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 233
+        "line": 224
       }
     },
     "types::math::Vector3": {
@@ -38698,7 +38908,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 257
+              "line": 248
             }
           }
         ],
@@ -38713,7 +38923,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 256
+        "line": 247
       }
     },
     "types::math::Vector4": {
@@ -38744,7 +38954,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 280
+              "line": 271
             }
           }
         ],
@@ -38759,7 +38969,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 279
+        "line": 270
       }
     },
     "types::shared_ptr::SharedPtr": {
@@ -57890,7 +58100,7 @@
               },
               "definition": false,
               "for_type": "types::math::Matrix4",
-              "text": "\n    #[cfg(feature = \"glam\")]\n    impl From<glam::Mat4> for Matrix4 {\n        fn from(m: glam::Mat4) -> Self {\n            Self {\n                data: m.to_cols_array(),\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Matrix4> for glam::Mat4 {\n        fn from(m: Matrix4) -> Self {\n            glam::Mat4::from_cols_array(&m.data)\n        }\n    }\n    impl std::fmt::Debug for Matrix4 {\n        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {\n            let mut list = f.debug_list();\n            for row in self.data.chunks_exact(4) {\n                list.entry(&row);\n            }\n            list.finish()\n        }\n    }\n    impl Matrix4 {\n        /// All elements zero.\n        pub const ZERO: Self = Self { data: [0.0; 16] };\n        /// The identity matrix; identical under either the row-major or the column-major reading.\n        pub const IDENTITY: Self = Self {\n            data: [\n                1.0, 0.0, 0.0, 0.0, //\n                0.0, 1.0, 0.0, 0.0, //\n                0.0, 0.0, 1.0, 0.0, //\n                0.0, 0.0, 0.0, 1.0,\n            ],\n        };\n\n        pub fn as_ptr(&self) -> *const f32 {\n            self.data.as_ptr()\n        }\n\n        pub fn as_mut_ptr(&mut self) -> *mut f32 {\n            self.data.as_mut_ptr()\n        }\n    }\n\n    #[cfg(feature = \"glam\")]\n    impl std::ops::Mul for Matrix4 {\n        type Output = Matrix4;\n        // `a * b` matches the engine's Multiply4x4(a, b) (row-major a . b). The glam multiply is\n        // reversed on purpose: from_cols_array transposes engine-row-major into glam's column\n        // convention, so the engine product a . b is glam(b) * glam(a) mapped back through From.\n        fn mul(self, rhs: Matrix4) -> Matrix4 {\n            Matrix4::from(glam::Mat4::from(rhs) * glam::Mat4::from(self))\n        }\n    }\n\n    #[cfg(all(test, feature = \"glam\"))]\n    #[allow(clippy::items_after_test_module)]\n    mod matrix4_mul_tests {\n        use super::*;\n        fn translation(x: f32, y: f32, z: f32) -> Matrix4 {\n            // engine row-major: the translation lives in the last row (data[12..14])\n            let mut m = Matrix4 {\n                data: [\n                    1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,\n                ],\n            };\n            m.data[12] = x;\n            m.data[13] = y;\n            m.data[14] = z;\n            m\n        }\n        /// A rotation of 90 degrees about +Z, engine row-major: the basis vectors live in the rows,\n        /// so row 0 (right) becomes +Y and row 1 (up) becomes -X.\n        fn rot_z_90() -> Matrix4 {\n            let mut m = Matrix4::IDENTITY;\n            m.data[0] = 0.0;\n            m.data[1] = 1.0;\n            m.data[4] = -1.0;\n            m.data[5] = 0.0;\n            m\n        }\n\n        /// The textbook row-major product the engine's Multiply4x4 documents:\n        /// `result[i][j] = sum_k a[i][k] * b[k][j]`. An independent oracle for the operator, which\n        /// reaches the same result the long way around (through glam's flipped convention).\n        fn row_major_mul(a: &Matrix4, b: &Matrix4) -> Matrix4 {\n            let mut data = [0.0f32; 16];\n            for row in 0..4 {\n                for col in 0..4 {\n                    data[row * 4 + col] =\n                        (0..4).map(|k| a.data[row * 4 + k] * b.data[k * 4 + col]).sum();\n                }\n            }\n            Matrix4 { data }\n        }\n\n        #[test]\n        fn mul_matches_engine_convention() {\n            let id = translation(0.0, 0.0, 0.0);\n            let a = translation(1.0, 2.0, 3.0);\n            // identity is the unit on both sides\n            assert_eq!((id * a).data, a.data);\n            assert_eq!((a * id).data, a.data);\n            // row-major translations compose by adding their offsets (engine p . T1 . T2)\n            let ab = a * translation(10.0, 20.0, 30.0);\n            assert!((ab.data[12] - 11.0).abs() < 1e-5);\n            assert!((ab.data[13] - 22.0).abs() < 1e-5);\n            assert!((ab.data[14] - 33.0).abs() < 1e-5);\n        }\n\n        /// Composing two translations is commutative, so it cannot tell `a . b` from `b . a`. Pin the\n        /// operand order against the documented row-major product using a non-commutative pair, and\n        /// assert the pair really is non-commutative so the check has teeth.\n        #[test]\n        fn mul_operand_order_matches_row_major_product() {\n            let r = rot_z_90();\n            let t = translation(10.0, 20.0, 30.0);\n            assert_ne!((r * t).data, (t * r).data);\n            for (a, b) in [(r, t), (t, r)] {\n                let expected = row_major_mul(&a, &b);\n                for (i, (got, want)) in (a * b).data.iter().zip(expected.data.iter()).enumerate() {\n                    assert!((got - want).abs() < 1e-5, \"element {i}: {got} vs {want}\");\n                }\n            }\n        }\n\n        /// Row-vector semantics: `p . (a . b)` applies `a` first. Translating the origin along +X and\n        /// then rotating 90 degrees about +Z must land on +Y.\n        #[test]\n        fn mul_is_row_vector_apply_left_first() {\n            let m = translation(1.0, 0.0, 0.0) * rot_z_90();\n            let p = [0.0f32, 0.0, 0.0, 1.0];\n            let out: Vec<f32> = (0..4)\n                .map(|col| (0..4).map(|k| p[k] * m.data[k * 4 + col]).sum())\n                .collect();\n            assert!(out[0].abs() < 1e-5, \"x = {}\", out[0]);\n            assert!((out[1] - 1.0).abs() < 1e-5, \"y = {}\", out[1]);\n        }\n    }\n"
+              "text": "\n    #[cfg(feature = \"glam\")]\n    impl From<glam::Mat4> for Matrix4 {\n        fn from(m: glam::Mat4) -> Self {\n            Self {\n                data: m.to_cols_array(),\n            }\n        }\n    }\n    #[cfg(feature = \"glam\")]\n    impl From<Matrix4> for glam::Mat4 {\n        fn from(m: Matrix4) -> Self {\n            glam::Mat4::from_cols_array(&m.data)\n        }\n    }\n    impl std::fmt::Debug for Matrix4 {\n        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {\n            let mut list = f.debug_list();\n            for row in self.data.chunks_exact(4) {\n                list.entry(&row);\n            }\n            list.finish()\n        }\n    }\n    impl Matrix4 {\n        pub fn as_ptr(&self) -> *const f32 {\n            self.data.as_ptr()\n        }\n\n        pub fn as_mut_ptr(&mut self) -> *mut f32 {\n            self.data.as_mut_ptr()\n        }\n    }\n\n    #[cfg(feature = \"glam\")]\n    impl std::ops::Mul for Matrix4 {\n        type Output = Matrix4;\n        // `a * b` matches the engine's Multiply4x4(a, b) (row-major a . b). The glam multiply is\n        // reversed on purpose: from_cols_array transposes engine-row-major into glam's column\n        // convention, so the engine product a . b is glam(b) * glam(a) mapped back through From.\n        fn mul(self, rhs: Matrix4) -> Matrix4 {\n            Matrix4::from(glam::Mat4::from(rhs) * glam::Mat4::from(self))\n        }\n    }\n\n    #[cfg(all(test, feature = \"glam\"))]\n    #[allow(clippy::items_after_test_module)]\n    mod matrix4_mul_tests {\n        use super::*;\n        fn translation(x: f32, y: f32, z: f32) -> Matrix4 {\n            // engine row-major: the translation lives in the last row (data[12..14])\n            let mut m = Matrix4 {\n                data: [\n                    1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,\n                ],\n            };\n            m.data[12] = x;\n            m.data[13] = y;\n            m.data[14] = z;\n            m\n        }\n        /// A rotation of 90 degrees about +Z, engine row-major: the basis vectors live in the rows,\n        /// so row 0 (right) becomes +Y and row 1 (up) becomes -X.\n        fn rot_z_90() -> Matrix4 {\n            let mut m = Matrix4::IDENTITY;\n            m.data[0] = 0.0;\n            m.data[1] = 1.0;\n            m.data[4] = -1.0;\n            m.data[5] = 0.0;\n            m\n        }\n\n        /// The textbook row-major product the engine's Multiply4x4 documents:\n        /// `result[i][j] = sum_k a[i][k] * b[k][j]`. An independent oracle for the operator, which\n        /// reaches the same result the long way around (through glam's flipped convention).\n        fn row_major_mul(a: &Matrix4, b: &Matrix4) -> Matrix4 {\n            let mut data = [0.0f32; 16];\n            for row in 0..4 {\n                for col in 0..4 {\n                    data[row * 4 + col] =\n                        (0..4).map(|k| a.data[row * 4 + k] * b.data[k * 4 + col]).sum();\n                }\n            }\n            Matrix4 { data }\n        }\n\n        #[test]\n        fn mul_matches_engine_convention() {\n            let id = translation(0.0, 0.0, 0.0);\n            let a = translation(1.0, 2.0, 3.0);\n            // identity is the unit on both sides\n            assert_eq!((id * a).data, a.data);\n            assert_eq!((a * id).data, a.data);\n            // row-major translations compose by adding their offsets (engine p . T1 . T2)\n            let ab = a * translation(10.0, 20.0, 30.0);\n            assert!((ab.data[12] - 11.0).abs() < 1e-5);\n            assert!((ab.data[13] - 22.0).abs() < 1e-5);\n            assert!((ab.data[14] - 33.0).abs() < 1e-5);\n        }\n\n        /// Composing two translations is commutative, so it cannot tell `a . b` from `b . a`. Pin the\n        /// operand order against the documented row-major product using a non-commutative pair, and\n        /// assert the pair really is non-commutative so the check has teeth.\n        #[test]\n        fn mul_operand_order_matches_row_major_product() {\n            let r = rot_z_90();\n            let t = translation(10.0, 20.0, 30.0);\n            assert_ne!((r * t).data, (t * r).data);\n            for (a, b) in [(r, t), (t, r)] {\n                let expected = row_major_mul(&a, &b);\n                for (i, (got, want)) in (a * b).data.iter().zip(expected.data.iter()).enumerate() {\n                    assert!((got - want).abs() < 1e-5, \"element {i}: {got} vs {want}\");\n                }\n            }\n        }\n\n        /// Row-vector semantics: `p . (a . b)` applies `a` first. Translating the origin along +X and\n        /// then rotating 90 degrees about +Z must land on +Y.\n        #[test]\n        fn mul_is_row_vector_apply_left_first() {\n            let m = translation(1.0, 0.0, 0.0) * rot_z_90();\n            let p = [0.0f32, 0.0, 0.0, 1.0];\n            let out: Vec<f32> = (0..4)\n                .map(|col| (0..4).map(|k| p[k] * m.data[k * 4 + col]).sum())\n                .collect();\n            assert!(out[0].abs() < 1e-5, \"x = {}\", out[0]);\n            assert!((out[1] - 1.0).abs() < 1e-5, \"y = {}\", out[1]);\n        }\n    }\n"
             },
             {
               "kind": "epilogue",

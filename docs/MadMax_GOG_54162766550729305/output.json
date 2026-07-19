@@ -1,5 +1,5 @@
 {
-  "schema_version": 10,
+  "schema_version": 11,
   "pyxis_version": "0.1.0",
   "pointer_size": 8,
   "project_name": "Mad Max (1.0.3 / GOG 54162766550729305)",
@@ -218,6 +218,27 @@
       "path": "c_char",
       "visibility": "public",
       "size": 1,
+      "alignment": 1,
+      "category": "predefined",
+      "kind": {
+        "type": "type",
+        "doc": null,
+        "fields": [],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "defaultable": true,
+        "packed": false,
+        "pinned": false
+      },
+      "source": null
+    },
+    "cstr": {
+      "path": "cstr",
+      "visibility": "public",
+      "size": 0,
       "alignment": 1,
       "category": "predefined",
       "kind": {
