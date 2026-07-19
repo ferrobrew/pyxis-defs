@@ -46,10 +46,8 @@ epilogue for Matrix3 r#"
 /// `data[0..2]` is right (+X), `data[4..6]` is up (+Y), `data[8..10]` is the +Z basis (so forward is
 /// `-data[8..10]`), and `data[12..14]` is the translation. Right-handed, Y-up.
 ///
-/// The glam conversions below bridge to glam's column-vector convention by transposing (row-major rows
-/// become glam columns), so glam matrix math on a converted [`Matrix4`] works without an explicit
-/// transpose. To build an engine transform in glam, set the basis vectors as the glam *columns*
-/// (right, up, -forward, translation) and use `to_cols_array`.
+/// When converting to a column-major math library, transpose the data and place basis vectors as
+/// columns (right, up, -forward, translation).
 #[copyable, defaultable, align(4)]
 pub type Matrix4 {
     /// All elements zero.

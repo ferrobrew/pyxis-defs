@@ -66,7 +66,6 @@ pub type RayCastResult {
 impl RayCastResult {
     /// Default-constructed `RayCastResult`: forward-pointing normal,
     /// `distance = 1`, sentinel `0xFFFFFFFF` in every `unknown` slot.
-    /// Matches the shape rust's `Default` impl produces.
     #[external_body]
     pub fn make() -> RayCastResult;
 }

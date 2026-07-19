@@ -129,8 +129,7 @@ impl SharedCount {
     #[external_body]
     pub fn release(&mut self);
     /// Bumps `count_impl`'s use_count and returns a fresh `SharedCount`
-    /// over the same refcount block. Cpp-only because the rust side
-    /// gets the same effect via `Clone`.
+    /// over the same refcount block.
     #[external_body]
     pub fn clone_(&self) -> SharedCount;
 }
@@ -200,8 +199,7 @@ impl WeakCount {
     #[external_body]
     pub fn release(&mut self);
     /// Static factory: bumps `shared`'s weak_count and wraps its
-    /// count_impl in a `WeakCount`. No-self method - mirrors the rust
-    /// `WeakCount::new_from_shared` associated fn shape.
+    /// count_impl in a `WeakCount`.
     #[external_body]
     pub fn from_shared(shared: *const SharedCount) -> WeakCount;
 }
@@ -296,10 +294,10 @@ impl<T, Y> SharedPtr<T> {
     /// Bit-cast to `SharedPtr<Y>` while preserving the refcount block.
     /// Caller asserts that T can be reinterpreted as Y.
     ///
-    /// MOVE semantics: the Rust implementation consumes `self`. The
-    /// original `SharedPtr<T>` is invalidated; the returned `SharedPtr<Y>`
-    /// inherits its refcount block with no atomic increment. If you need
-    /// to keep the `T` view alongside the `Y` view, call `.clone()` first.
+    /// MOVE semantics: consumes the source. The original `SharedPtr<T>` is
+    /// invalidated; the returned `SharedPtr<Y>` inherits its refcount
+    /// block with no atomic increment. If you need to keep the `T` view
+    /// alongside the `Y` view, clone first.
     #[external_body]
     pub fn static_pointer_cast(&self) -> SharedPtr<Y>;
 }

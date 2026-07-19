@@ -44,14 +44,14 @@ impl GameObject {
 
 #[cfg(backend = "cpp")]
 impl GameObject {
-    /// Cpp analog of rust's `GameObjectExt::get_matrix`. Reach is the same
-    /// (every derived type has an implicit `operator GameObject&()` so a
-    /// derived `obj.try_get_matrix(&m)` works without an explicit cast).
-    /// Returns `bool` rather than `std::optional<Matrix4>` to keep the
+    /// Gets the world matrix, writing it to `out`. Returns `false` if the object has
+    /// no transform. Reach is the same (every derived type has an implicit
+    /// `operator GameObject&()` so a derived `obj.try_get_matrix(&m)` works without
+    /// an explicit cast). Returns `bool` rather than an optional to keep the
     /// `<optional>` include out of the public surface.
     #[external_body]
     pub fn try_get_matrix(&self, out: *mut Matrix4) -> bool;
-    /// Cpp analog of rust's `GameObjectMutExt::set_matrix`.
+    /// Sets the world matrix.
     #[external_body]
     pub fn set_matrix(&mut self, matrix: *const Matrix4);
 }
