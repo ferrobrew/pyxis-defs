@@ -128,6 +128,46 @@ pub type CreateVertexProgramParams {
 #[address(0x141_953_320)]
 pub fn CreateVertexProgram(device: *mut HDevice_t, params: *const CreateVertexProgramParams) -> *mut void;
 
+/// Parameters to [`CreateHullProgram`]: the compiled DXBC bytecode, its byte length, and a debug name.
+/// Same layout as [`CreateVertexProgramParams`].
+pub type CreateHullProgramParams {
+    pub m_Code: *const u8,
+
+    #[address(0x8)]
+    pub m_Size: u64,
+
+    #[address(0x10)]
+    pub m_Name: *const u8,
+}
+
+/// The leaf hull-program creator: it wraps `ID3D11Device::CreateHullShader` (vtable slot 16) over
+/// `params.m_Code`/`params.m_Size`. `CreateHullShader` copies the bytecode, so a hook may substitute a
+/// patched copy that only has to outlive the call; unlike [`CreateVertexProgram`], the returned holder
+/// is a bare shader pointer with no retained bytecode copy. Static (no `this`); the first argument is
+/// the graphics device.
+#[address(0x141_953_690)]
+pub fn CreateHullProgram(device: *mut HDevice_t, params: *const CreateHullProgramParams) -> *mut void;
+
+/// Parameters to [`CreateDomainProgram`]: the compiled DXBC bytecode, its byte length, and a debug
+/// name. Same layout as [`CreateVertexProgramParams`].
+pub type CreateDomainProgramParams {
+    pub m_Code: *const u8,
+
+    #[address(0x8)]
+    pub m_Size: u64,
+
+    #[address(0x10)]
+    pub m_Name: *const u8,
+}
+
+/// The leaf domain-program creator: it wraps `ID3D11Device::CreateDomainShader` (vtable slot 17) over
+/// `params.m_Code`/`params.m_Size`. `CreateDomainShader` copies the bytecode, so a hook may substitute
+/// a patched copy that only has to outlive the call; like [`CreateHullProgram`], the returned holder is
+/// a bare shader pointer with no retained bytecode copy. Static (no `this`); the first argument is the
+/// graphics device.
+#[address(0x141_953_7A0)]
+pub fn CreateDomainProgram(device: *mut HDevice_t, params: *const CreateDomainProgramParams) -> *mut void;
+
 /// Stages `count` float4 constants into the given fragment constant buffer slot, starting at
 /// `start_offset`, writing to the context's per-slot staging buffer and setting the dirty flag. The
 /// actual GPU upload happens at the next state flush.
