@@ -20749,6 +20749,130 @@
         "line": 75
       }
     },
+    "graphics_engine::render_block::RenderBlockBark": {
+      "path": "graphics_engine::render_block::RenderBlockBark",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " The tree-trunk/branch render block (`NGraphicsEngine::CRenderBlockBark`, registered name\n `\"VegetationBark\"`): the solid woody geometry of trees, as distinct from the leaf cards. Forward-lit\n vegetation.",
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "Draw",
+            "doc": " Issues the color-pass geometry. The clip transform is a CPU-baked world-view-projection staged\n on vertex `cb1` registers 0..3 via `SetVertexProgramConstants` before any draw-kind routing:\n `cb1[0..3] = M_model_camera_relative · m_OffsetViewProjection` for the non-instanced case, or\n `m_OffsetViewProjection` verbatim for the instanced/billboard cases (the per-instance model\n matrix is then applied in-shader). The global `m_VPGlobals` is bound at `cb0` for wind/time\n globals only, not the view-projection. One of three draw kinds is selected from the instance-data\n pointer in [`CRBIInfo`](RBIInfo): a non-instanced `DrawIndexed`, a CPU-instanced\n `DrawIndexedInstanced` (per-instance stream at slot 2), or a GPU-indirect `DrawIndexedNoMutex`\n whose instance count lives in the type's `m_InstDrawParams` buffer. `m_RenderStatus` bits select\n bounce/GI, billboard, and geometry-program permutations.",
+            "doc_links": [
+              {
+                "text": "RBIInfo",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RBIInfo"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5369982864
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "render_context",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "info",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::render_block::RBIInfo"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 30,
+              "line": 352
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "DrawZ",
+            "doc": " Issues the depth-prepass and depth-and-velocity geometry. Same cb1-baked transform as\n [`Draw`](RenderBlockBark::Draw); the velocity pass additionally bakes the previous frame's\n world-view-projection into `cb1` registers 5..8 from `m_PreviousOffsetViewProjection`.",
+            "doc_links": [
+              {
+                "text": "RenderBlockBark::Draw",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockBark",
+                "anchor": "func-Draw"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5369981584
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "render_context",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "info",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::render_block::RBIInfo"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 30,
+              "line": 358
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 30,
+        "line": 339
+      }
+    },
     "graphics_engine::render_block::RenderBlockCharacter": {
       "path": "graphics_engine::render_block::RenderBlockCharacter",
       "visibility": "public",
@@ -21032,7 +21156,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 365
+              "line": 468
             }
           },
           {
@@ -21052,7 +21176,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 365
+              "line": 468
             }
           },
           {
@@ -21072,7 +21196,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 367
+              "line": 470
             }
           }
         ],
@@ -21124,7 +21248,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 372
+              "line": 475
             }
           },
           {
@@ -21166,7 +21290,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 376
+              "line": 479
             }
           },
           {
@@ -21235,7 +21359,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 380
+              "line": 483
             }
           }
         ],
@@ -21249,7 +21373,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 362
+        "line": 465
       }
     },
     "graphics_engine::render_block::RenderBlockDeferredLighting": {
@@ -21313,7 +21437,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 391
+              "line": 494
             }
           }
         ],
@@ -21327,7 +21451,148 @@
       },
       "source": {
         "file_index": 30,
-        "line": 385
+        "line": 488
+      }
+    },
+    "graphics_engine::render_block::RenderBlockFoliage": {
+      "path": "graphics_engine::render_block::RenderBlockFoliage",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " The grass/foliage render block (`NGraphicsEngine::CRenderBlockFoliage`, registered name\n `\"VegetationFoliage\"`): forward-lit ground cover and small plants, drawn in `RP_VEGETATION_OPAQUE`.\n The bulk is grass drawn GPU-indirect.",
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "Draw",
+            "doc": " Issues the color-pass geometry. The clip transform is staged per draw on vertex `cb2`: register 0\n the camera-relative world matrix (from [`CRBIInfo`](RBIInfo)'s matrix, translation minus\n `m_CameraPosition`), registers 4..7 a per-draw copy of `m_OffsetViewProjection` (byte-identical to\n the global `cb0[29..32]`), so the vertex shader composes `clip = world · OffsetVP` from `cb2`\n rather than reading `cb0`. `SetupConstantBuffers` binds `cb0 = m_VPGlobals` but only for globals.\n One of three draw kinds is selected from the instance-data flags: a CPU-instanced\n `DrawIndexedInstancedNoMutex` (instance count a CPU `u16`), the dominant grass path\n `DrawIndexedInstancedIndirect` (instance count in the type's GPU-only `m_InstDrawParams` args\n buffer, populated by the vegetation draw-indirect compute pass), or a non-instanced\n `DrawIndexedNoMutex`. The pass is forward-lit: the type's `Setup` binds the clustered-lighting\n constant buffer, the light-cluster index texture, GI, reflection, and sun-shadow-cascade\n resources to the fragment stage.",
+            "doc_links": [
+              {
+                "text": "RBIInfo",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RBIInfo"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5369945504
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "render_context",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "info",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::render_block::RBIInfo"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 30,
+              "line": 379
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 30,
+        "line": 364
+      }
+    },
+    "graphics_engine::render_block::RenderBlockOccluder": {
+      "path": "graphics_engine::render_block::RenderBlockOccluder",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " The occluder render block (`NGraphicsEngine::CRenderBlockOccluder`, registered name `\"Occluder\"`): a\n unit-cube depth proxy scaled per scene occluder, injected once per frame into `RP_Z_OCCLUDERS`\n (pass 47) to prime the main camera depth buffer so later Z and G-buffer passes early-Z reject\n occluded geometry. Depth-only (null fragment program). The CPU software-occlusion system consumes\n the same occluder data independently and is not fed by this GPU depth pass.",
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "DrawZ",
+            "doc": " Issues the occluder-box depth geometry. The non-instanced path bakes\n `WVP = (world - camera_offset) · m_OffsetViewProjection` (via\n `CRenderBlock::CalculateOffsetWorldViewProjectionMatrix`, `0x140136070`) into vertex `cb1`\n registers 0..3, register 4 a depth bias, then `DrawIndexed` per box. The instanced path\n (`gfx.occluders.use_instancing`) instead reads the global `m_VPGlobals` view-projection at `cb0`\n with per-instance world rows from a vertex stream and issues one `DrawIndexedInstanced`.\n `Draw`/`Setup` tail-call this and its `SetupZ`.",
+            "body": {
+              "type": "address",
+              "address": 5370273696
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "render_context",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "info",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::render_block::RBIInfo"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 30,
+              "line": 413
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 30,
+        "line": 403
       }
     },
     "graphics_engine::render_block::RenderBlockTerrain": {
@@ -21417,7 +21682,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 410
+              "line": 513
             }
           },
           {
@@ -21434,7 +21699,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 410
+              "line": 513
             }
           },
           {
@@ -21451,7 +21716,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 414
+              "line": 517
             }
           },
           {
@@ -21472,7 +21737,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 394
+              "line": 497
             }
           }
         ],
@@ -21516,7 +21781,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 420
+              "line": 523
             }
           }
         ],
@@ -21530,7 +21795,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 406
+        "line": 509
       }
     },
     "graphics_engine::render_block::RenderBlockTerrainPatch": {
@@ -21770,6 +22035,62 @@
               "file_index": 30,
               "line": 231
             }
+          },
+          {
+            "visibility": "public",
+            "name": "Draw",
+            "doc": " Issues the patch's geometry for the active render pass, keyed on\n [`m_ActiveRenderPass`](graphics_engine::graphics_engine::RenderContext::m_ActiveRenderPass):\n\n - Passes **56 and 57** (the near tessellating passes) draw GPU-indirect via\n   `DrawIndexedInstancedIndirectNoMutex`: the per-patch instance count comes from the terrain\n   patch system's GPU compute output, so no instance count is known CPU-side. Each stages a\n   one-`float4` control constant on vertex slot 3 (`{ m_DetailPatchIndex, mode, 0, 0 }`, `mode` = 2\n   for 56, 3 for 57) and binds the shared global detail index/vertex texture buffers before the\n   indirect draw.\n - Passes **58 and 60** draw the tail index range (`[m_SplitIndex, m_IndexCount)`) with a plain\n   `DrawIndexed`; passes **59 and 61** draw the head range (`[0, m_SplitIndex)`). The split\n   partitions the patch's index buffer between the two families.\n - Passes **14** and **38..=40** draw the full index range with a plain `DrawIndexed`.\n - Any other pass returns without drawing.\n\n The vertex transform for every path is the global view-projection: the type-level\n `SetupConstantBuffers` binds `m_VPGlobals` at vertex `cb0` (the rows carrying\n [`m_OffsetViewProjection`](graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection)),\n and the per-patch streamed constant buffer at vertex `cb1`; the tessellating passes additionally\n carry `m_OffsetViewProjection` in the hull/domain constants baked once per frame.",
+            "doc_links": [
+              {
+                "text": "graphics_engine::graphics_engine::RenderContext::m_ActiveRenderPass",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::RenderContext",
+                "anchor": "field-m_ActiveRenderPass"
+              },
+              {
+                "text": "graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::RenderContext",
+                "anchor": "field-m_OffsetViewProjection"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5372044608
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "render_context",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "info",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::render_block::RBIInfo"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 30,
+              "line": 254
+            }
           }
         ],
         "vftable": null,
@@ -21813,7 +22134,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 321
+              "line": 424
             }
           },
           {
@@ -21838,7 +22159,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 321
+              "line": 424
             }
           },
           {
@@ -21863,7 +22184,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 326
+              "line": 429
             }
           }
         ],
@@ -21904,7 +22225,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 335
+              "line": 438
             }
           }
         ],
@@ -21918,7 +22239,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 317
+        "line": 420
       }
     },
     "graphics_engine::render_block::RenderBlockTypeParticle": {
@@ -21949,7 +22270,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 350
+              "line": 453
             }
           },
           {
@@ -21974,7 +22295,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 350
+              "line": 453
             }
           },
           {
@@ -21999,7 +22320,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 356
+              "line": 459
             }
           },
           {
@@ -22020,7 +22341,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 338
+              "line": 441
             }
           }
         ],
@@ -22035,7 +22356,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 342
+        "line": 445
       }
     },
     "graphics_engine::render_block::RenderBlockTypeTerrain": {
@@ -22468,7 +22789,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 243
+              "line": 266
             }
           },
           {
@@ -22485,7 +22806,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 243
+              "line": 266
             }
           },
           {
@@ -22506,7 +22827,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 249
+              "line": 272
             }
           },
           {
@@ -22535,7 +22856,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 249
+              "line": 272
             }
           },
           {
@@ -22556,7 +22877,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 258
+              "line": 281
             }
           },
           {
@@ -22577,7 +22898,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 258
+              "line": 281
             }
           },
           {
@@ -22598,7 +22919,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 263
+              "line": 286
             }
           },
           {
@@ -22615,7 +22936,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 263
+              "line": 286
             }
           },
           {
@@ -22636,7 +22957,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 267
+              "line": 290
             }
           },
           {
@@ -22653,7 +22974,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 267
+              "line": 290
             }
           },
           {
@@ -22674,7 +22995,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 275
+              "line": 298
             }
           },
           {
@@ -22699,7 +23020,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 275
+              "line": 298
             }
           },
           {
@@ -22724,7 +23045,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 283
+              "line": 306
             }
           },
           {
@@ -22741,7 +23062,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 289
+              "line": 312
             }
           },
           {
@@ -22758,7 +23079,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 294
+              "line": 317
             }
           },
           {
@@ -22779,7 +23100,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 301
+              "line": 324
             }
           },
           {
@@ -22804,7 +23125,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 301
+              "line": 324
             }
           },
           {
@@ -22825,7 +23146,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 234
+              "line": 257
             }
           }
         ],
@@ -22866,7 +23187,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 310
+              "line": 333
             }
           }
         ],
@@ -22880,7 +23201,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 238
+        "line": 261
       }
     },
     "graphics_engine::render_block::SkinBatch": {
@@ -22998,6 +23319,73 @@
       "source": {
         "file_index": 30,
         "line": 20
+      }
+    },
+    "graphics_engine::render_block::TreeImpostorRB": {
+      "path": "graphics_engine::render_block::TreeImpostorRB",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " The tree-impostor render block (`CTreeImpostorRB`): far-distance flat billboard cards that replace\n full tree meshes at range.",
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "Draw",
+            "doc": " Issues the impostor cards as a single non-instanced `DrawIndexed` over a static quad index\n buffer (`6 * min(card_count, 0x1400)` indices); the vertex shader keys off\n `SV_VertexID` (`card = id >> 2`, `corner = id & 3`), pulling each card's world position, size, and\n atlas data from a texture buffer bound at vertex slot 0. The card orientation (facing) is computed\n in the vertex shader from the render camera carried in the engine's global per-view billboard\n constant buffer (the translation-bearing `m_ViewProjectionF`); the block stages only per-draw\n scalars on `cb1`. `m_RenderStatus & 6` selects the depth/shadow vertex- and fragment-program\n permutations. The vertex shader writes `SV_Position` directly, so this is not GPU-indirect.",
+            "body": {
+              "type": "address",
+              "address": 5372179744
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "render_context",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "info",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::render_block::RBIInfo"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 30,
+              "line": 395
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 30,
+        "line": 384
       }
     },
     "graphics_engine::render_engine::RenderBlockTypeBase": {
@@ -57765,9 +58153,12 @@
             "graphics_engine::render_block::Matrix3x4",
             "graphics_engine::render_block::RBIInfo",
             "graphics_engine::render_block::RenderBlockAtmosphericScattering",
+            "graphics_engine::render_block::RenderBlockBark",
             "graphics_engine::render_block::RenderBlockCharacter",
             "graphics_engine::render_block::RenderBlockCharacterSkin",
             "graphics_engine::render_block::RenderBlockDeferredLighting",
+            "graphics_engine::render_block::RenderBlockFoliage",
+            "graphics_engine::render_block::RenderBlockOccluder",
             "graphics_engine::render_block::RenderBlockTerrain",
             "graphics_engine::render_block::RenderBlockTerrainDetail",
             "graphics_engine::render_block::RenderBlockTerrainPatch",
@@ -57775,7 +58166,8 @@
             "graphics_engine::render_block::RenderBlockTypeParticle",
             "graphics_engine::render_block::RenderBlockTypeTerrain",
             "graphics_engine::render_block::RenderBlockTypeTerrainPatch",
-            "graphics_engine::render_block::SkinBatch"
+            "graphics_engine::render_block::SkinBatch",
+            "graphics_engine::render_block::TreeImpostorRB"
           ],
           "submodules": {},
           "functions": [],
