@@ -21389,6 +21389,150 @@
         "line": 172
       }
     },
+    "graphics_engine::render_block::RenderBlockTerrainDetail": {
+      "path": "graphics_engine::render_block::RenderBlockTerrainDetail",
+      "visibility": "public",
+      "size": 72,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " The terrain detail render block (`NGraphicsEngine::CTerrainRenderBlockDetail`, engine name\n \"TerrainDetail\"): the procedurally-generated detail rock skin — cliff walls, cave ceilings, and\n near-field rock detail scattered on the base terrain. Its vertices/indices/texels are produced\n each frame by the compute pipeline in the sibling terrain-setup block into shared structured\n buffers, and drawn GPU-indirect via a single `DrawIndexedInstancedIndirect` (the colour pass runs\n plain vertex+fragment, no tessellation). The vertex shader reads a patch-local vertex and\n transforms it by a CPU-baked `cb1` (vertex slot 1) whose rows are `T_patch · m_OffsetViewProjection`,\n where `T_patch` translates by the patch origin expressed relative to the camera; the resulting\n clip is the standard `m_OffsetViewProjection · (world - m_CameraPosition)`. `cb1` is staged by the\n block's per-patch `Setup` (via `SetVertexProgramConstants` on vertex slot 1) immediately before\n each `Draw`.",
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 48
+            },
+            "offset": 0,
+            "size": 48,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 410
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_WorldPatchX",
+            "doc": " The patch origin's world X. The vertices are patch-local in X relative to this; the baked `cb1`\n folds `(m_WorldPatchX - m_CameraPosition.x)` into its translation row.",
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 48,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 410
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_WorldPatchZ",
+            "doc": " The patch origin's world Z (see `m_WorldPatchX`).",
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 52,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 414
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_38",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 16
+            },
+            "offset": 56,
+            "size": 16,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 394
+            }
+          }
+        ],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "Draw",
+            "doc": " Issues the colour-pass draw: a single `DrawIndexedInstancedIndirect` over the compute-generated\n detail geometry, using the `cb1` transform staged by `Setup`.",
+            "body": {
+              "type": "address",
+              "address": 5372010576
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "ctx",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "info",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::render_block::RBIInfo"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 30,
+              "line": 420
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 30,
+        "line": 406
+      }
+    },
     "graphics_engine::render_block::RenderBlockTerrainPatch": {
       "path": "graphics_engine::render_block::RenderBlockTerrainPatch",
       "visibility": "public",
@@ -56779,6 +56923,77 @@
                 "file_index": 25,
                 "line": 175
               }
+            },
+            {
+              "visibility": "public",
+              "name": "SetVertexProgramConstants",
+              "doc": " Stages `count` float4 constants into the given **vertex** constant buffer slot, starting at\n `start_offset` (in float4 rows), writing to the context's per-slot staging buffer and setting the\n dirty flag; the GPU upload happens at the next state flush. The vertex analogue of\n [`SetFragmentProgramConstants`]. `cb_index` is the vertex-shader constant-buffer slot (e.g. `1`\n for `cb1`). A row-level redundancy check skips rows byte-identical to what is already staged.",
+              "doc_links": [
+                {
+                  "text": "SetFragmentProgramConstants",
+                  "target_kind": "module",
+                  "path": "graphics_engine::draw",
+                  "anchor": "func-SetFragmentProgramConstants"
+                }
+              ],
+              "body": {
+                "type": "address",
+                "address": 5395334976
+              },
+              "arguments": [
+                {
+                  "type": "field",
+                  "name": "ctx",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "graphics_engine::graphics_engine::HContext_t"
+                    }
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "cb_index",
+                  "type_ref": {
+                    "type": "raw",
+                    "path": "i32"
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "start_offset",
+                  "type_ref": {
+                    "type": "raw",
+                    "path": "u32"
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "data",
+                  "type_ref": {
+                    "type": "const_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "f32"
+                    }
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "count",
+                  "type_ref": {
+                    "type": "raw",
+                    "path": "u32"
+                  }
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system",
+              "source": {
+                "file_index": 25,
+                "line": 183
+              }
             }
           ],
           "splices": [],
@@ -57554,6 +57769,7 @@
             "graphics_engine::render_block::RenderBlockCharacterSkin",
             "graphics_engine::render_block::RenderBlockDeferredLighting",
             "graphics_engine::render_block::RenderBlockTerrain",
+            "graphics_engine::render_block::RenderBlockTerrainDetail",
             "graphics_engine::render_block::RenderBlockTerrainPatch",
             "graphics_engine::render_block::RenderBlockTypeFogVolume",
             "graphics_engine::render_block::RenderBlockTypeParticle",
