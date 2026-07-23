@@ -13938,6 +13938,101 @@
         "line": 14
       }
     },
+    "graphics_engine::draw::CreateDomainProgramParams": {
+      "path": "graphics_engine::draw::CreateDomainProgramParams",
+      "visibility": "public",
+      "size": 24,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " Parameters to [`CreateDomainProgram`]: the compiled DXBC bytecode, its byte length, and a debug\n name. Same layout as [`CreateVertexProgramParams`].",
+        "doc_links": [
+          {
+            "text": "CreateDomainProgram",
+            "target_kind": "module",
+            "path": "graphics_engine::draw",
+            "anchor": "func-CreateDomainProgram"
+          },
+          {
+            "text": "CreateVertexProgramParams",
+            "target_kind": "item",
+            "path": "graphics_engine::draw::CreateVertexProgramParams"
+          }
+        ],
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_Code",
+            "doc": null,
+            "type_ref": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              }
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 25,
+              "line": 154
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Size",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "offset": 8,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 25,
+              "line": 157
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Name",
+            "doc": null,
+            "type_ref": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              }
+            },
+            "offset": 16,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 25,
+              "line": 160
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 25,
+        "line": 153
+      }
+    },
     "graphics_engine::draw::CreateFragmentProgramParams": {
       "path": "graphics_engine::draw::CreateFragmentProgramParams",
       "visibility": "public",
@@ -14006,6 +14101,101 @@
       "source": {
         "file_index": 25,
         "line": 97
+      }
+    },
+    "graphics_engine::draw::CreateHullProgramParams": {
+      "path": "graphics_engine::draw::CreateHullProgramParams",
+      "visibility": "public",
+      "size": 24,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " Parameters to [`CreateHullProgram`]: the compiled DXBC bytecode, its byte length, and a debug name.\n Same layout as [`CreateVertexProgramParams`].",
+        "doc_links": [
+          {
+            "text": "CreateHullProgram",
+            "target_kind": "module",
+            "path": "graphics_engine::draw",
+            "anchor": "func-CreateHullProgram"
+          },
+          {
+            "text": "CreateVertexProgramParams",
+            "target_kind": "item",
+            "path": "graphics_engine::draw::CreateVertexProgramParams"
+          }
+        ],
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_Code",
+            "doc": null,
+            "type_ref": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              }
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 25,
+              "line": 134
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Size",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "u64"
+            },
+            "offset": 8,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 25,
+              "line": 137
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Name",
+            "doc": null,
+            "type_ref": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              }
+            },
+            "offset": 16,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 25,
+              "line": 140
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 25,
+        "line": 133
       }
     },
     "graphics_engine::draw::CreateVertexProgramParams": {
@@ -55424,7 +55614,9 @@
         "draw": {
           "doc": null,
           "items": [
+            "graphics_engine::draw::CreateDomainProgramParams",
             "graphics_engine::draw::CreateFragmentProgramParams",
+            "graphics_engine::draw::CreateHullProgramParams",
             "graphics_engine::draw::CreateVertexProgramParams",
             "graphics_engine::draw::PrimitiveType"
           ],
@@ -56421,6 +56613,112 @@
             },
             {
               "visibility": "public",
+              "name": "CreateHullProgram",
+              "doc": " The leaf hull-program creator: it wraps `ID3D11Device::CreateHullShader` (vtable slot 16) over\n `params.m_Code`/`params.m_Size`. `CreateHullShader` copies the bytecode, so a hook may substitute a\n patched copy that only has to outlive the call; unlike [`CreateVertexProgram`], the returned holder\n is a bare shader pointer with no retained bytecode copy. Static (no `this`); the first argument is\n the graphics device.",
+              "doc_links": [
+                {
+                  "text": "CreateVertexProgram",
+                  "target_kind": "module",
+                  "path": "graphics_engine::draw",
+                  "anchor": "func-CreateVertexProgram"
+                }
+              ],
+              "body": {
+                "type": "address",
+                "address": 5395265168
+              },
+              "arguments": [
+                {
+                  "type": "field",
+                  "name": "device",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "graphics_engine::graphics_engine::HDevice_t"
+                    }
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "params",
+                  "type_ref": {
+                    "type": "const_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "graphics_engine::draw::CreateHullProgramParams"
+                    }
+                  }
+                }
+              ],
+              "return_type": {
+                "type": "mut_pointer",
+                "inner": {
+                  "type": "raw",
+                  "path": "void"
+                }
+              },
+              "calling_convention": "system",
+              "source": {
+                "file_index": 25,
+                "line": 149
+              }
+            },
+            {
+              "visibility": "public",
+              "name": "CreateDomainProgram",
+              "doc": " The leaf domain-program creator: it wraps `ID3D11Device::CreateDomainShader` (vtable slot 17) over\n `params.m_Code`/`params.m_Size`. `CreateDomainShader` copies the bytecode, so a hook may substitute\n a patched copy that only has to outlive the call; like [`CreateHullProgram`], the returned holder is\n a bare shader pointer with no retained bytecode copy. Static (no `this`); the first argument is the\n graphics device.",
+              "doc_links": [
+                {
+                  "text": "CreateHullProgram",
+                  "target_kind": "module",
+                  "path": "graphics_engine::draw",
+                  "anchor": "func-CreateHullProgram"
+                }
+              ],
+              "body": {
+                "type": "address",
+                "address": 5395265440
+              },
+              "arguments": [
+                {
+                  "type": "field",
+                  "name": "device",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "graphics_engine::graphics_engine::HDevice_t"
+                    }
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "params",
+                  "type_ref": {
+                    "type": "const_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "graphics_engine::draw::CreateDomainProgramParams"
+                    }
+                  }
+                }
+              ],
+              "return_type": {
+                "type": "mut_pointer",
+                "inner": {
+                  "type": "raw",
+                  "path": "void"
+                }
+              },
+              "calling_convention": "system",
+              "source": {
+                "file_index": 25,
+                "line": 169
+              }
+            },
+            {
+              "visibility": "public",
               "name": "SetFragmentProgramConstants",
               "doc": " Stages `count` float4 constants into the given fragment constant buffer slot, starting at\n `start_offset`, writing to the context's per-slot staging buffer and setting the dirty flag. The\n actual GPU upload happens at the next state flush.",
               "body": {
@@ -56479,7 +56777,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 25,
-                "line": 135
+                "line": 175
               }
             }
           ],
