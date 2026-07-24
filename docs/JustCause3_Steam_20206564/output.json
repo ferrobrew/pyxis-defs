@@ -532,6 +532,20 @@
             "visibility": "private",
             "name": "_field_12",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "HumanIK::Init",
+                "target_kind": "item",
+                "path": "animation::ik::HumanIK",
+                "anchor": "func-Init"
+              },
+              {
+                "text": "HumanIK::GetEffectorIdFromBoneIndex",
+                "target_kind": "item",
+                "path": "animation::ik::HumanIK",
+                "anchor": "func-GetEffectorIdFromBoneIndex"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -3288,6 +3302,14 @@
             "visibility": "private",
             "name": "_field_a",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "ObjectBlackboardKeyInfo::m_DataOffset",
+                "target_kind": "item",
+                "path": "blackboard::ObjectBlackboardKeyInfo",
+                "anchor": "field-m_DataOffset"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -3429,6 +3451,20 @@
             "visibility": "private",
             "name": "_field_2c",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "Character::m_Blackboard",
+                "target_kind": "item",
+                "path": "character::character::Character",
+                "anchor": "field-m_Blackboard"
+              },
+              {
+                "text": "ObjectBlackboard::m_BbLock",
+                "target_kind": "item",
+                "path": "blackboard::ObjectBlackboard",
+                "anchor": "field-m_BbLock"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -7897,6 +7933,19 @@
             "visibility": "private",
             "name": "_field_a50",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "Character::UpdatePassFinalizePose_Parallel",
+                "target_kind": "item",
+                "path": "character::character::Character",
+                "anchor": "func-UpdatePassFinalizePose_Parallel"
+              },
+              {
+                "text": "HumanIK",
+                "target_kind": "item",
+                "path": "animation::ik::HumanIK"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -7965,6 +8014,13 @@
             "visibility": "private",
             "name": "_field_19c0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "ObjectBlackboard",
+                "target_kind": "item",
+                "path": "blackboard::ObjectBlackboard"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -8010,6 +8066,13 @@
             "visibility": "private",
             "name": "_field_2090",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "AimState",
+                "target_kind": "item",
+                "path": "character::character::AimState"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -8093,6 +8156,13 @@
             "visibility": "private",
             "name": "_field_262b",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "CharacterLodFlags",
+                "target_kind": "item",
+                "path": "character::character::CharacterLodFlags"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -8193,6 +8263,20 @@
             "visibility": "private",
             "name": "_field_2870",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "AimState::m_AimingWeapon",
+                "target_kind": "item",
+                "path": "character::character::AimState",
+                "anchor": "flag-m_AimingWeapon"
+              },
+              {
+                "text": "Character::m_AimFlags",
+                "target_kind": "item",
+                "path": "character::character::Character",
+                "anchor": "field-m_AimFlags"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -8245,6 +8329,19 @@
             "visibility": "private",
             "name": "_field_2a04",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "input::locomotion::NStateTask_InputLocoIdleTask::Update",
+                "target_kind": "item",
+                "path": "input::locomotion::NStateTask_InputLocoIdleTask",
+                "anchor": "func-Update"
+              },
+              {
+                "text": "animation::symbol_table::EventIdSymbolTable::ACT_TO_IDLE_ONE_OFF",
+                "target_kind": "item",
+                "path": "animation::symbol_table::EventIdSymbolTable::ACT_TO_IDLE_ONE_OFF"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -10236,6 +10333,38 @@
             "visibility": "private",
             "name": "_field_38c",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "CpuProfiler::Update",
+                "target_kind": "item",
+                "path": "cpu_profiler::CpuProfiler",
+                "anchor": "func-Update"
+              },
+              {
+                "text": "CpuProfiler::m_Counters",
+                "target_kind": "item",
+                "path": "cpu_profiler::CpuProfiler",
+                "anchor": "field-m_Counters"
+              },
+              {
+                "text": "CpuProfiler::m_Time",
+                "target_kind": "item",
+                "path": "cpu_profiler::CpuProfiler",
+                "anchor": "field-m_Time"
+              },
+              {
+                "text": "CpuProfiler::GetScopeName",
+                "target_kind": "item",
+                "path": "cpu_profiler::CpuProfiler",
+                "anchor": "func-GetScopeName"
+              },
+              {
+                "text": "CpuProfiler::m_Index",
+                "target_kind": "item",
+                "path": "cpu_profiler::CpuProfiler",
+                "anchor": "field-m_Index"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -10556,6 +10685,14 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "Atmosphere::GetWeather",
+                "target_kind": "item",
+                "path": "environment::Atmosphere",
+                "anchor": "func-GetWeather"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -10874,6 +11011,19 @@
             "visibility": "private",
             "name": "_field_1ec",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "WeatherController",
+                "target_kind": "item",
+                "path": "environment::WeatherController"
+              },
+              {
+                "text": "WeatherController::Init",
+                "target_kind": "item",
+                "path": "environment::WeatherController",
+                "anchor": "func-Init"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -11365,6 +11515,25 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "GrapplingHookState",
+                "target_kind": "item",
+                "path": "equipment::grappling_hook::GrapplingHookState"
+              },
+              {
+                "text": "GrapplingHookState::GHS_INACTIVE",
+                "target_kind": "item",
+                "path": "equipment::grappling_hook::GrapplingHookState",
+                "anchor": "variant-GHS_INACTIVE"
+              },
+              {
+                "text": "GrapplingHook::m_ActiveWire",
+                "target_kind": "item",
+                "path": "equipment::grappling_hook::GrapplingHook",
+                "anchor": "field-m_ActiveWire"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -11422,6 +11591,14 @@
             "visibility": "private",
             "name": "_field_238",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "GrapplingHook::m_WaitingForGrappleFire",
+                "target_kind": "item",
+                "path": "equipment::grappling_hook::GrapplingHook",
+                "anchor": "field-m_WaitingForGrappleFire"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -11510,6 +11687,14 @@
             "visibility": "private",
             "name": "_field_276",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "GrapplingHook::m_State",
+                "target_kind": "item",
+                "path": "equipment::grappling_hook::GrapplingHook",
+                "anchor": "field-m_State"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -12974,6 +13159,20 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "GameWorldObjectManager::StartCommitAddRemove",
+                "target_kind": "item",
+                "path": "game_world_object_manager::GameWorldObjectManager",
+                "anchor": "func-StartCommitAddRemove"
+              },
+              {
+                "text": "camera::camera_manager::CameraManager::m_ActiveCamera",
+                "target_kind": "item",
+                "path": "camera::camera_manager::CameraManager",
+                "anchor": "field-m_ActiveCamera"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -13451,6 +13650,26 @@
             "visibility": "private",
             "name": "_field_40",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "ResizeBuffers",
+                "target_kind": "module",
+                "path": "graphics_engine::device",
+                "anchor": "func-ResizeBuffers"
+              },
+              {
+                "text": "GetDeviceInfo",
+                "target_kind": "module",
+                "path": "graphics_engine::device",
+                "anchor": "func-GetDeviceInfo"
+              },
+              {
+                "text": "graphics_engine::graphics_engine::GraphicsEngine::CreateRenderSetups",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-CreateRenderSetups"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -13714,6 +13933,38 @@
             "visibility": "private",
             "name": "_field_20",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "GetDeviceInfo",
+                "target_kind": "module",
+                "path": "graphics_engine::device",
+                "anchor": "func-GetDeviceInfo"
+              },
+              {
+                "text": "Device::m_DeviceInfo",
+                "target_kind": "item",
+                "path": "graphics_engine::device::Device",
+                "anchor": "field-m_DeviceInfo"
+              },
+              {
+                "text": "graphics_engine::graphics_engine::GraphicsEngine::CreateRenderSetups",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-CreateRenderSetups"
+              },
+              {
+                "text": "DeviceInfo::m_DisplayWidth",
+                "target_kind": "item",
+                "path": "graphics_engine::device::DeviceInfo",
+                "anchor": "field-m_DisplayWidth"
+              },
+              {
+                "text": "DeviceInfo::m_DisplayHeight",
+                "target_kind": "item",
+                "path": "graphics_engine::device::DeviceInfo",
+                "anchor": "field-m_DisplayHeight"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -14585,6 +14836,14 @@
             "visibility": "private",
             "name": "_field_3dc",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "GISolver::m_CascadeToUpdate",
+                "target_kind": "item",
+                "path": "graphics_engine::gi::GISolver",
+                "anchor": "field-m_CascadeToUpdate"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -14815,6 +15074,14 @@
             "visibility": "private",
             "name": "_field_1284",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "OccluderCollectionManager::GetBFBCFrustumParamsForCameraAndTime",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::OccluderCollectionManager",
+                "anchor": "func-GetBFBCFrustumParamsForCameraAndTime"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -15182,6 +15449,14 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "GraphicsEngine::ResizeBuffers",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-ResizeBuffers"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -15228,6 +15503,26 @@
             "visibility": "private",
             "name": "_field_9",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "GraphicsEngine::HandleDrawThreadTask",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-HandleDrawThreadTask"
+              },
+              {
+                "text": "GraphicsEngine::m_CPUFinishedDrawingEvent",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "field-m_CPUFinishedDrawingEvent"
+              },
+              {
+                "text": "GraphicsEngine::WaitForCPUDrawToFinish",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-WaitForCPUDrawToFinish"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -15286,6 +15581,20 @@
             "visibility": "private",
             "name": "_field_15",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "GraphicsEngine::WaitForCPUDrawToFinish",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-WaitForCPUDrawToFinish"
+              },
+              {
+                "text": "GraphicsEngine::m_CPUDrawFinished",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "field-m_CPUDrawFinished"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -15369,6 +15678,26 @@
             "visibility": "private",
             "name": "_field_28",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "GraphicsEngine::DispatchDraw",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-DispatchDraw"
+              },
+              {
+                "text": "GraphicsEngine::Draw",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-Draw"
+              },
+              {
+                "text": "GraphicsEngine::WaitForCPUDrawToFinish",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-WaitForCPUDrawToFinish"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -15427,6 +15756,14 @@
             "visibility": "private",
             "name": "_field_34",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "GraphicsEngine::HandleModeChange",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-HandleModeChange"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -15473,6 +15810,14 @@
             "visibility": "private",
             "name": "_field_10c",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "GraphicsEngine::ApplyResize",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-ApplyResize"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -15519,6 +15864,20 @@
             "visibility": "private",
             "name": "_field_119",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "GraphicsEngine::ResizeBuffers",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-ResizeBuffers"
+              },
+              {
+                "text": "GraphicsEngine::HandleModeChange",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-HandleModeChange"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -15729,6 +16088,19 @@
             "visibility": "private",
             "name": "_field_160",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "GraphicsEngine::Draw",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-Draw"
+              },
+              {
+                "text": "camera::camera_manager::CameraManager",
+                "target_kind": "item",
+                "path": "camera::camera_manager::CameraManager"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -15907,6 +16279,20 @@
             "visibility": "private",
             "name": "_field_fa8",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "GraphicsEngine::m_BackBufferLinear",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "field-m_BackBufferLinear"
+              },
+              {
+                "text": "GraphicsEngine::CreateRenderSetups",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-CreateRenderSetups"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -16126,6 +16512,20 @@
             "visibility": "private",
             "name": "_field_1238",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "GraphicsEngine::HandleDrawThreadTask",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-HandleDrawThreadTask"
+              },
+              {
+                "text": "GraphicsEngine::Draw",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-Draw"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -16216,6 +16616,14 @@
             "visibility": "private",
             "name": "_field_12cc",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "GraphicsEngine::LoadShaderBundle",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::GraphicsEngine",
+                "anchor": "func-LoadShaderBundle"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -17238,6 +17646,14 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "SetupRenderStates",
+                "target_kind": "module",
+                "path": "graphics_engine::graphics_engine",
+                "anchor": "func-SetupRenderStates"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -17406,6 +17822,20 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "SetRenderSetup",
+                "target_kind": "module",
+                "path": "graphics_engine::graphics_engine",
+                "anchor": "func-SetRenderSetup"
+              },
+              {
+                "text": "HRenderSetup_t::m_Viewport",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::HRenderSetup_t",
+                "anchor": "field-m_Viewport"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -17458,6 +17888,14 @@
             "visibility": "private",
             "name": "_field_d9",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "HRenderSetup_t::m_HasCustomViewport",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::HRenderSetup_t",
+                "anchor": "field-m_HasCustomViewport"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -17504,6 +17942,14 @@
             "visibility": "private",
             "name": "_field_f4",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "SetRenderSetup",
+                "target_kind": "module",
+                "path": "graphics_engine::graphics_engine",
+                "anchor": "func-SetRenderSetup"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -17761,6 +18207,20 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "Camera::m_ProjectionF",
+                "target_kind": "item",
+                "path": "camera::camera::Camera",
+                "anchor": "field-m_ProjectionF"
+              },
+              {
+                "text": "RenderPass::SetRenderContextCamera",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPass",
+                "anchor": "func-SetRenderContextCamera"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -17813,6 +18273,13 @@
             "visibility": "private",
             "name": "_field_98",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "graphics_engine::render_block::RenderBlockTypeTerrain",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockTypeTerrain"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -17858,6 +18325,26 @@
             "visibility": "private",
             "name": "_field_118",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderPass::SetRenderContextCamera",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPass",
+                "anchor": "func-SetRenderContextCamera"
+              },
+              {
+                "text": "RenderPass::DoDraw",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPass",
+                "anchor": "func-DoDraw"
+              },
+              {
+                "text": "RenderPass::SortList",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPass",
+                "anchor": "func-SortList"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -17916,6 +18403,20 @@
             "visibility": "private",
             "name": "_field_224",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "Camera::m_FOV",
+                "target_kind": "item",
+                "path": "camera::camera::Camera",
+                "anchor": "field-m_FOV"
+              },
+              {
+                "text": "RenderPass::SetRenderContextCamera",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPass",
+                "anchor": "func-SetRenderContextCamera"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -17968,6 +18469,20 @@
             "visibility": "private",
             "name": "_field_300",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "Camera::m_Near",
+                "target_kind": "item",
+                "path": "camera::camera::Camera",
+                "anchor": "field-m_Near"
+              },
+              {
+                "text": "RenderPass::SetRenderContextCamera",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPass",
+                "anchor": "func-SetRenderContextCamera"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -18174,6 +18689,19 @@
             "visibility": "private",
             "name": "_field_43c",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "render_frame_counters",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::render_frame_counters"
+              },
+              {
+                "text": "graphics_engine::render_block::RenderBlockTypeTerrain::m_WasCBApplied",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockTypeTerrain",
+                "anchor": "field-m_WasCBApplied"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -18378,6 +18906,14 @@
             "visibility": "private",
             "name": "_field_77c",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderPass::SetRenderContextCamera",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPass",
+                "anchor": "func-SetRenderContextCamera"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -18888,6 +19424,14 @@
             "visibility": "private",
             "name": "_field_304",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "AAMode::AA_SMAA_T2X",
+                "target_kind": "item",
+                "path": "graphics_engine::post_effects::AAMode",
+                "anchor": "variant-AA_SMAA_T2X"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -19827,6 +20371,14 @@
             "visibility": "private",
             "name": "_field_8",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "ToneMappingEffect::Update",
+                "target_kind": "item",
+                "path": "graphics_engine::tone_mapping::ToneMappingEffect",
+                "anchor": "func-Update"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -20438,6 +20990,20 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "SunHaloEffect::PreApply",
+                "target_kind": "item",
+                "path": "graphics_engine::post_effects::SunHaloEffect",
+                "anchor": "func-PreApply"
+              },
+              {
+                "text": "SunHaloEffect::Apply",
+                "target_kind": "item",
+                "path": "graphics_engine::post_effects::SunHaloEffect",
+                "anchor": "func-Apply"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -20490,6 +21056,20 @@
             "visibility": "private",
             "name": "_field_115",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "SunHaloEffect::PreApply",
+                "target_kind": "item",
+                "path": "graphics_engine::post_effects::SunHaloEffect",
+                "anchor": "func-PreApply"
+              },
+              {
+                "text": "SunHaloEffect::Apply",
+                "target_kind": "item",
+                "path": "graphics_engine::post_effects::SunHaloEffect",
+                "anchor": "func-Apply"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -21849,6 +22429,20 @@
             "visibility": "private",
             "name": "_field_38",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "DrawIndexedInstancedIndirect",
+                "target_kind": "module",
+                "path": "graphics_engine::draw",
+                "anchor": "func-DrawIndexedInstancedIndirect"
+              },
+              {
+                "text": "SetVertexProgramConstants",
+                "target_kind": "module",
+                "path": "graphics_engine::draw",
+                "anchor": "func-SetVertexProgramConstants"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -21946,6 +22540,20 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderBlockTerrainPatch::m_Size",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockTerrainPatch",
+                "anchor": "field-m_Size"
+              },
+              {
+                "text": "RenderBlockTerrainPatch::m_TileX",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockTerrainPatch",
+                "anchor": "field-m_TileX"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -22087,6 +22695,14 @@
             "visibility": "private",
             "name": "_field_e4",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderBlockTerrainPatch::UpdateSortID",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockTerrainPatch",
+                "anchor": "func-UpdateSortID"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -22260,6 +22876,14 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderBlockTypeFogVolume::ResizeTextures",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockTypeFogVolume",
+                "anchor": "func-ResizeTextures"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -22396,6 +23020,14 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderBlockTypeParticle::m_ForceLowResRendering",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockTypeParticle",
+                "anchor": "field-m_ForceLowResRendering"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -22559,6 +23191,14 @@
             "visibility": "private",
             "name": "_field_50",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "graphics_engine::graphics_engine::RenderContext::m_RenderFrameNo",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::RenderContext",
+                "anchor": "field-m_RenderFrameNo"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -22647,6 +23287,14 @@
             "visibility": "private",
             "name": "_field_48c",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderBlockTypeTerrain::m_BackPatchCullThreshold",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockTypeTerrain",
+                "anchor": "field-m_BackPatchCullThreshold"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -22837,6 +23485,14 @@
             "visibility": "private",
             "name": "_field_4ac",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderBlockTypeTerrain::m_EnableBackPatchCulling",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockTypeTerrain",
+                "anchor": "field-m_EnableBackPatchCulling"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -22953,6 +23609,14 @@
             "visibility": "private",
             "name": "_field_50",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderBlockTypeTerrain::m_WasCBApplied",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockTypeTerrain",
+                "anchor": "field-m_WasCBApplied"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -23121,6 +23785,14 @@
             "visibility": "private",
             "name": "_field_44c",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderBlockTypeTerrainPatch::m_BackPatchCullThreshold",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockTypeTerrainPatch",
+                "anchor": "field-m_BackPatchCullThreshold"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -23226,6 +23898,14 @@
             "visibility": "private",
             "name": "_field_451",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderBlockTypeTerrainPatch::m_EnableBackPatchCulling",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockTypeTerrainPatch",
+                "anchor": "field-m_EnableBackPatchCulling"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -23272,6 +23952,13 @@
             "visibility": "private",
             "name": "_field_47c",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderBlockTypeTerrain",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockTypeTerrain"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -24942,6 +25629,19 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderPass",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPass"
+              },
+              {
+                "text": "RenderEngine::DrawRenderPassRange",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::RenderEngine",
+                "anchor": "func-DrawRenderPassRange"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -25044,6 +25744,25 @@
             "visibility": "private",
             "name": "_field_16c4",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "ResourceContext",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::ResourceContext"
+              },
+              {
+                "text": "RenderBlockTypeBase::Recreate",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::RenderBlockTypeBase",
+                "anchor": "vfunc-Recreate"
+              },
+              {
+                "text": "RenderBlockTypeBase::Create",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::RenderBlockTypeBase",
+                "anchor": "vfunc-Create"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -25101,6 +25820,31 @@
             "visibility": "private",
             "name": "_field_18f0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderEngine::SetGlobalShaderProgramCameraConstants",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::RenderEngine",
+                "anchor": "func-SetGlobalShaderProgramCameraConstants"
+              },
+              {
+                "text": "RenderContext",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::RenderContext"
+              },
+              {
+                "text": "RenderEngine::SetAllGlobalShaderProgramConstants",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::RenderEngine",
+                "anchor": "func-SetAllGlobalShaderProgramConstants"
+              },
+              {
+                "text": "graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::RenderContext",
+                "anchor": "field-m_OffsetViewProjection"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -27366,6 +28110,14 @@
             "visibility": "private",
             "name": "_field_1c",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderEngine::m_ResourceContext",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::RenderEngine",
+                "anchor": "field-m_ResourceContext"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -27420,6 +28172,20 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "TerrainPatchSystemUpdate",
+                "target_kind": "module",
+                "path": "graphics_engine::render_engine",
+                "anchor": "func-TerrainPatchSystemUpdate"
+              },
+              {
+                "text": "STerrainPatchSystem::m_TerrainCamera",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::STerrainPatchSystem",
+                "anchor": "field-m_TerrainCamera"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -30409,6 +31175,14 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderPass::SaveRenderFrameData",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPass",
+                "anchor": "func-SaveRenderFrameData"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -30536,6 +31310,20 @@
             "visibility": "private",
             "name": "_field_4c",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderPassState::m_Enabled",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPassState",
+                "anchor": "flag-m_Enabled"
+              },
+              {
+                "text": "graphics_engine::shadow_manager::ShadowManager::CommitRenderPassSettings",
+                "target_kind": "item",
+                "path": "graphics_engine::shadow_manager::ShadowManager",
+                "anchor": "func-CommitRenderPassSettings"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -30588,6 +31376,14 @@
             "visibility": "private",
             "name": "_field_90",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderPassSortState::m_Sorted",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPassSortState",
+                "anchor": "flag-m_Sorted"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -30658,6 +31454,20 @@
             "visibility": "private",
             "name": "_field_a0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderPass::SortList",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPass",
+                "anchor": "func-SortList"
+              },
+              {
+                "text": "RenderPass::DoDraw",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPass",
+                "anchor": "func-DoDraw"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -30713,6 +31523,14 @@
             "visibility": "private",
             "name": "_field_860",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderPass::SortList",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPass",
+                "anchor": "func-SortList"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -31621,6 +32439,13 @@
             "visibility": "private",
             "name": "_field_10",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "ShadowManager",
+                "target_kind": "item",
+                "path": "graphics_engine::shadow_manager::ShadowManager"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -31681,6 +32506,20 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "ShadowManager::UpdateRender",
+                "target_kind": "item",
+                "path": "graphics_engine::shadow_manager::ShadowManager",
+                "anchor": "func-UpdateRender"
+              },
+              {
+                "text": "ShadowManager::SetEnabled",
+                "target_kind": "item",
+                "path": "graphics_engine::shadow_manager::ShadowManager",
+                "anchor": "func-SetEnabled"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -31733,6 +32572,20 @@
             "visibility": "private",
             "name": "_field_5",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "ShadowManager::SetEnabled",
+                "target_kind": "item",
+                "path": "graphics_engine::shadow_manager::ShadowManager",
+                "anchor": "func-SetEnabled"
+              },
+              {
+                "text": "ShadowManager::m_SliceBase",
+                "target_kind": "item",
+                "path": "graphics_engine::shadow_manager::ShadowManager",
+                "anchor": "field-m_SliceBase"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -31830,6 +32683,14 @@
             "visibility": "private",
             "name": "_field_2430",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "ShadowManager::SetActiveShadowPassCount",
+                "target_kind": "item",
+                "path": "graphics_engine::shadow_manager::ShadowManager",
+                "anchor": "func-SetActiveShadowPassCount"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -31922,6 +32783,20 @@
             "visibility": "private",
             "name": "_field_61f8",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "ShadowManager::UpdateRender",
+                "target_kind": "item",
+                "path": "graphics_engine::shadow_manager::ShadowManager",
+                "anchor": "func-UpdateRender"
+              },
+              {
+                "text": "ShadowManager::CommitRenderPassSettings",
+                "target_kind": "item",
+                "path": "graphics_engine::shadow_manager::ShadowManager",
+                "anchor": "func-CommitRenderPassSettings"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -32874,6 +33749,20 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "CalculateMidAndBrightPointForHistogram",
+                "target_kind": "module",
+                "path": "graphics_engine::tone_mapping",
+                "anchor": "func-CalculateMidAndBrightPointForHistogram"
+              },
+              {
+                "text": "ToneMappingEffect::Update",
+                "target_kind": "item",
+                "path": "graphics_engine::tone_mapping::ToneMappingEffect",
+                "anchor": "func-Update"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -33027,6 +33916,20 @@
             "visibility": "private",
             "name": "_field_57c",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "ToneMappingEffect::Update",
+                "target_kind": "item",
+                "path": "graphics_engine::tone_mapping::ToneMappingEffect",
+                "anchor": "func-Update"
+              },
+              {
+                "text": "ToneMappingEffect::GenerateHistogramForFinalScene",
+                "target_kind": "item",
+                "path": "graphics_engine::tone_mapping::ToneMappingEffect",
+                "anchor": "func-GenerateHistogramForFinalScene"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -37971,6 +38874,13 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "PatchViewDesc",
+                "target_kind": "item",
+                "path": "patch_system::PatchViewDesc"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -38019,6 +38929,13 @@
             "visibility": "private",
             "name": "_field_10",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "PatchHeader",
+                "target_kind": "item",
+                "path": "patch_system::PatchHeader"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -38108,6 +39025,14 @@
             "visibility": "private",
             "name": "_field_30",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "TerrainPatchUpdate",
+                "target_kind": "module",
+                "path": "patch_system",
+                "anchor": "func-TerrainPatchUpdate"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -38289,6 +39214,14 @@
             "visibility": "private",
             "name": "_field_1b",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "PatchViewDesc::m_FrustumIDs",
+                "target_kind": "item",
+                "path": "patch_system::PatchViewDesc",
+                "anchor": "field-m_FrustumIDs"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -38419,6 +39352,14 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "PatchHeader::m_VisibilityBits",
+                "target_kind": "item",
+                "path": "patch_system::PatchHeader",
+                "anchor": "field-m_VisibilityBits"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -38841,6 +39782,14 @@
             "visibility": "private",
             "name": "_field_180",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "SpawnSystem::SetCenterPosition",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem",
+                "anchor": "func-SetCenterPosition"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -40470,6 +41419,14 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "OverlayUI::SetMouseCursorPosition",
+                "target_kind": "item",
+                "path": "ui::overlay_ui::OverlayUI",
+                "anchor": "func-SetMouseCursorPosition"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -40516,6 +41473,13 @@
             "visibility": "private",
             "name": "_field_18",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "Value",
+                "target_kind": "item",
+                "path": "ui::scaleform::Value"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -40592,6 +41556,14 @@
             "visibility": "private",
             "name": "_field_154",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "OverlayUI::SetMouseCursorPosition",
+                "target_kind": "item",
+                "path": "ui::overlay_ui::OverlayUI",
+                "anchor": "func-SetMouseCursorPosition"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -41369,6 +42341,26 @@
             "visibility": "private",
             "name": "_field_d7",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "ValueObjectInterface::GetDisplayInfo",
+                "target_kind": "item",
+                "path": "ui::scaleform::ValueObjectInterface",
+                "anchor": "func-GetDisplayInfo"
+              },
+              {
+                "text": "ValueObjectInterface::SetDisplayInfo",
+                "target_kind": "item",
+                "path": "ui::scaleform::ValueObjectInterface",
+                "anchor": "func-SetDisplayInfo"
+              },
+              {
+                "text": "DisplayInfo::VarsSet",
+                "target_kind": "item",
+                "path": "ui::scaleform::DisplayInfo",
+                "anchor": "field-VarsSet"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -41462,6 +42454,13 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "Value",
+                "target_kind": "item",
+                "path": "ui::scaleform::Value"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -41542,6 +42541,13 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "MemoryHeap",
+                "target_kind": "item",
+                "path": "ui::scaleform::MemoryHeap"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -42166,6 +43172,43 @@
             "visibility": "private",
             "name": "_field_4d",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "MovieImpl::MouseStates",
+                "target_kind": "item",
+                "path": "ui::scaleform::MovieImpl",
+                "anchor": "field-MouseStates"
+              },
+              {
+                "text": "MovieImpl::ProcessInput",
+                "target_kind": "item",
+                "path": "ui::scaleform::MovieImpl",
+                "anchor": "func-ProcessInput"
+              },
+              {
+                "text": "MouseState::CurButtonsState",
+                "target_kind": "item",
+                "path": "ui::scaleform::MouseState",
+                "anchor": "field-CurButtonsState"
+              },
+              {
+                "text": "MouseState::PrevButtonsState",
+                "target_kind": "item",
+                "path": "ui::scaleform::MouseState",
+                "anchor": "field-PrevButtonsState"
+              },
+              {
+                "text": "MouseState::FLAG_MOUSE_MOVED",
+                "target_kind": "item",
+                "path": "ui::scaleform::MouseState::FLAG_MOUSE_MOVED"
+              },
+              {
+                "text": "MouseState::LastPosition",
+                "target_kind": "item",
+                "path": "ui::scaleform::MouseState",
+                "anchor": "field-LastPosition"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -43471,6 +44514,13 @@
             "visibility": "private",
             "name": "_field_8",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "Movie",
+                "target_kind": "item",
+                "path": "ui::scaleform::Movie"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -43635,6 +44685,13 @@
             "visibility": "private",
             "name": "_field_58",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "TreeRoot",
+                "target_kind": "item",
+                "path": "ui::scaleform::TreeRoot"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -43683,6 +44740,25 @@
             "visibility": "private",
             "name": "_field_90",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "Viewport",
+                "target_kind": "item",
+                "path": "ui::scaleform::Viewport"
+              },
+              {
+                "text": "MovieImpl::SetViewportImpl",
+                "target_kind": "item",
+                "path": "ui::scaleform::MovieImpl",
+                "anchor": "func-SetViewportImpl"
+              },
+              {
+                "text": "TreeRoot::SetViewport",
+                "target_kind": "item",
+                "path": "ui::scaleform::TreeRoot",
+                "anchor": "func-SetViewport"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -43953,6 +45029,32 @@
             "visibility": "private",
             "name": "_field_100",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "MovieImpl::pRenderRoot",
+                "target_kind": "item",
+                "path": "ui::scaleform::MovieImpl",
+                "anchor": "field-pRenderRoot"
+              },
+              {
+                "text": "MovieImpl::ResetViewportMatrix",
+                "target_kind": "item",
+                "path": "ui::scaleform::MovieImpl",
+                "anchor": "func-ResetViewportMatrix"
+              },
+              {
+                "text": "MovieImpl::HandleEvent",
+                "target_kind": "item",
+                "path": "ui::scaleform::MovieImpl",
+                "anchor": "vfunc-HandleEvent"
+              },
+              {
+                "text": "MovieImpl::NotifyMouseState",
+                "target_kind": "item",
+                "path": "ui::scaleform::MovieImpl",
+                "anchor": "vfunc-NotifyMouseState"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -44021,6 +45123,19 @@
             "visibility": "private",
             "name": "_field_130",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "MouseState",
+                "target_kind": "item",
+                "path": "ui::scaleform::MouseState"
+              },
+              {
+                "text": "MovieImpl::MouseCursorCount",
+                "target_kind": "item",
+                "path": "ui::scaleform::MovieImpl",
+                "anchor": "field-MouseCursorCount"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -48606,6 +49721,14 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "Object::m_DisplayObject",
+                "target_kind": "item",
+                "path": "ui::scaleform::Object",
+                "anchor": "field-m_DisplayObject"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -48655,6 +49778,14 @@
             "visibility": "private",
             "name": "_field_30",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "Object::m_Traits",
+                "target_kind": "item",
+                "path": "ui::scaleform::Object",
+                "anchor": "field-m_Traits"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -48929,6 +50060,13 @@
             "visibility": "private",
             "name": "_field_c",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RefCountImpl",
+                "target_kind": "item",
+                "path": "ui::scaleform::RefCountImpl"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -49117,6 +50255,14 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RTHandle::NextCapture",
+                "target_kind": "item",
+                "path": "ui::scaleform::RTHandle",
+                "anchor": "func-NextCapture"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -49205,6 +50351,14 @@
             "visibility": "private",
             "name": "_field_110",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RTHandle::NextCapture",
+                "target_kind": "item",
+                "path": "ui::scaleform::RTHandle",
+                "anchor": "func-NextCapture"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -50771,6 +51925,14 @@
             "visibility": "private",
             "name": "_field_8",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "RenderHAL::CreateRenderTarget",
+                "target_kind": "item",
+                "path": "ui::scaleform::RenderHAL",
+                "anchor": "func-CreateRenderTarget"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -51141,6 +52303,13 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "Traits::FLAG_NON_DISPLAY_OBJECT",
+                "target_kind": "item",
+                "path": "ui::scaleform::Traits::FLAG_NON_DISPLAY_OBJECT"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -51186,6 +52355,14 @@
             "visibility": "private",
             "name": "_field_71",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "Traits::is_display_object",
+                "target_kind": "item",
+                "path": "ui::scaleform::Traits",
+                "anchor": "func-is_display_object"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -51232,6 +52409,13 @@
             "visibility": "private",
             "name": "_field_7c",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "Object",
+                "target_kind": "item",
+                "path": "ui::scaleform::Object"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -51426,6 +52610,13 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "TreeNode",
+                "target_kind": "item",
+                "path": "ui::scaleform::TreeNode"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -51636,6 +52827,20 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "TreeContainer::Insert",
+                "target_kind": "item",
+                "path": "ui::scaleform::TreeContainer",
+                "anchor": "func-Insert"
+              },
+              {
+                "text": "TreeContainer::Remove",
+                "target_kind": "item",
+                "path": "ui::scaleform::TreeContainer",
+                "anchor": "func-Remove"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -51756,6 +52961,18 @@
             "visibility": "private",
             "name": "_field_28",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "TreeContainer",
+                "target_kind": "item",
+                "path": "ui::scaleform::TreeContainer"
+              },
+              {
+                "text": "TreeRoot",
+                "target_kind": "item",
+                "path": "ui::scaleform::TreeRoot"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -51869,6 +53086,13 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "TreeContainer",
+                "target_kind": "item",
+                "path": "ui::scaleform::TreeContainer"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -52045,6 +53269,14 @@
             "visibility": "private",
             "name": "_field_1c",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "Value::Type",
+                "target_kind": "item",
+                "path": "ui::scaleform::Value",
+                "anchor": "field-Type"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -52366,6 +53598,25 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "MovieImpl::pObjectInterface",
+                "target_kind": "item",
+                "path": "ui::scaleform::MovieImpl",
+                "anchor": "field-pObjectInterface"
+              },
+              {
+                "text": "Value",
+                "target_kind": "item",
+                "path": "ui::scaleform::Value"
+              },
+              {
+                "text": "Value::pObjectInterface",
+                "target_kind": "item",
+                "path": "ui::scaleform::Value",
+                "anchor": "field-pObjectInterface"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -52862,6 +54113,14 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "UIManager::InitPlatformRT",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-InitPlatformRT"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -53235,6 +54494,26 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "UIManager::GetMovieSpaceMouseCursor",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-GetMovieSpaceMouseCursor"
+              },
+              {
+                "text": "UIManager::ComputeMovieSizeOnViewSize",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-ComputeMovieSizeOnViewSize"
+              },
+              {
+                "text": "UIManager::m_MouseDeltaY",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "field-m_MouseDeltaY"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -53421,6 +54700,20 @@
             "visibility": "private",
             "name": "_field_48",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "WndProc",
+                "target_kind": "module",
+                "path": "window",
+                "anchor": "func-WndProc"
+              },
+              {
+                "text": "UIManager::SetMousePos",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-SetMousePos"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -53553,6 +54846,14 @@
             "visibility": "private",
             "name": "_field_214",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "UIManager::SendMouseEvents",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-SendMouseEvents"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -53783,6 +55084,14 @@
             "visibility": "private",
             "name": "_field_1330",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "UiThreadCommandQueue::m_RenderThreadId",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UiThreadCommandQueue",
+                "anchor": "field-m_RenderThreadId"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -53860,6 +55169,20 @@
             "visibility": "private",
             "name": "_field_1378",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "UIManager::InitPlatformRT",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-InitPlatformRT"
+              },
+              {
+                "text": "RenderTargetData::UpdateData",
+                "target_kind": "item",
+                "path": "ui::ui_manager::RenderTargetData",
+                "anchor": "func-UpdateData"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -53915,6 +55238,20 @@
             "visibility": "private",
             "name": "_field_1398",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "UIManager::SendMouseEvents",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-SendMouseEvents"
+              },
+              {
+                "text": "UIManager::MousePointerVisibility",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-MousePointerVisibility"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -54005,6 +55342,14 @@
             "visibility": "private",
             "name": "_field_1480",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "UIManager::Convert3DCoords",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-Convert3DCoords"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -54076,6 +55421,14 @@
             "visibility": "private",
             "name": "_field_148c",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "UIManager::ComputeSafeArea",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-ComputeSafeArea"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
@@ -54172,6 +55525,32 @@
             "visibility": "private",
             "name": "_field_14a4",
             "doc": null,
+            "doc_links": [
+              {
+                "text": "UIManager::InitPlatformRT",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-InitPlatformRT"
+              },
+              {
+                "text": "UIManager::ComputeMovieSizeOnViewSize",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-ComputeMovieSizeOnViewSize"
+              },
+              {
+                "text": "UIManager::SetMovieViewport",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-SetMovieViewport"
+              },
+              {
+                "text": "UIManager::ComputeSafeArea",
+                "target_kind": "item",
+                "path": "ui::ui_manager::UIManager",
+                "anchor": "func-ComputeSafeArea"
+              }
+            ],
             "type_ref": {
               "type": "array",
               "inner": {
