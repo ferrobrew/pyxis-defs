@@ -19,13 +19,13 @@ pub type EventID {
     pub const TYPE_ID_F32: u64 = 0x2,
     /// Type ID for `CString` event arguments.
     pub const TYPE_ID_CSTRING: u64 = 0x3,
-    /// Type ID for `Matrix4` event arguments.
+    /// Type ID for [`Matrix4`] event arguments.
     pub const TYPE_ID_MATRIX4: u64 = 0x4,
     /// Type ID for `u32` event arguments.
     pub const TYPE_ID_U32: u64 = 0x5,
-    /// Type ID for `GameObject` event arguments.
+    /// Type ID for [`GameObject`] event arguments.
     pub const TYPE_ID_GAME_OBJECT: u64 = 0xB,
-    /// Type ID for `Character` event arguments.
+    /// Type ID for [`Character`] event arguments.
     pub const TYPE_ID_CHARACTER: u64 = 0xC,
     /// Bitwise OR mask for `Option<T>` event arguments.
     pub const TYPE_ID_OPTION_MASK: u64 = 0x80,

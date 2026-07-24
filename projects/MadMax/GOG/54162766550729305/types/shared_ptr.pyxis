@@ -136,7 +136,7 @@ pub type SharedPtr<T> {
 // below. (MadMax's shared_ptr has no C++ side declared here.)
 #[cfg(backend = "rust")]
 impl<T> SharedPtr<T> {
-    /// Constructs a null `SharedPtr<T>` (refcount block is null).
+    /// Constructs a null [`SharedPtr<T>`](SharedPtr) (refcount block is null).
     #[external_body]
     pub fn new() -> SharedPtr<T>;
     /// `true` if the stored pointer is non-null.
@@ -205,9 +205,9 @@ epilogue for SharedPtr r#"
             }
         }
 
-        /// Given a `SharedPtr<T>`, returns a `SharedPtr<Y>` if `T: AsMut<Y>`.
+        /// Given a [`SharedPtr<T>`](SharedPtr), returns a [`SharedPtr<Y>`](SharedPtr) if `T: AsMut<Y>`.
         /// Pyxis defines `AsMut` conversions for inheritance, so this can be used
-        /// to convert a `SharedPtr<Derived>` to a `SharedPtr<Base>`.
+        /// to convert a [`SharedPtr<Derived>`](SharedPtr) to a [`SharedPtr<Base>`](SharedPtr).
         ///
         /// That being said, it's still somewhat unsafe, so use with caution.
         pub unsafe fn as_mut_cast<Y>(self) -> SharedPtr<Y>

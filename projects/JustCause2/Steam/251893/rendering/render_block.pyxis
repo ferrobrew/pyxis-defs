@@ -7,7 +7,7 @@ prologue r#"
 "#;
 
 /// `ManuallyDrop<SharedPtr<u32>>` is used instead of `SharedPtr<u32>` to avoid
-/// the `Drop` implementation of `SharedPtr<u32>` being called when the `RenderBlock`
+/// the `Drop` implementation of `SharedPtr<u32>` being called when the [`RenderBlock`]
 /// is dropped. The destructor, which we call in `drop`, will decrement the refcount
 /// for us.
 #[size(8), align(4), cpp_name = "::pyxis::ManuallyDrop<::types::shared_ptr::SharedPtr<::std::uint32_t>>"]
@@ -118,7 +118,7 @@ impl GenericRenderBlock {
 
 #[cfg(backend = "rust")]
 impl GenericRenderBlock {
-    /// Construct a `GenericRenderBlock` via the native constructor.
+    /// Construct a [`GenericRenderBlock`] via the native constructor.
     #[external_body]
     pub fn new() -> GenericRenderBlock;
 }
@@ -192,7 +192,7 @@ impl RenderBlockLine {
 
 #[cfg(backend = "rust")]
 impl RenderBlockLine {
-    /// Construct a `RenderBlockLine` via the native constructor.
+    /// Construct a [`RenderBlockLine`] via the native constructor.
     #[external_body]
     pub fn new() -> RenderBlockLine;
 }
@@ -256,7 +256,7 @@ impl RenderBlockTriangle {
 
 #[cfg(backend = "rust")]
 impl RenderBlockTriangle {
-    /// Construct a `RenderBlockTriangle` via the native constructor.
+    /// Construct a [`RenderBlockTriangle`] via the native constructor.
     #[external_body]
     pub fn new() -> RenderBlockTriangle;
 }
@@ -336,7 +336,7 @@ impl RenderBlockGeneral {
 
 #[cfg(backend = "rust")]
 impl RenderBlockGeneral {
-    /// Construct a `RenderBlockGeneral` via the native constructor.
+    /// Construct a [`RenderBlockGeneral`] via the native constructor.
     #[external_body]
     pub fn new() -> RenderBlockGeneral;
 }
@@ -446,7 +446,7 @@ impl RenderBlock3DText {
 
 #[cfg(backend = "rust")]
 impl RenderBlock3DText {
-    /// Construct a `RenderBlock3DText` by zeroing the struct and
+    /// Construct a [`RenderBlock3DText`] by zeroing the struct and
     /// assigning the known-good vftable, sentinel hashes, and defaults.
     #[external_body]
     pub fn new() -> RenderBlock3DText;

@@ -558,7 +558,14 @@
       "category": "defined",
       "kind": {
         "type": "constant",
-        "doc": " Type ID for `Character` event arguments.",
+        "doc": " Type ID for [`Character`] event arguments.",
+        "doc_links": [
+          {
+            "text": "Character",
+            "target_kind": "item",
+            "path": "game_objects::character::Character"
+          }
+        ],
         "value_type": {
           "type": "raw",
           "path": "u64"
@@ -627,7 +634,14 @@
       "category": "defined",
       "kind": {
         "type": "constant",
-        "doc": " Type ID for `GameObject` event arguments.",
+        "doc": " Type ID for [`GameObject`] event arguments.",
+        "doc_links": [
+          {
+            "text": "GameObject",
+            "target_kind": "item",
+            "path": "game_objects::game_object::GameObject"
+          }
+        ],
         "value_type": {
           "type": "raw",
           "path": "u64"
@@ -673,7 +687,14 @@
       "category": "defined",
       "kind": {
         "type": "constant",
-        "doc": " Type ID for `Matrix4` event arguments.",
+        "doc": " Type ID for [`Matrix4`] event arguments.",
+        "doc_links": [
+          {
+            "text": "Matrix4",
+            "target_kind": "item",
+            "path": "types::math::Matrix4"
+          }
+        ],
         "value_type": {
           "type": "raw",
           "path": "u64"
@@ -21358,7 +21379,14 @@
           {
             "visibility": "public",
             "name": "new",
-            "doc": " Constructs a null `SharedPtr<T>` (refcount block is null).",
+            "doc": " Constructs a null [`SharedPtr<T>`](SharedPtr) (refcount block is null).",
+            "doc_links": [
+              {
+                "text": "SharedPtr",
+                "target_kind": "item",
+                "path": "types::shared_ptr::SharedPtr"
+              }
+            ],
             "body": {
               "type": "external"
             },
@@ -25089,7 +25117,7 @@
               },
               "definition": false,
               "for_type": "types::shared_ptr::SharedPtr",
-              "text": "\n    // SharedPtr\n    #[allow(dead_code)]\n    impl<T> SharedPtr<T> {\n        pub fn new() -> SharedPtr<T> {\n            SharedPtr {\n                px: ptr::null_mut(),\n                pn: SharedCount {\n                    count_impl: ptr::null_mut(),\n                },\n            }\n        }\n\n        pub unsafe fn as_ref(&self) -> Option<&T> {\n            self.exists().then(|| unsafe { &*self.px })\n        }\n\n        pub unsafe fn as_mut(&mut self) -> Option<&mut T> {\n            self.exists().then(|| unsafe { &mut *self.px })\n        }\n\n        pub fn exists(&self) -> bool {\n            !self.px.is_null()\n        }\n\n        pub fn refcount(&self) -> i32 {\n            unsafe { (*self.pn.count_impl).use_count.load(Ordering::SeqCst) }\n        }\n\n        pub fn is_only_owner(&self) -> bool {\n            self.refcount() == 1\n        }\n\n        pub unsafe fn swap(&mut self, rhs: &mut SharedPtr<T>) {\n            unsafe {\n                swap_unaligned(&raw mut self.px, &raw mut rhs.px);\n            }\n            self.pn.swap(&mut rhs.pn);\n        }\n\n        pub unsafe fn reset_with_empty(&mut self) {\n            unsafe {\n                self.swap(&mut SharedPtr::new());\n            }\n        }\n\n        /// Absolutely no verification on this - make sure that T can be casted to Y!\n        pub unsafe fn static_pointer_cast<Y>(self) -> SharedPtr<Y> {\n            SharedPtr {\n                px: self.px as *mut Y,\n                pn: self.pn,\n            }\n        }\n\n        /// Given a `SharedPtr<T>`, returns a `SharedPtr<Y>` if `T: AsMut<Y>`.\n        /// Pyxis defines `AsMut` conversions for inheritance, so this can be used\n        /// to convert a `SharedPtr<Derived>` to a `SharedPtr<Base>`.\n        ///\n        /// That being said, it's still somewhat unsafe, so use with caution.\n        pub unsafe fn as_mut_cast<Y>(self) -> SharedPtr<Y>\n        where\n            T: AsMut<Y>,\n        {\n            SharedPtr {\n                px: unsafe { (*self.px).as_mut() as *mut Y },\n                pn: self.pn,\n            }\n        }\n    }\n    impl<T> Clone for SharedPtr<T> {\n        fn clone(&self) -> SharedPtr<T> {\n            SharedPtr {\n                px: self.px,\n                pn: self.pn.clone(),\n            }\n        }\n    }\n    impl<T> Default for SharedPtr<T> {\n        fn default() -> SharedPtr<T> {\n            SharedPtr::new()\n        }\n    }\n    impl<T> PartialEq for SharedPtr<T> {\n        fn eq(&self, other: &SharedPtr<T>) -> bool {\n            self.px == other.px\n        }\n    }\n    impl<T> Eq for SharedPtr<T> {}\n"
+              "text": "\n    // SharedPtr\n    #[allow(dead_code)]\n    impl<T> SharedPtr<T> {\n        pub fn new() -> SharedPtr<T> {\n            SharedPtr {\n                px: ptr::null_mut(),\n                pn: SharedCount {\n                    count_impl: ptr::null_mut(),\n                },\n            }\n        }\n\n        pub unsafe fn as_ref(&self) -> Option<&T> {\n            self.exists().then(|| unsafe { &*self.px })\n        }\n\n        pub unsafe fn as_mut(&mut self) -> Option<&mut T> {\n            self.exists().then(|| unsafe { &mut *self.px })\n        }\n\n        pub fn exists(&self) -> bool {\n            !self.px.is_null()\n        }\n\n        pub fn refcount(&self) -> i32 {\n            unsafe { (*self.pn.count_impl).use_count.load(Ordering::SeqCst) }\n        }\n\n        pub fn is_only_owner(&self) -> bool {\n            self.refcount() == 1\n        }\n\n        pub unsafe fn swap(&mut self, rhs: &mut SharedPtr<T>) {\n            unsafe {\n                swap_unaligned(&raw mut self.px, &raw mut rhs.px);\n            }\n            self.pn.swap(&mut rhs.pn);\n        }\n\n        pub unsafe fn reset_with_empty(&mut self) {\n            unsafe {\n                self.swap(&mut SharedPtr::new());\n            }\n        }\n\n        /// Absolutely no verification on this - make sure that T can be casted to Y!\n        pub unsafe fn static_pointer_cast<Y>(self) -> SharedPtr<Y> {\n            SharedPtr {\n                px: self.px as *mut Y,\n                pn: self.pn,\n            }\n        }\n\n        /// Given a [`SharedPtr<T>`](SharedPtr), returns a [`SharedPtr<Y>`](SharedPtr) if `T: AsMut<Y>`.\n        /// Pyxis defines `AsMut` conversions for inheritance, so this can be used\n        /// to convert a [`SharedPtr<Derived>`](SharedPtr) to a [`SharedPtr<Base>`](SharedPtr).\n        ///\n        /// That being said, it's still somewhat unsafe, so use with caution.\n        pub unsafe fn as_mut_cast<Y>(self) -> SharedPtr<Y>\n        where\n            T: AsMut<Y>,\n        {\n            SharedPtr {\n                px: unsafe { (*self.px).as_mut() as *mut Y },\n                pn: self.pn,\n            }\n        }\n    }\n    impl<T> Clone for SharedPtr<T> {\n        fn clone(&self) -> SharedPtr<T> {\n            SharedPtr {\n                px: self.px,\n                pn: self.pn.clone(),\n            }\n        }\n    }\n    impl<T> Default for SharedPtr<T> {\n        fn default() -> SharedPtr<T> {\n            SharedPtr::new()\n        }\n    }\n    impl<T> PartialEq for SharedPtr<T> {\n        fn eq(&self, other: &SharedPtr<T>) -> bool {\n            self.px == other.px\n        }\n    }\n    impl<T> Eq for SharedPtr<T> {}\n"
             },
             {
               "kind": "epilogue",

@@ -110,7 +110,7 @@ pub type GraphicsEngine {
     /// The engine-owned scene render camera: a by-value copy rebuilt each
     /// [`Draw`](GraphicsEngine::Draw) by `Camera::SetupRenderCamera` (reverse-Z + jitter, then the
     /// view-projection products from `m_View`). This is the camera the render passes consume;
-    /// distinct from the `CameraManager`'s camera objects, which are pointers to the gameplay
+    /// distinct from the [`CameraManager`](camera::camera_manager::CameraManager)'s camera objects, which are pointers to the gameplay
     /// cameras.
     #[address(0x170)]
     pub m_RenderCamera: Camera,
@@ -348,7 +348,7 @@ pub fn BeginScopeMarker(context: *mut HContext_t, name: *const u8);
 pub fn EndScopeMarker(context: *mut HContext_t);
 
 /// The cascaded sun-shadow constants for the forward-material resolve: the cascade transform plus the
-/// per-cascade box-test parameters, staged into cb0 by `RenderEngine::SetGlobalShaderConstants`.
+/// per-cascade box-test parameters, staged into cb0 by [`SetGlobalShaderConstants`](graphics_engine::render_engine::RenderEngine::SetGlobalShaderConstants).
 #[size(0x120), align(4)]
 pub type ShadowCascades {
     /// Maps a camera-relative world position into cascade/texture space (row-major, row-vector; its
@@ -530,7 +530,7 @@ impl GraphicsEngine {
     pub fn DestroyRenderSetups(&mut self);
 
     /// Applies a resize: tears down the render setups, has the UI drop its references, resizes the
-    /// swapchain (the device-level `ResizeBuffers`), re-creates the render
+    /// swapchain (the device-level [`ResizeBuffers`](graphics_engine::device::ResizeBuffers)), re-creates the render
     /// setups at the new size ([`CreateRenderSetups`](GraphicsEngine::CreateRenderSetups)), runs every
     /// registered resize callback (which re-sizes the pass-owned pools), restores the UI, and updates
     /// the camera aspect and window params. Called from
@@ -567,7 +567,7 @@ impl GraphicsEngine {
     pub fn LoadShaderBundle(&mut self, name: *const u8) -> bool;
 
     /// Sets [`m_ActiveCursor`](GraphicsEngine::m_ActiveCursor) and, when it changed, posts
-    /// `WM_SETCURSOR` to the game window so `WndProc` runs
+    /// `WM_SETCURSOR` to the game window so [`WndProc`] runs
     /// [`UpdateCursor`](GraphicsEngine::UpdateCursor). `COverlayUI` drives it: `Arrow` when the
     /// overlay cursor becomes visible, `None` when it hides.
     #[address(0x140_0A1_AB0)]
@@ -577,7 +577,7 @@ impl GraphicsEngine {
     /// null `HCURSOR` and clips the cursor to the client rect (when the window is foreground);
     /// otherwise it unclips and sets `GraphicsParams::m_Cursors[cursor]`. The four entries are
     /// loaded at startup as the system `IDC_ARROW`, `IDC_CROSS`, `IDC_HAND`, and `IDC_NO`
-    /// cursors. Called from `WndProc` on `WM_SETCURSOR`.
+    /// cursors. Called from [`WndProc`] on `WM_SETCURSOR`.
     #[address(0x140_0A1_AF0)]
     pub fn UpdateCursor(&mut self);
 }

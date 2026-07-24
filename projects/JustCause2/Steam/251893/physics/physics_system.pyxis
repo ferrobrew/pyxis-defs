@@ -24,7 +24,7 @@ impl AIRayCastFilter {
 
 #[cfg(backend = "rust")]
 impl AIRayCastFilter {
-    /// Construct an `AIRayCastFilter` via the native constructor.
+    /// Construct an [`AIRayCastFilter`] via the native constructor.
     #[external_body]
     pub fn new() -> AIRayCastFilter;
 }
@@ -64,7 +64,7 @@ pub type RayCastResult {
 }
 #[cfg(backend = "cpp")]
 impl RayCastResult {
-    /// Default-constructed `RayCastResult`: forward-pointing normal,
+    /// Default-constructed [`RayCastResult`]: forward-pointing normal,
     /// `distance = 1`, sentinel `0xFFFFFFFF` in every `unknown` slot.
     #[external_body]
     pub fn make() -> RayCastResult;
@@ -72,7 +72,7 @@ impl RayCastResult {
 
 #[cfg(backend = "rust")]
 impl RayCastResult {
-    /// Default-constructed `RayCastResult`: forward-pointing normal,
+    /// Default-constructed [`RayCastResult`]: forward-pointing normal,
     /// `distance = 1`, sentinel `0xFFFFFFFF` in every `unknown` slot.
     #[external_body]
     pub fn new() -> RayCastResult;

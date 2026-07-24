@@ -83,7 +83,7 @@ pub type PatchContext {
 }
 
 /// The per-patch CPU fragment for the base VolumetricTerrain patch maps (registered against the
-/// `TerrainPatchUpdate` hash by `OldTerrainPatchSystem::TerrainPatchSystemCreateLayers`). It
+/// [`TerrainPatchUpdate`] hash by `OldTerrainPatchSystem::TerrainPatchSystemCreateLayers`). It
 /// advances patch construction and destruction (creating or destroying the patch's
 /// [`RenderBlockTerrain`](graphics_engine::render_block::RenderBlockTerrain) constant buffers,
 /// updating the global terrain mask, and adjusting per-LOD memory statistics), and for constructed

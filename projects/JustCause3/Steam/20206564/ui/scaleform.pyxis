@@ -1,4 +1,4 @@
-/// Scaleform `RefCountImpl` -- the base class for reference-counted Scaleform objects. Provides
+/// Scaleform [`RefCountImpl`] -- the base class for reference-counted Scaleform objects. Provides
 /// a vtable pointer at +0 and an atomic refcount at +8. `AddRef`/`Release` are non-virtual;
 /// the vtable's slot 0 is the destructor, called when the refcount reaches zero.
 #[size(0x10)]
@@ -77,12 +77,12 @@ impl Movie {
 
 /// The Scaleform `Render::ContextImpl::Context`: the display-tree snapshot pipeline between the
 /// update thread and the renderer. `Capture` (update thread) merges the active snapshot's changes
-/// into the pending snapshot; `RTHandle::NextCapture` (render thread) consumes the pending
+/// into the pending snapshot; [`NextCapture`](RTHandle::NextCapture) (render thread) consumes the pending
 /// snapshot into the displaying one, at most once per HAL frame. Only the fields the payload
 /// touches are modeled; the declared size covers just the modeled prefix.
 #[size(0x118)]
 pub type RenderContext {
-    /// The once-a-frame consumption latch: while set, `RTHandle::NextCapture` keeps the current
+    /// The once-a-frame consumption latch: while set, [`NextCapture`](RTHandle::NextCapture) keeps the current
     /// displaying snapshot instead of consuming the pending one. Set by the first `NextCapture`
     /// of a HAL frame and cleared by `HAL::EndFrame` (`EndFrameContextNotify`), so within one
     /// `CUIManager::Render` call every draw sees the same snapshot.
@@ -263,7 +263,7 @@ epilogue for Traits r#"
 /// view rectangle the movie occupies within it. `CUIManager::SetMovieViewport` builds one as
 /// `{BufferWidth: vw, BufferHeight: vh, Left: (vw - movie_w) / 2, Top: (vh - movie_h) / 2,
 /// Width: movie_w, Height: movie_h, Scissor*: 0, Flags: 0, Scale: 1.0, AspectRatio: 1.0}`, where
-/// `movie_w`/`movie_h` are `UIManager::m_MovieScaleWidth`/`Height` at call time (not the
+/// `movie_w`/`movie_h` are [`m_MovieScaleWidth`](ui::ui_manager::UIManager::m_MovieScaleWidth)/`Height` at call time (not the
 /// arguments).
 #[copyable, defaultable, size(0x34), align(4)]
 pub type Viewport {
@@ -370,7 +370,7 @@ pub type MouseState {
 /// [`GetDisplayHandle`](MovieImpl::GetDisplayHandle): one refcounted `HandleData` pointer.
 #[size(0x8)]
 pub type DisplayHandle {
-    /// The refcounted `RTHandle::HandleData` (starts with `RefCountImpl`, so
+    /// The refcounted `RTHandle::HandleData` (starts with [`RefCountImpl`], so
     /// [`RefCountImpl::AddRef`] pins a copied handle).
     #[address(0x0)]
     pub pData: *mut RefCountImpl,
@@ -386,7 +386,7 @@ pub type RTHandle {
 }
 impl RTHandle {
     /// Consumes the context's pending snapshot into the displaying one (at most once per HAL
-    /// frame: the context's [`NextCaptureCalledInFrame`](RenderContext::NextCaptureCalledInFrame)
+    /// frame: the context's [`NextCaptureCalledInFrame`](ui::scaleform::RenderContext::NextCaptureCalledInFrame)
     /// latch short-circuits repeats). Returns whether the handle is valid to draw. `notify` is
     /// the HAL's context notify ([`RenderHAL::GetContextNotify`]); `frame_id` is 0.
     #[address(0x141_9A7_970)]
@@ -469,7 +469,7 @@ pub type MovieImpl {
         /// Snapshots the display tree for the render thread (`GFx::Movie` vtable slot 25). Must be
         /// called from the current capture thread (see
         /// [`SetCaptureThread`](MovieImpl::SetCaptureThread)); `if_changed = false` forces a fresh
-        /// snapshot. The next `RTHandle::NextCapture` on the render side picks it up.
+        /// snapshot. The next [`NextCapture`](RTHandle::NextCapture) on the render side picks it up.
         #[index(25)]
         pub fn Capture(&mut self, if_changed: bool) -> u64;
 
@@ -535,7 +535,7 @@ pub type MovieImpl {
     #[address(0x38)]
     pub pObjectInterface: *mut void,
 
-    /// The Scaleform `MemoryHeap` the movie allocates from.
+    /// The Scaleform [`MemoryHeap`] the movie allocates from.
     #[address(0x40)]
     pub pHeap: *mut MemoryHeap,
 
@@ -703,7 +703,7 @@ impl MovieImpl {
     pub fn HitTestImpl(&mut self, x: f32, y: f32, test_cond: u32, controller_idx: u32) -> bool;
 }
 
-/// A Scaleform `MemoryHeap`. Opaque; allocation goes through its vtable (`Alloc` at slot offset
+/// A Scaleform [`MemoryHeap`]. Opaque; allocation goes through its vtable (`Alloc` at slot offset
 /// `0x50`).
 #[min_size(1)]
 pub type MemoryHeap;
@@ -865,7 +865,7 @@ epilogue for Value r#"
 #[min_size(1)]
 pub type ValueObjectInterface;
 impl ValueObjectInterface {
-    /// Reads a display object's `DisplayInfo` (position, scale, alpha, visibility). `data` is the
+    /// Reads a display object's [`DisplayInfo`] (position, scale, alpha, visibility). `data` is the
     /// value's [`mValue`](Value::mValue) payload. Returns false when the value is not a display
     /// object.
     #[address(0x141_BB8_690)]
@@ -924,7 +924,7 @@ pub type DisplayInfo {
 epilogue for Value r#"
     #[allow(dead_code)]
     impl Value {
-        /// An unmanaged boolean value, safe to pass to `Movie::SetVariable` (the movie copies it;
+        /// An unmanaged boolean value, safe to pass to [`SetVariable`](Movie::SetVariable) (the movie copies it;
         /// nothing needs releasing).
         pub fn new_boolean(value: bool) -> Self {
             // SAFETY: all-zero is the unmanaged null value; every field tolerates zero.
@@ -936,7 +936,7 @@ epilogue for Value r#"
     }
 "#;
 
-/// A node in the display tree returned by `Movie::GetDisplayObjectsTree`. Inherits from
+/// A node in the display tree returned by [`GetDisplayObjectsTree`](Movie::GetDisplayObjectsTree). Inherits from
 /// [`RefCountImpl`] and embeds a `Scaleform::String` for the name and a
 /// `Scaleform::ArrayDataBase<Ptr<AmpMovieObjectDesc>>` for children.
 ///
@@ -952,7 +952,7 @@ pub type AmpMovieObjectDesc {
     pub name: *const u8,
 
     /// Pointer to the child array. Each element is a `Ptr<AmpMovieObjectDesc>` (a raw pointer
-    /// to another `AmpMovieObjectDesc`).
+    /// to another [`AmpMovieObjectDesc`]).
     #[address(0x18)]
     pub children: *mut *mut AmpMovieObjectDesc,
 

@@ -37,7 +37,7 @@ impl OverlayUI {
     pub fn HideMouseCursor(&mut self);
 
     /// Moves the `MCI_cursor` clip to `(x, y)` in movie stage coordinates (the space
-    /// `CUIManager::GetMovieSpaceMouseCursor` produces) via a `DisplayInfo` X/Y write. No-ops
+    /// `CUIManager::GetMovieSpaceMouseCursor` produces) via a [`DisplayInfo`] X/Y write. No-ops
     /// unless the overlay is active.
     #[address(0x140_E4F_260)]
     pub fn SetMouseCursorPosition(&mut self, x: f32, y: f32);

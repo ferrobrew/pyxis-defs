@@ -704,7 +704,14 @@
           {
             "visibility": "public",
             "name": "new",
-            "doc": " Construct a `Camera` via the native constructor.",
+            "doc": " Construct a [`Camera`] via the native constructor.",
+            "doc_links": [
+              {
+                "text": "Camera",
+                "target_kind": "item",
+                "path": "camera::camera::Camera"
+              }
+            ],
             "body": {
               "type": "external"
             },
@@ -40778,7 +40785,19 @@
           {
             "visibility": "public",
             "name": "pyxis_hk_as_referenced_object",
-            "doc": " Returns a pointer to the embedded `HkReferencedObject` field.\n The `HkRefCounted<T>` template uses this to drive ref/unref via\n `referenced_object.hpp`'s free helpers; each shape type exposes\n it because the field path differs per type (direct vs nested\n inside `HkpShape`).",
+            "doc": " Returns a pointer to the embedded [`HkReferencedObject`] field.\n The `HkRefCounted<T>` template uses this to drive ref/unref via\n `referenced_object.hpp`'s free helpers; each shape type exposes\n it because the field path differs per type (direct vs nested\n inside [`HkpShape`]).",
+            "doc_links": [
+              {
+                "text": "HkReferencedObject",
+                "target_kind": "item",
+                "path": "physics::havok::referenced_object::HkReferencedObject"
+              },
+              {
+                "text": "HkpShape",
+                "target_kind": "item",
+                "path": "physics::havok::rigid_body::HkpShape"
+              }
+            ],
             "body": {
               "type": "external"
             },
@@ -41239,7 +41258,14 @@
           {
             "visibility": "public",
             "name": "new",
-            "doc": " Construct an `HkpRigidBodyCInfo` via the native constructor.",
+            "doc": " Construct an [`HkpRigidBodyCInfo`] via the native constructor.",
+            "doc_links": [
+              {
+                "text": "HkpRigidBodyCInfo",
+                "target_kind": "item",
+                "path": "physics::havok::rigid_body::HkpRigidBodyCInfo"
+              }
+            ],
             "body": {
               "type": "external"
             },
@@ -45612,7 +45638,19 @@
           {
             "visibility": "public",
             "name": "make_heap",
-            "doc": " Heap-allocates a `PfxRigidBody` and runs the native ctor against\n the provided `HkpRigidBody`. Caller takes ownership; tear down\n via `destructor(false)` + `delete` or wrap in a smart-pointer.",
+            "doc": " Heap-allocates a [`PfxRigidBody`] and runs the native ctor against\n the provided [`HkpRigidBody`]. Caller takes ownership; tear down\n via `destructor(false)` + `delete` or wrap in a smart-pointer.",
+            "doc_links": [
+              {
+                "text": "PfxRigidBody",
+                "target_kind": "item",
+                "path": "physics::pfx_rigid_body::PfxRigidBody"
+              },
+              {
+                "text": "HkpRigidBody",
+                "target_kind": "item",
+                "path": "physics::havok::rigid_body::HkpRigidBody"
+              }
+            ],
             "body": {
               "type": "external"
             },
@@ -46397,7 +46435,14 @@
           {
             "visibility": "public",
             "name": "new",
-            "doc": " Construct an `AIRayCastFilter` via the native constructor.",
+            "doc": " Construct an [`AIRayCastFilter`] via the native constructor.",
+            "doc_links": [
+              {
+                "text": "AIRayCastFilter",
+                "target_kind": "item",
+                "path": "physics::physics_system::AIRayCastFilter"
+              }
+            ],
             "body": {
               "type": "external"
             },
@@ -46809,7 +46854,14 @@
           {
             "visibility": "public",
             "name": "make",
-            "doc": " Default-constructed `RayCastResult`: forward-pointing normal,\n `distance = 1`, sentinel `0xFFFFFFFF` in every `unknown` slot.",
+            "doc": " Default-constructed [`RayCastResult`]: forward-pointing normal,\n `distance = 1`, sentinel `0xFFFFFFFF` in every `unknown` slot.",
+            "doc_links": [
+              {
+                "text": "RayCastResult",
+                "target_kind": "item",
+                "path": "physics::physics_system::RayCastResult"
+              }
+            ],
             "body": {
               "type": "external"
             },
@@ -46832,7 +46884,14 @@
           {
             "visibility": "public",
             "name": "new",
-            "doc": " Default-constructed `RayCastResult`: forward-pointing normal,\n `distance = 1`, sentinel `0xFFFFFFFF` in every `unknown` slot.",
+            "doc": " Default-constructed [`RayCastResult`]: forward-pointing normal,\n `distance = 1`, sentinel `0xFFFFFFFF` in every `unknown` slot.",
+            "doc_links": [
+              {
+                "text": "RayCastResult",
+                "target_kind": "item",
+                "path": "physics::physics_system::RayCastResult"
+              }
+            ],
             "body": {
               "type": "external"
             },
@@ -48670,7 +48729,14 @@
           {
             "visibility": "public",
             "name": "new",
-            "doc": " Construct a `GenericRenderBlock` via the native constructor.",
+            "doc": " Construct a [`GenericRenderBlock`] via the native constructor.",
+            "doc_links": [
+              {
+                "text": "GenericRenderBlock",
+                "target_kind": "item",
+                "path": "rendering::render_block::GenericRenderBlock"
+              }
+            ],
             "body": {
               "type": "external"
             },
@@ -49292,7 +49358,14 @@
       "cpp_name": "::pyxis::ManuallyDrop<::types::shared_ptr::SharedPtr<::std::uint32_t>>",
       "kind": {
         "type": "type",
-        "doc": " `ManuallyDrop<SharedPtr<u32>>` is used instead of `SharedPtr<u32>` to avoid\n the `Drop` implementation of `SharedPtr<u32>` being called when the `RenderBlock`\n is dropped. The destructor, which we call in `drop`, will decrement the refcount\n for us.",
+        "doc": " `ManuallyDrop<SharedPtr<u32>>` is used instead of `SharedPtr<u32>` to avoid\n the `Drop` implementation of `SharedPtr<u32>` being called when the [`RenderBlock`]\n is dropped. The destructor, which we call in `drop`, will decrement the refcount\n for us.",
+        "doc_links": [
+          {
+            "text": "RenderBlock",
+            "target_kind": "item",
+            "path": "rendering::render_block::RenderBlock"
+          }
+        ],
         "fields": [],
         "associated_functions": [],
         "vftable": null,
@@ -49697,7 +49770,14 @@
           {
             "visibility": "public",
             "name": "new",
-            "doc": " Construct a `RenderBlock3DText` by zeroing the struct and\n assigning the known-good vftable, sentinel hashes, and defaults.",
+            "doc": " Construct a [`RenderBlock3DText`] by zeroing the struct and\n assigning the known-good vftable, sentinel hashes, and defaults.",
+            "doc_links": [
+              {
+                "text": "RenderBlock3DText",
+                "target_kind": "item",
+                "path": "rendering::render_block::RenderBlock3DText"
+              }
+            ],
             "body": {
               "type": "external"
             },
@@ -50260,7 +50340,14 @@
           {
             "visibility": "public",
             "name": "new",
-            "doc": " Construct a `RenderBlockGeneral` via the native constructor.",
+            "doc": " Construct a [`RenderBlockGeneral`] via the native constructor.",
+            "doc_links": [
+              {
+                "text": "RenderBlockGeneral",
+                "target_kind": "item",
+                "path": "rendering::render_block::RenderBlockGeneral"
+              }
+            ],
             "body": {
               "type": "external"
             },
@@ -50678,7 +50765,14 @@
           {
             "visibility": "public",
             "name": "new",
-            "doc": " Construct a `RenderBlockLine` via the native constructor.",
+            "doc": " Construct a [`RenderBlockLine`] via the native constructor.",
+            "doc_links": [
+              {
+                "text": "RenderBlockLine",
+                "target_kind": "item",
+                "path": "rendering::render_block::RenderBlockLine"
+              }
+            ],
             "body": {
               "type": "external"
             },
@@ -51192,7 +51286,14 @@
           {
             "visibility": "public",
             "name": "new",
-            "doc": " Construct a `RenderBlockTriangle` via the native constructor.",
+            "doc": " Construct a [`RenderBlockTriangle`] via the native constructor.",
+            "doc_links": [
+              {
+                "text": "RenderBlockTriangle",
+                "target_kind": "item",
+                "path": "rendering::render_block::RenderBlockTriangle"
+              }
+            ],
             "body": {
               "type": "external"
             },
@@ -51809,7 +51910,14 @@
           {
             "visibility": "public",
             "name": "new",
-            "doc": " Construct a `RenderBlockInstanceInfo` with `colors[0]` and\n `colors[1]` primed to opaque white; remaining fields are zeroed.",
+            "doc": " Construct a [`RenderBlockInstanceInfo`] with `colors[0]` and\n `colors[1]` primed to opaque white; remaining fields are zeroed.",
+            "doc_links": [
+              {
+                "text": "RenderBlockInstanceInfo",
+                "target_kind": "item",
+                "path": "rendering::render_engine::RenderBlockInstanceInfo"
+              }
+            ],
             "body": {
               "type": "external"
             },
@@ -56416,7 +56524,14 @@
           {
             "visibility": "public",
             "name": "clone_",
-            "doc": " Bumps `count_impl`'s use_count and returns a fresh `SharedCount`\n over the same refcount block.",
+            "doc": " Bumps `count_impl`'s use_count and returns a fresh [`SharedCount`]\n over the same refcount block.",
+            "doc_links": [
+              {
+                "text": "SharedCount",
+                "target_kind": "item",
+                "path": "types::shared_ptr::SharedCount"
+              }
+            ],
             "body": {
               "type": "external"
             },
@@ -57327,7 +57442,14 @@
           {
             "visibility": "public",
             "name": "from_shared",
-            "doc": " Static factory: bumps `shared`'s weak_count and wraps its\n count_impl in a `WeakCount`.",
+            "doc": " Static factory: bumps `shared`'s weak_count and wraps its\n count_impl in a [`WeakCount`].",
+            "doc_links": [
+              {
+                "text": "WeakCount",
+                "target_kind": "item",
+                "path": "types::shared_ptr::WeakCount"
+              }
+            ],
             "body": {
               "type": "external"
             },
@@ -57695,7 +57817,14 @@
           {
             "visibility": "public",
             "name": "new",
-            "doc": " Default-construct an empty `StdString` via MSVCP80's\n `std::basic_string::basic_string()`.",
+            "doc": " Default-construct an empty [`StdString`] via MSVCP80's\n `std::basic_string::basic_string()`.",
+            "doc_links": [
+              {
+                "text": "StdString",
+                "target_kind": "item",
+                "path": "types::std_string::StdString"
+              }
+            ],
             "body": {
               "type": "external"
             },

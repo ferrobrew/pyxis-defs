@@ -43,7 +43,7 @@ impl StdString {
 // below. (C++ uses `ctor` / `ctor_cstr` above.)
 #[cfg(backend = "rust")]
 impl StdString {
-    /// Default-construct an empty `StdString` via MSVCP80's
+    /// Default-construct an empty [`StdString`] via MSVCP80's
     /// `std::basic_string::basic_string()`.
     #[external_body]
     pub fn new() -> StdString;

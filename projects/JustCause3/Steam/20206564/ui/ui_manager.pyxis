@@ -126,7 +126,7 @@ pub type UIManager {
     #[address(0x44)]
     pub m_CurrentCaptureThread: u32,
 
-    /// The last mouse position's x, in window-client pixels. `WndProc` writes it on every
+    /// The last mouse position's x, in window-client pixels. [`WndProc`] writes it on every
     /// `WM_MOUSEMOVE` via [`SetMousePos`](UIManager::SetMousePos) -- the only writer, so the OS
     /// message stream is the sole source of the UI mouse position (the DirectInput mouse device
     /// only contributes deltas, buttons, and the wheel).

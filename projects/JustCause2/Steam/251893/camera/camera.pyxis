@@ -40,7 +40,7 @@ impl Camera {
 
 #[cfg(backend = "rust")]
 impl Camera {
-    /// Construct a `Camera` via the native constructor.
+    /// Construct a [`Camera`] via the native constructor.
     #[external_body]
     pub fn new() -> Camera;
 }

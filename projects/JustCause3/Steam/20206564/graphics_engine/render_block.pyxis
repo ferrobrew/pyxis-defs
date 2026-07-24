@@ -37,7 +37,7 @@ impl RBIInfo {
     pub fn GetMatrix(&self, out: *mut Matrix4, index: i32) -> *mut Matrix4;
 }
 
-/// The skinned character render block (the `Character` RBMDL block type). A character model is
+/// The skinned character render block (the [`Character`](character::character::Character) RBMDL block type). A character model is
 /// composed of one block per material; the same block objects are drawn for every pass, branching
 /// internally on [`RenderContext::m_RenderStatus`](graphics_engine::graphics_engine::RenderContext::m_RenderStatus)
 /// to select the shadow/depth-only path versus the full material path.
@@ -240,9 +240,9 @@ impl RenderBlockTerrainPatch {
     ///   for 56, 3 for 57) and binds the shared global detail index/vertex texture buffers before the
     ///   indirect draw.
     /// - Passes **58 and 60** draw the tail index range (`[m_SplitIndex, m_IndexCount)`) with a plain
-    ///   `DrawIndexed`; passes **59 and 61** draw the head range (`[0, m_SplitIndex)`). The split
+    ///   [`DrawIndexed`]; passes **59 and 61** draw the head range (`[0, m_SplitIndex)`). The split
     ///   partitions the patch's index buffer between the two families.
-    /// - Passes **14** and **38..=40** draw the full index range with a plain `DrawIndexed`.
+    /// - Passes **14** and **38..=40** draw the full index range with a plain [`DrawIndexed`].
     /// - Any other pass returns without drawing.
     ///
     /// The vertex transform for every path is the global view-projection: the type-level
@@ -339,13 +339,13 @@ impl RenderBlockTypeTerrainPatch {
 pub type RenderBlockBark;
 impl RenderBlockBark {
     /// Issues the color-pass geometry. The clip transform is a CPU-baked world-view-projection staged
-    /// on vertex `cb1` registers 0..3 via `SetVertexProgramConstants` before any draw-kind routing:
+    /// on vertex `cb1` registers 0..3 via [`SetVertexProgramConstants`] before any draw-kind routing:
     /// `cb1[0..3] = M_model_camera_relative · m_OffsetViewProjection` for the non-instanced case, or
     /// `m_OffsetViewProjection` verbatim for the instanced/billboard cases (the per-instance model
     /// matrix is then applied in-shader). The global `m_VPGlobals` is bound at `cb0` for wind/time
     /// globals only, not the view-projection. One of three draw kinds is selected from the instance-data
-    /// pointer in [`CRBIInfo`](RBIInfo): a non-instanced `DrawIndexed`, a CPU-instanced
-    /// `DrawIndexedInstanced` (per-instance stream at slot 2), or a GPU-indirect `DrawIndexedNoMutex`
+    /// pointer in [`CRBIInfo`](RBIInfo): a non-instanced [`DrawIndexed`], a CPU-instanced
+    /// [`DrawIndexedInstanced`] (per-instance stream at slot 2), or a GPU-indirect `DrawIndexedNoMutex`
     /// whose instance count lives in the type's `m_InstDrawParams` buffer. `m_RenderStatus` bits select
     /// bounce/GI, billboard, and geometry-program permutations.
     #[address(0x140_136_F90)]
@@ -370,7 +370,7 @@ impl RenderBlockFoliage {
     /// rather than reading `cb0`. `SetupConstantBuffers` binds `cb0 = m_VPGlobals` but only for globals.
     /// One of three draw kinds is selected from the instance-data flags: a CPU-instanced
     /// `DrawIndexedInstancedNoMutex` (instance count a CPU `u16`), the dominant grass path
-    /// `DrawIndexedInstancedIndirect` (instance count in the type's GPU-only `m_InstDrawParams` args
+    /// [`DrawIndexedInstancedIndirect`] (instance count in the type's GPU-only `m_InstDrawParams` args
     /// buffer, populated by the vegetation draw-indirect compute pass), or a non-instanced
     /// `DrawIndexedNoMutex`. The pass is forward-lit: the type's `Setup` binds the clustered-lighting
     /// constant buffer, the light-cluster index texture, GI, reflection, and sun-shadow-cascade
@@ -383,7 +383,7 @@ impl RenderBlockFoliage {
 /// full tree meshes at range.
 pub type TreeImpostorRB;
 impl TreeImpostorRB {
-    /// Issues the impostor cards as a single non-instanced `DrawIndexed` over a static quad index
+    /// Issues the impostor cards as a single non-instanced [`DrawIndexed`] over a static quad index
     /// buffer (`6 * min(card_count, 0x1400)` indices); the vertex shader keys off
     /// `SV_VertexID` (`card = id >> 2`, `corner = id & 3`), pulling each card's world position, size, and
     /// atlas data from a texture buffer bound at vertex slot 0. The card orientation (facing) is computed
@@ -405,9 +405,9 @@ impl RenderBlockOccluder {
     /// Issues the occluder-box depth geometry. The non-instanced path bakes
     /// `WVP = (world - camera_offset) · m_OffsetViewProjection` (via
     /// `CRenderBlock::CalculateOffsetWorldViewProjectionMatrix`, `0x140136070`) into vertex `cb1`
-    /// registers 0..3, register 4 a depth bias, then `DrawIndexed` per box. The instanced path
+    /// registers 0..3, register 4 a depth bias, then [`DrawIndexed`] per box. The instanced path
     /// (`gfx.occluders.use_instancing`) instead reads the global `m_VPGlobals` view-projection at `cb0`
-    /// with per-instance world rows from a vertex stream and issues one `DrawIndexedInstanced`.
+    /// with per-instance world rows from a vertex stream and issues one [`DrawIndexedInstanced`].
     /// `Draw`/`Setup` tail-call this and its `SetupZ`.
     #[address(0x140_17D_FA0)]
     pub fn DrawZ(&self, render_context: *mut RenderContext, info: *const RBIInfo);
@@ -498,12 +498,12 @@ impl RenderBlockDeferredLighting {
 /// "TerrainDetail"): the procedurally-generated detail rock skin — cliff walls, cave ceilings, and
 /// near-field rock detail scattered on the base terrain. Its vertices/indices/texels are produced
 /// each frame by the compute pipeline in the sibling terrain-setup block into shared structured
-/// buffers, and drawn GPU-indirect via a single `DrawIndexedInstancedIndirect` (the colour pass runs
+/// buffers, and drawn GPU-indirect via a single [`DrawIndexedInstancedIndirect`] (the colour pass runs
 /// plain vertex+fragment, no tessellation). The vertex shader reads a patch-local vertex and
 /// transforms it by a CPU-baked `cb1` (vertex slot 1) whose rows are `T_patch · m_OffsetViewProjection`,
 /// where `T_patch` translates by the patch origin expressed relative to the camera; the resulting
 /// clip is the standard `m_OffsetViewProjection · (world - m_CameraPosition)`. `cb1` is staged by the
-/// block's per-patch `Setup` (via `SetVertexProgramConstants` on vertex slot 1) immediately before
+/// block's per-patch `Setup` (via [`SetVertexProgramConstants`] on vertex slot 1) immediately before
 /// each `Draw`.
 #[min_size(0x48)]
 pub type RenderBlockTerrainDetail {
@@ -517,7 +517,7 @@ pub type RenderBlockTerrainDetail {
     pub m_WorldPatchZ: f32,
 }
 impl RenderBlockTerrainDetail {
-    /// Issues the colour-pass draw: a single `DrawIndexedInstancedIndirect` over the compute-generated
+    /// Issues the colour-pass draw: a single [`DrawIndexedInstancedIndirect`] over the compute-generated
     /// detail geometry, using the `cb1` transform staged by `Setup`.
     #[address(0x140_326_050)]
     pub fn Draw(&mut self, ctx: *mut RenderContext, info: *const RBIInfo);

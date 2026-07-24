@@ -59,8 +59,8 @@ impl PfxRigidBody {
 
 #[cfg(backend = "cpp")]
 impl PfxRigidBody {
-    /// Heap-allocates a `PfxRigidBody` and runs the native ctor against
-    /// the provided `HkpRigidBody`. Caller takes ownership; tear down
+    /// Heap-allocates a [`PfxRigidBody`] and runs the native ctor against
+    /// the provided [`HkpRigidBody`]. Caller takes ownership; tear down
     /// via `destructor(false)` + `delete` or wrap in a smart-pointer.
     #[external_body]
     pub fn make_heap(rigid_body: *mut HkpRigidBody) -> *mut PfxRigidBody;

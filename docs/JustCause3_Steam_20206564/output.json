@@ -13323,7 +13323,21 @@
           {
             "visibility": "public",
             "name": "m_BackBuffer",
-            "doc": " The presentable back-buffer surface owned by the DXGI swapchain, returned by\n `GetDeviceSurface``(BackBuffer)`. `ResizeBuffers` recreates its RTV/SRV/texture on a\n swapchain resize.",
+            "doc": " The presentable back-buffer surface owned by the DXGI swapchain, returned by\n [`GetDeviceSurface`]``(BackBuffer). [`ResizeBuffers`] recreates its RTV/SRV/texture on a\n swapchain resize.",
+            "doc_links": [
+              {
+                "text": "GetDeviceSurface",
+                "target_kind": "module",
+                "path": "graphics_engine::device",
+                "anchor": "func-GetDeviceSurface"
+              },
+              {
+                "text": "ResizeBuffers",
+                "target_kind": "module",
+                "path": "graphics_engine::device",
+                "anchor": "func-ResizeBuffers"
+              }
+            ],
             "type_ref": {
               "type": "mut_pointer",
               "inner": {
@@ -13457,8 +13471,20 @@
           {
             "visibility": "public",
             "name": "m_DeviceInfo",
-            "doc": " The device's live mode descriptor. `ResizeBuffers` writes its display dimensions/ratio on a\n swapchain resize; `GetDeviceInfo` returns a copy of it. Subsystems that re-size their own\n render targets read their dimensions from here (via `GetDeviceInfo`), so it is the\n device-side source of the display size independent of the [`CreateRenderSetups`](graphics_engine::graphics_engine::GraphicsEngine::CreateRenderSetups)\n parameter.",
+            "doc": " The device's live mode descriptor. [`ResizeBuffers`] writes its display dimensions/ratio on a\n swapchain resize; [`GetDeviceInfo`] returns a copy of it. Subsystems that re-size their own\n render targets read their dimensions from here (via [`GetDeviceInfo`]), so it is the\n device-side source of the display size independent of the [`CreateRenderSetups`](graphics_engine::graphics_engine::GraphicsEngine::CreateRenderSetups)\n parameter.",
             "doc_links": [
+              {
+                "text": "ResizeBuffers",
+                "target_kind": "module",
+                "path": "graphics_engine::device",
+                "anchor": "func-ResizeBuffers"
+              },
+              {
+                "text": "GetDeviceInfo",
+                "target_kind": "module",
+                "path": "graphics_engine::device",
+                "anchor": "func-GetDeviceInfo"
+              },
               {
                 "text": "graphics_engine::graphics_engine::GraphicsEngine::CreateRenderSetups",
                 "target_kind": "item",
@@ -13561,8 +13587,14 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": " The device's cached mode/capability descriptor. `GetDeviceInfo` returns a copy of the device's own\n instance ([`Device::m_DeviceInfo`]), and [`CreateRenderSetups`](graphics_engine::graphics_engine::GraphicsEngine::CreateRenderSetups)\n sizes every scene render target from a caller-supplied copy's\n [`m_DisplayWidth`](DeviceInfo::m_DisplayWidth)/[`m_DisplayHeight`](DeviceInfo::m_DisplayHeight).",
+        "doc": " The device's cached mode/capability descriptor. [`GetDeviceInfo`] returns a copy of the device's own\n instance ([`Device::m_DeviceInfo`]), and [`CreateRenderSetups`](graphics_engine::graphics_engine::GraphicsEngine::CreateRenderSetups)\n sizes every scene render target from a caller-supplied copy's\n [`m_DisplayWidth`](DeviceInfo::m_DisplayWidth)/[`m_DisplayHeight`](DeviceInfo::m_DisplayHeight).",
         "doc_links": [
+          {
+            "text": "GetDeviceInfo",
+            "target_kind": "module",
+            "path": "graphics_engine::device",
+            "anchor": "func-GetDeviceInfo"
+          },
           {
             "text": "Device::m_DeviceInfo",
             "target_kind": "item",
@@ -13722,8 +13754,14 @@
       "category": "defined",
       "kind": {
         "type": "enum",
-        "doc": " The surface a device exposes to `GetDeviceSurface`. The presentable back buffer is\n [`BackBuffer`](DeviceSurface::BackBuffer); the eye-specific variants are for stereo output devices.",
+        "doc": " The surface a device exposes to [`GetDeviceSurface`]. The presentable back buffer is\n [`BackBuffer`](DeviceSurface::BackBuffer); the eye-specific variants are for stereo output devices.",
         "doc_links": [
+          {
+            "text": "GetDeviceSurface",
+            "target_kind": "module",
+            "path": "graphics_engine::device",
+            "anchor": "func-GetDeviceSurface"
+          },
           {
             "text": "DeviceSurface::BackBuffer",
             "target_kind": "item",
@@ -15711,13 +15749,18 @@
           {
             "visibility": "public",
             "name": "m_RenderCamera",
-            "doc": " The engine-owned scene render camera: a by-value copy rebuilt each\n [`Draw`](GraphicsEngine::Draw) by `Camera::SetupRenderCamera` (reverse-Z + jitter, then the\n view-projection products from `m_View`). This is the camera the render passes consume;\n distinct from the `CameraManager`'s camera objects, which are pointers to the gameplay\n cameras.",
+            "doc": " The engine-owned scene render camera: a by-value copy rebuilt each\n [`Draw`](GraphicsEngine::Draw) by `Camera::SetupRenderCamera` (reverse-Z + jitter, then the\n view-projection products from `m_View`). This is the camera the render passes consume;\n distinct from the [`CameraManager`](camera::camera_manager::CameraManager)'s camera objects, which are pointers to the gameplay\n cameras.",
             "doc_links": [
               {
                 "text": "GraphicsEngine::Draw",
                 "target_kind": "item",
                 "path": "graphics_engine::graphics_engine::GraphicsEngine",
                 "anchor": "func-Draw"
+              },
+              {
+                "text": "camera::camera_manager::CameraManager",
+                "target_kind": "item",
+                "path": "camera::camera_manager::CameraManager"
               }
             ],
             "type_ref": {
@@ -16518,8 +16561,14 @@
           {
             "visibility": "public",
             "name": "ApplyResize",
-            "doc": " Applies a resize: tears down the render setups, has the UI drop its references, resizes the\n swapchain (the device-level `ResizeBuffers`), re-creates the render\n setups at the new size ([`CreateRenderSetups`](GraphicsEngine::CreateRenderSetups)), runs every\n registered resize callback (which re-sizes the pass-owned pools), restores the UI, and updates\n the camera aspect and window params. Called from\n [`HandleModeChange`](GraphicsEngine::HandleModeChange) in the [`Draw`](GraphicsEngine::Draw)\n prologue, so it runs on the main thread with no draw in flight.",
+            "doc": " Applies a resize: tears down the render setups, has the UI drop its references, resizes the\n swapchain (the device-level [`ResizeBuffers`](graphics_engine::device::ResizeBuffers)), re-creates the render\n setups at the new size ([`CreateRenderSetups`](GraphicsEngine::CreateRenderSetups)), runs every\n registered resize callback (which re-sizes the pass-owned pools), restores the UI, and updates\n the camera aspect and window params. Called from\n [`HandleModeChange`](GraphicsEngine::HandleModeChange) in the [`Draw`](GraphicsEngine::Draw)\n prologue, so it runs on the main thread with no draw in flight.",
             "doc_links": [
+              {
+                "text": "graphics_engine::device::ResizeBuffers",
+                "target_kind": "module",
+                "path": "graphics_engine::device",
+                "anchor": "func-ResizeBuffers"
+              },
               {
                 "text": "GraphicsEngine::CreateRenderSetups",
                 "target_kind": "item",
@@ -16724,13 +16773,19 @@
           {
             "visibility": "public",
             "name": "SetCursor",
-            "doc": " Sets [`m_ActiveCursor`](GraphicsEngine::m_ActiveCursor) and, when it changed, posts\n `WM_SETCURSOR` to the game window so `WndProc` runs\n [`UpdateCursor`](GraphicsEngine::UpdateCursor). `COverlayUI` drives it: `Arrow` when the\n overlay cursor becomes visible, `None` when it hides.",
+            "doc": " Sets [`m_ActiveCursor`](GraphicsEngine::m_ActiveCursor) and, when it changed, posts\n `WM_SETCURSOR` to the game window so [`WndProc`] runs\n [`UpdateCursor`](GraphicsEngine::UpdateCursor). `COverlayUI` drives it: `Arrow` when the\n overlay cursor becomes visible, `None` when it hides.",
             "doc_links": [
               {
                 "text": "GraphicsEngine::m_ActiveCursor",
                 "target_kind": "item",
                 "path": "graphics_engine::graphics_engine::GraphicsEngine",
                 "anchor": "field-m_ActiveCursor"
+              },
+              {
+                "text": "WndProc",
+                "target_kind": "module",
+                "path": "window",
+                "anchor": "func-WndProc"
               },
               {
                 "text": "GraphicsEngine::UpdateCursor",
@@ -16766,13 +16821,19 @@
           {
             "visibility": "public",
             "name": "UpdateCursor",
-            "doc": " Applies [`m_ActiveCursor`](GraphicsEngine::m_ActiveCursor) to the OS: for `None` it sets a\n null `HCURSOR` and clips the cursor to the client rect (when the window is foreground);\n otherwise it unclips and sets `GraphicsParams::m_Cursors[cursor]`. The four entries are\n loaded at startup as the system `IDC_ARROW`, `IDC_CROSS`, `IDC_HAND`, and `IDC_NO`\n cursors. Called from `WndProc` on `WM_SETCURSOR`.",
+            "doc": " Applies [`m_ActiveCursor`](GraphicsEngine::m_ActiveCursor) to the OS: for `None` it sets a\n null `HCURSOR` and clips the cursor to the client rect (when the window is foreground);\n otherwise it unclips and sets `GraphicsParams::m_Cursors[cursor]`. The four entries are\n loaded at startup as the system `IDC_ARROW`, `IDC_CROSS`, `IDC_HAND`, and `IDC_NO`\n cursors. Called from [`WndProc`] on `WM_SETCURSOR`.",
             "doc_links": [
               {
                 "text": "GraphicsEngine::m_ActiveCursor",
                 "target_kind": "item",
                 "path": "graphics_engine::graphics_engine::GraphicsEngine",
                 "anchor": "field-m_ActiveCursor"
+              },
+              {
+                "text": "WndProc",
+                "target_kind": "module",
+                "path": "window",
+                "anchor": "func-WndProc"
               }
             ],
             "body": {
@@ -18441,7 +18502,15 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": " The cascaded sun-shadow constants for the forward-material resolve: the cascade transform plus the\n per-cascade box-test parameters, staged into cb0 by `RenderEngine::SetGlobalShaderConstants`.",
+        "doc": " The cascaded sun-shadow constants for the forward-material resolve: the cascade transform plus the\n per-cascade box-test parameters, staged into cb0 by [`SetGlobalShaderConstants`](graphics_engine::render_engine::RenderEngine::SetGlobalShaderConstants).",
+        "doc_links": [
+          {
+            "text": "graphics_engine::render_engine::RenderEngine::SetGlobalShaderConstants",
+            "target_kind": "item",
+            "path": "graphics_engine::render_engine::RenderEngine",
+            "anchor": "func-SetGlobalShaderConstants"
+          }
+        ],
         "fields": [
           {
             "visibility": "public",
@@ -20763,12 +20832,30 @@
           {
             "visibility": "public",
             "name": "Draw",
-            "doc": " Issues the color-pass geometry. The clip transform is a CPU-baked world-view-projection staged\n on vertex `cb1` registers 0..3 via `SetVertexProgramConstants` before any draw-kind routing:\n `cb1[0..3] = M_model_camera_relative · m_OffsetViewProjection` for the non-instanced case, or\n `m_OffsetViewProjection` verbatim for the instanced/billboard cases (the per-instance model\n matrix is then applied in-shader). The global `m_VPGlobals` is bound at `cb0` for wind/time\n globals only, not the view-projection. One of three draw kinds is selected from the instance-data\n pointer in [`CRBIInfo`](RBIInfo): a non-instanced `DrawIndexed`, a CPU-instanced\n `DrawIndexedInstanced` (per-instance stream at slot 2), or a GPU-indirect `DrawIndexedNoMutex`\n whose instance count lives in the type's `m_InstDrawParams` buffer. `m_RenderStatus` bits select\n bounce/GI, billboard, and geometry-program permutations.",
+            "doc": " Issues the color-pass geometry. The clip transform is a CPU-baked world-view-projection staged\n on vertex `cb1` registers 0..3 via [`SetVertexProgramConstants`] before any draw-kind routing:\n `cb1[0..3] = M_model_camera_relative · m_OffsetViewProjection` for the non-instanced case, or\n `m_OffsetViewProjection` verbatim for the instanced/billboard cases (the per-instance model\n matrix is then applied in-shader). The global `m_VPGlobals` is bound at `cb0` for wind/time\n globals only, not the view-projection. One of three draw kinds is selected from the instance-data\n pointer in [`CRBIInfo`](RBIInfo): a non-instanced [`DrawIndexed`], a CPU-instanced\n [`DrawIndexedInstanced`] (per-instance stream at slot 2), or a GPU-indirect `DrawIndexedNoMutex`\n whose instance count lives in the type's `m_InstDrawParams` buffer. `m_RenderStatus` bits select\n bounce/GI, billboard, and geometry-program permutations.",
             "doc_links": [
+              {
+                "text": "SetVertexProgramConstants",
+                "target_kind": "module",
+                "path": "graphics_engine::draw",
+                "anchor": "func-SetVertexProgramConstants"
+              },
               {
                 "text": "RBIInfo",
                 "target_kind": "item",
                 "path": "graphics_engine::render_block::RBIInfo"
+              },
+              {
+                "text": "DrawIndexed",
+                "target_kind": "module",
+                "path": "graphics_engine::draw",
+                "anchor": "func-DrawIndexed"
+              },
+              {
+                "text": "DrawIndexedInstanced",
+                "target_kind": "module",
+                "path": "graphics_engine::draw",
+                "anchor": "func-DrawIndexedInstanced"
               }
             ],
             "body": {
@@ -20881,8 +20968,13 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": " The skinned character render block (the `Character` RBMDL block type). A character model is\n composed of one block per material; the same block objects are drawn for every pass, branching\n internally on [`RenderContext::m_RenderStatus`](graphics_engine::graphics_engine::RenderContext::m_RenderStatus)\n to select the shadow/depth-only path versus the full material path.",
+        "doc": " The skinned character render block (the [`Character`](character::character::Character) RBMDL block type). A character model is\n composed of one block per material; the same block objects are drawn for every pass, branching\n internally on [`RenderContext::m_RenderStatus`](graphics_engine::graphics_engine::RenderContext::m_RenderStatus)\n to select the shadow/depth-only path versus the full material path.",
         "doc_links": [
+          {
+            "text": "character::character::Character",
+            "target_kind": "item",
+            "path": "character::character::Character"
+          },
           {
             "text": "graphics_engine::graphics_engine::RenderContext::m_RenderStatus",
             "target_kind": "item",
@@ -21468,12 +21560,18 @@
           {
             "visibility": "public",
             "name": "Draw",
-            "doc": " Issues the color-pass geometry. The clip transform is staged per draw on vertex `cb2`: register 0\n the camera-relative world matrix (from [`CRBIInfo`](RBIInfo)'s matrix, translation minus\n `m_CameraPosition`), registers 4..7 a per-draw copy of `m_OffsetViewProjection` (byte-identical to\n the global `cb0[29..32]`), so the vertex shader composes `clip = world · OffsetVP` from `cb2`\n rather than reading `cb0`. `SetupConstantBuffers` binds `cb0 = m_VPGlobals` but only for globals.\n One of three draw kinds is selected from the instance-data flags: a CPU-instanced\n `DrawIndexedInstancedNoMutex` (instance count a CPU `u16`), the dominant grass path\n `DrawIndexedInstancedIndirect` (instance count in the type's GPU-only `m_InstDrawParams` args\n buffer, populated by the vegetation draw-indirect compute pass), or a non-instanced\n `DrawIndexedNoMutex`. The pass is forward-lit: the type's `Setup` binds the clustered-lighting\n constant buffer, the light-cluster index texture, GI, reflection, and sun-shadow-cascade\n resources to the fragment stage.",
+            "doc": " Issues the color-pass geometry. The clip transform is staged per draw on vertex `cb2`: register 0\n the camera-relative world matrix (from [`CRBIInfo`](RBIInfo)'s matrix, translation minus\n `m_CameraPosition`), registers 4..7 a per-draw copy of `m_OffsetViewProjection` (byte-identical to\n the global `cb0[29..32]`), so the vertex shader composes `clip = world · OffsetVP` from `cb2`\n rather than reading `cb0`. `SetupConstantBuffers` binds `cb0 = m_VPGlobals` but only for globals.\n One of three draw kinds is selected from the instance-data flags: a CPU-instanced\n `DrawIndexedInstancedNoMutex` (instance count a CPU `u16`), the dominant grass path\n [`DrawIndexedInstancedIndirect`] (instance count in the type's GPU-only `m_InstDrawParams` args\n buffer, populated by the vegetation draw-indirect compute pass), or a non-instanced\n `DrawIndexedNoMutex`. The pass is forward-lit: the type's `Setup` binds the clustered-lighting\n constant buffer, the light-cluster index texture, GI, reflection, and sun-shadow-cascade\n resources to the fragment stage.",
             "doc_links": [
               {
                 "text": "RBIInfo",
                 "target_kind": "item",
                 "path": "graphics_engine::render_block::RBIInfo"
+              },
+              {
+                "text": "DrawIndexedInstancedIndirect",
+                "target_kind": "module",
+                "path": "graphics_engine::draw",
+                "anchor": "func-DrawIndexedInstancedIndirect"
               }
             ],
             "body": {
@@ -21542,7 +21640,21 @@
           {
             "visibility": "public",
             "name": "DrawZ",
-            "doc": " Issues the occluder-box depth geometry. The non-instanced path bakes\n `WVP = (world - camera_offset) · m_OffsetViewProjection` (via\n `CRenderBlock::CalculateOffsetWorldViewProjectionMatrix`, `0x140136070`) into vertex `cb1`\n registers 0..3, register 4 a depth bias, then `DrawIndexed` per box. The instanced path\n (`gfx.occluders.use_instancing`) instead reads the global `m_VPGlobals` view-projection at `cb0`\n with per-instance world rows from a vertex stream and issues one `DrawIndexedInstanced`.\n `Draw`/`Setup` tail-call this and its `SetupZ`.",
+            "doc": " Issues the occluder-box depth geometry. The non-instanced path bakes\n `WVP = (world - camera_offset) · m_OffsetViewProjection` (via\n `CRenderBlock::CalculateOffsetWorldViewProjectionMatrix`, `0x140136070`) into vertex `cb1`\n registers 0..3, register 4 a depth bias, then [`DrawIndexed`] per box. The instanced path\n (`gfx.occluders.use_instancing`) instead reads the global `m_VPGlobals` view-projection at `cb0`\n with per-instance world rows from a vertex stream and issues one [`DrawIndexedInstanced`].\n `Draw`/`Setup` tail-call this and its `SetupZ`.",
+            "doc_links": [
+              {
+                "text": "DrawIndexed",
+                "target_kind": "module",
+                "path": "graphics_engine::draw",
+                "anchor": "func-DrawIndexed"
+              },
+              {
+                "text": "DrawIndexedInstanced",
+                "target_kind": "module",
+                "path": "graphics_engine::draw",
+                "anchor": "func-DrawIndexedInstanced"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5370273696
@@ -21662,7 +21774,21 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": " The terrain detail render block (`NGraphicsEngine::CTerrainRenderBlockDetail`, engine name\n \"TerrainDetail\"): the procedurally-generated detail rock skin — cliff walls, cave ceilings, and\n near-field rock detail scattered on the base terrain. Its vertices/indices/texels are produced\n each frame by the compute pipeline in the sibling terrain-setup block into shared structured\n buffers, and drawn GPU-indirect via a single `DrawIndexedInstancedIndirect` (the colour pass runs\n plain vertex+fragment, no tessellation). The vertex shader reads a patch-local vertex and\n transforms it by a CPU-baked `cb1` (vertex slot 1) whose rows are `T_patch · m_OffsetViewProjection`,\n where `T_patch` translates by the patch origin expressed relative to the camera; the resulting\n clip is the standard `m_OffsetViewProjection · (world - m_CameraPosition)`. `cb1` is staged by the\n block's per-patch `Setup` (via `SetVertexProgramConstants` on vertex slot 1) immediately before\n each `Draw`.",
+        "doc": " The terrain detail render block (`NGraphicsEngine::CTerrainRenderBlockDetail`, engine name\n \"TerrainDetail\"): the procedurally-generated detail rock skin — cliff walls, cave ceilings, and\n near-field rock detail scattered on the base terrain. Its vertices/indices/texels are produced\n each frame by the compute pipeline in the sibling terrain-setup block into shared structured\n buffers, and drawn GPU-indirect via a single [`DrawIndexedInstancedIndirect`] (the colour pass runs\n plain vertex+fragment, no tessellation). The vertex shader reads a patch-local vertex and\n transforms it by a CPU-baked `cb1` (vertex slot 1) whose rows are `T_patch · m_OffsetViewProjection`,\n where `T_patch` translates by the patch origin expressed relative to the camera; the resulting\n clip is the standard `m_OffsetViewProjection · (world - m_CameraPosition)`. `cb1` is staged by the\n block's per-patch `Setup` (via [`SetVertexProgramConstants`] on vertex slot 1) immediately before\n each `Draw`.",
+        "doc_links": [
+          {
+            "text": "DrawIndexedInstancedIndirect",
+            "target_kind": "module",
+            "path": "graphics_engine::draw",
+            "anchor": "func-DrawIndexedInstancedIndirect"
+          },
+          {
+            "text": "SetVertexProgramConstants",
+            "target_kind": "module",
+            "path": "graphics_engine::draw",
+            "anchor": "func-SetVertexProgramConstants"
+          }
+        ],
         "fields": [
           {
             "visibility": "private",
@@ -21745,7 +21871,15 @@
           {
             "visibility": "public",
             "name": "Draw",
-            "doc": " Issues the colour-pass draw: a single `DrawIndexedInstancedIndirect` over the compute-generated\n detail geometry, using the `cb1` transform staged by `Setup`.",
+            "doc": " Issues the colour-pass draw: a single [`DrawIndexedInstancedIndirect`] over the compute-generated\n detail geometry, using the `cb1` transform staged by `Setup`.",
+            "doc_links": [
+              {
+                "text": "DrawIndexedInstancedIndirect",
+                "target_kind": "module",
+                "path": "graphics_engine::draw",
+                "anchor": "func-DrawIndexedInstancedIndirect"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5372010576
@@ -22039,13 +22173,19 @@
           {
             "visibility": "public",
             "name": "Draw",
-            "doc": " Issues the patch's geometry for the active render pass, keyed on\n [`m_ActiveRenderPass`](graphics_engine::graphics_engine::RenderContext::m_ActiveRenderPass):\n\n - Passes **56 and 57** (the near tessellating passes) draw GPU-indirect via\n   `DrawIndexedInstancedIndirectNoMutex`: the per-patch instance count comes from the terrain\n   patch system's GPU compute output, so no instance count is known CPU-side. Each stages a\n   one-`float4` control constant on vertex slot 3 (`{ m_DetailPatchIndex, mode, 0, 0 }`, `mode` = 2\n   for 56, 3 for 57) and binds the shared global detail index/vertex texture buffers before the\n   indirect draw.\n - Passes **58 and 60** draw the tail index range (`[m_SplitIndex, m_IndexCount)`) with a plain\n   `DrawIndexed`; passes **59 and 61** draw the head range (`[0, m_SplitIndex)`). The split\n   partitions the patch's index buffer between the two families.\n - Passes **14** and **38..=40** draw the full index range with a plain `DrawIndexed`.\n - Any other pass returns without drawing.\n\n The vertex transform for every path is the global view-projection: the type-level\n `SetupConstantBuffers` binds `m_VPGlobals` at vertex `cb0` (the rows carrying\n [`m_OffsetViewProjection`](graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection)),\n and the per-patch streamed constant buffer at vertex `cb1`; the tessellating passes additionally\n carry `m_OffsetViewProjection` in the hull/domain constants baked once per frame.",
+            "doc": " Issues the patch's geometry for the active render pass, keyed on\n [`m_ActiveRenderPass`](graphics_engine::graphics_engine::RenderContext::m_ActiveRenderPass):\n\n - Passes **56 and 57** (the near tessellating passes) draw GPU-indirect via\n   `DrawIndexedInstancedIndirectNoMutex`: the per-patch instance count comes from the terrain\n   patch system's GPU compute output, so no instance count is known CPU-side. Each stages a\n   one-`float4` control constant on vertex slot 3 (`{ m_DetailPatchIndex, mode, 0, 0 }`, `mode` = 2\n   for 56, 3 for 57) and binds the shared global detail index/vertex texture buffers before the\n   indirect draw.\n - Passes **58 and 60** draw the tail index range (`[m_SplitIndex, m_IndexCount)`) with a plain\n   [`DrawIndexed`]; passes **59 and 61** draw the head range (`[0, m_SplitIndex)`). The split\n   partitions the patch's index buffer between the two families.\n - Passes **14** and **38..=40** draw the full index range with a plain [`DrawIndexed`].\n - Any other pass returns without drawing.\n\n The vertex transform for every path is the global view-projection: the type-level\n `SetupConstantBuffers` binds `m_VPGlobals` at vertex `cb0` (the rows carrying\n [`m_OffsetViewProjection`](graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection)),\n and the per-patch streamed constant buffer at vertex `cb1`; the tessellating passes additionally\n carry `m_OffsetViewProjection` in the hull/domain constants baked once per frame.",
             "doc_links": [
               {
                 "text": "graphics_engine::graphics_engine::RenderContext::m_ActiveRenderPass",
                 "target_kind": "item",
                 "path": "graphics_engine::graphics_engine::RenderContext",
                 "anchor": "field-m_ActiveRenderPass"
+              },
+              {
+                "text": "DrawIndexed",
+                "target_kind": "module",
+                "path": "graphics_engine::draw",
+                "anchor": "func-DrawIndexed"
               },
               {
                 "text": "graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection",
@@ -23335,7 +23475,15 @@
           {
             "visibility": "public",
             "name": "Draw",
-            "doc": " Issues the impostor cards as a single non-instanced `DrawIndexed` over a static quad index\n buffer (`6 * min(card_count, 0x1400)` indices); the vertex shader keys off\n `SV_VertexID` (`card = id >> 2`, `corner = id & 3`), pulling each card's world position, size, and\n atlas data from a texture buffer bound at vertex slot 0. The card orientation (facing) is computed\n in the vertex shader from the render camera carried in the engine's global per-view billboard\n constant buffer (the translation-bearing `m_ViewProjectionF`); the block stages only per-draw\n scalars on `cb1`. `m_RenderStatus & 6` selects the depth/shadow vertex- and fragment-program\n permutations. The vertex shader writes `SV_Position` directly, so this is not GPU-indirect.",
+            "doc": " Issues the impostor cards as a single non-instanced [`DrawIndexed`] over a static quad index\n buffer (`6 * min(card_count, 0x1400)` indices); the vertex shader keys off\n `SV_VertexID` (`card = id >> 2`, `corner = id & 3`), pulling each card's world position, size, and\n atlas data from a texture buffer bound at vertex slot 0. The card orientation (facing) is computed\n in the vertex shader from the render camera carried in the engine's global per-view billboard\n constant buffer (the translation-bearing `m_ViewProjectionF`); the block stages only per-draw\n scalars on `cb1`. `m_RenderStatus & 6` selects the depth/shadow vertex- and fragment-program\n permutations. The vertex shader writes `SV_Position` directly, so this is not GPU-indirect.",
+            "doc_links": [
+              {
+                "text": "DrawIndexed",
+                "target_kind": "module",
+                "path": "graphics_engine::draw",
+                "anchor": "func-DrawIndexed"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5372179744
@@ -27361,8 +27509,14 @@
           {
             "visibility": "public",
             "name": "m_TerrainCamera",
-            "doc": " A copy of the LOD camera (`CameraManager::m_ActiveCamera`) taken when\n [`m_UpdateCamera`](STerrainPatchSystem::m_UpdateCamera) is set. The terrain render passes point\n their frustum camera at this and cull patches against its\n [`m_FrustumPlane`](camera::camera::Camera::m_FrustumPlane).",
+            "doc": " A copy of the LOD camera ([`m_ActiveCamera`](camera::camera_manager::CameraManager::m_ActiveCamera)) taken when\n [`m_UpdateCamera`](STerrainPatchSystem::m_UpdateCamera) is set. The terrain render passes point\n their frustum camera at this and cull patches against its\n [`m_FrustumPlane`](camera::camera::Camera::m_FrustumPlane).",
             "doc_links": [
+              {
+                "text": "camera::camera_manager::CameraManager::m_ActiveCamera",
+                "target_kind": "item",
+                "path": "camera::camera_manager::CameraManager",
+                "anchor": "field-m_ActiveCamera"
+              },
               {
                 "text": "STerrainPatchSystem::m_UpdateCamera",
                 "target_kind": "item",
@@ -40516,7 +40670,14 @@
           {
             "visibility": "public",
             "name": "SetMouseCursorPosition",
-            "doc": " Moves the `MCI_cursor` clip to `(x, y)` in movie stage coordinates (the space\n `CUIManager::GetMovieSpaceMouseCursor` produces) via a `DisplayInfo` X/Y write. No-ops\n unless the overlay is active.",
+            "doc": " Moves the `MCI_cursor` clip to `(x, y)` in movie stage coordinates (the space\n `CUIManager::GetMovieSpaceMouseCursor` produces) via a [`DisplayInfo`] X/Y write. No-ops\n unless the overlay is active.",
+            "doc_links": [
+              {
+                "text": "DisplayInfo",
+                "target_kind": "item",
+                "path": "ui::scaleform::DisplayInfo"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5383713376
@@ -40571,8 +40732,14 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": " A node in the display tree returned by `Movie::GetDisplayObjectsTree`. Inherits from\n [`RefCountImpl`] and embeds a `Scaleform::String` for the name and a\n `Scaleform::ArrayDataBase<Ptr<AmpMovieObjectDesc>>` for children.\n\n Layout verified from `GetChildDescTree` at `0x141_A30_410`.",
+        "doc": " A node in the display tree returned by [`GetDisplayObjectsTree`](Movie::GetDisplayObjectsTree). Inherits from\n [`RefCountImpl`] and embeds a `Scaleform::String` for the name and a\n `Scaleform::ArrayDataBase<Ptr<AmpMovieObjectDesc>>` for children.\n\n Layout verified from `GetChildDescTree` at `0x141_A30_410`.",
         "doc_links": [
+          {
+            "text": "Movie::GetDisplayObjectsTree",
+            "target_kind": "item",
+            "path": "ui::scaleform::Movie",
+            "anchor": "vfunc-GetDisplayObjectsTree"
+          },
           {
             "text": "RefCountImpl",
             "target_kind": "item",
@@ -40627,7 +40794,14 @@
           {
             "visibility": "public",
             "name": "children",
-            "doc": " Pointer to the child array. Each element is a `Ptr<AmpMovieObjectDesc>` (a raw pointer\n to another `AmpMovieObjectDesc`).",
+            "doc": " Pointer to the child array. Each element is a `Ptr<AmpMovieObjectDesc>` (a raw pointer\n to another [`AmpMovieObjectDesc`]).",
+            "doc_links": [
+              {
+                "text": "AmpMovieObjectDesc",
+                "target_kind": "item",
+                "path": "ui::scaleform::AmpMovieObjectDesc"
+              }
+            ],
             "type_ref": {
               "type": "mut_pointer",
               "inner": {
@@ -40807,8 +40981,13 @@
           {
             "visibility": "public",
             "name": "pData",
-            "doc": " The refcounted `RTHandle::HandleData` (starts with `RefCountImpl`, so\n [`RefCountImpl::AddRef`] pins a copied handle).",
+            "doc": " The refcounted `RTHandle::HandleData` (starts with [`RefCountImpl`], so\n [`RefCountImpl::AddRef`] pins a copied handle).",
             "doc_links": [
+              {
+                "text": "RefCountImpl",
+                "target_kind": "item",
+                "path": "ui::scaleform::RefCountImpl"
+              },
               {
                 "text": "RefCountImpl::AddRef",
                 "target_kind": "item",
@@ -41350,7 +41529,14 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": " A Scaleform `MemoryHeap`. Opaque; allocation goes through its vtable (`Alloc` at slot offset\n `0x50`).",
+        "doc": " A Scaleform [`MemoryHeap`]. Opaque; allocation goes through its vtable (`Alloc` at slot offset\n `0x50`).",
+        "doc_links": [
+          {
+            "text": "MemoryHeap",
+            "target_kind": "item",
+            "path": "ui::scaleform::MemoryHeap"
+          }
+        ],
         "fields": [
           {
             "visibility": "private",
@@ -43373,7 +43559,14 @@
           {
             "visibility": "public",
             "name": "pHeap",
-            "doc": " The Scaleform `MemoryHeap` the movie allocates from.",
+            "doc": " The Scaleform [`MemoryHeap`] the movie allocates from.",
+            "doc_links": [
+              {
+                "text": "MemoryHeap",
+                "target_kind": "item",
+                "path": "ui::scaleform::MemoryHeap"
+              }
+            ],
             "type_ref": {
               "type": "mut_pointer",
               "inner": {
@@ -44924,13 +45117,19 @@
             {
               "visibility": "public",
               "name": "Capture",
-              "doc": " Snapshots the display tree for the render thread (`GFx::Movie` vtable slot 25). Must be\n called from the current capture thread (see\n [`SetCaptureThread`](MovieImpl::SetCaptureThread)); `if_changed = false` forces a fresh\n snapshot. The next `RTHandle::NextCapture` on the render side picks it up.",
+              "doc": " Snapshots the display tree for the render thread (`GFx::Movie` vtable slot 25). Must be\n called from the current capture thread (see\n [`SetCaptureThread`](MovieImpl::SetCaptureThread)); `if_changed = false` forces a fresh\n snapshot. The next [`NextCapture`](RTHandle::NextCapture) on the render side picks it up.",
               "doc_links": [
                 {
                   "text": "MovieImpl::SetCaptureThread",
                   "target_kind": "item",
                   "path": "ui::scaleform::MovieImpl",
                   "anchor": "vfunc-SetCaptureThread"
+                },
+                {
+                  "text": "RTHandle::NextCapture",
+                  "target_kind": "item",
+                  "path": "ui::scaleform::RTHandle",
+                  "anchor": "func-NextCapture"
                 }
               ],
               "body": {
@@ -46438,13 +46637,19 @@
           {
             "visibility": "public",
             "name": "Capture",
-            "doc": " Snapshots the display tree for the render thread (`GFx::Movie` vtable slot 25). Must be\n called from the current capture thread (see\n [`SetCaptureThread`](MovieImpl::SetCaptureThread)); `if_changed = false` forces a fresh\n snapshot. The next `RTHandle::NextCapture` on the render side picks it up.",
+            "doc": " Snapshots the display tree for the render thread (`GFx::Movie` vtable slot 25). Must be\n called from the current capture thread (see\n [`SetCaptureThread`](MovieImpl::SetCaptureThread)); `if_changed = false` forces a fresh\n snapshot. The next [`NextCapture`](RTHandle::NextCapture) on the render side picks it up.",
             "doc_links": [
               {
                 "text": "MovieImpl::SetCaptureThread",
                 "target_kind": "item",
                 "path": "ui::scaleform::MovieImpl",
                 "anchor": "vfunc-SetCaptureThread"
+              },
+              {
+                "text": "RTHandle::NextCapture",
+                "target_kind": "item",
+                "path": "ui::scaleform::RTHandle",
+                "anchor": "func-NextCapture"
               }
             ],
             "type_ref": {
@@ -48553,10 +48758,10 @@
           {
             "visibility": "public",
             "name": "NextCapture",
-            "doc": " Consumes the context's pending snapshot into the displaying one (at most once per HAL\n frame: the context's [`NextCaptureCalledInFrame`](RenderContext::NextCaptureCalledInFrame)\n latch short-circuits repeats). Returns whether the handle is valid to draw. `notify` is\n the HAL's context notify ([`RenderHAL::GetContextNotify`]); `frame_id` is 0.",
+            "doc": " Consumes the context's pending snapshot into the displaying one (at most once per HAL\n frame: the context's [`NextCaptureCalledInFrame`](ui::scaleform::RenderContext::NextCaptureCalledInFrame)\n latch short-circuits repeats). Returns whether the handle is valid to draw. `notify` is\n the HAL's context notify ([`RenderHAL::GetContextNotify`]); `frame_id` is 0.",
             "doc_links": [
               {
-                "text": "RenderContext::NextCaptureCalledInFrame",
+                "text": "ui::scaleform::RenderContext::NextCaptureCalledInFrame",
                 "target_kind": "item",
                 "path": "ui::scaleform::RenderContext",
                 "anchor": "field-NextCaptureCalledInFrame"
@@ -48674,7 +48879,14 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": " Scaleform `RefCountImpl` -- the base class for reference-counted Scaleform objects. Provides\n a vtable pointer at +0 and an atomic refcount at +8. `AddRef`/`Release` are non-virtual;\n the vtable's slot 0 is the destructor, called when the refcount reaches zero.",
+        "doc": " Scaleform [`RefCountImpl`] -- the base class for reference-counted Scaleform objects. Provides\n a vtable pointer at +0 and an atomic refcount at +8. `AddRef`/`Release` are non-virtual;\n the vtable's slot 0 is the destructor, called when the refcount reaches zero.",
+        "doc_links": [
+          {
+            "text": "RefCountImpl",
+            "target_kind": "item",
+            "path": "ui::scaleform::RefCountImpl"
+          }
+        ],
         "fields": [
           {
             "visibility": "private",
@@ -48891,7 +49103,15 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": " The Scaleform `Render::ContextImpl::Context`: the display-tree snapshot pipeline between the\n update thread and the renderer. `Capture` (update thread) merges the active snapshot's changes\n into the pending snapshot; `RTHandle::NextCapture` (render thread) consumes the pending\n snapshot into the displaying one, at most once per HAL frame. Only the fields the payload\n touches are modeled; the declared size covers just the modeled prefix.",
+        "doc": " The Scaleform `Render::ContextImpl::Context`: the display-tree snapshot pipeline between the\n update thread and the renderer. `Capture` (update thread) merges the active snapshot's changes\n into the pending snapshot; [`NextCapture`](RTHandle::NextCapture) (render thread) consumes the pending\n snapshot into the displaying one, at most once per HAL frame. Only the fields the payload\n touches are modeled; the declared size covers just the modeled prefix.",
+        "doc_links": [
+          {
+            "text": "RTHandle::NextCapture",
+            "target_kind": "item",
+            "path": "ui::scaleform::RTHandle",
+            "anchor": "func-NextCapture"
+          }
+        ],
         "fields": [
           {
             "visibility": "private",
@@ -48917,7 +49137,15 @@
           {
             "visibility": "public",
             "name": "NextCaptureCalledInFrame",
-            "doc": " The once-a-frame consumption latch: while set, `RTHandle::NextCapture` keeps the current\n displaying snapshot instead of consuming the pending one. Set by the first `NextCapture`\n of a HAL frame and cleared by `HAL::EndFrame` (`EndFrameContextNotify`), so within one\n `CUIManager::Render` call every draw sees the same snapshot.",
+            "doc": " The once-a-frame consumption latch: while set, [`NextCapture`](RTHandle::NextCapture) keeps the current\n displaying snapshot instead of consuming the pending one. Set by the first `NextCapture`\n of a HAL frame and cleared by `HAL::EndFrame` (`EndFrameContextNotify`), so within one\n `CUIManager::Render` call every draw sees the same snapshot.",
+            "doc_links": [
+              {
+                "text": "RTHandle::NextCapture",
+                "target_kind": "item",
+                "path": "ui::scaleform::RTHandle",
+                "anchor": "func-NextCapture"
+              }
+            ],
             "type_ref": {
               "type": "raw",
               "path": "bool"
@@ -52160,8 +52388,13 @@
           {
             "visibility": "public",
             "name": "GetDisplayInfo",
-            "doc": " Reads a display object's `DisplayInfo` (position, scale, alpha, visibility). `data` is the\n value's [`mValue`](Value::mValue) payload. Returns false when the value is not a display\n object.",
+            "doc": " Reads a display object's [`DisplayInfo`] (position, scale, alpha, visibility). `data` is the\n value's [`mValue`](Value::mValue) payload. Returns false when the value is not a display\n object.",
             "doc_links": [
+              {
+                "text": "DisplayInfo",
+                "target_kind": "item",
+                "path": "ui::scaleform::DisplayInfo"
+              },
               {
                 "text": "Value::mValue",
                 "target_kind": "item",
@@ -52335,7 +52568,7 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": " A Scaleform `GFx::Viewport` (a `Render::Viewport` plus `Scale` and `AspectRatio`): the\n description [`MovieImpl::SetViewportImpl`] copies into [`MovieImpl::Viewport`]. `BufferWidth`\n and `BufferHeight` describe the whole output surface; `Left`/`Top`/`Width`/`Height` are the\n view rectangle the movie occupies within it. `CUIManager::SetMovieViewport` builds one as\n `{BufferWidth: vw, BufferHeight: vh, Left: (vw - movie_w) / 2, Top: (vh - movie_h) / 2,\n Width: movie_w, Height: movie_h, Scissor*: 0, Flags: 0, Scale: 1.0, AspectRatio: 1.0}`, where\n `movie_w`/`movie_h` are `UIManager::m_MovieScaleWidth`/`Height` at call time (not the\n arguments).",
+        "doc": " A Scaleform `GFx::Viewport` (a `Render::Viewport` plus `Scale` and `AspectRatio`): the\n description [`MovieImpl::SetViewportImpl`] copies into [`MovieImpl::Viewport`]. `BufferWidth`\n and `BufferHeight` describe the whole output surface; `Left`/`Top`/`Width`/`Height` are the\n view rectangle the movie occupies within it. `CUIManager::SetMovieViewport` builds one as\n `{BufferWidth: vw, BufferHeight: vh, Left: (vw - movie_w) / 2, Top: (vh - movie_h) / 2,\n Width: movie_w, Height: movie_h, Scissor*: 0, Flags: 0, Scale: 1.0, AspectRatio: 1.0}`, where\n `movie_w`/`movie_h` are [`m_MovieScaleWidth`](ui::ui_manager::UIManager::m_MovieScaleWidth)/`Height` at call time (not the\n arguments).",
         "doc_links": [
           {
             "text": "MovieImpl::SetViewportImpl",
@@ -52348,6 +52581,12 @@
             "target_kind": "item",
             "path": "ui::scaleform::MovieImpl",
             "anchor": "field-Viewport"
+          },
+          {
+            "text": "ui::ui_manager::UIManager::m_MovieScaleWidth",
+            "target_kind": "item",
+            "path": "ui::ui_manager::UIManager",
+            "anchor": "field-m_MovieScaleWidth"
           }
         ],
         "fields": [
@@ -53202,8 +53441,14 @@
           {
             "visibility": "public",
             "name": "m_MouseX",
-            "doc": " The last mouse position's x, in window-client pixels. `WndProc` writes it on every\n `WM_MOUSEMOVE` via [`SetMousePos`](UIManager::SetMousePos) -- the only writer, so the OS\n message stream is the sole source of the UI mouse position (the DirectInput mouse device\n only contributes deltas, buttons, and the wheel).",
+            "doc": " The last mouse position's x, in window-client pixels. [`WndProc`] writes it on every\n `WM_MOUSEMOVE` via [`SetMousePos`](UIManager::SetMousePos) -- the only writer, so the OS\n message stream is the sole source of the UI mouse position (the DirectInput mouse device\n only contributes deltas, buttons, and the wheel).",
             "doc_links": [
+              {
+                "text": "WndProc",
+                "target_kind": "module",
+                "path": "window",
+                "anchor": "func-WndProc"
+              },
               {
                 "text": "UIManager::SetMousePos",
                 "target_kind": "item",
@@ -55686,8 +55931,14 @@
         {
           "visibility": "public",
           "name": "CpuFragmentWaitUntilSignalIsNonZero",
-          "doc": " Spin-wait (pumping other ready fragments) until `*signal` is non-zero -- one of Avalanche's CPU\n job-fragment primitives, the engine's drain for an outstanding async fragment. For example the\n draw-dispatch fragment signals completion at `GraphicsEngine::m_DrawThreadWorkSignal` (`+0x30`). It\n returns immediately when the signal is already non-zero, so it is only safe to call when the\n matching fragment was actually kicked: below two primary threads the work runs inline and the signal\n is never raised, so guard the call with [`CpuPrimaryCount`] to avoid spinning forever.\n\n The wait is **work-stealing**: while the signal is zero, the underlying `CpuFragmentWait` loop\n pops queued fragments off the global sync queue and runs them (`CpuFragmentRun`) on the\n *calling* thread, so the caller must be a thread the fragment system knows (a registered\n worker or the primary thread) — fragments executed on a foreign thread fault on the fragment\n system's per-thread state.",
+          "doc": " Spin-wait (pumping other ready fragments) until `*signal` is non-zero -- one of Avalanche's CPU\n job-fragment primitives, the engine's drain for an outstanding async fragment. For example the\n draw-dispatch fragment signals completion at [`m_DrawThreadWorkSignal`](graphics_engine::graphics_engine::GraphicsEngine::m_DrawThreadWorkSignal) (`+0x30`). It\n returns immediately when the signal is already non-zero, so it is only safe to call when the\n matching fragment was actually kicked: below two primary threads the work runs inline and the signal\n is never raised, so guard the call with [`CpuPrimaryCount`] to avoid spinning forever.\n\n The wait is **work-stealing**: while the signal is zero, the underlying `CpuFragmentWait` loop\n pops queued fragments off the global sync queue and runs them (`CpuFragmentRun`) on the\n *calling* thread, so the caller must be a thread the fragment system knows (a registered\n worker or the primary thread) — fragments executed on a foreign thread fault on the fragment\n system's per-thread state.",
           "doc_links": [
+            {
+              "text": "graphics_engine::graphics_engine::GraphicsEngine::m_DrawThreadWorkSignal",
+              "target_kind": "item",
+              "path": "graphics_engine::graphics_engine::GraphicsEngine",
+              "anchor": "field-m_DrawThreadWorkSignal"
+            },
             {
               "text": "CpuPrimaryCount",
               "target_kind": "module",
@@ -58294,13 +58545,19 @@
             {
               "visibility": "public",
               "name": "TerrainPatchSystemUpdate",
-              "doc": " The once-per-frame terrain patch system update (called from `CLandscapeManager::UpdateRender` in the\n sim phase). When [`STerrainPatchSystem::m_UpdateCamera`] is set it copies the LOD camera\n (`CameraManager::m_ActiveCamera`) into [`STerrainPatchSystem::m_TerrainCamera`] and points every\n terrain render pass's frustum camera at it. `ctx` carries the source camera.",
+              "doc": " The once-per-frame terrain patch system update (called from `CLandscapeManager::UpdateRender` in the\n sim phase). When [`STerrainPatchSystem::m_UpdateCamera`] is set it copies the LOD camera\n ([`m_ActiveCamera`](camera::camera_manager::CameraManager::m_ActiveCamera)) into [`STerrainPatchSystem::m_TerrainCamera`] and points every\n terrain render pass's frustum camera at it. `ctx` carries the source camera.",
               "doc_links": [
                 {
                   "text": "STerrainPatchSystem::m_UpdateCamera",
                   "target_kind": "item",
                   "path": "graphics_engine::render_engine::STerrainPatchSystem",
                   "anchor": "field-m_UpdateCamera"
+                },
+                {
+                  "text": "camera::camera_manager::CameraManager::m_ActiveCamera",
+                  "target_kind": "item",
+                  "path": "camera::camera_manager::CameraManager",
+                  "anchor": "field-m_ActiveCamera"
                 },
                 {
                   "text": "STerrainPatchSystem::m_TerrainCamera",
@@ -58822,8 +59079,14 @@
         {
           "visibility": "public",
           "name": "TerrainPatchUpdate",
-          "doc": " The per-patch CPU fragment for the base VolumetricTerrain patch maps (registered against the\n `TerrainPatchUpdate` hash by `OldTerrainPatchSystem::TerrainPatchSystemCreateLayers`). It\n advances patch construction and destruction (creating or destroying the patch's\n [`RenderBlockTerrain`](graphics_engine::render_block::RenderBlockTerrain) constant buffers,\n updating the global terrain mask, and adjusting per-LOD memory statistics), and for constructed\n patches it updates the block's alpha fade, sort id, and tessellated index count, then submits\n the block to one render pass per set [`PatchHeader::m_VisibilityBits`] bit: frustum id 0 routes\n to the color passes (the near-detail pass for base-LOD tiles within one tile of the camera, the\n near pass for other tiles at the context's high-detail LOD, and the far pass otherwise), ids\n 1..=8 to the static shadow passes (only when the terrain type renders to shadow maps), ids\n 9..=10 to the reflective shadow passes, and id 12 to the depth prepass.",
+          "doc": " The per-patch CPU fragment for the base VolumetricTerrain patch maps (registered against the\n [`TerrainPatchUpdate`] hash by `OldTerrainPatchSystem::TerrainPatchSystemCreateLayers`). It\n advances patch construction and destruction (creating or destroying the patch's\n [`RenderBlockTerrain`](graphics_engine::render_block::RenderBlockTerrain) constant buffers,\n updating the global terrain mask, and adjusting per-LOD memory statistics), and for constructed\n patches it updates the block's alpha fade, sort id, and tessellated index count, then submits\n the block to one render pass per set [`PatchHeader::m_VisibilityBits`] bit: frustum id 0 routes\n to the color passes (the near-detail pass for base-LOD tiles within one tile of the camera, the\n near pass for other tiles at the context's high-detail LOD, and the far pass otherwise), ids\n 1..=8 to the static shadow passes (only when the terrain type renders to shadow maps), ids\n 9..=10 to the reflective shadow passes, and id 12 to the depth prepass.",
           "doc_links": [
+            {
+              "text": "TerrainPatchUpdate",
+              "target_kind": "module",
+              "path": "patch_system",
+              "anchor": "func-TerrainPatchUpdate"
+            },
             {
               "text": "graphics_engine::render_block::RenderBlockTerrain",
               "target_kind": "item",
@@ -59269,7 +59532,7 @@
               },
               "definition": false,
               "for_type": "ui::scaleform::Value",
-              "text": "\n    #[allow(dead_code)]\n    impl Value {\n        /// An unmanaged boolean value, safe to pass to `Movie::SetVariable` (the movie copies it;\n        /// nothing needs releasing).\n        pub fn new_boolean(value: bool) -> Self {\n            // SAFETY: all-zero is the unmanaged null value; every field tolerates zero.\n            let mut v: Self = unsafe { ::core::mem::zeroed() };\n            v.Type = Self::VT_BOOLEAN;\n            v.mValue = value as u64;\n            v\n        }\n    }\n"
+              "text": "\n    #[allow(dead_code)]\n    impl Value {\n        /// An unmanaged boolean value, safe to pass to [`SetVariable`](Movie::SetVariable) (the movie copies it;\n        /// nothing needs releasing).\n        pub fn new_boolean(value: bool) -> Self {\n            // SAFETY: all-zero is the unmanaged null value; every field tolerates zero.\n            let mut v: Self = unsafe { ::core::mem::zeroed() };\n            v.Type = Self::VT_BOOLEAN;\n            v.mValue = value as u64;\n            v\n        }\n    }\n"
             },
             {
               "kind": "epilogue",

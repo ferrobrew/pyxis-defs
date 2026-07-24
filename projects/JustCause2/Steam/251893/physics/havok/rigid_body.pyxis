@@ -44,7 +44,7 @@ impl HkpRigidBodyCInfo {
 
 #[cfg(backend = "rust")]
 impl HkpRigidBodyCInfo {
-    /// Construct an `HkpRigidBodyCInfo` via the native constructor.
+    /// Construct an [`HkpRigidBodyCInfo`] via the native constructor.
     #[external_body]
     pub fn new() -> HkpRigidBodyCInfo;
 }
@@ -85,11 +85,11 @@ impl HkpRigidBody {
 
 #[cfg(backend = "cpp")]
 impl HkpRigidBody {
-    /// Returns a pointer to the embedded `HkReferencedObject` field.
+    /// Returns a pointer to the embedded [`HkReferencedObject`] field.
     /// The `HkRefCounted<T>` template uses this to drive ref/unref via
     /// `referenced_object.hpp`'s free helpers; each shape type exposes
     /// it because the field path differs per type (direct vs nested
-    /// inside `HkpShape`).
+    /// inside [`HkpShape`]).
     #[external_body]
     pub fn pyxis_hk_as_referenced_object(&mut self) -> *mut HkReferencedObject;
     /// Tear-down hook invoked from `HkRefCounted<T>::release()` once the

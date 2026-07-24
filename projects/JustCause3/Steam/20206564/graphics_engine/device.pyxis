@@ -16,7 +16,7 @@ extern type IDXGISwapChain;
 #[size(8), align(8), rust_name = "windows::Win32::Graphics::Dxgi::IDXGIOutput", cpp_header = "<dxgi.h>", cpp_name = "::IDXGIOutput*"]
 extern type IDXGIOutput;
 
-/// The device's cached mode/capability descriptor. `GetDeviceInfo` returns a copy of the device's own
+/// The device's cached mode/capability descriptor. [`GetDeviceInfo`] returns a copy of the device's own
 /// instance ([`Device::m_DeviceInfo`]), and [`CreateRenderSetups`](graphics_engine::graphics_engine::GraphicsEngine::CreateRenderSetups)
 /// sizes every scene render target from a caller-supplied copy's
 /// [`m_DisplayWidth`](DeviceInfo::m_DisplayWidth)/[`m_DisplayHeight`](DeviceInfo::m_DisplayHeight).
@@ -37,7 +37,7 @@ pub type DeviceInfo {
     // 0x30 / 0x34 vertex / fragment shader-program versions.
 }
 
-/// The surface a device exposes to `GetDeviceSurface`. The presentable back buffer is
+/// The surface a device exposes to [`GetDeviceSurface`]. The presentable back buffer is
 /// [`BackBuffer`](DeviceSurface::BackBuffer); the eye-specific variants are for stereo output devices.
 #[copyable]
 pub enum DeviceSurface: i32 {
@@ -65,7 +65,7 @@ pub type Context {
 pub type Device {
     pub m_Context: *mut Context,
     /// The presentable back-buffer surface owned by the DXGI swapchain, returned by
-    /// `GetDeviceSurface``(BackBuffer)`. `ResizeBuffers` recreates its RTV/SRV/texture on a
+    /// [`GetDeviceSurface`]``(BackBuffer). [`ResizeBuffers`] recreates its RTV/SRV/texture on a
     /// swapchain resize.
     pub m_BackBuffer: *mut Texture,
 
@@ -76,9 +76,9 @@ pub type Device {
     #[address(0x38)]
     pub m_DXGIOutput: IDXGIOutput,
 
-    /// The device's live mode descriptor. `ResizeBuffers` writes its display dimensions/ratio on a
-    /// swapchain resize; `GetDeviceInfo` returns a copy of it. Subsystems that re-size their own
-    /// render targets read their dimensions from here (via `GetDeviceInfo`), so it is the
+    /// The device's live mode descriptor. [`ResizeBuffers`] writes its display dimensions/ratio on a
+    /// swapchain resize; [`GetDeviceInfo`] returns a copy of it. Subsystems that re-size their own
+    /// render targets read their dimensions from here (via [`GetDeviceInfo`]), so it is the
     /// device-side source of the display size independent of the [`CreateRenderSetups`](graphics_engine::graphics_engine::GraphicsEngine::CreateRenderSetups)
     /// parameter.
     #[address(0x190)]

@@ -38,7 +38,7 @@ impl RenderBlockInstanceInfo {
 
 #[cfg(backend = "rust")]
 impl RenderBlockInstanceInfo {
-    /// Construct a `RenderBlockInstanceInfo` with `colors[0]` and
+    /// Construct a [`RenderBlockInstanceInfo`] with `colors[0]` and
     /// `colors[1]` primed to opaque white; remaining fields are zeroed.
     #[external_body]
     pub fn new() -> RenderBlockInstanceInfo;
