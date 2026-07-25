@@ -114,9 +114,9 @@ pub type CreateFragmentProgramParams {
 }
 
 /// The leaf fragment-program creator: it wraps `ID3D11Device::CreatePixelShader` over
-/// `params.m_Code`/`params.m_Size`. `CreatePixelShader` copies the bytecode, so a hook may substitute a
-/// patched copy that only has to outlive the call. Static (no `this`); the first argument is the
-/// graphics device.
+/// `params.m_Code`/`params.m_Size`. `CreatePixelShader` copies the bytecode, so `params.m_Code` need
+/// not remain valid past the call, and the returned holder retains no bytecode of its own. Static (no
+/// `this`); the first argument is the graphics device.
 #[address(0x141_953_470)]
 pub fn CreateFragmentProgram(device: *mut HDevice_t, params: *mut CreateFragmentProgramParams) -> *mut void;
 
@@ -153,10 +153,10 @@ pub type CreateHullProgramParams {
 }
 
 /// The leaf hull-program creator: it wraps `ID3D11Device::CreateHullShader` (vtable slot 16) over
-/// `params.m_Code`/`params.m_Size`. `CreateHullShader` copies the bytecode, so a hook may substitute a
-/// patched copy that only has to outlive the call; unlike [`CreateVertexProgram`], the returned holder
-/// is a bare shader pointer with no retained bytecode copy. Static (no `this`); the first argument is
-/// the graphics device.
+/// `params.m_Code`/`params.m_Size`. `CreateHullShader` copies the bytecode, so `params.m_Code` need not
+/// remain valid past the call; unlike [`CreateVertexProgram`], the returned holder is a bare shader
+/// pointer with no retained bytecode copy. Static (no `this`); the first argument is the graphics
+/// device.
 #[address(0x141_953_690)]
 pub fn CreateHullProgram(device: *mut HDevice_t, params: *const CreateHullProgramParams) -> *mut void;
 
@@ -173,10 +173,10 @@ pub type CreateDomainProgramParams {
 }
 
 /// The leaf domain-program creator: it wraps `ID3D11Device::CreateDomainShader` (vtable slot 17) over
-/// `params.m_Code`/`params.m_Size`. `CreateDomainShader` copies the bytecode, so a hook may substitute
-/// a patched copy that only has to outlive the call; like [`CreateHullProgram`], the returned holder is
-/// a bare shader pointer with no retained bytecode copy. Static (no `this`); the first argument is the
-/// graphics device.
+/// `params.m_Code`/`params.m_Size`. `CreateDomainShader` copies the bytecode, so `params.m_Code` need
+/// not remain valid past the call; like [`CreateHullProgram`], the returned holder is a bare shader
+/// pointer with no retained bytecode copy. Static (no `this`); the first argument is the graphics
+/// device.
 #[address(0x141_953_7A0)]
 pub fn CreateDomainProgram(device: *mut HDevice_t, params: *const CreateDomainProgramParams) -> *mut void;
 
