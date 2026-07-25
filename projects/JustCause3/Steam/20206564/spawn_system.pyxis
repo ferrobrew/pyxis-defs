@@ -30,7 +30,7 @@ pub type SpawnBudgetEntry {
 }
 
 /// The spawn system: manages streaming (de)spawn of characters and vehicles around the player. Each
-/// frame, [`Update`](SpawnSystem::Update) builds a BFBC cull frustum from the camera manager's active
+/// frame, [`Update`](Self::Update) builds a BFBC cull frustum from the camera manager's active
 /// camera and uses it as a "don't (de)spawn while visible" gate in `CSpawnFactoryImpl::CheckInternal`, so
 /// objects are not spawned or despawned inside the player's view. Its budgets are characters and
 /// vehicles, so it governs NPC/vehicle (de)spawns near the view edge, not buildings.
@@ -57,17 +57,17 @@ pub type SpawnSystem {
     pub m_SpawnBFBCState: *mut SBFBCProcessState,
 
     /// The center position the spawn system streams around, set by
-    /// [`SetCenterPosition`](SpawnSystem::SetCenterPosition).
+    /// [`SetCenterPosition`](Self::SetCenterPosition).
     #[address(0x194)]
     pub m_CenterPos: Vector3,
 
     /// The view position for the spawn visibility gate, set by
-    /// [`SetCenterPosition`](SpawnSystem::SetCenterPosition).
+    /// [`SetCenterPosition`](Self::SetCenterPosition).
     #[address(0x1A0)]
     pub m_ViewPos: Vector3,
 
     /// The view direction for the spawn visibility gate, set by
-    /// [`SetCenterPosition`](SpawnSystem::SetCenterPosition).
+    /// [`SetCenterPosition`](Self::SetCenterPosition).
     #[address(0x1AC)]
     pub m_ViewDir: Vector3,
 }
@@ -76,8 +76,8 @@ impl SpawnSystem {
     /// view position, and at its tail builds a BFBC cull frustum from the camera manager's active camera
     /// ([`CameraManager::m_ActiveCamera`](camera::camera_manager::CameraManager::m_ActiveCamera)) via
     /// [`GetBFBCFrustumParamsForCameraAndTime`](graphics_engine::graphics_engine::OccluderCollectionManager::GetBFBCFrustumParamsForCameraAndTime),
-    /// storing the result in [`m_SpawnBFBCParams`](SpawnSystem::m_SpawnBFBCParams) and
-    /// [`m_SpawnBFBCState`](SpawnSystem::m_SpawnBFBCState) for the factory's visibility gate.
+    /// storing the result in [`m_SpawnBFBCParams`](Self::m_SpawnBFBCParams) and
+    /// [`m_SpawnBFBCState`](Self::m_SpawnBFBCState) for the factory's visibility gate.
     #[address(0x140_EFE_E90)]
     pub fn Update(&mut self);
 

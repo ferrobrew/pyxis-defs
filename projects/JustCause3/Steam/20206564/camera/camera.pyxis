@@ -82,7 +82,7 @@ impl Camera {
     #[address(0x140_0B3_B80)]
     pub fn SetupRenderCamera(&mut self, jitter: bool) -> *mut void;
 
-    /// Sets or clears the `m_ComputeView` flag. When set, [`UpdateRender`](Camera::UpdateRender)
+    /// Sets or clears the `m_ComputeView` flag. When set, [`UpdateRender`](Self::UpdateRender)
     /// re-derives `m_View` as the inverse of `m_TransformF` each frame instead of reading a supplied
     /// view matrix.
     #[address(0x140_09B_DB0)]
@@ -98,7 +98,7 @@ impl Camera {
     /// data from `m_ViewProjection`: it inverts the view-projection, transforms the NDC cube corners to
     /// world space (using `transform`'s translation for the apex), and derives the planes. Reads the
     /// standard-depth `m_ViewProjection` (not the reverse-Z `m_ViewProjectionF`) and asserts
-    /// `!m_IsRenderCamera`. Called from [`UpdateRender`](Camera::UpdateRender) when the view is dirty;
+    /// `!m_IsRenderCamera`. Called from [`UpdateRender`](Self::UpdateRender) when the view is dirty;
     /// the frustum-cull consumers (terrain patches, occlusion) read these planes, not `m_ProjectionF`.
     #[address(0x140_0B2_FC0)]
     pub fn UpdateFrustum(&mut self, transform: *const Matrix4);

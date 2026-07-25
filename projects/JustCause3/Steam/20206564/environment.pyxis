@@ -60,7 +60,7 @@ impl Weather {
 
 #[min_size(0x520)]
 pub type Atmosphere {
-    /// The live weather, also returned by [`GetWeather`](Atmosphere::GetWeather).
+    /// The live weather, also returned by [`GetWeather`](Self::GetWeather).
     #[address(0x518)]
     pub m_Weather: *mut Weather,
 }

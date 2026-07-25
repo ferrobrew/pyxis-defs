@@ -34,54 +34,54 @@ pub type EffectInfo {
 
 #[singleton(0x142_E2B_6F0), min_size(0x1F10)]
 pub type GraphicsEngine {
-    /// Whether the engine has finished its system initialisation. [`ResizeBuffers`](GraphicsEngine::ResizeBuffers)
+    /// Whether the engine has finished its system initialisation. [`ResizeBuffers`](Self::ResizeBuffers)
     /// only applies a resize inline once this is set.
     #[address(0x8)]
     pub m_HasBeenInitialized: bool,
 
-    /// Set by the tail of [`HandleDrawThreadTask`](GraphicsEngine::HandleDrawThreadTask) once the
+    /// Set by the tail of [`HandleDrawThreadTask`](Self::HandleDrawThreadTask) once the
     /// frame's CPU draw has completed (just before
-    /// [`m_CPUFinishedDrawingEvent`](GraphicsEngine::m_CPUFinishedDrawingEvent) is signalled).
-    /// [`WaitForCPUDrawToFinish`](GraphicsEngine::WaitForCPUDrawToFinish) returns immediately when
+    /// [`m_CPUFinishedDrawingEvent`](Self::m_CPUFinishedDrawingEvent) is signalled).
+    /// [`WaitForCPUDrawToFinish`](Self::WaitForCPUDrawToFinish) returns immediately when
     /// set and otherwise waits on the event.
     #[address(0x14)]
     pub m_CPUDrawFinished: bool,
 
     /// The Win32 event `HandleDrawThreadTask` signals at its tail;
-    /// [`WaitForCPUDrawToFinish`](GraphicsEngine::WaitForCPUDrawToFinish) waits on it (infinite)
-    /// while [`m_CPUDrawFinished`](GraphicsEngine::m_CPUDrawFinished) is clear.
+    /// [`WaitForCPUDrawToFinish`](Self::WaitForCPUDrawToFinish) waits on it (infinite)
+    /// while [`m_CPUDrawFinished`](Self::m_CPUDrawFinished) is clear.
     #[address(0x18)]
     pub m_CPUFinishedDrawingEvent: *mut void,
 
     /// When a draw fragment is outstanding, points at its completion signal (a `u32` that the
     /// fragment sets non-zero); null otherwise.
-    /// [`WaitForCPUDrawToFinish`](GraphicsEngine::WaitForCPUDrawToFinish) drains it first, via the
+    /// [`WaitForCPUDrawToFinish`](Self::WaitForCPUDrawToFinish) drains it first, via the
     /// work-stealing `cpu_fragment::CpuFragmentWaitUntilSignalIsNonZero`.
     #[address(0x20)]
     pub m_DrawFragmentSignal: *mut u32,
 
     /// Completion signal for the async draw-dispatch CPU fragment that
-    /// [`DispatchDraw`](GraphicsEngine::DispatchDraw) kicks to run the render passes. The fragment sets
+    /// [`DispatchDraw`](Self::DispatchDraw) kicks to run the render passes. The fragment sets
     /// it non-zero on completion; the engine waits on it (via
     /// `cpu_fragment::CpuFragmentWaitUntilSignalIsNonZero`, gated by `CpuPrimaryCount() > 1`) only at the
-    /// *next* [`Draw`](GraphicsEngine::Draw)'s entry.
-    /// [`WaitForCPUDrawToFinish`](GraphicsEngine::WaitForCPUDrawToFinish) does *not* wait on it.
+    /// *next* [`Draw`](Self::Draw)'s entry.
+    /// [`WaitForCPUDrawToFinish`](Self::WaitForCPUDrawToFinish) does *not* wait on it.
     #[address(0x30)]
     pub m_DrawThreadWorkSignal: u32,
 
     /// The display-mode state machine serviced once per frame by
-    /// [`HandleModeChange`](GraphicsEngine::HandleModeChange): while idle it applies a deferred
+    /// [`HandleModeChange`](Self::HandleModeChange): while idle it applies a deferred
     /// window resize, and while a mode change is pending it applies the fullscreen/adapter change.
     #[address(0x108)]
     pub m_DisplayModeChangeState: u32,
 
-    /// Set at the tail of [`ApplyResize`](GraphicsEngine::ApplyResize) once a resize has been applied
+    /// Set at the tail of [`ApplyResize`](Self::ApplyResize) once a resize has been applied
     /// and a valid display mode is in effect.
     #[address(0x118)]
     pub m_HasNewValidDisplayMode: bool,
 
-    /// The pending deferred-resize width, stashed by [`ResizeBuffers`](GraphicsEngine::ResizeBuffers)
-    /// and consumed by [`HandleModeChange`](GraphicsEngine::HandleModeChange).
+    /// The pending deferred-resize width, stashed by [`ResizeBuffers`](Self::ResizeBuffers)
+    /// and consumed by [`HandleModeChange`](Self::HandleModeChange).
     #[address(0x11C)]
     pub m_WindowWidth: u32,
 
@@ -89,14 +89,14 @@ pub type GraphicsEngine {
     #[address(0x120)]
     pub m_WindowHeight: u32,
 
-    /// When set, [`ResizeBuffers`](GraphicsEngine::ResizeBuffers) applies a resize inline rather than
+    /// When set, [`ResizeBuffers`](Self::ResizeBuffers) applies a resize inline rather than
     /// deferring it; the fullscreen/adapter path sets it around its device reset.
     #[address(0x124)]
     pub m_SynchronousResize: bool,
 
-    /// Set when a deferred resize is pending in [`m_WindowWidth`](GraphicsEngine::m_WindowWidth)/
-    /// [`m_WindowHeight`](GraphicsEngine::m_WindowHeight), consumed by
-    /// [`HandleModeChange`](GraphicsEngine::HandleModeChange).
+    /// Set when a deferred resize is pending in [`m_WindowWidth`](Self::m_WindowWidth)/
+    /// [`m_WindowHeight`](Self::m_WindowHeight), consumed by
+    /// [`HandleModeChange`](Self::HandleModeChange).
     #[address(0x125)]
     pub m_HasNewWindowSettings: bool,
 
@@ -108,7 +108,7 @@ pub type GraphicsEngine {
     pub m_ShadowManager: *mut ShadowManager,
 
     /// The engine-owned scene render camera: a by-value copy rebuilt each
-    /// [`Draw`](GraphicsEngine::Draw) by `Camera::SetupRenderCamera` (reverse-Z + jitter, then the
+    /// [`Draw`](Self::Draw) by `Camera::SetupRenderCamera` (reverse-Z + jitter, then the
     /// view-projection products from `m_View`). This is the camera the render passes consume;
     /// distinct from the [`CameraManager`](camera::camera_manager::CameraManager)'s camera objects, which are pointers to the gameplay
     /// cameras.
@@ -126,9 +126,9 @@ pub type GraphicsEngine {
     #[address(0xFA0)]
     pub m_VelocityBufferTexture: *mut Texture,
 
-    /// The final composite render setup: colour → [`m_BackBufferLinear`](GraphicsEngine::m_BackBufferLinear),
+    /// The final composite render setup: colour → [`m_BackBufferLinear`](Self::m_BackBufferLinear),
     /// depth → the main depth surface. Built by
-    /// [`CreateRenderSetups`](GraphicsEngine::CreateRenderSetups) against the live swapchain back
+    /// [`CreateRenderSetups`](Self::CreateRenderSetups) against the live swapchain back
     /// buffer and stored as the render context's setup; the HUD and the scene resolve target it.
     #[address(0x1_050)]
     pub m_BackBufferRenderSetup: *mut HRenderSetup_t,
@@ -153,8 +153,8 @@ pub type GraphicsEngine {
     #[address(0x1_230)]
     pub m_BackBufferLinear: *mut Texture,
 
-    /// Whether [`HandleDrawThreadTask`](GraphicsEngine::HandleDrawThreadTask) renders the 3D scene
-    /// this frame (GBuffer, world, post-effects) rather than only the UI. [`Draw`](GraphicsEngine::Draw)
+    /// Whether [`HandleDrawThreadTask`](Self::HandleDrawThreadTask) renders the 3D scene
+    /// this frame (GBuffer, world, post-effects) rather than only the UI. [`Draw`](Self::Draw)
     /// sets it from the game state and the UI's static-background grab: it is cleared while a
     /// full-screen UI with a static background is shown (pause / map / menus), in which case the draw
     /// thread clears the target to transparent instead of rendering the scene.
@@ -166,7 +166,7 @@ pub type GraphicsEngine {
     pub m_EffectInfoIndex: u32,
 
     /// The currently-loaded shader bundle name, compared by
-    /// [`LoadShaderBundle`](GraphicsEngine::LoadShaderBundle) to skip a same-name reload. The
+    /// [`LoadShaderBundle`](Self::LoadShaderBundle) to skip a same-name reload. The
     /// bundle names are `"Shaders"` / `"ShadersLowShadows"` (and the Intel `"ShadersConstMath*"`
     /// variants).
     #[address(0x1_300)]
@@ -239,13 +239,13 @@ pub type D3D11Viewport {
 /// are mapped; the type extends past them (`min_size` is the 8-aligned bound just past the last field).
 #[min_size(0xF8)]
 pub type HRenderSetup_t {
-    /// When set, [`SetRenderSetup`] applies [`m_Viewport`](HRenderSetup_t::m_Viewport) as the
+    /// When set, [`SetRenderSetup`] applies [`m_Viewport`](Self::m_Viewport) as the
     /// rasterizer viewport; when clear, it synthesizes a viewport covering the full render target.
     #[address(0xD8)]
     pub m_HasCustomViewport: bool,
 
     /// The fixed rasterizer viewport applied when
-    /// [`m_HasCustomViewport`](HRenderSetup_t::m_HasCustomViewport) is set.
+    /// [`m_HasCustomViewport`](Self::m_HasCustomViewport) is set.
     #[address(0xDC)]
     pub m_Viewport: D3D11Viewport,
 }
@@ -443,7 +443,7 @@ pub type RenderContext {
     /// manager's parity storage. The deferred lighting shaders index them dynamically by a light's
     /// packed slice index (`cb0[63 + 4*slice .. 66 + 4*slice]` in the GlobalConstants) to project a
     /// light-relative position into its shadow-atlas slice; the sun resolve uses
-    /// [`m_ShadowCascades`](RenderContext::m_ShadowCascades) instead.
+    /// [`m_ShadowCascades`](Self::m_ShadowCascades) instead.
     /// The instance-transform slot the render blocks pass to
     /// [`RBIInfo::GetMatrix`](graphics_engine::render_block::RBIInfo::GetMatrix) for the current
     /// dispatch.
@@ -474,11 +474,11 @@ pub type RenderContext {
 pub type DrawThreadTaskParam;
 impl GraphicsEngine {
     /// Blocks until the frame's CPU draw has completed: first drains an outstanding draw
-    /// fragment via [`m_DrawFragmentSignal`](GraphicsEngine::m_DrawFragmentSignal) (a
+    /// fragment via [`m_DrawFragmentSignal`](Self::m_DrawFragmentSignal) (a
     /// work-stealing wait -- see
     /// `cpu_fragment::CpuFragmentWaitUntilSignalIsNonZero`),
-    /// then waits on [`m_CPUFinishedDrawingEvent`](GraphicsEngine::m_CPUFinishedDrawingEvent)
-    /// unless [`m_CPUDrawFinished`](GraphicsEngine::m_CPUDrawFinished) is already set. Because of
+    /// then waits on [`m_CPUFinishedDrawingEvent`](Self::m_CPUFinishedDrawingEvent)
+    /// unless [`m_CPUDrawFinished`](Self::m_CPUDrawFinished) is already set. Because of
     /// the work-stealing drain, only threads the fragment system knows may call it.
     #[address(0x140_0C4_690)]
     pub fn WaitForCPUDrawToFinish(&mut self);
@@ -512,17 +512,17 @@ impl GraphicsEngine {
     /// `device_info`'s [`m_DisplayWidth`](graphics_engine::device::DeviceInfo::m_DisplayWidth)/
     /// [`m_DisplayHeight`](graphics_engine::device::DeviceInfo::m_DisplayHeight) (some at half
     /// resolution), so it can be re-run at any size by passing a modified copy. The final
-    /// `BackBufferLinear` alias plus [`m_BackBufferRenderSetup`](GraphicsEngine::m_BackBufferRenderSetup)
+    /// `BackBufferLinear` alias plus [`m_BackBufferRenderSetup`](Self::m_BackBufferRenderSetup)
     /// and the post-effect setup are instead built against the live swapchain surface via
     /// `GetDeviceSurface(BackBuffer)`, independent of
     /// `device_info`. Per-pass viewports follow the bound target's size, so no per-pass viewport
     /// changes are needed. Assumes the previously created setups have been torn down
-    /// ([`DestroyRenderSetups`](GraphicsEngine::DestroyRenderSetups)) and that no draw is in flight.
+    /// ([`DestroyRenderSetups`](Self::DestroyRenderSetups)) and that no draw is in flight.
     #[address(0x140_0CE_930)]
     pub fn CreateRenderSetups(&mut self, device_info: *const DeviceInfo) -> bool;
 
     /// Destroys every scene render target, surface, and render setup created by
-    /// [`CreateRenderSetups`](GraphicsEngine::CreateRenderSetups), including the `BackBufferLinear`
+    /// [`CreateRenderSetups`](Self::CreateRenderSetups), including the `BackBufferLinear`
     /// alias, after first unbinding the active setup. The swapchain back buffer itself is not touched.
     /// Pass-owned render targets (post-effect, SSAO, SSR, anti-aliasing pools) are not freed here — the
     /// registered resize callbacks re-allocate those.
@@ -531,26 +531,26 @@ impl GraphicsEngine {
 
     /// Applies a resize: tears down the render setups, has the UI drop its references, resizes the
     /// swapchain (the device-level [`ResizeBuffers`](graphics_engine::device::ResizeBuffers)), re-creates the render
-    /// setups at the new size ([`CreateRenderSetups`](GraphicsEngine::CreateRenderSetups)), runs every
+    /// setups at the new size ([`CreateRenderSetups`](Self::CreateRenderSetups)), runs every
     /// registered resize callback (which re-sizes the pass-owned pools), restores the UI, and updates
     /// the camera aspect and window params. Called from
-    /// [`HandleModeChange`](GraphicsEngine::HandleModeChange) in the [`Draw`](GraphicsEngine::Draw)
+    /// [`HandleModeChange`](Self::HandleModeChange) in the [`Draw`](Self::Draw)
     /// prologue, so it runs on the main thread with no draw in flight.
     #[address(0x140_0CF_A90)]
     pub fn ApplyResize(&mut self, width: u32, height: u32);
 
     /// The resize request entry. Applies the resize inline via
-    /// [`ApplyResize`](GraphicsEngine::ApplyResize) when
-    /// [`m_SynchronousResize`](GraphicsEngine::m_SynchronousResize) and
-    /// [`m_HasBeenInitialized`](GraphicsEngine::m_HasBeenInitialized) are set; otherwise it stashes the
-    /// dimensions in [`m_WindowWidth`](GraphicsEngine::m_WindowWidth)/
-    /// [`m_WindowHeight`](GraphicsEngine::m_WindowHeight) and defers to the next
-    /// [`HandleModeChange`](GraphicsEngine::HandleModeChange).
+    /// [`ApplyResize`](Self::ApplyResize) when
+    /// [`m_SynchronousResize`](Self::m_SynchronousResize) and
+    /// [`m_HasBeenInitialized`](Self::m_HasBeenInitialized) are set; otherwise it stashes the
+    /// dimensions in [`m_WindowWidth`](Self::m_WindowWidth)/
+    /// [`m_WindowHeight`](Self::m_WindowHeight) and defers to the next
+    /// [`HandleModeChange`](Self::HandleModeChange).
     #[address(0x140_0D4_3C0)]
     pub fn ResizeBuffers(&mut self, width: u32, height: u32);
 
-    /// Services the display-mode state machine once per frame from the [`Draw`](GraphicsEngine::Draw)
-    /// prologue: applies a deferred resize ([`ApplyResize`](GraphicsEngine::ApplyResize)) when one is
+    /// Services the display-mode state machine once per frame from the [`Draw`](Self::Draw)
+    /// prologue: applies a deferred resize ([`ApplyResize`](Self::ApplyResize)) when one is
     /// pending, or the fullscreen/adapter change when a mode change is pending, then reconciles the
     /// flip interval. It runs after the previous frame's draw dispatch has drained and before the
     /// current frame is dispatched.
@@ -558,7 +558,7 @@ impl GraphicsEngine {
     pub fn HandleModeChange(&mut self);
 
     /// Loads (or reloads) the named shader bundle and re-creates every shader holder from it, but only
-    /// if `name` differs from [`m_CurrentBundleName`](GraphicsEngine::m_CurrentBundleName).
+    /// if `name` differs from [`m_CurrentBundleName`](Self::m_CurrentBundleName).
     /// Re-creating the holders routes every shader through
     /// `Graphics::CreateFragmentProgram`. The bundle names are `"Shaders"` / `"ShadersLowShadows"`
     /// (and the Intel `"ShadersConstMath*"` variants), selected by shadow quality in
@@ -566,14 +566,14 @@ impl GraphicsEngine {
     #[address(0x140_0DE_9A0)]
     pub fn LoadShaderBundle(&mut self, name: *const u8) -> bool;
 
-    /// Sets [`m_ActiveCursor`](GraphicsEngine::m_ActiveCursor) and, when it changed, posts
+    /// Sets [`m_ActiveCursor`](Self::m_ActiveCursor) and, when it changed, posts
     /// `WM_SETCURSOR` to the game window so [`WndProc`] runs
-    /// [`UpdateCursor`](GraphicsEngine::UpdateCursor). `COverlayUI` drives it: `Arrow` when the
+    /// [`UpdateCursor`](Self::UpdateCursor). `COverlayUI` drives it: `Arrow` when the
     /// overlay cursor becomes visible, `None` when it hides.
     #[address(0x140_0A1_AB0)]
     pub fn SetCursor(&mut self, cursor: ActiveCursor);
 
-    /// Applies [`m_ActiveCursor`](GraphicsEngine::m_ActiveCursor) to the OS: for `None` it sets a
+    /// Applies [`m_ActiveCursor`](Self::m_ActiveCursor) to the OS: for `None` it sets a
     /// null `HCURSOR` and clips the cursor to the client rect (when the window is foreground);
     /// otherwise it unclips and sets `GraphicsParams::m_Cursors[cursor]`. The four entries are
     /// loaded at startup as the system `IDC_ARROW`, `IDC_CROSS`, `IDC_HAND`, and `IDC_NO`
@@ -639,7 +639,7 @@ pub type BFBCFrustumCullParameters {
 /// The scene occluder / beam-frustum-based-culling manager. Its cull frustum is built (and cached
 /// per camera and time) from a camera's `m_View` and `m_ProjectionF`, and every scene-geometry,
 /// terrain, streaming, and occlusion consumer reads it through
-/// [`GetBFBCFrustumParamsForCameraAndTime`](OccluderCollectionManager::GetBFBCFrustumParamsForCameraAndTime).
+/// [`GetBFBCFrustumParamsForCameraAndTime`](Self::GetBFBCFrustumParamsForCameraAndTime).
 pub type OccluderCollectionManager;
 impl OccluderCollectionManager {
     /// Build or fetch the cached BFBC cull-frustum parameters for `camera` at `time`. The frustum is

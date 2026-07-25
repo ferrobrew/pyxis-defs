@@ -25,16 +25,16 @@ pub enum CpuScopeId: i32 {
 /// begin/end pairs into a triple-buffered counter ring, and a once-per-frame update converts the
 /// completed ring slot into per-phase milliseconds with a rolling 30-frame peak.
 ///
-/// In the release build the machinery is dead: [`Update`](CpuProfiler::Update) is compiled to an
-/// empty function, and the phase brackets that write [`m_Counters`](CpuProfiler::m_Counters) are
+/// In the release build the machinery is dead: [`Update`](Self::Update) is compiled to an
+/// empty function, and the phase brackets that write [`m_Counters`](Self::m_Counters) are
 /// compiled out of `CGame::Update` and the game states, so every field stays zero. The consumers
-/// remain -- `CBorkReport`'s telemetry serialises [`m_Time`](CpuProfiler::m_Time) via
-/// [`GetScopeName`](CpuProfiler::GetScopeName), and `CGraphicsEngine::DispatchDraw` forwards
-/// [`m_Index`](CpuProfiler::m_Index) to the draw task -- but they only ever read zeros.
+/// remain -- `CBorkReport`'s telemetry serialises [`m_Time`](Self::m_Time) via
+/// [`GetScopeName`](Self::GetScopeName), and `CGraphicsEngine::DispatchDraw` forwards
+/// [`m_Index`](Self::m_Index) to the draw task -- but they only ever read zeros.
 #[singleton(0x142_E5A_DF0), size(0x390), align(8)]
 pub type CpuProfiler {
     /// The last completed frame's milliseconds per phase, converted from
-    /// [`m_Counters`](CpuProfiler::m_Counters) by [`Update`](CpuProfiler::Update).
+    /// [`m_Counters`](Self::m_Counters) by [`Update`](Self::Update).
     #[address(0x0)]
     pub m_Time: [f32; 15],
 
@@ -42,7 +42,7 @@ pub type CpuProfiler {
     #[address(0x3C)]
     pub m_Peak: [f32; 15],
 
-    /// The counter ring position; [`Update`](CpuProfiler::Update) reads slot `(m_Index + 1) % 3`.
+    /// The counter ring position; [`Update`](Self::Update) reads slot `(m_Index + 1) % 3`.
     #[address(0x78)]
     pub m_Index: i32,
 
@@ -51,12 +51,12 @@ pub type CpuProfiler {
     pub m_Counters: [[[u64; 2]; 3]; 15],
 
     /// The running peak within the current 30-frame window, promoted into
-    /// [`m_Peak`](CpuProfiler::m_Peak) when the window rolls.
+    /// [`m_Peak`](Self::m_Peak) when the window rolls.
     #[address(0x350)]
     pub m_LocalPeak: [f32; 15],
 }
 impl CpuProfiler {
-    /// Converts the completed ring slot's QPC deltas into [`m_Time`](CpuProfiler::m_Time)
+    /// Converts the completed ring slot's QPC deltas into [`m_Time`](Self::m_Time)
     /// milliseconds and rolls the peak window. Compiled to an empty function in the release build;
     /// the once-per-frame call at the top of [`Update`](game::Game::Update) remains.
     #[address(0x140_062_490)]

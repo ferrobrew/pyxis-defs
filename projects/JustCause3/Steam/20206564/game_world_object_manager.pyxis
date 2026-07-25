@@ -2,9 +2,9 @@ use camera::camera::Camera;
 use spawn_system::SBFBCContext;
 
 /// The game world object manager: owns the character occlusion BFBC state and drives the per-frame
-/// character occlusion cull. Each frame, [`StartCommitAddRemove`](GameWorldObjectManager::StartCommitAddRemove)
-/// copies the camera manager's active camera into [`m_OcclusionCamera`](GameWorldObjectManager::m_OcclusionCamera)
-/// and dispatches [`ProcessCharacterOcclusion`](GameWorldObjectManager::ProcessCharacterOcclusion) via a
+/// character occlusion cull. Each frame, [`StartCommitAddRemove`](Self::StartCommitAddRemove)
+/// copies the camera manager's active camera into [`m_OcclusionCamera`](Self::m_OcclusionCamera)
+/// and dispatches [`ProcessCharacterOcclusion`](Self::ProcessCharacterOcclusion) via a
 /// CPU fragment. That function builds a BFBC cull frustum from the active camera via
 /// [`GetBFBCFrustumParamsForCameraAndTime`](graphics_engine::graphics_engine::OccluderCollectionManager::GetBFBCFrustumParamsForCameraAndTime),
 /// then runs `BFBCProcess` with `E_BFBC_PROCESSFUNCTION_FRUSTUM_CULL` to cull character occlusion —
@@ -13,7 +13,7 @@ use spawn_system::SBFBCContext;
 #[singleton(0x142_F17_128)]
 pub type GameWorldObjectManager {
     /// The camera the character occlusion cull builds its BFBC frustum against. Set each frame by
-    /// [`StartCommitAddRemove`](GameWorldObjectManager::StartCommitAddRemove) from
+    /// [`StartCommitAddRemove`](Self::StartCommitAddRemove) from
     /// [`CameraManager::m_ActiveCamera`](camera::camera_manager::CameraManager::m_ActiveCamera).
     #[address(0x9F8)]
     pub m_OcclusionCamera: *const Camera,
@@ -24,18 +24,18 @@ pub type GameWorldObjectManager {
 }
 impl GameWorldObjectManager {
     /// Copies the camera manager's active camera into
-    /// [`m_OcclusionCamera`](GameWorldObjectManager::m_OcclusionCamera), along with its frustum planes
+    /// [`m_OcclusionCamera`](Self::m_OcclusionCamera), along with its frustum planes
     /// and transform, then dispatches
-    /// [`ProcessCharacterOcclusion`](GameWorldObjectManager::ProcessCharacterOcclusion) via a CPU
+    /// [`ProcessCharacterOcclusion`](Self::ProcessCharacterOcclusion) via a CPU
     /// fragment (`CallProxy`).
     #[address(0x140_4BB_8B0)]
     pub fn StartCommitAddRemove(&mut self);
 
-    /// Builds a BFBC cull frustum from [`m_OcclusionCamera`](GameWorldObjectManager::m_OcclusionCamera)
+    /// Builds a BFBC cull frustum from [`m_OcclusionCamera`](Self::m_OcclusionCamera)
     /// via [`GetBFBCFrustumParamsForCameraAndTime`](graphics_engine::graphics_engine::OccluderCollectionManager::GetBFBCFrustumParamsForCameraAndTime),
     /// then runs `BFBCProcess` with `E_BFBC_PROCESSFUNCTION_FRUSTUM_CULL` to cull character occlusion.
     /// Dispatched asynchronously from
-    /// [`StartCommitAddRemove`](GameWorldObjectManager::StartCommitAddRemove).
+    /// [`StartCommitAddRemove`](Self::StartCommitAddRemove).
     #[address(0x140_4BB_7E0)]
     pub fn ProcessCharacterOcclusion(&mut self) -> u64;
 }

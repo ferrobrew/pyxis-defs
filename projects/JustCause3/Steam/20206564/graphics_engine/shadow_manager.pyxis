@@ -12,23 +12,23 @@ pub type CascadeData {
     pub m_Passes: [*mut RenderPass; 2],
 }
 
-/// The cascaded sun-shadow system. Each sim frame, [`UpdateRender`](ShadowManager::UpdateRender)
+/// The cascaded sun-shadow system. Each sim frame, [`UpdateRender`](Self::UpdateRender)
 /// fits the scheduled cascades to the active camera and writes the parity-buffered fit data; each
-/// dispatch, [`CommitRenderPassSettings`](ShadowManager::CommitRenderPassSettings) enables the
+/// dispatch, [`CommitRenderPassSettings`](Self::CommitRenderPassSettings) enables the
 /// scheduled atlas passes. Cascade re-renders are amortised across frames by an update pattern, so
 /// an unscheduled cascade keeps its previous fit and contents.
 #[min_size(0x6200)]
 pub type ShadowManager {
-    /// The settings-side enable flag. The per-frame [`UpdateRender`](ShadowManager::UpdateRender)
-    /// syncs the engine to it via [`SetEnabled`](ShadowManager::SetEnabled) whenever it differs
+    /// The settings-side enable flag. The per-frame [`UpdateRender`](Self::UpdateRender)
+    /// syncs the engine to it via [`SetEnabled`](Self::SetEnabled) whenever it differs
     /// from the live state -- the graphics-menu path for toggling shadows.
     #[address(0x4)]
     pub m_Enabled: bool,
 
     /// The sun-shadow cascade atlas: a single depth `Texture2DArray` whose slices hold every cascade's
-    /// (and the spot shadows') fitted shadow map. Created by [`SetEnabled`](ShadowManager::SetEnabled)
+    /// (and the spot shadows') fitted shadow map. Created by [`SetEnabled`](Self::SetEnabled)
     /// (`CreateShadowDepthTexture`, one render target per array slice). The atlas is parity double-
-    /// buffered: [`m_SliceBase`](ShadowManager::m_SliceBase) gives the base slice for each parity, so the
+    /// buffered: [`m_SliceBase`](Self::m_SliceBase) gives the base slice for each parity, so the
     /// scheduled cascades render into (and the material shaders sample) the parity's half of the array.
     #[address(0x60)]
     pub m_AtlasTexture: *mut Texture,
@@ -41,7 +41,7 @@ pub type ShadowManager {
     /// only every `2^level` frames (level 0 = every frame); between refreshes its fit is copied
     /// forward from the previous update. `CalculateUpdatePattern` assigns the levels (the default
     /// pattern is `{0, 1, 2, 3}` -- the nearest cascade every frame, each further one half as often),
-    /// and [`SetActiveShadowPassCount`](ShadowManager::SetActiveShadowPassCount) reads them each frame,
+    /// and [`SetActiveShadowPassCount`](Self::SetActiveShadowPassCount) reads them each frame,
     /// gated against a rolling counter, to decide which cascades refresh. This is the mechanism that
     /// amortises cascade re-renders across frames.
     #[address(0x2_468)]
@@ -67,12 +67,12 @@ impl ShadowManager {
     pub fn CommitRenderPassSettings(&mut self, ctx: *mut RenderContext);
 
     /// Creates or destroys the shadow render targets and passes; the settings path behind
-    /// [`m_Enabled`](ShadowManager::m_Enabled).
+    /// [`m_Enabled`](Self::m_Enabled).
     #[address(0x140_19E_E50)]
     pub fn SetEnabled(&mut self, enabled: bool);
 
-    /// The sim-side per-frame update: syncs [`m_Enabled`](ShadowManager::m_Enabled) via
-    /// [`SetEnabled`](ShadowManager::SetEnabled), fits the scheduled cascades to
+    /// The sim-side per-frame update: syncs [`m_Enabled`](Self::m_Enabled) via
+    /// [`SetEnabled`](Self::SetEnabled), fits the scheduled cascades to
     /// [`CameraManager::m_ActiveCamera`](camera::camera_manager::CameraManager::m_ActiveCamera)
     /// (the fit frustum comes from that camera's `m_ProjectionF`), copies the unscheduled
     /// cascades' previous fits forward, writes the parity-indexed cascade transforms and per-slice
@@ -82,11 +82,11 @@ impl ShadowManager {
 
     /// Sets the number of active shadow passes (sun cascades plus spot shadows) and rebuilds the
     /// per-frame cascade update schedule: it refreshes the amortisation pattern (recomputing
-    /// [`m_CascadeUpdateLevels`](ShadowManager::m_CascadeUpdateLevels) on a cascade/spot count change),
+    /// [`m_CascadeUpdateLevels`](Self::m_CascadeUpdateLevels) on a cascade/spot count change),
     /// then marks each cascade as either refreshing this frame -- when
     /// `((1 << m_CascadeUpdateLevels[c]) - 1) & rolling_counter == 0` -- or copying its previous fit
     /// forward. Called from `CGameStateRun::UpdateShadows` before
-    /// [`UpdateRender`](ShadowManager::UpdateRender).
+    /// [`UpdateRender`](Self::UpdateRender).
     #[address(0x140_18A_7D0)]
     pub fn SetActiveShadowPassCount(&mut self, count: i32);
 }

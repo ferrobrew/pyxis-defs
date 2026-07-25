@@ -22,12 +22,12 @@ pub type HistogramGeneration {
 #[min_size(0xBF8)]
 pub type ToneMappingEffect {
     /// The exposure-weighted histogram, filled by
-    /// [`CalculateMidAndBrightPointForHistogram`] and read by [`Update`](ToneMappingEffect::Update).
+    /// [`CalculateMidAndBrightPointForHistogram`] and read by [`Update`](Self::Update).
     #[address(0x8)]
     pub m_Histogram: HistogramGeneration,
 
     /// The ping-pong selector for the exposure-weighted histogram metering, flipped each frame by
-    /// [`Update`](ToneMappingEffect::Update).
+    /// [`Update`](Self::Update).
     #[address(0x2A0)]
     pub m_HistogramPingPong: u32,
 
@@ -42,8 +42,8 @@ pub type ToneMappingEffect {
     pub m_NumBuckets: u32,
 
     /// The current clamped, smoothed auto-exposure multiplier. Written once per frame by
-    /// [`Update`](ToneMappingEffect::Update) and read back into the next frame's
-    /// [`GenerateHistogramForFinalScene`](ToneMappingEffect::GenerateHistogramForFinalScene) metering,
+    /// [`Update`](Self::Update) and read back into the next frame's
+    /// [`GenerateHistogramForFinalScene`](Self::GenerateHistogramForFinalScene) metering,
     /// closing the feedback loop.
     #[address(0xBF0)]
     pub m_CurrentExposure: f32,
@@ -58,9 +58,9 @@ impl ToneMappingEffect {
 
     /// Meters the second, non-exposure-weighted scene-luminance histogram (`m_Histogram2`) at a fixed
     /// exposure of `1.0`, so it measures raw scene brightness -- the value
-    /// [`Update`](ToneMappingEffect::Update) divides the auto-exposure target by. Runs once per
+    /// [`Update`](Self::Update) divides the auto-exposure target by. Runs once per
     /// dispatch in the post chain, like
-    /// [`GenerateHistogramForFinalScene`](ToneMappingEffect::GenerateHistogramForFinalScene).
+    /// [`GenerateHistogramForFinalScene`](Self::GenerateHistogramForFinalScene).
     #[address(0x140_119_8F0)]
     pub fn DrawHistogramWindow(&self, ctx: *mut void, pec: *mut void, mgr: *mut void, index: u32);
 

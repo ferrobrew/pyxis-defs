@@ -28,7 +28,7 @@ pub type ObjectBlackboardKeyInfo {
 /// lives at [`Character::m_Blackboard`](Character::m_Blackboard) and carries
 /// the locomotion values (the camera-relative move direction, the target face direction, the up
 /// direction). Values are read and written by id through the template accessors below, under
-/// [`m_BbLock`](ObjectBlackboard::m_BbLock).
+/// [`m_BbLock`](Self::m_BbLock).
 #[size(0x30), align(8)]
 pub type ObjectBlackboard {
     /// The id of the target face direction (`CVector3f`): the desired body facing the orientation
@@ -46,11 +46,11 @@ pub type ObjectBlackboard {
     /// the stop acts).
     pub const SPEED_ID: u32 = 3396837917,
     /// The id of the second float the input move task reads alongside
-    /// [`SPEED_ID`](ObjectBlackboard::SPEED_ID); semantics unmapped, a candidate input-strength
+    /// [`SPEED_ID`](Self::SPEED_ID); semantics unmapped, a candidate input-strength
     /// signal.
     pub const AUX_FLOAT_ID: u32 = 2217900102,
 
-    /// The key table, [`m_KeyInfoCapacity`](ObjectBlackboard::m_KeyInfoCapacity) slots; keys are
+    /// The key table, [`m_KeyInfoCapacity`](Self::m_KeyInfoCapacity) slots; keys are
     /// assigned as they are first written.
     pub m_KeyInfos: *mut ObjectBlackboardKeyInfo,
 

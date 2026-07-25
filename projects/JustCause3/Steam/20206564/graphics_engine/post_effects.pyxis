@@ -37,7 +37,7 @@ pub type PostEffectContext {
 pub type PostEffectsManager;
 impl PostEffectsManager {
     /// Enqueues the world post-effect block, then steps the world fade accumulator
-    /// ([`ApplyWorldFadeFilter`](PostEffectsManager::ApplyWorldFadeFilter)). `dt` flows only into
+    /// ([`ApplyWorldFadeFilter`](Self::ApplyWorldFadeFilter)). `dt` flows only into
     /// that accumulator; the texture arguments are the scene inputs.
     #[address(0x140_14B_FE0)]
     pub fn ApplyWorldFilters(&mut self, dt: f32, setup: *mut HRenderSetup_t, a4: *mut HTexture_t, a5: *mut HTexture_t, a6: *mut HTexture_t, a7: *mut HTexture_t, a8: *mut HTexture_t);
@@ -66,7 +66,7 @@ impl PostEffectsManager {
     pub fn ApplySubsampleJitter(&self, proj: *mut Matrix4, width: i32, height: i32);
 }
 
-/// The render block for the post-effects pass. Its [`Draw`](RenderBlockPostEffects::Draw) runs the
+/// The render block for the post-effects pass. Its [`Draw`](Self::Draw) runs the
 /// HDR post chain in order: histogram generation, sun-halo pre-apply, blur (bokeh or plain), glare,
 /// depth of field, motion blur, the HDR-to-LDR tonemap, the player-damage vignette, anti-aliasing,
 /// sun halo, and the final fade.
@@ -135,12 +135,12 @@ impl PlayerDamageEffect {
     pub fn Apply(&mut self, ctx: *mut HContext_t, pec: *mut PostEffectContext, a4: *mut void, input: u32) -> u32;
 }
 
-/// The sun halo. [`PreApply`](SunHaloEffect::PreApply) prepares it and sets the ready flag;
-/// [`Apply`](SunHaloEffect::Apply) composites it.
+/// The sun halo. [`PreApply`](Self::PreApply) prepares it and sets the ready flag;
+/// [`Apply`](Self::Apply) composites it.
 #[min_size(0x118)]
 pub type SunHaloEffect {
-    /// The ready flag: [`PreApply`](SunHaloEffect::PreApply) sets it when the halo is prepared, and
-    /// [`Apply`](SunHaloEffect::Apply) early-outs when it is clear.
+    /// The ready flag: [`PreApply`](Self::PreApply) sets it when the halo is prepared, and
+    /// [`Apply`](Self::Apply) early-outs when it is clear.
     #[address(0x114)]
     pub m_Ready: bool,
 }

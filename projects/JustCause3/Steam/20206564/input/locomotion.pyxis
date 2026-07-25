@@ -27,7 +27,7 @@ impl NStateTask_InputLocoSetTargetDirTask {
 }
 
 /// The locomotion move task active when the character is on foot and *not* holding an aim. Its
-/// [`Update`](NStateTask_InputLocoMoveTask::Update) reads [`Character::m_AimFlags`] and dispatches
+/// [`Update`](Self::Update) reads [`Character::m_AimFlags`] and dispatches
 /// to run/steer versus strafe locomotion.
 pub type NStateTask_InputLocoMoveTask;
 impl NStateTask_InputLocoMoveTask {
@@ -69,7 +69,7 @@ impl NStateTask_InputLocoIdleTask {
 }
 
 /// Free helpers that queue the concrete locomotion animation acts. The queued act encodes the
-/// movement style: [`QueueMoveActions`](NStateTask_LocoUtil::QueueMoveActions) steers the body
+/// movement style: [`QueueMoveActions`](Self::QueueMoveActions) steers the body
 /// toward the movement direction, while the aim-relative variants keep the body facing the aim and
 /// play directional strafe animations.
 pub type NStateTask_LocoUtil;
@@ -107,7 +107,7 @@ impl NStateTask_LocoUtil {
     pub fn EvaluateCharacterOrientation(out: *mut Matrix4, character: *mut Character, track_face_dir: bool, snap_to_face_dir: bool, wait_for_blend: bool, max_step_deg: f32, dt: f32) -> *mut Matrix4;
 
     /// The model-space variant of
-    /// [`EvaluateCharacterOrientation`](NStateTask_LocoUtil::EvaluateCharacterOrientation), also
+    /// [`EvaluateCharacterOrientation`](Self::EvaluateCharacterOrientation), also
     /// called from the movement task and from the grapple reel-in controller. The bools are
     /// believed to match the world-space variant minus the blend gate; unverified.
     #[address(0x140_81F_490)]
@@ -116,7 +116,7 @@ impl NStateTask_LocoUtil {
     /// Computes this frame's movement direction from the animation root motion and the new body
     /// orientation. Called from [`NStateTask_MovementLocomotionTask::Update`], which normalizes
     /// `out_direction`, scales it by
-    /// [`EvaluateCharacterSpeed`](NStateTask_LocoUtil::EvaluateCharacterSpeed), and writes the
+    /// [`EvaluateCharacterSpeed`](Self::EvaluateCharacterSpeed), and writes the
     /// result as the character's physics velocity -- so overriding `out_direction` after the call
     /// redirects the movement without touching the speed envelope. The bools and `out_secondary`
     /// are unmapped.
@@ -144,7 +144,7 @@ impl NStateTask_LocoUtil {
     #[address(0x140_818_C90)]
     pub fn QueueStops(character: *mut Character) -> bool;
 
-    /// The aim-mode variant of [`QueueStops`](NStateTask_LocoUtil::QueueStops): stop-and-turn acts
+    /// The aim-mode variant of [`QueueStops`](Self::QueueStops): stop-and-turn acts
     /// that settle the body toward the aim.
     #[address(0x140_832_060)]
     pub fn QueueStopTurns(character: *mut Character) -> bool;
@@ -153,8 +153,8 @@ impl NStateTask_LocoUtil {
     /// character to the player's aim-target position (or the camera forward while planting an
     /// explosive), both rotated into the character's local frame when the relevant state flag is
     /// set. Consumed by the aim-relative act dispatchers
-    /// ([`QueueAimRelativeMoveActions`](NStateTask_LocoUtil::QueueAimRelativeMoveActions),
-    /// [`QueueStopTurns`](NStateTask_LocoUtil::QueueStopTurns), and the on-spot turn queuers) to
+    /// ([`QueueAimRelativeMoveActions`](Self::QueueAimRelativeMoveActions),
+    /// [`QueueStopTurns`](Self::QueueStopTurns), and the on-spot turn queuers) to
     /// select directional acts and on-spot turns. `move_dir` is a by-value `CVector3f` in the
     /// source, passed by pointer under the x64 ABI.
     #[address(0x140_831_880)]

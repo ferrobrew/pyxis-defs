@@ -194,7 +194,7 @@ pub fn GetRenderPassCategoryName(category: i32) -> *const u8;
 /// [`TerrainPatchSystemUpdate`].
 pub type STerrainPatchSystem {
     /// Whether [`TerrainPatchSystemUpdate`] refreshes
-    /// [`m_TerrainCamera`](STerrainPatchSystem::m_TerrainCamera) from the LOD camera this frame; when
+    /// [`m_TerrainCamera`](Self::m_TerrainCamera) from the LOD camera this frame; when
     /// clear, the previous frame's copy is kept.
     #[address(0x50)]
     pub m_UpdateCamera: bool,
@@ -204,7 +204,7 @@ pub type STerrainPatchSystem {
     pub m_TessellationDistance: f32,
 
     /// A copy of the LOD camera ([`m_ActiveCamera`](camera::camera_manager::CameraManager::m_ActiveCamera)) taken when
-    /// [`m_UpdateCamera`](STerrainPatchSystem::m_UpdateCamera) is set. The terrain render passes point
+    /// [`m_UpdateCamera`](Self::m_UpdateCamera) is set. The terrain render passes point
     /// their frustum camera at this and cull patches against its
     /// [`m_FrustumPlane`](camera::camera::Camera::m_FrustumPlane).
     #[address(0x58)]
@@ -221,7 +221,7 @@ pub fn TerrainPatchSystemUpdate(handle: *mut STerrainPatchSystem, ctx: *mut void
 #[singleton(0x142_ED0_E18), size(0x2220)]
 pub type RenderEngine {
     /// The per-pass render-block-item lists: one vector of [`RenderPass`] pointers per pass id.
-    /// [`DrawRenderPassRange`](RenderEngine::DrawRenderPassRange) and the per-frame list rotation walk
+    /// [`DrawRenderPassRange`](Self::DrawRenderPassRange) and the per-frame list rotation walk
     /// this.
     #[address(0x80)]
     pub m_RenderPasses: [Vector<*mut RenderPass>; 157],
@@ -240,9 +240,9 @@ pub type RenderEngine {
 
     /// The CPU staging copy of the global vertex-program constant buffer (the shaders'
     /// `GlobalConstants` cbuffer at vertex slot 0, `VP_GLOBAL_SIZE` = 49 float4 rows).
-    /// [`SetGlobalShaderProgramCameraConstants`](RenderEngine::SetGlobalShaderProgramCameraConstants)
+    /// [`SetGlobalShaderProgramCameraConstants`](Self::SetGlobalShaderProgramCameraConstants)
     /// fills the per-view rows from a [`RenderContext`], the fog and atmosphere setters fill rows
-    /// 14--24, and [`SetAllGlobalShaderProgramConstants`](RenderEngine::SetAllGlobalShaderProgramConstants)
+    /// 14--24, and [`SetAllGlobalShaderProgramConstants`](Self::SetAllGlobalShaderProgramConstants)
     /// uploads the whole block to the GPU. Row layout (row = float4 index): 0--3 the full
     /// (translation-bearing) view-projection, 4 the camera world position, 5 the camera forward
     /// axis, 9 the camera world position with `w = 1`, 14--24 fog and atmospheric scattering,
@@ -257,8 +257,8 @@ pub type RenderEngine {
     /// The CPU staging copy of the global fragment-program constant buffer (the shaders'
     /// `GlobalConstants` cbuffer at fragment slot 0, `FP_GLOBAL_SIZE` = 95 float4 rows): lighting,
     /// wetness, shadow, and per-view camera rows filled by
-    /// [`SetGlobalShaderConstants`](RenderEngine::SetGlobalShaderConstants), uploaded by
-    /// [`SetAllGlobalShaderProgramConstants`](RenderEngine::SetAllGlobalShaderProgramConstants).
+    /// [`SetGlobalShaderConstants`](Self::SetGlobalShaderConstants), uploaded by
+    /// [`SetAllGlobalShaderProgramConstants`](Self::SetAllGlobalShaderProgramConstants).
     #[address(0x1_C2C)]
     pub m_FPGlobalConstData: [Vector4; 95],
 }
@@ -305,7 +305,7 @@ impl RenderEngine {
     #[address(0x140_185_740)]
     pub fn SetGlobalShaderConstants(&mut self, ctx: *mut RenderContext);
 
-    /// Refreshes the per-view rows of [`m_VPGlobalConstData`](RenderEngine::m_VPGlobalConstData)
+    /// Refreshes the per-view rows of [`m_VPGlobalConstData`](Self::m_VPGlobalConstData)
     /// from a [`RenderContext`]: the full view-projection (rows 0--3), the camera world position
     /// and forward axis (rows 4, 5, 9), the offset view-projection (rows 29--32), the previous
     /// view-projection (rows 33--36), the frustum planes (rows 38--43), the previous offset
@@ -317,18 +317,18 @@ impl RenderEngine {
     pub fn SetGlobalShaderProgramCameraConstants(&mut self, ctx: *const RenderContext);
 
     /// Uploads both global constant-buffer staging blocks
-    /// ([`m_VPGlobalConstData`](RenderEngine::m_VPGlobalConstData) and
-    /// [`m_FPGlobalConstData`](RenderEngine::m_FPGlobalConstData)) into the context's global
+    /// ([`m_VPGlobalConstData`](Self::m_VPGlobalConstData) and
+    /// [`m_FPGlobalConstData`](Self::m_FPGlobalConstData)) into the context's global
     /// constant buffers via lock/memcpy/unlock. Called per pass by
     /// [`RenderPass::Draw`](graphics_engine::render_pass::RenderPass::Draw) and once per dispatch
     /// from `HandleDrawThreadTask`.
     #[address(0x140_173_850)]
     pub fn SetAllGlobalShaderProgramConstants(&mut self, ctx: *const RenderContext);
 
-    /// Writes `count` float4 rows into [`m_VPGlobalConstData`](RenderEngine::m_VPGlobalConstData)
+    /// Writes `count` float4 rows into [`m_VPGlobalConstData`](Self::m_VPGlobalConstData)
     /// starting at row `index` (bounds-asserted against `VP_GLOBAL_SIZE` = 49). The staging copy
     /// only; the GPU upload happens in
-    /// [`SetAllGlobalShaderProgramConstants`](RenderEngine::SetAllGlobalShaderProgramConstants).
+    /// [`SetAllGlobalShaderProgramConstants`](Self::SetAllGlobalShaderProgramConstants).
     #[address(0x140_173_8F0)]
     pub fn SetGlobalVertexProgramConstants(&mut self, index: u32, data: *const f32, count: u32);
 
@@ -392,8 +392,8 @@ pub type RenderBlockTypeBase {
         /// `CRenderEngine::RecreateRenderBlockTypes` calls this on every registered type with the
         /// render engine's own resource context (the settings-change path) — but several types,
         /// including the terrain setup types, implement it as a no-op; re-creating those requires
-        /// calling [`Destroy`](RenderBlockTypeBase::Destroy) and
-        /// [`Create`](RenderBlockTypeBase::Create) directly.
+        /// calling [`Destroy`](Self::Destroy) and
+        /// [`Create`](Self::Create) directly.
         #[index(3)]
         pub fn Recreate(&mut self, resource_context: *mut ResourceContext);
 
@@ -418,7 +418,7 @@ pub type RenderBlockTypeBase {
 
         /// Disables drawing of this type's blocks. In the release build the base implementation is
         /// compiled to a no-op (the enabled flag was optimized out), so suppressing a type requires
-        /// replacing its [`IsEnabled`](RenderBlockTypeBase::IsEnabled) vtable entry.
+        /// replacing its [`IsEnabled`](Self::IsEnabled) vtable entry.
         #[index(20)]
         pub fn Disable(&mut self);
     },

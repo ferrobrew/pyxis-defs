@@ -23,7 +23,7 @@ pub enum EffectorState: u32 {
 /// `m_State`, and `m_StateTime` offsets all match).
 #[size(0x14), align(4)]
 pub type InputDeviceEffector {
-    /// The analog value, e.g. trigger pressure or stick axis. [`Click`](InputDeviceEffector::Click)
+    /// The analog value, e.g. trigger pressure or stick axis. [`Click`](Self::Click)
     /// sets it to `1.0`.
     pub m_Value: f32,
     pub m_PrevValue: f32,

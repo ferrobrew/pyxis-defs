@@ -12,7 +12,7 @@ impl InputToOrbitModifier {
     #[address(0x140_6CB_3F0)]
     pub fn CalculateInputDeltaAngles(&mut self, params: *const InputToOrbitModifierParams, pipeline: *mut CameraPipelineContext) -> Vector2;
 
-    /// The caller of [`CalculateInputDeltaAngles`](InputToOrbitModifier::CalculateInputDeltaAngles):
+    /// The caller of [`CalculateInputDeltaAngles`](Self::CalculateInputDeltaAngles):
     /// takes the returned delta-angle and applies it to the camera via
     /// [`BoomTransform::DeltaTransform`].
     #[address(0x140_6DB_B80)]

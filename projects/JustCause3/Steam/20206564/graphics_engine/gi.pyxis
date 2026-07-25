@@ -1,6 +1,6 @@
 /// The light-propagation-volume solver: RSM inject + LPV propagation for the global-illumination pass.
 /// `CGISolver::Execute` refreshes one of the two LPV cascades each dispatch and toggles
-/// [`m_CascadeToUpdate`](GISolver::m_CascadeToUpdate) afterward, so the cascades are refreshed in
+/// [`m_CascadeToUpdate`](Self::m_CascadeToUpdate) afterward, so the cascades are refreshed in
 /// alternation across frames.
 #[size(0x3E0)]
 pub type GISolver {

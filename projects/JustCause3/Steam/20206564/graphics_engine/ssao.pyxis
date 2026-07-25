@@ -16,7 +16,7 @@ pub type SSAOPass {
     pub m_PrevFrameIndex: u32,
 
     /// The current slot the resolve writes and the final composite samples; advances with
-    /// [`m_PrevFrameIndex`](SSAOPass::m_PrevFrameIndex).
+    /// [`m_PrevFrameIndex`](Self::m_PrevFrameIndex).
     #[address(0x9A4)]
     pub m_CurrFrameIndex: u32,
 

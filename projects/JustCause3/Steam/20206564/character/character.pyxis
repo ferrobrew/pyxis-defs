@@ -26,7 +26,7 @@ pub bitflags AimState: u8 {
 
 /// Per-character LOD/update-gating flags. Checked before the SIM-phase animation and IK work:
 /// [`UpdatePassFinalizePose_Parallel`](Character::UpdatePassFinalizePose_Parallel) skips the
-/// HumanIK solve when [`REDUCED_LOD`](CharacterLodFlags::REDUCED_LOD) is set. Only that bit is mapped.
+/// HumanIK solve when [`REDUCED_LOD`](Self::REDUCED_LOD) is set. Only that bit is mapped.
 #[copyable]
 pub bitflags CharacterLodFlags: u8 {
     REDUCED_LOD = 0b0000_0010,
@@ -39,7 +39,7 @@ pub type Character {
     pub m_Inventory: Inventory,
 
     /// The character's embedded HumanIK solver. Driven each frame in
-    /// [`UpdatePassFinalizePose_Parallel`](Character::UpdatePassFinalizePose_Parallel), after the
+    /// [`UpdatePassFinalizePose_Parallel`](Self::UpdatePassFinalizePose_Parallel), after the
     /// animation graph finalizes the local pose and before the model-space pose is computed. See
     /// [`HumanIK`] for the per-pass lifecycle.
     #[address(0x1_0E0)]
@@ -70,7 +70,7 @@ pub type Character {
 
     /// The weapon-aim countdown timer, in seconds. It is refreshed while an aim input is held and
     /// decremented by the frame delta otherwise; a positive value keeps
-    /// [`m_AimingWeapon`](AimState::m_AimingWeapon) set in [`m_AimFlags`](Character::m_AimFlags),
+    /// [`m_AimingWeapon`](AimState::m_AimingWeapon) set in [`m_AimFlags`](Self::m_AimFlags),
     /// so the character stays in aim/strafe locomotion for a short tail after the aim button is
     /// released.
     #[address(0x2_A00)]
@@ -111,23 +111,23 @@ impl Character {
     pub fn GetSafeBoneMatrix(&self, safe_index: SafeBoneIndex, matrix: *mut Matrix4);
 
     /// The character's SIM-phase pose-finalization pass. After the animation graph has finalized the
-    /// local pose, this drives the [`HumanIK`](Character::m_HIK) solve (the `MAIN` body pass, gated
+    /// local pose, this drives the [`HumanIK`](Self::m_HIK) solve (the `MAIN` body pass, gated
     /// on [`HumanIK::HasTargets`], followed by the `SECONDARY` hand pass), then computes the
     /// model-space pose (`CalculateModelSpacePose`), and finally calls
-    /// [`UpdatePropEffects`](Character::UpdatePropEffects). Effector targets queued before this runs
+    /// [`UpdatePropEffects`](Self::UpdatePropEffects). Effector targets queued before this runs
     /// are solved into the pose the same frame.
     #[address(0x140_7F9_B10)]
     pub fn UpdatePassFinalizePose_Parallel(&mut self, context: *mut void);
 
     /// The per-frame update of the character's attached prop visual effects. Runs last in
-    /// [`UpdatePassFinalizePose_Parallel`](Character::UpdatePassFinalizePose_Parallel), after the IK
+    /// [`UpdatePassFinalizePose_Parallel`](Self::UpdatePassFinalizePose_Parallel), after the IK
     /// solve and the model-space pose computation.
     #[address(0x140_7C2_380)]
     pub fn UpdatePropEffects(&mut self, dt: f32);
 
     /// The per-frame player aiming-input update. Resolves whether the player is aiming a weapon or
-    /// grapple from the equipped weapon and [`m_AimTimer`](Character::m_AimTimer), then writes the
-    /// result into [`m_AimFlags`](Character::m_AimFlags)
+    /// grapple from the equipped weapon and [`m_AimTimer`](Self::m_AimTimer), then writes the
+    /// result into [`m_AimFlags`](Self::m_AimFlags)
     /// ([`m_AimingWeapon`](AimState::m_AimingWeapon) / [`m_AimingGrapple`](AimState::m_AimingGrapple)).
     /// The locomotion tasks read those flags to select aim-relative (strafe) movement. NPCs use a
     /// separate `HandleAimingInputNPC`; this variant is player-only and is the single point that
@@ -154,10 +154,10 @@ impl Character {
 
 #[size(0x240)]
 pub type AnimatedModel {
-    /// The number of [`m_ModelInstances`](AnimatedModel::m_ModelInstances) slots. Keep in sync
+    /// The number of [`m_ModelInstances`](Self::m_ModelInstances) slots. Keep in sync
     /// with that array's length.
     pub const MODEL_INSTANCE_SLOTS: u64 = 8,
-    /// The [`m_ModelInstances`](AnimatedModel::m_ModelInstances) slot holding the character's
+    /// The [`m_ModelInstances`](Self::m_ModelInstances) slot holding the character's
     /// *body* model -- the one whose skeleton the character's bone indices belong to. The other
     /// slots are attachments with their own skeletons (the parachute among them), where the same
     /// numeric indices land on arbitrary bones.
@@ -206,7 +206,7 @@ impl AnimationController {
 
     /// Advances the playback clocks of the controller's time-updatable blenders by `dt` (via
     /// `CPoseProducer::UpdateBlendersTimeInRange`) without recomputing the pose. Runs each SIM frame
-    /// in the character's animation pass, before [`UpdateAnimations`](AnimationController::UpdateAnimations).
+    /// in the character's animation pass, before [`UpdateAnimations`](Self::UpdateAnimations).
     #[address(0x140_479_4D0)]
     pub fn UpdateAnimationsTime(&mut self, dt: f32);
 

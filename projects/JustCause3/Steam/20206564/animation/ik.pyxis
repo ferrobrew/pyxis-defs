@@ -184,19 +184,19 @@ pub type EffectorIdTable {
 /// animation graph has finalized the local pose and before `CalculateModelSpacePose`. For each
 /// [`Pass`], the sequence is:
 ///
-/// 1. Targets are queued (via [`AddEffectorTargetPosition`](HumanIK::AddEffectorTargetPosition) /
-///    [`AddEffectorTargetRotation`](HumanIK::AddEffectorTargetRotation)) — the aim/reach IK does
+/// 1. Targets are queued (via [`AddEffectorTargetPosition`](Self::AddEffectorTargetPosition) /
+///    [`AddEffectorTargetRotation`](Self::AddEffectorTargetRotation)) — the aim/reach IK does
 ///    this during animation-graph evaluation for `MAIN`; the hand pass queues its own for
 ///    `SECONDARY`.
-/// 2. [`HasTargets`](HumanIK::HasTargets) gates the solve. If there are none, the whole solve for
+/// 2. [`HasTargets`](Self::HasTargets) gates the solve. If there are none, the whole solve for
 ///    that pass is skipped.
-/// 3. [`SetActiveIKPass`](HumanIK::SetActiveIKPass), then
-///    [`DriveAllCurrentEffectorControlValues`](HumanIK::DriveAllCurrentEffectorControlValues), then
-///    the solve proper: [`CharacterToIKState`](HumanIK::CharacterToIKState) →
-///    [`UpdateEffectorsFromTargets`](HumanIK::UpdateEffectorsFromTargets) →
-///    [`Solve`](HumanIK::Solve) → [`IKToCharacterState`](HumanIK::IKToCharacterState) (writing the
+/// 3. [`SetActiveIKPass`](Self::SetActiveIKPass), then
+///    [`DriveAllCurrentEffectorControlValues`](Self::DriveAllCurrentEffectorControlValues), then
+///    the solve proper: [`CharacterToIKState`](Self::CharacterToIKState) →
+///    [`UpdateEffectorsFromTargets`](Self::UpdateEffectorsFromTargets) →
+///    [`Solve`](Self::Solve) → [`IKToCharacterState`](Self::IKToCharacterState) (writing the
 ///    solved pose back into the character's `hkaPose`).
-/// 4. [`ResetSolveStep`](HumanIK::ResetSolveStep), then [`ClearTargets`](HumanIK::ClearTargets)
+/// 4. [`ResetSolveStep`](Self::ResetSolveStep), then [`ClearTargets`](Self::ClearTargets)
 ///    drops consumed targets (and returns whether the pass is now empty).
 ///
 /// A target queued before the `HasTargets` gate for a pass is therefore consumed in the same frame.
@@ -227,7 +227,7 @@ pub type HumanIK {
     #[address(0x20)]
     pub m_PassInfo: [PassInfo; 2],
 
-    /// The pass currently being driven; set by [`SetActiveIKPass`](HumanIK::SetActiveIKPass) and
+    /// The pass currently being driven; set by [`SetActiveIKPass`](Self::SetActiveIKPass) and
     /// read by the queue/solve helpers.
     #[address(0xB0)]
     pub m_CurrentPass: Pass,
@@ -283,7 +283,7 @@ pub type HumanIK {
 impl HumanIK {
     /// Builds the solver from a skeleton and an Autodesk HIK characterization buffer: creates the
     /// HIK character/state objects, maps each used HIK node to its skeleton bone index (populating
-    /// [`m_EffectorIds`](HumanIK::m_EffectorIds)), and zeroes the control-value arrays.
+    /// [`m_EffectorIds`](Self::m_EffectorIds)), and zeroes the control-value arrays.
     #[address(0x140_408_450)]
     pub fn Init(&mut self, skeleton: u64, characterization_buffer: *const u8, buffer_size: u64);
 
@@ -297,10 +297,10 @@ impl HumanIK {
     pub fn HasTargets(&mut self, pass: Pass) -> bool;
 
     /// Maps a skeleton bone index to its HumanIK effector id (`0..44`) via
-    /// [`m_EffectorIds`](HumanIK::m_EffectorIds), or `-1` if the bone has no effector mapping. The
+    /// [`m_EffectorIds`](Self::m_EffectorIds), or `-1` if the bone has no effector mapping. The
     /// bone index is in the same space as the character's bone matrices/joints (the value the safe-
     /// bone-index table resolves to). The head bone maps to effector `15`; the chest end effector is
-    /// [`GetChestEndEffectorId`](HumanIK::GetChestEndEffectorId).
+    /// [`GetChestEndEffectorId`](Self::GetChestEndEffectorId).
     #[address(0x140_3E2_BF0)]
     pub fn GetEffectorIdFromBoneIndex(&self, bone_index: u32) -> i32;
 
@@ -323,7 +323,7 @@ impl HumanIK {
     /// Queues a rotational effector target about a cardinal [`RotationAxis`], or updates the existing
     /// target for the same effector. `rotation_offset` is in radians. This is the axis-enum overload
     /// of the engine's `AddEffectorTargetRotation`; see
-    /// [`AddEffectorTargetRotationVector`](HumanIK::AddEffectorTargetRotationVector) for the
+    /// [`AddEffectorTargetRotationVector`](Self::AddEffectorTargetRotationVector) for the
     /// explicit-axis overload.
     #[address(0x140_408_960)]
     pub fn AddEffectorTargetRotation(&mut self, effector: i32, rotation_offset: f32, axis: RotationAxis, solve_step: SolveStep, pass: Pass, effector_interpolation: bool, effector_interpolation_rate: f32, effector_blend_out: bool, effector_blend_out_rate: f32);

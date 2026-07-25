@@ -11,7 +11,7 @@ pub type PatchHeader {
     #[address(0x10)]
     pub m_PatchX: i16,
 
-    /// The patch's Z coordinate in its map grid; see [`m_PatchX`](PatchHeader::m_PatchX).
+    /// The patch's Z coordinate in its map grid; see [`m_PatchX`](Self::m_PatchX).
     #[address(0x12)]
     pub m_PatchZ: i16,
 

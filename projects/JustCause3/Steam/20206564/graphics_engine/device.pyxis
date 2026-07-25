@@ -19,7 +19,7 @@ extern type IDXGIOutput;
 /// The device's cached mode/capability descriptor. [`GetDeviceInfo`] returns a copy of the device's own
 /// instance ([`Device::m_DeviceInfo`]), and [`CreateRenderSetups`](graphics_engine::graphics_engine::GraphicsEngine::CreateRenderSetups)
 /// sizes every scene render target from a caller-supplied copy's
-/// [`m_DisplayWidth`](DeviceInfo::m_DisplayWidth)/[`m_DisplayHeight`](DeviceInfo::m_DisplayHeight).
+/// [`m_DisplayWidth`](Self::m_DisplayWidth)/[`m_DisplayHeight`](Self::m_DisplayHeight).
 #[copyable, size(0x38)]
 pub type DeviceInfo {
     // 0x00 device type, 0x04 vendor, 0x08 group, 0x0C model.
@@ -38,7 +38,7 @@ pub type DeviceInfo {
 }
 
 /// The surface a device exposes to [`GetDeviceSurface`]. The presentable back buffer is
-/// [`BackBuffer`](DeviceSurface::BackBuffer); the eye-specific variants are for stereo output devices.
+/// [`BackBuffer`](Self::BackBuffer); the eye-specific variants are for stereo output devices.
 #[copyable]
 pub enum DeviceSurface: i32 {
     FrontBuffer = 0x0,

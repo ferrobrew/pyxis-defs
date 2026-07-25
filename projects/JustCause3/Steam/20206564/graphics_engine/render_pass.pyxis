@@ -122,7 +122,7 @@ pub enum RenderPassSortMethod: i32 {
 
 /// One of a render pass's double-buffered render-block-item lists.
 ///
-/// [`Add`](RBILists::Add) appends entries; on overflow (`m_NumElements >= m_ListSize`) it spills into
+/// [`Add`](Self::Add) appends entries; on overflow (`m_NumElements >= m_ListSize`) it spills into
 /// the global overflow list. [`DoDraw`](RenderPass::DoDraw) reads `min(m_ListSize, m_NumElements)`
 /// entries and never writes `m_NumElements`, so a populated list can be redrawn any number of times.
 #[min_size(0x10)]
@@ -172,15 +172,15 @@ pub bitflags RenderPassSortState: u16 {
 #[min_size(0x8C0)]
 pub type RenderPass {
     /// The list that new render-block-items append to this frame. Each rotation,
-    /// [`SaveRenderFrameData`](RenderPass::SaveRenderFrameData) re-points it at the new parity's list
+    /// [`SaveRenderFrameData`](Self::SaveRenderFrameData) re-points it at the new parity's list
     /// and zeroes its count; zeroing that count is how a pass's draw-time additions are reset.
     #[address(0x28)]
     pub m_CurrentAddList: *mut RBILists,
 
-    /// The list [`DoDraw`](RenderPass::DoDraw) draws this frame: the other parity's list, populated
+    /// The list [`DoDraw`](Self::DoDraw) draws this frame: the other parity's list, populated
     /// by last rotation's adds. Re-pointed alongside
-    /// [`m_CurrentAddList`](RenderPass::m_CurrentAddList) by
-    /// [`SaveRenderFrameData`](RenderPass::SaveRenderFrameData).
+    /// [`m_CurrentAddList`](Self::m_CurrentAddList) by
+    /// [`SaveRenderFrameData`](Self::SaveRenderFrameData).
     #[address(0x30)]
     pub m_CurrentDrawList: *mut RBILists,
 
@@ -203,17 +203,17 @@ pub type RenderPass {
     #[address(0x9E)]
     pub m_Index: i16,
 
-    /// The spinlock serializing [`SortList`](RenderPass::SortList) against concurrent callers
-    /// (the render-engine sort task and the lazy sort in [`DoDraw`](RenderPass::DoDraw)).
+    /// The spinlock serializing [`SortList`](Self::SortList) against concurrent callers
+    /// (the render-engine sort task and the lazy sort in [`DoDraw`](Self::DoDraw)).
     #[address(0x858)]
     pub m_SortLock: *mut void,
 
-    /// How [`SortList`](RenderPass::SortList) orders the draw list. Most passes leave the
+    /// How [`SortList`](Self::SortList) orders the draw list. Most passes leave the
     /// constructor default (`Auto`); passes that opt out set `None`.
     #[address(0x878)]
     pub m_SortMethod: RenderPassSortMethod,
 
-    /// The number of live entries in [`m_DepthSqTable`](RenderPass::m_DepthSqTable). The
+    /// The number of live entries in [`m_DepthSqTable`](Self::m_DepthSqTable). The
     /// constructor initializes a single zero bucket; with one bucket the bucketed sort computes no
     /// depth keys.
     #[address(0x87C)]
@@ -251,7 +251,7 @@ impl RenderPass {
     /// The virtual per-pass draw entry (vtable slot 0): when the pass has work, it runs
     /// `SetupRenderContext`, selects the pass camera (the pass's external camera if set, else the
     /// render camera) into the context via
-    /// [`SetRenderContextCamera`](RenderPass::SetRenderContextCamera), refreshes and uploads the
+    /// [`SetRenderContextCamera`](Self::SetRenderContextCamera), refreshes and uploads the
     /// global constant buffers
     /// ([`SetGlobalShaderProgramCameraConstants`](graphics_engine::render_engine::RenderEngine::SetGlobalShaderProgramCameraConstants)
     /// then
@@ -263,14 +263,14 @@ impl RenderPass {
 
     /// Draws the current draw list, walking `min(m_ListSize, m_NumElements)` blocks and
     /// vtable-dispatching each. Non-destructive -- never writes `m_NumElements`. Calls
-    /// [`SortList`](RenderPass::SortList) lazily before drawing. Consecutive blocks of one type
-    /// form a type run: [`ChangeRenderBlockType`](RenderPass::ChangeRenderBlockType) switches
+    /// [`SortList`](Self::SortList) lazily before drawing. Consecutive blocks of one type
+    /// form a type run: [`ChangeRenderBlockType`](Self::ChangeRenderBlockType) switches
     /// between runs, and the tail closes the final run (its type-level restore and its scope
     /// marker).
     #[address(0x140_1AC_7A0)]
     pub fn DoDraw(&mut self, ctx: *mut RenderContext, color_mask: u32) -> bool;
 
-    /// Switches the active render-block type between type runs in [`DoDraw`](RenderPass::DoDraw):
+    /// Switches the active render-block type between type runs in [`DoDraw`](Self::DoDraw):
     /// restores `prev` (dispatching the Z, colour, or glint restore variant selected by the pass
     /// id) and closes its scope marker (`Graphics::EndScopeMarker`), then re-applies the
     /// pass render states, sets up `next`, and opens a scope marker (`Graphics::BeginScopeMarker`)
@@ -284,12 +284,12 @@ impl RenderPass {
     /// Sorts the current draw list by ([`m_Depth`](RenderInstance::m_Depth),
     /// [`m_RenderBlockType`](RenderInstance::m_RenderBlockType),
     /// [`m_SortID`](RenderInstance::m_SortID)) according to
-    /// [`m_SortMethod`](RenderPass::m_SortMethod), first recomputing each entry's depth and
+    /// [`m_SortMethod`](Self::m_SortMethod), first recomputing each entry's depth and
     /// sort-ID keys through the block vtable
     /// ([`GetSortID`](RenderBlock::GetSortID) / [`GetSqDistanceToCamera`](RenderBlock::GetSqDistanceToCamera)).
-    /// Latches [`m_Sorted`](RenderPassSortState::m_Sorted) under [`m_SortLock`](RenderPass::m_SortLock),
+    /// Latches [`m_Sorted`](RenderPassSortState::m_Sorted) under [`m_SortLock`](Self::m_SortLock),
     /// so the sort runs at most once per list rotation; both the render-engine sort task
-    /// (`CRenderEngine::SortRenderPasses`) and the lazy call in [`DoDraw`](RenderPass::DoDraw)
+    /// (`CRenderEngine::SortRenderPasses`) and the lazy call in [`DoDraw`](Self::DoDraw)
     /// funnel here.
     #[address(0x140_1A8_7C0)]
     pub fn SortList(&mut self, sc: *const SortContext);
