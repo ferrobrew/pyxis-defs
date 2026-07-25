@@ -71,9 +71,21 @@ pub fn SetRenderSetup(ctx: *mut HContext_t, setup: *mut void, restore: bool);
 #[address(0x141_967_020)]
 pub fn Clear(ctx: *mut HContext_t, flags: u32, color: *mut void, depth: f32, stencil: u32);
 
-/// Copies one surface into another texture.
-#[address(0x141_95A_BA0)]
+/// Copies one surface into another texture: a whole-resource `ID3D11DeviceContext::CopyResource`
+/// of `src`'s D3D11 resource into `dst`'s, issued under the context mutex. The release build's
+/// symbol table misplaces this function's name onto [`EndDraw`] and labels this address
+/// `NGraphicsEngine::CGPUProfiler::BeginScope`; the body is unambiguous.
+#[address(0x141_954_850)]
 pub fn CopySurfaceToTexture(ctx: *mut HContext_t, dst: *mut void, src: *mut void);
+
+/// Submits the frame's recorded command work: under the context's critical section it indexes the
+/// context's command-slot ring and submits the two prebuilt command objects for the current slot
+/// through the backend. It takes no arguments beyond the context.
+///
+/// The release build's symbol table labels this address `Graphics::CopySurfaceToTexture`; the two
+/// names are swapped (see [`CopySurfaceToTexture`]).
+#[address(0x141_95A_BA0)]
+pub fn EndDraw(ctx: *mut HContext_t);
 
 /// Resolves an MSAA surface.
 #[address(0x141_967_2B0)]

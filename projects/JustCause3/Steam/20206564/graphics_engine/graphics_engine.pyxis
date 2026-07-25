@@ -115,6 +115,11 @@ pub type GraphicsEngine {
     #[address(0x170)]
     pub m_RenderCamera: Camera,
 
+    /// The engine-owned render context handed to the render passes: the per-view camera matrices,
+    /// the graphics context, and the currently-installed render setup.
+    #[address(0x720)]
+    pub m_RenderContext: RenderContext,
+
     #[address(0xEB0)]
     pub m_Device: *mut Device,
 
@@ -137,6 +142,14 @@ pub type GraphicsEngine {
     #[address(0x1_058)]
     pub m_MainDepthTexture: *mut Texture,
 
+    /// The render-target surface over [`m_MainDepthTexture`](Self::m_MainDepthTexture), built by
+    /// [`CreateRenderSetups`](Self::CreateRenderSetups) with
+    /// [`GetRenderTarget`](graphics_engine::surface::GetRenderTarget). It is the depth target of
+    /// the scene and back-buffer render setups, and the depth-stencil view the UI binds alongside
+    /// [`m_BackBufferLinear`](Self::m_BackBufferLinear).
+    #[address(0x1_060)]
+    pub m_MainDepthSurface: *mut Texture,
+
     /// Main scene HDR color ("MainColorBuffer").
     #[address(0x1_068)]
     pub m_MainColorBuffer: *mut Texture,
@@ -152,6 +165,14 @@ pub type GraphicsEngine {
     /// Final linear back buffer ("BackBufferLinear").
     #[address(0x1_230)]
     pub m_BackBufferLinear: *mut Texture,
+
+    /// The post-effect render setup: colour[0] is the raw device back-buffer surface, with no
+    /// depth. Built by [`CreateRenderSetups`](Self::CreateRenderSetups) alongside
+    /// [`m_BackBufferRenderSetup`](Self::m_BackBufferRenderSetup) and bound by
+    /// [`HandleDrawThreadTask`](Self::HandleDrawThreadTask) for the world filters and the
+    /// post-effect stack.
+    #[address(0x1_238)]
+    pub m_PostEffectRenderSetup: *mut HRenderSetup_t,
 
     /// Whether [`HandleDrawThreadTask`](Self::HandleDrawThreadTask) renders the 3D scene
     /// this frame (GBuffer, world, post-effects) rather than only the UI. [`Draw`](Self::Draw)
@@ -368,7 +389,7 @@ pub type ShadowCascades {
 /// The per-view render context the render passes read: the camera matrices (view, projection, the
 /// translation-free offset view-projection, and the separate camera world position), shadow data, and
 /// per-frame flags. Filled each dispatch by [`RenderPass::SetRenderContextCamera`].
-#[min_size(0x780)]
+#[min_size(0x790)]
 pub type RenderContext {
     /// The projection matrix for this dispatch, copied from [`Camera::m_ProjectionF`] by
     /// [`SetRenderContextCamera`](RenderPass::SetRenderContextCamera). The deferred-lighting
@@ -467,6 +488,17 @@ pub type RenderContext {
     /// path versus the full material path.
     #[address(0x778)]
     pub m_RenderStatus: u32,
+
+    /// The render setup this context draws into. On the graphics engine's own context this is the
+    /// context's copy of [`GraphicsEngine::m_BackBufferRenderSetup`], written by
+    /// [`CreateRenderSetups`](GraphicsEngine::CreateRenderSetups) immediately after the engine
+    /// field.
+    #[address(0x780)]
+    pub m_RenderSetup: *mut HRenderSetup_t,
+
+    /// The render setup the translucent pass draws into.
+    #[address(0x788)]
+    pub m_TranslucentRenderSetup: *mut HRenderSetup_t,
 }
 
 /// The opaque parameter block passed to
@@ -518,6 +550,11 @@ impl GraphicsEngine {
     /// `device_info`. Per-pass viewports follow the bound target's size, so no per-pass viewport
     /// changes are needed. Assumes the previously created setups have been torn down
     /// ([`DestroyRenderSetups`](Self::DestroyRenderSetups)) and that no draw is in flight.
+    ///
+    /// **The release build leaves the return value undefined.** The declared C++ return type is
+    /// `bool`, but release codegen dropped the final `return 1`: the last instruction before the
+    /// epilogue is the trailing [`CreateRenderSetup`] call, so `al` carries the low byte of the
+    /// pointer it returned. Callers must ignore the result.
     #[address(0x140_0CE_930)]
     pub fn CreateRenderSetups(&mut self, device_info: *const DeviceInfo) -> bool;
 
@@ -556,6 +593,16 @@ impl GraphicsEngine {
     /// current frame is dispatched.
     #[address(0x140_0F4_0C0)]
     pub fn HandleModeChange(&mut self);
+
+    /// Writes the pending screenshot to disk: saves `surface` to the requested colour filename
+    /// (and, when the request asked for depth, `depth_texture` to the depth filename) through the
+    /// device's texture-to-file writer, marks the screenshot request done, and clears a filename
+    /// whose write failed. Called from the draw thread once the frame the request was made on has
+    /// finished compositing, with the engine's
+    /// [`m_BackBufferLinear`](Self::m_BackBufferLinear) as the surface. The release build's symbol
+    /// table labels this address `NGraphicsEngine::CGPUProfiler::EndFrame`.
+    #[address(0x140_0DE_C90)]
+    pub fn SaveScreen(&mut self, surface: *mut Texture, depth_texture: *mut Texture);
 
     /// Loads (or reloads) the named shader bundle and re-creates every shader holder from it, but only
     /// if `name` differs from [`m_CurrentBundleName`](Self::m_CurrentBundleName).

@@ -1,0 +1,286 @@
+use graphics_engine::graphics_engine::{HDevice_t, HRenderSetup_t, HTexture_t};
+
+/// A texture/surface pixel format. The values are the `DXGI_FORMAT` codes the backend passes
+/// straight to D3D11 (so `ABGR32` is `DXGI_FORMAT_R8G8B8A8_UNORM`), with a handful of
+/// platform-independent names above `0x3E8` for formats D3D11 has no direct equivalent for.
+/// `Unknown` (0) means "take the format from the source data".
+///
+/// The engine's enumeration carries many aliases that resolve to the same code (`RGBA32`,
+/// `BGRA32`, and `FB_A8R8G8B8` are all `0x1C`); only one name per value is listed here.
+#[copyable]
+pub enum SurfaceFormat: i32 {
+    Unknown = 0x0,
+    A32B32G32R32F = 0x2,
+    RGBA32I = 0x4,
+    A16B16G16R16F = 0xA,
+    A16B16G16R16 = 0xB,
+    A16B16G16R16S = 0xD,
+    RGBA16I = 0xE,
+    RG32I = 0x12,
+    D32FS8 = 0x14,
+    FB_A2R10G10B10 = 0x18,
+    R11G11B10F = 0x1A,
+    /// 32-bit RGBA (`DXGI_FORMAT_R8G8B8A8_UNORM`).
+    ABGR32 = 0x1C,
+    RGBA8UI = 0x1E,
+    RGBA8I = 0x20,
+    G16R16F = 0x22,
+    G16R16 = 0x23,
+    RG16UI = 0x24,
+    RG16I = 0x26,
+    D32F = 0x28,
+    R32F = 0x29,
+    R32I = 0x2B,
+    D24S8 = 0x2D,
+    G8R8 = 0x31,
+    RG8UI = 0x32,
+    V8U8 = 0x33,
+    RG8I = 0x34,
+    R16F = 0x36,
+    D16 = 0x37,
+    R16 = 0x38,
+    R16UI = 0x39,
+    R16I = 0x3B,
+    R8 = 0x3D,
+    R8UI = 0x3E,
+    R8I = 0x40,
+    DXT1 = 0x47,
+    DXT3 = 0x4A,
+    DXT5 = 0x4D,
+    BC4 = 0x50,
+    BC5 = 0x53,
+    BC6_UF16 = 0x5F,
+    BC6_SF16 = 0x60,
+    BC7 = 0x62,
+    ARGB32 = 0x3E8,
+    ARGB4444 = 0x3E9,
+    RGB565 = 0x3EA,
+    A8L8 = 0x3EB,
+}
+
+/// How a resource is written to, which selects the D3D11 usage and bind flags at creation.
+/// [`Create2DTexture`] maps `RenderTarget` to a render-target (or depth-stencil, for a depth
+/// format) bind, `Dynamic` to a dynamic/CPU-writable resource, and `Default`/`Immutable` to a
+/// plain default-usage resource.
+#[copyable]
+pub enum UsageType: i32 {
+    Default = 0x0,
+    Immutable = 0x1,
+    Dynamic = 0x2,
+    RenderTarget = 0x4,
+}
+
+/// Which memory pool a resource is allocated from. `SysMem` produces a staging resource;
+/// `GfxMem` is ordinary GPU memory.
+#[copyable]
+pub enum PoolType: i32 {
+    GfxMem = 0x0,
+    SysMem = 0x1,
+}
+
+/// The multisample configuration of a surface or render setup. The low values double as the
+/// D3D11 sample count (`None` is one sample); the CSAA entries are legacy names with no D3D11
+/// equivalent.
+#[copyable]
+pub enum MultisampleFormat: i32 {
+    None = 0x1,
+    X2 = 0x2,
+    X4 = 0x4,
+    X8 = 0x8,
+    X8CSAA = 0x9,
+    X16CSAA = 0xA,
+    X16QCSAA = 0xB,
+    X32CSAA = 0xC,
+}
+
+/// The memory ordering of the initial data handed to a texture creator.
+#[copyable]
+pub enum DataLayout: i32 {
+    Row = 0x0,
+    Column = 0x1,
+}
+
+/// The tiling/swizzle mode of a texture's memory. Only `Linear` is meaningful on D3D11; the
+/// other entries exist for the console backends.
+#[copyable]
+pub enum TileMode: i32 {
+    Linear = -1,
+    MaxValue = 0x1F,
+    Lookup = 0xFE,
+    None = 0xFF,
+}
+
+/// The parameters to [`Create2DTexture`]. Padding at `0x24` aligns [`m_Name`](Self::m_Name) to
+/// eight bytes.
+#[size(0x50), align(8)]
+pub type Create2DTextureParams {
+    pub m_Width: u32,
+    pub m_Height: u32,
+    /// The array-slice count (`1` for a plain 2D texture).
+    pub m_NumSlices: u32,
+    pub m_NumMipLevels: u32,
+    /// The ESRAM byte offset on the console backends; ignored on D3D11.
+    pub m_ESRAMOffset: u32,
+    pub m_Format: SurfaceFormat,
+    pub m_MultisampleType: MultisampleFormat,
+    pub m_UsageType: UsageType,
+    pub m_PoolType: PoolType,
+
+    /// A debug name for the texture. The resource-tracking builds register the created texture
+    /// under `HashString(m_Name)` in the device's texture map; this build's creation path does
+    /// not read it.
+    #[address(0x28)]
+    pub m_Name: *const c_char,
+    /// The initial contents, or null to leave the texture uninitialised.
+    pub m_Data: *const void,
+    pub m_DataSize: u32,
+    pub m_DataLayout: DataLayout,
+    pub m_TileMode: TileMode,
+
+    /// A packed bitfield, from the low bit up: `m_PreTiled:1`, `m_PreAllocated:1`,
+    /// `m_InvertedZcull:1`, `m_TiledMemory:1`, `m_GenerateMips:1`, `m_PackedMips:1`,
+    /// `m_Castable:1`, `m_ColorSpace:1`, `m_UnorderedAccess:1`, `m_MipLevelClamp:4`,
+    /// `m_RenderCompression:1`.
+    ///
+    /// [`Create2DTexture`] reads four of them on D3D11: `m_ColorSpace` (bit 7) requests the sRGB
+    /// variant of the format, `m_Castable` (bit 6) creates the resource in the typeless
+    /// equivalent of the format so views may reinterpret it, `m_UnorderedAccess` (bit 8) adds a
+    /// UAV bind and creates the unordered-access view, and `m_MipLevelClamp` (bits 9-12)
+    /// becomes the view's most-detailed mip.
+    #[address(0x44)]
+    pub m_Flags: u32,
+
+    /// The allocation tag: `Group:6`, `Pool:1`, `Asset:1` from the low bit up.
+    #[address(0x48)]
+    pub m_Tag: u8,
+}
+
+/// The parameters to [`CreateSurfaceAlias`].
+#[size(0x20), align(8)]
+pub type CreateSurfaceAliasParams {
+    /// The surface to alias. Its handle is copied wholesale and its D3D11 resource is
+    /// referenced, not duplicated.
+    pub m_SourceSurface: *mut HTexture_t,
+
+    /// The format the alias' views reinterpret the source resource as.
+    #[address(0x8)]
+    pub m_Format: SurfaceFormat,
+
+    /// A debug name for the alias. As with [`Create2DTextureParams::m_Name`], this build's
+    /// creation path does not read it.
+    #[address(0x10)]
+    pub m_Name: *const c_char,
+
+    /// A packed bitfield, from the low bit up: `m_ColorSpace:1`, `m_ReadOnlyDepth:1`,
+    /// `m_ReadOnlyStencil:1`. `m_ColorSpace` requests the sRGB variant of
+    /// [`m_Format`](Self::m_Format); the read-only bits select the corresponding
+    /// depth-stencil-view read-only flags.
+    #[address(0x18)]
+    pub m_Flags: u32,
+}
+
+/// The parameters to [`CreateRenderSetup`]: the output targets a pass draws into. No dimensions
+/// appear here — a render setup's size is whatever its bound targets carry.
+#[size(0xE0), align(8)]
+pub type CreateRenderSetupParams {
+    /// The depth-stencil target, or null for a colour-only setup.
+    pub m_DepthTarget: *mut HTexture_t,
+
+    /// The colour targets, in `OMSetRenderTargets` order. The engine's own name for the first
+    /// entry is `m_ColorTarget`, which shares storage with the array. The count is derived at
+    /// creation by scanning for the first null, so the entries must be packed from `[0]`.
+    #[address(0x8)]
+    pub m_ColorTargets: [*mut HTexture_t; 8],
+
+    /// The buffer unordered-access views bound alongside the targets, likewise counted by
+    /// scanning for the first null.
+    #[address(0x48)]
+    pub m_UAVs: [*mut void; 8],
+
+    /// The texture unordered-access views, likewise counted by scanning for the first null.
+    #[address(0x88)]
+    pub m_TextureUAVs: [*mut HTexture_t; 8],
+
+    #[address(0xC8)]
+    pub m_MultisampleFormat: MultisampleFormat,
+
+    /// The colour-write mask stored on the setup.
+    #[address(0xCC)]
+    pub m_Mask: u32,
+
+    /// A packed bitfield, from the low bit up: `m_AutoResolve:1`, `m_EDRAMLayout:2`,
+    /// `m_UAVStart:4`. [`CreateRenderSetup`] reads `m_UAVStart` (bits 3-6) as the register slot
+    /// the unordered-access views start at; the sentinel `15` means "immediately after the
+    /// colour targets", and is replaced by the derived colour-target count.
+    #[address(0xD0)]
+    pub m_Flags: u32,
+
+    /// The EDRAM base on the console backends; ignored on D3D11.
+    #[address(0xD4)]
+    pub m_Base: u16,
+
+    /// The EDRAM hierarchical-Z base on the console backends; ignored on D3D11.
+    #[address(0xD6)]
+    pub m_HiZBase: u16,
+
+    /// An explicit EDRAM layout for the console backends; null on D3D11.
+    #[address(0xD8)]
+    pub m_ManualLayout: *mut void,
+}
+
+/// Creates a 2D texture: allocates the `0x58`-byte texture handle, creates the D3D11 resource
+/// from `params`, and creates the views the usage implies (a shader-resource view for
+/// non-staging textures, plus an unordered-access view when the params ask for one). A creation
+/// failure routes through the graphics critical-error path rather than returning null.
+///
+/// A texture is not by itself drawable: a render target is obtained from it with
+/// [`GetRenderTarget`].
+#[address(0x141_958_960)]
+pub fn Create2DTexture(device: *mut HDevice_t, params: *const Create2DTextureParams) -> *mut HTexture_t;
+
+/// Releases a texture's D3D11 resource and views and frees its handle.
+#[address(0x141_954_010)]
+pub fn Destroy2DTexture(device: *mut HDevice_t, texture: *mut HTexture_t);
+
+/// Returns a render-target surface over a slice of `texture`: a texture handle carrying the
+/// render-target (or depth-stencil) view for the selected mip level, cube face, and array range.
+/// This is the second half of the engine's standard scene-target construction —
+/// [`Create2DTexture`] for the storage, then `GetRenderTarget` for the surface bound as a render
+/// setup's target.
+#[address(0x141_95A_360)]
+pub fn GetRenderTarget(device: *mut HDevice_t, texture: *mut HTexture_t, mip_level: u32, face: u32, texarray_start_index: u32, texarray_slices: u32) -> *mut HTexture_t;
+
+/// Creates a second surface over an existing surface's D3D11 resource at a different format: it
+/// copies the source handle wholesale, **takes a D3D11 reference on the source resource**, and
+/// creates fresh shader-resource, render-target, and depth-stencil views at the requested
+/// format. No pixels are copied, and writes through the alias land in the source resource.
+///
+/// Because the alias holds a reference on the underlying resource, a swapchain buffer that is
+/// aliased cannot be resized until the alias is destroyed — `IDXGISwapChain::ResizeBuffers`
+/// fails while any reference to buffer 0 outstands.
+///
+/// When the source is the device back buffer and the requested format already equals the back
+/// buffer's format, the shader-resource view is skipped and the alias' own view is left null.
+#[address(0x141_95A_630)]
+pub fn CreateSurfaceAlias(device: *mut HDevice_t, params: *const CreateSurfaceAliasParams) -> *mut HTexture_t;
+
+/// Releases a surface's D3D11 views and frees its handle. In this build no active/inactive
+/// bookkeeping survives, so destroying a surface twice is an unguarded use-after-free rather
+/// than a trapped assertion.
+#[address(0x141_953_9C0)]
+pub fn DestroySurface(device: *mut HDevice_t, surface: *mut HTexture_t);
+
+/// Creates a render setup, the render-target configuration a pass binds with
+/// [`SetRenderSetup`](graphics_engine::graphics_engine::SetRenderSetup): it allocates the
+/// `0xF8`-byte setup, copies the depth target and the three eight-entry target/UAV arrays
+/// verbatim, and derives each array's count by scanning for the first null. It reads no width or
+/// height — the setup's dimensions come entirely from its bound targets, which is why
+/// `SetRenderSetup` can synthesize a full-target viewport from them.
+#[address(0x141_954_5F0)]
+pub fn CreateRenderSetup(device: *mut HDevice_t, params: *const CreateRenderSetupParams) -> *mut HRenderSetup_t;
+
+/// Frees a render setup. If it is the device's currently-bound setup it is unbound first (via
+/// `SetRenderSetup(context, null, false)`), so destroying a bound setup is safe. The targets the
+/// setup referenced are not touched.
+#[address(0x141_954_7F0)]
+pub fn DestroyRenderSetup(device: *mut HDevice_t, setup: *mut HRenderSetup_t);
