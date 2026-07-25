@@ -22005,7 +22005,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 468
+              "line": 470
             }
           },
           {
@@ -22025,7 +22025,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 468
+              "line": 470
             }
           },
           {
@@ -22045,7 +22045,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 470
+              "line": 472
             }
           }
         ],
@@ -22097,7 +22097,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 475
+              "line": 477
             }
           },
           {
@@ -22139,7 +22139,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 479
+              "line": 481
             }
           },
           {
@@ -22208,7 +22208,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 483
+              "line": 485
             }
           }
         ],
@@ -22222,7 +22222,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 465
+        "line": 467
       }
     },
     "graphics_engine::render_block::RenderBlockDeferredLighting": {
@@ -22286,7 +22286,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 494
+              "line": 496
             }
           }
         ],
@@ -22300,7 +22300,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 488
+        "line": 490
       }
     },
     "graphics_engine::render_block::RenderBlockFoliage": {
@@ -22391,7 +22391,7 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": " The occluder render block (`NGraphicsEngine::CRenderBlockOccluder`, registered name `\"Occluder\"`): a\n unit-cube depth proxy scaled per scene occluder, injected once per frame into `RP_Z_OCCLUDERS`\n (pass 47) to prime the main camera depth buffer so later Z and G-buffer passes early-Z reject\n occluded geometry. Depth-only (null fragment program). The CPU software-occlusion system consumes\n the same occluder data independently and is not fed by this GPU depth pass.",
+        "doc": " The occluder render block (`NGraphicsEngine::CRenderBlockOccluder`, registered name `\"Occluder\"`): a\n unit-cube depth proxy scaled per scene occluder, injected once per frame into `RP_Z_OCCLUDERS`\n (pass 47) to prime the main camera depth buffer so later Z and G-buffer passes early-Z reject\n occluded geometry. Depth-only (null fragment program), and write-only: nothing reads the primed\n depth back on the CPU. The CPU software-occlusion system consumes the same occluder source data\n through its own path and is not fed by this GPU depth pass.",
         "fields": [],
         "associated_functions": [
           {
@@ -22447,7 +22447,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 413
+              "line": 415
             }
           }
         ],
@@ -22461,7 +22461,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 403
+        "line": 405
       }
     },
     "graphics_engine::render_block::RenderBlockTerrain": {
@@ -22565,7 +22565,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 513
+              "line": 515
             }
           },
           {
@@ -22582,7 +22582,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 513
+              "line": 515
             }
           },
           {
@@ -22599,7 +22599,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 517
+              "line": 519
             }
           },
           {
@@ -22634,7 +22634,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 497
+              "line": 499
             }
           }
         ],
@@ -22686,7 +22686,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 523
+              "line": 525
             }
           }
         ],
@@ -22700,7 +22700,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 509
+        "line": 511
       }
     },
     "graphics_engine::render_block::RenderBlockTerrainPatch": {
@@ -23075,7 +23075,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 424
+              "line": 426
             }
           },
           {
@@ -23100,7 +23100,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 424
+              "line": 426
             }
           },
           {
@@ -23125,7 +23125,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 429
+              "line": 431
             }
           }
         ],
@@ -23166,7 +23166,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 438
+              "line": 440
             }
           }
         ],
@@ -23180,7 +23180,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 420
+        "line": 422
       }
     },
     "graphics_engine::render_block::RenderBlockTypeParticle": {
@@ -23219,7 +23219,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 453
+              "line": 455
             }
           },
           {
@@ -23244,7 +23244,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 453
+              "line": 455
             }
           },
           {
@@ -23269,7 +23269,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 459
+              "line": 461
             }
           },
           {
@@ -23290,7 +23290,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 441
+              "line": 443
             }
           }
         ],
@@ -23305,7 +23305,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 445
+        "line": 447
       }
     },
     "graphics_engine::render_block::RenderBlockTypeTerrain": {
@@ -24339,7 +24339,7 @@
           {
             "visibility": "public",
             "name": "Draw",
-            "doc": " Issues the impostor cards as a single non-instanced [`DrawIndexed`] over a static quad index\n buffer (`6 * min(card_count, 0x1400)` indices); the vertex shader keys off\n `SV_VertexID` (`card = id >> 2`, `corner = id & 3`), pulling each card's world position, size, and\n atlas data from a texture buffer bound at vertex slot 0. The card orientation (facing) is computed\n in the vertex shader from the render camera carried in the engine's global per-view billboard\n constant buffer (the translation-bearing `m_ViewProjectionF`); the block stages only per-draw\n scalars on `cb1`. `m_RenderStatus & 6` selects the depth/shadow vertex- and fragment-program\n permutations. The vertex shader writes `SV_Position` directly, so this is not GPU-indirect.",
+            "doc": " Issues the impostor cards as a single non-instanced [`DrawIndexed`] over a static quad index\n buffer (`6 * min(card_count, 0x1400)` indices); the vertex shader keys off\n `SV_VertexID` (`card = id >> 2`, `corner = id & 3`), pulling each card's world position, size, and\n atlas data from a texture buffer bound at vertex slot 0. The card orientation (facing) is computed\n in the vertex shader from the render camera carried in the engine's global per-view billboard\n constant buffer (the translation-bearing `m_ViewProjectionF`); the block stages only per-draw\n scalars on `cb1`. `m_RenderStatus & 6` selects the depth/shadow vertex- and fragment-program\n permutations. The vertex shader writes `SV_Position` directly; the index and instance counts are\n CPU-supplied, so no part of this block's submission is GPU-driven.",
             "doc_links": [
               {
                 "text": "DrawIndexed",
@@ -24383,7 +24383,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 395
+              "line": 396
             }
           }
         ],
@@ -60463,7 +60463,7 @@
             {
               "visibility": "public",
               "name": "CreateFragmentProgram",
-              "doc": " The leaf fragment-program creator: it wraps `ID3D11Device::CreatePixelShader` over\n `params.m_Code`/`params.m_Size`. `CreatePixelShader` copies the bytecode, so a hook may substitute a\n patched copy that only has to outlive the call. Static (no `this`); the first argument is the\n graphics device.",
+              "doc": " The leaf fragment-program creator: it wraps `ID3D11Device::CreatePixelShader` over\n `params.m_Code`/`params.m_Size`. `CreatePixelShader` copies the bytecode, so `params.m_Code` need\n not remain valid past the call, and the returned holder retains no bytecode of its own. Static (no\n `this`); the first argument is the graphics device.",
               "body": {
                 "type": "address",
                 "address": 5395264624
@@ -60561,7 +60561,7 @@
             {
               "visibility": "public",
               "name": "CreateHullProgram",
-              "doc": " The leaf hull-program creator: it wraps `ID3D11Device::CreateHullShader` (vtable slot 16) over\n `params.m_Code`/`params.m_Size`. `CreateHullShader` copies the bytecode, so a hook may substitute a\n patched copy that only has to outlive the call; unlike [`CreateVertexProgram`], the returned holder\n is a bare shader pointer with no retained bytecode copy. Static (no `this`); the first argument is\n the graphics device.",
+              "doc": " The leaf hull-program creator: it wraps `ID3D11Device::CreateHullShader` (vtable slot 16) over\n `params.m_Code`/`params.m_Size`. `CreateHullShader` copies the bytecode, so `params.m_Code` need not\n remain valid past the call; unlike [`CreateVertexProgram`], the returned holder is a bare shader\n pointer with no retained bytecode copy. Static (no `this`); the first argument is the graphics\n device.",
               "doc_links": [
                 {
                   "text": "CreateVertexProgram",
@@ -60614,7 +60614,7 @@
             {
               "visibility": "public",
               "name": "CreateDomainProgram",
-              "doc": " The leaf domain-program creator: it wraps `ID3D11Device::CreateDomainShader` (vtable slot 17) over\n `params.m_Code`/`params.m_Size`. `CreateDomainShader` copies the bytecode, so a hook may substitute\n a patched copy that only has to outlive the call; like [`CreateHullProgram`], the returned holder is\n a bare shader pointer with no retained bytecode copy. Static (no `this`); the first argument is the\n graphics device.",
+              "doc": " The leaf domain-program creator: it wraps `ID3D11Device::CreateDomainShader` (vtable slot 17) over\n `params.m_Code`/`params.m_Size`. `CreateDomainShader` copies the bytecode, so `params.m_Code` need\n not remain valid past the call; like [`CreateHullProgram`], the returned holder is a bare shader\n pointer with no retained bytecode copy. Static (no `this`); the first argument is the graphics\n device.",
               "doc_links": [
                 {
                   "text": "CreateHullProgram",
