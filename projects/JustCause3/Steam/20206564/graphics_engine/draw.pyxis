@@ -202,3 +202,11 @@ pub fn SetFragmentProgramConstants(ctx: *mut HContext_t, cb_index: i32, start_of
 /// for `cb1`). A row-level redundancy check skips rows byte-identical to what is already staged.
 #[address(0x141_964_740)]
 pub fn SetVertexProgramConstants(ctx: *mut HContext_t, cb_index: i32, start_offset: u32, data: *const f32, count: u32);
+
+/// Stages `count` float4 constants into the given **geometry** constant buffer slot, starting at
+/// `start_offset` (in float4 rows), writing to the context's per-slot staging buffer and setting the
+/// dirty flag; the GPU upload happens at the next state flush. The geometry analogue of
+/// [`SetFragmentProgramConstants`]. The clustered deferred-lighting pass is the volume user: it
+/// stages the light-assignment geometry shader's `ProjMatrix` here as four rows on `cb0`.
+#[address(0x141_964_A40)]
+pub fn SetGeometryProgramConstants(ctx: *mut HContext_t, cb_index: i32, start_offset: u32, data: *const f32, count: u32);

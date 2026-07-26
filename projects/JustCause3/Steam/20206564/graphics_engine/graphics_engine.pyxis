@@ -391,6 +391,17 @@ pub type ShadowCascades {
 /// per-frame flags. Filled each dispatch by [`RenderPass::SetRenderContextCamera`].
 #[min_size(0x790)]
 pub type RenderContext {
+    /// The world→view matrix for this dispatch, copied from [`Camera::m_View`] by
+    /// [`SetRenderContextCamera`](RenderPass::SetRenderContextCamera). Row 3 carries the camera
+    /// translation; [`CalculateOffsetViewProjectionMatrix`](graphics_engine::render_pass::CalculateOffsetViewProjectionMatrix) zeroes it before
+    /// multiplying by [`m_ProjectionF`](Self::m_ProjectionF) to produce
+    /// [`m_OffsetViewProjection`](Self::m_OffsetViewProjection). The clustered deferred-lighting
+    /// pass uploads rows 0..2 with a `(0, 0, 0, 1)` fourth row as the light-assignment vertex
+    /// shader's `ViewMatrix`, which transforms light proxy vertices the CPU has already made
+    /// relative to [`m_RenderCameraPosition`](Self::m_RenderCameraPosition) into view space.
+    #[address(0x18)]
+    pub m_View: Matrix4,
+
     /// The projection matrix for this dispatch, copied from [`Camera::m_ProjectionF`] by
     /// [`SetRenderContextCamera`](RenderPass::SetRenderContextCamera). The deferred-lighting
     /// clustered pass reads it to build the geometry proxy transform (cb0) and the froxel tile
@@ -411,6 +422,16 @@ pub type RenderContext {
     /// [`SortList`](RenderPass::SortList) as the sort camera position.
     #[address(0x218)]
     pub m_CameraPosition: Vector3,
+
+    /// The world position of the camera manager's render camera — the translation row of
+    /// `CCameraManager::GetRenderCamera()`'s `m_TransformF` — written each pass by
+    /// `CRenderPass::SetupRenderContext`. Distinct from
+    /// [`m_CameraPosition`](Self::m_CameraPosition), which follows whichever camera the pass draws
+    /// with (a light camera during the shadow passes); this always holds the main scene camera's
+    /// position. `CLightManager::SetupLightingData` and the clustered deferred-lighting pass
+    /// subtract it from each light's world position to build the camera-relative light proxies.
+    #[address(0x288)]
+    pub m_RenderCameraPosition: Vector3,
 
     /// The vertical field of view in radians, copied from [`Camera::m_FOV`] by
     /// [`SetRenderContextCamera`](RenderPass::SetRenderContextCamera).
@@ -445,6 +466,22 @@ pub type RenderContext {
     /// scope markers ([`BeginScopeMarker`] / [`EndScopeMarker`]) read it off the render context.
     #[address(0x318)]
     pub m_Context: *mut HContext_t,
+
+    /// The number of point lights active for this render frame, copied by
+    /// `CRenderPass::SetupRenderContext` from
+    /// `CLightManager::GetActiveRenderPointLightCount`. The clustered deferred-lighting pass uses it
+    /// as the instance count of its sphere-proxy draw, and skips the whole light-assignment phase
+    /// (including its render-target clear) when it and
+    /// [`m_ActiveSpotLightCount`](Self::m_ActiveSpotLightCount) are both zero.
+    #[address(0x3E8)]
+    pub m_ActivePointLightCount: i32,
+
+    /// The number of spot lights active for this render frame, copied by
+    /// `CRenderPass::SetupRenderContext` from
+    /// `CLightManager::GetActiveRenderSpotLightCount`. The clustered deferred-lighting pass uses it
+    /// as the instance count of its cone-proxy draw.
+    #[address(0x3F8)]
+    pub m_ActiveSpotLightCount: i32,
 
     /// The id (`ERenderPass`, see `render_engine::RenderPassId`) of the pass currently drawing
     /// through this context, written by `SetupRenderContext` from the pass's index. `RP_NONE` (0)
