@@ -91,6 +91,15 @@ pub fn EndDraw(ctx: *mut HContext_t);
 #[address(0x141_967_2B0)]
 pub fn ResolveSurface(ctx: *mut HContext_t, params: *mut void);
 
+/// Sets the scissor-enable bit of the context's current rasterizer-state key (bit 7 of the key's low
+/// byte), which becomes `D3D11_RASTERIZER_DESC::ScissorEnable` when the state object for that key is
+/// created. The key is looked up (and the object created on first use) by the render-state flush that
+/// precedes every draw, so the change takes effect from the next draw on. Only the enable flag lives
+/// in the key: the rectangles themselves are passed straight through to the context's
+/// `RSSetScissorRects` by a separate wrapper and are ignored while the flag is clear.
+#[address(0x141_966_B80)]
+pub fn SetScissorEnable(ctx: *mut HContext_t, enable: bool);
+
 // Surface RTV / DSV accessors: the render-target and depth-stencil views a device surface owns.
 
 /// Returns the surface's render-target view.
