@@ -14267,7 +14267,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 166
+              "line": 175
             }
           },
           {
@@ -14284,7 +14284,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 169
+              "line": 178
             }
           },
           {
@@ -14304,7 +14304,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 172
+              "line": 181
             }
           }
         ],
@@ -14319,7 +14319,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 165
+        "line": 174
       }
     },
     "graphics_engine::draw::CreateFragmentProgramParams": {
@@ -14357,7 +14357,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 110
+              "line": 119
             }
           },
           {
@@ -14374,7 +14374,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 113
+              "line": 122
             }
           }
         ],
@@ -14389,7 +14389,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 109
+        "line": 118
       }
     },
     "graphics_engine::draw::CreateHullProgramParams": {
@@ -14432,7 +14432,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 146
+              "line": 155
             }
           },
           {
@@ -14449,7 +14449,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 149
+              "line": 158
             }
           },
           {
@@ -14469,7 +14469,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 152
+              "line": 161
             }
           }
         ],
@@ -14484,7 +14484,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 145
+        "line": 154
       }
     },
     "graphics_engine::draw::CreateVertexProgramParams": {
@@ -14522,7 +14522,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 126
+              "line": 135
             }
           },
           {
@@ -14539,7 +14539,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 129
+              "line": 138
             }
           },
           {
@@ -14559,7 +14559,7 @@
             "is_base": false,
             "source": {
               "file_index": 25,
-              "line": 132
+              "line": 141
             }
           }
         ],
@@ -14574,7 +14574,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 125
+        "line": 134
       }
     },
     "graphics_engine::draw::PrimitiveType": {
@@ -60394,6 +60394,42 @@
             },
             {
               "visibility": "public",
+              "name": "SetScissorEnable",
+              "doc": " Sets the scissor-enable bit of the context's current rasterizer-state key (bit 7 of the key's low\n byte), which becomes `D3D11_RASTERIZER_DESC::ScissorEnable` when the state object for that key is\n created. The key is looked up (and the object created on first use) by the render-state flush that\n precedes every draw, so the change takes effect from the next draw on. Only the enable flag lives\n in the key: the rectangles themselves are passed straight through to the context's\n `RSSetScissorRects` by a separate wrapper and are ignored while the flag is clear.",
+              "body": {
+                "type": "address",
+                "address": 5395344256
+              },
+              "arguments": [
+                {
+                  "type": "field",
+                  "name": "ctx",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "graphics_engine::graphics_engine::HContext_t"
+                    }
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "enable",
+                  "type_ref": {
+                    "type": "raw",
+                    "path": "bool"
+                  }
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system",
+              "source": {
+                "file_index": 25,
+                "line": 101
+              }
+            },
+            {
+              "visibility": "public",
               "name": "GetRTVFromSurface",
               "doc": " Returns the surface's render-target view.",
               "body": {
@@ -60423,7 +60459,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 25,
-                "line": 98
+                "line": 107
               }
             },
             {
@@ -60457,7 +60493,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 25,
-                "line": 102
+                "line": 111
               }
             },
             {
@@ -60502,7 +60538,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 25,
-                "line": 121
+                "line": 130
               }
             },
             {
@@ -60555,7 +60591,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 25,
-                "line": 141
+                "line": 150
               }
             },
             {
@@ -60608,7 +60644,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 25,
-                "line": 161
+                "line": 170
               }
             },
             {
@@ -60661,7 +60697,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 25,
-                "line": 181
+                "line": 190
               }
             },
             {
@@ -60724,7 +60760,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 25,
-                "line": 187
+                "line": 196
               }
             },
             {
@@ -60795,7 +60831,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 25,
-                "line": 195
+                "line": 204
               }
             }
           ],
