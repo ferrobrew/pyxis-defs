@@ -489,11 +489,57 @@ impl RenderBlockCharacterSkin {
 /// lighting pass or a pass-through fallback.
 pub type RenderBlockDeferredLighting;
 impl RenderBlockDeferredLighting {
+    /// Selects between the block's two lighting paths on a single condition:
+    /// [`DrawPassThrough`](Self::DrawPassThrough) when
+    /// [`RenderEngine::IsWireframeEnabled`](graphics_engine::render_engine::RenderEngine) reports
+    /// wireframe, [`DrawClustered`](Self::DrawClustered) otherwise. Normal shaded rendering therefore
+    /// always takes the clustered path.
+    #[address(0x140_13E_1E0)]
+    pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
+
     /// The clustered-lighting entry point: runs the "LightAssignment" pass (rasterizing light proxy
     /// geometry into the froxel light-lookup target) and the "ClusteredLighting" pass (shading from
     /// it). Called from `Draw` when wireframe is disabled.
     #[address(0x140_13C_FD0)]
     pub fn DrawClustered(&self, rc: *mut RenderContext, a3: *mut void, a4: *mut HTexture_t);
+
+    /// The wireframe-only lighting path, reached from [`Draw`](Self::Draw) exclusively when
+    /// [`RenderEngine::IsWireframeEnabled`](graphics_engine::render_engine::RenderEngine) is set, so
+    /// it does not run during normal shaded rendering. Like the clustered path it recovers a
+    /// clip-to-view basis via [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4).
+    #[address(0x140_13C_D00)]
+    pub fn DrawPassThrough(&self, rc: *mut RenderContext);
+}
+
+/// The screen-space ambient-occlusion render block. Its `Draw` reconstructs view-space position from
+/// depth via [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4) and carries a temporal history
+/// across frames, indexed by a counter the block advances per invocation.
+pub type RenderBlockSSAO;
+impl RenderBlockSSAO {
+    /// Draws the ambient-occlusion pass, reconstructing from depth and accumulating into the
+    /// temporal history.
+    #[address(0x140_190_E80)]
+    pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
+}
+
+/// The screen-space reflection render block. Its `Draw` reconstructs world position from depth via
+/// [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4) and ray-marches a scene colour capture
+/// taken earlier in the frame.
+pub type RenderBlockScreenSpaceReflection;
+impl RenderBlockScreenSpaceReflection {
+    /// Draws the screen-space reflection pass.
+    #[address(0x140_191_E10)]
+    pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
+}
+
+/// The screen-space subsurface-scattering render block for skin. Its `Draw` reconstructs from depth
+/// via [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4) -- twice, once per blur axis -- and
+/// blurs the lit skin in screen space.
+pub type RenderBlockScreenSpaceSubSurfaceSkin;
+impl RenderBlockScreenSpaceSubSurfaceSkin {
+    /// Draws the subsurface-scattering pass.
+    #[address(0x140_192_D60)]
+    pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
 }
 
 /// The terrain detail render block (`NGraphicsEngine::CTerrainRenderBlockDetail`, engine name
