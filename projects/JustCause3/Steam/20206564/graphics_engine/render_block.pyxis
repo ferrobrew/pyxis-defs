@@ -1,4 +1,4 @@
-use graphics_engine::graphics_engine::{HContext_t, HTexture_t, RenderContext};
+use graphics_engine::graphics_engine::{HContext_t, HTexture_t, HVertexDeclaration_t, RenderContext};
 use graphics_engine::render_engine::RenderBlockTypeBase;
 use types::math::{Matrix4, Vector3};
 
@@ -441,23 +441,45 @@ impl RenderBlockTypeFogVolume {
     pub fn ResizeTextures(&mut self, width: u32, height: u32) -> bool;
 }
 
+/// The additive fog-volume render block *type* (the
+/// `NGraphicsEngine::CRenderBlockAddFogVolume::CRenderBlockTypeAddFogVolume` singleton, type name
+/// `"AddFogVolume"`): the shared vertex/fragment programs, unit vertex buffer, and sampler for the
+/// additive fog-volume blocks that `CFogManager` draws through its own render passes.
+///
+/// **This type is never registered.** `CRenderBlockAddFogVolume::InitType` (`0x140_33D_E80`)
+/// constructs it, stores it in this singleton, calls its `Create`, and returns — without calling
+/// `CRenderBlockFactory::AddType`. Its only caller is the `CFogManager` constructor
+/// (`0x140_358_870`), which does not register it either, so it never enters the global
+/// [`RenderBlockTypeRegistry`](graphics_engine::render_engine::RenderBlockTypeRegistry) and anything
+/// that enumerates the registry to reach every type will silently miss it — even though
+/// `CRenderPass::DoDraw` dispatches its `IsEnabled` through the vtable exactly as it does for a
+/// registered type. This singleton is the only way to reach it. See
+/// [`RenderBlockTypeParticle`](RenderBlockTypeParticle), which is unregistered in the same way.
+#[singleton(0x142_ED7_3D0), min_size(0x60)]
+pub type RenderBlockTypeAddFogVolume {
+    #[base]
+    pub base: RenderBlockTypeBase,
+}
+
 /// The particle render block *type* (the `CRenderBlockParticle::CRenderBlockTypeParticle` singleton):
 /// the shared state and shaders for every particle render block, including the flags that decide
 /// whether a particle draw is routed to the low-resolution particle pass.
 ///
 /// **This type is never registered.** `CRenderBlockParticle::InitType` (`0x140_4AD_2D0`) constructs
 /// it, stores it in this singleton, calls its `Create`, and returns — without calling
-/// `CRenderEngine::AddType`, which every other render block's `InitType`/`RegisterType` does. So it
-/// does not appear in the global
+/// `CRenderBlockFactory::AddType`, which every other render block's `InitType`/`RegisterType`
+/// eventually does. So it does not appear in the global
 /// [`RenderBlockTypeRegistry`](graphics_engine::render_engine::RenderBlockTypeRegistry), and anything
 /// that enumerates the registry to reach every type will silently miss it — even though
 /// `CRenderPass::DoDraw` dispatches its `IsEnabled` through the vtable exactly as it does for a
-/// registered type. This singleton is the only way to reach it. `CRenderBlockLRParticleCompose` is
-/// unregistered in the same way, and has no `RegisterType` at all; its type object is owned privately
-/// by `CPostEffectsManager` rather than held in a global.
+/// registered type. This singleton is the only way to reach it.
 ///
-/// Sweeping every `*::InitType` in the image against the callers of `CRenderEngine::AddType`
-/// (`0x140_173_110`) shows this is the *only* named `InitType` that skips registration.
+/// Walking every construction site of `IRenderBlockType` in the image — the calls to its constructor
+/// (`0x140_100_FC0`) plus the sites that inline it, which are exactly the writers of
+/// [`RenderBlockTypeInstances`](graphics_engine::render_engine::RenderBlockTypeInstances) — and
+/// checking each against `CRenderBlockFactory::AddType` (`0x140_161_2F0`) shows two types skip
+/// registration: this one and
+/// [`RenderBlockTypeAddFogVolume`](RenderBlockTypeAddFogVolume).
 #[singleton(0x142_F17_128), min_size(0xA87)]
 pub type RenderBlockTypeParticle {
     #[base]
@@ -551,11 +573,16 @@ impl RenderBlockScreenSpaceReflection {
 }
 
 /// The screen-space subsurface-scattering render block for skin. Its `Draw` reconstructs from depth
-/// via [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4) -- twice, once per blur axis -- and
-/// blurs the lit skin in screen space.
+/// via [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4) and blurs the lit skin in screen
+/// space.
 pub type RenderBlockScreenSpaceSubSurfaceSkin;
 impl RenderBlockScreenSpaceSubSurfaceSkin {
-    /// Draws the subsurface-scattering pass.
+    /// Draws the subsurface-scattering pass, on one of two mutually exclusive paths selected by the
+    /// block's own byte at `+0x18`: a single-draw path, and the full diffusion chain (a screen-space
+    /// gather into the SSS targets, then six separable blur draws ping-ponging between them). Each
+    /// path builds the depth-reconstruction basis with exactly one
+    /// [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4) call, before its first render-setup
+    /// bind, and uploads it as vertex constants 1..4.
     #[address(0x140_192_D60)]
     pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
 }
@@ -587,4 +614,152 @@ impl RenderBlockTerrainDetail {
     /// detail geometry, using the `cb1` transform staged by `Setup`.
     #[address(0x140_326_050)]
     pub fn Draw(&mut self, ctx: *mut RenderContext, info: *const RBIInfo);
+}
+
+/// The legacy (non-NVIDIA WaveWorks) high-end water render block *type*
+/// (`NGraphicsEngine::CWaterHighEndRenderBlock::CWaterHighEndRenderBlockType`): the shared per-pass
+/// setup for the `waterhighend`, `waterbelow`, and `watershader_lod0/1/2` shader permutations, which
+/// the engine selects at the lower water-quality settings in place of the WaveWorks path.
+pub type WaterHighEndRenderBlockType;
+impl WaterHighEndRenderBlockType {
+    /// Binds the water render state (alpha blend, depth test and write, back-face cull), the five
+    /// water textures and samplers, the wave-table vertex constants, and the fragment constants for
+    /// the water tuning — then stages the block type's `TypeConstants.ReflectionViewProj` on **vertex
+    /// slot 1, registers 1..4**.
+    ///
+    /// That matrix is
+    /// [`RenderContext::m_ViewProjectionF`](graphics_engine::graphics_engine::RenderContext::m_ViewProjectionF)
+    /// post-multiplied (row-vector convention, so the bias applies to the projected result) by the
+    /// constant NDC→texture bias
+    /// `{0.5,0,0,0 / 0,0.5,0,0 / 0,0,1,0 / 0.5,0.5,0,1}`. The vertex shaders transform the water
+    /// vertex by it with a multiply-add chain over those four registers and pass the `(u·w, v·w, w)`
+    /// components on as a projective `TEXCOORD1`; the pixel shaders divide by `w` to get the
+    /// screen-space UV they sample `ReflectionMap`, `RefractionMap`, and `DepthMap` with. The NDC→UV
+    /// half-scale is therefore already folded into the CPU-side matrix rather than done in the shader,
+    /// and the UV it produces is normalized over the *viewport* the matrix was built for.
+    ///
+    /// The fragment stage separately receives the inverse of
+    /// [`RenderContext::m_ViewProjectionF`](graphics_engine::graphics_engine::RenderContext::m_ViewProjectionF)
+    /// at fragment slot 1 registers 3..6 for its own depth reconstruction.
+    #[address(0x140_369_2E0)]
+    pub fn Setup(&self, rc: *mut RenderContext, vertex_declaration: *mut HVertexDeclaration_t);
+}
+
+/// The legacy high-end water render block (`NGraphicsEngine::CWaterHighEndRenderBlock`): one water
+/// patch of the ocean/lake surface grid, drawn with the shader permutations set up by
+/// [`WaterHighEndRenderBlockType`].
+pub type WaterHighEndRenderBlock;
+impl WaterHighEndRenderBlock {
+    /// Selects the vertex/fragment program permutation from the patch's distance to the camera (a far
+    /// pair beyond 1024 m, otherwise one of three LOD pairs), stages the patch's own position and
+    /// scale on vertex slot 2 register 0, binds the shared water vertex stream, and issues the patch's
+    /// quads through the block's internal `DrawQuads` ([`DrawIndexed`] per admitted quad). The
+    /// screen-space lookup matrix it draws with is the one
+    /// [`WaterHighEndRenderBlockType::Setup`](WaterHighEndRenderBlockType::Setup) staged for the pass;
+    /// nothing here restages it.
+    #[address(0x140_356_CC0)]
+    pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
+}
+
+/// The water-box render block *type*
+/// (`NGraphicsEngine::CWaterBoxRenderBlock::CWaterBoxRenderBlockType`): the per-pass setup for the
+/// `waterbox`, `waterboxbelow`, `waterboxsurface`, and `waterboxclear` permutations that render the
+/// bounded water volumes (pools, tanks, interiors) placed in the world as `NWater::SWaterBox`.
+pub type WaterBoxRenderBlockType;
+impl WaterBoxRenderBlockType {
+    /// Binds the water-box render state, textures, and samplers, stages `cbWaterConsts.WaterConsts` on
+    /// **vertex slot 1, registers 4..7**, and hands the fragment stage the inverse view-projection and
+    /// the water tuning.
+    ///
+    /// The vertex constant is
+    /// [`RenderContext::m_OffsetViewProjection`](graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection)
+    /// post-multiplied by the same NDC→texture bias
+    /// [`WaterHighEndRenderBlockType::Setup`](WaterHighEndRenderBlockType::Setup) applies, and it feeds
+    /// the same projective-`TEXCOORD1` screen-lookup idiom in the `waterbox*` shaders.
+    ///
+    /// The whole body is conditional on the water-box manager's mode flags: it runs only when the
+    /// volume-rendering flag is set or the surface-rendering flag is clear, so in surface-only mode it
+    /// stages nothing and the surface path relies on
+    /// [`SetupSurface`](Self::SetupSurface) instead.
+    #[address(0x140_369_020)]
+    pub fn Setup(&self, rc: *mut RenderContext, vertex_declaration: *mut HVertexDeclaration_t);
+
+    /// The alternative setup for the surface-rendering mode: binds the tessellated surface grid's
+    /// vertex declaration, stream, and index buffer, sets the stencil test that keeps the surface
+    /// inside the box, and sizes the vertex constant buffer at slot 2. Stages no view-projection of
+    /// its own.
+    #[address(0x140_33B_210)]
+    pub fn SetupSurface(&self, rc: *mut RenderContext, vertex_declaration: *mut HVertexDeclaration_t);
+}
+
+/// The water-box render block (`NGraphicsEngine::CWaterBoxRenderBlock`): one bounded water volume.
+pub type WaterBoxRenderBlock;
+impl WaterBoxRenderBlock {
+    /// Draws the box volume: the ten-triangle interior hull when the volume-rendering flag is set, and
+    /// then — unless the surface-rendering flag is set — the two-triangle top face with the near or
+    /// far surface permutation chosen by the camera's distance to the box. Both are plain
+    /// [`DrawIndexed`] calls over the type's shared geometry, and both consume the screen-lookup
+    /// matrix [`WaterBoxRenderBlockType::Setup`](WaterBoxRenderBlockType::Setup) staged for the pass.
+    #[address(0x140_33B_090)]
+    pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
+
+    /// Draws the box's tessellated surface grid (162 triangles) in the surface-rendering mode, staging
+    /// the box's own world transform — a scale by the box half-extents plus a camera-relative
+    /// translation — on **vertex slot 2, registers 0..3** first. It stages no view-projection; the
+    /// screen-lookup matrix is whatever
+    /// [`WaterBoxRenderBlockType::Setup`](WaterBoxRenderBlockType::Setup) last left on vertex slot 1.
+    /// `NWater::DrawWaterBoxSurface` (`0x140_368_C70`) runs the same body inline over every visible
+    /// registered water box.
+    #[address(0x140_355_800)]
+    pub fn DrawSurface(&self, rc: *mut RenderContext);
+}
+
+/// The screen-space decal render block *type*
+/// (`NGraphicsEngine::CRenderBlockSSDecal::CRenderBlockTypeSSDecal`): the per-pass setup shared by
+/// the twelve `ssdecal*` fragment permutations, which project a decal's textures onto whatever the
+/// scene depth buffer says is behind the decal's box volume.
+pub type RenderBlockTypeSSDecal;
+impl RenderBlockTypeSSDecal {
+    /// Binds the decal render state (alpha blend, depth test with depth writes off, back-face cull),
+    /// the shared vertex program and vertex declaration, and stages the pass's **depth→view-space
+    /// reconstruction basis on fragment slot 1, registers 0..3**.
+    ///
+    /// The basis is `Scaling(2, -2, 1)` with the translation row `(-1, 1, 0, 1)` — the viewport-UV to
+    /// NDC map — post-multiplied (row-vector convention) by the inverse of
+    /// [`RenderContext::m_View`](graphics_engine::graphics_engine::RenderContext::m_View) with its
+    /// translation row replaced by `(0, 0, 0, 1)`, times
+    /// [`RenderContext::m_ProjectionF`](graphics_engine::graphics_engine::RenderContext::m_ProjectionF).
+    /// The fragment shaders feed it the interpolated projective screen coordinate divided by its `w`
+    /// (a UV normalized over the *viewport*) together with the sampled scene depth, and divide the
+    /// result by `w` to recover the camera-relative world position the decal box is tested against.
+    ///
+    /// It is staged once per pass, not per draw: [`RenderBlockSSDecal::Draw`] restages every other
+    /// fragment constant the permutations read but never this one.
+    ///
+    /// The whole body is conditional on the render context's pass flags, so the depth-only and
+    /// velocity passes stage nothing.
+    #[address(0x140_191_C20)]
+    pub fn Setup(&self, rc: *mut RenderContext);
+}
+
+/// The screen-space decal render block (`NGraphicsEngine::CRenderBlockSSDecal`): one projected decal
+/// box, drawn with the permutations set up by [`RenderBlockTypeSSDecal`].
+pub type RenderBlockSSDecal;
+impl RenderBlockSSDecal {
+    /// Stages the decal's own constants and issues its box geometry as a single [`DrawIndexed`].
+    ///
+    /// On the vertex side it bakes the instance's offset world-view-projection at slot 1 registers
+    /// 0..3 and the decal's orthonormal box basis at registers 4..7. On the fragment side it stages
+    /// the decal's colour, fade, and masking tuning at slot 1 registers 4..11, and at **register 12**
+    /// the screen-space UV scale the render context carries — the factor that maps a `[0, 1]` viewport
+    /// UV onto the used region of the shared scene depth texture, which the permutations multiply
+    /// their reconstruction UV by before sampling it. It also sets the colour mask from the decal's
+    /// own channel flags, so the draw cannot be reproduced by re-issuing the underlying
+    /// [`DrawIndexed`] alone.
+    ///
+    /// The depth→view-space basis this consumes is whatever
+    /// [`RenderBlockTypeSSDecal::Setup`](RenderBlockTypeSSDecal::Setup) staged for the pass; nothing
+    /// here restages it.
+    #[address(0x140_17F_D40)]
+    pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
 }

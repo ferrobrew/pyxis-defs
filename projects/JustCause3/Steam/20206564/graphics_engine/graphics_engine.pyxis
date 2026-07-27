@@ -195,6 +195,10 @@ pub type GraphicsEngine {
 }
 
 // Opaque graphics handles, used behind pointers.
+/// A vertex-declaration handle: the input layout a render block binds before its draws, passed to the
+/// render block types' `Setup` and on to `Graphics::SetVertexDeclaration`.
+pub type HVertexDeclaration_t;
+
 /// A GPU context handle: the engine's wrapper over the D3D11 immediate context, carrying the deferred,
 /// dirty-tracked pipeline state that [`SetupRenderStates`] flushes to D3D before each draw. Partial:
 /// only the depth-stencil state index and stencil ref are mapped.
@@ -408,6 +412,16 @@ pub type RenderContext {
     /// bounds (cb1).
     #[address(0x58)]
     pub m_ProjectionF: Matrix4,
+
+    /// The world→clip view-projection for this dispatch, copied verbatim from
+    /// [`Camera::m_ViewProjectionF`] by
+    /// [`SetRenderContextCamera`](RenderPass::SetRenderContextCamera) — the reverse-Z projection
+    /// applied to the translation-bearing view, so it maps absolute world positions to clip space.
+    /// Distinct from [`m_OffsetViewProjection`](Self::m_OffsetViewProjection), which drops the camera
+    /// translation and is what the camera-relative geometry paths bake. The water block types build
+    /// their screen-space reflection/refraction lookup from it.
+    #[address(0x98)]
+    pub m_ViewProjectionF: Matrix4,
 
     /// The translation-free view-projection for this dispatch (the rotation and projection without the
     /// camera world translation). The tessellation constant buffers bake it directly (e.g.
