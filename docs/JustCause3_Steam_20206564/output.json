@@ -21774,7 +21774,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 837
+              "line": 849
             }
           },
           {
@@ -21836,7 +21836,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 858
+              "line": 870
             }
           }
         ],
@@ -21850,7 +21850,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 808
+        "line": 820
       }
     },
     "graphics_engine::render_block::RBIInfo": {
@@ -22442,7 +22442,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 539
+              "line": 551
             }
           },
           {
@@ -22462,7 +22462,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 539
+              "line": 551
             }
           },
           {
@@ -22482,7 +22482,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 541
+              "line": 553
             }
           }
         ],
@@ -22534,7 +22534,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 546
+              "line": 558
             }
           },
           {
@@ -22576,7 +22576,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 550
+              "line": 562
             }
           },
           {
@@ -22645,7 +22645,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 554
+              "line": 566
             }
           }
         ],
@@ -22659,7 +22659,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 536
+        "line": 548
       }
     },
     "graphics_engine::render_block::RenderBlockDeferredLighting": {
@@ -22731,7 +22731,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 567
+              "line": 579
             }
           },
           {
@@ -22784,7 +22784,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 573
+              "line": 585
             }
           },
           {
@@ -22833,7 +22833,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 580
+              "line": 592
             }
           }
         ],
@@ -22847,7 +22847,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 559
+        "line": 571
       }
     },
     "graphics_engine::render_block::RenderBlockFoliage": {
@@ -22914,6 +22914,62 @@
             "source": {
               "file_index": 30,
               "line": 409
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "DrawZ",
+            "doc": " Issues the depth-prepass, shadow, velocity, and reflective-shadow geometry. Stages the same\n `cb2` transform as [`Draw`](Self::Draw) — register 0 the camera-relative world matrix, registers\n 4..7 a copy of\n [`m_OffsetViewProjection`](graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection)\n — plus the fade/detail scalars at registers 8..10; on the velocity pass (pass id 50) it\n additionally stages the previous frame's offset view-projection at registers 11..14, which the\n vertex shader differences against the current one to produce the motion vector. Selects between a\n CPU-instanced `DrawIndexedInstancedNoMutex` and a `DrawInstanced` fed by two vertex texture\n buffers, on the same instance-data flags [`Draw`](Self::Draw) routes on.",
+            "doc_links": [
+              {
+                "text": "Self::Draw",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockFoliage",
+                "anchor": "func-Draw"
+              },
+              {
+                "text": "graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::RenderContext",
+                "anchor": "field-m_OffsetViewProjection"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5369944496
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "render_context",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "info",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::render_block::RBIInfo"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 30,
+              "line": 421
             }
           }
         ],
@@ -22994,7 +23050,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 445
+              "line": 457
             }
           }
         ],
@@ -23008,7 +23064,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 435
+        "line": 447
       }
     },
     "graphics_engine::render_block::RenderBlockSSAO": {
@@ -23080,7 +23136,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 614
+              "line": 626
             }
           }
         ],
@@ -23094,7 +23150,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 586
+        "line": 598
       }
     },
     "graphics_engine::render_block::RenderBlockSSDecal": {
@@ -23168,7 +23224,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 937
+              "line": 949
             }
           }
         ],
@@ -23182,7 +23238,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 920
+        "line": 932
       }
     },
     "graphics_engine::render_block::RenderBlockScreenSpaceReflection": {
@@ -23255,7 +23311,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 653
+              "line": 665
             }
           }
         ],
@@ -23269,7 +23325,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 620
+        "line": 632
       }
     },
     "graphics_engine::render_block::RenderBlockScreenSpaceSubSurfaceSkin": {
@@ -23336,7 +23392,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 668
+              "line": 680
             }
           }
         ],
@@ -23350,7 +23406,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 659
+        "line": 671
       }
     },
     "graphics_engine::render_block::RenderBlockTerrain": {
@@ -23454,7 +23510,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 687
+              "line": 699
             }
           },
           {
@@ -23471,7 +23527,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 687
+              "line": 699
             }
           },
           {
@@ -23488,7 +23544,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 691
+              "line": 703
             }
           },
           {
@@ -23523,7 +23579,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 671
+              "line": 683
             }
           }
         ],
@@ -23575,7 +23631,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 697
+              "line": 709
             }
           }
         ],
@@ -23589,7 +23645,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 683
+        "line": 695
       }
     },
     "graphics_engine::render_block::RenderBlockTerrainPatch": {
@@ -23964,7 +24020,7 @@
             "is_base": true,
             "source": {
               "file_index": 30,
-              "line": 490
+              "line": 502
             }
           },
           {
@@ -23997,7 +24053,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 473
+              "line": 485
             }
           }
         ],
@@ -24502,7 +24558,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 488
+        "line": 500
       }
     },
     "graphics_engine::render_block::RenderBlockTypeFogVolume": {
@@ -24541,7 +24597,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 456
+              "line": 468
             }
           },
           {
@@ -24566,7 +24622,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 456
+              "line": 468
             }
           },
           {
@@ -24591,7 +24647,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 461
+              "line": 473
             }
           }
         ],
@@ -24632,7 +24688,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 470
+              "line": 482
             }
           }
         ],
@@ -24646,7 +24702,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 452
+        "line": 464
       }
     },
     "graphics_engine::render_block::RenderBlockTypeParticle": {
@@ -24690,7 +24746,7 @@
             "is_base": true,
             "source": {
               "file_index": 30,
-              "line": 515
+              "line": 527
             }
           },
           {
@@ -24719,7 +24775,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 524
+              "line": 536
             }
           },
           {
@@ -24744,7 +24800,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 524
+              "line": 536
             }
           },
           {
@@ -24769,7 +24825,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 530
+              "line": 542
             }
           },
           {
@@ -24807,7 +24863,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 493
+              "line": 505
             }
           }
         ],
@@ -25312,7 +25368,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 513
+        "line": 525
       }
     },
     "graphics_engine::render_block::RenderBlockTypeSSDecal": {
@@ -25374,7 +25430,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 902
+              "line": 914
             }
           },
           {
@@ -25419,7 +25475,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 915
+              "line": 927
             }
           }
         ],
@@ -25433,7 +25489,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 881
+        "line": 893
       }
     },
     "graphics_engine::render_block::RenderBlockTypeTerrain": {
@@ -26574,7 +26630,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 426
+              "line": 438
             }
           }
         ],
@@ -26588,7 +26644,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 414
+        "line": 426
       }
     },
     "graphics_engine::render_block::WaterBoxRenderBlock": {
@@ -26655,7 +26711,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 785
+              "line": 797
             }
           },
           {
@@ -26694,7 +26750,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 795
+              "line": 807
             }
           }
         ],
@@ -26708,7 +26764,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 777
+        "line": 789
       }
     },
     "graphics_engine::render_block::WaterBoxRenderBlockType": {
@@ -26781,7 +26837,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 766
+              "line": 778
             }
           },
           {
@@ -26823,7 +26879,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 773
+              "line": 785
             }
           }
         ],
@@ -26837,7 +26893,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 749
+        "line": 761
       }
     },
     "graphics_engine::render_block::WaterHighEndRenderBlock": {
@@ -26911,7 +26967,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 742
+              "line": 754
             }
           }
         ],
@@ -26925,7 +26981,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 732
+        "line": 744
       }
     },
     "graphics_engine::render_block::WaterHighEndRenderBlockType": {
@@ -26986,7 +27042,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 726
+              "line": 738
             }
           }
         ],
@@ -27000,7 +27056,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 704
+        "line": 716
       }
     },
     "graphics_engine::render_engine::RenderBlockTypeBase": {
@@ -64726,7 +64782,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 30,
-                "line": 875
+                "line": 887
               }
             }
           ],
