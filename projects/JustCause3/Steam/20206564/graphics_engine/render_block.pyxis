@@ -1,4 +1,5 @@
 use graphics_engine::graphics_engine::{HContext_t, HTexture_t, RenderContext};
+use graphics_engine::render_engine::RenderBlockTypeBase;
 use types::math::{Matrix4, Vector3};
 
 /// A 3x4 skinning-palette bone matrix. The layout differs per render block (empirically, by the
@@ -443,8 +444,25 @@ impl RenderBlockTypeFogVolume {
 /// The particle render block *type* (the `CRenderBlockParticle::CRenderBlockTypeParticle` singleton):
 /// the shared state and shaders for every particle render block, including the flags that decide
 /// whether a particle draw is routed to the low-resolution particle pass.
+///
+/// **This type is never registered.** `CRenderBlockParticle::InitType` (`0x140_4AD_2D0`) constructs
+/// it, stores it in this singleton, calls its `Create`, and returns — without calling
+/// `CRenderEngine::AddType`, which every other render block's `InitType`/`RegisterType` does. So it
+/// does not appear in the global
+/// [`RenderBlockTypeRegistry`](graphics_engine::render_engine::RenderBlockTypeRegistry), and anything
+/// that enumerates the registry to reach every type will silently miss it — even though
+/// `CRenderPass::DoDraw` dispatches its `IsEnabled` through the vtable exactly as it does for a
+/// registered type. This singleton is the only way to reach it. `CRenderBlockLRParticleCompose` is
+/// unregistered in the same way, and has no `RegisterType` at all; its type object is owned privately
+/// by `CPostEffectsManager` rather than held in a global.
+///
+/// Sweeping every `*::InitType` in the image against the callers of `CRenderEngine::AddType`
+/// (`0x140_173_110`) shows this is the *only* named `InitType` that skips registration.
 #[singleton(0x142_F17_128), min_size(0xA87)]
 pub type RenderBlockTypeParticle {
+    #[base]
+    pub base: RenderBlockTypeBase,
+
     /// When set, a particle render block whose effect opts in and that falls below the low-resolution
     /// distance threshold routes its draw to the low-resolution particle pass (later composited back
     /// up by the low-res upsampling pass); when clear, that particle routes to the full-resolution
