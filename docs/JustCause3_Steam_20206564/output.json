@@ -21774,7 +21774,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 849
+              "line": 879
             }
           },
           {
@@ -21836,7 +21836,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 870
+              "line": 900
             }
           }
         ],
@@ -21850,7 +21850,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 820
+        "line": 850
       }
     },
     "graphics_engine::render_block::RBIInfo": {
@@ -23224,7 +23224,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 949
+              "line": 979
             }
           }
         ],
@@ -23238,7 +23238,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 932
+        "line": 962
       }
     },
     "graphics_engine::render_block::RenderBlockScreenSpaceReflection": {
@@ -25430,7 +25430,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 914
+              "line": 944
             }
           },
           {
@@ -25475,7 +25475,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 927
+              "line": 957
             }
           }
         ],
@@ -25489,7 +25489,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 893
+        "line": 923
       }
     },
     "graphics_engine::render_block::RenderBlockTypeTerrain": {
@@ -26717,13 +26717,31 @@
           {
             "visibility": "public",
             "name": "DrawSurface",
-            "doc": " Draws the box's tessellated surface grid (162 triangles) in the surface-rendering mode, staging\n the box's own world transform — a scale by the box half-extents plus a camera-relative\n translation — on **vertex slot 2, registers 0..3** first. It stages no view-projection; the\n screen-lookup matrix is whatever\n [`WaterBoxRenderBlockType::Setup`](WaterBoxRenderBlockType::Setup) last left on vertex slot 1.\n `NWater::DrawWaterBoxSurface` (`0x140_368_C70`) runs the same body inline over every visible\n registered water box.",
+            "doc": " Draws the box's tessellated surface grid (162 triangles) in the surface-rendering mode, staging\n the box's own world transform — a scale by the box half-extents plus a camera-relative\n translation — on **vertex slot 2, registers 0..3** first. It stages no view-projection; the\n screen-lookup matrix is whatever\n [`WaterBoxRenderBlockType::Setup`](WaterBoxRenderBlockType::Setup) last left on vertex slot 1.\n [`DrawWaterBoxSurface`](DrawWaterBoxSurface) runs the same body inline over every visible\n registered water box.\n\n The `waterboxsurface` vertex shader consumes those two stagings as `cb1[0..3]` (the box\n transform) and `cb1[4..7]` (the screen lookup), and takes its clip position from the *global*\n vertex constant buffer instead: it adds the camera world position at `cb0[4]` to the\n camera-relative transformed vertex, recovering an absolute world position, and multiplies that\n by the full, translation-bearing view-projection at `cb0[0..3]` — not the translation-free\n [`RenderContext::m_OffsetViewProjection`](graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection)\n at `cb0[29..32]` that the camera-relative model families use. It is the only member of the\n water-box family that builds clip that way; the volume permutations drawn by\n [`Draw`](Self::Draw) go through the block type's own staging.",
             "doc_links": [
               {
                 "text": "WaterBoxRenderBlockType::Setup",
                 "target_kind": "item",
                 "path": "graphics_engine::render_block::WaterBoxRenderBlockType",
                 "anchor": "func-Setup"
+              },
+              {
+                "text": "DrawWaterBoxSurface",
+                "target_kind": "module",
+                "path": "graphics_engine::render_block",
+                "anchor": "func-DrawWaterBoxSurface"
+              },
+              {
+                "text": "graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::RenderContext",
+                "anchor": "field-m_OffsetViewProjection"
+              },
+              {
+                "text": "Self::Draw",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::WaterBoxRenderBlock",
+                "anchor": "func-Draw"
               }
             ],
             "body": {
@@ -26750,7 +26768,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 807
+              "line": 817
             }
           }
         ],
@@ -64710,6 +64728,101 @@
           "functions": [
             {
               "visibility": "public",
+              "name": "DrawWaterBoxSurface",
+              "doc": " Draws every registered water box's surface grid, under the water-box manager's critical section:\n for each box, frustum-culls it against `CCameraManager::GetRenderCamera()`, stages the box\n transform — `CMatrix4f::Scaling` by the box half-extents, with the translation set to the box\n centre minus the render context's camera world position — on **vertex constant-buffer bank 2,\n registers 0..3**, and issues the grid as a plain [`DrawIndexed`] (162 primitives, or 6 in the\n manager's simplified mode). Inlined from\n [`WaterBoxRenderBlock::DrawSurface`](WaterBoxRenderBlock::DrawSurface), whose doc records the\n clip path the `waterboxsurface` shader builds from it. Called by\n [`NvWaterHighEndRenderBlock::Draw`](NvWaterHighEndRenderBlock::Draw) once the ocean quadtree is\n down.",
+              "doc_links": [
+                {
+                  "text": "DrawIndexed",
+                  "target_kind": "module",
+                  "path": "graphics_engine::draw",
+                  "anchor": "func-DrawIndexed"
+                },
+                {
+                  "text": "WaterBoxRenderBlock::DrawSurface",
+                  "target_kind": "item",
+                  "path": "graphics_engine::render_block::WaterBoxRenderBlock",
+                  "anchor": "func-DrawSurface"
+                },
+                {
+                  "text": "NvWaterHighEndRenderBlock::Draw",
+                  "target_kind": "item",
+                  "path": "graphics_engine::render_block::NvWaterHighEndRenderBlock",
+                  "anchor": "func-Draw"
+                }
+              ],
+              "body": {
+                "type": "address",
+                "address": 5372284016
+              },
+              "arguments": [
+                {
+                  "type": "field",
+                  "name": "rc",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "graphics_engine::graphics_engine::RenderContext"
+                    }
+                  }
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system",
+              "source": {
+                "file_index": 30,
+                "line": 831
+              }
+            },
+            {
+              "visibility": "public",
+              "name": "SetupWaterBoxSurface",
+              "doc": " Binds the water-box surface state ahead of [`DrawWaterBoxSurface`](DrawWaterBoxSurface): under the\n same critical section, and only when at least one box is registered, it fetches the shared\n [`WaterBoxRenderBlockType`](WaterBoxRenderBlockType) off the first box's render block and forwards\n to [`SetupSurface`](WaterBoxRenderBlockType::SetupSurface).",
+              "doc_links": [
+                {
+                  "text": "DrawWaterBoxSurface",
+                  "target_kind": "module",
+                  "path": "graphics_engine::render_block",
+                  "anchor": "func-DrawWaterBoxSurface"
+                },
+                {
+                  "text": "WaterBoxRenderBlockType",
+                  "target_kind": "item",
+                  "path": "graphics_engine::render_block::WaterBoxRenderBlockType"
+                },
+                {
+                  "text": "WaterBoxRenderBlockType::SetupSurface",
+                  "target_kind": "item",
+                  "path": "graphics_engine::render_block::WaterBoxRenderBlockType",
+                  "anchor": "func-SetupSurface"
+                }
+              ],
+              "body": {
+                "type": "address",
+                "address": 5372203296
+              },
+              "arguments": [
+                {
+                  "type": "field",
+                  "name": "rc",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "graphics_engine::graphics_engine::RenderContext"
+                    }
+                  }
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system",
+              "source": {
+                "file_index": 30,
+                "line": 838
+              }
+            },
+            {
+              "visibility": "public",
               "name": "WaveWorksSimulationStep",
               "doc": " Advances the WaveWorks ocean simulation one step and blocks until its displacement readback is\n available (`GFSDK_WaveWorks_Simulation_Simulation` — a helper in the game's own image, named by\n its telemetry zone, not an export of `gfsdk_waveworks.win64.dll`).\n\n Sets the simulation time, then loops `WaitStagingCursor` + `KickD3D11` until the staging cursor\n reports the readback is no longer in flight, and archives the resulting displacement snapshot —\n which is what the CPU-side wave-height and buoyancy queries\n (`GFSDK_WaveWorks_Simulation_GetArchivedDisplacements`) read. Finally restores the D3D state the\n kick changed from the shared savestate.\n\n Called once per frame from [`NvWaterHighEndRenderBlock::Draw`](NvWaterHighEndRenderBlock::Draw).\n It is not idempotent: each call archives another displacement snapshot and can block on the\n staging cursor.",
               "doc_links": [
@@ -64782,7 +64895,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 30,
-                "line": 887
+                "line": 917
               }
             }
           ],
