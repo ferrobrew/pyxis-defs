@@ -1,5 +1,5 @@
 {
-  "schema_version": 11,
+  "schema_version": 12,
   "pyxis_version": "0.1.0",
   "pointer_size": 8,
   "project_name": "Just Cause 3 (Steam 20206564)",
@@ -22463,6 +22463,67 @@
         "associated_functions": [
           {
             "visibility": "public",
+            "name": "Draw",
+            "doc": " Selects between the block's two lighting paths on a single condition:\n [`DrawPassThrough`](Self::DrawPassThrough) when\n [`RenderEngine::IsWireframeEnabled`](graphics_engine::render_engine::RenderEngine) reports\n wireframe, [`DrawClustered`](Self::DrawClustered) otherwise. Normal shaded rendering therefore\n always takes the clustered path.",
+            "doc_links": [
+              {
+                "text": "Self::DrawPassThrough",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockDeferredLighting",
+                "anchor": "func-DrawPassThrough"
+              },
+              {
+                "text": "graphics_engine::render_engine::RenderEngine",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::RenderEngine"
+              },
+              {
+                "text": "Self::DrawClustered",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockDeferredLighting",
+                "anchor": "func-DrawClustered"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5370012128
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "rc",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "info",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::render_block::RBIInfo"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 30,
+              "line": 498
+            }
+          },
+          {
+            "visibility": "public",
             "name": "DrawClustered",
             "doc": " The clustered-lighting entry point: runs the \"LightAssignment\" pass (rasterizing light proxy\n geometry into the froxel light-lookup target) and the \"ClusteredLighting\" pass (shading from\n it). Called from `Draw` when wireframe is disabled.",
             "body": {
@@ -22511,7 +22572,56 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 496
+              "line": 504
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "DrawPassThrough",
+            "doc": " The wireframe-only lighting path, reached from [`Draw`](Self::Draw) exclusively when\n [`RenderEngine::IsWireframeEnabled`](graphics_engine::render_engine::RenderEngine) is set, so\n it does not run during normal shaded rendering. Like the clustered path it recovers a\n clip-to-view basis via [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4).",
+            "doc_links": [
+              {
+                "text": "Self::Draw",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::RenderBlockDeferredLighting",
+                "anchor": "func-Draw"
+              },
+              {
+                "text": "graphics_engine::render_engine::RenderEngine",
+                "target_kind": "item",
+                "path": "graphics_engine::render_engine::RenderEngine"
+              },
+              {
+                "text": "types::math::Matrix4",
+                "target_kind": "item",
+                "path": "types::math::Matrix4"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5370006784
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "rc",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 30,
+              "line": 511
             }
           }
         ],
@@ -22689,6 +22799,228 @@
         "line": 405
       }
     },
+    "graphics_engine::render_block::RenderBlockSSAO": {
+      "path": "graphics_engine::render_block::RenderBlockSSAO",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " The screen-space ambient-occlusion render block. Its `Draw` reconstructs view-space position from\n depth via [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4) and carries a temporal history\n across frames, indexed by a counter the block advances per invocation.",
+        "doc_links": [
+          {
+            "text": "types::math::Matrix4",
+            "target_kind": "item",
+            "path": "types::math::Matrix4"
+          }
+        ],
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "Draw",
+            "doc": " Draws the ambient-occlusion pass, reconstructing from depth and accumulating into the\n temporal history.",
+            "body": {
+              "type": "address",
+              "address": 5370351232
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "rc",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "info",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::render_block::RBIInfo"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 30,
+              "line": 522
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 30,
+        "line": 517
+      }
+    },
+    "graphics_engine::render_block::RenderBlockScreenSpaceReflection": {
+      "path": "graphics_engine::render_block::RenderBlockScreenSpaceReflection",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " The screen-space reflection render block. Its `Draw` reconstructs world position from depth via\n [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4) and ray-marches a scene colour capture\n taken earlier in the frame.",
+        "doc_links": [
+          {
+            "text": "types::math::Matrix4",
+            "target_kind": "item",
+            "path": "types::math::Matrix4"
+          }
+        ],
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "Draw",
+            "doc": " Draws the screen-space reflection pass.",
+            "body": {
+              "type": "address",
+              "address": 5370355216
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "rc",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "info",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::render_block::RBIInfo"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 30,
+              "line": 532
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 30,
+        "line": 528
+      }
+    },
+    "graphics_engine::render_block::RenderBlockScreenSpaceSubSurfaceSkin": {
+      "path": "graphics_engine::render_block::RenderBlockScreenSpaceSubSurfaceSkin",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " The screen-space subsurface-scattering render block for skin. Its `Draw` reconstructs from depth\n via [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4) -- twice, once per blur axis -- and\n blurs the lit skin in screen space.",
+        "doc_links": [
+          {
+            "text": "types::math::Matrix4",
+            "target_kind": "item",
+            "path": "types::math::Matrix4"
+          }
+        ],
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "Draw",
+            "doc": " Draws the subsurface-scattering pass.",
+            "body": {
+              "type": "address",
+              "address": 5370359136
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "rc",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "info",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::render_block::RBIInfo"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 30,
+              "line": 542
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 30,
+        "line": 538
+      }
+    },
     "graphics_engine::render_block::RenderBlockTerrain": {
       "path": "graphics_engine::render_block::RenderBlockTerrain",
       "visibility": "public",
@@ -22790,7 +23122,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 515
+              "line": 561
             }
           },
           {
@@ -22807,7 +23139,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 515
+              "line": 561
             }
           },
           {
@@ -22824,7 +23156,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 519
+              "line": 565
             }
           },
           {
@@ -22859,7 +23191,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 499
+              "line": 545
             }
           }
         ],
@@ -22911,7 +23243,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 525
+              "line": 571
             }
           }
         ],
@@ -22925,7 +23257,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 511
+        "line": 557
       }
     },
     "graphics_engine::render_block::RenderBlockTerrainPatch": {
@@ -61906,6 +62238,9 @@
             "graphics_engine::render_block::RenderBlockDeferredLighting",
             "graphics_engine::render_block::RenderBlockFoliage",
             "graphics_engine::render_block::RenderBlockOccluder",
+            "graphics_engine::render_block::RenderBlockSSAO",
+            "graphics_engine::render_block::RenderBlockScreenSpaceReflection",
+            "graphics_engine::render_block::RenderBlockScreenSpaceSubSurfaceSkin",
             "graphics_engine::render_block::RenderBlockTerrain",
             "graphics_engine::render_block::RenderBlockTerrainDetail",
             "graphics_engine::render_block::RenderBlockTerrainPatch",
