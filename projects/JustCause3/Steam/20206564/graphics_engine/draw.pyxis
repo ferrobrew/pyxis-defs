@@ -53,9 +53,19 @@ pub fn DrawInstancedIndirect(a1: *mut void, a2: *mut void, a3: *mut void, a4: *m
 #[address(0x141_963_080)]
 pub fn DrawIndexedInstancedIndirect(a1: *mut void, a2: *mut void, a3: *mut void, a4: *mut void, a5: *mut void, a6: *mut void);
 
-/// A compute dispatch.
+/// A compute dispatch of `x` by `y` by `z` thread groups.
+///
+/// Unlike its neighbours above, this one's demangled symbol agrees with the disassembly: the body
+/// takes exactly four arguments in `rcx`/`edx`/`r8d`/`r9d`, flushes the pending render state through
+/// `Graphics::SetupRenderStates`, and forwards the three group counts to the backend's dispatch entry
+/// under the context's critical section.
+///
+/// A dispatch is not rasterization, so none of the rasterizer state applies to it: neither the
+/// viewport nor the scissor rectangle ([`SetScissorEnable`]) restricts which texels a dispatch's
+/// threads address. The addressed region is decided entirely by the group counts passed here and by
+/// the compute program's own mapping from `SV_DispatchThreadID` to texel.
 #[address(0x141_962_AD0)]
-pub fn Dispatch(a1: *mut void, a2: *mut void, a3: *mut void, a4: *mut void, a5: *mut void, a6: *mut void);
+pub fn Dispatch(ctx: *mut HContext_t, x: u32, y: u32, z: u32);
 
 /// A GPU-driven compute dispatch.
 #[address(0x141_962_B60)]

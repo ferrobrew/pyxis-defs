@@ -10,9 +10,11 @@ use types::std_vector::Vector;
 /// post-effects at `RP_POSTEFFECTS`. Named [`RenderPassId`] to avoid clashing with the [`RenderPass`]
 /// type.
 ///
-/// Verified against the retail pass-name switch ([`GetRenderPassName`]): relative to the 2016 dump,
-/// retail inserts `RP_VEGETATION_TRANSPARENT_AOIT` at `0x74` (shifting everything above by one) and
-/// removes the dump-era `RP_PARTICLE_RIBBON`, leaving `0x82` unnamed.
+/// Verified against the retail pass-name switch ([`GetRenderPassName`]): relative to the 2016 dump's
+/// `ERenderPass` header, retail inserts `RP_VEGETATION_TRANSPARENT_AOIT` at `0x74`, shifting
+/// everything above by one. `RP_PARTICLE_RIBBON` (`0x82`) is the one id the name switch does not
+/// name — it returns `"NONE"` for it — but the pass itself is live: the effect system creates it and
+/// the ribbon instantiator enqueues onto it, so the id is not a hole.
 #[copyable]
 pub enum RenderPassId: i32 {
     RP_NONE = 0x0,
@@ -68,6 +70,9 @@ pub enum RenderPassId: i32 {
     RP_Z_AND_VELOCITY_PASS = 0x32,
     RP_Z_DEBUG_VISUALIZATION = 0x33,
     RP_CLEAR = 0x34,
+    /// The road stencil layer. `CRoadMeshManager` owns it as the second of its two passes and
+    /// enqueues a spline-road block onto it whenever the road's visual type has shader type 0, so
+    /// its draw list is the same `CRenderBlockSplineRoad` geometry as [`RP_ROAD_LAYERS`](Self::RP_ROAD_LAYERS).
     RP_ROAD_STENCIL = 0x35,
     RP_TERRAINPATCH_DETAIL_MID = 0x36,
     RP_TERRAINPATCH_DETAIL_LOW = 0x37,
@@ -80,9 +85,15 @@ pub enum RenderPassId: i32 {
     RP_TERRAIN_APPLY_NEAR_DETAILED = 0x3E,
     RP_TERRAIN_APPLY_NEAR = 0x3F,
     RP_TERRAIN_APPLY_FAR = 0x40,
+    /// `CModelInstanceManager::DynamicModelOpaquePass`.
     RP_MODELS_DYNAMIC = 0x41,
+    /// `CModelInstanceManager::DamageEffectMaskedDynamicPass`.
     RP_MODELS_DYNAMIC_MASK_DAMAGE_POST_EFFECT = 0x42,
+    /// `CModelInstanceManager::StaticModelOpaquePass`.
     RP_MODELS_STATIC = 0x43,
+    /// The planar-reflection model pass. `CModelInstanceManager` creates *two* passes with this id —
+    /// `ReflectionPass` (opaque) and `TransparentReflectionPass` — and both render the model geometry
+    /// from the reflection camera into the reflection target rather than into the main scene target.
     RP_MODELS_REFLECTION = 0x44,
     RP_UNDERWATER_VEGETATION = 0x45,
     RP_VEGETATION_OPAQUE = 0x46,
@@ -90,13 +101,23 @@ pub enum RenderPassId: i32 {
     RP_VEGETATIONGROUP = 0x48,
     RP_VEGETATIONGROUP2 = 0x49,
     RP_TERRAIN_FOREST = 0x4A,
+    /// `CCreatureManager`'s own pass. Its draw list is `CCreatureRenderBlock`, whose `Draw` always
+    /// submits non-indexed from a vertex stream alone.
     RP_CREATURES = 0x4B,
+    /// The underwater fog gradient. One `CRenderBlockUnderwaterFogGradient` on `CSkyGradient`'s own
+    /// pass, drawing viewport-covering geometry — despite sitting inside the GBuffer index range.
     RP_UNDERWATER_FOG_GRADIENT = 0x4C,
     RP_Z_LOCK = 0x4D,
     RP_ROAD_JUNCTION = 0x4E,
+    /// The road surface layers. The first of `CRoadMeshManager`'s two passes; every visible road
+    /// enqueues its `CRenderBlockSplineRoad` here, which draws non-indexed.
     RP_ROAD_LAYERS = 0x4F,
     RP_ROAD_JUNCTION_OPAQUE = 0x50,
+    /// The depth downsample. A single `CRenderBlockDepthDownSample` on `m_DepthDownSamplePass`,
+    /// drawing viewport-covering geometry — despite sitting inside the GBuffer index range.
     RP_DOWNSAMPLE_DEPTH = 0x51,
+    /// The world decals. `CDecalManager::DecalRenderPass`; its draw list is the four
+    /// `CRenderBlockDecal*` block types, each of which draws non-indexed from a vertex stream alone.
     RP_DECALS = 0x52,
     RP_SCREEN_SPACE_DECALS = 0x53,
     RP_SCREEN_SPACE_ROAD_DECALS = 0x54,
@@ -126,42 +147,68 @@ pub enum RenderPassId: i32 {
     RP_COPY_FRAMEBUFFER = 0x6C,
     RP_WATER = 0x6D,
     RP_POST_WATER = 0x6E,
+    /// The skidmark layer. `CSkidmarkManager` owns the pass and re-enqueues its live skidmarks each
+    /// frame; the draw list is `CRenderBlockSkidmarks`, which draws non-indexed.
     RP_SKIDMARKS = 0x6F,
     RP_PRE_CLOUDS = 0x70,
     RP_LENSFLARE = 0x71,
     RP_POST_CLOUDS = 0x72,
     RP_APPLY_CLOUDS = 0x73,
     RP_VEGETATION_TRANSPARENT_AOIT = 0x74,
+    /// Fog-volume generation. The first of `CFogManager`'s two `CRenderBlockFogVolume` passes; the
+    /// block draws viewport-covering geometry, not a world-space volume.
     RP_FOG_VOLUME_GENERATE = 0x75,
+    /// Fog-volume upsampling. The second `CRenderBlockFogVolume` pass; likewise viewport-covering.
     RP_FOG_VOLUME_UPSAMPLE = 0x76,
+    /// The fog-volume composite. `CFogManager::m_RenderPassAddFogVolume`, drawing one
+    /// `CRenderBlockAddFogVolume` over the viewport.
     RP_FOG_VOLUME_APPLY = 0x77,
     RP_MASK_WATER = 0x78,
+    /// `CModelInstanceManager::ModelTransparentPass`.
     RP_MODELS_TRANSPARENT = 0x79,
     RP_VEGETATION_TRANSPARENT = 0x7A,
     RP_VEGETATION_POST_DRAW = 0x7B,
     RP_BB_RAIN = 0x7C,
+    /// `CModelInstanceManager::ModelGlintPass`.
     RP_MODELS_GLINT = 0x7D,
     RP_WATER_GODRAYS = 0x7E,
     RP_BULLETS = 0x7F,
     RP_CONTRAILS = 0x80,
     RP_GROUNDHAZE = 0x81,
+    /// The ribbon-effect pass. Created by the effect system alongside its ribbon instantiator pool
+    /// and fed by `CRibbonInstantiator::Update`. Unlike every other id, [`GetRenderPassName`] has no
+    /// case for it and reports `"NONE"`.
+    RP_PARTICLE_RIBBON = 0x82,
+    /// `CModelInstanceManager::HaloTransparentPass`.
     RP_MODEL_HALO_POST = 0x83,
     RP_PARTICLE_LOWRES = 0x84,
     RP_SPOTLIGHT_VOLUMETRICS = 0x85,
+    /// The window decals. `CDecalManager::WindowDecalRenderPass`, the second of its two passes;
+    /// decals whose surface is glass are routed here instead of [`RP_DECALS`](Self::RP_DECALS), and
+    /// draw with the same non-indexed `CRenderBlockDecal*` blocks.
     RP_WINDOW_DECALS = 0x86,
+    /// `CModelInstanceManager::ModelRefractPass`.
     RP_MODELS_REFRACT = 0x87,
     RP_PARTICLE_GENERAL = 0x88,
     RP_PARTICLE_DISTORT = 0x89,
     RP_PARTICLE_LOWRES_OVERLAY = 0x8A,
     RP_SCENE_CAPTURE = 0x8B,
+    /// `CModelInstanceManager::FinalZTransparentPass`.
     RP_Z_FINAL_TRANSPARENT = 0x8C,
     RP_CLEAR_SCREEN_SPACE_SUBSURFACE_SKIN = 0x8D,
+    /// `CModelInstanceManager::ClearStencilPass`: a model-geometry pass whose render setup also
+    /// carries the stencil clear.
     RP_CLEAR_STENCIL = 0x8E,
+    /// `CModelInstanceManager::GhostEffectPass`.
     RP_GHOST_EFFECT = 0x8F,
+    /// `CModelInstanceManager::OutlineMaskPass`: the model geometry that writes the outline mask,
+    /// as opposed to the viewport-covering [`RP_OUTLINE_EFFECT`](Self::RP_OUTLINE_EFFECT) family
+    /// that reads it.
     RP_OUTLINE_MASK = 0x90,
     RP_OUTLINE_EFFECT = 0x91,
     RP_OUTLINE_EFFECT_NO_DEPTH = 0x92,
     RP_OUTLINE_EFFECT_BLUR = 0x93,
+    /// `CModelInstanceManager::FinalTransparentPass`.
     RP_FINAL_TRANSPARENT = 0x94,
     RP_PARTICLE_ONSCREEN = 0x95,
     RP_POSTEFFECTS = 0x96,
