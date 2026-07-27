@@ -558,6 +558,29 @@ pub type RenderBlockSSAO;
 impl RenderBlockSSAO {
     /// Draws the ambient-occlusion pass, reconstructing from depth and accumulating into the
     /// temporal history.
+    ///
+    /// One call runs five phases, each binding its own render setup, and they do not share a
+    /// resolution: the [`SSAOPass`](graphics_engine::ssao::SSAOPass) sizes its depth targets at the
+    /// render resolution scaled by `m_Resolution` and its occlusion and history targets at half that
+    /// again, while the final composite goes to the full-resolution scene target.
+    ///
+    /// 1. A linear-depth pack into the current slot of the depth targets, followed by a whole-texture
+    ///    mip generation over it (the targets carry five mip levels).
+    /// 2. The occlusion generation into the first of the two occlusion targets, reconstructing
+    ///    view-space position from the packed depth using the render context's own projection terms
+    ///    and an inverse-transpose of its camera transform -- not through
+    ///    [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4).
+    /// 3. A separable bilateral blur, when the pass's blur flag is set: two draws ping-ponging between
+    ///    the two occlusion targets, so the blurred result ends up back in the first. Neither draw is
+    ///    idempotent -- each reads and writes the same pair of textures.
+    /// 4. The temporal resolve, when [`m_EnableTemporalFilter`](graphics_engine::ssao::SSAOPass) is
+    ///    set, into the current slot of the history targets, sampling the previous slot. This is the
+    ///    only phase that calls [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4), uploading the
+    ///    composed clip-to-world basis as vertex constants 1..4 of constant buffer 2. Unless the pass
+    ///    is on its first frame it is preceded by a second separable blur pair, over the previous
+    ///    history slot.
+    /// 5. The composite into the alpha channel of the scene target (colour mask 8, depth test on),
+    ///    followed by the inlined history advance.
     #[address(0x140_190_E80)]
     pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
 }
@@ -714,6 +737,85 @@ impl WaterBoxRenderBlock {
     pub fn DrawSurface(&self, rc: *mut RenderContext);
 }
 
+/// The WaveWorks water render block (`NGraphicsEngine::CNvWaterHighEndRenderBlock`): the ocean
+/// surface at the higher water-quality settings, simulated and tessellated through NVIDIA WaveWorks
+/// (`gfsdk_waveworks.win64.dll`) rather than through the engine's own patch grid.
+///
+/// Its block type registers itself as `"NvWaterHighEnd"` and owns the whole `NvWater*` shader family
+/// — `NvWaterShader_lod0[_tess]`, `NvWaterShader_lod1[_tess]`, `NvWaterBelow`,
+/// `NvWaterBelowShader_lod1`, `NvWaterLake`, and `NvWaterBox[_tess]` — selecting among them per draw
+/// from the tessellation cvar and the block's above/below-surface flag. It also owns the two
+/// constant buffers those permutations read: a 10-register buffer bound to **vertex and domain slot
+/// 1** and a 15-register buffer bound to **fragment slot 1**.
+pub type NvWaterHighEndRenderBlock;
+impl NvWaterHighEndRenderBlock {
+    /// Bakes the per-view WaveWorks matrices and stages both of the block type's constant buffers.
+    ///
+    /// The block keeps three 4x4 matrices of its own, all rebuilt here from the render context:
+    /// - the WaveWorks **view** matrix, `Y/Z-swap · `[`RenderContext::m_View`](graphics_engine::graphics_engine::RenderContext::m_View)
+    ///   (WaveWorks works in a Z-up frame, the engine in a Y-up one);
+    /// - the WaveWorks **projection** matrix, a verbatim copy of
+    ///   [`RenderContext::m_ProjectionF`](graphics_engine::graphics_engine::RenderContext::m_ProjectionF);
+    /// - their product, the `g_ModelViewProjectionMatrix` the `NvWater*` vertex and domain shaders
+    ///   write clip position from.
+    ///
+    /// It then maps the vertex/domain constant buffer write-discard and writes that product into
+    /// **registers 0..3**, followed by the top-down-camera offset/scale, wind direction, character
+    /// world position, time, and Gerstner tuning through byte offset 148; and maps the fragment
+    /// constant buffer, writing the WaveWorks view matrix into its registers 0..3 followed by the
+    /// water colour, scattering, fog, and foam tuning. Neither buffer is written anywhere else, and
+    /// [`Draw`](Self::Draw) restages nothing — it hands the same two block-held matrices straight to
+    /// WaveWorks — so the whole family's view depends solely on the render context this call read.
+    ///
+    /// The body is selected by [`RenderContext::m_ActiveRenderPass`](graphics_engine::graphics_engine::RenderContext::m_ActiveRenderPass):
+    /// `PRE_RP_WATER_CS_PRE` (41) only refreshes the block's cached camera info, `PRE_RP_WATER_WAKES_PRE`
+    /// (42) and `PRE_RP_WATER_FOAM_PRE` (43) only set the blend state and the wake/foam viewport
+    /// offsets, and every other pass takes the matrix-and-constant-buffer path described above.
+    ///
+    /// `sort_id` and `previous_sort_id` come from the draw-list walk in
+    /// [`RenderPass::DoDraw`](graphics_engine::render_pass::RenderPass): the element's sort id, and
+    /// `~0` on a block-type change. This override reads neither.
+    #[address(0x140_365_040)]
+    pub fn Setup(&self, rc: *mut RenderContext, sort_id: u64, previous_sort_id: u64);
+
+    /// Draws the WaveWorks ocean: the simulation step, the quadtree surface, the water-box surfaces,
+    /// and the far LOD skirt.
+    ///
+    /// On the same three-way pass split as [`Setup`](Self::Setup), `PRE_RP_WATER_CS_PRE` (41) runs the
+    /// compute foam sub-pass and `PRE_RP_WATER_FOAM_PRE` (43) the painted foam; every other pass takes
+    /// the main body, which in order: advances the ocean simulation
+    /// ([`WaveWorksSimulationStep`](WaveWorksSimulationStep)) unless the block's
+    /// simulation-suppressed flag is set; binds the render context's render setup, the `NvWater*`
+    /// program permutation for the current tessellation and above/below-surface state, and the water
+    /// depth/stencil state; calls `GFSDK_WaveWorks_Simulation_SetRenderStateD3D11` and
+    /// `GFSDK_WaveWorks_Quadtree_DrawD3D11` on the raw `ID3D11DeviceContext`, passing the two matrices
+    /// [`Setup`](Self::Setup) baked as the view and projection the quadtree culls and picks LODs
+    /// against; draws the registered water-box surfaces through `NWater::DrawWaterBoxSurface`; and
+    /// restores the D3D state WaveWorks changed with `GFSDK_WaveWorks_Savestate_RestoreD3D11`. If the
+    /// block's far-LOD flag is set it then draws the far skirt quad as a plain [`DrawIndexed`].
+    ///
+    /// The save and the restore of the WaveWorks savestate both happen inside this call, so no D3D
+    /// state it captures outlives the call.
+    #[address(0x140_37A_E00)]
+    pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
+}
+
+/// Advances the WaveWorks ocean simulation one step and blocks until its displacement readback is
+/// available (`GFSDK_WaveWorks_Simulation_Simulation` — a helper in the game's own image, named by
+/// its telemetry zone, not an export of `gfsdk_waveworks.win64.dll`).
+///
+/// Sets the simulation time, then loops `WaitStagingCursor` + `KickD3D11` until the staging cursor
+/// reports the readback is no longer in flight, and archives the resulting displacement snapshot —
+/// which is what the CPU-side wave-height and buoyancy queries
+/// (`GFSDK_WaveWorks_Simulation_GetArchivedDisplacements`) read. Finally restores the D3D state the
+/// kick changed from the shared savestate.
+///
+/// Called once per frame from [`NvWaterHighEndRenderBlock::Draw`](NvWaterHighEndRenderBlock::Draw).
+/// It is not idempotent: each call archives another displacement snapshot and can block on the
+/// staging cursor.
+#[address(0x140_336_CE0)]
+pub fn WaveWorksSimulationStep(render_time: f64, gfx_context: *mut void, kick_id: *mut u64, simulation: *mut void, savestate: *mut void);
+
 /// The screen-space decal render block *type*
 /// (`NGraphicsEngine::CRenderBlockSSDecal::CRenderBlockTypeSSDecal`): the per-pass setup shared by
 /// the twelve `ssdecal*` fragment permutations, which project a decal's textures onto whatever the
@@ -740,6 +842,19 @@ impl RenderBlockTypeSSDecal {
     /// velocity passes stage nothing.
     #[address(0x140_191_C20)]
     pub fn Setup(&self, rc: *mut RenderContext);
+
+    /// Binds the render context's global constant buffers to vertex and fragment slot 0 and declares
+    /// the pass's instance-constant slots: vertex slot 1 at **8** `float4` rows (base row 0), fragment
+    /// slot 1 at **13** rows (base row 0), and slots 2 and 3 unused on both stages.
+    ///
+    /// Those are exactly the rows the permutations declare: the shared `ssdecal` vertex program
+    /// declares `cb1[7]` and the twelve fragment permutations declare `cb1[13]`. Because
+    /// [`SetFragmentProgramConstantBufferSize`] rounds a declared row count up to the next pool size
+    /// class, the buffer actually bound to fragment slot 1 for this pass holds **16** rows and
+    /// [`SetupRenderStates`] uploads all sixteen — the three rows past the declared thirteen carry
+    /// whatever the shared staging array holds.
+    #[address(0x140_16D_420)]
+    pub fn SetupConstantBuffers(&self, rc: *mut RenderContext);
 }
 
 /// The screen-space decal render block (`NGraphicsEngine::CRenderBlockSSDecal`): one projected decal
