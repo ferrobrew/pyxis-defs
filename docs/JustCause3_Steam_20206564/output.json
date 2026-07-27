@@ -21674,6 +21674,171 @@
         "line": 12
       }
     },
+    "graphics_engine::render_block::NvWaterHighEndRenderBlock": {
+      "path": "graphics_engine::render_block::NvWaterHighEndRenderBlock",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " The WaveWorks water render block (`NGraphicsEngine::CNvWaterHighEndRenderBlock`): the ocean\n surface at the higher water-quality settings, simulated and tessellated through NVIDIA WaveWorks\n (`gfsdk_waveworks.win64.dll`) rather than through the engine's own patch grid.\n\n Its block type registers itself as `\"NvWaterHighEnd\"` and owns the whole `NvWater*` shader family\n — `NvWaterShader_lod0[_tess]`, `NvWaterShader_lod1[_tess]`, `NvWaterBelow`,\n `NvWaterBelowShader_lod1`, `NvWaterLake`, and `NvWaterBox[_tess]` — selecting among them per draw\n from the tessellation cvar and the block's above/below-surface flag. It also owns the two\n constant buffers those permutations read: a 10-register buffer bound to **vertex and domain slot\n 1** and a 15-register buffer bound to **fragment slot 1**.",
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "Setup",
+            "doc": " Bakes the per-view WaveWorks matrices and stages both of the block type's constant buffers.\n\n The block keeps three 4x4 matrices of its own, all rebuilt here from the render context:\n - the WaveWorks **view** matrix, `Y/Z-swap · `[`RenderContext::m_View`](graphics_engine::graphics_engine::RenderContext::m_View)\n   (WaveWorks works in a Z-up frame, the engine in a Y-up one);\n - the WaveWorks **projection** matrix, a verbatim copy of\n   [`RenderContext::m_ProjectionF`](graphics_engine::graphics_engine::RenderContext::m_ProjectionF);\n - their product, the `g_ModelViewProjectionMatrix` the `NvWater*` vertex and domain shaders\n   write clip position from.\n\n It then maps the vertex/domain constant buffer write-discard and writes that product into\n **registers 0..3**, followed by the top-down-camera offset/scale, wind direction, character\n world position, time, and Gerstner tuning through byte offset 148; and maps the fragment\n constant buffer, writing the WaveWorks view matrix into its registers 0..3 followed by the\n water colour, scattering, fog, and foam tuning. Neither buffer is written anywhere else, and\n [`Draw`](Self::Draw) restages nothing — it hands the same two block-held matrices straight to\n WaveWorks — so the whole family's view depends solely on the render context this call read.\n\n The body is selected by [`RenderContext::m_ActiveRenderPass`](graphics_engine::graphics_engine::RenderContext::m_ActiveRenderPass):\n `PRE_RP_WATER_CS_PRE` (41) only refreshes the block's cached camera info, `PRE_RP_WATER_WAKES_PRE`\n (42) and `PRE_RP_WATER_FOAM_PRE` (43) only set the blend state and the wake/foam viewport\n offsets, and every other pass takes the matrix-and-constant-buffer path described above.\n\n `sort_id` and `previous_sort_id` come from the draw-list walk in\n [`RenderPass::DoDraw`](graphics_engine::render_pass::RenderPass): the element's sort id, and\n `~0` on a block-type change. This override reads neither.",
+            "doc_links": [
+              {
+                "text": "graphics_engine::graphics_engine::RenderContext::m_View",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::RenderContext",
+                "anchor": "field-m_View"
+              },
+              {
+                "text": "graphics_engine::graphics_engine::RenderContext::m_ProjectionF",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::RenderContext",
+                "anchor": "field-m_ProjectionF"
+              },
+              {
+                "text": "Self::Draw",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::NvWaterHighEndRenderBlock",
+                "anchor": "func-Draw"
+              },
+              {
+                "text": "graphics_engine::graphics_engine::RenderContext::m_ActiveRenderPass",
+                "target_kind": "item",
+                "path": "graphics_engine::graphics_engine::RenderContext",
+                "anchor": "field-m_ActiveRenderPass"
+              },
+              {
+                "text": "graphics_engine::render_pass::RenderPass",
+                "target_kind": "item",
+                "path": "graphics_engine::render_pass::RenderPass"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5372268608
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "rc",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "sort_id",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u64"
+                }
+              },
+              {
+                "type": "field",
+                "name": "previous_sort_id",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u64"
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 30,
+              "line": 779
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "Draw",
+            "doc": " Draws the WaveWorks ocean: the simulation step, the quadtree surface, the water-box surfaces,\n and the far LOD skirt.\n\n On the same three-way pass split as [`Setup`](Self::Setup), `PRE_RP_WATER_CS_PRE` (41) runs the\n compute foam sub-pass and `PRE_RP_WATER_FOAM_PRE` (43) the painted foam; every other pass takes\n the main body, which in order: advances the ocean simulation\n ([`WaveWorksSimulationStep`](WaveWorksSimulationStep)) unless the block's\n simulation-suppressed flag is set; binds the render context's render setup, the `NvWater*`\n program permutation for the current tessellation and above/below-surface state, and the water\n depth/stencil state; calls `GFSDK_WaveWorks_Simulation_SetRenderStateD3D11` and\n `GFSDK_WaveWorks_Quadtree_DrawD3D11` on the raw `ID3D11DeviceContext`, passing the two matrices\n [`Setup`](Self::Setup) baked as the view and projection the quadtree culls and picks LODs\n against; draws the registered water-box surfaces through `NWater::DrawWaterBoxSurface`; and\n restores the D3D state WaveWorks changed with `GFSDK_WaveWorks_Savestate_RestoreD3D11`. If the\n block's far-LOD flag is set it then draws the far skirt quad as a plain [`DrawIndexed`].\n\n The save and the restore of the WaveWorks savestate both happen inside this call, so no D3D\n state it captures outlives the call.",
+            "doc_links": [
+              {
+                "text": "Self::Setup",
+                "target_kind": "item",
+                "path": "graphics_engine::render_block::NvWaterHighEndRenderBlock",
+                "anchor": "func-Setup"
+              },
+              {
+                "text": "WaveWorksSimulationStep",
+                "target_kind": "module",
+                "path": "graphics_engine::render_block",
+                "anchor": "func-WaveWorksSimulationStep"
+              },
+              {
+                "text": "DrawIndexed",
+                "target_kind": "module",
+                "path": "graphics_engine::draw",
+                "anchor": "func-DrawIndexed"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5372358144
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "rc",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "info",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::render_block::RBIInfo"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 30,
+              "line": 800
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 30,
+        "line": 750
+      }
+    },
     "graphics_engine::render_block::RBIInfo": {
       "path": "graphics_engine::render_block::RBIInfo",
       "visibility": "public",
@@ -22853,7 +23018,19 @@
           {
             "visibility": "public",
             "name": "Draw",
-            "doc": " Draws the ambient-occlusion pass, reconstructing from depth and accumulating into the\n temporal history.",
+            "doc": " Draws the ambient-occlusion pass, reconstructing from depth and accumulating into the\n temporal history.\n\n One call runs five phases, each binding its own render setup, and they do not share a\n resolution: the [`SSAOPass`](graphics_engine::ssao::SSAOPass) sizes its depth targets at the\n render resolution scaled by `m_Resolution` and its occlusion and history targets at half that\n again, while the final composite goes to the full-resolution scene target.\n\n 1. A linear-depth pack into the current slot of the depth targets, followed by a whole-texture\n    mip generation over it (the targets carry five mip levels).\n 2. The occlusion generation into the first of the two occlusion targets, reconstructing\n    view-space position from the packed depth using the render context's own projection terms\n    and an inverse-transpose of its camera transform -- not through\n    [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4).\n 3. A separable bilateral blur, when the pass's blur flag is set: two draws ping-ponging between\n    the two occlusion targets, so the blurred result ends up back in the first. Neither draw is\n    idempotent -- each reads and writes the same pair of textures.\n 4. The temporal resolve, when [`m_EnableTemporalFilter`](graphics_engine::ssao::SSAOPass) is\n    set, into the current slot of the history targets, sampling the previous slot. This is the\n    only phase that calls [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4), uploading the\n    composed clip-to-world basis as vertex constants 1..4 of constant buffer 2. Unless the pass\n    is on its first frame it is preceded by a second separable blur pair, over the previous\n    history slot.\n 5. The composite into the alpha channel of the scene target (colour mask 8, depth test on),\n    followed by the inlined history advance.",
+            "doc_links": [
+              {
+                "text": "graphics_engine::ssao::SSAOPass",
+                "target_kind": "item",
+                "path": "graphics_engine::ssao::SSAOPass"
+              },
+              {
+                "text": "types::math::Matrix4",
+                "target_kind": "item",
+                "path": "types::math::Matrix4"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5370351232
@@ -22889,7 +23066,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 562
+              "line": 585
             }
           }
         ],
@@ -22977,7 +23154,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 764
+              "line": 879
             }
           }
         ],
@@ -22991,7 +23168,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 747
+        "line": 862
       }
     },
     "graphics_engine::render_block::RenderBlockScreenSpaceReflection": {
@@ -23051,7 +23228,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 572
+              "line": 595
             }
           }
         ],
@@ -23065,7 +23242,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 568
+        "line": 591
       }
     },
     "graphics_engine::render_block::RenderBlockScreenSpaceSubSurfaceSkin": {
@@ -23132,7 +23309,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 587
+              "line": 610
             }
           }
         ],
@@ -23146,7 +23323,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 578
+        "line": 601
       }
     },
     "graphics_engine::render_block::RenderBlockTerrain": {
@@ -23250,7 +23427,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 606
+              "line": 629
             }
           },
           {
@@ -23267,7 +23444,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 606
+              "line": 629
             }
           },
           {
@@ -23284,7 +23461,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 610
+              "line": 633
             }
           },
           {
@@ -23319,7 +23496,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 590
+              "line": 613
             }
           }
         ],
@@ -23371,7 +23548,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 616
+              "line": 639
             }
           }
         ],
@@ -23385,7 +23562,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 602
+        "line": 625
       }
     },
     "graphics_engine::render_block::RenderBlockTerrainPatch": {
@@ -25170,7 +25347,52 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 742
+              "line": 844
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "SetupConstantBuffers",
+            "doc": " Binds the render context's global constant buffers to vertex and fragment slot 0 and declares\n the pass's instance-constant slots: vertex slot 1 at **8** `float4` rows (base row 0), fragment\n slot 1 at **13** rows (base row 0), and slots 2 and 3 unused on both stages.\n\n Those are exactly the rows the permutations declare: the shared `ssdecal` vertex program\n declares `cb1[7]` and the twelve fragment permutations declare `cb1[13]`. Because\n [`SetFragmentProgramConstantBufferSize`] rounds a declared row count up to the next pool size\n class, the buffer actually bound to fragment slot 1 for this pass holds **16** rows and\n [`SetupRenderStates`] uploads all sixteen — the three rows past the declared thirteen carry\n whatever the shared staging array holds.",
+            "doc_links": [
+              {
+                "text": "SetFragmentProgramConstantBufferSize",
+                "target_kind": "module",
+                "path": "graphics_engine::draw",
+                "anchor": "func-SetFragmentProgramConstantBufferSize"
+              },
+              {
+                "text": "SetupRenderStates",
+                "target_kind": "module",
+                "path": "graphics_engine::draw",
+                "anchor": "func-SetupRenderStates"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5370205216
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "rc",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 30,
+              "line": 857
             }
           }
         ],
@@ -25184,7 +25406,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 721
+        "line": 823
       }
     },
     "graphics_engine::render_block::RenderBlockTypeTerrain": {
@@ -26343,7 +26565,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 704
+              "line": 727
             }
           },
           {
@@ -26382,7 +26604,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 714
+              "line": 737
             }
           }
         ],
@@ -26396,7 +26618,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 696
+        "line": 719
       }
     },
     "graphics_engine::render_block::WaterBoxRenderBlockType": {
@@ -26469,7 +26691,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 685
+              "line": 708
             }
           },
           {
@@ -26511,7 +26733,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 692
+              "line": 715
             }
           }
         ],
@@ -26525,7 +26747,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 668
+        "line": 691
       }
     },
     "graphics_engine::render_block::WaterHighEndRenderBlock": {
@@ -26599,7 +26821,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 661
+              "line": 684
             }
           }
         ],
@@ -26613,7 +26835,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 651
+        "line": 674
       }
     },
     "graphics_engine::render_block::WaterHighEndRenderBlockType": {
@@ -26674,7 +26896,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 645
+              "line": 668
             }
           }
         ],
@@ -26688,7 +26910,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 623
+        "line": 646
       }
     },
     "graphics_engine::render_engine::RenderBlockTypeBase": {
@@ -63091,7 +63313,15 @@
             {
               "visibility": "public",
               "name": "SetFragmentProgramConstants",
-              "doc": " Stages `count` float4 constants into the given fragment constant buffer slot, starting at\n `start_offset`, writing to the context's per-slot staging buffer and setting the dirty flag. The\n actual GPU upload happens at the next state flush.",
+              "doc": " Stages `count` float4 constants into the given fragment constant buffer slot, starting at\n `start_offset`, writing to the context's per-slot staging buffer and setting the dirty flag. The\n actual GPU upload happens at the next state flush.\n\n The staging buffer is a single 512-row `float4` array per shader stage, held in the graphics\n context (the fragment one begins at context offset `0x2020`, after the vertex one at `0x20`); the\n four slots of a stage carve their windows out of it, each starting at the row\n [`SetFragmentProgramConstantBufferSize`] recorded for it. The write is therefore bounded by that\n window and by the pooled buffer the slot is bound to, not by `count` alone. A row-level redundancy\n check skips rows byte-identical to what is already staged, and a call that skips every row leaves\n the dirty flag alone.",
+              "doc_links": [
+                {
+                  "text": "SetFragmentProgramConstantBufferSize",
+                  "target_kind": "module",
+                  "path": "graphics_engine::draw",
+                  "anchor": "func-SetFragmentProgramConstantBufferSize"
+                }
+              ],
               "body": {
                 "type": "address",
                 "address": 5395335232
@@ -63148,7 +63378,169 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 25,
-                "line": 196
+                "line": 204
+              }
+            },
+            {
+              "visibility": "public",
+              "name": "SetFragmentProgramConstantBufferSize",
+              "doc": " Declares how large a fragment constant-buffer slot is for the draws that follow, and where in the\n stage's shared staging array its window begins.\n\n `count` is a number of `float4` rows. It is not stored as-is: the engine rounds it **up** to the\n next entry of a fixed 17-entry pool-size table — `1, 2, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128,\n 196, 256, 384, 512` — and binds the pre-created `ID3D11Buffer` of that size to the slot (a\n `PSSetConstantBuffers` call, skipped when the size class is unchanged). The rounded size class,\n not `count`, is what [`SetupRenderStates`] later uploads, so the constant buffer the shader sees is\n the rounded one and the rows between `count` and the size class are uploaded as whatever the\n staging array happens to hold. `start_offset` is recorded as the slot's base row within the\n stage's 512-row staging array; every shipped call passes `0`, so at most one staged slot per stage\n is live at a time. Passing `count = 0` unbinds the slot and clears its dirty flag.\n\n The debug build additionally keeps `count` verbatim so that every\n [`SetFragmentProgramConstants`] can assert that its own `start_offset + count` stays within it; the\n release build stores only the bound buffer, the size class, and the base row, and performs no\n bounds check at all.",
+              "doc_links": [
+                {
+                  "text": "SetupRenderStates",
+                  "target_kind": "module",
+                  "path": "graphics_engine::draw",
+                  "anchor": "func-SetupRenderStates"
+                },
+                {
+                  "text": "SetFragmentProgramConstants",
+                  "target_kind": "module",
+                  "path": "graphics_engine::draw",
+                  "anchor": "func-SetFragmentProgramConstants"
+                }
+              ],
+              "body": {
+                "type": "address",
+                "address": 5395334064
+              },
+              "arguments": [
+                {
+                  "type": "field",
+                  "name": "ctx",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "graphics_engine::graphics_engine::HContext_t"
+                    }
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "cb_index",
+                  "type_ref": {
+                    "type": "raw",
+                    "path": "i32"
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "start_offset",
+                  "type_ref": {
+                    "type": "raw",
+                    "path": "u32"
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "count",
+                  "type_ref": {
+                    "type": "raw",
+                    "path": "u32"
+                  }
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system",
+              "source": {
+                "file_index": 25,
+                "line": 224
+              }
+            },
+            {
+              "visibility": "public",
+              "name": "SetVertexProgramConstantBufferSize",
+              "doc": " The vertex analogue of [`SetFragmentProgramConstantBufferSize`], over the vertex staging array and\n the vertex slots' pooled buffers.",
+              "doc_links": [
+                {
+                  "text": "SetFragmentProgramConstantBufferSize",
+                  "target_kind": "module",
+                  "path": "graphics_engine::draw",
+                  "anchor": "func-SetFragmentProgramConstantBufferSize"
+                }
+              ],
+              "body": {
+                "type": "address",
+                "address": 5395333760
+              },
+              "arguments": [
+                {
+                  "type": "field",
+                  "name": "ctx",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "graphics_engine::graphics_engine::HContext_t"
+                    }
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "cb_index",
+                  "type_ref": {
+                    "type": "raw",
+                    "path": "i32"
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "start_offset",
+                  "type_ref": {
+                    "type": "raw",
+                    "path": "u32"
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "count",
+                  "type_ref": {
+                    "type": "raw",
+                    "path": "u32"
+                  }
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system",
+              "source": {
+                "file_index": 25,
+                "line": 229
+              }
+            },
+            {
+              "visibility": "public",
+              "name": "SetupRenderStates",
+              "doc": " Flushes the graphics context's deferred state to D3D11 ahead of a draw: for each of the four slots\n of each shader stage whose dirty flag is set, maps its bound constant buffer with\n `D3D11_MAP_WRITE_DISCARD` and copies `16 * size_class` bytes into it from the stage's staging array\n starting at the slot's base row — the **rounded** size class from\n [`SetFragmentProgramConstantBufferSize`], not the requested row count — then resolves the\n depth-stencil, blend, and rasterizer state objects from their cached descriptors.",
+              "doc_links": [
+                {
+                  "text": "SetFragmentProgramConstantBufferSize",
+                  "target_kind": "module",
+                  "path": "graphics_engine::draw",
+                  "anchor": "func-SetFragmentProgramConstantBufferSize"
+                }
+              ],
+              "body": {
+                "type": "address",
+                "address": 5395316384
+              },
+              "arguments": [
+                {
+                  "type": "field",
+                  "name": "ctx",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "graphics_engine::graphics_engine::HContext_t"
+                    }
+                  }
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system",
+              "source": {
+                "file_index": 25,
+                "line": 238
               }
             },
             {
@@ -63219,7 +63611,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 25,
-                "line": 204
+                "line": 246
               }
             },
             {
@@ -63290,7 +63682,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 25,
-                "line": 212
+                "line": 254
               }
             }
           ],
@@ -64121,6 +64513,7 @@
           "doc": null,
           "items": [
             "graphics_engine::render_block::Matrix3x4",
+            "graphics_engine::render_block::NvWaterHighEndRenderBlock",
             "graphics_engine::render_block::RBIInfo",
             "graphics_engine::render_block::RenderBlockAtmosphericScattering",
             "graphics_engine::render_block::RenderBlockBark",
@@ -64150,7 +64543,85 @@
             "graphics_engine::render_block::WaterHighEndRenderBlockType"
           ],
           "submodules": {},
-          "functions": [],
+          "functions": [
+            {
+              "visibility": "public",
+              "name": "WaveWorksSimulationStep",
+              "doc": " Advances the WaveWorks ocean simulation one step and blocks until its displacement readback is\n available (`GFSDK_WaveWorks_Simulation_Simulation` — a helper in the game's own image, named by\n its telemetry zone, not an export of `gfsdk_waveworks.win64.dll`).\n\n Sets the simulation time, then loops `WaitStagingCursor` + `KickD3D11` until the staging cursor\n reports the readback is no longer in flight, and archives the resulting displacement snapshot —\n which is what the CPU-side wave-height and buoyancy queries\n (`GFSDK_WaveWorks_Simulation_GetArchivedDisplacements`) read. Finally restores the D3D state the\n kick changed from the shared savestate.\n\n Called once per frame from [`NvWaterHighEndRenderBlock::Draw`](NvWaterHighEndRenderBlock::Draw).\n It is not idempotent: each call archives another displacement snapshot and can block on the\n staging cursor.",
+              "doc_links": [
+                {
+                  "text": "NvWaterHighEndRenderBlock::Draw",
+                  "target_kind": "item",
+                  "path": "graphics_engine::render_block::NvWaterHighEndRenderBlock",
+                  "anchor": "func-Draw"
+                }
+              ],
+              "body": {
+                "type": "address",
+                "address": 5372079328
+              },
+              "arguments": [
+                {
+                  "type": "field",
+                  "name": "render_time",
+                  "type_ref": {
+                    "type": "raw",
+                    "path": "f64"
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "gfx_context",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "void"
+                    }
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "kick_id",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "u64"
+                    }
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "simulation",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "void"
+                    }
+                  }
+                },
+                {
+                  "type": "field",
+                  "name": "savestate",
+                  "type_ref": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "void"
+                    }
+                  }
+                }
+              ],
+              "return_type": null,
+              "calling_convention": "system",
+              "source": {
+                "file_index": 30,
+                "line": 817
+              }
+            }
+          ],
           "splices": [],
           "source": {
             "file_index": 30,
