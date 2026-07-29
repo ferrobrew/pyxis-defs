@@ -1,0 +1,5 @@
+# Normalize line endings to LF on checkout regardless of platform.
+# This prevents CRLF from being introduced on Windows checkouts,
+# which previously caused byte-offset drift bugs in the pyxis
+# compiler's span-to-offset computation.
+* text=auto eol=lf
