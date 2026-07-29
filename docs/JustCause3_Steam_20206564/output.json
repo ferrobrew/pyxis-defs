@@ -1,5 +1,5 @@
 {
-  "schema_version": 12,
+  "schema_version": 13,
   "pyxis_version": "0.1.0",
   "pointer_size": 8,
   "project_name": "Just Cause 3 (Steam 20206564)",
@@ -21774,7 +21774,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 879
+              "line": 896
             }
           },
           {
@@ -21836,7 +21836,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 900
+              "line": 917
             }
           }
         ],
@@ -21850,7 +21850,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 850
+        "line": 867
       }
     },
     "graphics_engine::render_block::RBIInfo": {
@@ -22442,7 +22442,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 551
+              "line": 568
             }
           },
           {
@@ -22462,7 +22462,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 551
+              "line": 568
             }
           },
           {
@@ -22482,7 +22482,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 553
+              "line": 570
             }
           }
         ],
@@ -22534,7 +22534,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 558
+              "line": 575
             }
           },
           {
@@ -22576,7 +22576,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 562
+              "line": 579
             }
           },
           {
@@ -22645,7 +22645,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 566
+              "line": 583
             }
           }
         ],
@@ -22659,7 +22659,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 548
+        "line": 565
       }
     },
     "graphics_engine::render_block::RenderBlockDeferredLighting": {
@@ -22731,7 +22731,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 579
+              "line": 596
             }
           },
           {
@@ -22784,7 +22784,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 585
+              "line": 602
             }
           },
           {
@@ -22833,7 +22833,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 592
+              "line": 609
             }
           }
         ],
@@ -22847,7 +22847,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 571
+        "line": 588
       }
     },
     "graphics_engine::render_block::RenderBlockFoliage": {
@@ -22984,6 +22984,86 @@
       "source": {
         "file_index": 30,
         "line": 394
+      }
+    },
+    "graphics_engine::render_block::RenderBlockLightGlow": {
+      "path": "graphics_engine::render_block::RenderBlockLightGlow",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " The light-glow render block (`NGraphicsEngine::CRenderBlockLightGlow`, registered name\n `\"LightGlow\"`): a screen-space sprite for a point/spot light corona, drawn in\n `CModelInstanceManager::HaloTransparentPass` (`RP_MODEL_HALO_POST`). The shape is a fixed\n billboard quad (`SLightGlowVertex`); placement is driven entirely on the CPU. The draw reads the\n light world position and colour/scale from [`CRBIInfo`](RBIInfo), projects it through the render\n context's translation-bearing view-projection, converts the result to pixel coordinates, and\n uploads the screen-space sprite corners and scale to vertex constant buffer `cb1` registers 0..4\n and 5 before issuing a non-instanced [`DrawIndexed`].",
+        "doc_links": [
+          {
+            "text": "RBIInfo",
+            "target_kind": "item",
+            "path": "graphics_engine::render_block::RBIInfo"
+          },
+          {
+            "text": "DrawIndexed",
+            "target_kind": "module",
+            "path": "graphics_engine::draw",
+            "anchor": "func-DrawIndexed"
+          }
+        ],
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "Draw",
+            "doc": " Issues the screen-space light-glow sprite. The block's own vertex shader applies the\n CPU-staged corners in `cb1` with no further transform, so the sprite position is fixed by the\n render context's camera at the moment of this draw.",
+            "body": {
+              "type": "address",
+              "address": 5370343968
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "render_context",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "info",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::render_block::RBIInfo"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 30,
+              "line": 474
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 30,
+        "line": 468
       }
     },
     "graphics_engine::render_block::RenderBlockOccluder": {
@@ -23136,7 +23216,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 626
+              "line": 643
             }
           }
         ],
@@ -23150,7 +23230,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 598
+        "line": 615
       }
     },
     "graphics_engine::render_block::RenderBlockSSDecal": {
@@ -23224,7 +23304,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 979
+              "line": 996
             }
           }
         ],
@@ -23238,7 +23318,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 962
+        "line": 979
       }
     },
     "graphics_engine::render_block::RenderBlockScreenSpaceReflection": {
@@ -23311,7 +23391,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 665
+              "line": 682
             }
           }
         ],
@@ -23325,7 +23405,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 632
+        "line": 649
       }
     },
     "graphics_engine::render_block::RenderBlockScreenSpaceSubSurfaceSkin": {
@@ -23392,7 +23472,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 680
+              "line": 697
             }
           }
         ],
@@ -23406,7 +23486,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 671
+        "line": 688
       }
     },
     "graphics_engine::render_block::RenderBlockTerrain": {
@@ -23510,7 +23590,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 699
+              "line": 716
             }
           },
           {
@@ -23527,7 +23607,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 699
+              "line": 716
             }
           },
           {
@@ -23544,7 +23624,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 703
+              "line": 720
             }
           },
           {
@@ -23579,7 +23659,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 683
+              "line": 700
             }
           }
         ],
@@ -23631,7 +23711,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 709
+              "line": 726
             }
           }
         ],
@@ -23645,7 +23725,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 695
+        "line": 712
       }
     },
     "graphics_engine::render_block::RenderBlockTerrainPatch": {
@@ -24020,7 +24100,7 @@
             "is_base": true,
             "source": {
               "file_index": 30,
-              "line": 502
+              "line": 519
             }
           },
           {
@@ -24053,7 +24133,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 485
+              "line": 502
             }
           }
         ],
@@ -24558,7 +24638,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 500
+        "line": 517
       }
     },
     "graphics_engine::render_block::RenderBlockTypeFogVolume": {
@@ -24597,7 +24677,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 468
+              "line": 485
             }
           },
           {
@@ -24622,7 +24702,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 468
+              "line": 485
             }
           },
           {
@@ -24647,7 +24727,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 473
+              "line": 490
             }
           }
         ],
@@ -24688,7 +24768,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 482
+              "line": 499
             }
           }
         ],
@@ -24702,7 +24782,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 464
+        "line": 481
       }
     },
     "graphics_engine::render_block::RenderBlockTypeParticle": {
@@ -24746,7 +24826,7 @@
             "is_base": true,
             "source": {
               "file_index": 30,
-              "line": 527
+              "line": 544
             }
           },
           {
@@ -24775,7 +24855,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 536
+              "line": 553
             }
           },
           {
@@ -24800,7 +24880,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 536
+              "line": 553
             }
           },
           {
@@ -24825,7 +24905,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 542
+              "line": 559
             }
           },
           {
@@ -24863,7 +24943,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 505
+              "line": 522
             }
           }
         ],
@@ -25368,7 +25448,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 525
+        "line": 542
       }
     },
     "graphics_engine::render_block::RenderBlockTypeSSDecal": {
@@ -25430,7 +25510,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 944
+              "line": 961
             }
           },
           {
@@ -25475,7 +25555,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 957
+              "line": 974
             }
           }
         ],
@@ -25489,7 +25569,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 923
+        "line": 940
       }
     },
     "graphics_engine::render_block::RenderBlockTypeTerrain": {
@@ -26711,7 +26791,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 797
+              "line": 814
             }
           },
           {
@@ -26768,7 +26848,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 817
+              "line": 834
             }
           }
         ],
@@ -26782,7 +26862,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 789
+        "line": 806
       }
     },
     "graphics_engine::render_block::WaterBoxRenderBlockType": {
@@ -26855,7 +26935,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 778
+              "line": 795
             }
           },
           {
@@ -26897,7 +26977,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 785
+              "line": 802
             }
           }
         ],
@@ -26911,7 +26991,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 761
+        "line": 778
       }
     },
     "graphics_engine::render_block::WaterHighEndRenderBlock": {
@@ -26985,7 +27065,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 754
+              "line": 771
             }
           }
         ],
@@ -26999,7 +27079,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 744
+        "line": 761
       }
     },
     "graphics_engine::render_block::WaterHighEndRenderBlockType": {
@@ -27060,7 +27140,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 738
+              "line": 755
             }
           }
         ],
@@ -27074,7 +27154,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 716
+        "line": 733
       }
     },
     "graphics_engine::render_engine::RenderBlockTypeBase": {
@@ -64703,6 +64783,7 @@
             "graphics_engine::render_block::RenderBlockCharacterSkin",
             "graphics_engine::render_block::RenderBlockDeferredLighting",
             "graphics_engine::render_block::RenderBlockFoliage",
+            "graphics_engine::render_block::RenderBlockLightGlow",
             "graphics_engine::render_block::RenderBlockOccluder",
             "graphics_engine::render_block::RenderBlockSSAO",
             "graphics_engine::render_block::RenderBlockSSDecal",
@@ -64771,7 +64852,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 30,
-                "line": 831
+                "line": 848
               }
             },
             {
@@ -64818,7 +64899,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 30,
-                "line": 838
+                "line": 855
               }
             },
             {
@@ -64895,7 +64976,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 30,
-                "line": 917
+                "line": 934
               }
             }
           ],
