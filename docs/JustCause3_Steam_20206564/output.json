@@ -14738,7 +14738,7 @@
             "is_base": false,
             "source": {
               "file_index": 26,
-              "line": 18
+              "line": 20
             }
           },
           {
@@ -14758,7 +14758,7 @@
             "is_base": false,
             "source": {
               "file_index": 26,
-              "line": 18
+              "line": 20
             }
           }
         ],
@@ -14773,7 +14773,7 @@
       },
       "source": {
         "file_index": 26,
-        "line": 15
+        "line": 17
       }
     },
     "graphics_engine::gi::GISolver": {
@@ -14812,7 +14812,7 @@
             "is_base": false,
             "source": {
               "file_index": 26,
-              "line": 10
+              "line": 12
             }
           },
           {
@@ -14829,7 +14829,7 @@
             "is_base": false,
             "source": {
               "file_index": 26,
-              "line": 10
+              "line": 12
             }
           },
           {
@@ -14858,7 +14858,7 @@
             "is_base": false,
             "source": {
               "file_index": 26,
-              "line": 1
+              "line": 3
             }
           }
         ],
@@ -14873,7 +14873,7 @@
       },
       "source": {
         "file_index": 26,
-        "line": 6
+        "line": 8
       }
     },
     "graphics_engine::gi::LightManager": {
@@ -14896,15 +14896,53 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 1829128
+              "size": 12
             },
             "offset": 0,
-            "size": 1829128,
+            "size": 12,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 26,
-              "line": 27
+              "line": 31
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_GlobalLightDiffuse",
+            "doc": " The diffuse colour of the embedded global light (the sun, or the moon at night) -- the head\n of `m_GlobalLight.m_Light.Diffuse`. The atmospheric-scattering sky-lighting compute and the\n deferred sun term both read it.",
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Vector3"
+            },
+            "offset": 12,
+            "size": 12,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 26,
+              "line": 31
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_18",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 1829104
+            },
+            "offset": 24,
+            "size": 1829104,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 26,
+              "line": 35
             }
           },
           {
@@ -14924,7 +14962,7 @@
             "is_base": false,
             "source": {
               "file_index": 26,
-              "line": 27
+              "line": 35
             }
           }
         ],
@@ -14939,7 +14977,7 @@
       },
       "source": {
         "file_index": 26,
-        "line": 24
+        "line": 26
       }
     },
     "graphics_engine::graphics_engine::ActiveCursor": {
@@ -15050,7 +15088,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 734
+              "line": 740
             }
           },
           {
@@ -15067,7 +15105,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 734
+              "line": 740
             }
           },
           {
@@ -15096,7 +15134,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 726
+              "line": 732
             }
           }
         ],
@@ -15111,7 +15149,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 730
+        "line": 736
       }
     },
     "graphics_engine::graphics_engine::D3D11Viewport": {
@@ -15270,7 +15308,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 557
+        "line": 563
       }
     },
     "graphics_engine::graphics_engine::EffectInfo": {
@@ -16787,7 +16825,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 567
+              "line": 573
             }
           },
           {
@@ -16815,7 +16853,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 572
+              "line": 578
             }
           },
           {
@@ -16835,7 +16873,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 576
+              "line": 582
             }
           },
           {
@@ -16855,7 +16893,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 580
+              "line": 586
             }
           },
           {
@@ -16889,7 +16927,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 584
+              "line": 590
             }
           },
           {
@@ -16936,7 +16974,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 590
+              "line": 596
             }
           },
           {
@@ -17002,7 +17040,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 610
+              "line": 616
             }
           },
           {
@@ -17030,7 +17068,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 618
+              "line": 624
             }
           },
           {
@@ -17092,7 +17130,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 628
+              "line": 634
             }
           },
           {
@@ -17166,7 +17204,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 638
+              "line": 644
             }
           },
           {
@@ -17200,7 +17238,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 646
+              "line": 652
             }
           },
           {
@@ -17250,7 +17288,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 656
+              "line": 662
             }
           },
           {
@@ -17292,7 +17330,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 665
+              "line": 671
             }
           },
           {
@@ -17340,7 +17378,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 672
+              "line": 678
             }
           },
           {
@@ -17374,7 +17412,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 680
+              "line": 686
             }
           }
         ],
@@ -17418,7 +17456,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 689
+              "line": 695
             }
           },
           {
@@ -17439,7 +17477,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 690
+              "line": 696
             }
           },
           {
@@ -17456,7 +17494,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 691
+              "line": 697
             }
           },
           {
@@ -17473,7 +17511,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 692
+              "line": 698
             }
           },
           {
@@ -17490,7 +17528,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 693
+              "line": 699
             }
           },
           {
@@ -17507,7 +17545,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 694
+              "line": 700
             }
           },
           {
@@ -17524,7 +17562,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 695
+              "line": 701
             }
           },
           {
@@ -17541,7 +17579,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 696
+              "line": 702
             }
           },
           {
@@ -17558,7 +17596,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 697
+              "line": 703
             }
           },
           {
@@ -17579,7 +17617,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 700
+              "line": 706
             }
           },
           {
@@ -17596,7 +17634,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 700
+              "line": 706
             }
           },
           {
@@ -17613,7 +17651,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 701
+              "line": 707
             }
           },
           {
@@ -17630,7 +17668,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 702
+              "line": 708
             }
           },
           {
@@ -17651,7 +17689,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 705
+              "line": 711
             }
           },
           {
@@ -17668,7 +17706,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 705
+              "line": 711
             }
           },
           {
@@ -17685,7 +17723,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 706
+              "line": 712
             }
           },
           {
@@ -17702,7 +17740,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 707
+              "line": 713
             }
           },
           {
@@ -17723,7 +17761,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 687
+              "line": 693
             }
           }
         ],
@@ -17738,7 +17776,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 688
+        "line": 694
       }
     },
     "graphics_engine::graphics_engine::HContext_t": {
@@ -18309,7 +18347,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 27,
-              "line": 749
+              "line": 755
             }
           }
         ],
@@ -18323,7 +18361,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 741
+        "line": 747
       }
     },
     "graphics_engine::graphics_engine::RenderContext": {
@@ -19023,8 +19061,25 @@
             }
           },
           {
+            "visibility": "public",
+            "name": "m_GlobalLightVector",
+            "doc": " The direction toward the global light (the sun, or the moon at night) for this dispatch.\n The atmospheric-scattering scene composite uploads it directly and derives its sky and fog\n brightness factors from the elevation (`y`) component.",
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Vector3"
+            },
+            "offset": 1020,
+            "size": 12,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 27,
+              "line": 504
+            }
+          },
+          {
             "visibility": "private",
-            "name": "_field_3fc",
+            "name": "_field_408",
             "doc": null,
             "type_ref": {
               "type": "array",
@@ -19032,15 +19087,15 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 60
+              "size": 48
             },
-            "offset": 1020,
-            "size": 60,
+            "offset": 1032,
+            "size": 48,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 504
+              "line": 510
             }
           },
           {
@@ -19057,7 +19112,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 504
+              "line": 510
             }
           },
           {
@@ -19091,7 +19146,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 512
+              "line": 518
             }
           },
           {
@@ -19121,7 +19176,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 512
+              "line": 518
             }
           },
           {
@@ -19152,7 +19207,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 523
+              "line": 529
             }
           },
           {
@@ -19173,7 +19228,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 526
+              "line": 532
             }
           },
           {
@@ -19194,7 +19249,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 526
+              "line": 532
             }
           },
           {
@@ -19211,7 +19266,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 530
+              "line": 536
             }
           },
           {
@@ -19236,7 +19291,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 535
+              "line": 541
             }
           },
           {
@@ -19257,7 +19312,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 541
+              "line": 547
             }
           },
           {
@@ -19274,7 +19329,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 541
+              "line": 547
             }
           },
           {
@@ -19309,7 +19364,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 548
+              "line": 554
             }
           },
           {
@@ -19343,7 +19398,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 548
+              "line": 554
             }
           },
           {
@@ -19363,7 +19418,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 552
+              "line": 558
             }
           }
         ],
@@ -19413,7 +19468,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 718
+              "line": 724
             }
           },
           {
@@ -19430,7 +19485,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 719
+              "line": 725
             }
           },
           {
@@ -19447,7 +19502,7 @@
             "is_base": false,
             "source": {
               "file_index": 27,
-              "line": 720
+              "line": 726
             }
           }
         ],
@@ -19462,7 +19517,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 717
+        "line": 723
       }
     },
     "graphics_engine::graphics_engine::ShadowCascades": {
@@ -19608,7 +19663,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 711
+        "line": 717
       }
     },
     "graphics_engine::graphics_engine::render_frame_counters": {
@@ -19628,7 +19683,7 @@
       },
       "source": {
         "file_index": 27,
-        "line": 724
+        "line": 730
       }
     },
     "graphics_engine::light_manager::LightManager": {
@@ -19835,7 +19890,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 184
+              "line": 272
             }
           },
           {
@@ -19852,7 +19907,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 184
+              "line": 272
             }
           },
           {
@@ -19881,7 +19936,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 179
+              "line": 267
             }
           }
         ],
@@ -19950,7 +20005,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 189
+              "line": 277
             }
           },
           {
@@ -20005,7 +20060,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 194
+              "line": 282
             }
           },
           {
@@ -20052,7 +20107,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 199
+              "line": 287
             }
           }
         ],
@@ -20066,7 +20121,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 182
+        "line": 270
       }
     },
     "graphics_engine::post_effects::BlurEffect": {
@@ -20133,7 +20188,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 118
+              "line": 206
             }
           }
         ],
@@ -20147,7 +20202,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 115
+        "line": 203
       }
     },
     "graphics_engine::post_effects::BlurEffectBokeh": {
@@ -20224,7 +20279,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 126
+              "line": 214
             }
           }
         ],
@@ -20238,7 +20293,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 123
+        "line": 211
       }
     },
     "graphics_engine::post_effects::DepthOfFieldEffect": {
@@ -20313,7 +20368,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 138
+              "line": 226
             }
           }
         ],
@@ -20327,7 +20382,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 135
+        "line": 223
       }
     },
     "graphics_engine::post_effects::DownScale2x2PackFocus": {
@@ -20405,7 +20460,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 111
+              "line": 199
             }
           }
         ],
@@ -20419,7 +20474,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 84
+        "line": 172
       }
     },
     "graphics_engine::post_effects::FadeEffect": {
@@ -20475,7 +20530,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 145
+              "line": 233
             }
           }
         ],
@@ -20489,7 +20544,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 142
+        "line": 230
       }
     },
     "graphics_engine::post_effects::GlareEffect": {
@@ -20567,7 +20622,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 152
+              "line": 240
             }
           }
         ],
@@ -20581,7 +20636,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 149
+        "line": 237
       }
     },
     "graphics_engine::post_effects::MotionBlurEffect": {
@@ -20680,7 +20735,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 132
+              "line": 220
             }
           }
         ],
@@ -20694,7 +20749,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 129
+        "line": 217
       }
     },
     "graphics_engine::post_effects::PlayerDamageEffect": {
@@ -20769,7 +20824,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 159
+              "line": 247
             }
           }
         ],
@@ -20783,7 +20838,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 156
+        "line": 244
       }
     },
     "graphics_engine::post_effects::PostEffectContext": {
@@ -20813,12 +20868,167 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 29
+              "line": 90
             }
           },
           {
             "visibility": "private",
             "name": "_field_8",
+            "doc": null,
+            "doc_links": [
+              {
+                "text": "Self::m_Exposure",
+                "target_kind": "item",
+                "path": "graphics_engine::post_effects::PostEffectContext",
+                "anchor": "field-m_Exposure"
+              }
+            ],
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 48
+            },
+            "offset": 8,
+            "size": 48,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 95
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_HistogramBrightPointAfterExposure",
+            "doc": " The smoothed bright point of the exposure-weighted histogram, published alongside\n [`m_Exposure`](Self::m_Exposure) each post-effects block draw.",
+            "doc_links": [
+              {
+                "text": "Self::m_Exposure",
+                "target_kind": "item",
+                "path": "graphics_engine::post_effects::PostEffectContext",
+                "anchor": "field-m_Exposure"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 56,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 95
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Exposure",
+            "doc": " The applied auto-exposure multiplier. Published each post-effects block draw from the\n tone-mapping effect's smoothed exposure, and uploaded by [`DepthOfFieldEffect::Apply`] as\n the composite's exposure fragment constant (c2.x).",
+            "doc_links": [
+              {
+                "text": "DepthOfFieldEffect::Apply",
+                "target_kind": "item",
+                "path": "graphics_engine::post_effects::DepthOfFieldEffect",
+                "anchor": "func-Apply"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 60,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 101
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_40",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 18
+            },
+            "offset": 64,
+            "size": 18,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 106
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_TonemapWhenDisabled",
+            "doc": " When the post-effects manager is disabled, selects the tonemap-only composite shader instead\n of the raw passthrough.",
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 82,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 106
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_53",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 1
+            },
+            "offset": 83,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 110
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_ToneMappingTechnique",
+            "doc": " Selects the tone-mapping operator family for the composite shaders.",
+            "type_ref": {
+              "type": "raw",
+              "path": "graphics_engine::post_effects::ToneMappingTechnique"
+            },
+            "offset": 84,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 110
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_58",
             "doc": null,
             "doc_links": [
               {
@@ -20834,15 +21044,15 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 148
+              "size": 68
             },
-            "offset": 8,
-            "size": 148,
+            "offset": 88,
+            "size": 68,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 34
+              "line": 115
             }
           },
           {
@@ -20867,7 +21077,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 34
+              "line": 115
             }
           }
         ],
@@ -20882,13 +21092,13 @@
       },
       "source": {
         "file_index": 29,
-        "line": 28
+        "line": 89
       }
     },
     "graphics_engine::post_effects::PostEffectRenderContext": {
       "path": "graphics_engine::post_effects::PostEffectRenderContext",
       "visibility": "public",
-      "size": 904,
+      "size": 976,
       "alignment": 8,
       "category": "defined",
       "kind": {
@@ -20905,15 +21115,56 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 900
+              "size": 816
             },
             "offset": 0,
-            "size": 900,
+            "size": 816,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 25
+              "line": 30
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_EnvCubeTexture",
+            "doc": " The composite environment cube map (static env blended with the dynamic sky cube), the\n ambient specular source the material shaders sample. Written per frame from the render\n engine's composite cube.",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "void"
+              }
+            },
+            "offset": 816,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 30
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_338",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 76
+            },
+            "offset": 824,
+            "size": 76,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 33
             }
           },
           {
@@ -20930,7 +21181,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 25
+              "line": 33
             }
           },
           {
@@ -20951,7 +21202,245 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 22
+              "line": 39
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_CurrentNightLightReference",
+            "doc": " The night-light reference level for the current time of day, interpolated from the\n atmosphere's 24-entry per-hour table and copied in per frame from the light manager's\n frame-info ring.",
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 904,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 39
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_38c",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 4
+            },
+            "offset": 908,
+            "size": 4,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 43
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Dt",
+            "doc": " The frame delta time in seconds.",
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 912,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 43
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_TimeOfDay",
+            "doc": " The time of day in hours (0-24), copied per frame from the world time.",
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 916,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 47
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_TimeOfDayEmissiveScale",
+            "doc": " The emissive intensity scale for the current time of day.",
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 920,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 51
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_39c",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 4
+            },
+            "offset": 924,
+            "size": 4,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 55
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_LightBuffer",
+            "doc": " The clustered-lighting frame constant buffer, copied per frame from the light manager.",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "void"
+              }
+            },
+            "offset": 928,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 55
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_LightLookup",
+            "doc": " The clustered light-grid lookup texture for this frame, copied from the light manager's\n three-slot per-frame ring (indexed by the render context frame counter modulo three).",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "void"
+              }
+            },
+            "offset": 936,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 60
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_LightIndexBuffer",
+            "doc": " The clustered light index buffer for this frame, from the same three-slot ring as\n [`m_LightLookup`](Self::m_LightLookup).",
+            "doc_links": [
+              {
+                "text": "Self::m_LightLookup",
+                "target_kind": "item",
+                "path": "graphics_engine::post_effects::PostEffectRenderContext",
+                "anchor": "field-m_LightLookup"
+              }
+            ],
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "void"
+              }
+            },
+            "offset": 944,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 65
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_LightTuningBuffer",
+            "doc": " The lighting tuning constant buffer.",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "void"
+              }
+            },
+            "offset": 952,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 69
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_HorizonMap0",
+            "doc": " The first of the paired terrain horizon maps (large-scale sky-visibility occlusion).",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "void"
+              }
+            },
+            "offset": 960,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 73
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_HorizonMap1",
+            "doc": " The second of the paired terrain horizon maps.",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "void"
+              }
+            },
+            "offset": 968,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 77
             }
           }
         ],
@@ -20966,7 +21455,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 23
+        "line": 25
       }
     },
     "graphics_engine::post_effects::PostEffectRenderFlags": {
@@ -20977,7 +21466,7 @@
       "category": "defined",
       "kind": {
         "type": "bitflags",
-        "doc": " Per-frame render-context flags carried by a [`PostEffectRenderContext`].",
+        "doc": " Per-frame render-context flags carried by a [`PostEffectRenderContext`] (the packed bools that\n follow the aniso field in the render context).",
         "doc_links": [
           {
             "text": "PostEffectRenderContext",
@@ -20991,12 +21480,20 @@
         },
         "flags": [
           {
-            "name": "m_MotionVectorReprojection",
+            "name": "m_CameraUnderwater",
             "value": 1,
-            "doc": " Enables depth-of-field's screen-space motion-vector reprojection.",
+            "doc": " The camera is underwater. [`DepthOfFieldEffect::Apply`] selects its underwater composite\n shader family when set.",
+            "doc_links": [
+              {
+                "text": "DepthOfFieldEffect::Apply",
+                "target_kind": "item",
+                "path": "graphics_engine::post_effects::DepthOfFieldEffect",
+                "anchor": "func-Apply"
+              }
+            ],
             "source": {
               "file_index": 29,
-              "line": 19
+              "line": 21
             }
           }
         ],
@@ -21008,19 +21505,95 @@
       },
       "source": {
         "file_index": 29,
-        "line": 17
+        "line": 18
       }
     },
     "graphics_engine::post_effects::PostEffectsManager": {
       "path": "graphics_engine::post_effects::PostEffectsManager",
       "visibility": "public",
-      "size": 0,
+      "size": 528,
       "alignment": 8,
       "category": "defined",
       "kind": {
         "type": "type",
         "doc": null,
-        "fields": [],
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "doc_links": [
+              {
+                "text": "DepthOfFieldEffect::Apply",
+                "target_kind": "item",
+                "path": "graphics_engine::post_effects::DepthOfFieldEffect",
+                "anchor": "func-Apply"
+              }
+            ],
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 526
+            },
+            "offset": 0,
+            "size": 526,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 124
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Enabled",
+            "doc": " Master enable for the post-effects chain. When clear, [`DepthOfFieldEffect::Apply`] swaps the\n full composite (exposure, grading, depth of field) for the tonemap-only or passthrough\n shader, and the manager skips the sun halo, fade, and global-pass enqueue.",
+            "doc_links": [
+              {
+                "text": "DepthOfFieldEffect::Apply",
+                "target_kind": "item",
+                "path": "graphics_engine::post_effects::DepthOfFieldEffect",
+                "anchor": "func-Apply"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 526,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 124
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_20f",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 1
+            },
+            "offset": 527,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 29,
+              "line": 118
+            }
+          }
+        ],
         "associated_functions": [
           {
             "visibility": "public",
@@ -21121,7 +21694,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 43
+              "line": 131
             }
           },
           {
@@ -21160,7 +21733,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 48
+              "line": 136
             }
           },
           {
@@ -21188,7 +21761,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 52
+              "line": 140
             }
           },
           {
@@ -21218,7 +21791,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 57
+              "line": 145
             }
           },
           {
@@ -21241,7 +21814,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 61
+              "line": 149
             }
           },
           {
@@ -21296,7 +21869,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 66
+              "line": 154
             }
           }
         ],
@@ -21310,7 +21883,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 37
+        "line": 119
       }
     },
     "graphics_engine::post_effects::RenderBlockPostEffects": {
@@ -21394,7 +21967,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 80
+              "line": 168
             }
           }
         ],
@@ -21408,7 +21981,7 @@
       },
       "source": {
         "file_index": 29,
-        "line": 77
+        "line": 165
       }
     },
     "graphics_engine::post_effects::SunHaloEffect": {
@@ -21467,7 +22040,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 169
+              "line": 257
             }
           },
           {
@@ -21498,7 +22071,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 169
+              "line": 257
             }
           },
           {
@@ -21533,7 +22106,7 @@
             "is_base": false,
             "source": {
               "file_index": 29,
-              "line": 162
+              "line": 250
             }
           }
         ],
@@ -21591,7 +22164,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 173
+              "line": 261
             }
           },
           {
@@ -21625,7 +22198,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 29,
-              "line": 176
+              "line": 264
             }
           }
         ],
@@ -21639,7 +22212,69 @@
       },
       "source": {
         "file_index": 29,
-        "line": 165
+        "line": 253
+      }
+    },
+    "graphics_engine::post_effects::ToneMappingTechnique": {
+      "path": "graphics_engine::post_effects::ToneMappingTechnique",
+      "visibility": "public",
+      "size": 4,
+      "alignment": 4,
+      "category": "defined",
+      "kind": {
+        "type": "enum",
+        "doc": " The tone-mapping operator applied by the HDR-to-LDR composite in\n [`DepthOfFieldEffect::Apply`].",
+        "doc_links": [
+          {
+            "text": "DepthOfFieldEffect::Apply",
+            "target_kind": "item",
+            "path": "graphics_engine::post_effects::DepthOfFieldEffect",
+            "anchor": "func-Apply"
+          }
+        ],
+        "underlying_type": {
+          "type": "raw",
+          "path": "i32"
+        },
+        "variants": [
+          {
+            "name": "Reinhard",
+            "value": 0,
+            "doc": null,
+            "source": {
+              "file_index": 29,
+              "line": 84
+            }
+          },
+          {
+            "name": "U2Filmic",
+            "value": 1,
+            "doc": null,
+            "source": {
+              "file_index": 29,
+              "line": 85
+            }
+          },
+          {
+            "name": "Photographic",
+            "value": 2,
+            "doc": null,
+            "source": {
+              "file_index": 29,
+              "line": 86
+            }
+          }
+        ],
+        "associated_functions": [],
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "default": null,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 29,
+        "line": 83
       }
     },
     "graphics_engine::render_block::Matrix3x4": {
@@ -21670,7 +22305,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 13
+              "line": 14
             }
           }
         ],
@@ -21685,7 +22320,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 12
+        "line": 13
       }
     },
     "graphics_engine::render_block::NvWaterHighEndRenderBlock": {
@@ -21774,7 +22409,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 896
+              "line": 980
             }
           },
           {
@@ -21836,7 +22471,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 917
+              "line": 1001
             }
           }
         ],
@@ -21850,7 +22485,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 867
+        "line": 951
       }
     },
     "graphics_engine::render_block::RBIInfo": {
@@ -21914,7 +22549,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 38
+              "line": 39
             }
           }
         ],
@@ -21928,26 +22563,147 @@
       },
       "source": {
         "file_index": 30,
-        "line": 32
+        "line": 33
       }
     },
     "graphics_engine::render_block::RenderBlockAtmosphericScattering": {
       "path": "graphics_engine::render_block::RenderBlockAtmosphericScattering",
       "visibility": "public",
-      "size": 0,
+      "size": 128,
       "alignment": 8,
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": " The atmospheric-scattering / aerial-perspective render block. Its `Draw` reconstructs world\n position from depth via [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4) -- for the whole\n screen, sky included -- and then ray-marches the sun shadow cascade and aerial perspective over\n the reconstructed positions.",
-        "doc_links": [
+        "doc": null,
+        "fields": [
           {
-            "text": "types::math::Matrix4",
-            "target_kind": "item",
-            "path": "types::math::Matrix4"
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 88
+            },
+            "offset": 0,
+            "size": 88,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 143
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_TowardsVector",
+            "doc": " The direction toward the dominant celestial light (the sun, or the moon at night), fed to\n both the sky-lighting SH compute and the aerial-perspective fragment constants.",
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Vector3"
+            },
+            "offset": 88,
+            "size": 12,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 143
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_64",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 4
+            },
+            "offset": 100,
+            "size": 4,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 147
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_HdrMultiplier",
+            "doc": " The HDR intensity multiplier applied to the scattering output.",
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 104,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 147
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_MinNightLuminance",
+            "doc": " The luminance floor applied at night.",
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 108,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 151
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_CloudCoverage",
+            "doc": " The cloud coverage factor fed to the sky-lighting SH compute.",
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 112,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 155
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_CloudAmbientColor",
+            "doc": " The cloud ambient colour fed to the sky-lighting SH compute.",
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Vector3"
+            },
+            "offset": 116,
+            "size": 12,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 159
+            }
           }
         ],
-        "fields": [],
         "associated_functions": [
           {
             "visibility": "public",
@@ -21995,7 +22751,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 82
+              "line": 166
             }
           }
         ],
@@ -22009,7 +22765,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 76
+        "line": 139
       }
     },
     "graphics_engine::render_block::RenderBlockBark": {
@@ -22087,7 +22843,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 382
+              "line": 466
             }
           },
           {
@@ -22137,7 +22893,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 388
+              "line": 472
             }
           }
         ],
@@ -22151,7 +22907,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 369
+        "line": 453
       }
     },
     "graphics_engine::render_block::RenderBlockCharacter": {
@@ -22195,7 +22951,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 49
+              "line": 50
             }
           },
           {
@@ -22215,7 +22971,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 49
+              "line": 50
             }
           },
           {
@@ -22235,7 +22991,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 51
+              "line": 52
             }
           }
         ],
@@ -22287,7 +23043,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 59
+              "line": 60
             }
           },
           {
@@ -22329,7 +23085,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 63
+              "line": 64
             }
           },
           {
@@ -22390,7 +23146,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 69
+              "line": 70
             }
           }
         ],
@@ -22404,7 +23160,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 46
+        "line": 47
       }
     },
     "graphics_engine::render_block::RenderBlockCharacterSkin": {
@@ -22442,7 +23198,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 568
+              "line": 652
             }
           },
           {
@@ -22462,7 +23218,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 568
+              "line": 652
             }
           },
           {
@@ -22482,7 +23238,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 570
+              "line": 654
             }
           }
         ],
@@ -22534,7 +23290,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 575
+              "line": 659
             }
           },
           {
@@ -22576,7 +23332,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 579
+              "line": 663
             }
           },
           {
@@ -22645,7 +23401,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 583
+              "line": 667
             }
           }
         ],
@@ -22659,7 +23415,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 565
+        "line": 649
       }
     },
     "graphics_engine::render_block::RenderBlockDeferredLighting": {
@@ -22731,7 +23487,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 596
+              "line": 680
             }
           },
           {
@@ -22784,7 +23540,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 602
+              "line": 686
             }
           },
           {
@@ -22833,7 +23589,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 609
+              "line": 693
             }
           }
         ],
@@ -22847,7 +23603,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 588
+        "line": 672
       }
     },
     "graphics_engine::render_block::RenderBlockFoliage": {
@@ -22913,7 +23669,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 409
+              "line": 493
             }
           },
           {
@@ -22969,7 +23725,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 421
+              "line": 505
             }
           }
         ],
@@ -22983,7 +23739,169 @@
       },
       "source": {
         "file_index": 30,
-        "line": 394
+        "line": 478
+      }
+    },
+    "graphics_engine::render_block::RenderBlockLRParticleCompose": {
+      "path": "graphics_engine::render_block::RenderBlockLRParticleCompose",
+      "visibility": "public",
+      "size": 48,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " The atmospheric-scattering / aerial-perspective render block. Its `Draw` reconstructs world\n position from depth via [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4) -- for the whole\n screen, sky included -- and then ray-marches the sun shadow cascade and aerial perspective over\n the reconstructed positions.\n The low-resolution particle compose block: blends the low-resolution particle buffer\n ([`m_SceneTexture`](Self::m_SceneTexture)) over the full-resolution scene with a premultiplied\n (`ONE`, `INV_SRC_ALPHA`) fullscreen draw, using the paired depth textures for the bilateral\n edge test. Drawn from the `RP_POSTEFFECTS` pass list ahead of the post-effects chain.",
+        "doc_links": [
+          {
+            "text": "types::math::Matrix4",
+            "target_kind": "item",
+            "path": "types::math::Matrix4"
+          },
+          {
+            "text": "Self::m_SceneTexture",
+            "target_kind": "item",
+            "path": "graphics_engine::render_block::RenderBlockLRParticleCompose",
+            "anchor": "field-m_SceneTexture"
+          }
+        ],
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 24
+            },
+            "offset": 0,
+            "size": 24,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 86
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_SceneTexture",
+            "doc": " The low-resolution buffer composited over the scene (fragment slot 0). Despite the name, it\n holds the low-resolution particle rendering, not the scene.",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::texture::Texture"
+              }
+            },
+            "offset": 24,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 86
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_LowResDepthTexture",
+            "doc": " The low-resolution depth texture (fragment slot 2).",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::texture::Texture"
+              }
+            },
+            "offset": 32,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 90
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_HighResDepthTexture",
+            "doc": " The full-resolution depth texture (fragment slot 1).",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::texture::Texture"
+              }
+            },
+            "offset": 40,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 94
+            }
+          }
+        ],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "Draw",
+            "doc": " Draws the compose: binds the low-resolution colour and the two depths, enables\n premultiplied blending, and issues the fullscreen geometry.",
+            "body": {
+              "type": "address",
+              "address": 5369833296
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "rc",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::graphics_engine::RenderContext"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "info",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "graphics_engine::render_block::RBIInfo"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 30,
+              "line": 100
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 30,
+        "line": 82
       }
     },
     "graphics_engine::render_block::RenderBlockLightGlow": {
@@ -23049,7 +23967,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 474
+              "line": 558
             }
           }
         ],
@@ -23063,7 +23981,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 468
+        "line": 552
       }
     },
     "graphics_engine::render_block::RenderBlockOccluder": {
@@ -23130,7 +24048,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 457
+              "line": 541
             }
           }
         ],
@@ -23144,7 +24062,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 447
+        "line": 531
       }
     },
     "graphics_engine::render_block::RenderBlockSSAO": {
@@ -23216,7 +24134,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 643
+              "line": 727
             }
           }
         ],
@@ -23230,7 +24148,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 615
+        "line": 699
       }
     },
     "graphics_engine::render_block::RenderBlockSSDecal": {
@@ -23304,7 +24222,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 996
+              "line": 1080
             }
           }
         ],
@@ -23318,7 +24236,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 979
+        "line": 1063
       }
     },
     "graphics_engine::render_block::RenderBlockScreenSpaceReflection": {
@@ -23391,7 +24309,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 682
+              "line": 766
             }
           }
         ],
@@ -23405,7 +24323,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 649
+        "line": 733
       }
     },
     "graphics_engine::render_block::RenderBlockScreenSpaceSubSurfaceSkin": {
@@ -23472,7 +24390,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 697
+              "line": 781
             }
           }
         ],
@@ -23486,7 +24404,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 688
+        "line": 772
       }
     },
     "graphics_engine::render_block::RenderBlockTerrain": {
@@ -23531,7 +24449,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 188
+              "line": 272
             }
           }
         ],
@@ -23545,7 +24463,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 173
+        "line": 257
       }
     },
     "graphics_engine::render_block::RenderBlockTerrainDetail": {
@@ -23590,7 +24508,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 716
+              "line": 800
             }
           },
           {
@@ -23607,7 +24525,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 716
+              "line": 800
             }
           },
           {
@@ -23624,7 +24542,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 720
+              "line": 804
             }
           },
           {
@@ -23659,7 +24577,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 700
+              "line": 784
             }
           }
         ],
@@ -23711,7 +24629,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 726
+              "line": 810
             }
           }
         ],
@@ -23725,7 +24643,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 712
+        "line": 796
       }
     },
     "graphics_engine::render_block::RenderBlockTerrainPatch": {
@@ -23770,7 +24688,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 201
+              "line": 285
             }
           },
           {
@@ -23801,7 +24719,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 201
+              "line": 285
             }
           },
           {
@@ -23818,7 +24736,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 205
+              "line": 289
             }
           },
           {
@@ -23835,7 +24753,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 209
+              "line": 293
             }
           },
           {
@@ -23856,7 +24774,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 213
+              "line": 297
             }
           },
           {
@@ -23873,7 +24791,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 213
+              "line": 297
             }
           },
           {
@@ -23890,7 +24808,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 217
+              "line": 301
             }
           },
           {
@@ -23919,7 +24837,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 225
+              "line": 309
             }
           },
           {
@@ -23944,7 +24862,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 225
+              "line": 309
             }
           }
         ],
@@ -23985,7 +24903,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 232
+              "line": 316
             }
           },
           {
@@ -24047,7 +24965,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 255
+              "line": 339
             }
           }
         ],
@@ -24061,7 +24979,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 195
+        "line": 279
       }
     },
     "graphics_engine::render_block::RenderBlockTypeAddFogVolume": {
@@ -24100,7 +25018,7 @@
             "is_base": true,
             "source": {
               "file_index": 30,
-              "line": 519
+              "line": 603
             }
           },
           {
@@ -24133,7 +25051,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 502
+              "line": 586
             }
           }
         ],
@@ -24638,7 +25556,236 @@
       },
       "source": {
         "file_index": 30,
-        "line": 517
+        "line": 601
+      }
+    },
+    "graphics_engine::render_block::RenderBlockTypeAtmosphericScattering": {
+      "path": "graphics_engine::render_block::RenderBlockTypeAtmosphericScattering",
+      "visibility": "public",
+      "size": 632,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " The atmospheric-scattering render block type object: the scattering LUT textures and the\n sky-lighting SH coefficient targets the block's compute pass writes each frame (in\n `PRE_RP_SKY_LIGHTING`) and every downstream material shader samples as the sky-light term\n (fragment slots `0x16`--`0x18`).",
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 384
+            },
+            "offset": 0,
+            "size": 384,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 111
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_TransmittanceTexture",
+            "doc": " The atmospheric transmittance LUT (compute slot 0).",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::texture::Texture"
+              }
+            },
+            "offset": 384,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 111
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_188",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 32
+            },
+            "offset": 392,
+            "size": 32,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 115
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_IrradianceTexture",
+            "doc": " The atmospheric irradiance LUT (compute slot 1).",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::texture::Texture"
+              }
+            },
+            "offset": 424,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 115
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_1b0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 32
+            },
+            "offset": 432,
+            "size": 32,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 119
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_InscatteringTexture",
+            "doc": " The atmospheric in-scattering LUT (compute slot 2).",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::texture::Texture"
+              }
+            },
+            "offset": 464,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 119
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_1d8",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 136
+            },
+            "offset": 472,
+            "size": 136,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 123
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_SHLightingRedCoeffs",
+            "doc": " The sky-lighting SH red-coefficient texture (fragment slot `0x16`).",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::texture::Texture"
+              }
+            },
+            "offset": 608,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 123
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_SHLightingGreenCoeffs",
+            "doc": " The sky-lighting SH green-coefficient texture (fragment slot `0x17`).",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::texture::Texture"
+              }
+            },
+            "offset": 616,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 127
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_SHLightingBlueCoeffs",
+            "doc": " The sky-lighting SH blue-coefficient texture (fragment slot `0x18`).",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "graphics_engine::texture::Texture"
+              }
+            },
+            "offset": 624,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 30,
+              "line": 131
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 30,
+        "line": 108
       }
     },
     "graphics_engine::render_block::RenderBlockTypeFogVolume": {
@@ -24677,7 +25824,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 485
+              "line": 569
             }
           },
           {
@@ -24702,7 +25849,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 485
+              "line": 569
             }
           },
           {
@@ -24727,7 +25874,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 490
+              "line": 574
             }
           }
         ],
@@ -24768,7 +25915,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 499
+              "line": 583
             }
           }
         ],
@@ -24782,7 +25929,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 481
+        "line": 565
       }
     },
     "graphics_engine::render_block::RenderBlockTypeParticle": {
@@ -24826,7 +25973,7 @@
             "is_base": true,
             "source": {
               "file_index": 30,
-              "line": 544
+              "line": 628
             }
           },
           {
@@ -24855,7 +26002,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 553
+              "line": 637
             }
           },
           {
@@ -24880,7 +26027,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 553
+              "line": 637
             }
           },
           {
@@ -24905,7 +26052,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 559
+              "line": 643
             }
           },
           {
@@ -24943,7 +26090,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 522
+              "line": 606
             }
           }
         ],
@@ -25448,7 +26595,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 542
+        "line": 626
       }
     },
     "graphics_engine::render_block::RenderBlockTypeSSDecal": {
@@ -25510,7 +26657,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 961
+              "line": 1045
             }
           },
           {
@@ -25555,7 +26702,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 974
+              "line": 1058
             }
           }
         ],
@@ -25569,7 +26716,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 940
+        "line": 1024
       }
     },
     "graphics_engine::render_block::RenderBlockTypeTerrain": {
@@ -25608,7 +26755,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 98
+              "line": 182
             }
           },
           {
@@ -25625,7 +26772,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 98
+              "line": 182
             }
           },
           {
@@ -25654,7 +26801,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 107
+              "line": 191
             }
           },
           {
@@ -25683,7 +26830,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 107
+              "line": 191
             }
           },
           {
@@ -25704,7 +26851,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 111
+              "line": 195
             }
           },
           {
@@ -25721,7 +26868,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 111
+              "line": 195
             }
           },
           {
@@ -25750,7 +26897,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 119
+              "line": 203
             }
           },
           {
@@ -25775,7 +26922,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 119
+              "line": 203
             }
           },
           {
@@ -25800,7 +26947,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 127
+              "line": 211
             }
           },
           {
@@ -25817,7 +26964,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 133
+              "line": 217
             }
           },
           {
@@ -25834,7 +26981,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 138
+              "line": 222
             }
           },
           {
@@ -25851,7 +26998,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 142
+              "line": 226
             }
           },
           {
@@ -25868,7 +27015,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 148
+              "line": 232
             }
           },
           {
@@ -25885,7 +27032,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 154
+              "line": 238
             }
           },
           {
@@ -25902,7 +27049,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 158
+              "line": 242
             }
           },
           {
@@ -25919,7 +27066,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 162
+              "line": 246
             }
           },
           {
@@ -25948,7 +27095,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 169
+              "line": 253
             }
           },
           {
@@ -25973,7 +27120,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 169
+              "line": 253
             }
           }
         ],
@@ -25988,7 +27135,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 92
+        "line": 176
       }
     },
     "graphics_engine::render_block::RenderBlockTypeTerrainPatch": {
@@ -26026,7 +27173,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 267
+              "line": 351
             }
           },
           {
@@ -26043,7 +27190,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 267
+              "line": 351
             }
           },
           {
@@ -26072,7 +27219,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 273
+              "line": 357
             }
           },
           {
@@ -26101,7 +27248,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 273
+              "line": 357
             }
           },
           {
@@ -26122,7 +27269,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 282
+              "line": 366
             }
           },
           {
@@ -26143,7 +27290,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 282
+              "line": 366
             }
           },
           {
@@ -26164,7 +27311,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 287
+              "line": 371
             }
           },
           {
@@ -26181,7 +27328,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 287
+              "line": 371
             }
           },
           {
@@ -26202,7 +27349,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 291
+              "line": 375
             }
           },
           {
@@ -26219,7 +27366,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 291
+              "line": 375
             }
           },
           {
@@ -26248,7 +27395,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 299
+              "line": 383
             }
           },
           {
@@ -26273,7 +27420,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 299
+              "line": 383
             }
           },
           {
@@ -26298,7 +27445,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 307
+              "line": 391
             }
           },
           {
@@ -26315,7 +27462,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 313
+              "line": 397
             }
           },
           {
@@ -26332,7 +27479,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 318
+              "line": 402
             }
           },
           {
@@ -26361,7 +27508,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 325
+              "line": 409
             }
           },
           {
@@ -26386,7 +27533,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 325
+              "line": 409
             }
           },
           {
@@ -26414,7 +27561,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 258
+              "line": 342
             }
           }
         ],
@@ -26455,7 +27602,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 334
+              "line": 418
             }
           },
           {
@@ -26518,7 +27665,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 363
+              "line": 447
             }
           }
         ],
@@ -26532,7 +27679,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 262
+        "line": 346
       }
     },
     "graphics_engine::render_block::SkinBatch": {
@@ -26562,7 +27709,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 22
+              "line": 23
             }
           },
           {
@@ -26579,7 +27726,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 23
+              "line": 24
             }
           },
           {
@@ -26596,7 +27743,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 25
+              "line": 26
             }
           },
           {
@@ -26613,7 +27760,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 27
+              "line": 28
             }
           },
           {
@@ -26634,7 +27781,7 @@
             "is_base": false,
             "source": {
               "file_index": 30,
-              "line": 16
+              "line": 17
             }
           }
         ],
@@ -26649,7 +27796,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 21
+        "line": 22
       }
     },
     "graphics_engine::render_block::TreeImpostorRB": {
@@ -26710,7 +27857,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 438
+              "line": 522
             }
           }
         ],
@@ -26724,7 +27871,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 426
+        "line": 510
       }
     },
     "graphics_engine::render_block::WaterBoxRenderBlock": {
@@ -26791,7 +27938,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 814
+              "line": 898
             }
           },
           {
@@ -26848,7 +27995,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 834
+              "line": 918
             }
           }
         ],
@@ -26862,7 +28009,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 806
+        "line": 890
       }
     },
     "graphics_engine::render_block::WaterBoxRenderBlockType": {
@@ -26935,7 +28082,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 795
+              "line": 879
             }
           },
           {
@@ -26977,7 +28124,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 802
+              "line": 886
             }
           }
         ],
@@ -26991,7 +28138,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 778
+        "line": 862
       }
     },
     "graphics_engine::render_block::WaterHighEndRenderBlock": {
@@ -27065,7 +28212,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 771
+              "line": 855
             }
           }
         ],
@@ -27079,7 +28226,7 @@
       },
       "source": {
         "file_index": 30,
-        "line": 761
+        "line": 845
       }
     },
     "graphics_engine::render_block::WaterHighEndRenderBlockType": {
@@ -27140,7 +28287,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 30,
-              "line": 755
+              "line": 839
             }
           }
         ],
@@ -27154,7 +28301,30 @@
       },
       "source": {
         "file_index": 30,
-        "line": 733
+        "line": 817
+      }
+    },
+    "graphics_engine::render_block::g_RenderBlockTypeAtmosphericScattering": {
+      "path": "graphics_engine::render_block::g_RenderBlockTypeAtmosphericScattering",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": " The pointer holding the atmospheric-scattering block type singleton.",
+        "value_type": {
+          "type": "mut_pointer",
+          "inner": {
+            "type": "raw",
+            "path": "graphics_engine::render_block::RenderBlockTypeAtmosphericScattering"
+          }
+        },
+        "address": 5417947888
+      },
+      "source": {
+        "file_index": 30,
+        "line": 136
       }
     },
     "graphics_engine::render_engine::RenderBlockTypeBase": {
@@ -64660,7 +65830,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 27,
-                "line": 685
+                "line": 691
               }
             }
           ],
@@ -64702,7 +65872,8 @@
             "graphics_engine::post_effects::PostEffectRenderFlags",
             "graphics_engine::post_effects::PostEffectsManager",
             "graphics_engine::post_effects::RenderBlockPostEffects",
-            "graphics_engine::post_effects::SunHaloEffect"
+            "graphics_engine::post_effects::SunHaloEffect",
+            "graphics_engine::post_effects::ToneMappingTechnique"
           ],
           "submodules": {},
           "functions": [
@@ -64761,7 +65932,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 29,
-                "line": 214
+                "line": 302
               }
             }
           ],
@@ -64783,6 +65954,7 @@
             "graphics_engine::render_block::RenderBlockCharacterSkin",
             "graphics_engine::render_block::RenderBlockDeferredLighting",
             "graphics_engine::render_block::RenderBlockFoliage",
+            "graphics_engine::render_block::RenderBlockLRParticleCompose",
             "graphics_engine::render_block::RenderBlockLightGlow",
             "graphics_engine::render_block::RenderBlockOccluder",
             "graphics_engine::render_block::RenderBlockSSAO",
@@ -64793,6 +65965,7 @@
             "graphics_engine::render_block::RenderBlockTerrainDetail",
             "graphics_engine::render_block::RenderBlockTerrainPatch",
             "graphics_engine::render_block::RenderBlockTypeAddFogVolume",
+            "graphics_engine::render_block::RenderBlockTypeAtmosphericScattering",
             "graphics_engine::render_block::RenderBlockTypeFogVolume",
             "graphics_engine::render_block::RenderBlockTypeParticle",
             "graphics_engine::render_block::RenderBlockTypeSSDecal",
@@ -64803,7 +65976,8 @@
             "graphics_engine::render_block::WaterBoxRenderBlock",
             "graphics_engine::render_block::WaterBoxRenderBlockType",
             "graphics_engine::render_block::WaterHighEndRenderBlock",
-            "graphics_engine::render_block::WaterHighEndRenderBlockType"
+            "graphics_engine::render_block::WaterHighEndRenderBlockType",
+            "graphics_engine::render_block::g_RenderBlockTypeAtmosphericScattering"
           ],
           "submodules": {},
           "functions": [
@@ -64852,7 +66026,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 30,
-                "line": 848
+                "line": 932
               }
             },
             {
@@ -64899,7 +66073,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 30,
-                "line": 855
+                "line": 939
               }
             },
             {
@@ -64976,7 +66150,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 30,
-                "line": 934
+                "line": 1018
               }
             }
           ],
