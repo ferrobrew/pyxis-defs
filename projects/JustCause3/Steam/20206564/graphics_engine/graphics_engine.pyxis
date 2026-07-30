@@ -390,6 +390,15 @@ pub type ShadowCascades {
     pub m_OffsetRadius: [Vector4; 6],
 }
 
+/// Per-frame packed state bits carried by a [`RenderContext`] (the packed bools that follow the
+/// aniso field).
+#[copyable]
+pub bitflags RenderContextFlags: u8 {
+    /// The camera is underwater. The depth-of-field composite selects its underwater shader family
+    /// when set.
+    m_CameraUnderwater = 0b0000_0001,
+}
+
 /// The per-view render context the render passes read: the camera matrices (view, projection, the
 /// translation-free offset view-projection, and the separate camera world position), shadow data, and
 /// per-frame flags. Filled each dispatch by [`RenderPass::SetRenderContextCamera`].
@@ -480,6 +489,59 @@ pub type RenderContext {
     /// scope markers ([`BeginScopeMarker`] / [`EndScopeMarker`]) read it off the render context.
     #[address(0x318)]
     pub m_Context: *mut HContext_t,
+
+    /// The composite environment cube map (static env blended with the dynamic sky cube), the
+    /// ambient specular source the material shaders sample. Written per frame from the render
+    /// engine's composite cube.
+    #[address(0x330)]
+    pub m_EnvCubeTexture: *mut void,
+
+    #[address(0x384)]
+    pub m_Flags: RenderContextFlags,
+
+    /// The night-light reference level for the current time of day, interpolated from the
+    /// atmosphere's 24-entry per-hour table and copied in per frame from the light manager's
+    /// frame-info ring.
+    #[address(0x388)]
+    pub m_CurrentNightLightReference: f32,
+
+    /// The frame delta time in seconds.
+    #[address(0x390)]
+    pub m_Dt: f32,
+
+    /// The time of day in hours (0-24), copied per frame from the world time.
+    #[address(0x394)]
+    pub m_TimeOfDay: f32,
+
+    /// The emissive intensity scale for the current time of day.
+    #[address(0x398)]
+    pub m_TimeOfDayEmissiveScale: f32,
+
+    /// The clustered-lighting frame constant buffer, copied per frame from the light manager.
+    #[address(0x3A0)]
+    pub m_LightBuffer: *mut void,
+
+    /// The clustered light-grid lookup texture for this frame, copied from the light manager's
+    /// three-slot per-frame ring (indexed by the render context frame counter modulo three).
+    #[address(0x3A8)]
+    pub m_LightLookup: *mut void,
+
+    /// The clustered light index buffer for this frame, from the same three-slot ring as
+    /// [`m_LightLookup`](Self::m_LightLookup).
+    #[address(0x3B0)]
+    pub m_LightIndexBuffer: *mut void,
+
+    /// The lighting tuning constant buffer.
+    #[address(0x3B8)]
+    pub m_LightTuningBuffer: *mut void,
+
+    /// The first of the paired terrain horizon maps (large-scale sky-visibility occlusion).
+    #[address(0x3C0)]
+    pub m_HorizonMap0: *mut void,
+
+    /// The second of the paired terrain horizon maps.
+    #[address(0x3C8)]
+    pub m_HorizonMap1: *mut void,
 
     /// The number of point lights active for this render frame, copied by
     /// `CRenderPass::SetupRenderContext` from
