@@ -1,5 +1,6 @@
 use graphics_engine::graphics_engine::{HContext_t, HTexture_t, HVertexDeclaration_t, RenderContext};
 use graphics_engine::render_engine::RenderBlockTypeBase;
+use graphics_engine::texture::Texture;
 use types::math::{Matrix4, Vector3};
 
 /// A 3x4 skinning-palette bone matrix. The layout differs per render block (empirically, by the
@@ -73,7 +74,90 @@ impl RenderBlockCharacter {
 /// position from depth via [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4) -- for the whole
 /// screen, sky included -- and then ray-marches the sun shadow cascade and aerial perspective over
 /// the reconstructed positions.
-pub type RenderBlockAtmosphericScattering;
+/// The low-resolution particle compose block: blends the low-resolution particle buffer
+/// ([`m_SceneTexture`](Self::m_SceneTexture)) over the full-resolution scene with a premultiplied
+/// (`ONE`, `INV_SRC_ALPHA`) fullscreen draw, using the paired depth textures for the bilateral
+/// edge test. Drawn from the `RP_POSTEFFECTS` pass list ahead of the post-effects chain.
+#[min_size(0x30)]
+pub type RenderBlockLRParticleCompose {
+    /// The low-resolution buffer composited over the scene (fragment slot 0). Despite the name, it
+    /// holds the low-resolution particle rendering, not the scene.
+    #[address(0x18)]
+    pub m_SceneTexture: *mut Texture,
+
+    /// The low-resolution depth texture (fragment slot 2).
+    #[address(0x20)]
+    pub m_LowResDepthTexture: *mut Texture,
+
+    /// The full-resolution depth texture (fragment slot 1).
+    #[address(0x28)]
+    pub m_HighResDepthTexture: *mut Texture,
+}
+impl RenderBlockLRParticleCompose {
+    /// Draws the compose: binds the low-resolution colour and the two depths, enables
+    /// premultiplied blending, and issues the fullscreen geometry.
+    #[address(0x140_112_750)]
+    pub fn Draw(&mut self, rc: *mut RenderContext, info: *const RBIInfo);
+}
+
+/// The atmospheric-scattering render block type object: the scattering LUT textures and the
+/// sky-lighting SH coefficient targets the block's compute pass writes each frame (in
+/// `PRE_RP_SKY_LIGHTING`) and every downstream material shader samples as the sky-light term
+/// (fragment slots `0x16`--`0x18`).
+#[min_size(0x278)]
+pub type RenderBlockTypeAtmosphericScattering {
+    /// The atmospheric transmittance LUT (compute slot 0).
+    #[address(0x180)]
+    pub m_TransmittanceTexture: *mut Texture,
+
+    /// The atmospheric irradiance LUT (compute slot 1).
+    #[address(0x1A8)]
+    pub m_IrradianceTexture: *mut Texture,
+
+    /// The atmospheric in-scattering LUT (compute slot 2).
+    #[address(0x1D0)]
+    pub m_InscatteringTexture: *mut Texture,
+
+    /// The sky-lighting SH red-coefficient texture (fragment slot `0x16`).
+    #[address(0x260)]
+    pub m_SHLightingRedCoeffs: *mut Texture,
+
+    /// The sky-lighting SH green-coefficient texture (fragment slot `0x17`).
+    #[address(0x268)]
+    pub m_SHLightingGreenCoeffs: *mut Texture,
+
+    /// The sky-lighting SH blue-coefficient texture (fragment slot `0x18`).
+    #[address(0x270)]
+    pub m_SHLightingBlueCoeffs: *mut Texture,
+}
+
+/// The pointer holding the atmospheric-scattering block type singleton.
+#[address(0x142_EF5_2F0)]
+pub extern g_RenderBlockTypeAtmosphericScattering: *mut RenderBlockTypeAtmosphericScattering;
+
+#[min_size(0x80)]
+pub type RenderBlockAtmosphericScattering {
+    /// The direction toward the dominant celestial light (the sun, or the moon at night), fed to
+    /// both the sky-lighting SH compute and the aerial-perspective fragment constants.
+    #[address(0x58)]
+    pub m_TowardsVector: Vector3,
+
+    /// The HDR intensity multiplier applied to the scattering output.
+    #[address(0x68)]
+    pub m_HdrMultiplier: f32,
+
+    /// The luminance floor applied at night.
+    #[address(0x6C)]
+    pub m_MinNightLuminance: f32,
+
+    /// The cloud coverage factor fed to the sky-lighting SH compute.
+    #[address(0x70)]
+    pub m_CloudCoverage: f32,
+
+    /// The cloud ambient colour fed to the sky-lighting SH compute.
+    #[address(0x74)]
+    pub m_CloudAmbientColor: Vector3,
+}
 impl RenderBlockAtmosphericScattering {
     /// Draws the atmospheric-scattering pass. `rc` is the per-view render context; `info` the
     /// instance info. Reconstructs view rays from depth via

@@ -12,21 +12,102 @@ pub enum AAMode: i32 {
     AA_FXAA = 0x4,
 }
 
-/// Per-frame render-context flags carried by a [`PostEffectRenderContext`].
+/// Per-frame render-context flags carried by a [`PostEffectRenderContext`] (the packed bools that
+/// follow the aniso field in the render context).
 #[copyable]
 pub bitflags PostEffectRenderFlags: u8 {
-    /// Enables depth-of-field's screen-space motion-vector reprojection.
-    m_MotionVectorReprojection = 0b0000_0001,
+    /// The camera is underwater. [`DepthOfFieldEffect::Apply`] selects its underwater composite
+    /// shader family when set.
+    m_CameraUnderwater = 0b0000_0001,
 }
 
-#[min_size(0x388)]
+#[min_size(0x3D0)]
 pub type PostEffectRenderContext {
+    /// The composite environment cube map (static env blended with the dynamic sky cube), the
+    /// ambient specular source the material shaders sample. Written per frame from the render
+    /// engine's composite cube.
+    #[address(0x330)]
+    pub m_EnvCubeTexture: *mut void,
+
     #[address(0x384)]
     pub m_Flags: PostEffectRenderFlags,
+
+    /// The night-light reference level for the current time of day, interpolated from the
+    /// atmosphere's 24-entry per-hour table and copied in per frame from the light manager's
+    /// frame-info ring.
+    #[address(0x388)]
+    pub m_CurrentNightLightReference: f32,
+
+    /// The frame delta time in seconds.
+    #[address(0x390)]
+    pub m_Dt: f32,
+
+    /// The time of day in hours (0-24), copied per frame from the world time.
+    #[address(0x394)]
+    pub m_TimeOfDay: f32,
+
+    /// The emissive intensity scale for the current time of day.
+    #[address(0x398)]
+    pub m_TimeOfDayEmissiveScale: f32,
+
+    /// The clustered-lighting frame constant buffer, copied per frame from the light manager.
+    #[address(0x3A0)]
+    pub m_LightBuffer: *mut void,
+
+    /// The clustered light-grid lookup texture for this frame, copied from the light manager's
+    /// three-slot per-frame ring (indexed by the render context frame counter modulo three).
+    #[address(0x3A8)]
+    pub m_LightLookup: *mut void,
+
+    /// The clustered light index buffer for this frame, from the same three-slot ring as
+    /// [`m_LightLookup`](Self::m_LightLookup).
+    #[address(0x3B0)]
+    pub m_LightIndexBuffer: *mut void,
+
+    /// The lighting tuning constant buffer.
+    #[address(0x3B8)]
+    pub m_LightTuningBuffer: *mut void,
+
+    /// The first of the paired terrain horizon maps (large-scale sky-visibility occlusion).
+    #[address(0x3C0)]
+    pub m_HorizonMap0: *mut void,
+
+    /// The second of the paired terrain horizon maps.
+    #[address(0x3C8)]
+    pub m_HorizonMap1: *mut void,
+}
+
+/// The tone-mapping operator applied by the HDR-to-LDR composite in
+/// [`DepthOfFieldEffect::Apply`].
+#[copyable]
+pub enum ToneMappingTechnique: i32 {
+    Reinhard = 0x0,
+    U2Filmic = 0x1,
+    Photographic = 0x2,
 }
 
 pub type PostEffectContext {
     pub m_RenderContext: *mut PostEffectRenderContext,
+
+    /// The smoothed bright point of the exposure-weighted histogram, published alongside
+    /// [`m_Exposure`](Self::m_Exposure) each post-effects block draw.
+    #[address(0x38)]
+    pub m_HistogramBrightPointAfterExposure: f32,
+
+    /// The applied auto-exposure multiplier. Published each post-effects block draw from the
+    /// tone-mapping effect's smoothed exposure, and uploaded by [`DepthOfFieldEffect::Apply`] as
+    /// the composite's exposure fragment constant (c2.x).
+    #[address(0x3C)]
+    pub m_Exposure: f32,
+
+    /// When the post-effects manager is disabled, selects the tonemap-only composite shader instead
+    /// of the raw passthrough.
+    #[address(0x52)]
+    pub m_TonemapWhenDisabled: bool,
+
+    /// Selects the tone-mapping operator family for the composite shaders.
+    #[address(0x54)]
+    pub m_ToneMappingTechnique: ToneMappingTechnique,
 
     /// The auto-exposure target numerator. [`ToneMappingEffect::Update`] sets the exposure target to
     /// this divided by the raw-brightness histogram mid-point.
@@ -34,7 +115,14 @@ pub type PostEffectContext {
     pub m_AutoExposureKey: f32,
 }
 
-pub type PostEffectsManager;
+#[min_size(0x210)]
+pub type PostEffectsManager {
+    /// Master enable for the post-effects chain. When clear, [`DepthOfFieldEffect::Apply`] swaps the
+    /// full composite (exposure, grading, depth of field) for the tonemap-only or passthrough
+    /// shader, and the manager skips the sun halo, fade, and global-pass enqueue.
+    #[address(0x20E)]
+    pub m_Enabled: bool,
+}
 impl PostEffectsManager {
     /// Enqueues the world post-effect block, then steps the world fade accumulator
     /// ([`ApplyWorldFadeFilter`](Self::ApplyWorldFadeFilter)). `dt` flows only into

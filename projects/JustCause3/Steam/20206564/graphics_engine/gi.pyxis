@@ -1,3 +1,5 @@
+use types::math::Vector3;
+
 /// The light-propagation-volume solver: RSM inject + LPV propagation for the global-illumination pass.
 /// `CGISolver::Execute` refreshes one of the two LPV cascades each dispatch and toggles
 /// [`m_CascadeToUpdate`](Self::m_CascadeToUpdate) afterward, so the cascades are refreshed in
@@ -22,6 +24,12 @@ pub type GIPass {
 /// to the manager, which is null until the light system initializes.
 #[singleton(0x142_ED0_E70), min_size(0x1BE910)]
 pub type LightManager {
+    /// The diffuse colour of the embedded global light (the sun, or the moon at night) -- the head
+    /// of `m_GlobalLight.m_Light.Diffuse`. The atmospheric-scattering sky-lighting compute and the
+    /// deferred sun term both read it.
+    #[address(0xC)]
+    pub m_GlobalLightDiffuse: Vector3,
+
     /// The global-illumination render pass.
     #[address(0x1BE_908)]
     pub m_GIPass: *mut GIPass,
