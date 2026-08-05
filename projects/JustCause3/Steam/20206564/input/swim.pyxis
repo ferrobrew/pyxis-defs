@@ -1,0 +1,74 @@
+use character::character::Character;
+use physics::PfxCharacterInstance;
+use state::StateContext;
+
+/// The input state task active while the character swims at the water surface. Unlike the on-foot
+/// locomotion family, the swim tasks do not route through
+/// [`NStateTask_LocoUtil::EvaluateCharacterOrientation`](input::locomotion::NStateTask_LocoUtil::EvaluateCharacterOrientation)
+/// or the target-face-dir blackboard: body turning is dispatched as discrete animation acts, and
+/// the actual heading change is applied by the movement actuators below.
+pub type NStateTask_InputSurfaceSwimTask;
+impl NStateTask_InputSurfaceSwimTask {
+    /// The per-frame update. Computes the camera-relative move direction (via
+    /// `GameCameraManager::GetInputMatrix`) and, for the player, the direction to the aim-target
+    /// position, then dispatches swim acts by the angle from the body forward
+    /// ([`ControllerUtility::GetDeltaAngleFromOrientation`](input::controller_utility::ControllerUtility::GetDeltaAngleFromOrientation)):
+    /// below 65 degrees the forward crawl-start act, between 65 and 180 degrees the directional
+    /// 120-degree turn acts (`ACT_SURFACE_SWIM_START_120R/L` while moving,
+    /// `ACT_SURFACE_IDLE_QUICKTURN_120R/L` while idle and wielding a weapon, measured against the
+    /// aim direction). When a turn is latched it writes the angle to the blackboard
+    /// ([`SWIM_TURN_ANGLE_ID`](blackboard::ObjectBlackboard::SWIM_TURN_ANGLE_ID)) and stores the
+    /// base/target direction pair in the character's swim action parameters for the actuator's
+    /// segment-gated slerp. Also handles the surface-to-underwater dive transition (camera pitched
+    /// down, sufficient depth, facing within 65 degrees of the move direction).
+    #[address(0x140_830_BA0)]
+    pub fn Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
+}
+
+/// The movement actuator task for surface swimming; delegates to [`UpdateSurfaceMovement`] for the
+/// player and `UpdateSurfaceMovementNPC` otherwise.
+pub type NStateTask_MovementSurfaceSwimTask;
+impl NStateTask_MovementSurfaceSwimTask {
+    /// The per-frame update.
+    #[address(0x140_82C_940)]
+    pub fn Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
+}
+
+/// The input state task active while the character swims underwater. Mirrors
+/// [`NStateTask_InputSurfaceSwimTask`]'s act dispatch, with `ACT_UW_SWIM_IDLE_TURN_120R/L` as the
+/// discrete turn acts and the surfacing transition in place of the dive.
+pub type NStateTask_InputUnderWaterSwimTask;
+impl NStateTask_InputUnderWaterSwimTask {
+    /// The per-frame update.
+    #[address(0x140_823_FC0)]
+    pub fn Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
+}
+
+/// The movement actuator task for underwater swimming; delegates to [`UpdateUnderwaterMovement`].
+pub type NStateTask_MovementUnderWaterSwimTask;
+impl NStateTask_MovementUnderWaterSwimTask {
+    /// The per-frame update.
+    #[address(0x140_82D_470)]
+    pub fn Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
+}
+
+/// The surface-swim movement core, called per frame by
+/// [`NStateTask_MovementSurfaceSwimTask::Update`] for the player. Computes buoyancy and the swim
+/// velocity, and applies the body orientation: the heading slerps from the latched animated-turn
+/// base direction to the target direction with the interpolant driven by the local time of the
+/// angle-correction animation segment (`ang_corr_seg_id`), is held at the current forward outside
+/// the steering segment (`steering_seg_id`), is blended with the water-surface plane for roll, and
+/// is written through [`PfxCharacterInstance::SetOrientation`] -- so the heading changes in
+/// act-sized steps rather than continuously. `warping_seg_id` drives the position warp toward a
+/// grapple or planted-explosive target. The segment ids are the task's loaded properties, passed
+/// as `idstring<SSegmentIdTag>` references.
+#[address(0x140_7E9_440)]
+pub fn UpdateSurfaceMovement(character: *mut Character, dt: f32, target_angle_offset: f32, ang_corr_seg_id: *const u32, steering_seg_id: *const u32, warping_seg_id: *const u32);
+
+/// The underwater-swim movement core, called per frame by
+/// [`NStateTask_MovementUnderWaterSwimTask::Update`]. Same orientation structure as
+/// [`UpdateSurfaceMovement`] -- segment-gated animated-turn slerp applied through
+/// [`PfxCharacterInstance::SetOrientation`] -- with the pitch following the three-dimensional swim
+/// direction instead of the surface plane.
+#[address(0x140_7A5_DC0)]
+pub fn UpdateUnderwaterMovement(character: *mut Character, dt: f32, target_angle_offset: f32, ang_corr_seg_id: *const u32, steering_seg_id: *const u32, p6: bool);

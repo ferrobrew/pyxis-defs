@@ -1,0 +1,51 @@
+use character::character::Character;
+use types::math::{Matrix4, Vector3};
+
+/// `CPfxCharacterInstance`: the character's physics-side body instance, owned by `CCharacter`
+/// through a `boost::shared_ptr`. Only the members needed so far are bound.
+pub type PfxCharacterInstance;
+impl PfxCharacterInstance {
+    /// Sets the physics body's rotation from the rotation part of `m` (via a quaternion
+    /// conversion) and zeroes the body's angular velocity; the translation part is ignored. The
+    /// swim movement cores ([`UpdateSurfaceMovement`](input::swim::UpdateSurfaceMovement) and
+    /// [`UpdateUnderwaterMovement`](input::swim::UpdateUnderwaterMovement)) apply their computed
+    /// body orientation through this each update.
+    #[address(0x140_239_100)]
+    pub fn SetOrientation(&mut self, m: *const Matrix4);
+
+    /// Returns the physics body's current linear velocity (world space, 3 floats) via the body's
+    /// Havok transform/velocity chain.
+    #[address(0x140_24D_820)]
+    pub fn GetVelocity(&self, out: *mut Vector3);
+}
+
+/// Rotates `from` toward `to` along the shortest arc, writing the result to `out`. It takes the
+/// rotation from `from` to `to` as an angle-axis pair and applies
+/// `min(angle / 0.2617994, 1) * rate` of it, so the step eases out as the two directions converge.
+/// Note that the step is **not** clamped to the remaining angle: a `rate` above 0.2617994 radians
+/// (15 degrees) overshoots the target, and one above twice that diverges. It logs `"UHOH!"` when
+/// the two directions are more than about 162 degrees apart, where the rotation axis is
+/// ill-conditioned.
+///
+/// The swim locomotion family calls it from two places per frame, for two different quantities:
+///
+/// - [`UpdateSurfaceMovement`](input::swim::UpdateSurfaceMovement) and
+///   [`UpdateUnderwaterMovement`](input::swim::UpdateUnderwaterMovement) rotate the character's
+///   current forward toward the desired direction (the world move direction from
+///   [`ControllerUtility::TransformInputDirToWorldDir`](input::controller_utility::ControllerUtility::TransformInputDirToWorldDir)
+///   while moving, the aim-target direction while aiming, the grapple target while reeling, or the
+///   current forward when the stick is neutral). The result is the `direction` argument to
+///   `CMatrix4f::CreateOrientation`, so **this call is what turns the body**.
+/// - [`ProcessMotion`] slerps the character's current velocity direction toward the wanted one.
+#[address(0x140_775_4F0)]
+pub fn DoRotate(from: *const Vector3, to: *const Vector3, rate: f32, out: *mut Vector3);
+
+/// Turns a wanted velocity into the velocity actually applied this frame: it slerps the direction
+/// of `current_vel` toward the direction of `wanted_vel` through [`DoRotate`], limited to
+/// `slerp_delta_angle` radians, then rescales the result to the horizontal magnitude of
+/// `wanted_vel`. Either direction falls back to the character's world-matrix forward when it is
+/// degenerate, and `xz_only` flattens both onto the ground plane first. `dt` is unused: the
+/// magnitude comes from `wanted_vel`, not from integration. The surface swim movement core uses it
+/// to keep a swimmer's motion from snapping direction when the stick swings.
+#[address(0x140_775_760)]
+pub fn ProcessMotion(character: *mut Character, dt: f32, current_vel: *const Vector3, wanted_vel: *const Vector3, slerp_delta_angle: f32, xz_only: bool, vel_out: *mut Vector3);

@@ -1,0 +1,22 @@
+use character::character::Character;
+use types::math::{Vector2, Vector3};
+
+/// `CControllerUtility`: static helpers that relate controller input, the camera, and character
+/// orientation. Only the members needed so far are bound.
+pub type ControllerUtility;
+impl ControllerUtility {
+    /// The signed XZ angle (degrees, -180..180) from the character's current world forward to
+    /// `dir`. Read by the swim input tasks to pick between the forward crawl-start act and the
+    /// directional 120-degree turn acts, by the AI turn/exit-vehicle behaviors, and by the
+    /// locomotion aim-blend state's sampler weighting.
+    #[address(0x140_781_410)]
+    pub fn GetDeltaAngleFromOrientation(character: *const Character, dir: *const Vector3) -> f32;
+
+    /// Transforms a camera-relative direction (`input_dir`, the negated camera forward) and a
+    /// camera-relative input vector (`input`, the stick's X and Y axes) into a world direction.
+    /// `input.x` is the lateral (strafe) axis and `input.y` the forward/back axis. The general
+    /// helper for turning controller input into a world direction: fifteen call sites across the
+    /// locomotion, swim, jump, melee, grapple, aim, and AI steering paths.
+    #[address(0x140_782_430)]
+    pub fn TransformInputDirToWorldDir(out: *mut Vector3, input_dir: *const Vector3, input: *const Vector2) -> *mut Vector3;
+}

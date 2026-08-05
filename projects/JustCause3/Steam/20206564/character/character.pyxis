@@ -2,7 +2,9 @@ use animation::ik::HumanIK;
 use animation::rule_system::AnimationRuleSystem;
 use blackboard::ObjectBlackboard;
 use character::inventory::Inventory;
+use character::swim_action_params::SwimActionParams;
 use equipment::grappling_hook::GrapplingHook;
+use physics::PfxCharacterInstance;
 use types::math::Matrix4;
 use types::math::Vector3;
 use types::shared_ptr::SharedPtr;
@@ -34,6 +36,11 @@ pub bitflags CharacterLodFlags: u8 {
 
 #[size(0x3540)]
 pub type Character {
+    /// `m_CurrentMotionState` while swimming, written by both swim movement cores every frame.
+    pub const MOTION_STATE_SWIMMING: u32 = 0x18,
+    /// `m_CurrentMotionState` while ragdolling.
+    pub const MOTION_STATE_RAGDOLL: u32 = 0x14,
+
     /// The character's embedded equipment inventory.
     #[address(0x980)]
     pub m_Inventory: Inventory,
@@ -48,6 +55,12 @@ pub type Character {
     #[address(0x1_780)]
     pub m_AnimatedModel: AnimatedModel,
 
+    /// The character's physics-side body instance. The movement actuators drive the character
+    /// through it: they write the wanted velocity into its input and its orientation through
+    /// [`SetOrientation`](physics::PfxCharacterInstance::SetOrientation).
+    #[address(0x2_050)]
+    pub m_PfxCharacter: SharedPtr<PfxCharacterInstance>,
+
     /// The character's embedded [`ObjectBlackboard`] (`lea rcx, [character+2060h]` at every
     /// blackboard call site in the loco tasks).
     #[address(0x2_060)]
@@ -56,6 +69,14 @@ pub type Character {
     /// Packed aiming-state bit-flags; see [`AimState`].
     #[address(0x2_0F1)]
     pub m_AimFlags: AimState,
+
+    /// How the character's motion is integrated this frame (`CCharacter::EMotionState`), read by
+    /// the dispatch in `CCharacter::UpdateIntegratingPhysics`. Each movement actuator sets it as
+    /// part of its per-frame update. Left as a raw integer because only a few of its ~25 values have
+    /// been confirmed against the release build: `MOTION_STATE_SWIMMING` and `MOTION_STATE_RAGDOLL`
+    /// on this type.
+    #[address(0x2_494)]
+    pub m_CurrentMotionState: u32,
 
     #[address(0x2_62A)]
     pub m_IsLocalCharacter: bool,
@@ -85,6 +106,10 @@ pub type Character {
     /// aim reference moves.
     #[address(0x2_BB0)]
     pub m_IdleFidgetTimer: f32,
+
+    /// The swim locomotion family's per-character state; see [`SwimActionParams`].
+    #[address(0x3_004)]
+    pub m_SwimActionParams: SwimActionParams,
 }
 impl Character {
     #[address(0x140_7D5_B00)]
@@ -194,6 +219,13 @@ pub type AnimationController;
 impl AnimationController {
     #[address(0x140_434_E30)]
     pub fn GetBoneIndex(&self, hash: u32) -> u32;
+
+    /// The current animation's unfiltered root velocity, in the character's local frame. The
+    /// movement actuators take its horizontal magnitude as the character's speed for the frame, so
+    /// the shipped clips are what set how fast a given locomotion state travels -- both swim
+    /// movement cores scale their wanted velocity by it.
+    #[address(0x140_434_F20)]
+    pub fn GetRawRootVelocity(&self) -> *const Vector3;
 
     #[address(0x140_43F_E70)]
     pub fn GetBoneMatrix(&self, index: u32, matrix: *mut Matrix4);
