@@ -496,6 +496,27 @@ pub type RenderContext {
     #[address(0x330)]
     pub m_EnvCubeTexture: *mut void,
 
+    /// The dynamic (planar) reflection colour texture. `CNvWaterHighEndRenderBlock::Setup` binds it
+    /// on fragment slot 1 (clearing the slot when the pointer is null).
+    #[address(0x338)]
+    pub m_DynamicReflectionColorTexture: *mut Texture,
+
+    /// The dynamic (planar) reflection alpha texture, paired with
+    /// [`m_DynamicReflectionColorTexture`](Self::m_DynamicReflectionColorTexture).
+    /// `CNvWaterHighEndRenderBlock::Setup` binds it on fragment slot 12 (clearing the slot when the
+    /// pointer is null).
+    #[address(0x340)]
+    pub m_DynamicReflectionAlphaTexture: *mut Texture,
+
+    /// The scene colour texture as of this pass, the screen-space refraction source.
+    /// `CNvWaterHighEndRenderBlock::Setup` binds it on fragment slot 3.
+    #[address(0x350)]
+    pub m_BackBufferTexture: *mut Texture,
+
+    /// The scene depth texture. `CNvWaterHighEndRenderBlock::Setup` binds it on fragment slot 0.
+    #[address(0x358)]
+    pub m_DepthBufferTexture: *mut Texture,
+
     #[address(0x384)]
     pub m_Flags: RenderContextFlags,
 

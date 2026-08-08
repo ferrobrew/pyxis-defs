@@ -976,7 +976,30 @@ pub fn SetupWaterBoxSurface(rc: *mut RenderContext);
 /// from the tessellation cvar and the block's above/below-surface flag. It also owns the two
 /// constant buffers those permutations read: a 10-register buffer bound to **vertex and domain slot
 /// 1** and a 15-register buffer bound to **fragment slot 1**.
-pub type NvWaterHighEndRenderBlock;
+#[min_size(0x3F18)]
+pub type NvWaterHighEndRenderBlock {
+    /// When set, [`Draw`](Self::Draw) skips the ocean simulation step
+    /// ([`WaveWorksSimulationStep`](WaveWorksSimulationStep)) and `UpdateSimulation` stops
+    /// advancing [`m_RenderTime`](Self::m_RenderTime), freezing the simulated sea state. Driven by
+    /// the camera's altitude above the water.
+    #[address(0x185)]
+    pub m_AltitudeSimulationPause: bool,
+
+    /// Whether the camera is below the ocean surface. [`Draw`](Self::Draw) selects the below-water
+    /// vertex/fragment permutations when set, and [`Setup`](Self::Setup) stages the underwater
+    /// tweak set (specular, transparency depth, refraction disturbance) instead of the above-water
+    /// one.
+    #[address(0x1A4)]
+    pub m_UnderWater: bool,
+
+    /// The ocean simulation clock in seconds, advanced once per game frame by `UpdateSimulation`
+    /// (`m_deltaTime * m_TimeScale` per step, skipped while
+    /// [`m_AltitudeSimulationPause`](Self::m_AltitudeSimulationPause) is set). [`Draw`](Self::Draw)
+    /// hands it to the simulation step as the simulation time, and [`Setup`](Self::Setup) bakes it
+    /// into the vertex/domain constants as the shader time.
+    #[address(0x3_F10)]
+    pub m_RenderTime: f64,
+}
 impl NvWaterHighEndRenderBlock {
     /// Bakes the per-view WaveWorks matrices and stages both of the block type's constant buffers.
     ///
@@ -1027,6 +1050,46 @@ impl NvWaterHighEndRenderBlock {
     /// state it captures outlives the call.
     #[address(0x140_37A_E00)]
     pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
+}
+
+/// The WaveWorks water render block *type*
+/// (`CNvWaterHighEndRenderBlock::CNvWaterHighEndRenderBlockType` singleton): the shared state
+/// behind every [`NvWaterHighEndRenderBlock`] draw — the `NvWater*` shader family, the two shared
+/// constant buffers, and the shared water textures
+/// [`Setup`](NvWaterHighEndRenderBlock::Setup)/[`Draw`](NvWaterHighEndRenderBlock::Draw) bind.
+#[singleton(0x142_EF5_2A8), min_size(0x190)]
+pub type NvWaterHighEndRenderBlockType {
+    /// The tessellation option (`ETessellationOptions`): `1` selects the tessellated shader
+    /// permutations, and indexes the vertex-shader pair the draw binds.
+    #[address(0x24)]
+    pub m_TessellationOptions: i32,
+
+    /// The top-down water modulation texture, bound on vertex (or domain, when tessellating)
+    /// slot 0 by [`Draw`](NvWaterHighEndRenderBlock::Draw).
+    #[address(0x168)]
+    pub m_WaterModTexture: *mut Texture,
+
+    /// The foam detail texture, bound on fragment slot 5 by
+    /// [`Setup`](NvWaterHighEndRenderBlock::Setup).
+    #[address(0x170)]
+    pub m_FoamTexture: *mut Texture,
+
+    /// The water normal-detail (bump) texture, bound on fragment slot 4 by
+    /// [`Setup`](NvWaterHighEndRenderBlock::Setup).
+    #[address(0x178)]
+    pub m_WaterBumpTexture: *mut Texture,
+
+    /// The distant (backdrop) planar reflection texture. When
+    /// `CWaterPatchManager::m_EnableScreenSpaceWaterReflection` is set,
+    /// [`Draw`](NvWaterHighEndRenderBlock::Draw) re-binds fragment slot 2 to this in place of
+    /// [`m_FullReflectionTexture`](Self::m_FullReflectionTexture).
+    #[address(0x180)]
+    pub m_DistantReflectionTexture: *mut Texture,
+
+    /// The full planar reflection texture, bound on fragment slot 2 by
+    /// [`Setup`](NvWaterHighEndRenderBlock::Setup).
+    #[address(0x188)]
+    pub m_FullReflectionTexture: *mut Texture,
 }
 
 /// Advances the WaveWorks ocean simulation one step and blocks until its displacement readback is
