@@ -23,6 +23,13 @@ pub bitflags CameraState: u8 {
 
 #[size(0x5B0)]
 pub type Camera {
+    /// The near-plane default the engine's `Camera` constructor applies; the engine reads the
+    /// live value from `m_Near`.
+    pub const DEFAULT_NEAR_PLANE: f32 = 0.1,
+    /// The far-plane default the engine's `Camera` constructor applies; the engine
+    /// reads the live value from `m_Far`.
+    pub const DEFAULT_FAR_PLANE: f32 = 38400.0,
+
     pub m_OrthoValues: Vector2,
     pub m_OffCenterTiles: i32,
     pub m_OffCenterTileX: i32,

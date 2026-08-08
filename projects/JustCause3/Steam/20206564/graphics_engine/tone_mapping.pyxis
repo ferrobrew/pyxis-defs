@@ -41,6 +41,12 @@ pub type ToneMappingEffect {
     #[address(0x578)]
     pub m_NumBuckets: u32,
 
+    /// The ping-pong selector for the internal histogram ring the per-frame exposure step advances:
+    /// [`Update`](Self::Update) increments it each real frame, so a caller that runs `Update`
+    /// once per eye steps it twice per frame and can read back a stale histogram.
+    #[address(0x57C)]
+    pub m_OcclusionQuerySlotSelector: u32,
+
     /// The applied auto-exposure multiplier: the clamped, smoothed (EMA) value
     /// [`Update`](Self::Update) writes once per frame. [`Apply`](Self::Apply) publishes it
     /// into the frame's [`PostEffectContext::m_Exposure`](PostEffectContext) --

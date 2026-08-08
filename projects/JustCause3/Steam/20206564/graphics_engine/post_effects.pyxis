@@ -52,6 +52,11 @@ pub type PostEffectContext {
 
 #[min_size(0x210)]
 pub type PostEffectsManager {
+    /// The slot-base the slot-returning effects' result textures live at in the manager's texture
+    /// array: a stage's current result is `CTX[slot + 83]`, where `CTX` is the manager argument the
+    /// post block passes to the effect chain and `slot` is the effect's declared slot index.
+    pub const RESULT_TEXTURE_SLOT_BASE: u64 = 83,
+
     /// Master enable for the post-effects chain. When clear, [`DepthOfFieldEffect::Apply`] swaps the
     /// full composite (exposure, grading, depth of field) for the tonemap-only or passthrough
     /// shader, and the manager skips the sun halo, fade, and global-pass enqueue.
@@ -104,13 +109,22 @@ impl RenderBlockPostEffects {
 }
 
 /// The bokeh depth-of-field downscale prepass: a 2x2 pack plus focus.
-pub type DownScale2x2PackFocus;
+#[min_size(0xC8)]
+pub type DownScale2x2PackFocus {
+    /// The effect's own working resolution, at a quarter of the scene's.
+    #[address(0xC0)]
+    pub m_Width: u32,
+
+    #[address(0xC4)]
+    pub m_Height: u32,
+}
 impl DownScale2x2PackFocus {
     /// Runs the prepass: a near-field circle-of-confusion prologue built entirely out of compute
     /// dispatches, then the packing draw.
     ///
     /// The prologue works on a quarter-resolution pair of single-channel textures (the effect's own
-    /// `m_Width`/`m_Height` at `+0xC0`/`+0xC4` divided by four in each dimension), and every
+    /// [`m_Width`](Self::m_Width)/[`m_Height`](Self::m_Height) divided by four in each dimension),
+    /// and every
     /// [`Dispatch`](graphics_engine::draw::Dispatch) in it is sized `ceil(width / 4 / 32)` by
     /// `ceil(height / 4 / 8)` groups of 32x8 threads, covering that whole texture:
     ///

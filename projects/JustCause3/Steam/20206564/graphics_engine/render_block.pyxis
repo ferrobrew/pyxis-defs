@@ -170,8 +170,9 @@ impl RenderBlockAtmosphericScattering {
 /// Its `SetupConstantBuffers` uploads the per-LOD-slot hull/domain tessellation constant buffer —
 /// which bakes the dispatch's
 /// [`RenderContext::m_OffsetViewProjection`](graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection),
-/// camera position, and tessellation factors — into `m_HDTypeConstants[slot]` (22 constant-buffer
-/// handles at `0x60`), caching it per slot keyed on the frame the upload was made for.
+/// camera position, and tessellation factors — into
+/// [`m_HDTypeConstants`](Self::m_HDTypeConstants) (22 constant-buffer handles), caching it per slot
+/// keyed on the frame the upload was made for.
 #[singleton(0x142_EED_228), min_size(0x4C0)]
 pub type RenderBlockTypeTerrain {
     /// The debug visualization mode. When `<= 0`, `Setup` selects the normal shading fragment
@@ -180,6 +181,11 @@ pub type RenderBlockTypeTerrain {
     /// entries, so 1..=7 are valid).
     #[address(0x4C)]
     pub m_DebugMode: i32,
+
+    /// The constant-buffer handle array, per-LOD-slot, whose entries the type's
+    /// `SetupConstantBuffers` bakes the tessellation constants into.
+    #[address(0x60)]
+    pub m_HDTypeConstants: [u64; 22],
 
     /// Per-LOD-slot cache stamp: the
     /// [`RenderContext::m_RenderFrameNo`](graphics_engine::graphics_engine::RenderContext::m_RenderFrameNo)
@@ -350,9 +356,12 @@ pub type RenderBlockTypeTerrainPatch {
     #[address(0x4C)]
     pub m_DebugMode: i32,
 
-    /// Per-LOD-slot cache stamp; see [`RenderBlockTypeTerrain::m_WasCBApplied`]. The constant-buffer
-    /// handle array (`m_HDTypeConstants[22]`) sits at `0x70` for this variant, so the stamp array
-    /// follows at `0x120`.
+    /// The constant-buffer handle array, per-LOD-slot.
+    #[address(0x70)]
+    pub m_HDTypeConstants: [u64; 22],
+
+    /// Per-LOD-slot cache stamp; see [`RenderBlockTypeTerrain::m_WasCBApplied`]. Sits after
+    /// [`m_HDTypeConstants`](Self::m_HDTypeConstants).
     #[address(0x120)]
     pub m_WasCBApplied: [u32; 22],
 
@@ -730,7 +739,20 @@ impl RenderBlockSSAO {
 /// The screen-space reflection render block. Its `Draw` reconstructs world position from depth via
 /// [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4) and ray-marches a scene colour capture
 /// taken earlier in the frame.
-pub type RenderBlockScreenSpaceReflection;
+#[min_size(0xA78)]
+pub type RenderBlockScreenSpaceReflection {
+    /// The block's own working resolution for the blur: the size the separable blur dispatches and
+    /// constants are derived from.
+    #[address(0xA68)]
+    pub m_WorkingWidth: u32,
+
+    #[address(0xA6C)]
+    pub m_WorkingHeight: u32,
+
+    /// Selects the blur path: the two-draw separable blur when set, the compute blur when clear.
+    #[address(0xA74)]
+    pub m_ComputeBlur: bool,
+}
 impl RenderBlockScreenSpaceReflection {
     /// Draws the screen-space reflection pass.
     ///
@@ -738,7 +760,7 @@ impl RenderBlockScreenSpaceReflection {
     /// phase that calls [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4) (uploaded as vertex
     /// constants 1..4) and which writes the block's reflection-colour and reflection-alpha targets
     /// through a stencil test; and then a separable blur of those two targets, on one of two mutually
-    /// exclusive paths selected by the block's compute-blur flag at `+0xA74`.
+    /// exclusive paths selected by [`m_ComputeBlur`](Self::m_ComputeBlur).
     ///
     /// The pixel-shader path is two fullscreen draws ping-ponging the colour/alpha pair against a
     /// second pair, so the blurred result lands back in the first pair. The compute path is two
@@ -749,7 +771,8 @@ impl RenderBlockScreenSpaceReflection {
     /// - The second blurs vertically, dispatched `ceil(height / 256)` by `width` groups, with the
     ///   source and destination pairs exchanged so the result again ends up in the first pair.
     ///
-    /// `width` and `height` are the block's own working resolution at `+0xA68` and `+0xA6C`. They are
+    /// [`m_WorkingWidth`](Self::m_WorkingWidth) and [`m_WorkingHeight`](Self::m_WorkingHeight) are the
+    /// block's own working resolution. They are
     /// also uploaded as `x` and `y` of compute constant 0, whose `w` is the axis flag that tells the
     /// program which way to blur (1.0 horizontal, 0.0 vertical) by transposing its thread-id-to-texel
     /// mapping; there is no origin or offset term in either constant buffer, and the program addresses
@@ -769,12 +792,17 @@ impl RenderBlockScreenSpaceReflection {
 /// The screen-space subsurface-scattering render block for skin. Its `Draw` reconstructs from depth
 /// via [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4) and blurs the lit skin in screen
 /// space.
-pub type RenderBlockScreenSpaceSubSurfaceSkin;
+#[min_size(0x20)]
+pub type RenderBlockScreenSpaceSubSurfaceSkin {
+    /// Selects the draw path: the single-draw path when set, the full diffusion chain when clear.
+    #[address(0x18)]
+    pub m_DrawMode: u8,
+}
 impl RenderBlockScreenSpaceSubSurfaceSkin {
-    /// Draws the subsurface-scattering pass, on one of two mutually exclusive paths selected by the
-    /// block's own byte at `+0x18`: a single-draw path, and the full diffusion chain (a screen-space
-    /// gather into the SSS targets, then six separable blur draws ping-ponging between them). Each
-    /// path builds the depth-reconstruction basis with exactly one
+    /// Draws the subsurface-scattering pass, on one of two mutually exclusive paths selected by
+    /// [`m_DrawMode`](Self::m_DrawMode): a single-draw path, and the full diffusion chain (a
+    /// screen-space gather into the SSS targets, then six separable blur draws ping-ponging between
+    /// them). Each path builds the depth-reconstruction basis with exactly one
     /// [`Matrix4::PerspectiveFovInverse`](types::math::Matrix4) call, before its first render-setup
     /// bind, and uploads it as vertex constants 1..4.
     #[address(0x140_192_D60)]

@@ -806,7 +806,19 @@ pub type BFBCFrustumCullParameters {
 /// per camera and time) from a camera's `m_View` and `m_ProjectionF`, and every scene-geometry,
 /// terrain, streaming, and occlusion consumer reads it through
 /// [`GetBFBCFrustumParamsForCameraAndTime`](Self::GetBFBCFrustumParamsForCameraAndTime).
-pub type OccluderCollectionManager;
+///
+/// The main cull camera is the manager's own copy of the active centre camera, embedded at
+/// [`CULLING_CAMERA_OFFSET`](Self::CULLING_CAMERA_OFFSET) (the consumer identity every main-view BFBC
+/// consumer passes; shadow and reflection culls use separate functions). The layout around it is not
+/// yet mapped, so the offset is carried as a named constant rather than a field.
+#[min_size(0x8)]
+pub type OccluderCollectionManager {
+    /// The main cull camera the manager embeds at [`CULLING_CAMERA_OFFSET`](Self::CULLING_CAMERA_OFFSET):
+    /// a verbatim copy of the active centre camera, used as the identity every main-view BFBC consumer
+    /// (terrain, dynamic/static models, streaming, AO volumes) passes to
+    /// [`GetBFBCFrustumParamsForCameraAndTime`](Self::GetBFBCFrustumParamsForCameraAndTime).
+    pub const CULLING_CAMERA_OFFSET: u64 = 0x8,
+}
 impl OccluderCollectionManager {
     /// Build or fetch the cached BFBC cull-frustum parameters for `camera` at `time`. The frustum is
     /// derived from `camera.m_View` combined with `camera.m_ProjectionF`, so overwriting the camera's

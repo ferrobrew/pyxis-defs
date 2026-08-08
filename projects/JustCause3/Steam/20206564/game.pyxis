@@ -1,5 +1,13 @@
 #[singleton(0x142_E22_E68), min_size(0x2C0)]
 pub type Game {
+    /// The intra-`Update` site at which the game's per-frame render bookkeeping starts: the
+    /// `m_UpdateFlags & 4` check (the `jz`) that normally gates `UpdateRender` (and everything
+    /// after it) on the frame-pacing mode sits here.
+    pub const UPDATE_RENDER_GATE_OFFSET: u64 = 0x787,
+    /// The intra-`Update` site at which the render bookkeeping ends: `++m_RenderCount`, the last
+    /// step of the `UpdateRender` tail.
+    pub const UPDATE_RENDER_LENGTH_OFFSET: u64 = 0x7A2,
+
     #[address(0x10)]
     pub m_CountAccumulator: u64,
     pub m_UpdateFrequency: u32,
