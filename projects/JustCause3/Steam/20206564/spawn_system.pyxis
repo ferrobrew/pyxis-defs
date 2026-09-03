@@ -1,5 +1,5 @@
 use camera::camera::Camera;
-use types::math::Vector3;
+use types::math::{Matrix4, Vector3};
 use types::std_vector::Vector;
 
 /// The opaque BFBC context: the per-system beam-frustum-based-culling state that `BFBCProcess` reads
@@ -29,13 +29,86 @@ pub type SpawnBudgetEntry {
     pub m_Budget: u32,
 }
 
-/// The spawn system: manages streaming (de)spawn of characters and vehicles around the player. Each
+/// The completion callback for [`Spawn`](SpawnSystem::Spawn): a code pointer with the signature
+/// `void (*)(const std::vector<boost::shared_ptr<CGameObject>>* spawned_objects, void* userdata)`,
+/// invoked with the spawned objects and the caller's userdata once the request has been serviced.
+/// Modeled as a raw pointer because the definition language does not yet express function-pointer
+/// types.
+pub type SpawnCallback = *const u8;
+
+/// The spawn system: manages streaming (de)spawn of dynamic objects around the player. Each
 /// frame, [`Update`](Self::Update) builds a BFBC cull frustum from the camera manager's active
 /// camera and uses it as a "don't (de)spawn while visible" gate in `CSpawnFactoryImpl::CheckInternal`, so
-/// objects are not spawned or despawned inside the player's view. Its budgets are characters and
-/// vehicles, so it governs NPC/vehicle (de)spawns near the view edge, not buildings.
+/// objects are not spawned or despawned inside the player's view.
+///
+/// Its resource definitions are loaded at startup from the per-pool spawn definition files
+/// (`settings/spawn_*_defs.bin`) referenced by `settings/spawn_budget_pools.bin`. Each budget pool
+/// (aircraft, animals, civilians, combatants, devices, props, road decorations, trains, vehicles,
+/// weapons, effects, and encounters) names a definition file, and each definition therein carries
+/// an exported-entity path (`.ee`), a space-separated tag string, a selection weight, and an
+/// optional debug-menu category. Spawn requests select definitions by matching tags, so the system
+/// governs the (de)spawn of every tag-addressable dynamic object, not only characters and
+/// vehicles. World geometry is placed by the location system instead and does not pass through
+/// here.
 #[singleton(0x142_F18_998)]
 pub type SpawnSystem {
+    /// `EFactoryFlags`: bypasses none of the spawn checks; the factory performs resource
+    /// requesting, despawn, line-of-sight, player-proximity, spawn-block, time, spawn-pool,
+    /// physics, and landscape checks as configured.
+    pub const FF_DEFAULT: u32 = 0x0,
+    /// `EFactoryFlags`: do not request resource streaming; spawn only if already loaded.
+    pub const FF_NO_RESOURCE_REQUEST: u32 = 0x1,
+    /// `EFactoryFlags`: skip taking the system lock.
+    pub const FF_NO_SYSTEM_LOCK: u32 = 0x2,
+    /// `EFactoryFlags`: skip the despawn check.
+    pub const FF_NO_DESPAWN_CHECK: u32 = 0x4,
+    /// `EFactoryFlags`: skip the line-of-sight check that blocks spawning inside the player's view.
+    pub const FF_NO_LOS_CHECK: u32 = 0x8,
+    /// `EFactoryFlags`: skip the player-proximity check.
+    pub const FF_NO_PLAYER_PROX_CHECK: u32 = 0x10,
+    /// `EFactoryFlags`: skip the spawn-block volume check.
+    pub const FF_NO_SPAWN_BLOCK_CHECK: u32 = 0x20,
+    /// `EFactoryFlags`: skip the frame time-budget check.
+    pub const FF_NO_TIME_CHECK: u32 = 0x40,
+    /// `EFactoryFlags`: skip the spawn-pool budget check.
+    pub const FF_NO_SPAWN_POOL_CHECK: u32 = 0x80,
+    /// `EFactoryFlags`: skip the active-physics-area check.
+    pub const FF_NO_PHYSICS_CHECK: u32 = 0x100,
+    /// `EFactoryFlags`: do not count the spawn against its pool budget.
+    pub const FF_NO_BUDGET_COUNT: u32 = 0x200,
+    /// `EFactoryFlags`: skip the landscape (ground validity) check.
+    pub const FF_NO_LANDSCAPE_CHECK: u32 = 0x400,
+    /// `EFactoryFlags`: mark the spawn as an ambient spawn.
+    pub const FF_AMBIENT_SPAWN: u32 = 0x800,
+    /// `EFactoryFlags`: mark the spawn as mission critical, protecting it from despawn.
+    pub const FF_MISSION_CRITICAL: u32 = 0x1000,
+    /// `EFactoryFlags`: allow definitions flagged as premium content.
+    pub const FF_PREMIUM_SPAWN: u32 = 0x2000,
+    /// `EFactoryFlags`: allow definitions flagged as prototype content.
+    pub const FF_PROTOTYPE_SPAWN: u32 = 0x4000,
+    /// `EFactoryFlags`: automatically place a despawn block on the spawned object.
+    pub const FF_AUTO_DESPAWN_BLOCK: u32 = 0x8000,
+    /// `EFactoryFlags`: skip the spawn-loop debug check.
+    pub const FF_NO_DEBUG_LOOP_CHECK: u32 = 0x10000,
+    /// `EFactoryFlags`: stream the definition's resources at high priority.
+    pub const FF_HIGH_PRIORITY_LOAD: u32 = 0x20000,
+    /// `EFactoryFlags`: run the debug-check variant of the spawn checks.
+    pub const FF_DEBUG_CHECK: u32 = 0x40000,
+    /// `EFactoryFlags`: mark the spawn as a debug spawn.
+    pub const FF_DEBUG_SPAWN: u32 = 0x80000,
+    /// `EFactoryFlags` combination used for secondary attach-object spawns (no despawn,
+    /// line-of-sight, player-proximity, spawn-block, or time checks).
+    pub const FF_SECONDARY_SPAWN_CHECKS: u32 = 0x17C,
+    /// `EFactoryFlags` combination used for debug spawns (no despawn, line-of-sight,
+    /// player-proximity, or time checks, no debug-loop check, and high-priority load).
+    pub const FF_DEBUG_SPAWN_CHECKS: u32 = 0x2013C,
+    /// `EFactoryFlags` combination used for black-market and other high-priority player-facing
+    /// spawns (no despawn, line-of-sight, player-proximity, spawn-block, or time checks, premium
+    /// content allowed, and high-priority load). `CInventory::SpawnSecondaryAttachObject` passes
+    /// this for the player and [`FF_SECONDARY_SPAWN_CHECKS`](Self::FF_SECONDARY_SPAWN_CHECKS)
+    /// otherwise.
+    pub const FF_HIGH_PRIO_SPAWN_CHECKS: u32 = 0x2207C,
+
     /// The per-tag spawn budget entries. Each entry tracks the max object count (budget), current
     /// count, and despawn-rank state for one spawn tag. When the count exceeds the budget, the
     /// highest-despawn-rank object is despawned.
@@ -86,4 +159,17 @@ impl SpawnSystem {
     /// camera's position and forward direction.
     #[address(0x140_DF4_BE0)]
     pub fn SetCenterPosition(&mut self, centerpos: *const Vector3, viewpos: *const Vector3, viewdir: *const Vector3);
+
+    /// Queues an asynchronous spawn request for the resource definitions matching the given tag
+    /// string. Tags are separated by spaces, commas, or pipes; a definition matches when it
+    /// carries every requested tag, and the matching set must belong to a single budget pool. The
+    /// request creates a spawn factory, streams the selected definition's exported entity in if
+    /// needed, and is serviced on a later frame by the spawn thread's update; on success the
+    /// callback fires with the spawned objects and the given userdata. The transform is the
+    /// world-space placement for the spawned object. `flags` is a combination of the
+    /// `EFactoryFlags` constants ([`FF_DEFAULT`](Self::FF_DEFAULT) and friends) controlling which
+    /// spawn checks apply. The callback may be null when the caller does not need the spawned
+    /// objects.
+    #[address(0x140_E97_DA0)]
+    pub fn Spawn(&mut self, tags: *const u8, transform: *const Matrix4, flags: u32, callback: SpawnCallback, userdata: *mut u8);
 }
