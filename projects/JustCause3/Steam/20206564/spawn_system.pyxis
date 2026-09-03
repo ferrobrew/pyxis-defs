@@ -58,17 +58,17 @@ pub type SpawnSystem {
 
     /// The center position the spawn system streams around, set by
     /// [`SetCenterPosition`](Self::SetCenterPosition).
-    #[address(0x194)]
+    #[address(0x184)]
     pub m_CenterPos: Vector3,
 
     /// The view position for the spawn visibility gate, set by
     /// [`SetCenterPosition`](Self::SetCenterPosition).
-    #[address(0x1A0)]
+    #[address(0x190)]
     pub m_ViewPos: Vector3,
 
     /// The view direction for the spawn visibility gate, set by
     /// [`SetCenterPosition`](Self::SetCenterPosition).
-    #[address(0x1AC)]
+    #[address(0x19C)]
     pub m_ViewDir: Vector3,
 }
 impl SpawnSystem {
@@ -81,7 +81,9 @@ impl SpawnSystem {
     #[address(0x140_EFE_E90)]
     pub fn Update(&mut self);
 
-    /// Sets the spawn center, view position, and view direction used by the visibility gate.
-    #[address(0x141_276_3B0)]
+    /// Sets the spawn center, view position, and view direction used by the visibility gate. Called
+    /// once per frame by `CGameStateRun::UpdateCenterPosition` with the streaming center and the active
+    /// camera's position and forward direction.
+    #[address(0x140_DF4_BE0)]
     pub fn SetCenterPosition(&mut self, centerpos: *const Vector3, viewpos: *const Vector3, viewdir: *const Vector3);
 }
