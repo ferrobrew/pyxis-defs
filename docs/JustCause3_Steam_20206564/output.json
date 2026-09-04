@@ -50462,15 +50462,45 @@
         "line": 24
       }
     },
+    "spawn_system::SpawnCallback": {
+      "path": "spawn_system::SpawnCallback",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "type_alias",
+        "doc": " The completion callback for [`Spawn`](SpawnSystem::Spawn): a code pointer with the signature\n `void (*)(const std::vector<boost::shared_ptr<CGameObject>>* spawned_objects, void* userdata)`,\n invoked with the spawned objects and the caller's userdata once the request has been serviced.\n Modeled as a raw pointer because the definition language does not yet express function-pointer\n types.",
+        "doc_links": [
+          {
+            "text": "SpawnSystem::Spawn",
+            "target_kind": "item",
+            "path": "spawn_system::SpawnSystem",
+            "anchor": "func-Spawn"
+          }
+        ],
+        "target": {
+          "type": "const_pointer",
+          "inner": {
+            "type": "raw",
+            "path": "u8"
+          }
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 37
+      }
+    },
     "spawn_system::SpawnSystem": {
       "path": "spawn_system::SpawnSystem",
       "visibility": "public",
-      "size": 440,
+      "size": 424,
       "alignment": 8,
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": " The spawn system: manages streaming (de)spawn of characters and vehicles around the player. Each\n frame, [`Update`](Self::Update) builds a BFBC cull frustum from the camera manager's active\n camera and uses it as a \"don't (de)spawn while visible\" gate in `CSpawnFactoryImpl::CheckInternal`, so\n objects are not spawned or despawned inside the player's view. Its budgets are characters and\n vehicles, so it governs NPC/vehicle (de)spawns near the view edge, not buildings.",
+        "doc": " The spawn system: manages streaming (de)spawn of dynamic objects around the player. Each\n frame, [`Update`](Self::Update) builds a BFBC cull frustum from the camera manager's active\n camera and uses it as a \"don't (de)spawn while visible\" gate in `CSpawnFactoryImpl::CheckInternal`, so\n objects are not spawned or despawned inside the player's view.\n\n Its resource definitions are loaded at startup from the per-pool spawn definition files\n (`settings/spawn_*_defs.bin`) referenced by `settings/spawn_budget_pools.bin`. Each budget pool\n (aircraft, animals, civilians, combatants, devices, props, road decorations, trains, vehicles,\n weapons, effects, and encounters) names a definition file, and each definition therein carries\n an exported-entity path (`.ee`), a space-separated tag string, a selection weight, and an\n optional debug-menu category. Spawn requests select definitions by matching tags, so the system\n governs the (de)spawn of every tag-addressable dynamic object, not only characters and\n vehicles. World geometry is placed by the location system instead and does not pass through\n here.",
         "doc_links": [
           {
             "text": "Self::Update",
@@ -50498,7 +50528,7 @@
             "is_base": false,
             "source": {
               "file_index": 48,
-              "line": 43
+              "line": 116
             }
           },
           {
@@ -50521,7 +50551,7 @@
             "is_base": false,
             "source": {
               "file_index": 48,
-              "line": 43
+              "line": 116
             }
           },
           {
@@ -50542,7 +50572,7 @@
             "is_base": false,
             "source": {
               "file_index": 48,
-              "line": 47
+              "line": 120
             }
           },
           {
@@ -50562,7 +50592,7 @@
             "is_base": false,
             "source": {
               "file_index": 48,
-              "line": 47
+              "line": 120
             }
           },
           {
@@ -50590,7 +50620,7 @@
             "is_base": false,
             "source": {
               "file_index": 48,
-              "line": 53
+              "line": 126
             }
           },
           {
@@ -50610,7 +50640,7 @@
             "is_base": false,
             "source": {
               "file_index": 48,
-              "line": 57
+              "line": 130
             }
           },
           {
@@ -50631,15 +50661,15 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 20
+              "size": 4
             },
             "offset": 384,
-            "size": 20,
+            "size": 4,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 48,
-              "line": 62
+              "line": 135
             }
           },
           {
@@ -50658,13 +50688,13 @@
               "type": "raw",
               "path": "types::math::Vector3"
             },
-            "offset": 404,
+            "offset": 388,
             "size": 12,
             "alignment": 4,
             "is_base": false,
             "source": {
               "file_index": 48,
-              "line": 62
+              "line": 135
             }
           },
           {
@@ -50683,13 +50713,13 @@
               "type": "raw",
               "path": "types::math::Vector3"
             },
-            "offset": 416,
+            "offset": 400,
             "size": 12,
             "alignment": 4,
             "is_base": false,
             "source": {
               "file_index": 48,
-              "line": 67
+              "line": 140
             }
           },
           {
@@ -50708,13 +50738,13 @@
               "type": "raw",
               "path": "types::math::Vector3"
             },
-            "offset": 428,
+            "offset": 412,
             "size": 12,
             "alignment": 4,
             "is_base": false,
             "source": {
               "file_index": 48,
-              "line": 72
+              "line": 145
             }
           }
         ],
@@ -50762,16 +50792,16 @@
             "calling_convention": "system",
             "source": {
               "file_index": 48,
-              "line": 82
+              "line": 155
             }
           },
           {
             "visibility": "public",
             "name": "SetCenterPosition",
-            "doc": " Sets the spawn center, view position, and view direction used by the visibility gate.",
+            "doc": " Sets the spawn center, view position, and view direction used by the visibility gate. Called\n once per frame by `CGameStateRun::UpdateCenterPosition` with the streaming center and the active\n camera's position and forward direction.",
             "body": {
               "type": "address",
-              "address": 5388067760
+              "address": 5383343072
             },
             "arguments": [
               {
@@ -50815,7 +50845,86 @@
             "calling_convention": "system",
             "source": {
               "file_index": 48,
-              "line": 86
+              "line": 161
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "Spawn",
+            "doc": " Queues an asynchronous spawn request for the resource definitions matching the given tag\n string. Tags are separated by spaces, commas, or pipes; a definition matches when it\n carries every requested tag, and the matching set must belong to a single budget pool. The\n request creates a spawn factory, streams the selected definition's exported entity in if\n needed, and is serviced on a later frame by the spawn thread's update; on success the\n callback fires with the spawned objects and the given userdata. The transform is the\n world-space placement for the spawned object. `flags` is a combination of the\n `EFactoryFlags` constants ([`FF_DEFAULT`](Self::FF_DEFAULT) and friends) controlling which\n spawn checks apply. The callback may be null when the caller does not need the spawned\n objects.",
+            "doc_links": [
+              {
+                "text": "Self::FF_DEFAULT",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem::FF_DEFAULT"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5384011168
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "tags",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "u8"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "transform",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "types::math::Matrix4"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "flags",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              },
+              {
+                "type": "field",
+                "name": "callback",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "u8"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "userdata",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "u8"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 48,
+              "line": 174
             }
           }
         ],
@@ -50825,11 +50934,596 @@
         "cloneable": false,
         "defaultable": false,
         "packed": false,
-        "pinned": false
+        "pinned": false,
+        "nested_items": [
+          "spawn_system::SpawnSystem::FF_DEFAULT",
+          "spawn_system::SpawnSystem::FF_NO_RESOURCE_REQUEST",
+          "spawn_system::SpawnSystem::FF_NO_SYSTEM_LOCK",
+          "spawn_system::SpawnSystem::FF_NO_DESPAWN_CHECK",
+          "spawn_system::SpawnSystem::FF_NO_LOS_CHECK",
+          "spawn_system::SpawnSystem::FF_NO_PLAYER_PROX_CHECK",
+          "spawn_system::SpawnSystem::FF_NO_SPAWN_BLOCK_CHECK",
+          "spawn_system::SpawnSystem::FF_NO_TIME_CHECK",
+          "spawn_system::SpawnSystem::FF_NO_SPAWN_POOL_CHECK",
+          "spawn_system::SpawnSystem::FF_NO_PHYSICS_CHECK",
+          "spawn_system::SpawnSystem::FF_NO_BUDGET_COUNT",
+          "spawn_system::SpawnSystem::FF_NO_LANDSCAPE_CHECK",
+          "spawn_system::SpawnSystem::FF_AMBIENT_SPAWN",
+          "spawn_system::SpawnSystem::FF_MISSION_CRITICAL",
+          "spawn_system::SpawnSystem::FF_PREMIUM_SPAWN",
+          "spawn_system::SpawnSystem::FF_PROTOTYPE_SPAWN",
+          "spawn_system::SpawnSystem::FF_AUTO_DESPAWN_BLOCK",
+          "spawn_system::SpawnSystem::FF_NO_DEBUG_LOOP_CHECK",
+          "spawn_system::SpawnSystem::FF_HIGH_PRIORITY_LOAD",
+          "spawn_system::SpawnSystem::FF_DEBUG_CHECK",
+          "spawn_system::SpawnSystem::FF_DEBUG_SPAWN",
+          "spawn_system::SpawnSystem::FF_SECONDARY_SPAWN_CHECKS",
+          "spawn_system::SpawnSystem::FF_DEBUG_SPAWN_CHECKS",
+          "spawn_system::SpawnSystem::FF_HIGH_PRIO_SPAWN_CHECKS"
+        ]
       },
       "source": {
         "file_index": 48,
-        "line": 38
+        "line": 54
+      }
+    },
+    "spawn_system::SpawnSystem::FF_AMBIENT_SPAWN": {
+      "path": "spawn_system::SpawnSystem::FF_AMBIENT_SPAWN",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: mark the spawn as an ambient spawn.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 2048
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 82
+      }
+    },
+    "spawn_system::SpawnSystem::FF_AUTO_DESPAWN_BLOCK": {
+      "path": "spawn_system::SpawnSystem::FF_AUTO_DESPAWN_BLOCK",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: automatically place a despawn block on the spawned object.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 32768
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 90
+      }
+    },
+    "spawn_system::SpawnSystem::FF_DEBUG_CHECK": {
+      "path": "spawn_system::SpawnSystem::FF_DEBUG_CHECK",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: run the debug-check variant of the spawn checks.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 262144
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 96
+      }
+    },
+    "spawn_system::SpawnSystem::FF_DEBUG_SPAWN": {
+      "path": "spawn_system::SpawnSystem::FF_DEBUG_SPAWN",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: mark the spawn as a debug spawn.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 524288
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 98
+      }
+    },
+    "spawn_system::SpawnSystem::FF_DEBUG_SPAWN_CHECKS": {
+      "path": "spawn_system::SpawnSystem::FF_DEBUG_SPAWN_CHECKS",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags` combination used for debug spawns (no despawn, line-of-sight,\n player-proximity, or time checks, no debug-loop check, and high-priority load).",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 131388
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 104
+      }
+    },
+    "spawn_system::SpawnSystem::FF_DEFAULT": {
+      "path": "spawn_system::SpawnSystem::FF_DEFAULT",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: bypasses none of the spawn checks; the factory performs resource\n requesting, despawn, line-of-sight, player-proximity, spawn-block, time, spawn-pool,\n physics, and landscape checks as configured.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 0
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 58
+      }
+    },
+    "spawn_system::SpawnSystem::FF_HIGH_PRIORITY_LOAD": {
+      "path": "spawn_system::SpawnSystem::FF_HIGH_PRIORITY_LOAD",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: stream the definition's resources at high priority.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 131072
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 94
+      }
+    },
+    "spawn_system::SpawnSystem::FF_HIGH_PRIO_SPAWN_CHECKS": {
+      "path": "spawn_system::SpawnSystem::FF_HIGH_PRIO_SPAWN_CHECKS",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags` combination used for black-market and other high-priority player-facing\n spawns (no despawn, line-of-sight, player-proximity, spawn-block, or time checks, premium\n content allowed, and high-priority load). `CInventory::SpawnSecondaryAttachObject` passes\n this for the player and [`FF_SECONDARY_SPAWN_CHECKS`](Self::FF_SECONDARY_SPAWN_CHECKS)\n otherwise.",
+        "doc_links": [
+          {
+            "text": "Self::FF_SECONDARY_SPAWN_CHECKS",
+            "target_kind": "item",
+            "path": "spawn_system::SpawnSystem::FF_SECONDARY_SPAWN_CHECKS"
+          }
+        ],
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 139388
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 110
+      }
+    },
+    "spawn_system::SpawnSystem::FF_MISSION_CRITICAL": {
+      "path": "spawn_system::SpawnSystem::FF_MISSION_CRITICAL",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: mark the spawn as mission critical, protecting it from despawn.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 4096
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 84
+      }
+    },
+    "spawn_system::SpawnSystem::FF_NO_BUDGET_COUNT": {
+      "path": "spawn_system::SpawnSystem::FF_NO_BUDGET_COUNT",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: do not count the spawn against its pool budget.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 512
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 78
+      }
+    },
+    "spawn_system::SpawnSystem::FF_NO_DEBUG_LOOP_CHECK": {
+      "path": "spawn_system::SpawnSystem::FF_NO_DEBUG_LOOP_CHECK",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: skip the spawn-loop debug check.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 65536
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 92
+      }
+    },
+    "spawn_system::SpawnSystem::FF_NO_DESPAWN_CHECK": {
+      "path": "spawn_system::SpawnSystem::FF_NO_DESPAWN_CHECK",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: skip the despawn check.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 4
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 64
+      }
+    },
+    "spawn_system::SpawnSystem::FF_NO_LANDSCAPE_CHECK": {
+      "path": "spawn_system::SpawnSystem::FF_NO_LANDSCAPE_CHECK",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: skip the landscape (ground validity) check.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 1024
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 80
+      }
+    },
+    "spawn_system::SpawnSystem::FF_NO_LOS_CHECK": {
+      "path": "spawn_system::SpawnSystem::FF_NO_LOS_CHECK",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: skip the line-of-sight check that blocks spawning inside the player's view.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 8
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 66
+      }
+    },
+    "spawn_system::SpawnSystem::FF_NO_PHYSICS_CHECK": {
+      "path": "spawn_system::SpawnSystem::FF_NO_PHYSICS_CHECK",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: skip the active-physics-area check.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 256
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 76
+      }
+    },
+    "spawn_system::SpawnSystem::FF_NO_PLAYER_PROX_CHECK": {
+      "path": "spawn_system::SpawnSystem::FF_NO_PLAYER_PROX_CHECK",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: skip the player-proximity check.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 16
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 68
+      }
+    },
+    "spawn_system::SpawnSystem::FF_NO_RESOURCE_REQUEST": {
+      "path": "spawn_system::SpawnSystem::FF_NO_RESOURCE_REQUEST",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: do not request resource streaming; spawn only if already loaded.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 1
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 60
+      }
+    },
+    "spawn_system::SpawnSystem::FF_NO_SPAWN_BLOCK_CHECK": {
+      "path": "spawn_system::SpawnSystem::FF_NO_SPAWN_BLOCK_CHECK",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: skip the spawn-block volume check.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 32
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 70
+      }
+    },
+    "spawn_system::SpawnSystem::FF_NO_SPAWN_POOL_CHECK": {
+      "path": "spawn_system::SpawnSystem::FF_NO_SPAWN_POOL_CHECK",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: skip the spawn-pool budget check.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 128
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 74
+      }
+    },
+    "spawn_system::SpawnSystem::FF_NO_SYSTEM_LOCK": {
+      "path": "spawn_system::SpawnSystem::FF_NO_SYSTEM_LOCK",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: skip taking the system lock.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 2
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 62
+      }
+    },
+    "spawn_system::SpawnSystem::FF_NO_TIME_CHECK": {
+      "path": "spawn_system::SpawnSystem::FF_NO_TIME_CHECK",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: skip the frame time-budget check.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 64
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 72
+      }
+    },
+    "spawn_system::SpawnSystem::FF_PREMIUM_SPAWN": {
+      "path": "spawn_system::SpawnSystem::FF_PREMIUM_SPAWN",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: allow definitions flagged as premium content.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 8192
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 86
+      }
+    },
+    "spawn_system::SpawnSystem::FF_PROTOTYPE_SPAWN": {
+      "path": "spawn_system::SpawnSystem::FF_PROTOTYPE_SPAWN",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags`: allow definitions flagged as prototype content.",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 16384
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 88
+      }
+    },
+    "spawn_system::SpawnSystem::FF_SECONDARY_SPAWN_CHECKS": {
+      "path": "spawn_system::SpawnSystem::FF_SECONDARY_SPAWN_CHECKS",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " `EFactoryFlags` combination used for secondary attach-object spawns (no despawn,\n line-of-sight, player-proximity, spawn-block, or time checks).",
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 380
+        }
+      },
+      "source": {
+        "file_index": 48,
+        "line": 101
       }
     },
     "state::StateContext": {
@@ -73112,6 +73806,7 @@
         "spawn_system::SBFBCProcessParameter",
         "spawn_system::SBFBCProcessState",
         "spawn_system::SpawnBudgetEntry",
+        "spawn_system::SpawnCallback",
         "spawn_system::SpawnSystem"
       ],
       "submodules": {},
