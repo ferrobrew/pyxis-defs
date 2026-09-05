@@ -1,0 +1,50 @@
+use hash::HashString;
+use types::math::Matrix4;
+
+/// The game world interface (`IGameWorld`), reached through the `Base::CSingle<IGameWorld>`
+/// instance pointer. The concrete object is `CGameWorld`, which owns the object manager, the
+/// world file, and the player-teleport state machine; the interface subobject is what every
+/// caller (bookmarks, teleport triggers, mission starts) goes through. Only the vtable is mapped.
+#[singleton(0x142_F17_CD0), min_size(0x8)]
+pub type GameWorld {
+    /// Bit `0x1` of the teleport `flags`: keep the active mission running across the teleport.
+    /// Without it the mission manager aborts the active mission as part of the teleport.
+    pub const TELEPORT_FLAG_KEEP_MISSION: u32 = 0x1,
+    /// Bit `0x2` of the teleport `flags` (deferred teleports only): skip the fade-to-black even
+    /// when `use_fade` is set.
+    pub const TELEPORT_FLAG_NO_FADE: u32 = 0x2,
+
+    vftable {
+        /// Queues a deferred player teleport that `CGameWorld::UpdateTeleport` services over the
+        /// following frames through its `TELEPORT_*` state machine. `world` is the destination
+        /// transform (the translation row places the character; the rotation sets the facing and
+        /// resets the camera behind it). `state` is an optional character state to enter on
+        /// arrival (null keeps the neutral state). With `use_load_state` the game enters the load
+        /// game state so the destination streams in first, with a load screen if
+        /// `use_load_screen`; without it the world must already be resident (the engine logs a
+        /// warning past 500 m from the active camera). `use_fade` fades the overlay UI to black for
+        /// `fade_out_time` seconds and back in over `fade_in_time`. `flags` is a bit set of
+        /// [`TELEPORT_FLAG_KEEP_MISSION`](Self::TELEPORT_FLAG_KEEP_MISSION) and
+        /// [`TELEPORT_FLAG_NO_FADE`](Self::TELEPORT_FLAG_NO_FADE). `teleport_done_event`, when
+        /// non-null, is sent once the arrival completes. Asserts when a teleport is already in
+        /// flight ([`IsTeleporting`](Self::IsTeleporting)). Main thread only.
+        #[index(19)]
+        pub fn TeleportPlayer(&mut self, world: *const Matrix4, state: *const HashString, use_load_state: bool, use_fade: bool, fade_in_time: f32, fade_out_time: f32, flags: u32, teleport_done_event: *mut u8, use_load_screen: bool);
+
+        /// Teleports the local player's character synchronously: initializes the character's
+        /// transform to `world`, forces the neutral animation state, optionally enters `state`,
+        /// resets the game camera behind the new transform, and re-enables the player and
+        /// character. Fires `game_teleporting_initiated` and `game_teleporting_completed`, resets
+        /// the current settlement, province, and region, and notifies the HUD. Aborts the active
+        /// mission unless `flags` has
+        /// [`TELEPORT_FLAG_KEEP_MISSION`](Self::TELEPORT_FLAG_KEEP_MISSION). No streaming: the
+        /// destination must already be resident. Asserts when a deferred teleport is in flight.
+        /// Main thread only.
+        #[index(20)]
+        pub fn TeleportPlayerInstant(&mut self, world: *const Matrix4, state: *const HashString, flags: u32);
+
+        /// Whether a deferred [`TeleportPlayer`](Self::TeleportPlayer) is still being serviced.
+        #[index(21)]
+        pub fn IsTeleporting(&mut self) -> bool;
+    },
+}

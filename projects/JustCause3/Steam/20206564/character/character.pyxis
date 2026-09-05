@@ -26,6 +26,16 @@ pub bitflags AimState: u8 {
     m_WasAiming = 0b0010_0000,
 }
 
+/// Per-character damage-handling bit-flags. Only the god-mode bit is mapped; the others cover the
+/// related invulnerability variants (`m_JesusMode` and the sequence-scoped god mode among them).
+#[copyable]
+pub bitflags DamageStateFlags: u8 {
+    /// God mode: the character takes no damage. Written by [`SetGodMode`](Character::SetGodMode);
+    /// the player object re-applies its own god-mode flag through that setter whenever the two
+    /// disagree.
+    GOD_MODE = 0b0000_0010,
+}
+
 /// Per-character LOD/update-gating flags. Checked before the SIM-phase animation and IK work:
 /// [`UpdatePassFinalizePose_Parallel`](Character::UpdatePassFinalizePose_Parallel) skips the
 /// HumanIK solve when [`REDUCED_LOD`](Self::REDUCED_LOD) is set. Only that bit is mapped.
@@ -66,6 +76,17 @@ pub type Character {
     #[address(0x2_060)]
     pub m_Blackboard: ObjectBlackboard,
 
+    /// Packed damage-state bit-flags; see [`DamageStateFlags`].
+    #[address(0x2_0E9)]
+    pub m_DamageFlags: DamageStateFlags,
+
+    /// Whether the character's weapons draw ammunition without consuming it. Read by
+    /// `CWeaponBase::HasUnlimitedAmmo` together with the non-player and challenge-island rules.
+    /// Set through [`SetUnlimitedAmmo`](Self::SetUnlimitedAmmo), which also refreshes the HUD's
+    /// weapon readout for the player.
+    #[address(0x2_0F0)]
+    pub m_UnlimitedAmmo: bool,
+
     /// Packed aiming-state bit-flags; see [`AimState`].
     #[address(0x2_0F1)]
     pub m_AimFlags: AimState,
@@ -88,6 +109,11 @@ pub type Character {
     #[address(0x2_7F0)]
     pub m_WorldMatrixT0: Matrix4,
     pub m_WorldMatrixT1: Matrix4,
+
+    /// Whether this character is a player character (local or remote). Gates the player-only
+    /// side effects of setters such as [`SetUnlimitedAmmo`](Self::SetUnlimitedAmmo).
+    #[address(0x2_9D0)]
+    pub m_IsPlayer: bool,
 
     /// The weapon-aim countdown timer, in seconds. It is refreshed while an aim input is held and
     /// decremented by the frame delta otherwise; a positive value keeps
@@ -123,6 +149,17 @@ impl Character {
 
     #[address(0x140_7AF_550)]
     pub fn GetHeadPosition(&self, position: *mut Vector3) -> *mut Vector3;
+
+    /// Sets [`m_UnlimitedAmmo`](Self::m_UnlimitedAmmo). For the locally controlled player, a
+    /// change also re-selects the current weapon on the HUD so its ammo readout updates.
+    #[address(0x140_7B1_4B0)]
+    pub fn SetUnlimitedAmmo(&mut self, unlimited: bool);
+
+    /// Sets the [`GOD_MODE`](DamageStateFlags::GOD_MODE) damage flag and the damageable's
+    /// invulnerability. Enabling it on a living character also restores full health, forces the
+    /// neutral animation state, and notifies the network component.
+    #[address(0x140_7FD_7C0)]
+    pub fn SetGodMode(&mut self, enabled: bool);
 
     /// Returns a reference to the character's grappling-hook slot
     /// ([`Inventory::m_GrapplingHook`](character::inventory::Inventory::m_GrapplingHook)).

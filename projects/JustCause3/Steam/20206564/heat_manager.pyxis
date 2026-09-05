@@ -1,0 +1,74 @@
+use character::character::Character;
+
+/// One heat level's tuning (`CHeatManager::SLevelDef`), loaded from the heat settings. Partial:
+/// only the point threshold is mapped; the rest of the 0x7C-byte record is pursuer and vehicle
+/// budgets, timers, and the level's send/receive events.
+#[size(0x7C), align(4)]
+pub type HeatLevelDef {
+    /// The heat-point total at which the target's heat reaches this level.
+    #[address(0x0)]
+    pub m_PointThreshold: i32,
+}
+
+/// The heat (wanted level) system: tracks the heat target (the player), its heat points and
+/// level, the pursuer and ambient enemy lists, reinforcement calls, and roadblocks. Updated once
+/// per frame from the game systems update; every setter asserts the main thread.
+#[singleton(0x142_F18_6C0), size(0x950)]
+pub type HeatManager {
+    /// The number of heat levels above zero: valid levels are `0..=MAX_LEVEL`.
+    pub const MAX_LEVEL: i32 = 5,
+    /// The [`m_LevelCap`](Self::m_LevelCap) value meaning no cap. Set by `CHeatManager::Reset`.
+    pub const LEVEL_CAP_NONE: i32 = -1,
+
+    /// Whether the heat system runs at all. While clear, the per-frame update skips heat
+    /// accumulation, spawning, and vocals entirely. Toggled by the heat area triggers and by
+    /// `SetHeatActive`.
+    #[address(0x20)]
+    pub m_SystemActive: bool,
+
+    /// Whether heat changes are locked. While set, the update neither raises nor decays the level:
+    /// heat points still accumulate on the target but no level transition, reinforcement call, or
+    /// clear timer fires. Read together with the initial-heat timer by `GetHeatLocked`. Set by the
+    /// `heat_lock` / `heat_unlock` events and `SetHeatLock`.
+    #[address(0x21)]
+    pub m_SystemLocked: bool,
+
+    /// Per-level tuning, indexed by level (`0..=MAX_LEVEL`).
+    #[address(0x40)]
+    pub m_Levels: [HeatLevelDef; 6],
+
+    /// The current heat level, `0..=MAX_LEVEL`. Written by [`SetHeat`](Self::SetHeat) and
+    /// [`ClearHeat`](Self::ClearHeat); read by every consumer (`GetHeat`).
+    #[address(0x360)]
+    pub m_Level: i32,
+
+    /// The maximum level heat may reach, or [`LEVEL_CAP_NONE`](Self::LEVEL_CAP_NONE) for no cap.
+    /// [`SetHeat`](Self::SetHeat) clamps the requested level to it unless told to ignore it.
+    #[address(0x364)]
+    pub m_LevelCap: i32,
+}
+impl HeatManager {
+    /// Sets the heat level on `target`: clears any previous target's heat, tops the target's heat
+    /// points up to the level's threshold, records the target, and fires the level's heat-change
+    /// (and vocal) events. `level` is clamped to `0..=m_LevelCap` unless `ignore_cap`.
+    /// `force_initial_heat_lock` restarts the initial-heat lock timer.
+    #[address(0x140_A4F_C70)]
+    pub fn SetHeat(&mut self, level: i32, target: *mut Character, ignore_cap: bool, force_initial_heat_lock: bool);
+
+    /// Drops the heat to zero: zeroes the target's heat points and timers, clears the pursuer,
+    /// ambient, and vehicle lists, fires the current level's heat-cleared event (and the vocal
+    /// unless `silent`), and restarts the initial-heat lock.
+    #[address(0x140_A4F_A30)]
+    pub fn ClearHeat(&mut self, silent: bool);
+
+    /// Sets [`m_LevelCap`](Self::m_LevelCap), clamped to `0..=MAX_LEVEL`, and if the current level
+    /// exceeds it, lowers the level to the cap and trims the target's heat points to just below the
+    /// next threshold. Use a direct write of [`LEVEL_CAP_NONE`](Self::LEVEL_CAP_NONE) to remove
+    /// the cap; this clamps negatives to zero.
+    #[address(0x140_A50_B90)]
+    pub fn SetLevelCap(&mut self, cap: i32);
+
+    /// The current heat target (the character carrying the heat), or null when none.
+    #[address(0x140_A44_B80)]
+    pub fn GetHeatTarget(&self) -> *mut Character;
+}
