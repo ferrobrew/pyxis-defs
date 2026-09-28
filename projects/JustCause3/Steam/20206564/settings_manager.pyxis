@@ -1,0 +1,98 @@
+/// A game setting (`CSettingsManager::ESettingType`), the index into
+/// [`SettingsManager::m_Settings`].
+#[copyable]
+pub enum SettingType: i32 {
+    EFirstSettingType = 0x0,
+    EGraphicsMotionBlur = 0x1,
+    EGraphicsAniso = 0x2,
+    EGraphicsLodFactor = 0x3,
+    EGraphicsShadowsQuality = 0x4,
+    EGraphicsPostEffects = 0x5,
+    EGraphicsTextureQuality = 0x6,
+    EGraphicsWaterDetail = 0x7,
+    EGraphicsShadowsResolution = 0x8,
+    EGraphicsSSAO = 0x9,
+    EGraphicsEdgeFade = 0xA,
+    EGraphicsGI = 0xB,
+    EGraphicsSSReflection = 0xC,
+    EGraphicsBokehDOF = 0xD,
+    /// The display mode index; [`SettingsManager::GetValue`] computes it from the display mode list
+    /// rather than reading [`SettingsManager::m_Settings`].
+    EDisplayMode = 0xE,
+    EDisplayFullscreen = 0xF,
+    EDisplayFullscreenWidth = 0x10,
+    EDisplayFullscreenHeight = 0x11,
+    EDisplayWindowedWidth = 0x12,
+    EDisplayWindowedHeight = 0x13,
+    EDisplayRefreshRate = 0x14,
+    EDisplayVSync = 0x15,
+    EDisplayGamma = 0x16,
+    EDisplayHudState = 0x17,
+    EControllerVibration = 0x18,
+    EControllerInvertAimingY = 0x19,
+    EControllerInvertAimingX = 0x1A,
+    EControllerFlightYAxis = 0x1B,
+    EControllerFireButton = 0x1C,
+    EControllerSensitivityPitch = 0x1D,
+    EControllerSensitivityYaw = 0x1E,
+    EControllerCrouchToggle = 0x1F,
+    EControllerDisableInputWhenOutOfFocus = 0x20,
+    /// Whether the gamepad is the active input device: non-zero for the gamepad (and while unset,
+    /// before any input), zero for the keyboard and mouse. `CSettingsManager::Update` sets it every
+    /// frame from the frame's input events: a gamepad event sets it, and a keyboard or mouse event
+    /// clears it. Gameplay reads it for the device-specific rules: melee is a click of
+    /// `PUSH_GRAPPLE` on the keyboard and a short tap-and-release on the gamepad
+    /// (`CCharacter::IsMeleeClicked`), aim assist is allowed only on the gamepad
+    /// (`CPlayerAimControl::SetAimType` and `CPlayer::SetAimMode` force normal aim otherwise), and
+    /// fall prevention, walking, detonation, the button prompts, and camera sensitivity differ.
+    EPCUseGamepad = 0x21,
+    EPCGamepadExclusiveLockControllerMode = 0x22,
+    EMouseInvertAimingX = 0x23,
+    EMouseInvertAimingY = 0x24,
+    EMouseSensitivityX = 0x25,
+    EMouseSensitivityY = 0x26,
+    EDifficulty = 0x27,
+    ECameraCentering = 0x28,
+    ELoadAndSaveEnabled = 0x29,
+    EDLCEnabled = 0x2A,
+    EProfileSignInEnabled = 0x2B,
+    ESoundGameplayVolume = 0x2C,
+    ESoundMusicVolume = 0x2D,
+    ESoundVoiceVolume = 0x2E,
+    ESubtitleEnabled = 0x2F,
+    /// Always reads as zero through [`SettingsManager::GetValue`].
+    EPS4ControllerSpeakerEnabled = 0x30,
+    EGraphicsAA = 0x31,
+    ESkinParachute = 0x32,
+    ESkinWingsuit = 0x33,
+    ESkinRico = 0x34,
+    /// Read from a global flag by [`SettingsManager::GetValue`].
+    ENoir = 0x35,
+    /// Read from a global flag by [`SettingsManager::GetValue`].
+    EDoge = 0x36,
+    EExtendedFriends = 0x37,
+    EForceArabic = 0x38,
+    EForceEnglishVO = 0x39,
+    EGraphicsWaterTesselation = 0x3A,
+    EGraphicsAOITQuality = 0x3B,
+    /// The number of settings, and so the length of [`SettingsManager::m_Settings`].
+    ENumSettingTypes = 0x3C,
+}
+
+/// The settings manager (`CSettingsManager`, a `Base::CSingle` singleton): the game's options, one
+/// integer per [`SettingType`], with their persistence and change handling. Only some members are
+/// bound.
+#[singleton(0x142_F37_BD0), min_size(0x178)]
+pub type SettingsManager {
+    /// The value of each setting, indexed by [`SettingType`]. `CSettingsManager::SetValue` writes
+    /// an entry and raises an update flag that applies the change (and may persist it); a direct
+    /// write to an entry applies nothing else.
+    #[address(0x84)]
+    pub m_Settings: [i32; 60],
+}
+impl SettingsManager {
+    /// Returns the value of `setting`: the entry in [`m_Settings`](Self::m_Settings), except for the
+    /// few settings whose values live elsewhere (see [`SettingType`]).
+    #[address(0x140_D3B_3C0)]
+    pub fn GetValue(&self, setting: SettingType) -> i32;
+}

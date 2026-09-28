@@ -215,6 +215,15 @@ pub type WeaponBase {
         #[index(54)]
         pub fn UpdateFromUserPostSim_Parallel(&mut self, dt: f32, aim_position: *const Vector3, input: *const void);
 
+        /// The serial counterpart of
+        /// [`UpdateFromUserPostSim_Parallel`](Self::UpdateFromUserPostSim_Parallel), called with the
+        /// same arguments by
+        /// [`Inventory::UpdateWeapons_Serial`](character::inventory::Inventory::UpdateWeapons_Serial).
+        /// It does not write
+        /// [`m_AimTargetPosition`](Self::m_AimTargetPosition).
+        #[index(55)]
+        pub fn UpdateFromUserPostSim_Serial(&mut self, dt: f32, aim_position: *const Vector3, input: *const void);
+
         /// Returns the weapon type's tuning block (`SWeaponTuningBase`), from which the fire code
         /// reads recoil, scatter, and spread ranges.
         #[index(57)]
@@ -363,6 +372,11 @@ pub type WeaponBase {
     /// The weapon's state.
     #[address(0x424)]
     pub m_State: WeaponState,
+
+    /// The hash of the weapon type's name, which identifies the weapon type (the damage messages
+    /// carry it, and type-specific code compares it against named hashes).
+    #[address(0x460)]
+    pub m_WeaponNameHash: u32,
 
     /// Whether precision aim is disabled for this weapon; the player's aim-input handling zeroes
     /// the aim timer while it is set.

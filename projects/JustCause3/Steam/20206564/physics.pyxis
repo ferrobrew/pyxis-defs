@@ -134,11 +134,39 @@ impl IgnoreMaterialFlagFilter {
     pub fn SetIgnoreCameraPass(&mut self, ignore: bool);
 }
 
-/// The result of a ray query (`CCastRayInfoBase`): the hit position, normal, and fraction, the hit
-/// body and instance, and the hit material's pass flags. Only the methods are bound.
-pub type CastRayInfoBase;
+/// The result of a ray query (`CCastRayInfoBase`): the hit normal and fraction, and the hit object
+/// and body. [`PhysicsSystem::CastRay`] fills it from the query's closest hit, and on a miss sets the
+/// fraction to one and clears the object. Engine callers construct it on the stack: the
+/// [`VFTABLE`](Self::VFTABLE) pointer, a null [`m_HitObjectId`](Self::m_HitObjectId), then
+/// [`Reset`](Self::Reset).
+#[size(0x38), align(8)]
+pub type CastRayInfoBase {
+    /// The address of the `CCastRayInfoBase` virtual table.
+    pub const VFTABLE: u64 = 0x142343F08,
+
+    pub __vftable: u64,
+
+    /// The surface normal at the hit.
+    #[address(0x8)]
+    pub m_Normal: Vector3,
+
+    /// The hit's position along the queried segment, as a fraction of the segment from the query's
+    /// start distance to its end distance; one on a miss.
+    #[address(0x14)]
+    pub m_HitDistance: f32,
+
+    /// The object id (`SObjectID`) of the hit object, or null for world geometry.
+    #[address(0x18)]
+    pub m_HitObjectId: u64,
+
+    /// The Havok body id of the hit body.
+    #[address(0x30)]
+    pub m_BodyId: u32,
+}
 impl CastRayInfoBase {
-    /// Clears the result for reuse.
+    /// Clears the result for reuse: a unit normal and fraction, a null object, an invalid body,
+    /// then the virtual hit-object setter with null. It calls through the virtual table, which must
+    /// already be set.
     #[address(0x140_255_8C0)]
     pub fn Reset(&mut self);
 
@@ -148,8 +176,23 @@ impl CastRayInfoBase {
     pub fn DidHitBulletPassMaterial(&self) -> bool;
 }
 
-/// A [`CastRayInfoBase`] that resolves the hit material on demand (`CCastRayInfo`).
-pub type CastRayInfo;
+/// A [`CastRayInfoBase`] that records the hit object and resolves the hit material on demand
+/// (`CCastRayInfo`). Engine callers construct the base first and then switch the virtual table to
+/// [`VFTABLE`](Self::VFTABLE) and clear [`m_GameObject`](Self::m_GameObject).
+#[size(0x48), align(8)]
+pub type CastRayInfo {
+    /// The address of the `CCastRayInfo` virtual table.
+    pub const VFTABLE: u64 = 0x1423452C8,
+
+    #[base]
+    pub base: CastRayInfoBase,
+
+    /// The hit object: the game object that owns the hit physics instance (for a character, the
+    /// `CCharacter`), written by the virtual hit-object setter [`PhysicsSystem::CastRay`] calls. Null
+    /// for world geometry and on a miss.
+    #[address(0x38)]
+    pub m_GameObject: *mut void,
+}
 impl CastRayInfo {
     /// `CCastRayInfo::GetHitMaterial` (a virtual): the hit shape's game material
     /// (`EGameMaterialId`), looked up through the physics system's world.

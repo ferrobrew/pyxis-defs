@@ -1,5 +1,6 @@
 use character::character::Character;
 use equipment::grappling_hook::GrapplingHook;
+use equipment::weapon::WeaponBase;
 use types::math::Vector3;
 use types::shared_ptr::SharedPtr;
 
@@ -24,6 +25,12 @@ pub enum WeaponSlot: i32 {
 /// are mapped.
 #[min_size(0x3E8)]
 pub type Inventory {
+    /// The weapon in each slot, indexed by [`WeaponSlot`] (up to
+    /// [`E_NUM_WEAPON_SLOTS`](WeaponSlot::E_NUM_WEAPON_SLOTS)); a null pointer for an empty slot.
+    /// `CCharacter::GetWeaponInInventory` returns a reference to an entry.
+    #[address(0x20)]
+    pub m_Weapons: [SharedPtr<WeaponBase>; 8],
+
     /// The character's grappling hook, or null before the inventory is populated.
     /// `CCharacter::GetGrapplingHook` returns a reference to this field.
     #[address(0xC0)]
@@ -44,10 +51,24 @@ impl Inventory {
     #[address(0x140_942_920)]
     pub fn Update_Parallel(&mut self, dt: f32, muzzle_target: *const Vector3, grenade_target: *const Vector3);
 
-    /// The inventory's parallel weapon update, taking the same aim targets as
-    /// [`Update_Parallel`](Self::Update_Parallel).
-    #[address(0x140_91B_BB0)]
+    /// The inventory's parallel weapon update, called from [`Update_Parallel`](Self::Update_Parallel)
+    /// with the same aim targets. It calls each active weapon's
+    /// [`UpdateFromUserPostSim_Parallel`](equipment::weapon::WeaponBase::UpdateFromUserPostSim_Parallel):
+    /// the mounted gun in [`E_SLOT_HEAVY`](WeaponSlot::E_SLOT_HEAVY) while the owner is in a
+    /// mounted-gun state, otherwise the boost wingsuit's guns while wingsuiting or else the wielding
+    /// weapon, all with `muzzle_target`, and then the selected grenade with `grenade_target`. The
+    /// fire inputs passed down come from the owner's
+    /// [`m_WeaponInputs`](character::character::Character::m_WeaponInputs), zeroed while shooting
+    /// (or throwing) is not allowed. The disassembler mislabels it `CGrapplingHook::GetFireInputEnabled`.
+    #[address(0x140_8C6_9A0)]
     pub fn UpdateWeapons_Parallel(&mut self, dt: f32, muzzle_target: *const Vector3, grenade_target: *const Vector3);
+
+    /// The serial counterpart of [`UpdateWeapons_Parallel`](Self::UpdateWeapons_Parallel): the same
+    /// weapons with the same targets and inputs, through
+    /// [`UpdateFromUserPostSim_Serial`](equipment::weapon::WeaponBase::UpdateFromUserPostSim_Serial),
+    /// and additionally the planted-explosive slot's weapon.
+    #[address(0x140_91B_BB0)]
+    pub fn UpdateWeapons_Serial(&mut self, dt: f32, muzzle_target: *const Vector3, grenade_target: *const Vector3);
 
     /// Whether the character may shoot: [`m_DoesAnimationAllowShooting`](Self::m_DoesAnimationAllowShooting)
     /// is set and the owner's
