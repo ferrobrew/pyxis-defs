@@ -529,6 +529,35 @@ impl WeapoIsTryingToFireCondition {
     pub fn Evaluate(&self, instance: *const void) -> bool;
 }
 
+/// `CWallPenetrationWeaponComponent`: the weapon component that detects a held weapon's barrel
+/// penetrating a wall or a character. Only the owner is bound.
+#[min_size(0xD8)]
+pub type WallPenetrationWeaponComponent {
+    /// The weapon the component belongs to (`CWeaponComponentBase::m_Owner`).
+    #[address(0xD0)]
+    pub m_Owner: *mut WeaponBase,
+}
+impl WallPenetrationWeaponComponent {
+    /// The component's serial weapon update. It acts only while the owner's
+    /// [`m_State`](WeaponBase::m_State) is [`E_WS_WIELDING`](WeaponState::E_WS_WIELDING) or
+    /// [`E_WS_DUAL_WIELDING`](WeaponState::E_WS_DUAL_WIELDING) and the owner is used by a player,
+    /// and it is the only writer of the owner's
+    /// [`m_IsWeaponPenetratingWallIfInAim`](WeaponBase::m_IsWeaponPenetratingWallIfInAim),
+    /// [`m_IsWeaponPenetratingCharacterIfInAim`](WeaponBase::m_IsWeaponPenetratingCharacterIfInAim),
+    /// and [`m_IsLeanOverFirePossible`](WeaponBase::m_IsLeanOverFirePossible). While the holder
+    /// is reeled in, drawing, holstering, or switching weapons, or is in a full-body pickup, it
+    /// clears both penetration flags and sets the lean-over and
+    /// [`m_AimingWeaponIsPossible`](WeaponBase::m_AimingWeaponIsPossible) flags. Otherwise it
+    /// collides a box, built from the holder's shoulders or hips toward the barrel, against the
+    /// world. A character hit sets the character flag and clears the wall flag. A world hit sets
+    /// the wall flag, clears lean-over, and clears `m_AimingWeaponIsPossible` unless the component
+    /// allows aiming while penetrating (`m_CanAimWhenPenetrating`). A clear result lasting long
+    /// enough clears both penetration flags and sets lean-over and `m_AimingWeaponIsPossible`
+    /// again. The box follows the holder's animated pose, not the weapon's own transform.
+    #[address(0x140_92F_930)]
+    pub fn UpdateWeapon_Serial(&mut self, dt: f32, weapon_data: *mut WeaponData, p3: f32);
+}
+
 /// `CTurretWeaponComponent`: a weapon component that rotates a turret toward its weapon's target.
 /// Its layout is unmapped.
 pub type TurretWeaponComponent;

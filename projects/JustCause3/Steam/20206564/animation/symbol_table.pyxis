@@ -16,6 +16,17 @@ pub type EventIdSymbolTable {
     /// per-character idle countdown (reset to a random ~8.5-12 s each time the character moves)
     /// elapses while the character is standing still, calm, and not attached to a vehicle.
     pub const ACT_TO_IDLE_ONE_OFF: cstr = c"ACT_TO_IDLE_ONE_OFF",
+    /// The automatic holster queued by `CPlayer::UpdateMentalState`
+    /// ([`Player_UpdateMentalState`](character::player::Player_UpdateMentalState)) when the
+    /// player's mental state decays to relaxed with a weapon wielded. It drives a state chain in
+    /// `rico_base.afsmb` whose `NWeaponUnequipTask` queues [`UB_ACT_HOLSTER`](Self::UB_ACT_HOLSTER).
+    pub const ACT_ON_UNEQUIP_WEAPON_SLOW: cstr = c"ACT_ON_UNEQUIP_WEAPON_SLOW",
+    /// The upper-body holster act. Queued by
+    /// [`Inventory::UpdateWeaponHandling`](character::inventory::Inventory::UpdateWeaponHandling)'s
+    /// relaxed branch for the player, by
+    /// [`Character::HolsterWeapon`](character::character::Character::HolsterWeapon) for other
+    /// characters, and by `NWeaponUnequipTask` on entering its state.
+    pub const UB_ACT_HOLSTER: cstr = c"UB_ACT_HOLSTER",
 }
 impl EventIdSymbolTable {
     /// Resolves an act name to its runtime id. Registers the name with a fresh id when it is not
