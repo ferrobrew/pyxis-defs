@@ -1,0 +1,33 @@
+/// The input steering (`CSteering`) that binds the frame profiler's `"frameprofiler"` input action
+/// map: the actions that navigate, sort, pause, and close the on-screen frame profiler. Created on
+/// first use by [`GetFrameProfilerInputs`], which registers the instance.
+#[singleton(0x142_F38_768), size(0x40)]
+pub type SteeringFrameProfiler {
+    #[address(0x0)]
+    pub __vftable: u64,
+}
+impl SteeringFrameProfiler {
+    /// Constructs the steering, loads its action map (disabled), and registers the instance.
+    #[address(0x140_E98_200)]
+    pub fn Constructor(&mut self) -> *mut SteeringFrameProfiler;
+
+    /// Creates (or, when it already exists, unmaps) the `"frameprofiler"` input action map for the
+    /// [`Gamepad`](input::input_device_manager::DeviceType::Gamepad) device and maps the frame
+    /// profiler's ten actions to it, from
+    /// [`PROFILER_UP`](input::input_action_map::Action::PROFILER_UP) through
+    /// [`PROFILER_TOGGLE_INPUT_FOCUS_B`](input::input_action_map::Action::PROFILER_TOGGLE_INPUT_FOCUS_B).
+    #[address(0x140_E84_7F0)]
+    pub fn LoadActionMap(&mut self);
+}
+
+/// Reads the frame profiler's input actions into the out flags (creating the
+/// [`SteeringFrameProfiler`] on first use): up and down as held, left, right, close, change-sorting,
+/// show-empty-timers, and pause as clicked, and `toggle_input_focus` set on the frame both focus
+/// buttons become held together.
+#[address(0x140_E98_580)]
+pub fn GetFrameProfilerInputs(up_pressed: *mut bool, down_pressed: *mut bool, left_pressed: *mut bool, right_pressed: *mut bool, close_pressed: *mut bool, change_sorting_pressed: *mut bool, show_empty_timers_pressed: *mut bool, pause_pressed: *mut bool, toggle_input_focus: *mut bool);
+
+/// Resets the player and debug steerings' input action maps, so input consumed by the frame
+/// profiler does not also drive the player.
+#[address(0x140_DF6_9D0)]
+pub fn FrameProfilerOverridePlayerInputs();

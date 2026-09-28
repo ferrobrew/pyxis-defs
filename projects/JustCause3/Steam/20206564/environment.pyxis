@@ -1,7 +1,7 @@
 #[singleton(0x142_F17_250), size(0x90)]
 pub type WorldTime {
-    /// The current time of day, in hours. The render engine copies this out each frame, so a write
-    /// here propagates to lighting.
+    /// The current time of day, in hours. The render engine copies this out each frame for
+    /// lighting.
     #[address(0x80)]
     pub m_CurrentTimeOfDay: f32,
 
@@ -13,27 +13,26 @@ pub type WorldTime {
 }
 impl WorldTime {
     /// Sets the time of day in hours: wraps to a 24-hour range, fires the per-hour event, and clamps
-    /// against `m_PauseTimeOfDay`. Preferred over writing `m_CurrentTimeOfDay` directly.
+    /// against `m_PauseTimeOfDay`.
     #[address(0x140_52C_D20)]
     pub fn SetTimeOfDay(&mut self, hours: f32);
 }
 
 /// The live weather state: a continuous scalar model.
 ///
-/// **Caution:** [`WeatherController`]'s per-frame update overwrites these scalars toward its own
-/// targets unless a force flag or a named weather event holds them, so prefer firing an event (see
-/// [`WeatherController::Init`]) to pin a state.
+/// [`WeatherController`]'s per-frame update overwrites these scalars toward its own targets unless a
+/// force flag or a named weather event (see [`WeatherController::Init`]) holds them.
 #[min_size(0x1F0)]
 pub type Weather {
     /// The snow blend, in `0..1`.
     ///
-    /// **Unverified:** from the dump's struct layout, not instruction-verified.
+    /// The offset is unconfirmed.
     #[address(0x1C)]
     pub m_SnowRatio: f32,
 
     /// The rain intensity, in `0..1`.
     ///
-    /// **Unverified:** from the dump's struct layout, not instruction-verified.
+    /// The offset is unconfirmed.
     #[address(0x20)]
     pub m_RainIntensity: f32,
 
@@ -42,8 +41,8 @@ pub type Weather {
     pub m_Severity: f32,
 }
 impl Weather {
-    /// Sets `m_Severity` and clears the severity-update flag. See the type's caution about the
-    /// controller overwriting it.
+    /// Sets `m_Severity` and clears the severity-update flag. The controller's per-frame update
+    /// overwrites the result unless a force flag or weather event holds it (see [`Weather`]).
     #[address(0x140_3A2_290)]
     pub fn SetSeverity(&mut self, severity: f32);
 
@@ -89,17 +88,15 @@ pub type WeatherController {
 }
 impl WeatherController {
     /// Subscribes the named weather events (the `EVENT_*` constants, plus `cloud_base` and
-    /// `cloud_height`). Firing one via the engine's event send is the robust way to hold a weather
-    /// state, since the controller's per-frame update otherwise overwrites the [`Weather`]
-    /// scalars.
+    /// `cloud_height`). A fired event holds its weather state; without one, the controller's
+    /// per-frame update overwrites the [`Weather`] scalars.
     #[address(0x140_3A2_4F0)]
     pub fn Init(&mut self);
 }
 
 pub type DayCycle;
 impl DayCycle {
-    /// The in-engine reference that reads and writes both the time of day and the weather each cycle:
-    /// the canonical example of driving both systems.
+    /// Reads and writes both the time of day and the weather each cycle.
     #[address(0x140_495_F30)]
     pub fn Apply(&mut self);
 }

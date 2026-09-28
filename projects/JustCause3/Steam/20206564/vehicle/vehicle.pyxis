@@ -1,0 +1,118 @@
+use character::character::Character;
+use types::math::{Matrix4, Vector3};
+
+/// The engine's vehicle classification (`NVehicle::EVehicleType`), stored on a vehicle as
+/// `CVehicle::m_VehicleType` and returned by `CVehicle::GetVehicleType`, which is inlined at every
+/// use in this build. Jetskis classify as [`EBOAT`](Self::EBOAT). The field's offset is not mapped.
+pub enum VehicleType: i32 {
+    ECAR = 0x0,
+    EHELICOPTER = 0x1,
+    EBOAT = 0x2,
+    EAIRPLANE = 0x3,
+    EMOTORCYCLE = 0x4,
+    ESUB = 0x5,
+    ETRAIN = 0x6,
+}
+
+/// A vehicle seat identifier (`NVehicle::ESeat`): an index into [`Vehicle::m_Seats`], with the
+/// seat categories laid out in bands (driver, passengers, gunners, stunt positions, scripted).
+pub enum Seat: i32 {
+    EDriverSeat = 0x0,
+    EPassengerSeat = 0x1,
+    EGunnerSeat = 0x6,
+    EStuntSeat = 0x8,
+    EScriptedSeats = 0x14,
+    /// No seat: returned by [`Vehicle::GetSeat`] for a character that is not seated in the vehicle.
+    ENoSeatIdentifier = -1,
+}
+
+/// One seat of a vehicle (`CVehicle::CSeat`). It is interaction-graph metadata (the graph node the
+/// seated character occupies, the door slot, the window part, and whether the player may use it)
+/// and carries no transform: a seated character's pose comes from its own attach bone and offset.
+#[size(0x30)]
+pub type VehicleSeat {
+    /// The interaction-graph node a character occupies while in this seat.
+    /// [`Vehicle::GetSeat`] matches a character's current node against it.
+    pub m_GraphNode: *mut u8,
+}
+
+/// A vehicle (`CVehicle`). Like other game objects it carries its `CGameObject` base at the same
+/// offset as a character does
+/// ([`Character::GAME_OBJECT_BASE_OFFSET`](character::character::Character::GAME_OBJECT_BASE_OFFSET)),
+/// and the vtable there serves RTTI and the transform virtuals. Only some members are bound.
+#[min_size(0x53A4)]
+pub type Vehicle {
+    /// The number of entries in [`m_Seats`](Self::m_Seats).
+    pub const MAX_SEATS: u64 = 42,
+
+    /// The vehicle's seats, indexed by [`Seat`].
+    #[address(0xB28)]
+    pub m_Seats: [VehicleSeat; 42],
+
+    /// The seat the local player occupies, or [`Seat::ENoSeatIdentifier`]. The game's input
+    /// contexts test it against [`Seat::EDriverSeat`] to decide whether driver controls apply.
+    #[address(0x1_5DC)]
+    pub m_LocalPlayerSeat: Seat,
+
+    /// The world-space point the vehicle's weapons aim at, written by
+    /// [`SetAimTargetPosition`](Self::SetAimTargetPosition).
+    #[address(0x4_C34)]
+    pub m_AimingTargetPosition: Vector3,
+
+    /// How long, in seconds, AI-controlled vehicle weapons keep an externally supplied aim target.
+    /// [`SetAimTargetPosition`](Self::SetAimTargetPosition) sets it to `-1` when the local player
+    /// drives and to `2` otherwise.
+    #[address(0x4_D48)]
+    pub m_AIVehicleWeaponAimTimeout: f32,
+
+    /// The vehicle's physics body (`CPfxVehicle*`). [`IsMech`](Self::IsMech) tests its strafing
+    /// wheel-steering controller.
+    #[address(0x4_DD0)]
+    pub m_PfxVehicle: *mut u8,
+
+    /// The hash of the vehicle's type name (`HashString` of names such as
+    /// `v1706_boat_na_rocketboat`), compared by [`IsRocketBoat`](Self::IsRocketBoat).
+    #[address(0x5_3A0)]
+    pub m_VehicleTypeNameHash: u32,
+}
+impl Vehicle {
+    /// Sets [`m_AimingTargetPosition`](Self::m_AimingTargetPosition) and refreshes
+    /// [`m_AIVehicleWeaponAimTimeout`](Self::m_AIVehicleWeaponAimTimeout).
+    #[address(0x140_F24_B00)]
+    pub fn SetAimTargetPosition(&mut self, position: *const Vector3);
+
+    /// Returns the seat `character` occupies: the index of the seat whose graph node is the
+    /// character's current interaction-graph node, or [`Seat::ENoSeatIdentifier`].
+    #[address(0x140_F24_FB0)]
+    pub fn GetSeat(&self, character: *const Character) -> Seat;
+
+    /// Whether the vehicle is a mech: its physics body has a strafing wheel-steering controller.
+    #[address(0x140_F23_990)]
+    pub fn IsMech(&self) -> bool;
+
+    /// Moves the vehicle to `transform` directly (through the `CGameObject` transform setter),
+    /// invalidates its collision caches, and detaches any player grapple wire attached to it.
+    /// Seated characters follow through their attachment.
+    #[address(0x140_F4F_C60)]
+    pub fn TeleportVehicle(&mut self, transform: *const Matrix4, p2: f32);
+
+    /// The current yaw angle of the vehicle's weapon turret, read from the powered hinge controller
+    /// of the turret part; `0` when the vehicle has no turret.
+    #[address(0x140_F90_FC0)]
+    pub fn GetWeaponTurretCurrentYawAngle(&self) -> f32;
+
+    /// Whether the vehicle is the rocket boat: [`m_VehicleTypeNameHash`](Self::m_VehicleTypeNameHash)
+    /// equals the hash of `v1706_boat_na_rocketboat` (computed once and cached). The sea-vehicle
+    /// input, water-contact, and player action contexts use it. IDA labels this address
+    /// `CWeaponBase::MarkNextWeaponComponentForFire`, but every caller passes a vehicle; the name
+    /// here is descriptive.
+    #[address(0x140_F6F_8F0)]
+    pub fn IsRocketBoat(&self) -> bool;
+}
+
+/// `NStateTask_InputVehicleExitTask::TeleportUpwards`, run from the vehicle-exit animation event
+/// callback: probes upward from the character with a raycast and a sphere collision test for clear
+/// space, forces the neutral state, and relocates the character there directly rather than through
+/// the physics proxy (the placement itself is inferred from the call shape).
+#[address(0x140_81A_3C0)]
+pub fn NStateTask_InputVehicleExitTask_TeleportUpwards(character: *mut Character);

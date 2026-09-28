@@ -1,0 +1,8 @@
+/// `CResourceLoaderRuntimeContainerHandler_CreateObjectsAsync`: the background job body that turns a
+/// loaded runtime container into game objects. It walks the container's objects, creates each
+/// through its registered game-object creator, applies the set-properties batches (attached
+/// effects, physics parameters, events, model lookups), builds the hierarchy transforms, and hands
+/// the result to `CGameWorldLoaderRC::OnLoaded`. `job_data` is the handler's job context; the
+/// return value is the job status.
+#[address(0x140_55C_160)]
+pub fn CreateObjectsAsync(job_data: *mut void) -> i32;

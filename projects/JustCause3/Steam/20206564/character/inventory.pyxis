@@ -1,13 +1,72 @@
+use character::character::Character;
 use equipment::grappling_hook::GrapplingHook;
+use types::math::Vector3;
 use types::shared_ptr::SharedPtr;
 
+/// An inventory weapon slot (`CInventory::EWeaponSlot`). Mounted guns a character picks up occupy
+/// [`E_SLOT_HEAVY`](Self::E_SLOT_HEAVY): `CCharacter::IsInMountedGunState` tests the weapon in that
+/// slot.
+pub enum WeaponSlot: i32 {
+    E_SLOT_DUAL_WIELD = 0x0,
+    E_SLOT_TWO_HANDED = 0x1,
+    E_SLOT_HEAVY = 0x2,
+    E_SLOT_HAND_GRENADE = 0x3,
+    E_SLOT_PLANTED_EXPLOSIVE = 0x4,
+    E_SLOT_FOW = 0x5,
+    E_SLOT_TWO_HANDED_SPECIAL = 0x6,
+    E_SLOT_BEACON = 0x7,
+    E_NUM_WEAPON_SLOTS = 0x8,
+    E_NONE = 0x9,
+}
+
 /// The character's equipment inventory (`CInventory`), embedded in `CCharacter`
-/// ([`Character::m_Inventory`](character::character::Character::m_Inventory)). Only the
-/// grappling-hook slot is mapped.
-#[min_size(0xD0)]
+/// ([`Character::m_Inventory`](character::character::Character::m_Inventory)). Only some members
+/// are mapped.
+#[min_size(0x3E8)]
 pub type Inventory {
     /// The character's grappling hook, or null before the inventory is populated.
     /// `CCharacter::GetGrapplingHook` returns a reference to this field.
     #[address(0xC0)]
     pub m_GrapplingHook: SharedPtr<GrapplingHook>,
+
+    /// Whether the current animation permits shooting; one half of
+    /// [`GetAnimationAllowsShooting`](Self::GetAnimationAllowsShooting).
+    #[address(0x184)]
+    pub m_DoesAnimationAllowShooting: bool,
+
+    /// The character that owns the inventory.
+    #[address(0x3E0)]
+    pub m_Character: *mut Character,
+}
+impl Inventory {
+    /// The inventory's parallel per-frame update. `muzzle_target` and `grenade_target` point at
+    /// by-value `CVector3f` copies of the owner's weapon and grenade aim targets.
+    #[address(0x140_942_920)]
+    pub fn Update_Parallel(&mut self, dt: f32, muzzle_target: *const Vector3, grenade_target: *const Vector3);
+
+    /// The inventory's parallel weapon update, taking the same aim targets as
+    /// [`Update_Parallel`](Self::Update_Parallel).
+    #[address(0x140_91B_BB0)]
+    pub fn UpdateWeapons_Parallel(&mut self, dt: f32, muzzle_target: *const Vector3, grenade_target: *const Vector3);
+
+    /// Whether the character may shoot: [`m_DoesAnimationAllowShooting`](Self::m_DoesAnimationAllowShooting)
+    /// is set and the owner's
+    /// [`SB_DISABLE_SHOOT`](state::StateBitFlag::SB_DISABLE_SHOOT) state
+    /// bit is clear.
+    #[address(0x140_8BB_630)]
+    pub fn GetAnimationAllowsShooting(&self) -> bool;
+
+    /// Recomputes the inventory's per-frame permissions from the owner's state (it consults the
+    /// grapple reel-in predicates among others).
+    #[address(0x140_91B_3E0)]
+    pub fn UpdateInventoryPermissions(&mut self);
+
+    /// The inventory's per-frame weapon-handling update (`CInventory::UpdateWeaponHandling`).
+    #[address(0x140_932_F10)]
+    pub fn UpdateWeaponHandling(&mut self, dt: f32);
+
+    /// Updates the inventory's attached effect container (the wielded weapon's muzzle flash,
+    /// casings, and sounds), when it has one.
+    #[address(0x140_8C6_D30)]
+    pub fn UpdateAttachmentEffects(&mut self, dt: f32);
 }

@@ -2,20 +2,19 @@
 /// job-fragment primitives, the engine's drain for an outstanding async fragment. For example the
 /// draw-dispatch fragment signals completion at
 /// [`m_DrawThreadWorkSignal`](graphics_engine::graphics_engine::GraphicsEngine::m_DrawThreadWorkSignal). It
-/// returns immediately when the signal is already non-zero, so it is only safe to call when the
-/// matching fragment was actually kicked: below two primary threads the work runs inline and the signal
-/// is never raised, so guard the call with [`CpuPrimaryCount`] to avoid spinning forever.
+/// returns immediately when the signal is already non-zero, and otherwise spins until the matching
+/// fragment raises it. Below two primary threads ([`CpuPrimaryCount`]) the draw work runs inline and
+/// never raises its signal, so a wait on that signal never returns.
 ///
-/// The wait is **work-stealing**: while the signal is zero, the underlying `CpuFragmentWait` loop
-/// pops queued fragments off the global sync queue and runs them (`CpuFragmentRun`) on the
-/// *calling* thread, so the caller must be a thread the fragment system knows (a registered
-/// worker or the primary thread) — fragments executed on a foreign thread fault on the fragment
-/// system's per-thread state.
+/// The wait is work-stealing: while the signal is zero, the underlying `CpuFragmentWait` loop pops
+/// queued fragments off the global sync queue and runs them (`CpuFragmentRun`) on the calling
+/// thread. A fragment run on a thread the fragment system does not know (neither a registered worker
+/// nor the primary thread) faults on the fragment system's per-thread state.
 #[address(0x141_DFA_730)]
 pub fn CpuFragmentWaitUntilSignalIsNonZero(signal: *const u32);
 
 /// The number of primary job-worker threads. The engine only dispatches the async draw fragment (and
 /// only waits on its signal) when this is greater than `1`; at or below it the draw runs inline and the
-/// completion signal is never raised, so any wait on that signal must be guarded by this count.
+/// completion signal is never raised.
 #[address(0x141_0CF_770)]
 pub fn CpuPrimaryCount() -> i32;

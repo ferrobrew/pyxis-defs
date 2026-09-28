@@ -1,6 +1,6 @@
 /// A hashed string id (`CHashString` / `ava::idstring`): a string reduced to its little-endian
 /// `hashlittle` hash, used as a type, state, and event id throughout the animation and event
-/// systems. Only the hash survives in the release build.
+/// systems. Only the hash is stored.
 #[copyable, min_size(0x4)]
 pub type HashString {
     /// The `hashlittle(name)` hash identifying the string.

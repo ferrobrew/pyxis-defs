@@ -1,9 +1,232 @@
 use character::character::Character;
 use types::math::{Matrix4, Vector3};
 
-/// `CPfxCharacterInstance`: the character's physics-side body instance, owned by `CCharacter`
-/// through a `boost::shared_ptr`. Only the members needed so far are bound.
-pub type PfxCharacterInstance;
+/// The physics system (`CPhysicsSystem`), a `Base::CSingle` singleton that owns the Havok world and
+/// serves the engine's scene queries. The queries are sim-phase calls against the live Havok world.
+/// Only some members are bound.
+#[singleton(0x142_EDC_120), min_size(0x38)]
+pub type PhysicsSystem {
+    /// The collision layer [`CastRaySimple`](Self::CastRaySimple) hardcodes, and the one the
+    /// player's direct-aim query passes to [`CastRay`](Self::CastRay).
+    pub const QUERY_LAYER: i32 = 21,
+
+    /// The Havok world.
+    #[address(0x30)]
+    pub m_World: *mut hknpWorld,
+}
+impl PhysicsSystem {
+    /// The general ray query: casts `ray` (world space, normalized direction) from `min_fraction`
+    /// out to `max_distance` along its direction against collision `layer`, returning whether it
+    /// hit. `info`, when non-null, receives the closest hit; `filter`, when non-null, replaces the
+    /// default hit filter (and can exclude materials or an instance); `flags` is a
+    /// collision-filter-info word, `0` for a plain query. Backed by [`hknpWorld::castRay`].
+    #[address(0x140_286_740)]
+    pub fn CastRay(&mut self, ray: *const Ray3, min_fraction: f32, max_distance: f32, info: *mut CastRayInfoBase, filter: *mut RaycastFilter, flags: u32, layer: i32) -> bool;
+
+    /// Whether the segment from `start` to `end` is blocked: builds the ray from the two points and
+    /// calls [`CastRay`](Self::CastRay) with no hit info, the default filter, and
+    /// [`QUERY_LAYER`](Self::QUERY_LAYER).
+    #[address(0x140_286_BE0)]
+    pub fn CastRaySimple(&mut self, start: *const Vector3, end: *const Vector3, flags: u32) -> bool;
+
+    /// A ray query against the terrain only, with the parameters of [`CastRay`](Self::CastRay).
+    #[address(0x140_286_CE0)]
+    pub fn CastRayTerrain(&mut self, ray: *const Ray3, min_fraction: f32, max_distance: f32, info: *mut CastRayInfoBase) -> bool;
+
+    /// Intersects the segment from `start` to `end` with the water surface, writing the hit point
+    /// to `hit` and returning whether there was one.
+    #[address(0x140_23C_150)]
+    pub fn CastRayWaterSurface(&mut self, start: *const Vector3, end: *const Vector3, hit: *mut Vector3) -> bool;
+
+    /// Sweeps a sphere of `radius` from `start` to `end`, reporting hits to `collector` (an
+    /// `hknpCollisionQueryCollector`).
+    #[address(0x140_202_C90)]
+    pub fn CastSphere(&mut self, start: *const Vector3, end: *const Vector3, radius: f32, p4: f32, collector: *mut void, filter_info: u32, p7: f32) -> bool;
+
+    /// Sweeps an arbitrary Havok shape (`hknpShape*`) with the rotation `rotation` (`hkRotationf`)
+    /// from `start` to `end`, reporting hits to `collector`.
+    #[address(0x140_1F0_890)]
+    pub fn CastShape(&mut self, start: *const Vector3, end: *const Vector3, p3: f32, shape: *const void, rotation: *const void, collector: *mut void, filter_info: u32, p8: f32) -> bool;
+}
+
+/// The water query interface (`CPhysicsSystem::IWaterProxy`) through which physics code reads
+/// water heights, reached through [`PhysicsSystem_s_WaterQueryProxy`]. Only the first slot is bound.
+pub type WaterProxy {
+    vftable {
+        /// The world sea level, the height of the open-sea water plane.
+        /// [`PhysicsSystem::CastRayWaterSurface`] tests a segment against it after the water boxes.
+        #[index(0)]
+        pub fn GetWorldSeaLevel(&mut self) -> f32;
+    },
+}
+
+/// `CPhysicsSystem::s_WaterQueryProxy`: the water query singleton buoyancy, water interaction,
+/// vehicle fin forces, and the water-surface ray query read water heights from.
+#[address(0x142_EDC_230)]
+pub extern PhysicsSystem_s_WaterQueryProxy: *mut WaterProxy;
+
+/// A ray (`CRay3`): an origin and a direction, both world space when passed to
+/// [`PhysicsSystem::CastRay`].
+#[copyable, size(0x18), align(4)]
+pub type Ray3 {
+    pub Origin: Vector3,
+    /// The ray direction; the queries expect it normalized.
+    pub Direction: Vector3,
+}
+
+/// Material pass bits of a [`RaycastFilter`]'s material masks. Game materials carry per-pass
+/// "holey" flags (a bullet passes foliage, a ray passes glass, and similar); a filter that sets a
+/// bit in its ignore mask does not stop at materials flagged for that pass.
+#[copyable]
+pub bitflags MaterialPassFlags: u32 {
+    /// Materials a bullet passes through. Set by
+    /// [`IgnoreMaterialFlagFilter::SetIgnoreBulletPass`].
+    BULLET_PASS = 0x20,
+    /// Materials the camera passes through. Set by
+    /// [`IgnoreMaterialFlagFilter::SetIgnoreCameraPass`].
+    CAMERA_PASS = 0x40,
+    /// Materials a ray passes through. Set by [`IgnoreMaterialFlagFilter::SetIgnoreRayPass`].
+    RAY_PASS = 0x80,
+}
+
+/// The engine's closest-hit ray filter (`CRaycastFilter`, derived from Havok's
+/// `hknpClosestHitCollector`): collects the closest hit while skipping ignored materials and one
+/// ignored instance.
+#[size(0xC0), align(16)]
+pub type RaycastFilter {
+    /// Materials whose pass flags are in this mask do not count as hits.
+    #[address(0x90)]
+    pub m_IgnoreMaterialMask: MaterialPassFlags,
+    /// Materials whose pass flags are in this mask always count as hits.
+    pub m_ForceMaterialMask: MaterialPassFlags,
+    /// An instance the query never hits (`IPfxInstance*`), such as the caster's own proxy.
+    pub m_IgnorePfxInstance: *mut void,
+
+    /// The Havok world the filter resolves bodies in; the physics system's world when constructed
+    /// with null.
+    #[address(0xB0)]
+    pub m_World: *const hknpWorld,
+}
+impl RaycastFilter {
+    /// `CRaycastFilter::CRaycastFilter`: constructs the filter with its two material masks, the
+    /// instance to ignore (may be null), and the world (null selects [`PhysicsSystem::m_World`]).
+    #[address(0x140_1FC_BA0)]
+    pub fn Construct(&mut self, ignore_material_mask: MaterialPassFlags, force_material_mask: MaterialPassFlags, ignore_instance: *mut void, world: *const hknpWorld) -> *mut RaycastFilter;
+}
+
+/// A [`RaycastFilter`] whose ignore mask is set pass by pass (`CIgnoreMaterialFlagFilter`).
+#[size(0xC0), align(16)]
+pub type IgnoreMaterialFlagFilter {
+    #[base]
+    pub base: RaycastFilter,
+}
+impl IgnoreMaterialFlagFilter {
+    /// Sets or clears [`BULLET_PASS`](MaterialPassFlags::BULLET_PASS) in the ignore mask.
+    #[address(0x140_B86_840)]
+    pub fn SetIgnoreBulletPass(&mut self, ignore: bool);
+
+    /// Sets or clears [`RAY_PASS`](MaterialPassFlags::RAY_PASS) in the ignore mask.
+    #[address(0x140_B86_860)]
+    pub fn SetIgnoreRayPass(&mut self, ignore: bool);
+
+    /// Sets or clears [`CAMERA_PASS`](MaterialPassFlags::CAMERA_PASS) in the ignore mask.
+    #[address(0x140_B86_880)]
+    pub fn SetIgnoreCameraPass(&mut self, ignore: bool);
+}
+
+/// The result of a ray query (`CCastRayInfoBase`): the hit position, normal, and fraction, the hit
+/// body and instance, and the hit material's pass flags. Only the methods are bound.
+pub type CastRayInfoBase;
+impl CastRayInfoBase {
+    /// Clears the result for reuse.
+    #[address(0x140_255_8C0)]
+    pub fn Reset(&mut self);
+
+    /// Whether the hit material lets bullets pass
+    /// ([`BULLET_PASS`](MaterialPassFlags::BULLET_PASS)); false for two special material ids.
+    #[address(0x140_23B_DF0)]
+    pub fn DidHitBulletPassMaterial(&self) -> bool;
+}
+
+/// A [`CastRayInfoBase`] that resolves the hit material on demand (`CCastRayInfo`).
+pub type CastRayInfo;
+impl CastRayInfo {
+    /// `CCastRayInfo::GetHitMaterial` (a virtual): the hit shape's game material
+    /// (`EGameMaterialId`), looked up through the physics system's world.
+    #[address(0x140_2B3_BA0)]
+    pub fn GetHitMaterial(&self) -> i32;
+}
+
+/// The ragdoll's proxy phantom (`CRagdollProxyPhantom`), the shape set that stands in for a
+/// character's ragdoll bodies in hit tests. Only one method is bound.
+pub type RagdollProxyPhantom;
+impl RagdollProxyPhantom {
+    /// The name hash of the ragdoll part a ray hit (the hit's shape key matched against the
+    /// phantom's shapes), or `0` when the hit is not one of them. `CCharacter::OnDamage` uses it to
+    /// find the body part a hit struck.
+    #[address(0x140_3E4_8E0)]
+    pub fn GetHitNameHash(&mut self, info: *const CastRayInfoBase) -> u32;
+}
+
+/// The Havok physics world (`hknpWorld`). Only some members are bound.
+pub type hknpWorld;
+impl hknpWorld {
+    /// Casts a ray query (`hknpRayCastQuery`) and reports hits to `collector`
+    /// (`hknpCollisionQueryCollector`).
+    #[address(0x141_500_BE0)]
+    pub fn castRay(&self, query: *const void, collector: *mut void);
+
+    /// Replaces the shape (`hknpShape*`) of the body `body_id` on the live world.
+    #[address(0x141_4CF_370)]
+    pub fn setBodyShape(&mut self, body_id: u32, shape: *const void);
+}
+
+/// The Havok-facing input of a character proxy (`CPfxCharacterInstance::CCharacterInput`), read by
+/// the physics step to drive the proxy.
+#[size(0x10), align(4)]
+pub type CharacterInput {
+    pub jump: bool,
+    /// Whether [`wantedVelocity`](Self::wantedVelocity) is game-controlled. The on-foot locomotion
+    /// task sets it when it takes its velocity from the blackboard's code-driven path and clears it
+    /// otherwise.
+    pub gameControledVelocity: bool,
+
+    /// The velocity the proxy should move at (world space). The on-foot locomotion task
+    /// (`NStateTask_MovementLocomotionTask::Update`) writes its solved velocity here every tick,
+    /// including standing idle.
+    #[address(0x4)]
+    pub wantedVelocity: Vector3,
+}
+
+/// `CPfxCharacterInstance`: the character's physics-side body instance (the Havok character proxy),
+/// owned by `CCharacter` through a `boost::shared_ptr`. Only some members are bound.
+#[min_size(0xF8)]
+pub type PfxCharacterInstance {
+    /// Havok's invalid body id, which [`GetCharacterRigidBodyId`](Self::GetCharacterRigidBodyId)
+    /// reports when there is no body.
+    pub const INVALID_BODY_ID: u32 = 0x7FFFFFFF,
+
+    /// The proxy input the physics step reads; see [`CharacterInput`].
+    #[address(0x38)]
+    pub m_Input: CharacterInput,
+
+    /// The current proxy state (`CPfxCharacterInstance::EProxyState`), which selects the proxy's
+    /// collision shape. Written by [`SetProxyState`](Self::SetProxyState).
+    #[address(0xC8)]
+    pub m_ProxyState: i32,
+
+    /// The Havok character rigid body (`hknpCharacterRigidBody*`), which holds the body id that
+    /// [`GetCharacterRigidBodyId`](Self::GetCharacterRigidBodyId) reads.
+    #[address(0xD0)]
+    pub m_CharacterRigidBody: *mut void,
+
+    /// The character rigid-body listener (`CCustomCharacterRBListener*`).
+    #[address(0xE8)]
+    pub m_CharacterRBListener: *mut void,
+    /// The owning character (`IPfxCharacter*`). Its `GetSharedPfxCharacterSettings` virtual returns
+    /// the shared settings that hold the per-state shape table.
+    pub m_Owner: *mut void,
+}
 impl PfxCharacterInstance {
     /// Sets the physics body's rotation from the rotation part of `m` (via a quaternion
     /// conversion) and zeroes the body's angular velocity; the translation part is ignored. The
@@ -17,7 +240,37 @@ impl PfxCharacterInstance {
     /// Havok transform/velocity chain.
     #[address(0x140_24D_820)]
     pub fn GetVelocity(&self, out: *mut Vector3);
+
+    /// Switches the proxy to `state` when it differs from [`m_ProxyState`](Self::m_ProxyState):
+    /// stores it, fetches the shared settings through [`m_Owner`](Self::m_Owner), swaps the live
+    /// body's shape to the settings' shape for that state ([`hknpWorld::setBodyShape`]), and
+    /// copies the state's per-shape byte into the rigid-body listener
+    /// ([`m_CharacterRBListener`](Self::m_CharacterRBListener)). The capsule
+    /// dimensions live in those pre-built shapes.
+    #[address(0x140_239_580)]
+    pub fn SetProxyState(&mut self, state: i32);
+
+    /// Writes the Havok body id of [`m_CharacterRigidBody`](Self::m_CharacterRigidBody) to `out`
+    /// ([`INVALID_BODY_ID`](Self::INVALID_BODY_ID) when there is no body) and returns `out`.
+    #[address(0x140_24D_A40)]
+    pub fn GetCharacterRigidBodyId(&self, out: *mut u32) -> *mut u32;
+
+    /// Builds the Havok character context for the proxy: a character-state manager with the
+    /// on-ground, in-air, and jumping states registered. It does not set the capsule dimensions.
+    #[address(0x140_24D_370)]
+    pub fn BuildDefaultCharacterContext(&mut self);
 }
+
+/// `SweptSphereCast`: a free-function sphere sweep that fills `result` (`CCastResult`). The
+/// meaning of its scalar parameters is not established.
+#[address(0x140_738_670)]
+pub fn SweptSphereCast(p0: f32, p1: f32, p2: f32, p3: f32, p4: f32, p5: f32, v0: *const Vector3, v1: *const Vector3, p8: f32, p9: bool, result: *mut void);
+
+/// Rotates `from` toward `to` by the fraction `t` of the angle between them (about the axis of the
+/// shortest-arc rotation), writing the result to `out`. When the two directions are within the
+/// `0.99` dot-product threshold it writes `to` unchanged. The swim movement cores call it.
+#[address(0x140_775_620)]
+pub fn SlerpAroundAxis(from: *const Vector3, to: *const Vector3, t: f32, out: *mut Vector3);
 
 /// Rotates `from` toward `to` along the shortest arc, writing the result to `out`. It takes the
 /// rotation from `from` to `to` as an angle-axis pair and applies

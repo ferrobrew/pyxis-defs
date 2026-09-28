@@ -1,10 +1,10 @@
 /// Scaleform [`RefCountImpl`] -- the base class for reference-counted Scaleform objects. Provides
-/// a vtable pointer at +0 and an atomic refcount at +8. `AddRef`/`Release` are non-virtual;
-/// the vtable's slot 0 is the destructor, called when the refcount reaches zero.
+/// a vtable pointer and an atomic [`ref_count`](Self::ref_count). `AddRef`/`Release` are
+/// non-virtual; the virtual [`destructor`](Self::destructor) runs when the refcount reaches zero.
 #[size(0x10)]
 pub type RefCountImpl {
     vftable {
-        /// Virtual destructor, slot 0. Called by `Release` when the refcount reaches zero.
+        /// Virtual destructor. Called by `Release` when the refcount reaches zero.
         pub fn destructor(&mut self, flags: u32);
     },
 
@@ -18,7 +18,7 @@ impl RefCountImpl {
     pub fn AddRef(&self);
 
     /// Decrements the reference count atomically. When it reaches zero, calls the virtual
-    /// destructor (vtable slot 0).
+    /// [`destructor`](Self::destructor).
     #[address(0x141_998_440)]
     pub fn Release(&self);
 }
@@ -30,19 +30,25 @@ impl RefCountImpl {
 /// [`VFTABLE`](Self::VFTABLE).
 #[min_size(0x18)]
 pub type Movie {
-    /// The `AS3::MovieRoot` vtable address (the `ASMovieRootBase` layout: slot 35 is
-    /// [`GetDisplayObjectsTree`](Self::GetDisplayObjectsTree), slots 49/50/57 are the bound
-    /// SetVariable/GetVariable/Invoke). The payload checks a live object against it before
-    /// trusting the vtable-indexed calls, since the object's dynamic type is load-bearing here.
+    /// The `AS3::MovieRoot` vtable address (the `ASMovieRootBase` layout, which holds
+    /// [`GetDisplayObjectsTree`](Self::GetDisplayObjectsTree) and the virtuals whose
+    /// implementations are the bound SetVariable/GetVariable/Invoke).
     pub const VFTABLE: u64 = 0x1426216B0,
+    /// The [`SetVariable`](Self::SetVariable) `set_var_type` (`GFx::Movie::SetVarType`) for a
+    /// plain assignment with no persistence across clip re-creation.
+    pub const SV_NORMAL: u32 = 0,
+    /// The `set_var_type` that re-applies the value when the clip is re-created.
+    pub const SV_STICKY: u32 = 1,
+    /// The `set_var_type` that keeps the value for the life of the movie.
+    pub const SV_PERMANENT: u32 = 2,
 
     vftable {
         /// Recursively walks the runtime display tree from the root movie clip: returns a tree of
         /// [`AmpMovieObjectDesc`] nodes, each carrying the clip's instance name (or `"Unnamed"`)
         /// and a child array, calling `DisplayObject::GetName` on every child and recursing into
         /// containers. `heap` is the Scaleform `MemoryHeap*` used for the allocations (e.g.
-        /// [`MovieImpl::pHeap`]); the tree is freed by releasing the root node. Slot 35 of the
-        /// `ASMovieRootBase` vtable; the implementation is at `0x141_BED_530`. Call on the capture
+        /// [`MovieImpl::pHeap`]); the tree is freed by releasing the root node. The implementation
+        /// is [`GetDisplayObjectsTreeImpl`](Self::GetDisplayObjectsTreeImpl). Call on the capture
         /// (game update) thread, where the display tree is stable.
         #[index(35)]
         pub fn GetDisplayObjectsTree(&self, heap: *mut MemoryHeap) -> *mut AmpMovieObjectDesc;
@@ -54,10 +60,18 @@ pub type Movie {
     pub pMovieImpl: *mut MovieImpl,
 }
 impl Movie {
+    /// The `AS3::MovieRoot` implementation of the
+    /// [`GetDisplayObjectsTree`](Self::GetDisplayObjectsTree) virtual: allocates the root
+    /// [`AmpMovieObjectDesc`] from `heap`, names it after the root movie clip, and fills its
+    /// children through `DisplayObjContainer::GetChildDescTree`. Returns null without a root clip.
+    #[address(0x141_BED_530)]
+    pub fn GetDisplayObjectsTreeImpl(&self, heap: *mut MemoryHeap) -> *mut AmpMovieObjectDesc;
+
     /// Sets an AS3 variable by clip path. The path is a dot-separated string like
-    /// `"MCI_hud.MCI_poi_stage._visible"`, resolved from the root timeline. `SetVarType` controls
-    /// persistence across clip re-creation (0 = normal). Call on the capture (game update)
-    /// thread.
+    /// `"MCI_hud.MCI_poi_stage._visible"`, resolved from the root timeline. `set_var_type` (one of
+    /// [`SV_NORMAL`](Self::SV_NORMAL), [`SV_STICKY`](Self::SV_STICKY), and
+    /// [`SV_PERMANENT`](Self::SV_PERMANENT)) controls persistence across clip re-creation. Call on
+    /// the capture (game update) thread.
     #[address(0x141_C47_FA0)]
     pub fn SetVariable(&self, path: *const u8, value: *const Value, set_var_type: u32) -> bool;
 
@@ -78,8 +92,8 @@ impl Movie {
 /// The Scaleform `Render::ContextImpl::Context`: the display-tree snapshot pipeline between the
 /// update thread and the renderer. `Capture` (update thread) merges the active snapshot's changes
 /// into the pending snapshot; [`NextCapture`](RTHandle::NextCapture) (render thread) consumes the pending
-/// snapshot into the displaying one, at most once per HAL frame. Only the fields the payload
-/// touches are modeled; the declared size covers just the modeled prefix.
+/// snapshot into the displaying one, at most once per HAL frame. Only some fields are modeled;
+/// the declared size covers only the modeled prefix.
 #[size(0x118)]
 pub type RenderContext {
     /// The once-a-frame consumption latch: while set, [`NextCapture`](RTHandle::NextCapture) keeps the current
@@ -99,8 +113,8 @@ pub type RenderContext {
 impl RenderContext {
     /// Creates a fresh [`TreeRoot`] entry in this context (`Context::CreateEntry<TreeRoot>`):
     /// allocates its `NodeData` from the context heap and registers the entry. The root starts
-    /// parentless with no viewport; give it one via [`TreeRoot::SetViewport`] and a stage matrix
-    /// via [`TreeNode::SetMatrix`] before drawing it. Call on the capture (game update) thread.
+    /// parentless with no viewport; [`TreeRoot::SetViewport`] sets its viewport and
+    /// [`TreeNode::SetMatrix`] its stage matrix. Call on the capture (game update) thread.
     #[address(0x141_994_560)]
     pub fn CreateEntryTreeRoot(&mut self) -> *mut TreeRoot;
 
@@ -110,15 +124,23 @@ impl RenderContext {
     pub fn CreateEntryTreeContainer(&mut self) -> *mut TreeContainer;
 }
 
-/// A Scaleform render-tree node: a `Render::ContextImpl::Entry` (a 56-byte slot in a
-/// 0x1000-aligned entry page) whose per-snapshot `NodeData` carries the transform, visibility,
-/// and bounds. [`TreeContainer`] and [`TreeRoot`] share this header; a pointer to either casts to
-/// this freely.
+/// A Scaleform render-tree node: a `Render::ContextImpl::Entry` (a slot in a 0x1000-aligned entry
+/// page) whose per-snapshot `NodeData` carries the transform, visibility, and bounds.
+/// [`TreeContainer`] and [`TreeRoot`] share this header; a pointer to either casts to this
+/// freely. Each write to an entry's `NodeData` records a `Render::TreeChangeConstants` change
+/// bit (`Change_*`) on the entry.
 #[size(0x38)]
 pub type TreeNode {
+    /// The change bit for a child insertion (`Change_ChildInsert`).
+    pub const CHANGE_CHILD_INSERT: u32 = 0x100,
+    /// The change bit for a child removal (`Change_ChildRemove`).
+    pub const CHANGE_CHILD_REMOVE: u32 = 0x200,
+    /// The change bit for a viewport write (`Change_Viewport`).
+    pub const CHANGE_VIEWPORT: u32 = 0x1000,
+
     /// The entry's reference count. [`TreeContainer::Insert`] increments it and
-    /// [`TreeContainer::Remove`] decrements it (destroying the entry at zero), so moving a node
-    /// between containers must hold an extra count across the remove.
+    /// [`TreeContainer::Remove`] decrements it (destroying the entry at zero), so a node moved
+    /// between containers without an extra count held across the remove is destroyed.
     #[address(0x8)]
     pub RefCount: u64,
 
@@ -150,18 +172,20 @@ impl TreeNode {
 
 /// A render-tree container node (`Render::TreeContainer`): a [`TreeNode`] whose `NodeData` holds
 /// a child `TreeNodeArray`. The display side mirrors every `DisplayObjContainer` into one, and
-/// addresses children by *cached numeric index* (`GFx::DisplayList`'s `TreeIndex`) -- so removing
-/// a child behind the display list's back shifts its siblings' cached indices; swap in a
-/// placeholder node instead when a child must leave without the display list knowing.
+/// addresses children by cached numeric index (`GFx::DisplayList`'s `TreeIndex`), so removing a
+/// child without the display list's knowledge shifts its siblings out of step with their cached
+/// indices.
 #[size(0x38)]
 pub type TreeContainer;
 impl TreeContainer {
-    /// Inserts `node` at `index` (entry-change bit 0x100): refcounts the node, sets its
+    /// Inserts `node` at `index`, recording
+    /// [`CHANGE_CHILD_INSERT`](TreeNode::CHANGE_CHILD_INSERT): refcounts the node, sets its
     /// [`pParent`](TreeNode::pParent), and propagates. Capture (game update) thread only.
     #[address(0x141_9E6_720)]
     pub fn Insert(&mut self, index: u64, node: *mut TreeNode) -> bool;
 
-    /// Removes `count` children starting at `index` (entry-change bit 0x200): nulls each child's
+    /// Removes `count` children starting at `index`, recording
+    /// [`CHANGE_CHILD_REMOVE`](TreeNode::CHANGE_CHILD_REMOVE): nulls each child's
     /// [`pParent`](TreeNode::pParent) and drops its refcount (destroying it at zero). Capture
     /// (game update) thread only.
     #[address(0x141_9E6_790)]
@@ -182,9 +206,10 @@ impl TreeContainer {
 #[size(0x38)]
 pub type TreeRoot;
 impl TreeRoot {
-    /// Writes the root's viewport (entry-change bit 0x1000, self-comparing). `viewport` is a
-    /// [`Viewport`] (e.g. [`MovieImpl::Viewport`]); the 0x2C `Render::Viewport` prefix is
-    /// copied. Capture (game update) thread only.
+    /// Writes the root's viewport, recording [`CHANGE_VIEWPORT`](TreeNode::CHANGE_VIEWPORT) only
+    /// when the viewport differs. `viewport` is a [`Viewport`] (e.g. [`MovieImpl::Viewport`]);
+    /// the `Render::Viewport` prefix, up to and including [`Flags`](Viewport::Flags), is copied.
+    /// Capture (game update) thread only.
     #[address(0x141_9E6_860)]
     pub fn SetViewport(&mut self, viewport: *const Viewport);
 }
@@ -267,6 +292,14 @@ epilogue for Traits r#"
 /// arguments).
 #[copyable, defaultable, size(0x34), align(4)]
 pub type Viewport {
+    /// The [`Flags`](Self::Flags) bit for a render-texture target (`View_IsRenderTexture`).
+    pub const VIEW_IS_RENDER_TEXTURE: u32 = 0x1,
+    /// The [`Flags`](Self::Flags) bit that enables the scissor rectangle
+    /// (`View_UseScissorRect`).
+    pub const VIEW_USE_SCISSOR_RECT: u32 = 0x4,
+    /// The [`Flags`](Self::Flags) mask for the orientation (`View_Orientation_Mask`).
+    pub const VIEW_ORIENTATION_MASK: u32 = 0x30,
+
     pub BufferWidth: i32,
     pub BufferHeight: i32,
     pub Left: i32,
@@ -277,7 +310,9 @@ pub type Viewport {
     pub ScissorTop: i32,
     pub ScissorWidth: i32,
     pub ScissorHeight: i32,
-    /// `View_*` flags (bit 0 render texture, bit 2 use scissor, bits 4-5 orientation, ...).
+    /// `View_*` flags, among them [`VIEW_IS_RENDER_TEXTURE`](Self::VIEW_IS_RENDER_TEXTURE),
+    /// [`VIEW_USE_SCISSOR_RECT`](Self::VIEW_USE_SCISSOR_RECT), and the
+    /// [`VIEW_ORIENTATION_MASK`](Self::VIEW_ORIENTATION_MASK) bits.
     pub Flags: u32,
     /// The view scale used by the `SM_NO_SCALE` mode; every engine caller passes 1.0.
     pub Scale: f32,
@@ -287,7 +322,7 @@ pub type Viewport {
 }
 
 /// A Scaleform `GFx::MouseState`: one tracked mouse's per-movie state
-/// ([`MovieImpl::MouseStates`]). `MouseState::UpdateState` (`0x141_9DD_E60`) fills it while
+/// ([`MovieImpl::MouseStates`]). `MouseState::UpdateState` fills it while
 /// [`MovieImpl::ProcessInput`] drains the input-events queue during `Advance`: it copies
 /// [`CurButtonsState`](Self::CurButtonsState) into
 /// [`PrevButtonsState`](Self::PrevButtonsState), applies the entry's button/wheel payload,
@@ -299,6 +334,15 @@ pub type Viewport {
 /// test.
 #[size(0x50), align(8)]
 pub type MouseState {
+    /// The [`CurButtonsState`](Self::CurButtonsState) bit for the left button
+    /// (`MouseButton_Left`).
+    pub const MOUSE_BUTTON_LEFT: u32 = 0x1,
+    /// The [`CurButtonsState`](Self::CurButtonsState) bit for the right button
+    /// (`MouseButton_Right`).
+    pub const MOUSE_BUTTON_RIGHT: u32 = 0x2,
+    /// The [`CurButtonsState`](Self::CurButtonsState) bit for the middle button
+    /// (`MouseButton_Middle`).
+    pub const MOUSE_BUTTON_MIDDLE: u32 = 0x4,
     /// [`Flags`](Self::Flags) bit: the topmost entity resolved to null on the last update.
     pub const FLAG_TOPMOST_ENTITY_IS_NULL: u8 = 0x1,
     /// [`Flags`](Self::Flags) bit: the previous topmost entity was null.
@@ -330,8 +374,7 @@ pub type MouseState {
     #[address(0x18)]
     pub MouseButtonDownEntities: [u64; 3],
 
-    /// The current button bitmask (bit 0 left, bit 1 right, bit 2 middle), as last applied from
-    /// the queue. [`MovieImpl::NotifyMouseState`] diffs its `buttons` argument against this when
+    /// The current button bitmask (`MOUSE_BUTTON_*` bits), as last applied from the queue. [`MovieImpl::NotifyMouseState`] diffs its `buttons` argument against this when
     /// queueing.
     #[address(0x30)]
     pub CurButtonsState: u32,
@@ -407,7 +450,7 @@ impl RTHandle {
 #[min_size(0x18)]
 pub type RenderTarget {
     vftable {
-        /// Releases the target (refcounted; slot 2).
+        /// Releases the target (refcounted).
         #[index(2)]
         pub fn Release(&mut self);
     },
@@ -421,6 +464,10 @@ pub type RenderTarget {
 /// [`UIManager::m_MovieScaleWidth`](ui::ui_manager::UIManager::m_MovieScaleWidth)).
 #[copyable, size(0x1C), align(4)]
 pub type MouseEvent {
+    /// The [`Button`](Self::Button) index of the left button.
+    pub const BUTTON_LEFT: u32 = 0,
+    /// The [`Button`](Self::Button) index of the right button.
+    pub const BUTTON_RIGHT: u32 = 1,
     /// The [`Type`](Self::Type) of a mouse-move event.
     pub const TYPE_MOUSE_MOVE: u32 = 1,
     /// The [`Type`](Self::Type) of a button-press event.
@@ -442,7 +489,8 @@ pub type MouseEvent {
     /// The wheel amount in Flash line units; the engine sends `lZ / 120 * 3` from the DirectInput
     /// mouse's z axis.
     pub ScrollDelta: f32,
-    /// The button index for down/up events: `0` left, `1` right.
+    /// The button index for down/up events: [`BUTTON_LEFT`](Self::BUTTON_LEFT) or
+    /// [`BUTTON_RIGHT`](Self::BUTTON_RIGHT).
     pub Button: u32,
     pub MouseIndex: u32,
 }
@@ -464,28 +512,55 @@ pub type MovieImpl {
     /// The [`ViewScaleMode`](Self::ViewScaleMode) that fills the view rectangle, preserving
     /// aspect (cropping as needed).
     pub const SM_NO_BORDER: u32 = 3,
+    /// The [`ViewAlignment`](Self::ViewAlignment) that centres the stage (`Align_Center`), the
+    /// constructor default.
+    pub const ALIGN_CENTER: u32 = 0,
+    /// The [`HitTest`](Self::HitTest) `test_cond` (`GFx::Movie::HitTestType`) that tests bounds.
+    pub const HIT_TEST_BOUNDS: u32 = 0,
+    /// The `test_cond` that tests shapes.
+    pub const HIT_TEST_SHAPES: u32 = 1,
+    /// The `test_cond` that tests for button events from `controller_idx`.
+    pub const HIT_TEST_BUTTON_EVENTS: u32 = 2,
+    /// The `test_cond` that tests shapes, counting invisible ones.
+    pub const HIT_TEST_SHAPES_NO_INVISIBLE: u32 = 3,
+    /// The [`Flags`](Self::Flags) bit (`Flag_NeedMouseUpdate`) marking mouse state pending
+    /// re-resolution; [`ProcessInput`](Self::ProcessInput) tests and clears it.
+    pub const FLAG_NEED_MOUSE_UPDATE: u32 = 0x80,
 
     vftable {
-        /// Snapshots the display tree for the render thread (`GFx::Movie` vtable slot 25). Must be
+        /// Advances the movie by `delta_t` seconds: processes queued
+        /// input, runs the timeline and AS3 frame, and, when `capture` is set, finishes with
+        /// [`CaptureImpl`](Self::CaptureImpl). Returns the time until the next frame is due.
+        #[index(24)]
+        pub fn Advance(&mut self, delta_t: f32, frame_catch_up_count: u32, capture: bool) -> f32;
+
+        /// Snapshots the display tree for the render thread. Must be
         /// called from the current capture thread (see
         /// [`SetCaptureThread`](Self::SetCaptureThread)); `if_changed = false` forces a fresh
         /// snapshot. The next [`NextCapture`](RTHandle::NextCapture) on the render side picks it up.
         #[index(25)]
         pub fn Capture(&mut self, if_changed: bool) -> u64;
 
-        /// Returns the movie's display handle (`GFx::Movie` vtable slot 26): the pinned
+        /// Returns the movie's display handle: the pinned
         /// `DisplayHandle<TreeRoot>` whose `pData` the renderer copies (with an `AddRef`) into a
         /// stack [`RTHandle`] before consuming the frame's capture.
         #[index(26)]
         pub fn GetDisplayHandle(&mut self) -> *mut DisplayHandle;
 
-        /// Reassigns which thread owns the capture (`GFx::Movie` vtable slot 27). The engine hands
+        /// Reassigns which thread owns the capture. The engine hands
         /// ownership between the update thread and the render thread this way
         /// (`RenderOffScreenTextures` does exactly this per frame).
         #[index(27)]
         pub fn SetCaptureThread(&mut self, thread_id: u32);
 
-        /// Routes a `GFx::Event` to the movie (`GFx::Movie` vtable slot 35). For a
+        /// Shuts down the movie's render context: a thunk into
+        /// `Render::ContextImpl::Context::Shutdown` on the embedded
+        /// [`RenderContext`](Self::RenderContext). `wait`
+        /// blocks until the render thread has released the context.
+        #[index(28)]
+        pub fn ShutdownRendering(&mut self, wait: bool);
+
+        /// Routes a `GFx::Event` to the movie. For a
         /// [`MouseEvent`] the movie records the new mouse state, which the next `Advance`
         /// processes into AS3 mouse events (hover, press, release). Call on the capture (game
         /// update) thread. `CUIManager::SendMouseEvents` is the engine's only mouse feeder, and
@@ -494,9 +569,9 @@ pub type MovieImpl {
         #[index(35)]
         pub fn HandleEvent(&mut self, event: *const MouseEvent) -> u32;
 
-        /// Reads one mouse's current state (`GFx::Movie` vtable slot 36): the position comes
+        /// Reads one mouse's current state: the position comes
         /// from [`MouseStates`](Self::MouseStates)`[mouse_index].LastPosition` converted to
-        /// **view-rectangle pixels** (`(twips * 0.05 - ViewOffset) / ViewScale` per axis, the
+        /// view-rectangle pixels (`(twips * 0.05 - ViewOffset) / ViewScale` per axis, the
         /// same space [`NotifyMouseState`](Self::NotifyMouseState) takes), and `buttons`
         /// from [`CurButtonsState`](MouseState::CurButtonsState). Out pointers may be null; a
         /// `mouse_index` at or beyond [`MouseCursorCount`](Self::MouseCursorCount) leaves
@@ -504,26 +579,30 @@ pub type MovieImpl {
         #[index(36)]
         pub fn GetMouseState(&mut self, mouse_index: u32, x: *mut f32, y: *mut f32, buttons: *mut u32);
 
-        /// Directly overwrites one mouse's state (`GFx::Movie` vtable slot 37): position in
-        /// movie-viewport pixels (the same space as [`MouseEvent`]) plus a button bitmask (bit 0
-        /// left, bit 1 right), bypassing the event objects. Processed on the next `Advance`, like
+        /// Directly overwrites one mouse's state: position in
+        /// movie-viewport pixels (the same space as [`MouseEvent`]) plus a button bitmask
+        /// ([`MOUSE_BUTTON_LEFT`](MouseState::MOUSE_BUTTON_LEFT) and
+        /// [`MOUSE_BUTTON_RIGHT`](MouseState::MOUSE_BUTTON_RIGHT)), bypassing the event objects. Processed on the next `Advance`, like
         /// [`HandleEvent`](Self::HandleEvent).
         #[index(37)]
         pub fn NotifyMouseState(&mut self, x: f32, y: f32, buttons: u32, mouse_index: u32);
 
-        /// Hit-tests the display tree at a point in view-rectangle pixels (`GFx::Movie` vtable
-        /// slot 38): transforms by the inverse of
+        /// Hit-tests the display tree at a point in view-rectangle pixels: transforms by the inverse of
         /// [`ViewportMatrix`](Self::ViewportMatrix), then tests each root level's shapes.
-        /// `test_cond` is the `HitTestType` (0 = bounds, 1 = shapes, 2 = button events with
-        /// `controller_idx`, 3 = shapes counting invisible).
+        /// `test_cond` is one of the `HIT_TEST_*` constants, such as
+        /// [`HIT_TEST_SHAPES`](Self::HIT_TEST_SHAPES).
         #[index(38)]
         pub fn HitTest(&mut self, x: f32, y: f32, test_cond: u32, controller_idx: u32) -> bool;
 
-        /// Sets how many mice the movie tracks (`GFx::Movie` vtable slot 43); `0` disables mouse
+        /// Sets how many mice the movie tracks; `0` disables mouse
         /// processing entirely. `CUIManager::RestoreAfterReset` sets `1` when a DirectInput mouse
         /// device exists and `0` otherwise.
         #[index(43)]
         pub fn SetMouseCursorCount(&mut self, count: u32);
+
+        /// Returns the movie's memory heap, [`pHeap`](Self::pHeap).
+        #[index(48)]
+        pub fn GetHeap(&self) -> *mut MemoryHeap;
     },
 
     /// The AS3 `MovieRoot` (the [`Movie`] interface): SetVariable, Invoke, and the display tree.
@@ -556,7 +635,7 @@ pub type MovieImpl {
 
     /// The movie's current [`Viewport`], as last copied in by
     /// [`SetViewportImpl`](Self::SetViewportImpl). [`TreeRoot::SetViewport`] takes it
-    /// directly (copying the 0x2C `Render::Viewport` prefix).
+    /// directly (copying the `Render::Viewport` prefix).
     #[address(0xA0)]
     pub Viewport: Viewport,
 
@@ -589,8 +668,8 @@ pub type MovieImpl {
     #[address(0xE8)]
     pub ViewScaleMode: u32,
 
-    /// The `Align_*` stage alignment (0 = center) used by the `SM_NO_SCALE` mode. Constructed
-    /// as 0.
+    /// The `Align_*` stage alignment used by the `SM_NO_SCALE` mode. Constructed as
+    /// [`ALIGN_CENTER`](Self::ALIGN_CENTER).
     #[address(0xEC)]
     pub ViewAlignment: u32,
 
@@ -629,40 +708,41 @@ pub type MovieImpl {
     #[address(0x2_3F0)]
     pub MouseCursorCount: u32,
 
+    /// The movie's `FLAG_*` state bits (`MovieImpl::Flags`), among them
+    /// [`FLAG_NEED_MOUSE_UPDATE`](Self::FLAG_NEED_MOUSE_UPDATE).
+    #[address(0x5_2F0)]
+    pub Flags: u32,
+
     /// The movie's embedded `Render::Context` (the snapshot pipeline: active/pending/displaying
     /// snapshots, the capture locks, and the once-a-frame consumption latch).
     #[address(0x5_350)]
     pub RenderContext: RenderContext,
 }
 impl MovieImpl {
-    /// The concrete implementation behind the [`Capture`](Self::Capture) virtual (vtable
-    /// slot 25): gates on `Context::HasChanges` when `if_changed` is set, suspends the GC, and
+    /// The concrete implementation behind the [`Capture`](Self::Capture) virtual: gates on `Context::HasChanges` when `if_changed` is set, suspends the GC, and
     /// runs `Render::Context::Capture` to publish the frame's display-tree changes as the pending
     /// snapshot. `CUIManager::PreRender` calls it right after `Advance`, on the game update
     /// thread with the deferred render lock held -- the only point in the frame where every
-    /// display-tree writer is quiescent, which makes it the seam for pre-capture display-list
-    /// edits.
+    /// display-tree writer is quiescent.
     #[address(0x141_98B_7D0)]
     pub fn CaptureImpl(&mut self, if_changed: bool) -> u64;
 
-    /// The concrete implementation behind [`HandleEvent`](Self::HandleEvent) (vtable slot
-    /// 35). For mouse move/down/up/wheel events it transforms the event's position by the
+    /// The concrete implementation behind [`HandleEvent`](Self::HandleEvent). For mouse move/down/up/wheel events it transforms the event's position by the
     /// inverse of [`ViewportMatrix`](Self::ViewportMatrix) (view-rectangle pixels to stage
     /// twips) and queues the result on the input-events queue; nothing is stored raw. The next
     /// `Advance` drains the queue into AS3 mouse processing.
     #[address(0x141_983_0D0)]
     pub fn HandleEventImpl(&mut self, event: *const MouseEvent) -> u32;
 
-    /// The concrete implementation behind [`NotifyMouseState`](Self::NotifyMouseState)
-    /// (vtable slot 37). Transforms `(x, y)` by the inverse of
+    /// The concrete implementation behind [`NotifyMouseState`](Self::NotifyMouseState). Transforms `(x, y)` by the inverse of
     /// [`ViewportMatrix`](Self::ViewportMatrix), queues a mouse move at the resulting stage
     /// position (twips), then diffs `buttons` against the tracked per-mouse button state and
     /// queues a button event per changed bit.
     #[address(0x141_983_830)]
     pub fn NotifyMouseStateImpl(&mut self, x: f32, y: f32, buttons: u32, mouse_index: u32);
 
-    /// The concrete implementation behind the `SetViewport` virtual (vtable slot 12). When
-    /// `desc` differs from [`Viewport`](Self::Viewport) (memcmp over all 0x34 bytes), copies
+    /// The concrete implementation behind the `SetViewport` virtual. When `desc` differs from
+    /// [`Viewport`](Self::Viewport) (a memcmp over the whole [`Viewport`]), copies
     /// it in, runs [`UpdateViewport`](Self::UpdateViewport), and pushes the new state to the
     /// render tree ([`TreeRoot::SetViewport`], background color, and `TreeNode::SetMatrix` with
     /// [`ViewportMatrix`](Self::ViewportMatrix) on [`pRenderRoot`](Self::pRenderRoot)).
@@ -688,65 +768,70 @@ impl MovieImpl {
     /// Drains the input-events queue during `Advance`: keyboard entries go to focus handling,
     /// mouse entries to `ProcessMouse` (which runs `MouseState::UpdateState` and hit-tests the
     /// display tree at the entry's stage-twips position). Afterwards, for any tracked mouse that
-    /// saw no entry this drain but has pending state (movie-flag 0x80), re-resolves the hover
+    /// saw no entry this drain while [`FLAG_NEED_MOUSE_UPDATE`](Self::FLAG_NEED_MOUSE_UPDATE) is
+    /// set and the mouse is [`FLAG_ACTIVATED`](MouseState::FLAG_ACTIVATED), re-resolves the hover
     /// target from [`MouseState::LastPosition`].
     #[address(0x141_994_890)]
     pub fn ProcessInput(&mut self);
 
-    /// The concrete implementation behind [`GetMouseState`](Self::GetMouseState) (vtable
-    /// slot 36).
+    /// The concrete implementation behind [`GetMouseState`](Self::GetMouseState).
     #[address(0x141_983_920)]
     pub fn GetMouseStateImpl(&mut self, mouse_index: u32, x: *mut f32, y: *mut f32, buttons: *mut u32);
 
-    /// The concrete implementation behind [`HitTest`](Self::HitTest) (vtable slot 38).
+    /// The concrete implementation behind [`HitTest`](Self::HitTest).
     #[address(0x141_983_9A0)]
     pub fn HitTestImpl(&mut self, x: f32, y: f32, test_cond: u32, controller_idx: u32) -> bool;
 }
 
-/// A Scaleform [`MemoryHeap`]. Opaque; allocation goes through its vtable (`Alloc` at slot offset
-/// `0x50`).
-#[min_size(1)]
-pub type MemoryHeap;
+/// A Scaleform [`MemoryHeap`]. Opaque apart from its vtable, through which allocation goes.
+#[min_size(8)]
+pub type MemoryHeap {
+    vftable {
+        /// Allocates `size` bytes from the heap.
+        #[index(10)]
+        pub fn Alloc(&mut self, size: u64) -> *mut void;
+    },
+}
 
 /// The Scaleform `Render::D3D1x::HAL` behind `CUIManager::m_RenderHAL`: the D3D11 rendering
 /// backend the UI render worker draws through.
 #[min_size(0x473B8)]
 pub type RenderHAL {
     vftable {
-        /// Binds `target` as the frame's display render target (slot 3). `CUIManager::Render`
+        /// Binds `target` as the frame's display render target. `CUIManager::Render`
         /// calls it with `m_RenderBuffer` before `BeginFrame`, paired with a trailing
         /// [`PopRenderTarget`](Self::PopRenderTarget).
         #[index(3)]
         pub fn SetRenderTarget(&mut self, target: *mut RenderTarget, set_state: bool);
 
-        /// Pushes `target` for nested rendering within a frame (slot 4), as
+        /// Pushes `target` for nested rendering within a frame, as
         /// `RenderOffScreenTextures` does per off-screen movie. `frame_rect` is `[x0, y0, x1,
         /// y1]` floats; `clear_color` points at a packed color (0 = transparent).
         #[index(4)]
         pub fn PushRenderTarget(&mut self, target: *mut RenderTarget, flags: u64, frame_rect: *const f32, clear_color: *const u32);
 
-        /// Pops the pushed (or set) render target (slot 5).
+        /// Pops the pushed (or set) render target.
         #[index(5)]
         pub fn PopRenderTarget(&mut self, flags: u32);
 
-        /// Begins the HAL frame (slot 11). `EndFrame` clears every context's once-a-frame
+        /// Begins the HAL frame. `EndFrame` clears every context's once-a-frame
         /// consumption latch via `EndFrameContextNotify`.
         #[index(11)]
         pub fn BeginFrame(&mut self) -> bool;
 
-        /// Ends the HAL frame (slot 12).
+        /// Ends the HAL frame.
         #[index(12)]
         pub fn EndFrame(&mut self);
 
-        /// Begins a scene (draw batch) within the frame (slot 15).
+        /// Begins a scene (draw batch) within the frame.
         #[index(15)]
         pub fn BeginScene(&mut self) -> bool;
 
-        /// Ends the scene (slot 16).
+        /// Ends the scene.
         #[index(16)]
         pub fn EndScene(&mut self);
 
-        /// The HAL's `Render::ContextImpl::RenderNotify` (slot 19), passed to
+        /// The HAL's `Render::ContextImpl::RenderNotify`, passed to
         /// [`RTHandle::NextCapture`].
         #[index(19)]
         pub fn GetContextNotify(&mut self) -> *mut void;
@@ -757,14 +842,15 @@ pub type RenderHAL {
     pub pDevice: *mut void,
 
     /// The `ID3D11DeviceContext` every HAL draw goes through (possibly a deferred context; see
-    /// `UsingDeferredContext` at `0x473C0`). Work recorded on it from the UI render worker is
+    /// the HAL's `UsingDeferredContext` flag). Work recorded on it from the UI render worker is
     /// ordered with the HAL's own draws.
     #[address(0x47_3B0)]
     pub pDeviceContext: *mut void,
 }
 impl RenderHAL {
     /// Builds a [`RenderTarget`] from D3D color/depth views (`ID3D11RenderTargetView*` /
-    /// `ID3D11DepthStencilView*`); the concrete implementation behind vtable slot 111.
+    /// `ID3D11DepthStencilView*`); the concrete implementation behind the `CreateRenderTarget`
+    /// virtual.
     /// `RenderOffScreenTextures` creates one per off-screen draw and releases it afterwards.
     /// Render thread only.
     #[address(0x141_DE1_110)]
@@ -872,9 +958,8 @@ impl ValueObjectInterface {
     pub fn GetDisplayInfo(&mut self, data: *mut void, info: *mut DisplayInfo) -> bool;
 
     /// Writes the `DisplayInfo` fields selected by [`DisplayInfo::VarsSet`] directly at the
-    /// display-object level -- no AVM path resolution and no AS3 property setters, which is what
-    /// makes it suitable for high-frequency writes (the game's own `CHUDUI::UpdatePOIs` drives
-    /// POI positions and visibility through it every frame).
+    /// display-object level -- no AVM path resolution and no AS3 property setters.
+    /// `CHUDUI::UpdatePOIs` drives POI positions and visibility through it every frame.
     #[address(0x141_BAE_F00)]
     pub fn SetDisplayInfo(&mut self, data: *mut void, info: *const DisplayInfo) -> bool;
 
@@ -915,7 +1000,7 @@ pub type DisplayInfo {
     #[address(0xD0)]
     pub EdgeAAMode: u32,
     /// Which fields a [`SetDisplayInfo`](ValueObjectInterface::SetDisplayInfo) call applies
-    /// (`V_*` bits; `0x40` = visible).
+    /// (`V_*` bits, such as [`V_VISIBLE`](Self::V_VISIBLE)).
     pub VarsSet: u16,
     pub Visible: bool,
 }
@@ -940,14 +1025,15 @@ epilogue for Value r#"
 /// [`RefCountImpl`] and embeds a `Scaleform::String` for the name and a
 /// `Scaleform::ArrayDataBase<Ptr<AmpMovieObjectDesc>>` for children.
 ///
-/// Layout verified from `GetChildDescTree` at `0x141_A30_410`.
+/// Layout verified from `DisplayObjContainer::GetChildDescTree`.
 #[size(0x30)]
 pub type AmpMovieObjectDesc {
     #[base]
     pub ref_count_impl: RefCountImpl,
 
     /// The clip's instance name, or `"Unnamed"`: a `Scaleform::String`, i.e. a pointer to a
-    /// [`StringDataDesc`] with heap flags packed into the pointer's low 3 bits (mask with `& !7`).
+    /// [`StringDataDesc`] with heap flags packed into the pointer's low bits (mask off
+    /// [`HEAP_FLAGS_MASK`](StringDataDesc::HEAP_FLAGS_MASK)).
     #[address(0x10)]
     pub name: *const u8,
 
@@ -965,11 +1051,19 @@ pub type AmpMovieObjectDesc {
     pub child_capacity: u64,
 }
 
-/// The heap data descriptor behind a `Scaleform::String`: an 8-byte allocated size and a 4-byte
-/// refcount, followed by the NUL-terminated character data. Reached from the string's pointer after
-/// masking off the heap flags in its low 3 bits (`& !7`).
+/// The heap data descriptor behind a `Scaleform::String`: an allocated size and a refcount,
+/// followed by the NUL-terminated character data. Reached from the string's pointer after masking
+/// off the heap flags ([`HEAP_FLAGS_MASK`](Self::HEAP_FLAGS_MASK)).
 #[min_size(0x10)]
 pub type StringDataDesc {
+    /// The low bits of a `Scaleform::String` pointer that carry heap flags rather than address.
+    pub const HEAP_FLAGS_MASK: u64 = 0x7,
+
+    /// The allocated size.
+    pub Size: u64,
+    /// The reference count.
+    pub RefCount: u32,
+
     /// The first character of the NUL-terminated string data.
     #[address(0xC)]
     pub m_Data: c_char,
@@ -1031,3 +1125,16 @@ epilogue for AmpMovieObjectDesc r#"
 /// `CCommStatsUI` -> `comm_stats`, `CCommBragsFeatsUI` -> `comm_brags_feats`,
 /// `CCommStoreUI` -> `comm_store`, `CRewardUI` -> `reward`, `CROMUI` -> (none).
 pub type ScaleformInfo;
+
+/// `GFx::Loader`: the Scaleform movie loader.
+pub type Loader {
+    /// The load flag that skips import binding: `MovieBindProcess::BindNextFrame` tests it before
+    /// resolving a movie's imported symbol libraries (`LoadDisableImports`).
+    pub const LOAD_DISABLE_IMPORTS: u32 = 0x100000,
+}
+impl Loader {
+    /// Loads (or fetches from the resource library) the movie definition at `filename` with the
+    /// given load flags.
+    #[address(0x141_976_DD0)]
+    pub fn CreateMovie(&mut self, filename: *const u8, load_constants: u32, memory_arena: u64) -> *mut void;
+}

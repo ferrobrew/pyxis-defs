@@ -5,10 +5,75 @@ use types::math::Vector3;
 
 pub type InstanceProperties;
 
-/// `SCharacterMovementSettings`: the per-character movement tuning block. Only passed through
-/// opaquely so far; its first float is the walk/run speed threshold the start-act selection
-/// compares against.
-pub type CharacterMovementSettings;
+/// `SCharacterOnFootSettings`: the on-foot block of [`CharacterMovementSettings`].
+#[size(0x8C), align(4)]
+pub type CharacterOnFootSettings {
+    /// The walk/run speed threshold the start-act selection compares against.
+    pub m_WalkSpeed: f32,
+    pub m_WalkMaxVelocity: f32,
+    pub m_WalkAcceleration: f32,
+    pub m_WalkDeceleration: f32,
+    pub m_WalkMinInput: f32,
+    pub m_JogMaxVelocity: f32,
+    pub m_JogAcceleration: f32,
+    pub m_JogDeceleration: f32,
+    pub m_RunSpeed: f32,
+    pub m_RunBackpedalSpeed: f32,
+    pub m_RunAcceleration: f32,
+    pub m_RunDeceleration: f32,
+    pub m_RunMinInput: f32,
+    pub m_MaxSpeedToPlayStartAnim: f32,
+    pub m_MaxSpeedToPlayStopAnim: f32,
+    pub m_AngularDisplacementSpeed: f32,
+    pub m_AngularOrientationSpeed: f32,
+    pub m_AngularBackDisplacementSpeed: f32,
+    pub m_AngularBackOrientationSpeed: f32,
+    pub m_StopFrameBuffer: f32,
+    pub m_StartFrameBuffer: f32,
+    pub m_StartWhenAimingFrameBuffer: f32,
+    pub m_EnableStarts: f32,
+    pub m_EnablePlants: f32,
+    pub m_EnableStops: f32,
+    pub m_MaxLeftLeanAngle: f32,
+    pub m_MaxRightLeanAngle: f32,
+    pub m_HeavyWeaponWalkSpeed: f32,
+    pub m_LandAngularDisplacementSpeed: f32,
+    pub m_LandAngularOrientationSpeed: f32,
+    pub m_NonCombatWalkSpeed: f32,
+    pub m_NonCombatWalkAngularAccel: f32,
+    pub m_NonCombatWalkAngularSpeed: f32,
+    pub m_PredictedFallHeightTolerance: f32,
+    pub m_PredictedWallDistanceTolerance: f32,
+}
+
+/// `SCharacterSwimSettings`: the swim block of [`CharacterMovementSettings`]. The offsets of the
+/// two turn-rate fields within the movement settings are confirmed.
+#[size(0x30), align(4)]
+pub type CharacterSwimSettings {
+    pub m_SurfaceSwimFullDeflection: f32,
+    /// The surface-swim velocity turn rate; `UpdateSurfaceMovement` scales it by [`SWIM_TURN_RATE_SCALE`](input::swim::SWIM_TURN_RATE_SCALE) degrees per second.
+    pub m_SurfaceSwimDirSlerpSpeed: f32,
+    /// The surface-swim facing turn rate: `UpdateSurfaceMovement` rotates the body toward the desired direction at this times [`SWIM_TURN_RATE_SCALE`](input::swim::SWIM_TURN_RATE_SCALE) degrees per second (overridden by [`SWIM_AIM_TURN_RATE`](input::swim::SWIM_AIM_TURN_RATE) while aiming or planting explosives).
+    pub m_SurfaceSwimFaceDirSlerpSpeed: f32,
+    pub m_UnderwaterToSurfaceDepth: f32,
+    pub m_SurfaceToUnderwaterPitch: f32,
+    pub m_UnderwaterInheritedDecel: f32,
+    pub m_UnderwaterSwimDirMaxAngular: f32,
+    pub m_UpwardSwimSpeedUp: f32,
+    pub m_ShallowDepthBobDepth: f32,
+    pub m_ShallowDepthMaxBobVelocity: f32,
+    pub m_SpeedNoRotationControl: f32,
+    pub m_SurfaceSwimNoInputToStopTime: f32,
+}
+
+/// `SCharacterMovementSettings`: the per-character movement tuning resource (referenced from the
+/// character's movement-settings handle): the on-foot and swim blocks, followed by the plant
+/// settings (unmapped).
+#[min_size(0xBC), align(4)]
+pub type CharacterMovementSettings {
+    pub m_OnFootSettings: CharacterOnFootSettings,
+    pub m_SwimSettings: CharacterSwimSettings,
+}
 
 /// The locomotion task that reads the movement effectors and writes the move direction to the
 /// character blackboard. Like the other `NStateTask` functions, `self` is the *character* -- the
@@ -35,8 +100,8 @@ impl NStateTask_InputLocoMoveTask {
     /// [`Character::m_AimFlags`] ([`m_AimingWeapon`](character::character::AimState::m_AimingWeapon) /
     /// [`m_AimingGrapple`](character::character::AimState::m_AimingGrapple)): with neither set it queues
     /// [`QueueMoveActions`](NStateTask_LocoUtil::QueueMoveActions) (run — the body steers toward the
-    /// movement vector), otherwise it queues the aim-relative (strafe) acts. This branch is the
-    /// concrete point where on-foot movement becomes third-person steer instead of FPS-style strafe.
+    /// movement vector), otherwise it queues the aim-relative (strafe) acts. This branch selects
+    /// between the run/steer and strafe movement styles on foot.
     #[address(0x140_812_5E0)]
     pub fn Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
 }
@@ -46,8 +111,8 @@ impl NStateTask_InputLocoMoveTask {
 pub type NStateTask_InputLocoAimRelativeTask;
 impl NStateTask_InputLocoAimRelativeTask {
     /// The per-frame update. Like [`NStateTask_InputLocoMoveTask::Update`] it re-reads
-    /// [`Character::m_AimFlags`] each frame and dispatches to the strafe or run acts, so dropping the
-    /// aim bits here falls back to run/steer.
+    /// [`Character::m_AimFlags`] each frame and dispatches to the strafe or run acts, so the task
+    /// falls back to run/steer once the aim bits clear.
     #[address(0x140_836_500)]
     pub fn Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
 }
@@ -83,8 +148,8 @@ impl NStateTask_LocoUtil {
     /// Queues the aim-relative (strafe) acts. It derives the facing reference from the weapon-aim
     /// target when [`m_AimingWeapon`](character::character::AimState::m_AimingWeapon) is set (or the
     /// grapple target for [`m_AimingGrapple`](character::character::AimState::m_AimingGrapple)),
-    /// and falls back to the character's own current forward when neither is set — so this alone
-    /// does not turn the body toward the camera without an aim reference.
+    /// and falls back to the character's own current forward when neither is set, so without an aim
+    /// reference the body keeps its current facing.
     #[address(0x140_832_6B0)]
     pub fn QueueAimRelativeMoveActions(character: *mut Character) -> bool;
 
@@ -97,7 +162,8 @@ impl NStateTask_LocoUtil {
     /// [`NStateTask_MovementLocomotionTask::Update`]. With `track_face_dir` clear (and outside a
     /// gating animation segment) the rotation comes from the animation root motion
     /// (`CAnimationControl::GetDeltaRotation`) — the run-mode steer. With it set, the target face
-    /// direction is read from the character blackboard (id `736589998`) and the body is yawed
+    /// direction is read from the character blackboard
+    /// ([`TARGET_FACE_DIR_ID`](blackboard::ObjectBlackboard::TARGET_FACE_DIR_ID)) and the body is yawed
     /// toward it: snapped directly when `snap_to_face_dir` is set (gated on the blend being
     /// finished when `wait_for_blend` is also set), otherwise rate-limited to `max_step_deg`
     /// degrees per call — the aim-mode camera tracking. `max_step_deg` must be positive on the
@@ -117,16 +183,17 @@ impl NStateTask_LocoUtil {
     /// orientation. Called from [`NStateTask_MovementLocomotionTask::Update`], which normalizes
     /// `out_direction`, scales it by
     /// [`EvaluateCharacterSpeed`](Self::EvaluateCharacterSpeed), and writes the
-    /// result as the character's physics velocity -- so overriding `out_direction` after the call
-    /// redirects the movement without touching the speed envelope. The bools and `out_secondary`
-    /// are unmapped.
+    /// result as the character's physics velocity. `out_direction` therefore sets only the heading
+    /// of the velocity; the speed envelope comes from the speed evaluation. The bools and
+    /// `out_secondary` are unmapped.
     #[address(0x140_81A_B90)]
     pub fn EvaluateCharacterDisplacement(character: *mut Character, orientation: *const Matrix4, p3: bool, p4: bool, p5: bool, p6: f32, out_secondary: *mut Vector3, out_direction: *mut Vector3);
 
     /// Computes this frame's movement speed for the character: the magnitude of the animation
     /// control's raw root velocity -- so the speed envelope, including the ramp-up through the
     /// start acts, comes from the animation clips themselves. With `use_blackboard_override` set,
-    /// the blackboard float id `1707123197` replaces the result when present. Multiplied onto the
+    /// the [`SPEED_OVERRIDE_ID`](blackboard::ObjectBlackboard::SPEED_OVERRIDE_ID) float replaces
+    /// the result when present. Multiplied onto the
     /// normalized displacement direction by the movement task.
     #[address(0x140_81A_B10)]
     pub fn EvaluateCharacterSpeed(character: *mut Character, use_blackboard_override: bool) -> f32;
@@ -179,7 +246,7 @@ impl NStateTask_MovementLocomotionTask {
 pub type NStateTask_MovementJumpTask;
 impl NStateTask_MovementJumpTask {
     /// The per-frame update. Computes a desired facing direction, rate-limits the body toward it,
-    /// and writes the character orientation (the release inlines the `SetOrientation` writes). The
+    /// and writes the character orientation (the `SetOrientation` writes are inlined). The
     /// desired facing has two sources: when
     /// [`m_AimingWeapon`](character::character::AimState::m_AimingWeapon) is set it faces the weapon
     /// aim target (`CPlayerAimControl`'s stored target world position, which tracks the aim camera);
@@ -206,3 +273,50 @@ pub extern LocoUtil_NoAimStrafeMaxAngle: f32;
 pub extern LocoUtil_NoAimStrafeMaxAngleAlt: f32;
 #[address(0x142_F2F_B64)]
 pub extern NCharacter_ActMoveNoAim: u32;
+
+/// The locomotion input task active while precision-aiming on foot.
+pub type NStateTask_InputLocoAimPrecisionTask;
+impl NStateTask_InputLocoAimPrecisionTask {
+    /// The per-frame update. When the player is in precision aim mode and aiming a weapon is
+    /// possible it queues the precision-aim idle or move act from the blackboard speed; otherwise
+    /// it dispatches like [`NStateTask_InputLocoMoveTask::Update`]: aim-relative move or stop-turn
+    /// acts while [`Character::m_AimFlags`] has an aim bit set, run/steer move or stop acts
+    /// otherwise.
+    #[address(0x140_817_820)]
+    pub fn Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
+}
+
+/// The movement task that warps the character onto a physical anchor during a scripted warp.
+pub type NPhysicalAnchorWarpTask;
+impl NPhysicalAnchorWarpTask {
+    /// The per-frame update: lerps the character toward the anchor over the warp segment's local
+    /// time, evaluates the orientation and displacement through
+    /// [`NStateTask_LocoUtil`], and writes the target direction to the blackboard.
+    #[address(0x140_83E_210)]
+    pub fn Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
+}
+
+/// The melee input task.
+pub type NStateTask_InputMeleeTask;
+impl NStateTask_InputMeleeTask {
+    /// The per-frame update. When melee is possible and clicked (the player also needs the hammer
+    /// ability), picks the melee target from the aim control, sets the character's link target and
+    /// combat mental state, and queues the melee acts.
+    #[address(0x140_830_150)]
+    pub fn Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
+}
+
+/// The movement actuator task for stunt locomotion on vehicles and in stunt areas, including the
+/// stunt step-up and step-down states.
+pub type NStateTask_MovementStuntingTask;
+impl NStateTask_MovementStuntingTask {
+    /// The per-frame update. Resolves the stunt area the character stands on (projecting and
+    /// clamping onto its edges, or entering the next interaction-graph node), computes the
+    /// orientation through
+    /// [`EvaluateCharacterOrientation`](NStateTask_LocoUtil::EvaluateCharacterOrientation) (or the
+    /// MS variant) and the displacement through
+    /// [`EvaluateCharacterDisplacement`](NStateTask_LocoUtil::EvaluateCharacterDisplacement),
+    /// inheriting the vehicle's speed, and writes the proxy's wanted velocity.
+    #[address(0x140_82B_440)]
+    pub fn Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
+}

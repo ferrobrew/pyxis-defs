@@ -1,0 +1,66 @@
+use aim::target::Target;
+use character::character::Character;
+use types::math::Matrix4;
+use types::math::Vector3;
+use types::shared_ptr::SharedPtr;
+
+/// A latched grapple target (`CWireEnd::SHookTargetInfo`): the target position, plus the target or
+/// game object it is relative to and the position in that object's space. The hook fills it from the aim state when it fires, and the wire end flies to and attaches at it.
+#[size(0x38)]
+pub type HookTargetInfo {
+    /// The target the hook homes on, or null for a target-less (surface) latch.
+    pub m_HomingHookTarget: *mut Target,
+
+    /// The world-space target position at the time it was latched.
+    /// `CGrapplingHook::SetUpTarget` writes the aim slot's position here.
+    #[address(0x8)]
+    pub m_TargetPosition: Vector3,
+
+    /// Whether the aim slot was in range when the target was latched.
+    #[address(0x20)]
+    pub m_WasInRange: bool,
+
+    /// The target game object (a `boost::weak_ptr<CGameObject>`: object pointer and weak control
+    /// block), or null.
+    #[address(0x28)]
+    pub m_TargetGameObject: [*mut void; 2],
+}
+impl HookTargetInfo {
+    /// Latches `target` with `local_position` in the target's game-object space.
+    #[address(0x140_926_C00)]
+    pub fn SetupTargetFromTarget(&mut self, target: *mut Target, local_position: *const Vector3);
+
+    /// Latches the game object `game_object` (a `CGameObject`) with `local_position` in its space.
+    #[address(0x140_926_E50)]
+    pub fn SetupTargetFromGameObject(&mut self, game_object: *mut void, local_position: *const Vector3);
+
+    /// Writes the latched target's current world position, following the target object when there
+    /// is one.
+    #[address(0x140_927_040)]
+    pub fn GetTargetWorldPosition(&self, result: *mut Vector3);
+}
+
+/// One end of a grapple wire (`CWireEnd`). A `CGrapplingHookWire` holds two: the near end at the
+/// device and the far end at the hook. An end extends toward a latched [`HookTargetInfo`], then
+/// attaches to a proxy (`CGrapplePointProxy`), not to a bare coordinate. The layout is unmapped.
+pub type WireEnd;
+impl WireEnd {
+    /// Puts the end into its extending state: it flies from `start_pos` at `speed` toward
+    /// `target_info`, as a ghost wire when `ghost_wire`.
+    #[address(0x140_93D_700)]
+    pub fn SetExtend(&mut self, start_pos: *const Vector3, speed: f32, target_info: *mut HookTargetInfo, ghost_wire: bool);
+
+    /// Attaches the end at `hit_pos`: builds the attachment proxy from the ray hit `cast_info` (a
+    /// `CCastRayInfo`) with `SetupProxyForAttachment` and moves the end to its attached state.
+    #[address(0x140_94A_FB0)]
+    pub fn Attach(&mut self, hit_pos: *const Vector3, cast_info: *mut void, hook_owner: *const SharedPtr<Character>, reattaching: bool);
+
+    /// Attaches the end to an existing attachment proxy (a `CGrapplePointProxy`).
+    #[address(0x140_8F4_850)]
+    pub fn AttachToProxy(&mut self, proxy: *mut void);
+
+    /// Attaches the end to bone `bone` of `character` at `local_offset`, through a new
+    /// `CCharacterBoneAttachedPointProxy`.
+    #[address(0x140_8F9_1F0)]
+    pub fn AttachToCharacterBone(&mut self, character: *const SharedPtr<Character>, bone: i32, local_offset: *const Matrix4);
+}

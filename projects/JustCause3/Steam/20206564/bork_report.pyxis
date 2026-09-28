@@ -1,0 +1,22 @@
+/// One sampled report entry (`CBorkReport::ReportEntry`): the accumulated GPU per-category, GPU
+/// memory, CPU per-phase, and memory metrics for a sampling window. Layout not yet mapped.
+pub type ReportEntry;
+
+/// Avalanche's crash and telemetry report ("bork report"). It samples frame metrics and writes them
+/// as JSON metric entries and a plain-text `total.txt` summary.
+pub type BorkReport;
+impl BorkReport {
+    /// Writes `entry`'s metrics as a JSON array: the per-category GPU times (named by
+    /// `GetRenderPassCategoryName`), the frame time and its peak, the per-category GPU memory, the
+    /// CPU frame and draw times, the per-phase CPU times named through
+    /// [`CpuProfiler::GetScopeName`](cpu_profiler::CpuProfiler::GetScopeName), and the CPU memory
+    /// usage.
+    #[address(0x140_878_330)]
+    pub fn WriteMetrics(&mut self, entry: *mut ReportEntry);
+
+    /// Writes the sampling session's averages to `total.txt` in the scratch path: build and system
+    /// information, then the average GPU time, frame time, memory usage, per-category GPU times and
+    /// memory, and per-phase CPU times. Called when sampling stops.
+    #[address(0x140_8A3_0F0)]
+    pub fn WriteTotalEntry(&mut self);
+}

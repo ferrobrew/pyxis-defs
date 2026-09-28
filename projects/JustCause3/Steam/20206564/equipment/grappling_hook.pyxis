@@ -1,3 +1,8 @@
+use aim::target::TargetType;
+use character::character::Character;
+use equipment::wire_end::HookTargetInfo;
+use state::StateContext;
+use types::math::Vector3;
 use types::shared_ptr::SharedPtr;
 
 /// The grappling hook's high-level state machine (`CGrapplingHook::m_State`). `SetState` is the
@@ -37,6 +42,12 @@ pub type GrapplingHook {
     #[address(0x234)]
     pub m_State: GrapplingHookState,
 
+    /// The latched fire target, filled by [`SetUpTarget`](Self::SetUpTarget) when the hook fires.
+    /// [`GetLastGrappleTargetPos`](Self::GetLastGrappleTargetPos) reads its current world position,
+    /// so the fire and its arm IK follow the latched target rather than the live aim slot.
+    #[address(0x238)]
+    pub m_HookFireInfo: HookTargetInfo,
+
     /// The countdown (seconds) armed when a hook fire is committed, within which the fire
     /// animation must emit its release track message before the fire is abandoned. Set to `2.0`
     /// alongside [`m_WaitingForGrappleFire`](Self::m_WaitingForGrappleFire) by the fire
@@ -57,8 +68,95 @@ pub type GrapplingHook {
     #[address(0x275)]
     pub m_WaitingForTetherFire: bool,
 
+    /// The cached reel-in target position in world space. The reel-in aim IK turns the chest
+    /// toward it while a wire is active. The offset is confirmed; the name is
+    /// unconfirmed.
+    #[address(0x318)]
+    pub m_CachedReelTargetPosition: Vector3,
+
     /// The wire currently driving the reel/attach flow, or null when none is live. The state
     /// readers null-check this before interpreting [`m_State`](Self::m_State).
     #[address(0x3C8)]
     pub m_ActiveWire: SharedPtr<GrapplingHookWire>,
+}
+impl GrapplingHook {
+    /// Latches the `player`'s (a `CPlayer`) aim slot `target_type` into `target_info`: reads the
+    /// slot's [`m_AimPos`](aim::aim::PlayerAimControl::m_AimPos) and
+    /// [`m_Target`](aim::aim::PlayerAimControl::m_Target) from the player's aim control, stores the
+    /// position in the target object's space, and falls back to the aim control's current grapple
+    /// game object only for [`TARGET_GRAPPLE`](TargetType::TARGET_GRAPPLE). Later changes to the
+    /// aim slot do not move the latched target.
+    #[address(0x140_939_CF0)]
+    pub fn SetUpTarget(player: *mut void, target_info: *mut HookTargetInfo, target_type: TargetType);
+
+    /// Writes the latched fire target's current world position
+    /// ([`m_HookFireInfo`](Self::m_HookFireInfo)) and returns true.
+    #[address(0x140_93A_4B0)]
+    pub fn GetLastGrappleTargetPos(&self, position: *mut Vector3) -> bool;
+
+    /// Computes the fire direction toward the latched target and hands it to
+    /// [`DoActFire`](Self::DoActFire).
+    #[address(0x140_943_2E0)]
+    pub fn TryFireHook(&mut self, holder: *const SharedPtr<Character>, dual_tether_fire: bool, grapple_reel_fire: bool);
+
+    /// Queues the directional fire act for `aim_direction` on `holder`: picks the
+    /// `ACT_GRAPPLE_FIRE_*` sector (or `ACT_GRAPPLE_TETHER_FIRE_*` for a dual tether) from the
+    /// angle between the direction and the character. No wire is created here; the hook spawns on
+    /// the fire animation's release track message.
+    #[address(0x140_8FE_D80)]
+    pub fn DoActFire(aim_direction: *const Vector3, holder: *const SharedPtr<Character>, dual_tether_fire: bool, grapple_reel_fire: bool);
+
+    /// The pre-simulation hook update: dispatches the grapple input (fire, reel, dual tether,
+    /// retract, release) and advances the reel and tether state.
+    #[address(0x140_949_F70)]
+    pub fn OnPreSimUpdate(&mut self, dt: f32);
+
+    /// The post-camera hook update. On the fire animation's release frame it creates the wire
+    /// ([`CreateNewWire`](Self::CreateNewWire)), pins the near end to the device, and starts the
+    /// far end extending toward the latched target
+    /// ([`WireEnd::SetExtend`](equipment::wire_end::WireEnd::SetExtend)).
+    #[address(0x140_94E_D60)]
+    pub fn OnPostCamUpdate(&mut self, dt: f32);
+
+    /// Spawns a new wire at `spawn_pos` and returns it through `result`.
+    #[address(0x140_923_BC0)]
+    pub fn CreateNewWire(&mut self, result: *mut SharedPtr<GrapplingHookWire>, spawn_pos: *const Vector3) -> *mut SharedPtr<GrapplingHookWire>;
+
+    /// Retracts the active wire: destroys its physics constraint, detaches the near end, and
+    /// notifies the HUD.
+    #[address(0x140_8F7_A10)]
+    pub fn RetractActiveWire(&mut self);
+
+    /// Whether the hook is in its "aiming" state: an active wire that is not reeling in and not a
+    /// custom wire; with the re-reel upgrade, reeling in also counts.
+    #[address(0x140_8C8_EA0)]
+    pub fn IsHookAimingState(&self) -> bool;
+
+    /// Whether the HUD shows the attached-wire part of the grapple reticle: an active, attached
+    /// wire while the hook is not in [`GHS_REELING_IN`](GrapplingHookState::GHS_REELING_IN),
+    /// [`GHS_REELED_ATTACHED`](GrapplingHookState::GHS_REELED_ATTACHED),
+    /// [`GHS_REELED_HANG`](GrapplingHookState::GHS_REELED_HANG), or
+    /// [`GHS_REELED_UPSIDEDOWN`](GrapplingHookState::GHS_REELED_UPSIDEDOWN).
+    #[address(0x140_8C9_4C0)]
+    pub fn ShouldShowAttachedUI(&self) -> bool;
+
+    /// Writes the interpolated graphics world position of the active wire's attached far end for
+    /// the render interpolation factor `dtf`. Returns false without an attached active wire.
+    #[address(0x140_8D7_B30)]
+    pub fn GetActiveWireAttachmentGraphicsWorldPosition(&self, dtf: f32, gfx_pos_out: *mut Vector3) -> bool;
+
+    /// Pushes the wires' tension and attach-type data to the HUD (`CHUDUI::UpdateWireData`).
+    #[address(0x140_902_DC0)]
+    pub fn PushWireDataToUI(&self);
+}
+
+/// The in-air grapple fire motion state task (`NStateTask_InAirGrappleFireMotionTask`). Like the
+/// other `NStateTask` functions, it runs against the character's state context.
+pub type NStateTask_InAirGrappleFireMotionTask;
+impl NStateTask_InAirGrappleFireMotionTask {
+    /// Enters the task, orienting the fire motion from the camera matrix
+    /// (`CGameCameraManager::GetCameraMatrix`, read directly rather than through the aim slot) and
+    /// the latched target ([`GrapplingHook::GetLastGrappleTargetPos`]).
+    #[address(0x140_810_B60)]
+    pub fn OnEnter(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
 }

@@ -1,0 +1,27 @@
+/// The aim purpose a target or aim slot serves (`CTarget::ETargetType`). The target system scores
+/// every candidate once per purpose, and the player's aim control keeps one slot per purpose in each
+/// of its per-purpose arrays (see [`PlayerAimControl`](aim::aim::PlayerAimControl)), indexed by
+/// this value.
+#[copyable]
+pub enum TargetType: i32 {
+    /// Firearms: the slot the character's weapons aim at.
+    TARGET_WEAPONS = 0x0,
+    /// Sticky aim assist.
+    TARGET_STICKY_AIM = 0x1,
+    /// The grappling hook.
+    TARGET_GRAPPLE = 0x2,
+    /// Melee attacks.
+    TARGET_MELEE = 0x3,
+    /// Thrown grenades.
+    TARGET_GRENADE = 0x4,
+    /// Snap aim assist.
+    TARGET_SNAP = 0x5,
+    /// The number of target types, and so the length of every per-purpose array.
+    NOF_TARGET_TYPES = 0x6,
+}
+
+/// A scored aim candidate (`CTarget`) registered with the target system: a weak reference to its
+/// game object, its local- and world-space aim positions, per-[`TargetType`] fitness and validity,
+/// and a visibility raycast. Characters, vehicles, vehicle parts, rigid objects, and destruction
+/// objects each own one. The layout is unmapped.
+pub type Target;

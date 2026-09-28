@@ -1,0 +1,160 @@
+use graphics_engine::graphics_engine::{HContext_t, HDevice_t, HTimeStampDisjointQuery_t, HTimeStampQuery_t};
+
+/// A graphics-backend occlusion query handle (`Graphics::HOcclusionQuery_t`).
+pub type HOcclusionQuery_t;
+
+/// A graphics-backend event (fence) query handle (`Graphics::HEventQuery_t`).
+pub type HEventQuery_t;
+
+/// The per-kind query counts of a [`GPUBufferedQuery`] (`CGPUBufferedQuery::SCreateParams`). The
+/// same shape holds both the capacities and the per-frame usage counters.
+#[size(0x8), align(2), copyable]
+pub type GPUBufferedQueryCreateParams {
+    pub m_NumTimestamps: u16,
+    pub m_NumOcclusions: u16,
+    pub m_NumFences: u16,
+    pub m_NumFrequency: u8,
+    pub m_NumBuffers: u8,
+}
+
+/// A ring of GPU queries buffered over several frames (`NGraphicsEngine::CGPUBufferedQuery`): each
+/// query kind has `count * m_NumBuffers` handles, so a caller can issue queries this frame and read
+/// them back buffers later without stalling on the GPU. The issue functions return the handle index
+/// they used, or [`INVALID_QUERY_INDEX`](Self::INVALID_QUERY_INDEX) when the kind's per-buffer
+/// capacity is exhausted.
+#[size(0x30), align(8)]
+pub type GPUBufferedQuery {
+    /// The index the issue functions return when the kind's per-buffer capacity is exhausted. The
+    /// end and read functions accept it and do nothing (the reads return 0).
+    pub const INVALID_QUERY_INDEX: i32 = -1,
+
+    pub m_Timestamps: *mut *mut HTimeStampQuery_t,
+    pub m_Occlusions: *mut *mut HOcclusionQuery_t,
+    pub m_Fences: *mut *mut HEventQuery_t,
+    pub m_Frequency: *mut *mut HTimeStampDisjointQuery_t,
+    /// The per-buffer capacity of each kind, and the buffer count.
+    pub m_Params: GPUBufferedQueryCreateParams,
+    /// This frame's usage of each kind; `m_NumBuffers` holds the current buffer index.
+    pub m_Current: GPUBufferedQueryCreateParams,
+}
+impl GPUBufferedQuery {
+    /// Allocates the handle arrays and creates `count * m_NumBuffers` queries of each kind.
+    #[address(0x140_0A0_740)]
+    pub fn Create(&mut self, device: *mut HDevice_t, params: GPUBufferedQueryCreateParams);
+
+    /// Destroys every query and frees the handle arrays.
+    #[address(0x140_0A0_8C0)]
+    pub fn Destroy(&mut self, device: *mut HDevice_t);
+
+    /// Issues the next timestamp query of the current buffer; returns its index or
+    /// [`INVALID_QUERY_INDEX`](Self::INVALID_QUERY_INDEX).
+    #[address(0x140_0A0_4E0)]
+    pub fn SetTimestamp(&mut self, ctx: *mut HContext_t) -> i32;
+
+    /// Issues the next event (fence) query of the current buffer; returns its index or
+    /// [`INVALID_QUERY_INDEX`](Self::INVALID_QUERY_INDEX).
+    #[address(0x140_0A0_480)]
+    pub fn SetFence(&mut self, ctx: *mut HContext_t) -> i32;
+
+    /// Begins the next occlusion query of the current buffer; returns its index or
+    /// [`INVALID_QUERY_INDEX`](Self::INVALID_QUERY_INDEX).
+    #[address(0x140_0A0_540)]
+    pub fn SetOcclusionBegin(&mut self, ctx: *mut HContext_t) -> i32;
+
+    /// Ends the occlusion query at `index` (ignored when it is [`INVALID_QUERY_INDEX`](Self::INVALID_QUERY_INDEX)).
+    #[address(0x140_0A0_5A0)]
+    pub fn SetOcclusionEnd(&mut self, ctx: *mut HContext_t, index: i32);
+
+    /// Begins the next timestamp-disjoint (frequency) query of the current buffer; returns its index
+    /// or [`INVALID_QUERY_INDEX`](Self::INVALID_QUERY_INDEX).
+    #[address(0x140_0A0_5D0)]
+    pub fn SetFrequencyBegin(&mut self, ctx: *mut HContext_t) -> i32;
+
+    /// Reads the occlusion query at `index` (0 when it is [`INVALID_QUERY_INDEX`](Self::INVALID_QUERY_INDEX)).
+    #[address(0x140_0A0_6C0)]
+    pub fn GetOcclusionResult(&mut self, ctx: *mut HContext_t, index: i32) -> u32;
+
+    /// Reads the timestamp frequency of the disjoint query at `index` (0 when it is [`INVALID_QUERY_INDEX`](Self::INVALID_QUERY_INDEX)).
+    #[address(0x140_0A0_700)]
+    pub fn GetFrequencyResult(&mut self, ctx: *mut HContext_t, index: i32) -> u64;
+}
+
+/// One slot of a [`RenderPassGpuTimingQuery`] ring (`CRenderPassGpuTimingQuery::STimeStampData`).
+#[size(0x20), align(8)]
+pub type RenderPassGpuTimingQueryTimeStampData {
+    pub m_TimeStampQueryStart: *mut HTimeStampQuery_t,
+    pub m_TimeStampQueryEnd: *mut HTimeStampQuery_t,
+    pub m_GPUFrequencyQuery: *mut HTimeStampDisjointQuery_t,
+    /// The last read timestamp frequency (initialised to 100 MHz).
+    pub m_Frequency: u64,
+}
+
+/// A GPU timer for one render pass (`NGraphicsEngine::CRenderPassGpuTimingQuery`): a four-slot ring
+/// of start/end timestamp and disjoint queries, read back three frames later into a timing
+/// history. The render engine owns one instance, timing the particle pass.
+#[size(0x38), align(8)]
+pub type RenderPassGpuTimingQuery {
+    /// The four ring slots.
+    pub m_TimeStamps: *mut RenderPassGpuTimingQueryTimeStampData,
+    pub m_CurrentTimeStampIndex: u32,
+    pub m_CurrentHistoryIndex: u32,
+    /// The GPU time of recent frames in milliseconds.
+    pub m_ParticleGPUTimingHistory: [f32; 10],
+}
+impl RenderPassGpuTimingQuery {
+    /// Allocates the four ring slots and creates their queries.
+    #[address(0x140_0A0_A20)]
+    pub fn Create(&mut self, device: *mut HDevice_t);
+
+    /// Destroys the ring's queries and frees it.
+    #[address(0x140_0A0_AC0)]
+    pub fn Destroy(&mut self, device: *mut HDevice_t);
+
+    /// Advances the ring, reads the oldest slot's timestamps and frequency into the history, then
+    /// records the start timestamp and begins the disjoint query of the new slot.
+    #[address(0x140_0A0_B40)]
+    pub fn BeginGPUTimingQuery(&mut self, ctx: *mut HContext_t);
+
+    /// Records the current slot's end timestamp and ends its disjoint query.
+    #[address(0x140_0A0_C70)]
+    pub fn EndGPUTimingQuery(&mut self, ctx: *mut HContext_t);
+
+    /// A fixed weighted average of the
+    /// [`m_ParticleGPUTimingHistory`](Self::m_ParticleGPUTimingHistory) samples, in milliseconds.
+    #[address(0x140_0A0_CC0)]
+    pub fn GetAverageGpuTiming(&mut self) -> f32;
+}
+
+/// The engine's developer GPU profiler (`NGraphicsEngine::CGPUProfiler`, `g_GPUProfiler`): per-scope
+/// GPU and CPU times, occlusion, and draw-call counts over the render-pass categories. Only the
+/// construction and the result-count accessor survive; the scope recording and result
+/// read-back are compiled out. Created by `CGraphicsEngine::InitializeSystem`.
+#[singleton(0x142_E5B_668), size(0x928)]
+pub type GPUProfiler;
+impl GPUProfiler {
+    #[address(0x140_0F3_E60)]
+    pub fn Constructor(&mut self) -> *mut GPUProfiler;
+
+    /// The number of scope results in the last frame's results (80-byte `SScopeData` entries).
+    #[address(0x140_0B7_EF0)]
+    pub fn GetScopeResultCount(&self) -> i32;
+
+    /// The scope result at `index`. Compiled to return null.
+    #[address(0x140_0A0_F90)]
+    pub fn GetScopeResult(&self, index: i32) -> *const void;
+}
+
+/// A scoped graphics debug marker (`Graphics::CScopeMarker`): the constructor opens a named scope on
+/// the context with [`BeginScopeMarker`](graphics_engine::graphics_engine::BeginScopeMarker) and the
+/// destructor closes it with [`EndScopeMarker`](graphics_engine::graphics_engine::EndScopeMarker).
+#[size(0x8), align(8)]
+pub type ScopeMarker {
+    pub m_Context: *mut HContext_t,
+}
+impl ScopeMarker {
+    #[address(0x140_099_990)]
+    pub fn Constructor(&mut self, ctx: *mut HContext_t, name: *const u8) -> *mut ScopeMarker;
+
+    #[address(0x140_099_9C0)]
+    pub fn Destructor(&mut self);
+}

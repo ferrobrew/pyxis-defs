@@ -1,0 +1,42 @@
+use types::math::Vector3;
+
+/// The character's animation control parameters (`CControlParameters`), reached through
+/// [`Character::m_ControlParameters`](character::character::Character::m_ControlParameters). Only some
+/// members are bound.
+#[min_size(0x140)]
+pub type ControlParameters {
+    /// The weapon aim point (world space), copied here from the player's aim control each frame by
+    /// `CPlayer::UpdatePostCamera` alongside
+    /// [`Character::UpdateWeaponAiming`](character::character::Character::UpdateWeaponAiming).
+    #[address(0xB0)]
+    pub m_AimTargetWeapons: Vector3,
+
+    /// The animation user VM state, holding the character state-bitflag words.
+    #[address(0xD8)]
+    pub m_UserVM: UserVM,
+}
+
+/// The animation state machine's per-instance data (`SUserVM`, derived from
+/// `SAnimatedModelInstanceData`): the register file and the state-bitflag words. Animation-graph
+/// evaluation on the SIM tick sets and clears the bits as the state machine enters and leaves
+/// states; the one-bit predicates on [`Character`](character::character::Character) read them. The
+/// words are game-thread data.
+///
+/// The bits are named by [`StateBitFlag`](state::StateBitFlag), an index across the words: bit `n`
+/// lives in word `n / 64` at position `n % 64`, so its mask within that word is `1 << (n % 64)`.
+#[min_size(0x30)]
+pub type UserVM {
+    /// The animation register array.
+    pub m_Registers: *mut f32,
+    pub m_RegisterCount: u32,
+
+    /// The current state bits `0..64` ([`StateBitFlag`](state::StateBitFlag) indices `0x00..0x40`).
+    #[address(0x10)]
+    pub m_CurrentStateBitFlags0: u64,
+    /// The current state bits `64..128` ([`StateBitFlag`](state::StateBitFlag) indices `0x40..0x80`).
+    pub m_CurrentStateBitFlags1: u64,
+    /// The current state bits `128..192` ([`StateBitFlag`](state::StateBitFlag) indices `0x80..0xC0`).
+    pub m_CurrentStateBitFlags2: u64,
+    /// The fourth state word; no state bit is assigned to it.
+    pub m_CurrentStateBitFlags3: u64,
+}

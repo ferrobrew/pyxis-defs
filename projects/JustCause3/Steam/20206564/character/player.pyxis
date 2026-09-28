@@ -1,0 +1,78 @@
+use aim::aim::PlayerAimControl;
+use character::avatar::Avatar;
+use character::character::Character;
+
+/// The player's aim mode (`CPlayer::EAimModes`), held in [`Player::m_AimMode`].
+pub enum AimMode: i32 {
+    /// Normal (hip) aim.
+    AIM_NORMAL = 0x0,
+    /// Precision (down-sights) aim.
+    AIM_PRECISION = 0x1,
+    AIM_MAX = 0x2,
+}
+
+/// The local player object (`CPlayer`). It derives from `NEvent::CEventHandler` and then
+/// `CAvatar`, so the [`Avatar`] base sits at [`AVATAR_BASE_OFFSET`](Self::AVATAR_BASE_OFFSET) and a
+/// character's [`m_Avatar`](character::character::Character::m_Avatar) points there rather than at
+/// the start of the player. Only some members are bound.
+#[min_size(0x1414)]
+pub type Player {
+    /// The offset of the [`Avatar`] base within the player.
+    pub const AVATAR_BASE_OFFSET: u64 = 0x10,
+
+    /// The player's character.
+    #[address(0x110)]
+    pub m_Character: *mut Character,
+
+    /// The player's aim control, which resolves the aim points each frame. Its weapon aim point
+    /// (the [`TARGET_WEAPONS`](aim::target::TargetType::TARGET_WEAPONS) slot of
+    /// [`m_AimPos`](aim::aim::PlayerAimControl::m_AimPos)) is the target the arm aim IK tasks steer
+    /// toward.
+    #[address(0x158)]
+    pub m_AimControl: *mut PlayerAimControl,
+
+    /// The player's aim mode: [`AIM_PRECISION`](AimMode::AIM_PRECISION) while in precision
+    /// (down-sights) aim, [`AIM_NORMAL`](AimMode::AIM_NORMAL) otherwise. Written by
+    /// [`SetAimMode`](Self::SetAimMode).
+    #[address(0x1_40C)]
+    pub m_AimMode: AimMode,
+    /// The game time ([`Clock`](clock::Clock) game-time milliseconds) at which
+    /// [`m_AimMode`](Self::m_AimMode) last changed.
+    pub m_AimModeChangeTime: u32,
+}
+impl Player {
+    /// Switches the player's aim mode. Entering precision aim
+    /// ([`AIM_PRECISION`](AimMode::AIM_PRECISION)) is refused while
+    /// falling without a parachute or when the character has none of the aimable weapon slots
+    /// filled. On a change it records [`m_AimModeChangeTime`](Self::m_AimModeChangeTime), adds or
+    /// removes the precision-aim camera hint (adding it only when `add_camera_hint` is set), sets
+    /// the aim control's aim state, and forwards the mode to the selected weapon (or draws it).
+    #[address(0x140_C3C_EB0)]
+    pub fn SetAimMode(&mut self, mode: AimMode, add_camera_hint: bool);
+
+    /// Drops the player out of precision aim ([`SetAimMode`](Self::SetAimMode) with
+    /// [`AIM_NORMAL`](AimMode::AIM_NORMAL)) when the
+    /// character can no longer precision-aim and is not planting an explosive. Called from
+    /// `CPlayer::UpdatePostPhysics`.
+    #[address(0x140_C3D_100)]
+    pub fn UpdateAimMode(&mut self);
+}
+
+/// `CPlayer::UpdatePostCamera`, the player's override of the `CAvatar::UpdatePostCamera` virtual;
+/// `avatar` is the player's [`Avatar`] base. Runs the aim control's post-simulation update, then
+/// publishes its weapon aim point to the character (the control parameters' aim target and
+/// [`Character::UpdateWeaponAiming`]) and its grenade aim point
+/// ([`Character::UpdateGrenadeAiming`]), and, when the player sits in a vehicle's driver seat, to
+/// the vehicle ([`Vehicle::SetAimTargetPosition`](vehicle::vehicle::Vehicle::SetAimTargetPosition)).
+#[address(0x140_CF7_BB0)]
+pub fn Player_UpdatePostCamera(avatar: *mut Avatar, dt: f32);
+
+/// `CPlayer::UpdateMentalState`, the player's override of the `CAvatar` virtual; `avatar` is the
+/// player's [`Avatar`] base. After the base update it sets the character's mental state:
+/// relaxed while [`Character_ForceNonCombat`](character::character::Character_ForceNonCombat) is
+/// set, combat while [`Character_ForceCombat`](character::character::Character_ForceCombat) is
+/// set, relaxed while the character is holstering (or a further character state check holds), and
+/// combat while it has weapon input, throws a grenade, wields a heavy weapon, or aims a weapon
+/// outside explosive planting. Otherwise combat decays to relaxed once the combat hold expires.
+#[address(0x140_C12_BE0)]
+pub fn Player_UpdateMentalState(avatar: *mut Avatar, dt: f32);

@@ -1,0 +1,11 @@
+/// The per-instance skinning palette data (`NGraphicsEngine::CSkinningPaletteData`). Only its static
+/// deletion queue is mapped.
+pub type SkinningPaletteData;
+impl SkinningPaletteData {
+    /// Drains the double-buffered, lock-protected queue of skinning-palette vertex buffers pending
+    /// deletion (`CSkinningPaletteData::UpdateDeleteQueue`, static). Called once per dispatch from
+    /// [`GraphicsEngine::HandleDrawThreadTask`](graphics_engine::graphics_engine::GraphicsEngine::HandleDrawThreadTask).
+    /// IDA mislabels this address as a GPU-profiler `EndScope`.
+    #[address(0x140_156_6D0)]
+    pub fn UpdateDeleteQueue();
+}

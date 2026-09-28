@@ -3,7 +3,7 @@ use graphics_engine::graphics_engine::{HDevice_t, HRenderSetup_t, HTexture_t};
 /// A texture/surface pixel format. The values are the `DXGI_FORMAT` codes the backend passes
 /// straight to D3D11 (so [`ABGR32`](Self::ABGR32) is `DXGI_FORMAT_R8G8B8A8_UNORM`), with a handful
 /// of platform-independent names above [`ARGB32`](Self::ARGB32) for formats D3D11 has no direct
-/// equivalent for. `Unknown` (0) means "take the format from the source data".
+/// equivalent for. `Unknown` means "take the format from the source data".
 ///
 /// The engine's enumeration carries many aliases that resolve to the same code (`RGBA32`,
 /// `BGRA32`, and `FB_A8R8G8B8` all share [`ABGR32`](Self::ABGR32)'s code); only one name per
@@ -111,8 +111,8 @@ pub enum TileMode: i32 {
     None = 0xFF,
 }
 
-/// The parameters to [`Create2DTexture`]. Padding at `0x24` aligns [`m_Name`](Self::m_Name) to
-/// eight bytes.
+/// The parameters to [`Create2DTexture`]. Padding after [`m_PoolType`](Self::m_PoolType) aligns
+/// [`m_Name`](Self::m_Name) to eight bytes.
 #[size(0x50), align(8)]
 pub type Create2DTextureParams {
     pub m_Width: u32,
@@ -143,11 +143,10 @@ pub type Create2DTextureParams {
     /// `m_Castable:1`, `m_ColorSpace:1`, `m_UnorderedAccess:1`, `m_MipLevelClamp:4`,
     /// `m_RenderCompression:1`.
     ///
-    /// [`Create2DTexture`] reads four of them on D3D11: `m_ColorSpace` (bit 7) requests the sRGB
-    /// variant of the format, `m_Castable` (bit 6) creates the resource in the typeless
-    /// equivalent of the format so views may reinterpret it, `m_UnorderedAccess` (bit 8) adds a
-    /// UAV bind and creates the unordered-access view, and `m_MipLevelClamp` (bits 9-12)
-    /// becomes the view's most-detailed mip.
+    /// [`Create2DTexture`] reads four of them on D3D11: `m_ColorSpace` requests the sRGB variant
+    /// of the format, `m_Castable` creates the resource in the typeless equivalent of the format
+    /// so views may reinterpret it, `m_UnorderedAccess` adds a UAV bind and creates the
+    /// unordered-access view, and `m_MipLevelClamp` becomes the view's most-detailed mip.
     #[address(0x44)]
     pub m_Flags: u32,
 
@@ -184,6 +183,21 @@ pub type CreateSurfaceAliasParams {
 /// appear here — a render setup's size is whatever its bound targets carry.
 #[size(0xE0), align(8)]
 pub type CreateRenderSetupParams {
+    /// The [`m_Mask`](Self::m_Mask) value enabling writes to all four colour channels, which
+    /// [`CreateRenderSetups`](graphics_engine::graphics_engine::GraphicsEngine::CreateRenderSetups)
+    /// passes for its setups.
+    pub const MASK_ALL_CHANNELS: u32 = 15,
+    /// The `m_UAVStart` value in [`m_Flags`](Self::m_Flags) that [`CreateRenderSetup`] replaces
+    /// with the derived colour-target count, so the unordered-access views start immediately
+    /// after the colour targets.
+    pub const UAV_START_AFTER_COLOR_TARGETS: u32 = 15,
+    /// The [`m_Flags`](Self::m_Flags) value
+    /// [`CreateRenderSetups`](graphics_engine::graphics_engine::GraphicsEngine::CreateRenderSetups)
+    /// passes for its setups, including both back-buffer setups: it sets `m_AutoResolve`, leaves
+    /// `m_EDRAMLayout` clear, and sets `m_UAVStart` to
+    /// [`UAV_START_AFTER_COLOR_TARGETS`](Self::UAV_START_AFTER_COLOR_TARGETS).
+    pub const DEFAULT_FLAGS: u32 = 0x79,
+
     /// The depth-stencil target, or null for a colour-only setup.
     pub m_DepthTarget: *mut HTexture_t,
 
@@ -210,9 +224,10 @@ pub type CreateRenderSetupParams {
     pub m_Mask: u32,
 
     /// A packed bitfield, from the low bit up: `m_AutoResolve:1`, `m_EDRAMLayout:2`,
-    /// `m_UAVStart:4`. [`CreateRenderSetup`] reads `m_UAVStart` (bits 3-6) as the register slot
-    /// the unordered-access views start at; the sentinel `15` means "immediately after the
-    /// colour targets", and is replaced by the derived colour-target count.
+    /// `m_UAVStart:4`. [`CreateRenderSetup`] reads `m_UAVStart` as the register slot the
+    /// unordered-access views start at; the sentinel
+    /// [`UAV_START_AFTER_COLOR_TARGETS`](Self::UAV_START_AFTER_COLOR_TARGETS) is replaced by the
+    /// derived colour-target count.
     #[address(0xD0)]
     pub m_Flags: u32,
 
@@ -273,7 +288,7 @@ pub fn DestroySurface(device: *mut HDevice_t, surface: *mut HTexture_t);
 
 /// Creates a render setup, the render-target configuration a pass binds with
 /// [`SetRenderSetup`](graphics_engine::graphics_engine::SetRenderSetup): it allocates the
-/// `0xF8`-byte setup, copies the depth target and the three eight-entry target/UAV arrays
+/// setup, copies the depth target and the three target/UAV arrays
 /// verbatim, and derives each array's count by scanning for the first null. It reads no width or
 /// height — the setup's dimensions come entirely from its bound targets, which is why
 /// `SetRenderSetup` can synthesize a full-target viewport from them.

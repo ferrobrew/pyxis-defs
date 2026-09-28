@@ -1,0 +1,34 @@
+use hash::HashString;
+
+/// `SUpgradeInfo`: one gear-mod upgrade's definition and state, as returned by
+/// `CProfileManager::GetUpgradeInfo`. Only the leading fields are mapped; the id hashes are stored
+/// bare. The profile manager's sorted table stores each one after its 8-byte key, at a
+/// 0x128-byte stride.
+#[min_size(0x120), align(8)]
+pub type UpgradeInfo {
+    pub m_Id: HashString,
+    pub m_TaskGroupId: HashString,
+    pub m_DlcId: u32,
+
+    #[address(0x10)]
+    pub m_TaskGroup: *const void,
+    pub m_StarThreshold: i32,
+    pub m_IsResearched: bool,
+    /// Whether the upgrade is purchased. Gameplay gates test it together with
+    /// [`m_IsEnabled`](Self::m_IsEnabled).
+    pub m_IsPurchased: bool,
+    /// Whether the player has the purchased upgrade switched on; set from the comm/skill UI.
+    pub m_IsEnabled: bool,
+}
+
+/// `CProfileManager` (a `Base::CSingle` singleton): the player profile, including the upgrade
+/// table. Only the upgrade lookup is mapped.
+#[singleton(0x142_F37_1A8)]
+pub type ProfileManager;
+impl ProfileManager {
+    /// Binary-searches the upgrade table (sorted by id hash) for `id` and returns its
+    /// [`UpgradeInfo`]. When the id is absent it returns a static, zero-initialized default entry,
+    /// never null, so the purchased and enabled tests read false.
+    #[address(0x140_C7E_6C0)]
+    pub fn GetUpgradeInfo(&self, id: *const HashString) -> *const UpgradeInfo;
+}

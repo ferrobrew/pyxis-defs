@@ -50,18 +50,51 @@ pub type PostEffectContext {
     pub m_AutoExposureKey: f32,
 }
 
-#[min_size(0x210)]
+#[min_size(0x4A0)]
 pub type PostEffectsManager {
     /// The slot-base the slot-returning effects' result textures live at in the manager's texture
-    /// array: a stage's current result is `CTX[slot + 83]`, where `CTX` is the manager argument the
-    /// post block passes to the effect chain and `slot` is the effect's declared slot index.
+    /// array: a stage's current result is `CTX[slot + RESULT_TEXTURE_SLOT_BASE]` (an entry of
+    /// [`m_FullscreenLinearTempTexture`](Self::m_FullscreenLinearTempTexture)), where `CTX` is the
+    /// manager argument the post block passes to the effect chain and `slot` is the effect's declared
+    /// slot index.
     pub const RESULT_TEXTURE_SLOT_BASE: u64 = 83,
+    /// The qword index of [`m_FullscreenSrgbTempTexture`](Self::m_FullscreenSrgbTempTexture) in the
+    /// manager: the sRGB view of the slot's result is `CTX[slot + SRGB_RESULT_TEXTURE_SLOT_BASE]`.
+    /// SMAA's edge detection and
+    /// final blend read the current slot through it.
+    pub const SRGB_RESULT_TEXTURE_SLOT_BASE: u64 = 80,
+    /// The number of full-screen temporary textures in the post chain's slot ring
+    /// (`s_FullscreenTempTextureCount`); effects advance the slot as
+    /// `(slot + 1) % FULLSCREEN_TEMP_TEXTURE_COUNT`.
+    pub const FULLSCREEN_TEMP_TEXTURE_COUNT: u32 = 3,
+
+    /// The anti-aliasing effect, which [`ApplySubsampleJitter`](Self::ApplySubsampleJitter) forwards
+    /// to.
+    #[address(0x110)]
+    pub m_AntiAliasing: *mut AntiAliasingEffect,
 
     /// Master enable for the post-effects chain. When clear, [`DepthOfFieldEffect::Apply`] swaps the
     /// full composite (exposure, grading, depth of field) for the tonemap-only or passthrough
     /// shader, and the manager skips the sun halo, fade, and global-pass enqueue.
     #[address(0x20E)]
     pub m_Enabled: bool,
+
+    /// The sRGB views of the post chain's full-screen temporary textures, one per ring slot.
+    #[address(0x280)]
+    pub m_FullscreenSrgbTempTexture: [*mut HTexture_t; 3],
+
+    /// The linear views of the post chain's full-screen temporary textures, one per ring slot: the
+    /// slot-indexed results the effects hand along the chain.
+    #[address(0x298)]
+    pub m_FullscreenLinearTempTexture: [*mut HTexture_t; 3],
+
+    /// The high-precision composite velocity texture SMAA's temporal blend reads.
+    #[address(0x310)]
+    pub m_HighPrecisionCompositeVelocityTexture: *mut HTexture_t,
+
+    /// The render setup the chain's final copy draws into.
+    #[address(0x498)]
+    pub m_TargetRenderSetup: *mut HRenderSetup_t,
 }
 impl PostEffectsManager {
     /// Enqueues the world post-effect block, then steps the world fade accumulator
@@ -101,7 +134,9 @@ impl PostEffectsManager {
 ///
 /// It threads a single result-texture slot index through the slot-returning effects
 /// ([`DepthOfFieldEffect`], [`MotionBlurEffect`], [`PlayerDamageEffect`], [`AntiAliasingEffect`]),
-/// hopping between the three fullscreen temp textures.
+/// moving between the
+/// [`FULLSCREEN_TEMP_TEXTURE_COUNT`](PostEffectsManager::FULLSCREEN_TEMP_TEXTURE_COUNT) full-screen
+/// temporary textures.
 pub type RenderBlockPostEffects;
 impl RenderBlockPostEffects {
     #[address(0x140_16A_260)]
@@ -212,6 +247,23 @@ impl SunHaloEffect {
     #[address(0x140_0F8_030)]
     pub fn Apply(&mut self, ctx: *mut HContext_t) -> u64;
 }
+
+/// The temporal anti-aliasing (SMAA T2X) sub-pixel jitter offsets in pixels, indexed by
+/// `[m_FrameIndex & 1][axis]` (`g_JitteredSamples`). [`AntiAliasingEffect::ApplySubsampleJitter`]
+/// scales them by [`jitter_scale_factor`] and divides by the target size.
+#[address(0x142_305_360)]
+pub extern jittered_samples: [[f32; 2]; 2];
+/// The scale applied to [`jittered_samples`] (`g_JitterScaleFactor`).
+#[address(0x142_D3A_708)]
+pub extern jitter_scale_factor: f32;
+/// Whether SMAA's edge-detection pass marks detected edges in the stencil buffer
+/// (`g_EnableEdgeStencil`, default set), so the blend pass runs only where the stencil matches.
+#[address(0x142_D3A_6F3)]
+pub extern edge_stencil_enabled: bool;
+/// The stencil bits SMAA's edge detection writes and its blend pass tests (`g_EdgeStencilBitMask`,
+/// statically initialised in the module image).
+#[address(0x142_D3A_6FE)]
+pub extern edge_stencil_bit_mask: u8;
 
 /// The anti-aliasing resolve. [`AAMode::AA_SMAA_T2X`] additionally reprojects against a previous-frame
 /// history texture.

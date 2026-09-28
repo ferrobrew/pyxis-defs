@@ -1,12 +1,33 @@
 #[singleton(0x142_E22_E68), min_size(0x2C0)]
 pub type Game {
     /// The intra-`Update` site at which the game's per-frame render bookkeeping starts: the
-    /// `m_UpdateFlags & 4` check (the `jz`) that normally gates `UpdateRender` (and everything
+    /// [`E_GUF_RENDER`](GameUpdateFlags::E_GUF_RENDER) check (the `jz`) that normally gates `UpdateRender` (and everything
     /// after it) on the frame-pacing mode sits here.
     pub const UPDATE_RENDER_GATE_OFFSET: u64 = 0x787,
     /// The intra-`Update` site at which the render bookkeeping ends: `++m_RenderCount`, the last
     /// step of the `UpdateRender` tail.
     pub const UPDATE_RENDER_LENGTH_OFFSET: u64 = 0x7A2,
+    /// The [`m_InterpolationOverride`](Self::m_InterpolationOverride) value meaning no override:
+    /// the method chosen each frame stands.
+    pub const INTERPOLATION_OVERRIDE_NONE: i32 = -1,
+    /// The [`m_PrevInterpolationMethod`](Self::m_PrevInterpolationMethod) value written when the
+    /// frame takes the paused path; it matches no method, so the next unpaused frame resets the
+    /// accumulators.
+    pub const INTERPOLATION_METHOD_PAUSED: u32 = 0xFFFFFFFF,
+    /// The [`m_InterpolationMethod`](Self::m_InterpolationMethod) chosen during gameplay: the
+    /// fractional sim step accumulates in `m_RunningFrameFraction` and [`UpdateGame`](Self::UpdateGame)
+    /// runs at most once per render frame. The method names are descriptive; the engine uses bare
+    /// integers.
+    pub const INTERPOLATION_METHOD_SINGLE_STEP: u32 = 1,
+    /// The [`m_InterpolationMethod`](Self::m_InterpolationMethod) chosen while a cutscene plays:
+    /// the same accumulator, but [`UpdateGame`](Self::UpdateGame) runs once per whole step
+    /// accumulated (capped), subtracting one per update.
+    pub const INTERPOLATION_METHOD_ACCUMULATED: u32 = 2,
+    /// The [`m_InterpolationMethod`](Self::m_InterpolationMethod) that derives the number of sim
+    /// steps from `QueryPerformanceCounter` wall-clock time since the method was entered, running
+    /// several [`UpdateGame`](Self::UpdateGame) calls per frame when rendering falls behind. Only
+    /// reachable through [`m_InterpolationOverride`](Self::m_InterpolationOverride).
+    pub const INTERPOLATION_METHOD_TIME_BASED: u32 = 3,
 
     #[address(0x10)]
     pub m_CountAccumulator: u64,
@@ -21,17 +42,33 @@ pub type Game {
 
     #[address(0x94)]
     pub m_RenderCount: u32,
+    /// The frame-pacing method [`Update`](Self::Update) uses this frame, rechosen every frame:
+    /// [`INTERPOLATION_METHOD_ACCUMULATED`](Self::INTERPOLATION_METHOD_ACCUMULATED) while a cutscene
+    /// plays, [`INTERPOLATION_METHOD_SINGLE_STEP`](Self::INTERPOLATION_METHOD_SINGLE_STEP) otherwise,
+    /// or [`m_InterpolationOverride`](Self::m_InterpolationOverride) when that is non-negative.
     pub m_InterpolationMethod: u32,
+    /// The method used on the previous frame; a change resets the accumulators. Set to
+    /// [`INTERPOLATION_METHOD_PAUSED`](Self::INTERPOLATION_METHOD_PAUSED) when the frame takes the
+    /// paused path.
     pub m_PrevInterpolationMethod: u32,
+    /// A console override for [`m_InterpolationMethod`](Self::m_InterpolationMethod);
+    /// [`INTERPOLATION_OVERRIDE_NONE`](Self::INTERPOLATION_OVERRIDE_NONE) when unset.
     pub m_InterpolationOverride: i32,
 
     #[address(0x260)]
     pub m_DecoupleEnabled: bool,
 
+    /// The [`GameUpdateFlags`] bit set gating the phases of [`Update`](Self::Update): the sim
+    /// step, the render-bookkeeping step, and the tools step.
     #[address(0x2B8)]
     pub m_UpdateFlags: u32,
 }
 impl Game {
+    /// `CGame::~CGame`: tears down the message-box manager, the game resource cache and handler,
+    /// the profiler utility, and the version display.
+    #[address(0x140_967_600)]
+    pub fn Destructor(&mut self);
+
     #[address(0x140_952_390)]
     pub fn Draw(&self, dt: f32);
 
@@ -48,6 +85,28 @@ impl Game {
     /// times per [`Update`](Self::Update) according to the frame-pacing mode.
     #[address(0x140_952_1F0)]
     pub fn UpdateGame(&mut self, update_contexts: *mut UpdateContexts);
+}
+
+/// `CGame::EGameUpdateFlags`: the phases of [`Game::Update`] enabled by
+/// [`Game::m_UpdateFlags`].
+#[copyable]
+pub bitflags GameUpdateFlags: u32 {
+    /// Runs the tools hooks at the end of the frame.
+    E_GUF_TOOLS = 0x1,
+    /// Runs the sim step: the frame-pacing switch that calls [`Game::UpdateGame`].
+    E_GUF_UPDATE = 0x2,
+    /// Runs [`Game::UpdateRender`] after the sim step.
+    E_GUF_RENDER = 0x4,
+}
+
+/// `CGameStateRun`: the in-game state's static update functions.
+pub type GameStateRun;
+impl GameStateRun {
+    /// The render-side update the run state performs while the game is paused: drives the
+    /// landscape, UI prerender, video, water simulation, and resource streaming, and waits for the
+    /// CPU draw, without running the camera update.
+    #[address(0x140_9AE_200)]
+    pub fn UpdateRenderPaused(update_contexts: *mut UpdateContexts);
 }
 
 // Opaque engine context types carried by the per-frame update contexts.

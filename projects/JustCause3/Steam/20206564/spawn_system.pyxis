@@ -173,3 +173,17 @@ impl SpawnSystem {
     #[address(0x140_E97_DA0)]
     pub fn Spawn(&mut self, tags: *const u8, transform: *const Matrix4, flags: u32, callback: SpawnCallback, userdata: *mut u8);
 }
+
+/// An opaque `CSpawnSystem::SResourceDef`: one spawnable resource's definition.
+pub type SpawnResourceDef;
+
+/// `CSpawnSystem::CSpawnFactoryImpl`: the factory that vets and performs individual spawns.
+pub type SpawnFactoryImpl;
+impl SpawnFactoryImpl {
+    /// Vets a spawn of `resource` at `transform`: checks mission and encounter state, landscape
+    /// physics residency, world-position validity, the despawn rank, the camera-visibility gate
+    /// (a BFBC frustum test against the camera's box-frustum parameters), and a physics shape
+    /// overlap. Returns whether the spawn may proceed.
+    #[address(0x140_F09_430)]
+    pub fn CheckInternal(&mut self, resource: *mut SpawnResourceDef, transform: *const Matrix4, priority: i16, flags: u32) -> bool;
+}

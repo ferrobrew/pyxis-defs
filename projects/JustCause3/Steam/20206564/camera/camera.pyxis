@@ -109,4 +109,10 @@ impl Camera {
     /// the frustum-cull consumers (terrain patches, occlusion) read these planes, not `m_ProjectionF`.
     #[address(0x140_0B2_FC0)]
     pub fn UpdateFrustum(&mut self, transform: *const Matrix4);
+
+    /// Tests a world-space axis-aligned box (`CAABox`: min then max corner) against the camera's
+    /// frustum planes and AABB-test acceleration data, as rebuilt by
+    /// [`UpdateFrustum`](Self::UpdateFrustum). Returns whether any part of the box is inside.
+    #[address(0x140_09C_210)]
+    pub fn IsBoxVisible(&self, aabb: *const [Vector3; 2]) -> bool;
 }

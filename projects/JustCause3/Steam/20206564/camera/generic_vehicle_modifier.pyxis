@@ -1,0 +1,30 @@
+/// `CGenericVehicleModifier::EVehicleCameraState`: the vehicle camera family, chosen each update
+/// from the vehicle type.
+#[copyable]
+pub enum VehicleCameraState: u32 {
+    /// Land vehicles and boats.
+    eDRIVING_CAMERA = 0x0,
+    /// Airplanes.
+    ePLANE_CAMERA = 0x1,
+    /// Helicopters.
+    eHELICOPTER_CAMERA = 0x2,
+}
+
+/// `CGenericVehicleModifier`: the camera modifier that drives the camera while in a vehicle.
+/// Only the fields below are mapped.
+#[min_size(0x1F0)]
+pub type GenericVehicleModifier {
+    /// The camera family for the current vehicle.
+    #[address(0x1E8)]
+    pub m_CameraState: VehicleCameraState,
+    /// Whether the crash camera is in use (the vehicle is out of control, incapacitated,
+    /// destroyed, or burning).
+    pub m_IsUsingCrashCamera: bool,
+}
+impl GenericVehicleModifier {
+    /// Updates the in-water, in-air, and on-ground timers, picks
+    /// [`m_CameraState`](Self::m_CameraState) from the vehicle type, and decides the crash
+    /// camera.
+    #[address(0x140_742_100)]
+    pub fn UpdateCameraState(&mut self, dt: f32);
+}

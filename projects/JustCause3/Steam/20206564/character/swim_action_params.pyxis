@@ -3,10 +3,10 @@ use types::math::Vector3;
 
 /// `SSwimActionParams`: the per-character state the swim locomotion family carries across frames,
 /// embedded in [`Character`](character::character::Character). Constructed by
-/// `SSwimActionParams::SSwimActionParams` (0x140_779_BF0), which is where the fixed capsule offsets
-/// below get their values. Only the members needed so far are bound; the rest of the struct
-/// (momentum, transition and warping state, the surface-plane quaternions, the procedural anim
-/// amounts) is covered by the minimum size.
+/// [`Construct`](Self::Construct), which is where the fixed capsule offsets below get their
+/// values. Only some members are bound; the rest of the struct (momentum, transition and warping
+/// state, the surface-plane quaternions, the procedural anim amounts) is covered by the minimum
+/// size.
 #[min_size(0x27C), align(4)]
 pub type SwimActionParams {
     /// The rigid transform from the character's orientation frame to the physics capsule frame
@@ -53,4 +53,10 @@ pub type SwimActionParams {
     /// angle-correction animation segment, which is what makes a swim turn advance in act-sized
     /// steps rather than continuously.
     pub m_AnimatedTurnTargetDir: Vector3,
+}
+impl SwimActionParams {
+    /// `SSwimActionParams::SSwimActionParams`: initializes the parameters, including the fixed
+    /// capsule offsets and their inverses.
+    #[address(0x140_779_BF0)]
+    pub fn Construct(&mut self);
 }

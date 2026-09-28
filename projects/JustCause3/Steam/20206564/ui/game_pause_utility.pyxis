@@ -1,0 +1,49 @@
+/// `CGamePauseUtility::ESlowDownState`: the pause utility's state machine.
+#[copyable]
+pub enum PauseState: u32 {
+    E_STATE_NONE = 0x0,
+    /// Slowing the game down into the pause through the slow-motion manager.
+    E_STATE_SLOW_DOWN = 0x1,
+    /// The game is paused until the awaited action is pressed.
+    E_STATE_PAUSED = 0x2,
+    /// Speeding the game back up after the action.
+    E_STATE_SPEED_UP = 0x3,
+}
+
+/// `CGamePauseUtility::EValidActionMapsToWaitFor`: which action map the awaited action is read
+/// from.
+#[copyable]
+pub enum ActionMapToWaitFor: u32 {
+    PlayerActionMap = 0x0,
+    UIActionMap = 0x1,
+}
+
+/// `CGamePauseUtility` (a `Base::CSingle` singleton): the script facility that pauses the game
+/// until an action is pressed, used by tutorials.
+#[singleton(0x142_F34_278), min_size(0x14)]
+pub type GamePauseUtility {
+    /// The [`m_action`](Self::m_action) and [`m_reclick_action`](Self::m_reclick_action) value
+    /// meaning no action. `Update` resets both to it once the awaited action is clicked or
+    /// re-clicked.
+    pub const NO_ACTION: i32 = -1,
+
+    /// The current state.
+    pub m_state: PauseState,
+    /// Whether the pause was entered through the slow-down ramp.
+    pub m_used_slow_down: bool,
+
+    #[address(0x8)]
+    pub m_action_map: ActionMapToWaitFor,
+    /// The action id that ends the pause, or [`NO_ACTION`](Self::NO_ACTION).
+    pub m_action: i32,
+    /// The action id that must be re-clicked, or [`NO_ACTION`](Self::NO_ACTION).
+    pub m_reclick_action: i32,
+}
+impl GamePauseUtility {
+    /// Transitions the state machine: entering [`E_STATE_SLOW_DOWN`](PauseState::E_STATE_SLOW_DOWN)
+    /// starts a slow-motion ease-in whose callback moves to
+    /// [`E_STATE_PAUSED`](PauseState::E_STATE_PAUSED); entering
+    /// [`E_STATE_SPEED_UP`](PauseState::E_STATE_SPEED_UP) ramps the slow motion back out.
+    #[address(0x140_9BA_270)]
+    pub fn SetState(&mut self, state: PauseState);
+}

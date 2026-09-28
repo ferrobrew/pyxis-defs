@@ -1,7 +1,7 @@
 use character::character::Character;
 
 /// One heat level's tuning (`CHeatManager::SLevelDef`), loaded from the heat settings. Partial:
-/// only the point threshold is mapped; the rest of the 0x7C-byte record is pursuer and vehicle
+/// only the point threshold is mapped; the rest of the record is pursuer and vehicle
 /// budgets, timers, and the level's send/receive events.
 #[size(0x7C), align(4)]
 pub type HeatLevelDef {
@@ -63,8 +63,8 @@ impl HeatManager {
 
     /// Sets [`m_LevelCap`](Self::m_LevelCap), clamped to `0..=MAX_LEVEL`, and if the current level
     /// exceeds it, lowers the level to the cap and trims the target's heat points to just below the
-    /// next threshold. Use a direct write of [`LEVEL_CAP_NONE`](Self::LEVEL_CAP_NONE) to remove
-    /// the cap; this clamps negatives to zero.
+    /// next threshold. It clamps negative caps to zero, so it cannot set
+    /// [`LEVEL_CAP_NONE`](Self::LEVEL_CAP_NONE); `CHeatManager::Reset` does.
     #[address(0x140_A50_B90)]
     pub fn SetLevelCap(&mut self, cap: i32);
 

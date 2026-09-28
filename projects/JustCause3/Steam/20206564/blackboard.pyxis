@@ -1,25 +1,46 @@
 use graphics_engine::device::CRITICAL_SECTION;
 use types::math::Vector3;
 
+/// The type tag of a blackboard value (`SObjectBlackboardKeyInfo::EValueType`), stored narrow in
+/// [`ObjectBlackboardKeyInfo::m_ValueType`].
+pub enum ValueType: u8 {
+    VALUE_NONE = 0x0,
+    VALUE_FLOAT = 0x1,
+    VALUE_VECTOR = 0x2,
+    VALUE_UINT32 = 0x3,
+    VALUE_INT32 = 0x4,
+    /// A hash. The typed getters read it as [`VALUE_UINT32`](Self::VALUE_UINT32).
+    VALUE_HASH = 0x5,
+    VALUE_UINT64 = 0x6,
+    VALUE_UINT8 = 0x7,
+    /// The number of value types.
+    VALUE_NOF_TYPES = 0x8,
+}
+
+/// The persistence class of a blackboard key (`SObjectBlackboardKeyInfo::EPersistenceType`),
+/// recorded in [`ObjectBlackboardKeyInfo::m_PersistenceType`] when the key is first written.
+pub enum PersistenceType: u32 {
+    PERSISTENCE_SESSION = 0x0,
+    PERSISTENCE_LOCAL_FRAME = 0x1,
+    PERSISTENCE_GLOBAL_FRAME = 0x2,
+}
+
 /// One key slot in an [`ObjectBlackboard`]'s table (`SObjectBlackboardKeyInfo`): the key hash, the
 /// value's type tag and arena offset, and an optional debug label.
 #[size(0x18)]
 pub type ObjectBlackboardKeyInfo {
     /// The key hash the accessors look up by.
     pub m_KeyHash: u32,
-    /// The value's type tag (`SObjectBlackboardKeyInfo::EValueType`, stored narrow): `0` none,
-    /// `1` float, `2` vector, `3` u32, `4` i32, `5` hash (aliases to u32 on read), `6` u64,
-    /// `7` u8.
-    pub m_ValueType: u8,
+    /// The value's type tag.
+    pub m_ValueType: ValueType,
 
-    /// The persistence class (`SObjectBlackboardKeyInfo::EPersistenceType`): `0` session,
-    /// `1` local frame, `2` global frame.
+    /// The persistence class.
     #[address(0x8)]
-    pub m_PersistenceType: u32,
+    pub m_PersistenceType: PersistenceType,
     /// The value's byte offset within [`ObjectBlackboard::m_Data`].
     pub m_DataOffset: u16,
 
-    /// An optional debug label for the key; null at release call sites.
+    /// An optional debug label for the key; null at every call site.
     #[address(0x10)]
     pub m_DebugName: *const u8,
 }
@@ -45,6 +66,10 @@ pub type ObjectBlackboard {
     /// The id of the float speed value the input locomotion tasks branch on (`<= 0` routes into
     /// the stop acts).
     pub const SPEED_ID: u32 = 3396837917,
+    /// The id of the float that replaces the result of
+    /// [`EvaluateCharacterSpeed`](input::locomotion::NStateTask_LocoUtil::EvaluateCharacterSpeed) when that function is
+    /// asked to use the blackboard override and the key is present.
+    pub const SPEED_OVERRIDE_ID: u32 = 1707123197,
     /// The id of the second float the input move task reads alongside
     /// [`SPEED_ID`](Self::SPEED_ID); semantics unmapped, a candidate input-strength
     /// signal.
@@ -55,6 +80,19 @@ pub type ObjectBlackboard {
     /// `m_AnimatedTurnBaseDir`/`m_AnimatedTurnTargetDir` pair the swim movement actuators slerp
     /// between across the angle-correction animation segment.
     pub const SWIM_TURN_ANGLE_ID: u32 = 2828323117,
+    /// The id of the float master weight (clamped to 0-1) of the player's per-arm aim IK, read by
+    /// `NRightArmAimIK::Update` and `NReelInAimIK::Update` (the IK is skipped while it is zero). The
+    /// animation data writes it, not the aim logic.
+    pub const AIM_IK_WEIGHT_ID: u32 = 0xE812F93E,
+    /// The id of the previous target direction (`CVector3f`), written by
+    /// `NStateTask_InputLocoSetTargetDirTask::SetupTargetDir` and read by
+    /// `NStateTask_LocoUtil::EvaluateCharacterDisplacement` as the code-driven displacement
+    /// direction inside its special segments.
+    pub const PREVIOUS_TARGET_DIR_ID: u32 = 0x370A3A61,
+    /// The id of a float marker (written as `1.0` by the stunt set-target-direction task) whose
+    /// presence makes `NStateTask_LocoUtil::EvaluateCharacterDisplacement` skip the animation
+    /// root-motion branch and apply the [`MOVE_DIR_ID`](Self::MOVE_DIR_ID) direction instantly.
+    pub const APPLY_TARGET_DIR_INSTANTLY_ID: u32 = 0xE844061C,
 
     /// The key table, [`m_KeyInfoCapacity`](Self::m_KeyInfoCapacity) slots; keys are
     /// assigned as they are first written.
@@ -78,7 +116,7 @@ pub type ObjectBlackboard {
     #[address(0x20)]
     pub m_BbLock: *mut CRITICAL_SECTION,
 
-    /// The dev dump cursor ("first line to dump"); unreferenced by the shipped code.
+    /// The dev dump cursor ("first line to dump"); unreferenced by the game code.
     #[address(0x28)]
     pub m_FirstLineToDump: i32,
 }
@@ -94,8 +132,9 @@ impl ObjectBlackboard {
 
     /// The `SetBlackboardValue<CVector3f>` template instantiation. `value` is by-value `CVector3f`
     /// at the C++ level, which the MSVC x64 ABI passes by reference — hence the pointer here.
-    /// `flags` is `1` at every observed call site; `name` is an optional debug label, null in
-    /// release calls.
+    /// `persistence` is recorded when the call creates the key, and is
+    /// [`PERSISTENCE_LOCAL_FRAME`](PersistenceType::PERSISTENCE_LOCAL_FRAME) at every observed
+    /// call site; `name` is an optional debug label, null in every observed call.
     #[address(0x140_5C6_A70)]
-    pub fn SetVector3(&mut self, id: u32, value: *const Vector3, flags: u32, name: *const u8) -> bool;
+    pub fn SetVector3(&mut self, id: u32, value: *const Vector3, persistence: PersistenceType, name: *const u8) -> bool;
 }

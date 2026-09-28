@@ -1,0 +1,245 @@
+use hash::HashString;
+use input::input_action_map::Action;
+
+/// `CButtonMapping::EMapping`: a semantic button mapping, indexing
+/// [`ButtonMapping::m_AllInfo`]. The `MAPPING_*` values are grouped into per-context sections
+/// (generic, on foot, context-specific on foot, each vehicle class, UI, weaponized wingsuit, and
+/// mech); each section ends with an `END_*` marker slot that stays at the constructor default, and
+/// the `FIRST_*` / `LAST_*` constants give each section's inclusive bounds for the range queries.
+/// [`ButtonMapping::PopulateMappings`] hardcodes every entry.
+#[copyable]
+pub enum Mapping: u32 {
+    pub const FIRST_GENERIC_MAPPING: Mapping = Mapping::MAPPING_PAUSE,
+    pub const LAST_GENERIC_MAPPING: Mapping = Mapping::MAPPING_COMMLINK,
+    pub const FIRST_ON_FOOT_MAPPING: Mapping = Mapping::MAPPING_FIRE_GRAPPLING_HOOK,
+    pub const LAST_ON_FOOT_MAPPING: Mapping = Mapping::MAPPING_WALK,
+    pub const FIRST_CONTEXT_SPECIFIC_ON_FOOT_MAPPING: Mapping = Mapping::MAPPING_RELEASE_TETHERS_WITH_RETRACT,
+    pub const LAST_CONTEXT_SPECIFIC_ON_FOOT_MAPPING: Mapping = Mapping::MAPPING_KEEP_RAGDOLLING,
+    pub const FIRST_GENERIC_VEHICLE_MAPPINGS: Mapping = Mapping::MAPPING_LOOK_BACK_CAM,
+    pub const LAST_GENERIC_VEHICLE_MAPPINGS: Mapping = Mapping::MAPPING_VEHICLE_RELEASE_GRAPPLE,
+    pub const FIRST_GENERIC_LAND_VEHICLE_MAPPINGS: Mapping = Mapping::MAPPING_HANDBRAKE,
+    pub const LAST_GENERIC_LAND_VEHICLE_MAPPINGS: Mapping = Mapping::MAPPING_SOUND_HORN_SIREN_LAND_VEHICLE,
+    pub const FIRST_CAR_MAPPINGS: Mapping = Mapping::MAPPING_TURN_LEFT,
+    pub const LAST_CAR_MAPPINGS: Mapping = Mapping::MAPPING_STUNT_JUMP_CAR,
+    pub const FIRST_MOTORCYCLE_MAPPINGS: Mapping = Mapping::MAPPING_FIRE_WEAPON_MOTORCYCLE,
+    pub const LAST_MOTORCYCLE_MAPPINGS: Mapping = Mapping::MAPPING_LEAN_RIGHT_MOTORCYCLE,
+    pub const FIRST_GENERIC_SEA_VEHICLE_MAPPINGS: Mapping = Mapping::MAPPING_NITROUS_SEA_VEHICLE,
+    pub const LAST_GENERIC_SEA_VEHICLE_MAPPINGS: Mapping = Mapping::MAPPING_SOUND_HORN_SIREN_SEA_VEHICLE,
+    pub const FIRST_BOAT_MAPPINGS: Mapping = Mapping::MAPPING_FIRE_VEHICLE_WEAPON_PRIMARY_BOAT,
+    pub const LAST_BOAT_MAPPINGS: Mapping = Mapping::MAPPING_STUNT_JUMP_BOAT,
+    pub const FIRST_JETSKI_MAPPINGS: Mapping = Mapping::MAPPING_FIRE_WEAPON_JETSKI,
+    pub const LAST_JETSKI_MAPPINGS: Mapping = Mapping::MAPPING_HOLSTER_WEAPON_JETSKI,
+    pub const FIRST_GENERIC_AIR_VEHICLE_MAPPINGS: Mapping = Mapping::MAPPING_FIRE_VEHICLE_WEAPON_PRIMARY_AIR_VEHICLE,
+    pub const LAST_GENERIC_AIR_VEHICLE_MAPPINGS: Mapping = Mapping::MAPPING_FIRE_VEHICLE_WEAPON_SECONDARY_AIR_VEHICLE,
+    pub const FIRST_HELICOPTER_MAPPINGS: Mapping = Mapping::MAPPING_HELI_INC_ALTITUDE,
+    pub const LAST_HELICOPTER_MAPPINGS: Mapping = Mapping::MAPPING_NITROUS_HELICOPTER,
+    pub const FIRST_PLANE_MAPPINGS: Mapping = Mapping::MAPPING_PLANE_TURN_RIGHT,
+    pub const LAST_PLANE_MAPPINGS: Mapping = Mapping::MAPPING_NITROUS_PLANE,
+    pub const FIRST_UI_MAPPING: Mapping = Mapping::MAPPING_UI_OK,
+    pub const LAST_UI_MAPPING: Mapping = Mapping::MAPPING_UI_PAGE_PREV,
+    pub const FIRST_WEAPONIZED_WINGSUIT_MAPPING: Mapping = Mapping::MAPPING_WEAPONIZED_WINGSUIT_TAKEOFF,
+    pub const LAST_WEAPONIZED_WINGSUIT_MAPPING: Mapping = Mapping::MAPPING_WEAPONIZED_WINGSUIT_SECONDARY_WEAPON,
+    pub const FIRST_MECH_MAPPING: Mapping = Mapping::MAPPING_MECH_MOVE_FORWARD,
+    pub const LAST_MECH_MAPPING: Mapping = Mapping::MAPPING_MECH_FIRE_RIGHT_HAND_WEAPON,
+
+    MAPPING_PAUSE = 0x0,
+    MAPPING_COMMLINK = 0x1,
+    END_GENERIC_MAPPINGS = 0x2,
+    MAPPING_FIRE_GRAPPLING_HOOK = 0x3,
+    MAPPING_RETRACT_TETHERS = 0x4,
+    MAPPING_RELEASE_TETHERS_NON_CHORDED = 0x5,
+    MAPPING_FIRE_RIGHT = 0x6,
+    MAPPING_THROW_GRENADE = 0x7,
+    MAPPING_DETONATE_EXPLOSIVE_GAMEPAD = 0x8,
+    MAPPING_DETONATE_EXPLOSIVE_PC = 0x9,
+    MAPPING_RELOAD = 0xA,
+    MAPPING_JUMP = 0xB,
+    MAPPING_OPEN_WINGSUIT = 0xC,
+    MAPPING_OPEN_PARACHUTE = 0xD,
+    MAPPING_HAMMER = 0xE,
+    MAPPING_PRECISION_AIM = 0xF,
+    MAPPING_CANCEL = 0x10,
+    MAPPING_USE_ITEM = 0x11,
+    MAPPING_SELECT_DUAL_WIELD = 0x12,
+    MAPPING_SELECT_TWO_HANDED = 0x13,
+    MAPPING_SELECT_TWO_HANDED_SPECIAL = 0x14,
+    MAPPING_SELECT_EXPLOSIVE = 0x15,
+    MAPPING_PREV_WEAPON = 0x16,
+    MAPPING_NEXT_WEAPON = 0x17,
+    MAPPING_MOVE_FORWARD = 0x18,
+    MAPPING_MOVE_BACKWARD = 0x19,
+    MAPPING_MOVE_LEFT = 0x1A,
+    MAPPING_MOVE_RIGHT = 0x1B,
+    MAPPING_WALK = 0x1C,
+    END_ON_FOOT_MAPPINGS = 0x1D,
+    MAPPING_RELEASE_TETHERS_WITH_RETRACT = 0x1E,
+    MAPPING_DETACH_MOUNTED_GUN = 0x1F,
+    MAPPING_CANCEL_REEL_IN = 0x20,
+    MAPPING_SLINGSHOT_TO_REEL_IN = 0x21,
+    MAPPING_PLANT_EXPLOSIVE = 0x22,
+    MAPPING_HANG_JUMP = 0x23,
+    MAPPING_SNIPER_ZOOM = 0x24,
+    MAPPING_SKIP_CUTSCENE = 0x25,
+    MAPPING_LOOK_AT = 0x26,
+    MAPPING_AIR_BRAKE = 0x27,
+    MAPPING_SLINGSUIT_TO_REEL_IN = 0x28,
+    MAPPING_HOLSTER_WEAPON = 0x29,
+    MAPPING_REEL_BOOST = 0x2A,
+    MAPPING_KEEP_RAGDOLLING = 0x2B,
+    END_CONTEXT_SPECIFIC_ON_FOOT_MAPPINGS = 0x2C,
+    MAPPING_LOOK_BACK_CAM = 0x2D,
+    MAPPING_RECENTER_CAM = 0x2E,
+    MAPPING_EXIT_VEHICLE = 0x2F,
+    MAPPING_ATTACHED_TO_PARACHUTE = 0x30,
+    MAPPING_TOGGLE_MAGNET = 0x31,
+    MAPPING_VEHICLE_RELEASE_GRAPPLE = 0x32,
+    END_GENERIC_VEHICLE_MAPPINGS = 0x33,
+    MAPPING_HANDBRAKE = 0x34,
+    MAPPING_ACCELERATE_LAND_VEHICLE = 0x35,
+    MAPPING_REVERSE_LAND_VEHICLE = 0x36,
+    MAPPING_NITROUS_LAND_VEHICLE = 0x37,
+    MAPPING_TURBO_JUMP_LAND_VEHICLE = 0x38,
+    MAPPING_SOUND_HORN_SIREN_LAND_VEHICLE = 0x39,
+    END_GENERIC_LAND_VEHICLE_MAPPINGS = 0x3A,
+    MAPPING_TURN_LEFT = 0x3B,
+    MAPPING_TURN_RIGHT = 0x3C,
+    MAPPING_ENTER_GUNNER_SEAT = 0x3D,
+    MAPPING_FIRE_VEHICLE_WEAPON_PRIMARY_CAR = 0x3E,
+    MAPPING_FIRE_VEHICLE_WEAPON_SECONDARY_CAR = 0x3F,
+    MAPPING_STUNT_JUMP_CAR = 0x40,
+    END_CAR_MAPPINGS = 0x41,
+    MAPPING_FIRE_WEAPON_MOTORCYCLE = 0x42,
+    MAPPING_RELOAD_WEAPON_MOTORCYCLE = 0x43,
+    MAPPING_HOLSTER_WEAPON_MOTORCYCLE = 0x44,
+    MAPPING_TILT_FORWARD_MOTORCYCLE = 0x45,
+    MAPPING_TILT_BACKWARD_MOTORCYCLE = 0x46,
+    MAPPING_LEAN_LEFT_MOTORCYCLE = 0x47,
+    MAPPING_LEAN_RIGHT_MOTORCYCLE = 0x48,
+    END_MOTORCYCLE_MAPPINGS = 0x49,
+    MAPPING_NITROUS_SEA_VEHICLE = 0x4A,
+    MAPPING_TURBO_JUMP_SEA_VEHICLE = 0x4B,
+    MAPPING_TURN_LEFT_SEA_VEHICLE = 0x4C,
+    MAPPING_TURN_RIGHT_SEA_VEHICLE = 0x4D,
+    MAPPING_SOUND_HORN_SIREN_SEA_VEHICLE = 0x4E,
+    END_GENERIC_SEA_VEHICLE_MAPPINGS = 0x4F,
+    MAPPING_FIRE_VEHICLE_WEAPON_PRIMARY_BOAT = 0x50,
+    MAPPING_STUNT_JUMP_BOAT = 0x51,
+    END_BOAT_MAPPINGS = 0x52,
+    MAPPING_FIRE_WEAPON_JETSKI = 0x53,
+    MAPPING_RELOAD_WEAPON_JETSKI = 0x54,
+    MAPPING_HOLSTER_WEAPON_JETSKI = 0x55,
+    END_JETSKI_MAPPINGS = 0x56,
+    MAPPING_FIRE_VEHICLE_WEAPON_PRIMARY_AIR_VEHICLE = 0x57,
+    MAPPING_FIRE_VEHICLE_WEAPON_SECONDARY_AIR_VEHICLE = 0x58,
+    END_GENERIC_AIR_VEHICLE_MAPPINGS = 0x59,
+    MAPPING_HELI_INC_ALTITUDE = 0x5A,
+    MAPPING_HELI_DEC_ALTITUDE = 0x5B,
+    MAPPING_HELI_ROLL_RIGHT = 0x5C,
+    MAPPING_HELI_ROLL_LEFT = 0x5D,
+    MAPPING_HELI_TURN_LEFT = 0x5E,
+    MAPPING_HELI_TURN_RIGHT = 0x5F,
+    MAPPING_HELI_FORWARD = 0x60,
+    MAPPING_HELI_BACKWARD = 0x61,
+    MAPPING_STUNT_JUMP_HELICOPTER = 0x62,
+    MAPPING_NITROUS_HELICOPTER = 0x63,
+    END_HELICOPTER_MAPPINGS = 0x64,
+    MAPPING_PLANE_TURN_RIGHT = 0x65,
+    MAPPING_PLANE_TURN_LEFT = 0x66,
+    MAPPING_PLANE_ROLL_RIGHT = 0x67,
+    MAPPING_PLANE_ROLL_LEFT = 0x68,
+    MAPPING_PLANE_PITCH_UP = 0x69,
+    MAPPING_PLANE_PITCH_DOWN = 0x6A,
+    MAPPING_PLANE_INC_THRUST = 0x6B,
+    MAPPING_PLANE_DEC_THRUST = 0x6C,
+    MAPPING_STUNT_JUMP_PLANE = 0x6D,
+    MAPPING_NITROUS_PLANE = 0x6E,
+    END_PLANE_MAPPINGS = 0x6F,
+    MAPPING_UI_OK = 0x70,
+    MAPPING_UI_CANCEL = 0x71,
+    MAPPING_UI_TAB_NEXT = 0x72,
+    MAPPING_UI_TAB_PREV = 0x73,
+    MAPPING_UI_FILTER = 0x74,
+    MAPPING_UI_RECENTER = 0x75,
+    MAPPING_UI_PAGE_NEXT = 0x76,
+    MAPPING_UI_PAGE_PREV = 0x77,
+    END_UI_MAPPINGS = 0x78,
+    MAPPING_WEAPONIZED_WINGSUIT_TAKEOFF = 0x79,
+    MAPPING_WEAPONIZED_WINGSUIT_BOOST = 0x7A,
+    MAPPING_WEAPONIZED_WINGSUIT_BRAKE = 0x7B,
+    MAPPING_WEAPONIZED_WINGSUIT_EVADE = 0x7C,
+    MAPPING_WEAPONIZED_WINGSUIT_PRIMARY_WEAPON = 0x7D,
+    MAPPING_WEAPONIZED_WINGSUIT_SECONDARY_WEAPON = 0x7E,
+    END_WEAPONIZED_WINGSUIT_MAPPINGS = 0x7F,
+    MAPPING_MECH_MOVE_FORWARD = 0x80,
+    MAPPING_MECH_MOVE_BACKWARD = 0x81,
+    MAPPING_MECH_MOVE_LEFT = 0x82,
+    MAPPING_MECH_MOVE_RIGHT = 0x83,
+    MAPPING_MECH_JUMP = 0x84,
+    MAPPING_MECH_PUNCH = 0x85,
+    MAPPING_MECH_GRAVITY_GUN_ATTRACT = 0x86,
+    MAPPING_MECH_GRAVITY_GUN_DROP = 0x87,
+    MAPPING_MECH_GRAVITY_GUN_THROW = 0x88,
+    MAPPING_MECH_FIRE_RIGHT_HAND_WEAPON = 0x89,
+    END_MECH_MAPPINGS = 0x8A,
+    MAPPING_ACTIVATE_BAVARIUM_SHIELD = 0x8B,
+    MAPPING_CHALLENGE_RESET_VEHICLE = 0x8C,
+    NUM_MAPPINGS = 0x8D,
+}
+
+/// `CButtonMapping::EButtonInteraction`: how a mapping's actions must be pressed.
+#[copyable]
+pub enum ButtonInteraction: u32 {
+    BINT_SINGLE_BUTTON_TAP = 0x0,
+    BINT_SINGLE_BUTTON_HOLD = 0x1,
+    /// [`m_Action1`](MappingInfo::m_Action1) held while [`m_Action2`](MappingInfo::m_Action2) is
+    /// tapped.
+    BINT_TWO_BUTTON_HOLD_AND_TAP = 0x2,
+    /// Fires on button release.
+    BINT_SINGLE_BUTTON_RELEASE = 0x3,
+}
+
+/// `CButtonMapping::SMappingInfo`: one semantic mapping's actions, hint text, gates, and flags.
+/// The layout stores the two gate hashes as bare 32-bit hashes.
+#[size(0x1C), align(4), copyable]
+pub type MappingInfo {
+    pub m_Interaction: ButtonInteraction,
+    /// The primary action (the held one for a chord). The constructor default is
+    /// [`Action::COUNT`], an invalid action, which the `END_*` marker slots keep.
+    pub m_Action1: Action,
+    /// The tapped action of a chord, or [`Action::COUNT`] when unused.
+    pub m_Action2: Action,
+    /// The hash of the `buttonhint_*` localization key.
+    pub m_DescriptionKey: u32,
+    /// The upgrade that must be purchased and enabled for the mapping to be active, or zero.
+    pub m_RequiredUpgrade: HashString,
+    /// The ability that must be enabled on the player for the mapping to be active, or zero.
+    pub m_RequiredAbility: HashString,
+    /// Whether the player can rebind the mapping.
+    pub m_Customizable: bool,
+    /// Whether the mapping is listed on the controls screen.
+    pub m_ShowInUIMapping: bool,
+    /// Whether the mapping applies only to keyboard and mouse.
+    pub m_PCOnly: bool,
+    /// Whether the mapping applies only to a gamepad.
+    pub m_ControllerOnly: bool,
+}
+
+/// `CButtonMapping`: the fixed table of semantic button mappings the button-hint and
+/// controls-screen UI resolve against, plus the action list for the bindings screen.
+#[min_size(0xF6C)]
+pub type ButtonMapping {
+    /// One entry per [`Mapping`], [`NUM_MAPPINGS`](Mapping::NUM_MAPPINGS) in all.
+    pub m_AllInfo: [MappingInfo; 141],
+}
+impl ButtonMapping {
+    /// Calls [`PopulateMappings`](Self::PopulateMappings), then rebuilds the controls-screen
+    /// action list.
+    #[address(0x140_CA8_640)]
+    pub fn Init(&mut self);
+
+    /// Fills every [`m_AllInfo`](Self::m_AllInfo) entry from hardcoded data: the actions,
+    /// interaction, `buttonhint_*` key hash, ability and upgrade gates, and flags. There is no data
+    /// file behind the table.
+    #[address(0x140_C3B_BA0)]
+    pub fn PopulateMappings(&mut self);
+}

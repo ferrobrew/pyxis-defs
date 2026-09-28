@@ -82,6 +82,59 @@ impl RenderTargetData {
 /// viewport, and [`ComputeSafeArea`](Self::ComputeSafeArea) derives the UI safe area.
 #[singleton(0x142_E5B_620), size(0x14A8)]
 pub type UIManager {
+    /// The x and y at which [`SendMouseEvents`](Self::SendMouseEvents) places the Scaleform mouse
+    /// while [`m_IsUsingGamepad`](Self::m_IsUsingGamepad) is set.
+    pub const GAMEPAD_PARKED_MOUSE_POSITION: f32 = -1000.0,
+
+    /// The `IUIManager` interface vtable (`CUIManager`'s primary vtable). Each
+    /// slot's `CUIManager` implementation is also bound by address below, under the slot's name
+    /// with an `Impl` suffix.
+    vftable {
+        /// Returns the UI render context.
+        #[index(0)]
+        pub fn GetUIContext(&mut self) -> *mut void;
+
+        /// See [`StartRenderImpl`](Self::StartRenderImpl).
+        #[index(1)]
+        pub fn StartRender(&mut self, context: *const HContext_t);
+
+        /// See [`SyncRenderImpl`](Self::SyncRenderImpl).
+        #[index(2)]
+        pub fn SyncRender(&mut self);
+
+        /// See [`SubmitImpl`](Self::SubmitImpl).
+        #[index(3)]
+        pub fn Submit(&mut self);
+
+        /// See [`RenderImpl`](Self::RenderImpl).
+        #[index(4)]
+        pub fn Render(&mut self, context: *mut HContext_t);
+
+        /// See [`RenderOffScreenTexturesImpl`](Self::RenderOffScreenTexturesImpl).
+        #[index(5)]
+        pub fn RenderOffScreenTextures(&mut self, ctx: *mut *mut HContext_t);
+
+        /// See [`RenderStaticBackGroundImpl`](Self::RenderStaticBackGroundImpl).
+        #[index(6)]
+        pub fn RenderStaticBackGround(&mut self);
+
+        /// Releases device-dependent UI resources before a device reset.
+        #[index(7)]
+        pub fn PrepareForReset(&mut self);
+
+        /// See [`RestoreAfterResetImpl`](Self::RestoreAfterResetImpl).
+        #[index(8)]
+        pub fn RestoreAfterReset(&mut self);
+
+        /// Shows the UI.
+        #[index(9)]
+        pub fn Show(&mut self);
+
+        /// Hides the UI.
+        #[index(10)]
+        pub fn Hide(&mut self);
+    },
+
     /// The horizontal mouse letterbox offset from the engine's `MovieScaleInfo`
     /// (`m_MouseDeltaX`), in movie-viewport pixels.
     /// [`GetMovieSpaceMouseCursor`](Self::GetMovieSpaceMouseCursor) maps a movie-viewport
@@ -121,8 +174,9 @@ pub type UIManager {
     /// `PreRender` claims it for the update thread each frame via `CUIManager::SetCaptureThread`,
     /// which writes this field and the movie's capture thread together. `CUIBase::Invoke` runs the
     /// AVM immediately only when the calling thread matches this field, and queues into the UI's
-    /// command queue otherwise -- so a hook that borrows capture ownership must write this field
-    /// too, or game-thread invokes keep mutating the display list concurrently.
+    /// command queue otherwise. It does not consult the movie's own capture thread: if the movie's
+    /// capture thread changes without this field, game-thread invokes still run immediately and
+    /// mutate the display list concurrently with the new capture owner.
     #[address(0x44)]
     pub m_CurrentCaptureThread: u32,
 
@@ -138,6 +192,11 @@ pub type UIManager {
     #[address(0xB8)]
     pub m_MouseY: i32,
 
+    /// The grab-screen timer (seconds); `CHUDUI::OnOmniDamage` sets it to
+    /// [`OMNI_DAMAGE_GRAB_SCREEN_TIME`](ui::hud_ui::HUDUI::OMNI_DAMAGE_GRAB_SCREEN_TIME).
+    #[address(0xD4)]
+    pub m_GrabScreenTimer: f32,
+
     /// Whether the render system is initialized. One of the three gates `Render` checks before
     /// drawing.
     #[address(0x212)]
@@ -148,14 +207,14 @@ pub type UIManager {
     pub m_RenderActive: bool,
 
     /// The active `CSteering`, whose action map [`SendMouseEvents`](Self::SendMouseEvents)
-    /// polls for the mouse-button actions (`MOUSE1` = 249, `MOUSE2` = 250).
+    /// polls for the mouse-button actions ([`MOUSE1`](input::input_action_map::Action::MOUSE1) and
+    /// [`MOUSE2`](input::input_action_map::Action::MOUSE2)).
     #[address(0x220)]
     pub m_Steering: *mut void,
 
     /// The lock serializing the UI update (`PreRender`: `Advance` + `Capture`) against the UI
     /// render (`Render`, `RenderOffScreenTextures`). A Win32 critical section, so re-entrant on
-    /// the owning thread: a `Render` hook can hold it across visibility writes, captures, and
-    /// calls to the original (which re-enters it).
+    /// the owning thread.
     #[address(0x1_2B8)]
     pub m_DeferredRenderLock: *mut CRITICAL_SECTION,
 
@@ -197,7 +256,7 @@ pub type UIManager {
 
     /// Whether the player is currently driving the UI with a gamepad. While set,
     /// [`SendMouseEvents`](Self::SendMouseEvents) parks the Scaleform mouse at
-    /// `(-1000, -1000)` and [`MousePointerVisibility`](Self::MousePointerVisibility) hides
+    /// [`GAMEPAD_PARKED_MOUSE_POSITION`](Self::GAMEPAD_PARKED_MOUSE_POSITION) on both axes and [`MousePointerVisibility`](Self::MousePointerVisibility) hides
     /// the overlay cursor.
     #[address(0x1_47D)]
     pub m_IsUsingGamepad: bool,
@@ -233,28 +292,28 @@ pub type UIManager {
     pub m_CachedViewportRatio: f32,
 }
 impl UIManager {
-    /// Binds the UI render target: builds a [`RenderTargetData`] from the engine surface's
-    /// render-target and depth-stencil views via [`RenderTargetData::UpdateData`]. Called at startup
-    /// and on every device or resolution reset; `a2` carries the target side length (the buffer is
-    /// square: width = height = a2). This only creates the render buffer -- the Scaleform movie's
-    /// viewport is set separately by [`SetMovieViewport`](Self::SetMovieViewport).
     /// The UI render: takes [`m_DeferredRenderLock`](Self::m_DeferredRenderLock), checks the
     /// three render gates, retargets the Scaleform render-thread ids, drains the thread command
     /// queue, binds the display render target, and draws the movie's latest captured display tree
     /// (`GetDisplayHandle` -> `RTHandle::NextCapture` -> `HAL::Draw`) within a
     /// `BeginFrame`/`BeginScene` pair. Runs on a CPU-fragment worker (kicked by `StartRender`,
-    /// joined by `SyncRender`). `IUIManager` vtable slot 4.
+    /// joined by `SyncRender`).
     #[address(0x141_007_B70)]
-    pub fn Render(&mut self, context: *mut HContext_t);
+    pub fn RenderImpl(&mut self, context: *mut HContext_t);
 
+    /// Binds the UI render target: builds a [`RenderTargetData`] from the engine surface's
+    /// render-target and depth-stencil views via [`RenderTargetData::UpdateData`]. Called at startup
+    /// and on every device or resolution reset; `a2` carries the target side length (the buffer is
+    /// square: width = height = a2). This only creates the render buffer -- the Scaleform movie's
+    /// viewport is set separately by [`SetMovieViewport`](Self::SetMovieViewport).
     #[address(0x140_F69_6E0)]
     pub fn InitPlatformRT(&mut self, a2: i32);
 
     /// Re-runs [`InitPlatformRT`](Self::InitPlatformRT) after a device or resolution reset. Also
     /// recomputes the movie size, sets the movie viewport, and recomputes the safe area. Gated by an
-    /// internal reset counter, so a direct call may no-op if the counter is not at 1.
+    /// internal reset counter: it does nothing unless the counter is at 1.
     #[address(0x140_FA9_C70)]
-    pub fn RestoreAfterReset(&mut self);
+    pub fn RestoreAfterResetImpl(&mut self);
 
     /// Recomputes the movie render rectangle ([`m_MovieScaleWidth`](Self::m_MovieScaleWidth) /
     /// [`m_MovieScaleHeight`](Self::m_MovieScaleHeight)). It first refreshes the cached stage and
@@ -286,9 +345,7 @@ impl UIManager {
 
     /// The default-VP world-to-screen wrapper `CHUDUI::UpdateGrappleReticle` uses for the grapple
     /// reticle (its only callers): fetches the render camera's view-projection internally and
-    /// forwards to [`Convert3DCoords`](Self::Convert3DCoords). Because the VP is not a
-    /// parameter, the grapple reticle bypasses the floating panel's marker reprojection unless
-    /// this wrapper is hooked.
+    /// forwards to [`Convert3DCoords`](Self::Convert3DCoords).
     #[address(0x140_F89_9A0)]
     pub fn Convert3DCoordsDefault(&mut self, world: *const Vector3, out_x: *mut f32, out_y: *mut f32) -> bool;
 
@@ -305,23 +362,23 @@ impl UIManager {
 
     /// Begins the UI render job, posting to the async render thread.
     #[address(0x140_F1B_030)]
-    pub fn StartRender(&mut self, context: *const HContext_t);
+    pub fn StartRenderImpl(&mut self, context: *const HContext_t);
 
     /// A barrier that spin-waits until the async UI render job has finished.
     #[address(0x140_F1B_0C0)]
-    pub fn SyncRender(&mut self);
+    pub fn SyncRenderImpl(&mut self);
 
     /// The final commit: submits the render HAL's output under a graphics scoped lock.
     #[address(0x140_F1B_0D0)]
-    pub fn Submit(&mut self);
+    pub fn SubmitImpl(&mut self);
 
     /// Draws the pause / menu static background.
     #[address(0x140_F46_C20)]
-    pub fn RenderStaticBackGround(&mut self);
+    pub fn RenderStaticBackGroundImpl(&mut self);
 
     /// Renders Scaleform UI to offscreen textures for in-world screens. This is not the HUD.
     #[address(0x141_007_6C0)]
-    pub fn RenderOffScreenTextures(&mut self, ctx: *mut *mut HContext_t);
+    pub fn RenderOffScreenTexturesImpl(&mut self, ctx: *mut *mut HContext_t);
 
     /// Whether a static background is being shown.
     #[address(0x140_F1B_4C0)]
@@ -353,10 +410,13 @@ impl UIManager {
     /// [`MovieImpl::HandleEvent`](ui::scaleform::MovieImpl::HandleEvent): a move event only when
     /// the DirectInput mouse reported a non-zero x or y delta this frame (also repositioning the
     /// overlay cursor sprite via `COverlayUI::SetMouseCursorPosition`), a wheel event from the z
-    /// delta, and down/up events from the steering action map's `MOUSE1` (249) / `MOUSE2` (250)
-    /// effector states (2 = pressed edge, 4 = released edge). When
+    /// delta, and down/up events from the steering action map's
+    /// [`MOUSE1`](input::input_action_map::Action::MOUSE1) /
+    /// [`MOUSE2`](input::input_action_map::Action::MOUSE2) effector states
+    /// ([`Clicked`](input::input_action_map::EffectorState::Clicked) for the pressed edge,
+    /// [`Released`](input::input_action_map::EffectorState::Released) for the released edge). When
     /// [`m_IsUsingGamepad`](Self::m_IsUsingGamepad) is set it instead parks the mouse at
-    /// `(-1000, -1000)`. Returns false without the movie, the steering, or a mouse device.
+    /// [`GAMEPAD_PARKED_MOUSE_POSITION`](Self::GAMEPAD_PARKED_MOUSE_POSITION) on both axes. Returns false without the movie, the steering, or a mouse device.
     #[address(0x140_F1B_A60)]
     pub fn SendMouseEvents(&mut self, steering: *mut void) -> bool;
 

@@ -1,3 +1,222 @@
 /// The opaque per-task state-machine context passed to character and task update functions. Used only
 /// behind pointers; the layout is not yet mapped.
 pub type StateContext;
+
+/// `SUserVM::EStateBitFlag`: the index of a bit in the character's animation state-bit words, which
+/// state tasks in the animation graph set and clear and which game code and graph conditions read.
+/// Bit `n` lives in 64-bit word `n / 64` at bit `n % 64` (word 0 holds bits 0-63, word 1 bits
+/// 64-127, and so on); the words are stored in
+/// [`UserVM`](character::control_parameters::UserVM). The values are confirmed at every bit an
+/// accessor tests: the one-bit predicates on
+/// [`Character`](character::character::Character) (wingsuit, parachute, free fall, fast fall,
+/// reeling in, motorbike, swimming, attached parachute, pre-reel, pre-hang), the grapple bits of
+/// `IsReeledIn` and `IsGrappleHanging`, the aim, drawing, holstering, and pause-aim-timer bits
+/// `HandleAimingInputNPC` tests, and `SB_DISABLE_SHOOT`. The other values are unconfirmed.
+#[copyable]
+pub enum StateBitFlag: u32 {
+    /// Flying the wingsuit; read by [`Character::IsUsingWingsuit`](character::character::Character::IsUsingWingsuit).
+    SB_IS_WINGSUIT = 0x0,
+    SB_IS_NO_FIRING = 0x1,
+    SB_IS_GRAPPLE_TETHER_FIRING = 0x2,
+    SB_IS_GRAPPLE_FIRING = 0x3,
+    /// Falling; with [`SB_IS_FREE_FALLING`](Self::SB_IS_FREE_FALLING) forms the falling test.
+    SB_IS_FALLING = 0x4,
+    /// In free fall; read by [`Character::IsFreefalling`](character::character::Character::IsFreefalling).
+    SB_IS_FREE_FALLING = 0x5,
+    SB_DISABLE_GLOBAL_PARTIALS = 0x6,
+    SB_DISABLE_GLOBAL_ADDITIVES = 0x7,
+    SB_IN_IDLE = 0x8,
+    SB_IN_SLOW_START = 0x9,
+    SB_IN_FAST_START = 0xA,
+    SB_IN_SLOW_STOP = 0xB,
+    SB_IN_FAST_STOP = 0xC,
+    SB_IN_SLOW_STOP_TURN = 0xD,
+    SB_IN_FAST_STOP_TURN = 0xE,
+    SB_IN_SLOW_PLANT = 0xF,
+    SB_IN_FAST_PLANT = 0x10,
+    SB_IGNORE_MOTION_TRANSITIONS = 0x11,
+    SB_IN_MOTION = 0x12,
+    SB_IN_ANGLE_0 = 0x13,
+    SB_IN_ANGLE_90R = 0x14,
+    SB_IN_ANGLE_90L = 0x15,
+    SB_IN_ANGLE_120R = 0x16,
+    SB_IN_ANGLE_120L = 0x17,
+    SB_IN_ANGLE_180R = 0x18,
+    SB_IN_ANGLE_180L = 0x19,
+    /// Set while the idle-to-aim transition plays.
+    SB_IN_IDLE_AIMING = 0x1A,
+    SB_IN_REACTION = 0x1B,
+    SB_IN_ROTATE = 0x1C,
+    SB_IN_BACKPEDAL = 0x1D,
+    /// Makes aim IK additionally require the `ENABLE_AIM_IK_SEG` animation segment.
+    SB_USE_ENABLE_AIM_IK_SEG = 0x1E,
+    SB_IN_ANCHOR_WARPING = 0x1F,
+    /// Attached to a grapple point; one of the bits [`Character::IsReeledIn`](character::character::Character::IsReeledIn) accepts.
+    SB_IN_GRAPPLE_ATTACHED = 0x20,
+    /// In a fast (dive) fall; read by [`Character::IsFastfalling`](character::character::Character::IsFastfalling).
+    SB_IS_FASTFALLING = 0x21,
+    SB_IS_LANDING = 0x22,
+    /// Parachute deployed; read by [`Character::IsUsingParachute`](character::character::Character::IsUsingParachute).
+    SB_IS_PARACHUTING = 0x23,
+    SB_IS_GRAPPLE_HANG = 0x24,
+    SB_IS_PLANTING_EXPLOSIVES = 0x25,
+    SB_IS_THROWING_GRENADE = 0x26,
+    SB_IN_HIT_REACTION = 0x27,
+    /// Set while a weapon draw plays.
+    SB_IS_DRAWING_WEAPON = 0x28,
+    /// Latches the character's weapon-aim bit at its current value (neither raising nor lowering the aim).
+    SB_NO_WEAPON_AIM_NOAIM_TRANSITIONS = 0x29,
+    /// Hanging upside down from a grapple; read by [`Character::IsReeledIn`](character::character::Character::IsReeledIn) and [`Character::IsGrappleHanging`](character::character::Character::IsGrappleHanging).
+    SB_IS_GRAPPLE_UPSIDEDOWN = 0x2A,
+    SB_IN_RAGDOLL_GRAPPLE_FIRE = 0x2B,
+    /// Forces the character's weapon-aim bit off.
+    SB_NO_WEAPON_AIM = 0x2C,
+    SB_IS_LOCO_ONE_OFF = 0x2D,
+    SB_IS_LOOK_AT = 0x2E,
+    SB_IS_JUMPING = 0x2F,
+    SB_IS_LANDING_HARD = 0x30,
+    SB_IN_DO_ACT_WAIT = 0x31,
+    SB_IS_RELOADING = 0x32,
+    /// Mirrors the character's aim state (aiming a weapon or the grapple); the animation graph's `C_IS_AIMING_WPN_OR_GRPL` condition tests it.
+    SB_IS_AIMING_WPN_OR_GRPL = 0x33,
+    /// Switching weapons.
+    SB_IS_SWITCHING_WEAPONS = 0x34,
+    SB_NO_VERTICAL_ADDITIVES = 0x35,
+    /// Set while a weapon holster plays.
+    SB_IS_HOLSTERING_WEAPON = 0x36,
+    SB_IS_DETONATING_EXPLOSIVES = 0x37,
+    SB_DONT_APPLY_DAMAGE_IMPACT = 0x3A,
+    SB_DONT_APPLY_DAMAGE = 0x3B,
+    SB_FLINCH_ON_ZERO_DAMAGE = 0x3C,
+    SB_SKIP_HITREACTION_RAGDOLL = 0x3D,
+    SB_SKIP_HITREACTION_STUMBLE = 0x3E,
+    SB_SKIP_HITREACTION_FLINCH = 0x3F,
+    /// Disallows firing: `CInventory` clears its shooting permission while set.
+    SB_DISABLE_SHOOT = 0x40,
+    SB_DISABLE_RELOAD = 0x41,
+    SB_DISABLE_USE_GRENADES = 0x42,
+    SB_DISABLE_TOGGLE_PRECISION = 0x43,
+    SB_DISABLE_PICKUP = 0x44,
+    SB_DISABLE_SWITCH_WEAPONS = 0x45,
+    SB_DISABLE_PLANT_EXPLOSIVES = 0x46,
+    SB_DISABLE_TRIGGER_EXPLOSIVES = 0x47,
+    SB_DISABLE_PICKUP_MOUNTED_GUN = 0x48,
+    SB_DISABLE_DRAW_WEAPON = 0x49,
+    SB_DISABLE_HOLSTER_WEAPON = 0x4A,
+    SB_DISABLE_GRAPPLE_FIRE = 0x4B,
+    SB_DISABLE_MELEE = 0x4C,
+    SB_IN_RUSH_SEARCH = 0x4D,
+    SB_IN_HIJACKLING_EXPLOSIVE_STATE = 0x4E,
+    SB_SHOULD_IGNORE_FIRING_ANGLE = 0x4F,
+    SB_IN_GRAPPLE_STRUGGLE = 0x50,
+    SB_IN_USE_ITEM = 0x51,
+    SB_OVERRIDE_GLOBAL_DEATH = 0x52,
+    SB_ALLOW_STATIONARY_HITREACTION = 0x53,
+    /// Holds the character's aim timer (set by `NPauseAimTimerTask`): it is not decremented and is kept at no less than 0.5 s.
+    SB_PAUSE_AIM_TIMER = 0x54,
+    /// Suppresses the automatic weapon draw on entering combat.
+    SB_DISABLE_MENTAL_STATE_DRAW_WEAPON = 0x55,
+    SB_DISABLE_WEAPON_OFFHAND_IK = 0x56,
+    SB_WEAPON_OFFHAND_IK_LEFT = 0x57,
+    SB_WEAPON_OFFHAND_IK_RIGHT = 0x58,
+    SB_IN_TRANSITION_TO_WINGSUIT = 0x59,
+    /// Hanging from a vehicle-attached parachute; read by [`Character::IsInAttachedToParachute`](character::character::Character::IsInAttachedToParachute).
+    SB_IN_ATTACHED_TO_PARACHUTE = 0x5A,
+    /// In the reel-in wind-up; read by [`Character::IsPreReelingIn`](character::character::Character::IsPreReelingIn).
+    SB_IN_PRE_REEL = 0x5B,
+    SB_CAN_USE_ITEM = 0x5C,
+    SB_DISABLE_USE_ITEM = 0x5D,
+    SB_IN_TRANSITION_TO_PARACHUTE_FROM_FALL = 0x5E,
+    SB_IN_LOCOMOTION = 0x5F,
+    SB_APPLY_HIP_STUNT_ADJUSTMENT = 0x60,
+    SB_IN_LOOP_CONTEXT_ACTION = 0x61,
+    SB_IN_LOOP_CHILD_CONTEXT_ACTION = 0x62,
+    SB_FORCE_SEE_COMBAT_TARGET = 0x63,
+    SB_IS_IN_DEAD_STATE = 0x64,
+    /// Riding a motorcycle; read by [`Character::IsRidingMC`](character::character::Character::IsRidingMC), and accepted by [`Character::IsInRidingInVehicleState`](character::character::Character::IsInRidingInVehicleState) and [`Character::IsInDrivingVehicleState`](character::character::Character::IsInDrivingVehicleState) in place of a riding-state hash.
+    SB_IS_RIDING_MOTORBIKE = 0x65,
+    SB_IN_COVER_ENTRY = 0x66,
+    SB_IN_COVER = 0x67,
+    SB_IN_COVER_EXIT = 0x68,
+    SB_WAIT_TO_MOVE = 0x69,
+    SB_IN_CROUCH = 0x6A,
+    SB_IN_STOPPING = 0x6B,
+    /// A grapple reel-in traversal is in progress; read by [`Character::IsReelingIn`](character::character::Character::IsReelingIn).
+    SB_IN_REELING_IN = 0x6C,
+    SB_DISABLE_SWITCH_WEAPON_GUI = 0x6D,
+    SB_USE_ENABLE_LOOKAT_IK_SEG = 0x6E,
+    SB_USE_DISABLE_LOOKAT_IK_SEG = 0x6F,
+    SB_IN_MORTAR_MODE = 0x70,
+    SB_IN_MORTAR_FIRE = 0x71,
+    SB_IN_MORTAR_ENTER = 0x72,
+    SB_DISABLE_MORTAR_MODE = 0x73,
+    SB_INSIDE_VEHICLE = 0x74,
+    SB_OUTSIDE_VEHICLE = 0x75,
+    SB_IN_GRAPPLE_YANKING = 0x76,
+    SB_IN_RAGDOLL = 0x77,
+    /// Swimming, surface or underwater; read by [`Character::IsSwimming`](character::character::Character::IsSwimming).
+    SB_IS_SWIMMING = 0x78,
+    /// Swimming underwater; read by [`Character::IsUnderwaterSwimming`](character::character::Character::IsUnderwaterSwimming).
+    SB_IS_UW_SWIMMING = 0x79,
+    SB_IS_SWIM_TURNING = 0x7A,
+    SB_IN_MELEE = 0x7B,
+    SB_HELI_PASSENGER_COMBAT = 0x7C,
+    SB_IN_ROTATE_LEFT = 0x7D,
+    SB_IN_ROTATE_RIGHT = 0x7E,
+    SB_RANDOM_ENCOUNTER_IDLE = 0x7F,
+    SB_RANDOM_ENCOUNTER_ACKNOWLEDGE = 0x80,
+    SB_RANDOM_ENCOUNTER_DIALOGUE = 0x81,
+    SB_IS_GETTING_UP_FROM_RAGDOLL = 0x82,
+    SB_DISABLE_SWITCH_TO_PLANTED_EXPLOSIVE = 0x83,
+    /// Disables aim assist.
+    SB_DISABLE_AIM_ASSIST = 0x84,
+    SB_CALLING_FOR_REINFORCEMENTS = 0x85,
+    /// Playing a full-body pickup.
+    SB_IN_FULLBODY_PICKUP = 0x86,
+    /// In the wind-up to a grapple hang; read by [`Character::IsPreHang`](character::character::Character::IsPreHang).
+    SB_IN_PRE_HANG = 0x87,
+    SB_DISABLE_FACIAL_EXPRESSION = 0x88,
+    SB_DISABLE_GLOBAL_HITREACTIONS = 0x8C,
+    SB_GRAPPLE_IMMUNITY = 0x8D,
+    /// Reports that on-foot locomotion is in the aim-relative (strafing) acts.
+    SB_IN_LOCOMOTION_STRAFING = 0x8E,
+    SB_IN_ANGLE_45R = 0x8F,
+    SB_IN_ANGLE_45L = 0x90,
+    /// Set while a no-aim-to-aim transition plays.
+    SB_IN_NOAIM_TO_AIM = 0x91,
+    SB_UPDATE_STUCK_DETECTOR = 0x92,
+    SB_INVERT_VERTICAL_BLENDING = 0x93,
+    SB_IN_OBSERVING = 0x94,
+    SB_IN_ANGLE_135L = 0x95,
+    SB_IN_ANGLE_135R = 0x96,
+    SB_IS_CONCRETE_CHARACTER = 0x97,
+    SB_IS_BAVWING_AIRBRAKE = 0x98,
+    SB_IS_BAVWING_GROUND_TAKEOFF = 0x99,
+    SB_IS_BAVWING_EVADE = 0x9A,
+    SB_IS_BAVWING_EVADE_SPECIAL_RETICLE = 0x9B,
+    SB_IS_BAVWING_WATER_TAKEOFF = 0x9C,
+    SB_IS_BAVWING_RECOVER_FROM_FALL = 0x9D,
+    SB_VEHICLE_DISABLE_ARM_IK = 0x9E,
+    SB_IS_MECH_PUNCHING = 0x9F,
+    SB_IS_MECH_JUMPING = 0xA0,
+}
+
+/// `SUserVM::EContextBitFlag`: the index of a bit in the character's animation context-bit word,
+/// which game code sets to steer the animation graph. The values are unconfirmed.
+#[copyable]
+pub enum ContextBitFlag: u32 {
+    CB_IS_PREVENTING_FALL = 0x0,
+    CB_IS_MOTORBIKEISH = 0x1,
+    CB_UNSTUNTIFY = 0x2,
+    CB_FORCE_WALK = 0x3,
+    CB_FORCE_STOP = 0x4,
+    CB_IN_VISTA_NEAR_CAMERA_TRIGGER = 0x5,
+    CB_IN_VISTA_FAR_CAMERA_TRIGGER = 0x6,
+    CB_LOD_INVISIBLE = 0x7,
+    CB_LOD_SEMI_VISIBLE = 0x8,
+    CB_IS_FAKE_STUNTING = 0x9,
+    CB_IS_BOOSTING_REEL = 0xA,
+    CB_IS_ENCLOSED = 0xB,
+    CB_IS_CONCRETE_CHARACTER = 0xC,
+    CB_WINGSUIT_CHASE_ACTIVE = 0xD,
+}

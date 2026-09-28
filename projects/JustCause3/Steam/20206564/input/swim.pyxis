@@ -13,8 +13,9 @@ impl NStateTask_InputSurfaceSwimTask {
     /// `GameCameraManager::GetInputMatrix`) and, for the player, the direction to the aim-target
     /// position, then dispatches swim acts by the angle from the body forward
     /// ([`ControllerUtility::GetDeltaAngleFromOrientation`](input::controller_utility::ControllerUtility::GetDeltaAngleFromOrientation)):
-    /// below 65 degrees the forward crawl-start act, between 65 and 180 degrees the directional
-    /// 120-degree turn acts (`ACT_SURFACE_SWIM_START_120R/L` while moving,
+    /// below [`SWIM_TURN_ACT_MIN_ANGLE`] the forward crawl-start act, from there up to
+    /// [`SWIM_TURN_ACT_MAX_ANGLE`] the directional 120-degree turn acts
+    /// (`ACT_SURFACE_SWIM_START_120R/L` while moving,
     /// `ACT_SURFACE_IDLE_QUICKTURN_120R/L` while idle and wielding a weapon, measured against the
     /// aim direction). When a turn is latched it writes the angle to the blackboard
     /// ([`SWIM_TURN_ANGLE_ID`](blackboard::ObjectBlackboard::SWIM_TURN_ANGLE_ID)) and stores the
@@ -72,3 +73,21 @@ pub fn UpdateSurfaceMovement(character: *mut Character, dt: f32, target_angle_of
 /// direction instead of the surface plane.
 #[address(0x140_7A5_DC0)]
 pub fn UpdateUnderwaterMovement(character: *mut Character, dt: f32, target_angle_offset: f32, ang_corr_seg_id: *const u32, steering_seg_id: *const u32, p6: bool);
+
+/// The surface-swim movement core for NPCs, called by
+/// [`NStateTask_MovementSurfaceSwimTask::Update`] when the character is not the player.
+#[address(0x140_7A5_710)]
+pub fn UpdateSurfaceMovementNPC(character: *mut Character, dt: f32);
+
+/// The absolute angle (degrees) from the body forward below which the swim input tasks queue the
+/// forward crawl-start act, and at or above which they queue a directional 120-degree turn act.
+pub const SWIM_TURN_ACT_MIN_ANGLE: f32 = 65.0;
+/// The upper bound (degrees) of the swim input tasks' turn-act angle range.
+pub const SWIM_TURN_ACT_MAX_ANGLE: f32 = 180.0;
+/// The factor the swim movement cores multiply a turn rate by to get degrees per second: the
+/// surface core scales the movement settings' swim slerp speeds by it, and the underwater core
+/// uses it as a fixed rate.
+pub const SWIM_TURN_RATE_SCALE: f32 = 30.0;
+/// The fixed surface-swim facing turn rate (degrees per second) while aiming or planting
+/// explosives.
+pub const SWIM_AIM_TURN_RATE: f32 = 300.0;

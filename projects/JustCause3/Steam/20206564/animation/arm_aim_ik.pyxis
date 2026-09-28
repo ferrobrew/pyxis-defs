@@ -1,0 +1,140 @@
+use animation::ik::HumanIK;
+use character::character::Character;
+use state::StateContext;
+use types::math::Vector3;
+
+/// The aim effector index of an arm aim IK task (`NRightArmAimIK::EAimEffectorTypes`, which
+/// `NReelInAimIK::EAimEffectorTypes` aliases). [`RightArmAimIK::Update`] fills the effectors in
+/// this order.
+pub enum AimEffectorType: i32 {
+    AET_RIGHT_ARM = 0x0,
+    AET_RIGHT_HAND = 0x1,
+    AET_HEAD = 0x2,
+    /// The number of effector types.
+    AET_NOF_TYPES = 0x3,
+}
+
+/// One aim effector of an arm aim IK task (`SAimEffectorProperties`, shared in shape by
+/// `NRightArmAimIK` and `NReelInAimIK`). The task's `Update` fills the bone index, bone position, and
+/// gain each frame; `UpdateAimEffector` writes the aim direction and rotation axis it derives.
+#[size(0x2C), align(4)]
+pub type AimEffectorProperties {
+    /// The skeleton bone index the effector rotates (resolved from a safe-bone hash).
+    pub m_BoneIndex: i32,
+    /// The bone's position, in character-model space, taken from the pre-additive pose.
+    pub m_BonePosition: Vector3,
+    /// The effector's rotation-reach weight: the task's aim weight times the per-effector gain.
+    /// `UpdateAimEffector` writes it to [`HumanIK::m_TargetReachR`] for the effector.
+    pub m_Gain: f32,
+    /// The normalized direction from the bone to the aim target (model space).
+    pub m_AimDirection: Vector3,
+    /// The rotation axis turning the reference axis onto [`m_AimDirection`](Self::m_AimDirection).
+    pub m_RotationAxis: Vector3,
+}
+
+/// The right-arm (gun arm) aim IK task (`NRightArmAimIK`). A player-only animation state task,
+/// active in the weapon-aim states, that rotates the right arm, the right hand, and the head toward
+/// the aim target with rotation effectors on [`Pass::MAIN`](animation::ik::Pass::MAIN) at
+/// [`SolveStep::UPPER_BODY`](animation::ik::SolveStep::UPPER_BODY). Its per-instance properties are
+/// [`RightArmAimIKInstanceProperties`].
+pub type RightArmAimIK;
+impl RightArmAimIK {
+    /// The task's per-frame update. Runs only for the player and while the
+    /// [`AIM_IK_WEIGHT_ID`](blackboard::ObjectBlackboard::AIM_IK_WEIGHT_ID) weight is non-zero: brings the
+    /// player aim control's weapon aim point into model space (the inverse of
+    /// [`Character::m_WorldMatrixT1`]), fills the three effectors (`RIGHT_ARM`, `RIGHT_HAND`, and
+    /// `HEAD`, weighted by [`RightArmAimIK_ArmGain`], [`RightArmAimIK_HandGain`], and
+    /// [`RightArmAimIK_HeadGain`]), and calls [`UpdateAimEffector`](Self::UpdateAimEffector) for
+    /// each. The pole vector is the negated forward axis of the `ATTACH_HAND_RIGHT` bone.
+    #[address(0x140_845_B10)]
+    pub fn Update(ctx: *mut StateContext, p1: *mut void, props: *mut RightArmAimIKInstanceProperties);
+
+    /// Turns `props`'s bone axis toward `target`: computes the direction and the rotation axis
+    /// against `pole`, queues a rotation target on the bone's effector
+    /// ([`HumanIK::AddEffectorTargetRotationVector`], `UPPER_BODY`, `MAIN`, no interpolation or
+    /// blend-out), and writes the effector's rotation reach from `m_Gain`. Skips a target within
+    /// about 3 mm of the bone or already aligned with the pole.
+    #[address(0x140_838_EC0)]
+    pub fn UpdateAimEffector(hik: *mut HumanIK, target: *const Vector3, pole: *const Vector3, props: *mut AimEffectorProperties);
+}
+
+/// The instance properties of [`RightArmAimIK`] (`NRightArmAimIK::SInstanceProperties`).
+#[size(0x90), align(4)]
+pub type RightArmAimIKInstanceProperties {
+    pub m_PoleVector: Vector3,
+    /// The effectors, indexed by [`AimEffectorType`].
+    pub m_AimEffectors: [AimEffectorProperties; 3],
+}
+
+/// The grapple reel-in aim IK task (`NReelInAimIK`). A player-only animation state task, active in
+/// the grapple reel-in state, that rotates the right arm toward the aim target and swings the chest
+/// toward the grappling hook. Its per-instance properties are [`ReelInAimIKInstanceProperties`].
+pub type ReelInAimIK {
+    /// The largest chest swing, in degrees, [`Update`](Self::Update) applies toward the hook.
+    pub const MAX_CHEST_ROTATION_DEGREES: f32 = 45.0,
+}
+impl ReelInAimIK {
+    /// The task's per-frame update. Gated like [`RightArmAimIK::Update`] on the player and the
+    /// [`AIM_IK_WEIGHT_ID`](blackboard::ObjectBlackboard::AIM_IK_WEIGHT_ID) weight: aims the `RIGHT_ARM`
+    /// effector at the player aim control's weapon aim point (weighted by
+    /// [`AimIKUtil::GetIKWeightValue`]), then measures the signed horizontal angle, about the `SPINE`
+    /// bone, between that point and a position stored on the grappling hook, and past a threshold
+    /// queues a chest-end rotation of up to
+    /// [`MAX_CHEST_ROTATION_DEGREES`](Self::MAX_CHEST_ROTATION_DEGREES), faded by the reel
+    /// segment's local time.
+    #[address(0x140_841_D70)]
+    pub fn Update(ctx: *mut StateContext, p1: *mut void, props: *mut ReelInAimIKInstanceProperties);
+
+    /// The reel-in variant of [`RightArmAimIK::UpdateAimEffector`], additionally given the
+    /// character.
+    #[address(0x140_838_A80)]
+    pub fn UpdateAimEffector(hik: *mut HumanIK, target: *const Vector3, pole: *const Vector3, props: *mut AimEffectorProperties, character: *mut Character);
+}
+
+/// The instance properties of [`ReelInAimIK`] (`NReelInAimIK::SInstanceProperties`).
+#[size(0x38), align(4)]
+pub type ReelInAimIKInstanceProperties {
+    pub m_PoleVector: Vector3,
+    pub m_AimEffectors: [AimEffectorProperties; 1],
+}
+
+/// Shared helpers of the aim IK tasks (`NAimIKUtil`).
+pub type AimIKUtil;
+impl AimIKUtil {
+    /// The aim IK weight envelope for the character, in `0..1`: the aim segment's local time (or
+    /// `1` outside it, or when `force_full` is set), optionally overridden from the blackboard,
+    /// minus the local time of the aim fade-out segment.
+    #[address(0x140_802_BA0)]
+    pub fn GetIKWeightValue(character: *mut Character, force_full: bool) -> f32;
+}
+
+/// The per-effector gain of the [`RightArmAimIK`] `RIGHT_ARM` effector (initially `0.75`).
+#[address(0x142_D66_078)]
+pub extern RightArmAimIK_ArmGain: f32;
+/// The per-effector gain of the [`RightArmAimIK`] `RIGHT_HAND` effector (initially `0.6`).
+#[address(0x142_D66_07C)]
+pub extern RightArmAimIK_HandGain: f32;
+/// The per-effector gain of the [`RightArmAimIK`] `HEAD` effector (initially `0.15`).
+#[address(0x142_D66_080)]
+pub extern RightArmAimIK_HeadGain: f32;
+
+/// The per-frame update of the aim IK task (`NAimIKTask::Update`): the animation state task that
+/// orients the upper body toward the aim target while aiming a weapon or the grapple, queuing axis
+/// rotation targets (the chest end among them) weighted by [`AimIKUtil::GetIKWeightValue`].
+#[address(0x140_807_6D0)]
+pub fn NAimIKTask_Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
+
+/// The per-frame update of the grapple-fire arm IK task (`NGrapplingFireArmIK::Update`): poses the
+/// left arm toward the grapple target: reads the hook's last target position against the left
+/// shoulder and hand and publishes the result through the character blackboard.
+#[address(0x140_814_C80)]
+pub fn NGrapplingFireArmIK_Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
+
+/// The per-frame update of the look-at IK task (`NLookAtIKTask::Update`).
+#[address(0x140_827_B00)]
+pub fn NLookAtIKTask_Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
+
+/// The per-frame update of the locomotion IK task (`NLocoIKTask::Update`), which queues positional
+/// effector targets through [`HumanIK::AddEffectorTargetPosition`].
+#[address(0x140_826_480)]
+pub fn NLocoIKTask_Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);

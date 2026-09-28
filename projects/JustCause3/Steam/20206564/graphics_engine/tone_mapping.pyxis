@@ -42,8 +42,8 @@ pub type ToneMappingEffect {
     pub m_NumBuckets: u32,
 
     /// The ping-pong selector for the internal histogram ring the per-frame exposure step advances:
-    /// [`Update`](Self::Update) increments it each real frame, so a caller that runs `Update`
-    /// once per eye steps it twice per frame and can read back a stale histogram.
+    /// [`Update`](Self::Update) increments it on every call, and the engine calls `Update` once per
+    /// real frame.
     #[address(0x57C)]
     pub m_OcclusionQuerySlotSelector: u32,
 

@@ -179,3 +179,18 @@ pub fn UpdateParachutePhysics(character: *mut Character, dt: f32, input: *const 
 /// Also computes the velocity-alignment steering toward the horizontal velocity.
 #[address(0x140_7E6_480)]
 pub fn GetParachuteSteeringValues(character: *mut Character, para_settings: *const CharacterParachuteSettings, input: *const Vector2, dt: f32, steering_values_out: *mut Vector3, wanted_char_yawpitchroll_out: *mut Vector3, look_steer_out: *mut Vector2);
+
+/// Slerps the character and canopy proxy orientations in the parachute action params toward the
+/// wanted orientation. Called from [`UpdateParachutePhysics`].
+#[address(0x140_792_880)]
+pub fn UpdateParachutingTransforms(character: *mut Character, params: *mut ParachuteActionParams, wanted_yaw_pitch_roll: *const Vector3, transform: *const Matrix4, para_settings: *const CharacterParachuteSettings, dt: f32);
+
+/// Computes the conventional (physics-driven) parachute velocity from the steering values, the
+/// orientation, and the current velocity. Called from [`UpdateParachutePhysics`].
+#[address(0x140_792_D10)]
+pub fn ApplyConventionalParachuteVelocities(character: *mut Character, dt: f32, para_settings: *const CharacterParachuteSettings, transform: *const Matrix4, blend: f32, steering_values: *const Vector3, p6: *const Vector3, p7: *const Vector3, velocity_out: *mut Vector3);
+
+/// Computes the parachute velocity from the animation root velocity with steering applied. Called
+/// from [`UpdateParachutePhysics`].
+#[address(0x140_775_1E0)]
+pub fn ApplyAnimationVelocityWithSteering(character: *mut Character, dt: f32, para_settings: *const CharacterParachuteSettings, transform: *const Matrix4, blend: f32, velocity_out: *mut Vector3);
