@@ -3,6 +3,17 @@ use character::character::Character;
 use state::StateContext;
 use types::math::Vector3;
 
+/// The aim effector index of an arm aim IK task (`NRightArmAimIK::EAimEffectorTypes`, which
+/// `NReelInAimIK::EAimEffectorTypes` aliases). [`RightArmAimIK::Update`] fills the effectors in
+/// this order.
+pub enum AimEffectorType: i32 {
+    AET_RIGHT_ARM = 0x0,
+    AET_RIGHT_HAND = 0x1,
+    AET_HEAD = 0x2,
+    /// The number of effector types.
+    AET_NOF_TYPES = 0x3,
+}
+
 /// One aim effector of an arm aim IK task (`SAimEffectorProperties`, shared in shape by
 /// `NRightArmAimIK` and `NReelInAimIK`). The task's `Update` fills the bone index, bone position, and
 /// gain each frame; `UpdateAimEffector` writes the aim direction and rotation axis it derives.
@@ -51,8 +62,7 @@ impl RightArmAimIK {
 #[size(0x90), align(4)]
 pub type RightArmAimIKInstanceProperties {
     pub m_PoleVector: Vector3,
-    /// The effectors, indexed by `EAimEffectorTypes`: `AET_RIGHT_ARM` (0), `AET_RIGHT_HAND` (1),
-    /// and `AET_HEAD` (2).
+    /// The effectors, indexed by [`AimEffectorType`].
     pub m_AimEffectors: [AimEffectorProperties; 3],
 }
 

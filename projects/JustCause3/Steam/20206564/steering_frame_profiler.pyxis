@@ -11,8 +11,11 @@ impl SteeringFrameProfiler {
     #[address(0x140_E98_200)]
     pub fn Constructor(&mut self) -> *mut SteeringFrameProfiler;
 
-    /// Creates (or, when it already exists, unmaps) the `"frameprofiler"` input action map for
-    /// input device type 4 and maps the frame profiler's ten actions (ids 184..193) to it.
+    /// Creates (or, when it already exists, unmaps) the `"frameprofiler"` input action map for the
+    /// [`Gamepad`](input::input_device_manager::DeviceType::Gamepad) device and maps the frame
+    /// profiler's ten actions to it, from
+    /// [`PROFILER_UP`](input::input_action_map::Action::PROFILER_UP) through
+    /// [`PROFILER_TOGGLE_INPUT_FOCUS_B`](input::input_action_map::Action::PROFILER_TOGGLE_INPUT_FOCUS_B).
     #[address(0x140_E84_7F0)]
     pub fn LoadActionMap(&mut self);
 }

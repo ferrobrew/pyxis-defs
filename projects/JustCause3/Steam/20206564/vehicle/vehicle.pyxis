@@ -36,9 +36,10 @@ pub type VehicleSeat {
     pub m_GraphNode: *mut u8,
 }
 
-/// A vehicle (`CVehicle`). Like other game objects it carries its `CGameObject` base at offset `0x8`
-/// (the vtable there serves RTTI and the transform virtuals). Only the members needed so far are
-/// bound.
+/// A vehicle (`CVehicle`). Like other game objects it carries its `CGameObject` base at the same
+/// offset as a character does
+/// ([`Character::GAME_OBJECT_BASE_OFFSET`](character::character::Character::GAME_OBJECT_BASE_OFFSET)),
+/// and the vtable there serves RTTI and the transform virtuals. Only some members are bound.
 #[min_size(0x53A4)]
 pub type Vehicle {
     /// The number of entries in [`m_Seats`](Self::m_Seats).
@@ -65,7 +66,7 @@ pub type Vehicle {
     pub m_AIVehicleWeaponAimTimeout: f32,
 
     /// The vehicle's physics body (`CPfxVehicle*`). [`IsMech`](Self::IsMech) tests its strafing
-    /// wheel-steering controller, at offset `0x1480`.
+    /// wheel-steering controller.
     #[address(0x4_DD0)]
     pub m_PfxVehicle: *mut u8,
 
@@ -102,9 +103,9 @@ impl Vehicle {
 
     /// Whether the vehicle is the rocket boat: [`m_VehicleTypeNameHash`](Self::m_VehicleTypeNameHash)
     /// equals the hash of `v1706_boat_na_rocketboat` (computed once and cached). The sea-vehicle
-    /// input, water-contact, and player action contexts use it. The release IDB labels this address
-    /// `CWeaponBase::MarkNextWeaponComponentForFire`, but every caller passes a vehicle; the symbol
-    /// dump has no counterpart, so the name here is descriptive.
+    /// input, water-contact, and player action contexts use it. IDA labels this address
+    /// `CWeaponBase::MarkNextWeaponComponentForFire`, but every caller passes a vehicle; the name
+    /// here is descriptive.
     #[address(0x140_F6F_8F0)]
     pub fn IsRocketBoat(&self) -> bool;
 }

@@ -14,13 +14,13 @@ use types::math::Vector3;
 pub extern enable_low_res_spot_light_volume: bool;
 
 /// The scene light manager: gathers the frame's visible lights and prepares the per-frame lighting
-/// render state. Its release layout differs from the 2016 symbol dump's past the global light; only
-/// the fields below are verified.
+/// render state. Only the fields below are verified.
 #[singleton(0x142_ED0_E70), min_size(0x1BEA88)]
 pub type LightManager {
     /// The edge length in pixels of the clustered light grid's screen tiles:
     /// `CRenderBlockDeferredLighting::DrawClustered` divides the display size by it to get the tile
-    /// counts, and the light-grid lookup addresses tiles as `SV_Position >> 6`.
+    /// counts, and the light-grid lookup shader addresses tiles by shifting `SV_Position` right by
+    /// its base-2 logarithm.
     pub const LIGHT_GRID_TILE_SIZE: u32 = 64,
 
     /// The global light's (sun or moon) diffuse colour, the `Diffuse` of the embedded global light's
@@ -61,7 +61,7 @@ pub type LightManager {
     #[address(0x1BE_A30)]
     pub m_LightBuffer: *mut void,
 
-    /// The three-slot per-frame light-grid lookup ring, indexed by the render frame modulo three.
+    /// The per-frame light-grid lookup ring, indexed by the render frame modulo the ring length.
     #[address(0x1BE_A38)]
     pub m_LightLookup: [*mut void; 3],
 

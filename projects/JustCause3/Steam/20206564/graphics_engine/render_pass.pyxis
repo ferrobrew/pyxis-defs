@@ -150,6 +150,29 @@ impl RBILists {
 #[address(0x142_ED0_FA0)]
 pub extern render_block_overflow_count: u32;
 
+/// The render-status bits of [`RenderContext::m_RenderStatus`](graphics_engine::graphics_engine::RenderContext::m_RenderStatus)
+/// (`RenderContext::ERenderStatus`), which tell render blocks what kind of pass is drawing so they
+/// can select depth, shadow, or reflection shader permutations. [`SetupRenderContext`](RenderPass::SetupRenderContext) clears and sets
+/// [`RENDERSTATUS_STATIC_SHADOWMAP`](Self::RENDERSTATUS_STATIC_SHADOWMAP),
+/// [`RENDERSTATUS_DYNAMIC_SHADOWMAP`](Self::RENDERSTATUS_DYNAMIC_SHADOWMAP),
+/// [`RENDERSTATUS_REFLECTIONS`](Self::RENDERSTATUS_REFLECTIONS), and
+/// [`RENDERSTATUS_RSM`](Self::RENDERSTATUS_RSM) with the values given here, and also clears
+/// [`RENDERSTATUS_MIRROR`](Self::RENDERSTATUS_MIRROR). The other values are unconfirmed.
+#[copyable]
+pub bitflags RenderStatus: u32 {
+    RENDERSTATUS_DEFAULT = 0x1,
+    RENDERSTATUS_STATIC_SHADOWMAP = 0x2,
+    RENDERSTATUS_DYNAMIC_SHADOWMAP = 0x4,
+    RENDERSTATUS_REFLECTIONS = 0x8,
+    RENDERSTATUS_TILING = 0x10,
+    RENDERSTATUS_MIRROR = 0x20,
+    /// Set while the reflective shadow map passes draw.
+    RENDERSTATUS_RSM = 0x40,
+    RENDERSTATUS_BILLBOARD_ARRAY = 0x80,
+    /// Either shadow-map bit: the mask render blocks test to select their depth/shadow programs.
+    RENDERSTATUS_SHADOWMAP = 0x6,
+}
+
 /// Render-pass state flags. Only the draw gate is identified; the remaining bits are unmapped.
 #[copyable]
 pub bitflags RenderPassState: u16 {
@@ -167,15 +190,15 @@ pub bitflags RenderPassSortState: u16 {
     m_Sorted = 0b0000_0100_0000_0000,
 }
 
-/// The base render pass (`NGraphicsEngine::CRenderPass`, 0x8C0 bytes in the release build).
-/// Specialized passes derive from it, so only the base extent is claimed here.
+/// The base render pass (`NGraphicsEngine::CRenderPass`). Specialized passes derive from it and
+/// extend past the base extent.
 #[min_size(0x8C0)]
 pub type RenderPass {
-    /// The first squared depth-bucket boundary `CRenderEngine::InitializeSystem` registers on the
-    /// Z-and-velocity pass (40 metres, squared) in [`m_DepthSqTable`](Self::m_DepthSqTable).
+    /// The first squared depth-bucket boundary (in square metres) `CRenderEngine::InitializeSystem`
+    /// registers on the Z-and-velocity pass in [`m_DepthSqTable`](Self::m_DepthSqTable).
     pub const Z_AND_VELOCITY_DEPTH_SQ_NEAR: f32 = 1600.0,
-    /// The second squared depth-bucket boundary registered on the Z-and-velocity pass (120 metres,
-    /// squared).
+    /// The second squared depth-bucket boundary (in square metres) registered on the Z-and-velocity
+    /// pass.
     pub const Z_AND_VELOCITY_DEPTH_SQ_FAR: f32 = 14400.0,
 
     /// The list that new render-block-items append to this frame. Each rotation,
@@ -196,39 +219,39 @@ pub type RenderPass {
     #[address(0x48)]
     pub m_RenderBackToFront: i32,
 
-    /// The pass's stencil depth-fail operation (`RenderSettings[8]`, a `Graphics::EStencilOp`).
-    /// [`PreDraw`](Self::PreDraw) applies the pass's stencil state
+    /// The pass's stencil depth-fail operation (an entry of the pass's shipped `RenderSettings`, a
+    /// `Graphics::EStencilOp`). [`PreDraw`](Self::PreDraw) applies the pass's stencil state
     /// ([`SetStencilOp`](graphics_engine::draw::SetStencilOp) and siblings) when
-    /// [`m_StencilTestEnable`](Self::m_StencilTestEnable) is 1, and copies these settings into the
-    /// render context's stencil settings either way.
+    /// [`m_StencilTestEnable`](Self::m_StencilTestEnable) is enabled, and copies these settings into
+    /// the render context's stencil settings either way.
     #[address(0x58)]
     pub m_StencilOpZFail: u32,
 
-    /// The stencil depth-pass operation (`RenderSettings[9]`).
+    /// The stencil depth-pass operation (a `RenderSettings` entry).
     #[address(0x5C)]
     pub m_StencilOpZPass: u32,
 
-    /// The stencil fail operation (`RenderSettings[10]`).
+    /// The stencil fail operation (a `RenderSettings` entry).
     #[address(0x60)]
     pub m_StencilOpSFail: u32,
 
-    /// The stencil comparison function (`RenderSettings[11]`, a `Graphics::EStencilFunc`).
+    /// The stencil comparison function (a `RenderSettings` entry, a `Graphics::EStencilFunc`).
     #[address(0x64)]
     pub m_StencilFunc: u32,
 
-    /// The stencil read mask (`RenderSettings[12]`).
+    /// The stencil read mask (a `RenderSettings` entry).
     #[address(0x68)]
     pub m_StencilMask: u32,
 
-    /// The stencil write mask (`RenderSettings[13]`).
+    /// The stencil write mask (a `RenderSettings` entry).
     #[address(0x6C)]
     pub m_StencilWriteMask: u32,
 
-    /// The stencil reference value (`RenderSettings[14]`).
+    /// The stencil reference value (a `RenderSettings` entry).
     #[address(0x70)]
     pub m_StencilRef: u32,
 
-    /// Whether the pass stencil-tests (`RenderSettings[15]`, 1 = enabled). The per-pass settings
+    /// Whether the pass stencil-tests (a `RenderSettings` entry). The per-pass settings
     /// are shipped data; the engine also clears it in code for a few passes (the depth downsample
     /// and the outline blur).
     #[address(0x74)]
@@ -265,11 +288,13 @@ pub type RenderPass {
     pub m_NumDepthBuckets: u16,
 
     /// The depth-bucket boundary table for `FrontToBackBucketed` sorting: ascending *squared*
-    /// minimum distances, one per bucket, up to 16. An instance's bucket is the first entry its
+    /// minimum distances, one per bucket. An instance's bucket is the first entry its
     /// squared camera distance is below. Boundaries are registered at pass creation by squaring
     /// the boundary distance, appending it, and re-sorting the live prefix (the engine's
-    /// `AddDepthBucket`, inlined into `CRenderEngine::InitializeSystem` in the release build); the
-    /// only stock user is the Z-and-velocity pass, with boundaries at 40 and 120 metres.
+    /// `AddDepthBucket`, inlined into `CRenderEngine::InitializeSystem`); the
+    /// only stock user is the Z-and-velocity pass, with boundaries
+    /// [`Z_AND_VELOCITY_DEPTH_SQ_NEAR`](Self::Z_AND_VELOCITY_DEPTH_SQ_NEAR) and
+    /// [`Z_AND_VELOCITY_DEPTH_SQ_FAR`](Self::Z_AND_VELOCITY_DEPTH_SQ_FAR).
     #[address(0x880)]
     pub m_DepthSqTable: [f32; 16],
 }
@@ -281,7 +306,7 @@ impl RenderPass {
     pub fn SetupRenderFrameData(a1: *mut void, count: i32, a3: *mut void, items: *mut void);
 
     /// Stamps the per-pass render-context state (`CRenderPass::SetupRenderContext`, static): the
-    /// render-status shadow and reflection bits from the render engine's `m_IsRendering*` flags, the
+    /// [`RenderStatus`] shadow and reflection bits from the render engine's `m_IsRendering*` flags, the
     /// render camera's world position
     /// ([`m_RenderCameraPosition`](graphics_engine::graphics_engine::RenderContext::m_RenderCameraPosition)),
     /// the frame counter and its ring slots
@@ -306,11 +331,11 @@ impl RenderPass {
     /// The per-pass half of the list rotation, driven by the per-frame `CKeep1000Frames` call in the
     /// `CGraphicsEngine::Draw` prologue: points `m_CurrentAddList` at the new parity's list, the draw
     /// list at the other, and zeroes the new add-list's element count. Also snapshots the pass camera.
-    /// Occupies vtable slot 3 of the pass vtable.
+    /// It is an entry of the pass vtable.
     #[address(0x140_194_480)]
     pub fn SaveRenderFrameData(&mut self, parity: u32);
 
-    /// The virtual per-pass draw entry (vtable slot 0): when the pass has work, it runs
+    /// The virtual per-pass draw entry (the first entry of the pass vtable): when the pass has work, it runs
     /// `SetupRenderContext`, selects the pass camera (the pass's external camera if set, else the
     /// render camera) into the context via
     /// [`SetRenderContextCamera`](Self::SetRenderContextCamera), refreshes and uploads the
@@ -319,11 +344,12 @@ impl RenderPass {
     /// then
     /// [`SetAllGlobalShaderProgramConstants`](graphics_engine::render_engine::RenderEngine::SetAllGlobalShaderProgramConstants),
     /// under the `"SetGlobals"` marker), binds the pass's render setup and the global textures,
-    /// and vtable-dispatches the pass body (slots 1 and 2).
+    /// and vtable-dispatches the pass body ([`PreDraw`](Self::PreDraw) and
+    /// [`DoDraw`](Self::DoDraw)).
     #[address(0x140_194_540)]
     pub fn Draw(&mut self);
 
-    /// The per-pass pre-draw (vtable slot 1): resolves the back buffer and depth buffer when the pass
+    /// The per-pass pre-draw (a pass vtable entry): resolves the back buffer and depth buffer when the pass
     /// asks for them, binds the pass's render setup, applies its stencil state (see
     /// [`m_StencilTestEnable`](Self::m_StencilTestEnable)) and depth bias, and issues the pass's
     /// colour, depth, and stencil clears ([`ClearFlags`](graphics_engine::draw::ClearFlags)).
@@ -335,7 +361,7 @@ impl RenderPass {
     /// [`SortList`](Self::SortList) lazily before drawing. Consecutive blocks of one type
     /// form a type run: [`ChangeRenderBlockType`](Self::ChangeRenderBlockType) switches
     /// between runs, and the tail closes the final run (its type-level restore and its scope
-    /// marker). Occupies vtable slot 2 of the pass vtable (after `Draw` and `PreDraw`).
+    /// marker). It follows `Draw` and `PreDraw` in the pass vtable.
     #[address(0x140_1AC_7A0)]
     pub fn DoDraw(&mut self, ctx: *mut RenderContext, color_mask: u32) -> bool;
 

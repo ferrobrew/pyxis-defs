@@ -2,7 +2,7 @@ use character::character::Character;
 use types::math::{Vector2, Vector3};
 
 /// `CControllerUtility`: static helpers that relate controller input, the camera, and character
-/// orientation. Only the members needed so far are bound.
+/// orientation. Only some members are bound.
 pub type ControllerUtility;
 impl ControllerUtility {
     /// The signed XZ angle (degrees, -180..180) from the character's current world forward to

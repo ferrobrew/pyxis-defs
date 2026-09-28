@@ -11,11 +11,10 @@ use types::std_vector::Vector;
 /// post-effects at `RP_POSTEFFECTS`. Named [`RenderPassId`] to avoid clashing with the [`RenderPass`]
 /// type.
 ///
-/// Verified against the retail pass-name switch ([`GetRenderPassName`]): relative to the 2016 dump's
-/// `ERenderPass` header, retail inserts [`RenderPassId::RP_VEGETATION_TRANSPARENT_AOIT`], shifting
-/// everything above by one. [`RenderPassId::RP_PARTICLE_RIBBON`] is the one id the name switch does
-/// not name — it returns `"NONE"` for it — but the pass itself is live: the effect system creates it
-/// and the ribbon instantiator enqueues onto it, so the id is not a hole.
+/// Verified against the pass-name switch ([`GetRenderPassName`]).
+/// [`RenderPassId::RP_PARTICLE_RIBBON`] is the one id the name switch does not name — it returns
+/// `"NONE"` for it — but the pass itself is live: the effect system creates it and the ribbon
+/// instantiator enqueues onto it, so the id is not a hole.
 #[copyable]
 pub enum RenderPassId: i32 {
     RP_NONE = 0x0,
@@ -72,7 +71,8 @@ pub enum RenderPassId: i32 {
     RP_Z_DEBUG_VISUALIZATION = 0x33,
     RP_CLEAR = 0x34,
     /// The road stencil layer. `CRoadMeshManager` owns it as the second of its two passes and
-    /// enqueues a spline-road block onto it whenever the road's visual type has shader type 0, so
+    /// enqueues a spline-road block onto it whenever the road's visual type has shader type
+    /// [`ShaderType_Simple`](graphics_engine::model_instance::SplineRoadShaderType::ShaderType_Simple), so
     /// its draw list is the same `CRenderBlockSplineRoad` geometry as [`RP_ROAD_LAYERS`](Self::RP_ROAD_LAYERS).
     RP_ROAD_STENCIL = 0x35,
     RP_TERRAINPATCH_DETAIL_MID = 0x36,
@@ -397,8 +397,29 @@ pub type RenderEngine {
     #[address(0x1_8D0)]
     pub m_ResourceContext: ResourceContext,
 
+    /// Set while the planar/environment reflection passes draw; `CRenderPass::SetupRenderContext`
+    /// maps it to
+    /// [`RENDERSTATUS_REFLECTIONS`](graphics_engine::render_pass::RenderStatus::RENDERSTATUS_REFLECTIONS).
+    #[address(0x1_8F8)]
+    pub m_IsRenderingReflections: bool,
+
+    /// Set while the dynamic shadow passes draw
+    /// ([`RENDERSTATUS_DYNAMIC_SHADOWMAP`](graphics_engine::render_pass::RenderStatus::RENDERSTATUS_DYNAMIC_SHADOWMAP)).
+    #[address(0x1_8F9)]
+    pub m_IsRenderingDynamicShadowMap: bool,
+
+    /// Set while the static shadow passes draw
+    /// ([`RENDERSTATUS_STATIC_SHADOWMAP`](graphics_engine::render_pass::RenderStatus::RENDERSTATUS_STATIC_SHADOWMAP)).
+    #[address(0x1_8FA)]
+    pub m_IsRenderingStaticShadowMap: bool,
+
+    /// Set while the reflective shadow map passes draw
+    /// ([`RENDERSTATUS_RSM`](graphics_engine::render_pass::RenderStatus::RENDERSTATUS_RSM)).
+    #[address(0x1_8FB)]
+    pub m_IsRenderingReflectiveShadowMap: bool,
+
     /// The CPU staging copy of the global vertex-program constant buffer (the shaders'
-    /// `GlobalConstants` cbuffer at vertex slot 0, `VP_GLOBAL_SIZE` = 49 float4 rows).
+    /// `GlobalConstants` cbuffer at vertex slot 0, one float4 row per element).
     /// [`SetGlobalShaderProgramCameraConstants`](Self::SetGlobalShaderProgramCameraConstants)
     /// fills the per-view rows from a [`RenderContext`], the fog and atmosphere setters fill rows
     /// 14--24, and [`SetAllGlobalShaderProgramConstants`](Self::SetAllGlobalShaderProgramConstants)
@@ -410,28 +431,11 @@ pub type RenderEngine {
     /// (the matrix camera-relative opaque geometry multiplies by), 33--36 the previous
     /// view-projection, 37 frame time and dt, 38--43 the frustum planes, 44--47 the previous
     /// offset view-projection, and 48 the previous camera position.
-    /// Set while the planar/environment reflection passes draw; `CRenderPass::SetupRenderContext`
-    /// maps it to render-status bit `0x8`.
-    #[address(0x1_8F8)]
-    pub m_IsRenderingReflections: bool,
-
-    /// Set while the dynamic shadow passes draw (render-status bit `0x4`).
-    #[address(0x1_8F9)]
-    pub m_IsRenderingDynamicShadowMap: bool,
-
-    /// Set while the static shadow passes draw (render-status bit `0x2`).
-    #[address(0x1_8FA)]
-    pub m_IsRenderingStaticShadowMap: bool,
-
-    /// Set while the reflective shadow map passes draw (render-status bit `0x40`).
-    #[address(0x1_8FB)]
-    pub m_IsRenderingReflectiveShadowMap: bool,
-
     #[address(0x1_91C)]
     pub m_VPGlobalConstData: [Vector4; 49],
 
     /// The CPU staging copy of the global fragment-program constant buffer (the shaders'
-    /// `GlobalConstants` cbuffer at fragment slot 0, `FP_GLOBAL_SIZE` = 95 float4 rows): lighting,
+    /// `GlobalConstants` cbuffer at fragment slot 0, one float4 row per element): lighting,
     /// wetness, shadow, and per-view camera rows filled by
     /// [`SetGlobalShaderConstants`](Self::SetGlobalShaderConstants), uploaded by
     /// [`SetAllGlobalShaderProgramConstants`](Self::SetAllGlobalShaderProgramConstants). Row 0 `.w`
@@ -472,14 +476,18 @@ impl RenderEngine {
     #[address(0x140_186_600)]
     pub fn DrawRenderPassRange(&mut self, ctx: *mut HContext_t, setup: *mut HRenderSetup_t, first: RenderPassId, last: RenderPassId);
 
-    /// The pre-pass step: iterates the pre-pass categories (`1..=45` -- terrain-patch prep, the sky
-    /// lighting LUT, planar and environment reflections, cloud shadows, vegetation, the static and
-    /// dynamic sun-shadow cascade atlas, the reflective-shadow passes, the water-simulation compute, and
-    /// the rain occluder) and vtable-dispatches each [`RenderPass`]'s `Draw`, feeding it the render
+    /// The pre-pass step: iterates the pre-pass ids from
+    /// [`RP_TERRAINPATCH_CLEAR`](RenderPassId::RP_TERRAINPATCH_CLEAR) through
+    /// [`RP_RAIN_OCCLUDER`](RenderPassId::RP_RAIN_OCCLUDER) (terrain-patch prep, the sky lighting
+    /// LUT, planar and environment reflections, cloud shadows, vegetation, the static and dynamic
+    /// sun-shadow cascade atlas, the reflective-shadow passes, the water-simulation compute, and the
+    /// rain occluder) and vtable-dispatches each [`RenderPass`]'s `Draw`, feeding it the render
     /// context. Called from `HandleDrawThreadTask` before the GBuffer range. Each pass's
-    /// [`m_Enabled`](graphics_engine::render_pass::RenderPassState::m_Enabled) gates whether it draws;
-    /// the pre-pass cameras are the sun / reflection / world-space cameras (own camera, `RenderPass +
-    /// 0x870`), never the per-eye render camera, except terrain-patch prep (`1..=7`), which falls
+    /// [`m_Enabled`](graphics_engine::render_pass::RenderPassState::m_Enabled) gates whether it draws.
+    /// The pre-pass cameras are the sun, reflection, and world-space cameras (the pass's own external
+    /// camera), not the render camera. The exception is terrain-patch prep
+    /// ([`RP_TERRAINPATCH_CLEAR`](RenderPassId::RP_TERRAINPATCH_CLEAR) through
+    /// [`RP_TERRAINPATCH_ENUMERATION`](RenderPassId::RP_TERRAINPATCH_ENUMERATION)), which falls
     /// through to the render camera.
     #[address(0x140_186_760)]
     pub fn PreDraw(&mut self, ctx: *mut HContext_t) -> u64;
@@ -527,7 +535,7 @@ impl RenderEngine {
     pub fn SetAllGlobalShaderProgramConstants(&mut self, ctx: *const RenderContext);
 
     /// Writes `count` float4 rows into [`m_VPGlobalConstData`](Self::m_VPGlobalConstData)
-    /// starting at row `index` (bounds-asserted against `VP_GLOBAL_SIZE` = 49). The staging copy
+    /// starting at row `index` (bounds-asserted against the array's length). The staging copy
     /// only; the GPU upload happens in
     /// [`SetAllGlobalShaderProgramConstants`](Self::SetAllGlobalShaderProgramConstants).
     #[address(0x140_173_8F0)]
@@ -596,10 +604,9 @@ pub type RenderBlockTypeBase {
 
         /// Recreates the type's GPU resources against the given `SResourceContext`.
         /// `CRenderEngine::RecreateRenderBlockTypes` calls this on every registered type with the
-        /// render engine's own resource context (the settings-change path) — but several types,
-        /// including the terrain setup types, implement it as a no-op; re-creating those requires
-        /// calling [`Destroy`](Self::Destroy) and
-        /// [`Create`](Self::Create) directly.
+        /// render engine's own resource context (the settings-change path). Several types,
+        /// including the terrain setup types, implement it as a no-op; for those, only
+        /// [`Destroy`](Self::Destroy) followed by [`Create`](Self::Create) rebuilds the resources.
         #[index(3)]
         pub fn Recreate(&mut self, resource_context: *mut ResourceContext);
 
@@ -613,19 +620,19 @@ pub type RenderBlockTypeBase {
 
         /// Whether render passes draw blocks of this type: `CRenderPass::DoDraw` dispatches this
         /// per type run (vtable slot [`IsEnabled`](Self::IsEnabled)) and skips every block whose
-        /// type reports disabled. In the release build the base implementation is compiled to a
+        /// type reports disabled. The base implementation is compiled to a
         /// constant `true`.
         #[index(18)]
         pub fn IsEnabled(&self) -> bool;
 
-        /// Enables drawing of this type's blocks. In the release build the base implementation is
+        /// Enables drawing of this type's blocks. The base implementation is
         /// compiled to a no-op (the enabled flag was optimized out).
         #[index(19)]
         pub fn Enable(&mut self);
 
-        /// Disables drawing of this type's blocks. In the release build the base implementation is
-        /// compiled to a no-op (the enabled flag was optimized out), so suppressing a type requires
-        /// replacing its [`IsEnabled`](Self::IsEnabled) vtable entry.
+        /// Disables drawing of this type's blocks. The base implementation is
+        /// compiled to a no-op (the enabled flag was optimized out), so a type's
+        /// [`IsEnabled`](Self::IsEnabled) implementation alone decides whether its blocks draw.
         #[index(20)]
         pub fn Disable(&mut self);
     },
@@ -661,8 +668,8 @@ pub type RenderBlockTypeEntry {
 }
 
 /// The immediate operands inside the terrain setup types' `Create` functions that size the GPU
-/// detail-tessellation budget buffers (see `CRenderBlockTerrainDetailSetup::Create` at
-/// `0x14032C000` and `CRenderBlockTerrainSetup::Create` at `0x14032EA10`). The detail-quad
+/// detail-tessellation budget buffers (see `CRenderBlockTerrainDetailSetup::Create` and
+/// `CRenderBlockTerrainSetup::Create`). The detail-quad
 /// pipeline allocates from these buffers with unbounded GPU cursors, so their sizes are the hard
 /// budget of the detail tessellation skin; each constant is the address of a 32-bit element-count
 /// immediate, paired with the shipped value in [`TerrainDetailBudgetValues`].
@@ -702,8 +709,8 @@ pub type TerrainDetailBudgetValues {
 }
 
 /// The engine's fixed-size table of *every* live [`RenderBlockTypeBase`] instance, distinct from the
-/// [`RenderBlockTypeRegistry`] below. `IRenderBlockType`'s constructor (`0x140_100_FC0`, also inlined
-/// at many construction sites) scans this table for the first null slot, stores the instance there,
+/// [`RenderBlockTypeRegistry`] below. `IRenderBlockType`'s constructor (also inlined at many
+/// construction sites) scans this table for the first null slot, stores the instance there,
 /// and records the slot index in the object; the destructor clears the slot again. Every render-block
 /// type therefore appears here the moment it is constructed, whether or not it is later handed to
 /// `CRenderBlockFactory::AddType` — so this table, minus the registry, is the set of types that draw
@@ -715,10 +722,10 @@ pub type TerrainDetailBudgetValues {
 ///
 /// The table is **not** compacted: the destructor nulls only the slot its own object claimed, so a
 /// type destroyed out of construction order leaves a hole with occupied slots after it, and the next
-/// construction refills that hole rather than appending. A walk therefore has to cover all
-/// [`CAPACITY`](Self::CAPACITY) slots and skip nulls, which is what the engine's own consumer does —
-/// `CGPUProfiler::DrawDrawCallPanel` (`0x140_0E0_D00`) indexes every slot from 0 to 127 to label its
-/// per-type draw-call rows.
+/// construction refills that hole rather than appending. Occupied slots can therefore sit anywhere
+/// among the [`CAPACITY`](Self::CAPACITY) slots, with nulls between them. The engine's own reader,
+/// `CGPUProfiler::DrawDrawCallPanel`, indexes every slot and skips nulls to label its per-type
+/// draw-call rows.
 pub type RenderBlockTypeInstances {
     /// The first slot of the table.
     pub const ADDRESS: u64 = 0x142ED6FC0,

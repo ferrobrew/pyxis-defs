@@ -1,5 +1,14 @@
 use ui::scaleform::Value;
 
+/// The activation state of a `CUIBase` movie wrapper (`CUIBase::State`).
+#[copyable]
+pub enum UIBaseState: i32 {
+    INACTIVE = 0x0,
+    ACTIVATING = 0x1,
+    ACTIVE = 0x2,
+    DEACTIVATING = 0x3,
+}
+
 /// The overlay UI (`COverlayUI`): the `CUIBase` hosting the `MCI_cursor` mouse-cursor clip, the
 /// `MCI_black` fade, and the FPS readout inside the shared UI movie. The cursor is doubled:
 /// while visible the engine both shows the OS arrow cursor (via `CGraphicsEngine::SetCursor`)
@@ -8,10 +17,12 @@ use ui::scaleform::Value;
 /// into the movie's own render target.
 #[singleton(0x142_F38_858), min_size(0x154)]
 pub type OverlayUI {
-    /// The `CUIBase` activation state; `2` is active. [`SetMouseCursorPosition`](Self::SetMouseCursorPosition)
-    /// and `CUIManager::MousePointerVisibility` no-op unless it is `2`.
+    /// The `CUIBase` activation state.
+    /// [`SetMouseCursorPosition`](Self::SetMouseCursorPosition) and
+    /// `CUIManager::MousePointerVisibility` no-op unless it is
+    /// [`ACTIVE`](UIBaseState::ACTIVE).
     #[address(0x14)]
-    pub m_Current: u32,
+    pub m_Current: UIBaseState,
 
     /// The managed [`Value`] for the movie's `MCI_cursor` clip, bound by `GetMember` when the
     /// overlay activates.

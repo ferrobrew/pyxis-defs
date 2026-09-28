@@ -22,6 +22,11 @@ pub enum ActionMapToWaitFor: u32 {
 /// until an action is pressed, used by tutorials.
 #[singleton(0x142_F34_278), min_size(0x14)]
 pub type GamePauseUtility {
+    /// The [`m_action`](Self::m_action) and [`m_reclick_action`](Self::m_reclick_action) value
+    /// meaning no action. `Update` resets both to it once the awaited action is clicked or
+    /// re-clicked.
+    pub const NO_ACTION: i32 = -1,
+
     /// The current state.
     pub m_state: PauseState,
     /// Whether the pause was entered through the slow-down ramp.
@@ -29,9 +34,9 @@ pub type GamePauseUtility {
 
     #[address(0x8)]
     pub m_action_map: ActionMapToWaitFor,
-    /// The action id that ends the pause.
+    /// The action id that ends the pause, or [`NO_ACTION`](Self::NO_ACTION).
     pub m_action: i32,
-    /// The action id that must be re-clicked, or `-1`.
+    /// The action id that must be re-clicked, or [`NO_ACTION`](Self::NO_ACTION).
     pub m_reclick_action: i32,
 }
 impl GamePauseUtility {

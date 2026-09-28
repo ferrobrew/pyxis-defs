@@ -13,8 +13,9 @@ impl NStateTask_InputSurfaceSwimTask {
     /// `GameCameraManager::GetInputMatrix`) and, for the player, the direction to the aim-target
     /// position, then dispatches swim acts by the angle from the body forward
     /// ([`ControllerUtility::GetDeltaAngleFromOrientation`](input::controller_utility::ControllerUtility::GetDeltaAngleFromOrientation)):
-    /// below 65 degrees the forward crawl-start act, between 65 and 180 degrees the directional
-    /// 120-degree turn acts (`ACT_SURFACE_SWIM_START_120R/L` while moving,
+    /// below [`SWIM_TURN_ACT_MIN_ANGLE`] the forward crawl-start act, from there up to
+    /// [`SWIM_TURN_ACT_MAX_ANGLE`] the directional 120-degree turn acts
+    /// (`ACT_SURFACE_SWIM_START_120R/L` while moving,
     /// `ACT_SURFACE_IDLE_QUICKTURN_120R/L` while idle and wielding a weapon, measured against the
     /// aim direction). When a turn is latched it writes the angle to the blackboard
     /// ([`SWIM_TURN_ANGLE_ID`](blackboard::ObjectBlackboard::SWIM_TURN_ANGLE_ID)) and stores the

@@ -199,14 +199,14 @@ pub enum ButtonInteraction: u32 {
 }
 
 /// `CButtonMapping::SMappingInfo`: one semantic mapping's actions, hint text, gates, and flags.
-/// The release layout stores the two gate hashes as bare 32-bit hashes (7 dwords in all).
+/// The layout stores the two gate hashes as bare 32-bit hashes.
 #[size(0x1C), align(4), copyable]
 pub type MappingInfo {
     pub m_Interaction: ButtonInteraction,
-    /// The primary action (the held one for a chord). The constructor default is `255`, an invalid
-    /// action, which the `END_*` marker slots keep.
+    /// The primary action (the held one for a chord). The constructor default is
+    /// [`Action::COUNT`], an invalid action, which the `END_*` marker slots keep.
     pub m_Action1: Action,
-    /// The tapped action of a chord, or `255` when unused.
+    /// The tapped action of a chord, or [`Action::COUNT`] when unused.
     pub m_Action2: Action,
     /// The hash of the `buttonhint_*` localization key.
     pub m_DescriptionKey: u32,
@@ -228,7 +228,7 @@ pub type MappingInfo {
 /// controls-screen UI resolve against, plus the action list for the bindings screen.
 #[min_size(0xF6C)]
 pub type ButtonMapping {
-    /// One entry per [`Mapping`], `NUM_MAPPINGS` (141) in all.
+    /// One entry per [`Mapping`], [`NUM_MAPPINGS`](Mapping::NUM_MAPPINGS) in all.
     pub m_AllInfo: [MappingInfo; 141],
 }
 impl ButtonMapping {

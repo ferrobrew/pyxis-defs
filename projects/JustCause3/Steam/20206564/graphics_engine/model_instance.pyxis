@@ -34,8 +34,8 @@ impl ModelInstance {
     /// Builds the per-pass draw lists for this instance's render blocks. It fills an
     /// [`AddToRenderContext`] whose test camera is the camera manager's active camera, then
     /// dispatches to the `ForEachRb` instantiation selected by [`enable_coarse_pre_z_models`] and
-    /// [`use_bounding_box_model_rb_view`]. The release build's symbol table labels this address
-    /// `CModelInstance::AddToPass`; the signature and body match the symbol dump's `AddToRender`.
+    /// [`use_bounding_box_model_rb_view`]. IDA labels this address
+    /// `CModelInstance::AddToPass`; it is `AddToRender`.
     #[address(0x140_319_BD0)]
     pub fn AddToRender(&mut self, opaque_pass: *mut RenderPass, transparent_pass: *mut RenderPass, allow_pre_z: bool, allow_velocity_buffer: bool, allow_culling: bool, refract_pass: *mut RenderPass, sq_distance: f32);
 
@@ -80,9 +80,8 @@ impl ModelCollection {
     /// collections against the occluder manager's main cull camera (its cached parameters from
     /// `GetBFBCFrustumParamsForCameraAndTime`), passing each survivor on through
     /// `CModelCollection::CollectionCallback` and `CModelInstanceManager::BFBCCallback`, and
-    /// accumulating `cull_stat`. Static. The release build's symbol table labels this address
-    /// `CAOVolumeManager::AddToRenderThread`; the signature and body match the symbol dump's
-    /// `CModelCollection::DoCulling`.
+    /// accumulating `cull_stat`. Static. IDA labels this address
+    /// `CAOVolumeManager::AddToRenderThread`; it is `CModelCollection::DoCulling`.
     #[address(0x140_4E7_950)]
     pub fn DoCulling(bfbc: *mut BFBCContext, cull_stat: *mut void);
 }
@@ -93,11 +92,20 @@ impl ModelInstanceManager {
     /// The per-frame texture-streaming distance task: runs a BFBC squared-distance process over the
     /// model instances from the occluder manager's camera position (feeding
     /// `CModelInstanceManager::BFBCCallbackDistSq`), then kicks the streaming update jobs. Static.
-    /// The release build's symbol table labels this address
-    /// `CModelInstanceManager::DumpModelInstanceHistogram`; the body matches the symbol dump's
+    /// IDA labels this address `CModelInstanceManager::DumpModelInstanceHistogram`; it is
     /// `CModelInstanceManager::TextureStreamingTask`.
     #[address(0x140_4F3_010)]
     pub fn TextureStreamingTask(bfbc: *mut BFBCContext) -> i64;
+}
+
+/// The spline-road shader variant (`CRenderBlockTypeSplineRoad::EShaderType`). Each road visual type
+/// (`CRoadMeshManager::SRoadType`) carries one, loaded from the road's shipped data and stored as a
+/// byte, and `CRenderBlockSplineRoad::SetShaderType` copies it onto the road's render block.
+#[copyable]
+pub enum SplineRoadShaderType: i32 {
+    ShaderType_Simple = 0x0,
+    ShaderType_Dirt = 0x1,
+    ShaderType_Layered = 0x2,
 }
 
 /// The road mesh manager (`CRoadMeshManager`). Opaque.
@@ -105,7 +113,8 @@ pub type RoadMeshManager;
 impl RoadMeshManager {
     /// Adds the visible road render blocks to the road passes: each block's bounding box is tested
     /// against the camera manager's active camera (`CCamera::IsBoxVisible`), and survivors are added
-    /// to the road surface pass and, unless flagged otherwise, to the second road pass.
+    /// to the road surface pass and, when the road's visual type has shader type
+    /// [`ShaderType_Simple`](SplineRoadShaderType::ShaderType_Simple), to the second road pass.
     #[address(0x140_533_300)]
     pub fn UpdateAddToRenderer(&mut self);
 }

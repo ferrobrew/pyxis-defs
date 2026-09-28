@@ -1,3 +1,19 @@
+/// An input device class (`Input::EDeviceType`), as passed to the device manager's device lookup
+/// and action mapping.
+#[copyable]
+pub enum DeviceType: i32 {
+    Default = 0x0,
+    Keyboard = 0x1,
+    Mouse = 0x2,
+    Joystick = 0x3,
+    Gamepad = 0x4,
+    Memorycard = 0x5,
+    Microphone = 0x6,
+    Headphone = 0x7,
+    Unknown = 0x8,
+    DeviceTypeCount = 0x10,
+}
+
 #[singleton(0x142_E2B_6F8), size(0x78)]
 pub type InputDeviceManager {
     vftable {
@@ -9,8 +25,8 @@ pub type InputDeviceManager {
 }
 impl InputDeviceManager {
     /// The per-frame device poll: reads all devices, refreshes their effector states, and then runs
-    /// [`UpdateForceClicks`](Self::UpdateForceClicks). Effector writes injected before
-    /// this are overwritten by the poll, so inject after it instead.
+    /// [`UpdateForceClicks`](Self::UpdateForceClicks). The poll overwrites effector values written
+    /// before it runs.
     #[address(0x140_2F2_0C0)]
     pub fn Update(&mut self, dt: f32);
 

@@ -41,6 +41,14 @@ If a backend-specific detail is worth documenting (e.g., why a method returns `b
 
 Similarly, the definitions should not mention downstream use cases — how a consumer might use a type or what library they'll pass it to. Describe the type itself; consumers can read the prologue/epilogue for integration notes.
 
+### Doc comments describe their own build
+
+Each project describes one build of its application, and its doc comments speak about that build only. They do not qualify statements with the build ("in the release build") or compare it with other builds or reference material (an older symbol dump, a debug build). A name taken from reference material is used as the name, without attribution. A note that a disassembler mislabels a function is fine, stated without a build qualifier.
+
+### Doc comments do not restate numbers
+
+An address, field offset, vtable slot, enum value, flag value, hash, or constant value is recorded once, in the attribute or definition that owns it. A doc comment that needs to refer to one links to the item instead of repeating the number (``[`m_Input`](Self::m_Input)``, not `+0x3C`), because a copied number is not checked and drifts when the definition is corrected. Numbers that no definition records, such as tuning values the code does not expose, can stay in prose.
+
 ### `unknown<N>` for untyped regions
 
 Use `unknown<N>` for padding, reserved fields, or data whose layout hasn't been mapped yet rather than inventing a fake type.

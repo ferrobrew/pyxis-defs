@@ -25,7 +25,7 @@ pub enum CpuScopeId: i32 {
 /// begin/end pairs into a triple-buffered counter ring, and a once-per-frame update converts the
 /// completed ring slot into per-phase milliseconds with a rolling 30-frame peak.
 ///
-/// In the release build the machinery is dead: [`Update`](Self::Update) is compiled to an
+/// The machinery is dead: [`Update`](Self::Update) is compiled to an
 /// empty function, and the phase brackets that write [`m_Counters`](Self::m_Counters) are
 /// compiled out of `CGame::Update` and the game states, so every field stays zero. The consumers
 /// remain -- [`BorkReport`](bork_report::BorkReport)'s telemetry serialises [`m_Time`](Self::m_Time) via
@@ -57,17 +57,21 @@ pub type CpuProfiler {
 }
 impl CpuProfiler {
     /// Converts the completed ring slot's QPC deltas into [`m_Time`](Self::m_Time)
-    /// milliseconds and rolls the peak window. Compiled to an empty function in the release build;
+    /// milliseconds and rolls the peak window. Compiled to an empty function;
     /// the once-per-frame call at the top of [`Update`](game::Game::Update) remains.
     #[address(0x140_062_490)]
     pub fn Update(&mut self);
 
-    /// The phase's display name from the static 15-entry name table at `0x142D3A150`
-    /// (`"FRAME"`, `"DRAW"`, `"UPDATE_ALL"`, ...). Does not read `self`.
+    /// The phase's display name from [`cpu_scope_names`] (`"FRAME"`, `"DRAW"`, `"UPDATE_ALL"`,
+    /// ...). Does not read `self`.
     #[address(0x140_062_4A0)]
     pub fn GetScopeName(&self, id: CpuScopeId) -> *const u8;
 }
 
+/// The static name table behind [`CpuProfiler::GetScopeName`]: one name string per
+/// [`CpuScopeId`] phase, indexed by the id.
+#[address(0x142_D3A_150)]
+pub extern cpu_scope_names: [*const u8; 15];
 /// The engine's CPU profiler instance (`g_CpuProfiler`), a statically allocated object rather than a
 /// pointer: [`BorkReport::WriteMetrics`](bork_report::BorkReport::WriteMetrics) passes its address
 /// directly as `this` to [`CpuProfiler::GetScopeName`].

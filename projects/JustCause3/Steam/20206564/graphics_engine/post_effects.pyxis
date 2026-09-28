@@ -53,17 +53,19 @@ pub type PostEffectContext {
 #[min_size(0x4A0)]
 pub type PostEffectsManager {
     /// The slot-base the slot-returning effects' result textures live at in the manager's texture
-    /// array: a stage's current result is `CTX[slot + 83]` (an entry of
+    /// array: a stage's current result is `CTX[slot + RESULT_TEXTURE_SLOT_BASE]` (an entry of
     /// [`m_FullscreenLinearTempTexture`](Self::m_FullscreenLinearTempTexture)), where `CTX` is the
     /// manager argument the post block passes to the effect chain and `slot` is the effect's declared
     /// slot index.
     pub const RESULT_TEXTURE_SLOT_BASE: u64 = 83,
     /// The qword index of [`m_FullscreenSrgbTempTexture`](Self::m_FullscreenSrgbTempTexture) in the
-    /// manager: the sRGB view of the slot's result is `CTX[slot + 80]`. SMAA's edge detection and
+    /// manager: the sRGB view of the slot's result is `CTX[slot + SRGB_RESULT_TEXTURE_SLOT_BASE]`.
+    /// SMAA's edge detection and
     /// final blend read the current slot through it.
     pub const SRGB_RESULT_TEXTURE_SLOT_BASE: u64 = 80,
     /// The number of full-screen temporary textures in the post chain's slot ring
-    /// (`s_FullscreenTempTextureCount`); effects advance the slot as `(slot + 1) % 3`.
+    /// (`s_FullscreenTempTextureCount`); effects advance the slot as
+    /// `(slot + 1) % FULLSCREEN_TEMP_TEXTURE_COUNT`.
     pub const FULLSCREEN_TEMP_TEXTURE_COUNT: u32 = 3,
 
     /// The anti-aliasing effect, which [`ApplySubsampleJitter`](Self::ApplySubsampleJitter) forwards
@@ -132,7 +134,9 @@ impl PostEffectsManager {
 ///
 /// It threads a single result-texture slot index through the slot-returning effects
 /// ([`DepthOfFieldEffect`], [`MotionBlurEffect`], [`PlayerDamageEffect`], [`AntiAliasingEffect`]),
-/// hopping between the three fullscreen temp textures.
+/// moving between the
+/// [`FULLSCREEN_TEMP_TEXTURE_COUNT`](PostEffectsManager::FULLSCREEN_TEMP_TEXTURE_COUNT) full-screen
+/// temporary textures.
 pub type RenderBlockPostEffects;
 impl RenderBlockPostEffects {
     #[address(0x140_16A_260)]
@@ -257,7 +261,7 @@ pub extern jitter_scale_factor: f32;
 #[address(0x142_D3A_6F3)]
 pub extern edge_stencil_enabled: bool;
 /// The stencil bits SMAA's edge detection writes and its blend pass tests (`g_EdgeStencilBitMask`,
-/// default `0x60`: bits 5 and 6).
+/// statically initialised in the module image).
 #[address(0x142_D3A_6FE)]
 pub extern edge_stencil_bit_mask: u8;
 

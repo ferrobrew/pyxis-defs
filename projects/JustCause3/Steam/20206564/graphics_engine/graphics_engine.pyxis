@@ -1,5 +1,6 @@
 use camera::camera::Camera;
 use graphics_engine::device::{Device, DeviceInfo};
+use graphics_engine::render_pass::RenderStatus;
 use graphics_engine::shadow_manager::ShadowManager;
 use graphics_engine::texture::Texture;
 use types::math::{Matrix4, Vector3, Vector4};
@@ -20,16 +21,43 @@ pub enum ActiveCursor: i32 {
     Zoom,
 }
 
-/// One reflection-proxy depth-history slot in the planar / water reflection state machine. Five of
-/// these live on the graphics engine; the lifecycle byte advances once per scene dispatch.
+/// One reflection-proxy depth-history slot in the planar / water reflection state machine
+/// (`CGraphicsEngine::SEffectInfo`). The graphics engine holds an array of these in
+/// [`GraphicsEngine::m_EffectInfo`], and the lifecycle byte advances once per scene dispatch.
 #[size(0x50)]
 pub type EffectInfo {
+    /// The lifecycle value of a free slot. The `CopyEffectTextures` stage of
+    /// [`GraphicsEngine::HandleDrawThreadTask`] copies the reflection-proxy depth into the last free
+    /// slot it finds and marks that slot [`FRAME_INDEX_COPIED`](Self::FRAME_INDEX_COPIED).
+    pub const FRAME_INDEX_FREE: u8 = 0,
+    /// The lifecycle value of a slot whose depth was copied this dispatch. The next dispatch
+    /// increments it to [`FRAME_INDEX_READY`](Self::FRAME_INDEX_READY).
+    pub const FRAME_INDEX_COPIED: u8 = 1,
+    /// The lifecycle value of a slot whose copy is one dispatch old. The scan promotes it to
+    /// [`FRAME_INDEX_PICKED`](Self::FRAME_INDEX_PICKED).
+    pub const FRAME_INDEX_READY: u8 = 2,
+    /// The lifecycle value of the picked slot. The scan stores its index in
+    /// [`GraphicsEngine::m_EffectInfoIndex`]; the stage then writes the render camera's
+    /// view-projection into its [`m_Transform`](Self::m_Transform) and resets it to
+    /// [`FRAME_INDEX_FREE`](Self::FRAME_INDEX_FREE).
+    pub const FRAME_INDEX_PICKED: u8 = 3,
+
     /// The reflection-proxy depth texture.
     pub m_DepthTexture: *mut HTexture_t,
     pub m_Transform: Matrix4,
-    /// The lifecycle counter: `0` is free, `2` promotes to `3`, `3` is picked, otherwise it
-    /// increments.
+    /// The lifecycle counter, one of the `FRAME_INDEX_*` constants on this type. Any other non-free
+    /// value increments once per dispatch.
     pub m_FrameIndex: u8,
+}
+
+/// When a pending screenshot is taken relative to the UI draw
+/// (`CGraphicsEngine::EScreenshotMode`).
+#[copyable]
+pub enum ScreenshotMode: i32 {
+    /// The screenshot is taken after the UI is drawn.
+    ScreenshotWithUI = 0x0,
+    /// The screenshot is taken before the UI is drawn.
+    ScreenshotWithoutUI = 0x1,
 }
 
 #[singleton(0x142_E2B_6F0), min_size(0x1F10)]
@@ -76,10 +104,10 @@ pub type GraphicsEngine {
     #[address(0x88)]
     pub m_FramesUntilScreenshot: i32,
 
-    /// Whether the pending screenshot is taken before the UI is drawn (1) or after it (0)
+    /// Whether the pending screenshot is taken before or after the UI is drawn
     /// (`SScreenShotData::m_Mode`).
     #[address(0x8C)]
-    pub m_ScreenshotMode: i32,
+    pub m_ScreenshotMode: ScreenshotMode,
 
     /// Whether the pending screenshot also saves the depth buffer (`SScreenShotData::m_SaveDepth`).
     #[address(0x92)]
@@ -174,7 +202,7 @@ pub type GraphicsEngine {
     #[address(0x1_078)]
     pub m_DownSampledDepthTexture: *mut Texture,
 
-    /// Reflection-proxy depth-history (planar / water reflection state machine), 5 slots.
+    /// Reflection-proxy depth-history (planar / water reflection state machine).
     #[address(0x1_0A0)]
     pub m_EffectInfo: [EffectInfo; 5],
 
@@ -231,8 +259,8 @@ pub type GraphicsEngine {
     pub m_OutputGammaChanged: bool,
 
     /// A QPC timestamp from which [`HandleDrawThreadTask`](Self::HandleDrawThreadTask) measures
-    /// [`m_CPUDrawStallDuration`](Self::m_CPUDrawStallDuration). The symbol dump places
-    /// `m_CPUDrawStallTime` here; its writer has not been traced.
+    /// [`m_CPUDrawStallDuration`](Self::m_CPUDrawStallDuration). Its writer has not been
+    /// traced.
     #[address(0x1_2A8)]
     pub m_CPUDrawStallTime: u64,
 
@@ -440,9 +468,9 @@ pub fn DestroyTimeStampDisjointQuery(device: *mut HDevice_t, query: *mut HTimeSt
 #[address(0x141_955_A20)]
 pub fn BeginTimeStampDisjointQuery(context: *mut HContext_t, query: *mut HTimeStampDisjointQuery_t);
 
-/// Ends the disjoint interval (`ID3D11DeviceContext::End`). In the release build the body is
+/// Ends the disjoint interval (`ID3D11DeviceContext::End`). The body is
 /// identical-code-folded with [`SetTimeStampQuery`] (both call `End` under the context mutex), so
-/// this shares its address; the release symbol table's placement at `0x141954000` is an unrelated
+/// this shares its address. IDA places this name on an unrelated
 /// two-instruction stub.
 #[address(0x141_955_8B0)]
 pub fn EndTimeStampDisjointQuery(context: *mut HContext_t, query: *mut HTimeStampDisjointQuery_t);
@@ -453,7 +481,7 @@ pub fn EndTimeStampDisjointQuery(context: *mut HContext_t, query: *mut HTimeStam
 pub fn QueryTimeStampFrequency(context: *mut HContext_t, query: *mut HTimeStampDisjointQuery_t, out_frequency: *mut u64) -> FrequencyStatus;
 
 /// The developer scope-marker begin: opens a named instrumentation scope on the context. Compiled
-/// to an empty function in the release build, but its call sites and name strings survive
+/// to an empty function, but its call sites and name strings survive
 /// throughout the renderer -- the frame stages in `CGraphicsEngine::HandleDrawThreadTask`
 /// (`"Frame setup"`, `"CopyEffectTextures"`, `"Debug UI"`), the post-effect stack (SMAA, FXAA,
 /// depth of field, motion blur, lens flare, glare, tone mapping), deferred lighting, SSAO, SSR,
@@ -467,7 +495,7 @@ pub fn QueryTimeStampFrequency(context: *mut HContext_t, query: *mut HTimeStampD
 pub fn BeginScopeMarker(context: *mut HContext_t, name: *const u8);
 
 /// Closes the innermost scope opened by [`BeginScopeMarker`] on the context. Compiled to an empty
-/// function in the release build; the call sites survive.
+/// function; the call sites survive.
 #[address(0x141_954_D20)]
 pub fn EndScopeMarker(context: *mut HContext_t);
 
@@ -510,7 +538,7 @@ pub bitflags RenderContextFlags: u8 {
     /// `CLightManager::UpdateRenderContext`. `CRenderBlockDeferredLighting::DrawClustered` builds the
     /// light grid on the GPU only when it is set, and
     /// [`RenderContext::m_LightLookup`](RenderContext::m_LightLookup) then comes from the assignment
-    /// output rather than the per-frame ring. Not present in the 2016 symbol dump.
+    /// output rather than the per-frame ring.
     m_UseClusteredLightAssignment = 0b1000_0000,
 }
 
@@ -550,7 +578,7 @@ pub type RenderContext {
     /// The translation-free view-projection for this dispatch (the rotation and projection without the
     /// camera world translation). The tessellation constant buffers bake it directly (e.g.
     /// [`RenderBlockTypeTerrain::SetupConstantBuffers`](graphics_engine::render_block::RenderBlockTypeTerrain)),
-    /// so it carries the per-view (and, off-axis, per-eye) projection.
+    /// so it carries the per-view projection.
     #[address(0xD8)]
     pub m_OffsetViewProjection: Matrix4,
 
@@ -563,10 +591,10 @@ pub type RenderContext {
 
     /// The world transform of the camera this dispatch draws with, copied from the camera's
     /// `m_TransformF` by [`SetRenderContextCamera`](RenderPass::SetRenderContextCamera). Its
-    /// translation row (`+0x260`) is the same world position as
+    /// translation row is the same world position as
     /// [`m_CameraPosition`](Self::m_CameraPosition);
     /// [`SetGlobalShaderProgramCameraConstants`](graphics_engine::render_engine::RenderEngine::SetGlobalShaderProgramCameraConstants)
-    /// uploads that row and the forward row (`+0x250`) to the vertex GlobalConstants.
+    /// uploads that row and the forward row to the vertex GlobalConstants.
     #[address(0x230)]
     pub m_CameraTransform: Matrix4,
 
@@ -576,9 +604,8 @@ pub type RenderContext {
     /// [`m_CameraPosition`](Self::m_CameraPosition), which follows whichever camera the pass draws
     /// with (a light camera during the shadow passes); this always holds the main scene camera's
     /// position. `CLightManager::SetupLightingData` and the clustered deferred-lighting pass
-    /// subtract it from each light's world position to build the camera-relative light proxies. The
-    /// symbol dump names this field `m_EyePosition`. `CRenderEngine::SetFog` reads its `y` (height)
-    /// component at `+0x28C`.
+    /// subtract it from each light's world position to build the camera-relative light proxies.
+    /// `CRenderEngine::SetFog` reads its `y` (height) component.
     #[address(0x288)]
     pub m_RenderCameraPosition: Vector3,
 
@@ -713,7 +740,7 @@ pub type RenderContext {
     /// resolve uploads the register starting here as its vertex `cb1[5]`, which the fullscreen
     /// reconstruction vertex shaders multiply into their G-buffer UV, and
     /// [`RenderPass::PreDraw`](graphics_engine::render_pass::RenderPass::PreDraw) scales the
-    /// depth-resolve rectangle (the display size) by it. Not present in the 2016 symbol dump's layout.
+    /// depth-resolve rectangle (the display size) by it.
     #[address(0x39C)]
     pub m_UVScale: [f32; 2],
 
@@ -725,8 +752,8 @@ pub type RenderContext {
     pub m_LightBuffer: *mut void,
 
     /// The clustered light-grid lookup texture for this frame. `CLightManager::UpdateRenderContext`
-    /// copies it from the light manager's three-slot per-frame ring (indexed by the render context
-    /// frame counter modulo three), or from a single light-assignment output texture when the
+    /// copies it from the light manager's per-frame ring (indexed by the render context frame
+    /// counter modulo [`RING_SIZE`](RenderFrameCounters::RING_SIZE)), or from a single light-assignment output texture when the
     /// clustered light-assignment path is active
     /// ([`m_UseClusteredLightAssignment`](RenderContextFlags::m_UseClusteredLightAssignment)).
     /// [`SetupLightingTextures`](graphics_engine::render_engine::RenderBlockTypeBase::SetupLightingTextures)
@@ -737,21 +764,20 @@ pub type RenderContext {
     /// The render setup the second (fill) phase of the clustered light assignment draws into.
     /// `CRenderBlockDeferredLighting::DrawClustered` binds it, samples
     /// [`m_LightAssignmentTexture`](Self::m_LightAssignmentTexture) on fragment slot 0, and draws a
-    /// fullscreen triangle per depth slice. Copied per frame by `CLightManager::UpdateRenderContext`;
-    /// not present in the 2016 symbol dump's layout.
+    /// fullscreen triangle per depth slice. Copied per frame by `CLightManager::UpdateRenderContext`.
     #[address(0x3B8)]
     pub m_LightAssignmentFillRenderSetup: *mut HRenderSetup_t,
 
     /// The first light-assignment phase's output texture (one texel per 64-pixel tile, arrayed over
     /// light chunks), read by the fill phase. Copied per frame by
-    /// `CLightManager::UpdateRenderContext`; not present in the 2016 symbol dump's layout.
+    /// `CLightManager::UpdateRenderContext`.
     #[address(0x3C0)]
     pub m_LightAssignmentTexture: *mut Texture,
 
     /// The render setup the first clustered light-assignment phase draws into (the light proxy
     /// spheres and cones rasterized against the tile grid). `CRenderBlockDeferredLighting::DrawClustered`
     /// binds it and clears every colour target to one before drawing. Copied per frame by
-    /// `CLightManager::UpdateRenderContext`; not present in the 2016 symbol dump's layout.
+    /// `CLightManager::UpdateRenderContext`.
     #[address(0x3C8)]
     pub m_LightAssignmentRenderSetup: *mut HRenderSetup_t,
 
@@ -831,9 +857,10 @@ pub type RenderContext {
     #[address(0x434)]
     pub m_WindAnimation: f32,
 
-    /// The id (`ERenderPass`, see `render_engine::RenderPassId`) of the pass currently drawing
-    /// through this context, written by `SetupRenderContext` from the pass's index. `RP_NONE` (0)
-    /// outside a pass body.
+    /// The id (`ERenderPass`, see
+    /// [`RenderPassId`](graphics_engine::render_engine::RenderPassId)) of the pass currently
+    /// drawing through this context, written by `SetupRenderContext` from the pass's index.
+    /// [`RP_NONE`](graphics_engine::render_engine::RenderPassId::RP_NONE) outside a pass body.
     #[address(0x438)]
     pub m_ActiveRenderPass: i32,
 
@@ -845,19 +872,21 @@ pub type RenderContext {
     #[address(0x448)]
     pub m_RenderFrameNo: u32,
 
-    /// The render-frame ring slot for this dispatch, `m_RenderFrameNo % 3`, written by
-    /// `CRenderPass::SetupRenderContext`. It selects the current slot of every three-slot per-frame
-    /// ring the draw side reads, including the instance-transform slot the render blocks pass to
+    /// The render-frame ring slot for this dispatch, `m_RenderFrameNo %`
+    /// [`RING_SIZE`](RenderFrameCounters::RING_SIZE), written by
+    /// `CRenderPass::SetupRenderContext`. It selects the current slot of every per-frame ring the
+    /// draw side reads, including the instance-transform slot the render blocks pass to
     /// [`RBIInfo::GetMatrix`](graphics_engine::render_block::RBIInfo::GetMatrix).
     #[address(0x44C)]
     pub m_RenderFrameIndex: u32,
 
-    /// The previous render frame's ring slot, `(m_RenderFrameNo + 2) % 3`, written alongside
+    /// The previous render frame's ring slot, `(m_RenderFrameNo + RING_SIZE - 1) %`
+    /// [`RING_SIZE`](RenderFrameCounters::RING_SIZE), written alongside
     /// [`m_RenderFrameIndex`](Self::m_RenderFrameIndex).
     #[address(0x450)]
     pub m_PreviousRenderFrameIndex: u32,
 
-    /// The 8 per-atlas-slice projective shadow transforms, copied per dispatch from the shadow
+    /// The per-atlas-slice projective shadow transforms, copied per dispatch from the shadow
     /// manager's parity storage. The deferred lighting shaders index them dynamically by a light's
     /// packed slice index (`cb0[63 + 4*slice .. 66 + 4*slice]` in the GlobalConstants) to project a
     /// light-relative position into its shadow-atlas slice; the sun resolve uses
@@ -874,11 +903,11 @@ pub type RenderContext {
     #[address(0x774)]
     pub m_ActiveCascadeCount: u8,
 
-    /// The pass-family status bits for the current draw: `0x1` default, `0x2` static shadow map,
-    /// `0x4` dynamic shadow map. Render blocks branch on `& 6` to select the shadow/depth-only
-    /// path versus the full material path.
+    /// The pass-family status bits for the current draw. Render blocks branch on the shadow-map
+    /// bits ([`RENDERSTATUS_SHADOWMAP`](RenderStatus::RENDERSTATUS_SHADOWMAP)) to select the
+    /// shadow/depth-only path versus the full material path.
     #[address(0x778)]
-    pub m_RenderStatus: u32,
+    pub m_RenderStatus: RenderStatus,
 
     /// The render setup this context draws into. On the graphics engine's own context this is the
     /// context's copy of [`GraphicsEngine::m_BackBufferRenderSetup`], written by
@@ -938,14 +967,14 @@ impl GraphicsEngine {
     /// `BackBufferLinear` alias plus [`m_BackBufferRenderSetup`](Self::m_BackBufferRenderSetup)
     /// and the post-effect setup are instead built against the live swapchain surface via
     /// `GetDeviceSurface(BackBuffer)`, independent of
-    /// `device_info`. Per-pass viewports follow the bound target's size, so no per-pass viewport
-    /// changes are needed. Assumes the previously created setups have been torn down
+    /// `device_info`. Per-pass viewports follow the bound target's size. Assumes the previously
+    /// created setups have been torn down
     /// ([`DestroyRenderSetups`](Self::DestroyRenderSetups)) and that no draw is in flight.
     ///
-    /// **The release build leaves the return value undefined.** The declared C++ return type is
-    /// `bool`, but release codegen dropped the final `return 1`: the last instruction before the
+    /// The return value is undefined. The declared C++ return type is `bool`, but the compiled
+    /// code has no final `return 1`: the last instruction before the
     /// epilogue is the trailing [`CreateRenderSetup`] call, so `al` carries the low byte of the
-    /// pointer it returned. Callers must ignore the result.
+    /// pointer it returned. The result therefore carries no success information.
     #[address(0x140_0CE_930)]
     pub fn CreateRenderSetups(&mut self, device_info: *const DeviceInfo) -> bool;
 
@@ -1008,8 +1037,8 @@ impl GraphicsEngine {
     /// device's texture-to-file writer, marks the screenshot request done, and clears a filename
     /// whose write failed. Called from the draw thread once the frame the request was made on has
     /// finished compositing, with the engine's
-    /// [`m_BackBufferLinear`](Self::m_BackBufferLinear) as the surface. The release build's symbol
-    /// table labels this address `NGraphicsEngine::CGPUProfiler::EndFrame`.
+    /// [`m_BackBufferLinear`](Self::m_BackBufferLinear) as the surface. IDA labels this
+    /// address `NGraphicsEngine::CGPUProfiler::EndFrame`.
     #[address(0x140_0DE_C90)]
     pub fn SaveScreen(&mut self, surface: *mut Texture, depth_texture: *mut Texture);
 
@@ -1031,7 +1060,7 @@ impl GraphicsEngine {
 
     /// Applies [`m_ActiveCursor`](Self::m_ActiveCursor) to the OS: for `None` it sets a
     /// null `HCURSOR` and clips the cursor to the client rect (when the window is foreground);
-    /// otherwise it unclips and sets `GraphicsParams::m_Cursors[cursor]`. The four entries are
+    /// otherwise it unclips and sets `GraphicsParams::m_Cursors[cursor]`. The entries are
     /// loaded at startup as the system `IDC_ARROW`, `IDC_CROSS`, `IDC_HAND`, and `IDC_NO`
     /// cursors. Called from [`WndProc`] on `WM_SETCURSOR`.
     #[address(0x140_0A1_AF0)]
@@ -1070,7 +1099,8 @@ pub extern graphics_params: GraphicsParams;
 
 /// Per-real-frame counters, advanced once in the [`GraphicsEngine::Draw`] prologue. `m_FrameIndex`
 /// (set from the post-incrementing `m_Counter`) drives the TAA jitter phase and shadow parity;
-/// `m_RingIndex` is the three-slot constant-buffer ring.
+/// `m_RingIndex` is the slot of the constant-buffer ring, which has
+/// [`RING_SIZE`](Self::RING_SIZE) slots.
 #[copyable, size(0xC), align(4)]
 pub type RenderFrameCounters {
     /// The number of slots in the per-frame rings (`m_RingIndex = m_FrameIndex % RING_SIZE`), which
@@ -1084,7 +1114,8 @@ pub type RenderFrameCounters {
 
 #[address(0x142_D3A_6AC)]
 pub extern render_frame_counters: RenderFrameCounters;
-/// `m_Counter % 3` after the [`GraphicsEngine::Draw`] prologue increments the counter
+/// `m_Counter %` [`RING_SIZE`](RenderFrameCounters::RING_SIZE) after the [`GraphicsEngine::Draw`]
+/// prologue increments the counter
 /// (`CGraphicsEngine::RenderFrameIndex`).
 #[address(0x142_E5B_664)]
 pub extern render_frame_index: u32;
@@ -1133,8 +1164,7 @@ pub type OccluderCollectionManager {
 }
 impl OccluderCollectionManager {
     /// Build or fetch the cached BFBC cull-frustum parameters for `camera` at `time`. The frustum is
-    /// derived from `camera.m_View` combined with `camera.m_ProjectionF`, so overwriting the camera's
-    /// `m_ProjectionF` before this runs widens the resulting cull frustum without touching the view.
+    /// derived from `camera.m_View` combined with `camera.m_ProjectionF`.
     /// `out_params` and `out_state` receive pointers into the manager's per-camera cache slot;
     /// `*out_params` is the [`BFBCFrustumCullParameters`].
     #[address(0x140_0D6_8B0)]

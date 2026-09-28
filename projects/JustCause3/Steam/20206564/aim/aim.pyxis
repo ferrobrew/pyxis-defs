@@ -33,6 +33,17 @@ pub enum RayType: i32 {
     HIT_MIN_DISTANCE = 0x2,
 }
 
+/// The player's aim mode (`CPlayer::EAimModes`): normal or precision aim. `CPlayer::SetAimMode`
+/// switches it and passes it on to the wielded weapon's
+/// [`SetAimMode`](equipment::weapon::WeaponBase::SetAimMode).
+#[copyable]
+pub enum AimMode: i32 {
+    AIM_NORMAL = 0x0,
+    AIM_PRECISION = 0x1,
+    /// The number of aim modes.
+    AIM_MAX = 0x2,
+}
+
 /// The local player's aim state (`CPlayerAimControl`, an `ITargetSystemListener`), owned by the
 /// player. It is a target cache indexed by [`TargetType`]: every per-purpose array holds one slot
 /// per target type, filled each tick from one camera-derived raycast
@@ -217,9 +228,9 @@ impl PlayerAimControl {
     pub fn GetTargetBodyPosition(result: *mut Vector3, target: *mut Target, for_grenade: bool, adjust_y_pos: bool, clamp_to_hip: bool) -> *mut Vector3;
 
     /// Copies the weapon slot's aim position (`m_AimPos[TARGET_WEAPONS]`) to `result`. The
-    /// release body matches the dump's accessor and sits beside
-    /// [`GetActiveGrappleTargetPosition`](Self::GetActiveGrappleTargetPosition) in the same order
-    /// as in the dump; it has no direct callers, as callers read the field inline.
+    /// body sits beside
+    /// [`GetActiveGrappleTargetPosition`](Self::GetActiveGrappleTargetPosition); it has no direct
+    /// callers, as callers read the field inline.
     #[address(0x140_C14_230)]
     pub fn GetAverageWeaponTargetPosition(&self, result: *mut Vector3) -> *mut Vector3;
 

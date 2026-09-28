@@ -31,10 +31,10 @@ pub fn Draw(ctx: *mut HContext_t, prim: PrimitiveType, arg2: i32, arg3: i32);
 
 // Instanced / indirect draws and compute dispatches.
 //
-// The release build's symbol table attaches the wrong names to most of these, shuffled among
+// IDA attaches the wrong names to most of these, shuffled among
 // neighbouring addresses (for example it labels `DrawInstanced` as `DrawInstancedIndirect`,
 // `DrawIndexedInstancedIndirect` as `DrawIndexedNoMutex`, and `DrawIndexedInstancedMultiIndirect` as
-// `DrawIndexedInstancedIndirect`). The names below follow the symbol dump, matched by body: the
+// `DrawIndexedInstancedIndirect`). The names below are matched by body: the
 // `ID3D11DeviceContext` method each one calls, whether it loops, and whether it takes the context
 // mutex. The `NoMutex` variants skip the mutex because their callers already hold the context
 // (`AcquireThreadOwnership`).
@@ -134,18 +134,18 @@ pub bitflags ClearFlags: u32 {
 #[address(0x141_967_020)]
 pub fn Clear(ctx: *mut HContext_t, flags: u32, color: *mut void, depth: f32, stencil: u32);
 
-/// Stages the stencil-test enable into [`HContext_t::m_DepthStencilStateIndex`] (bit 6); applied
+/// Stages the stencil-test enable into [`HContext_t::m_DepthStencilStateIndex`]; applied
 /// at the next draw's state flush.
 #[address(0x141_966_730)]
 pub fn SetStencilTestEnable(ctx: *mut HContext_t, enable: i32);
 
-/// Stages the stencil comparison function (bits 7-10) and read mask (bits 11-18) into
+/// Stages the stencil comparison function and read mask into
 /// [`HContext_t::m_DepthStencilStateIndex`] and the reference value into
 /// [`HContext_t::m_StencilRef`].
 #[address(0x141_966_680)]
 pub fn SetStencilFunc(ctx: *mut HContext_t, func: i32, reference: u32, mask: u8);
 
-/// Stages the stencil write mask (bits 19-26 of [`HContext_t::m_DepthStencilStateIndex`]).
+/// Stages the stencil write mask into [`HContext_t::m_DepthStencilStateIndex`].
 #[address(0x141_966_6B0)]
 pub fn SetStencilMask(ctx: *mut HContext_t, write_mask: u8);
 
@@ -155,8 +155,8 @@ pub fn SetStencilMask(ctx: *mut HContext_t, write_mask: u8);
 pub fn SetStencilOp(ctx: *mut HContext_t, fail: i32, depth_fail: i32, depth_pass: i32);
 
 /// Copies one surface into another texture: a whole-resource `ID3D11DeviceContext::CopyResource`
-/// of `src`'s D3D11 resource into `dst`'s, issued under the context mutex. The release build's
-/// symbol table misplaces this function's name onto [`EndDraw`] and labels this address
+/// of `src`'s D3D11 resource into `dst`'s, issued under the context mutex. IDA
+/// misplaces this function's name onto [`EndDraw`] and labels this address
 /// `NGraphicsEngine::CGPUProfiler::BeginScope`; the body is unambiguous.
 #[address(0x141_954_850)]
 pub fn CopySurfaceToTexture(ctx: *mut HContext_t, dst: *mut void, src: *mut void);
@@ -165,7 +165,7 @@ pub fn CopySurfaceToTexture(ctx: *mut HContext_t, dst: *mut void, src: *mut void
 /// context's command-slot ring and submits the two prebuilt command objects for the current slot
 /// through the backend. It takes no arguments beyond the context.
 ///
-/// The release build's symbol table labels this address `Graphics::CopySurfaceToTexture`; the two
+/// IDA labels this address `Graphics::CopySurfaceToTexture`; the two
 /// names are swapped (see [`CopySurfaceToTexture`]).
 #[address(0x141_95A_BA0)]
 pub fn EndDraw(ctx: *mut HContext_t);
@@ -174,8 +174,7 @@ pub fn EndDraw(ctx: *mut HContext_t);
 #[address(0x141_967_2B0)]
 pub fn ResolveSurface(ctx: *mut HContext_t, params: *mut void);
 
-/// Sets the scissor-enable bit of the context's current rasterizer-state key (bit 7 of the key's low
-/// byte), which becomes `D3D11_RASTERIZER_DESC::ScissorEnable` when the state object for that key is
+/// Sets the scissor-enable bit of the context's current rasterizer-state key, which becomes `D3D11_RASTERIZER_DESC::ScissorEnable` when the state object for that key is
 /// created. The key is looked up (and the object created on first use) by the render-state flush that
 /// precedes every draw, so the change takes effect from the next draw on. Only the enable flag lives
 /// in the key: the rectangles themselves are passed straight through to the context's
@@ -277,7 +276,7 @@ pub fn CreateDomainProgram(device: *mut HDevice_t, params: *const CreateDomainPr
 /// actual GPU upload happens at the next state flush.
 ///
 /// The staging buffer is a single 512-row `float4` array per shader stage, held in the graphics
-/// context (the fragment one begins at context offset `0x2020`, after the vertex one at `0x20`); the
+/// context (the fragment one follows the vertex one); the
 /// four slots of a stage carve their windows out of it, each starting at the row
 /// [`SetFragmentProgramConstantBufferSize`] recorded for it. The write is therefore bounded by that
 /// window and by the pooled buffer the slot is bound to, not by `count` alone. A row-level redundancy
@@ -290,19 +289,17 @@ pub fn SetFragmentProgramConstants(ctx: *mut HContext_t, cb_index: i32, start_of
 /// stage's shared staging array its window begins.
 ///
 /// `count` is a number of `float4` rows. It is not stored as-is: the engine rounds it **up** to the
-/// next entry of a fixed 17-entry pool-size table — `1, 2, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128,
-/// 196, 256, 384, 512` — and binds the pre-created `ID3D11Buffer` of that size to the slot (a
+/// next entry of [`constant_buffer_size_classes`] and binds the pre-created `ID3D11Buffer` of that
+/// size to the slot (a
 /// `PSSetConstantBuffers` call, skipped when the size class is unchanged). The rounded size class,
 /// not `count`, is what [`SetupRenderStates`] later uploads, so the constant buffer the shader sees is
 /// the rounded one and the rows between `count` and the size class are uploaded as whatever the
 /// staging array happens to hold. `start_offset` is recorded as the slot's base row within the
-/// stage's 512-row staging array; every shipped call passes `0`, so at most one staged slot per stage
+/// stage's 512-row staging array; every call passes `0`, so at most one staged slot per stage
 /// is live at a time. Passing `count = 0` unbinds the slot and clears its dirty flag.
 ///
-/// The debug build additionally keeps `count` verbatim so that every
-/// [`SetFragmentProgramConstants`] can assert that its own `start_offset + count` stays within it; the
-/// release build stores only the bound buffer, the size class, and the base row, and performs no
-/// bounds check at all.
+/// The function stores only the bound buffer, the size class, and the base row. It does not keep
+/// `count`, and [`SetFragmentProgramConstants`] performs no bounds check against it.
 #[address(0x141_964_3B0)]
 pub fn SetFragmentProgramConstantBufferSize(ctx: *mut HContext_t, cb_index: i32, start_offset: u32, count: u32);
 
@@ -310,6 +307,13 @@ pub fn SetFragmentProgramConstantBufferSize(ctx: *mut HContext_t, cb_index: i32,
 /// the vertex slots' pooled buffers.
 #[address(0x141_964_280)]
 pub fn SetVertexProgramConstantBufferSize(ctx: *mut HContext_t, cb_index: i32, start_offset: u32, count: u32);
+
+/// The constant-buffer size classes (`CB_SIZES`), in `float4` rows and ascending.
+/// [`SetFragmentProgramConstantBufferSize`] and [`SetVertexProgramConstantBufferSize`] round a
+/// requested row count up to the first entry at or above it, and the context pre-creates one pooled
+/// `ID3D11Buffer` per slot and size class.
+#[address(0x142_5F9_300)]
+pub extern constant_buffer_size_classes: [u32; 17];
 
 /// Flushes the graphics context's deferred state to D3D11 ahead of a draw: for each of the four slots
 /// of each shader stage whose dirty flag is set, maps its bound constant buffer with

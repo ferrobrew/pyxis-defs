@@ -29,7 +29,7 @@ pub type CascadeData {
     /// [`RenderPassState::m_Enabled`](graphics_engine::render_pass::RenderPassState::m_Enabled).
     pub m_Passes: [*mut RenderPass; 2],
 
-    /// The pass settings for each frame parity (`[m_FrameIndex & 1]`), the stride-20 per-parity slice
+    /// The pass settings for each frame parity (`[m_FrameIndex & 1]`), the per-parity slice
     /// indices [`ShadowManager::CommitRenderPassSettings`] reads to re-point the passes' render
     /// setups.
     #[address(0x38)]
@@ -107,7 +107,7 @@ pub type ShadowManager {
 
     /// The per-slice projective shadow transforms for each frame parity (`[parity][slice]`),
     /// written by [`UpdateRender`](Self::UpdateRender). [`RenderPass::SetRenderContextCamera`] copies
-    /// the parity's eight into
+    /// the parity's matrices into
     /// [`RenderContext::m_ShadowMatrices`](graphics_engine::graphics_engine::RenderContext::m_ShadowMatrices).
     #[address(0x3_A50)]
     pub m_ShadowTextureMatrix: [[Matrix4; 8]; 2],

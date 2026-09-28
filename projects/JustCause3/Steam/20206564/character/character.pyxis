@@ -45,9 +45,8 @@ pub bitflags AimState: u8 {
 }
 
 /// A byte of `CCharacter` bitfields holding the visibility, invulnerability, and weapons-enabled
-/// flags. Not every bit is mapped: `0x08` (`Enabled`), `0x10` (`m_GhostMode`), and `0x20`
-/// (`m_PermanentGhostMode`) are the symbol dump's names for the remaining bits and are unverified in
-/// this build.
+/// flags. Not every bit is mapped: three of the remaining bits are, in ascending order, `Enabled`,
+/// `m_GhostMode`, and `m_PermanentGhostMode`, and these names are unconfirmed.
 #[copyable]
 pub bitflags DamageStateFlags: u8 {
     /// `Visible`: whether the character's models are shown. Read by `CCharacter::IsVisible`.
@@ -97,7 +96,7 @@ pub type Character {
     /// `m_CurrentMotionState` while ragdolling.
     pub const MOTION_STATE_RAGDOLL: u32 = 0x14,
     /// The offset of the character's `CGameObject` base subobject. RTTI tests (`IsType`) and the
-    /// `CGameObject` virtuals go through the vtable at this offset rather than the one at offset 0,
+    /// `CGameObject` virtuals go through the vtable at this offset rather than the primary one,
     /// and state tasks recover the character from that subobject by subtracting this offset.
     pub const GAME_OBJECT_BASE_OFFSET: u64 = 0x8,
     /// The slot, in the vtable of the [`GAME_OBJECT_BASE_OFFSET`](Self::GAME_OBJECT_BASE_OFFSET)
@@ -117,7 +116,7 @@ pub type Character {
 
     /// The character's aiming-settings resource (`TResourceCachePtr<SCharacterAimingSettings>`, a
     /// resource handle resolved through the resource cache). `HandleAimingInputNPC` reads the
-    /// aim-timer refill value from the resolved settings at offset `0x10`.
+    /// aim-timer refill value from the resolved settings.
     #[address(0x938)]
     pub m_AimingSettings: *mut u8,
 
@@ -141,8 +140,8 @@ pub type Character {
     #[address(0x2_050)]
     pub m_PfxCharacter: SharedPtr<PfxCharacterInstance>,
 
-    /// The character's embedded [`ObjectBlackboard`] (`lea rcx, [character+2060h]` at every
-    /// blackboard call site in the loco tasks).
+    /// The character's embedded [`ObjectBlackboard`]. The loco tasks' blackboard call sites address
+    /// it in place on the character.
     #[address(0x2_060)]
     pub m_Blackboard: ObjectBlackboard,
 
@@ -164,7 +163,7 @@ pub type Character {
     /// How the character's motion is integrated this frame (`CCharacter::EMotionState`), read by
     /// the dispatch in `CCharacter::UpdateIntegratingPhysics`. Each movement actuator sets it as
     /// part of its per-frame update. Left as a raw integer because only a few of its ~25 values have
-    /// been confirmed against the release build: `MOTION_STATE_SWIMMING` and `MOTION_STATE_RAGDOLL`
+    /// been confirmed: `MOTION_STATE_SWIMMING` and `MOTION_STATE_RAGDOLL`
     /// on this type.
     #[address(0x2_494)]
     pub m_CurrentMotionState: u32,
@@ -255,7 +254,7 @@ impl Character {
 
     /// Whether the character is attached to a vehicle (riding, or in the mount/dismount
     /// transitions), read from the animation rule system's current state. The state machine
-    /// pointers it walks are game-thread data; call on the game update thread.
+    /// pointers it walks are game-thread data, so the call is only safe on the game update thread.
     #[address(0x140_77F_080)]
     pub fn IsInVehicleAttachState(&self) -> bool;
 
@@ -396,7 +395,12 @@ impl Character {
     pub fn IsInDrivingVehicleState(&self) -> bool;
 
     /// Whether the character is reeled onto an attach point: the grappling hook's state is one of
-    /// the four reeled states (3 to 6), and either
+    /// the reeled states
+    /// ([`GHS_REELED_ATTACHED`](equipment::grappling_hook::GrapplingHookState::GHS_REELED_ATTACHED),
+    /// [`GHS_REELED_HANG`](equipment::grappling_hook::GrapplingHookState::GHS_REELED_HANG),
+    /// [`GHS_REELED_UPSIDEDOWN`](equipment::grappling_hook::GrapplingHookState::GHS_REELED_UPSIDEDOWN),
+    /// or [`GHS_REELED_STUNT`](equipment::grappling_hook::GrapplingHookState::GHS_REELED_STUNT)),
+    /// and either
     /// [`SB_IN_GRAPPLE_ATTACHED`](state::StateBitFlag::SB_IN_GRAPPLE_ATTACHED)
     /// or [`SB_IS_GRAPPLE_UPSIDEDOWN`](state::StateBitFlag::SB_IS_GRAPPLE_UPSIDEDOWN)
     /// is set or the body rule system is in one of eight reeled-in stunt and hang states.
@@ -404,8 +408,8 @@ impl Character {
     pub fn IsReeledIn(&self) -> bool;
 
     /// Whether the character hangs from a reeled grapple: with a hook present, the body rule
-    /// system is in `S_GRAPPLE_HANG` or `S_IDLE_HANG_STUNT`, the hook's state is the reeled-hang
-    /// state (4), or
+    /// system is in `S_GRAPPLE_HANG` or `S_IDLE_HANG_STUNT`, the hook's state is
+    /// [`GHS_REELED_HANG`](equipment::grappling_hook::GrapplingHookState::GHS_REELED_HANG), or
     /// [`SB_IS_GRAPPLE_UPSIDEDOWN`](state::StateBitFlag::SB_IS_GRAPPLE_UPSIDEDOWN)
     /// is set.
     #[address(0x140_79E_290)]
@@ -604,8 +608,8 @@ pub type AnimatedModel {
 }
 impl AnimatedModel {
     /// Tests whether the animation state machine would accept the act from its current state,
-    /// without queuing it. `CCharacter`'s vtable slot 37 forwards to this on
-    /// [`Character::m_AnimatedModel`]; the game's own act dispatchers call it before
+    /// without queuing it. A `CCharacter` virtual forwards to this on
+    /// [`Character::m_AnimatedModel`]; the game's act dispatchers call it before
     /// [`Character::QueueAct`] to pick a supported act.
     #[address(0x140_4B2_E00)]
     pub fn TryAct(&mut self, act: *const u32) -> bool;

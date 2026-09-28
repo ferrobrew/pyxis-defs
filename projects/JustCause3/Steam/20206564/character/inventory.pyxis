@@ -20,8 +20,8 @@ pub enum WeaponSlot: i32 {
 }
 
 /// The character's equipment inventory (`CInventory`), embedded in `CCharacter`
-/// ([`Character::m_Inventory`](character::character::Character::m_Inventory)). Only the members
-/// needed so far are mapped.
+/// ([`Character::m_Inventory`](character::character::Character::m_Inventory)). Only some members
+/// are mapped.
 #[min_size(0x3E8)]
 pub type Inventory {
     /// The character's grappling hook, or null before the inventory is populated.

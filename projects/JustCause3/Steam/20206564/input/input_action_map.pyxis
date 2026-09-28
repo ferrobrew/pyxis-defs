@@ -19,8 +19,7 @@ pub enum EffectorState: u32 {
 /// linked-list node whose extra id / next fields follow this struct; reading the effector itself uses
 /// only these fields.
 ///
-/// **Provenance:** the layout is from the debug PDB, cross-checked against retail usage (`m_Value`,
-/// `m_State`, and `m_StateTime` offsets all match).
+/// The `m_Value`, `m_State`, and `m_StateTime` offsets are confirmed against their uses.
 #[size(0x14), align(4)]
 pub type InputDeviceEffector {
     /// The analog value, e.g. trigger pressure or stick axis. [`Click`](Self::Click)
@@ -54,9 +53,8 @@ impl InputDeviceEffector {
     pub fn ForceClick(&mut self);
 }
 
-/// An action ID, indexing [`action_name_table`]. The numbering is fixed at build time, so action IDs
-/// can be hardcoded. The engine takes a raw int, and this enum is int-repr, so it converts cleanly
-/// into the action parameters.
+/// An action ID, indexing [`action_name_table`]. The numbering is fixed at build time. The engine
+/// passes action IDs as plain integers.
 #[copyable]
 pub enum Action: i32 {
     /// The number of action ids: the length of [`action_name_table`], and the action value
@@ -335,8 +333,8 @@ impl LocalPlayerActionMap {
     /// The single-argument `CInputActionMap::GetActionEffector(int)` overload the wrapper's own
     /// setters use: resolves an action to its effector without a device index. The singleton
     /// pointer is the underlying `CInputActionMap` itself (established from `ForceSetPressed`,
-    /// which passes it straight to the map's effector lookup), so the read-side lookup is exposed
-    /// here. Returns the shared null-effector sentinel for invalid ids; callers null-check anyway.
+    /// which passes it straight to the map's effector lookup). Returns the shared null-effector
+    /// sentinel for invalid ids.
     #[address(0x140_2F4_3C0)]
     pub fn GetActionEffector(&mut self, action: Action) -> *mut InputDeviceEffector;
 

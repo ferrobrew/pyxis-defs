@@ -1,6 +1,40 @@
 use types::math::Matrix4;
 use types::math::Vector3;
 
+/// What an [`EffectTransformInfo`] transform drives (`SEffectTransformInfo::ETransformType`).
+#[copyable]
+pub enum TransformType: i32 {
+    /// A 3D world transform.
+    ETransformType_Transform3D = 0x0,
+    ETransformType_AudioSpatialization = 0x1,
+    ETransformType_ReverbSpatialization = 0x2,
+    ETransformType_EchoSpatialization = 0x3,
+    ETransformType_Invalid = 0x4,
+}
+
+/// How an attached instance's rotation follows its attachment
+/// (`CAttachedEffectContainer::ERotationMode`).
+#[copyable]
+pub enum RotationMode: i32 {
+    ERotationMode_ATTACHED = 0x0,
+    ERotationMode_FIRST_FRAME = 0x1,
+    ERotationMode_ATTACHED_RANDOM_ROLL = 0x2,
+    ERotationMode_FIRST_FRAME_RANDOM_ROLL = 0x3,
+    ERotationMode_WORLD_UP_RANDOM = 0x4,
+    ERotationMode_RANDOM = 0x5,
+    ERotationMode_WORLD_UP = 0x6,
+    ERotationMode_COUNT = 0x7,
+}
+
+/// How an attached instance's translation follows its attachment
+/// (`CAttachedEffectContainer::ETranslationMode`).
+#[copyable]
+pub enum TranslationMode: i32 {
+    ETranslationMode_ATTACHED = 0x0,
+    ETranslationMode_FIRST_FRAME = 0x1,
+    ETranslationMode_COUNT = 0x2,
+}
+
 /// The world placement handed to a playing attached effect (`SEffectTransformInfo`): a transform,
 /// the velocity of the attachment, and what the transform is used for. Resolved per instance each
 /// update by the instance's transform function and copied whole into
@@ -14,10 +48,9 @@ pub type EffectTransformInfo {
     #[address(0x40)]
     pub m_Velocity: Vector3,
 
-    /// What the transform drives (`SEffectTransformInfo::ETransformType`): 0 is a 3D transform;
-    /// the others are audio, reverb, and echo spatialization, and 4 is invalid.
+    /// What the transform drives.
     #[address(0x50)]
-    pub m_Type: i32,
+    pub m_Type: TransformType,
 }
 
 /// One playing attached effect or sound (`NAttachedEffectContainer::SAttachedInstance`): an offset
@@ -35,14 +68,13 @@ pub type AttachedInstance {
     #[address(0x40)]
     pub m_TransformFunc: *mut void,
 
-    /// How the instance's rotation follows the attachment (`CAttachedEffectContainer::ERotationMode`).
+    /// How the instance's rotation follows the attachment.
     #[address(0x4C)]
-    pub m_RotationMode: i32,
+    pub m_RotationMode: RotationMode,
 
-    /// How the instance's translation follows the attachment
-    /// (`CAttachedEffectContainer::ETranslationMode`).
+    /// How the instance's translation follows the attachment.
     #[address(0x50)]
-    pub m_TranslationMode: i32,
+    pub m_TranslationMode: TranslationMode,
 
     /// The next playing instance in the owning container's list, or null.
     #[address(0x98)]
@@ -52,8 +84,9 @@ pub type AttachedInstance {
     #[address(0xF0)]
     pub m_TransformInfo: EffectTransformInfo,
 
-    /// The per-update velocity of the placement's translation: the position delta scaled by 30
-    /// (the fixed simulation rate), or zero for a non-3D transform.
+    /// The per-update velocity of the placement's translation: the position delta multiplied by
+    /// 1/30, or zero for a transform that is not
+    /// [`ETransformType_Transform3D`](TransformType::ETransformType_Transform3D).
     #[address(0x150)]
     pub m_MeasuredVelocity: Vector3,
 
@@ -62,9 +95,12 @@ pub type AttachedInstance {
     pub m_TransformExtraData: u64,
 }
 impl AttachedInstance {
-    /// Re-resolves the instance's placement for `container`. When the rotation mode is 0 or 2 or
-    /// the translation mode is 0, it calls [`m_TransformFunc`](Self::m_TransformFunc) and copies
-    /// the 0x60-byte [`EffectTransformInfo`] it returns into
+    /// Re-resolves the instance's placement for `container`. When the rotation mode is
+    /// [`ERotationMode_ATTACHED`](RotationMode::ERotationMode_ATTACHED) or
+    /// [`ERotationMode_ATTACHED_RANDOM_ROLL`](RotationMode::ERotationMode_ATTACHED_RANDOM_ROLL), or
+    /// the translation mode is
+    /// [`ETranslationMode_ATTACHED`](TranslationMode::ETranslationMode_ATTACHED), it calls [`m_TransformFunc`](Self::m_TransformFunc) and copies
+    /// the [`EffectTransformInfo`] it returns into
     /// [`m_TransformInfo`](Self::m_TransformInfo); it then applies the transform modes and derives
     /// [`m_MeasuredVelocity`](Self::m_MeasuredVelocity) from the translation delta.
     #[address(0x140_453_D00)]

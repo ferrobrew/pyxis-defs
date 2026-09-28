@@ -12,8 +12,7 @@ pub fn AIMechFireGravityGun(p0: u32, p1: *mut void, tree: *mut void, registry: *
 /// `_AiGetClosestEntityInRange`: finds the AI entity of `entity_type` (1-based category) closest
 /// to `point` within `range`, accepted by `faction` (and, with `alive_only`, alive), skipping
 /// `ignore_entity` and the entity owned by `owner_go`. Writes the found entity handle to
-/// `found_entity` (0 when none) and returns whether one was found. The release IDB labels this
-/// address `CAIPerception::GetCharacterWithMentalState`; its body and signature match the symbol
-/// dump's `_AiGetClosestEntityInRange` instead.
+/// `found_entity` (0 when none) and returns whether one was found. IDA labels this
+/// address `CAIPerception::GetCharacterWithMentalState`; it is `_AiGetClosestEntityInRange`.
 #[address(0x140_5F9_7F0)]
 pub fn AiGetClosestEntityInRange(point: *const Vector3, entity_type: u32, faction: i32, alive_only: u32, range: f32, ignore_entity: u32, found_entity: *mut u32, registry: *mut void, owner_go: *mut void) -> bool;

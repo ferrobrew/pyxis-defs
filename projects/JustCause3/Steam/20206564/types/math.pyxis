@@ -45,9 +45,6 @@ epilogue for Matrix3 r#"
 /// The 16 floats are four rows; a world or camera transform's rows are its basis vectors:
 /// `data[0..2]` is right (+X), `data[4..6]` is up (+Y), `data[8..10]` is the +Z basis (so forward is
 /// `-data[8..10]`), and `data[12..14]` is the translation. Right-handed, Y-up.
-///
-/// When converting to a column-major math library, transpose the data and place basis vectors as
-/// columns (right, up, -forward, translation).
 #[copyable, defaultable, align(4)]
 pub type Matrix4 {
     /// All elements zero.
@@ -96,6 +93,8 @@ impl Matrix4 {
 
 #[cfg(backend = "rust")]
 epilogue for Matrix4 r#"
+    // Converting to a column-major math library transposes the data and places the basis vectors
+    // as columns (right, up, -forward, translation).
     #[cfg(feature = "glam")]
     impl From<glam::Mat4> for Matrix4 {
         fn from(m: glam::Mat4) -> Self {

@@ -69,9 +69,8 @@ pub type GrapplingHook {
     pub m_WaitingForTetherFire: bool,
 
     /// The cached reel-in target position in world space. The reel-in aim IK turns the chest
-    /// toward it while a wire is active. Medium confidence on the name: the offset is read in the
-    /// release build, and the name comes from the dump's layout, which matches this build at the
-    /// neighbouring mapped fields.
+    /// toward it while a wire is active. The offset is confirmed; the name is
+    /// unconfirmed.
     #[address(0x318)]
     pub m_CachedReelTargetPosition: Vector3,
 

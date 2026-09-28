@@ -3,11 +3,10 @@
 ///
 /// `CSlowMotionManager::Update` (called once per frame from the special-effects update) writes
 /// [`Clock::m_UpdateSpeed`](clock::Clock::m_UpdateSpeed) every frame as a blend between this value
-/// and the active effect's game speed, weighted by the effect's eased status, so this is the
-/// authoritative "normal" clock rate rather than the clock field itself: a direct write to the
-/// clock's speed is overwritten on the next update, while a write here persists and still lets
-/// scripted slow-motion effects (the wingsuit near-miss, the death camera, sequences) blend
-/// against it. `CSlowMotionManager::Reset` copies it straight into the clock.
+/// and the active effect's game speed, weighted by the effect's eased status. Because the update
+/// rewrites the clock's speed every frame, this value, not the clock field, sets the normal clock
+/// rate, and scripted slow-motion effects (the wingsuit near-miss, the death camera, sequences)
+/// blend against it. `CSlowMotionManager::Reset` copies it straight into the clock.
 ///
 /// The game update divides frame deltas by the resulting clock speed where a real-time quantity
 /// is needed (health effects, camera collision, the run state's sub-step budget), and every other

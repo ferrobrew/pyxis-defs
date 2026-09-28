@@ -1,8 +1,8 @@
 use types::math::Vector3;
 
 /// The character's animation control parameters (`CControlParameters`), reached through
-/// [`Character::m_ControlParameters`](character::character::Character::m_ControlParameters). Only the
-/// members needed so far are bound.
+/// [`Character::m_ControlParameters`](character::character::Character::m_ControlParameters). Only some
+/// members are bound.
 #[min_size(0x140)]
 pub type ControlParameters {
     /// The weapon aim point (world space), copied here from the player's aim control each frame by

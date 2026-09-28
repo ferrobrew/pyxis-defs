@@ -1,8 +1,8 @@
 use hash::HashString;
 
 /// `SUpgradeInfo`: one gear-mod upgrade's definition and state, as returned by
-/// `CProfileManager::GetUpgradeInfo`. Only the leading fields are mapped; the release build stores
-/// the id hashes bare. The profile manager's sorted table stores each one after its 8-byte key, at a
+/// `CProfileManager::GetUpgradeInfo`. Only the leading fields are mapped; the id hashes are stored
+/// bare. The profile manager's sorted table stores each one after its 8-byte key, at a
 /// 0x128-byte stride.
 #[min_size(0x120), align(8)]
 pub type UpgradeInfo {

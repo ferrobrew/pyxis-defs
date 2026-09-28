@@ -1,4 +1,6 @@
+use aim::aim::AimMode;
 use character::character::AnimatedModel;
+use character::inventory::WeaponSlot;
 use types::math::Matrix4;
 use types::math::Vector3;
 use types::std_vector::Vector;
@@ -164,7 +166,8 @@ impl WeaponData {
 
 /// The base class of every weapon (`CWeaponBase`, a `CPhysicsGameObject`): fire input and timing,
 /// ammunition, recoil, heat, aim target, tuning, and the list of physical guns
-/// ([`WeaponData`]) it drives. The `CGameObject` subobject sits at `+0x8`.
+/// ([`WeaponData`]) it drives. The weapon embeds a `CGameObject` subobject after its vtable
+/// pointer.
 pub type WeaponBase {
     /// The seconds a blocked trigger pull stays buffered in
     /// [`m_InputBufferTimer`](Self::m_InputBufferTimer).
@@ -195,10 +198,10 @@ pub type WeaponBase {
         #[index(47)]
         pub fn IsWeaponAiming(&self) -> bool;
 
-        /// Applies the holder's aim mode (0 normal, 1 precision aim). `CPlayer::SetAimMode` calls
-        /// it after changing the player's aim mode.
+        /// Applies the holder's aim mode: normal or precision aim. `CPlayer::SetAimMode` calls it
+        /// after changing the player's aim mode.
         #[index(48)]
-        pub fn SetAimMode(&mut self, aim_mode: i32);
+        pub fn SetAimMode(&mut self, aim_mode: AimMode);
 
         /// The per-tick weapon update from its user after simulation: validates `aim_position` and
         /// stores it as [`m_AimTargetPosition`](Self::m_AimTargetPosition), then processes the
@@ -348,10 +351,9 @@ pub type WeaponBase {
     #[address(0x40A)]
     pub m_IsAutoAimInPrecisionAimEnabled: bool,
 
-    /// The inventory slot the weapon is equipped in (a `CInventory::EWeaponSlot`; 0 is dual wield,
-    /// 1 two-handed).
+    /// The inventory slot the weapon is equipped in.
     #[address(0x420)]
-    pub m_EquipSlot: i32,
+    pub m_EquipSlot: WeaponSlot,
 
     /// The weapon's state.
     #[address(0x424)]
@@ -459,7 +461,7 @@ impl WeaponBase {
 
     /// The `CGameObject::GetTransform` override: copies the first gun's
     /// [`WeaponData::GetWorldMatrixT1`] into `transform`. `game_object` is the weapon's
-    /// `CGameObject` subobject (the weapon plus `0x8`).
+    /// `CGameObject` subobject, not the start of the weapon.
     #[address(0x140_964_E50)]
     pub fn GetTransform(game_object: *const void, transform: *mut Matrix4) -> bool;
 
@@ -468,7 +470,7 @@ impl WeaponBase {
     /// context's interpolation factor, applies the holstered scale when holstered, pushes the
     /// result to [`WeaponData::m_BaseModelInstance`], and updates the gun's animated-model
     /// skinning; it then renders the weapon's components. `game_object` is the weapon's
-    /// `CGameObject` subobject (the weapon plus `0x8`).
+    /// `CGameObject` subobject, not the start of the weapon.
     #[address(0x140_966_380)]
     pub fn UpdateRender(game_object: *mut void, context: *mut void);
 }
@@ -491,10 +493,11 @@ impl BulletWeaponBase {
 /// `CSniperWeapon`: a precision-aim rifle. Its layout is unmapped.
 pub type SniperWeapon;
 impl SniperWeapon {
-    /// The [`WeaponBase::SetAimMode`] override: in precision aim (mode 1) it shows the HUD sniper
-    /// overlay and hides the holder, and in mode 0 it reverses both.
+    /// The [`WeaponBase::SetAimMode`] override: in [`AIM_PRECISION`](AimMode::AIM_PRECISION) it
+    /// shows the HUD sniper overlay and hides the holder, and in
+    /// [`AIM_NORMAL`](AimMode::AIM_NORMAL) it reverses both.
     #[address(0x140_97F_120)]
-    pub fn SetAimMode(&mut self, aim_mode: i32);
+    pub fn SetAimMode(&mut self, aim_mode: AimMode);
 }
 
 /// The weapon ballistics helpers (`NWeaponUtil`).

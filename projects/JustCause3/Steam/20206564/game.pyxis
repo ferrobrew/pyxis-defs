@@ -1,7 +1,7 @@
 #[singleton(0x142_E22_E68), min_size(0x2C0)]
 pub type Game {
     /// The intra-`Update` site at which the game's per-frame render bookkeeping starts: the
-    /// `m_UpdateFlags & 4` check (the `jz`) that normally gates `UpdateRender` (and everything
+    /// [`E_GUF_RENDER`](GameUpdateFlags::E_GUF_RENDER) check (the `jz`) that normally gates `UpdateRender` (and everything
     /// after it) on the frame-pacing mode sits here.
     pub const UPDATE_RENDER_GATE_OFFSET: u64 = 0x787,
     /// The intra-`Update` site at which the render bookkeeping ends: `++m_RenderCount`, the last
@@ -10,6 +10,10 @@ pub type Game {
     /// The [`m_InterpolationOverride`](Self::m_InterpolationOverride) value meaning no override:
     /// the method chosen each frame stands.
     pub const INTERPOLATION_OVERRIDE_NONE: i32 = -1,
+    /// The [`m_PrevInterpolationMethod`](Self::m_PrevInterpolationMethod) value written when the
+    /// frame takes the paused path; it matches no method, so the next unpaused frame resets the
+    /// accumulators.
+    pub const INTERPOLATION_METHOD_PAUSED: u32 = 0xFFFFFFFF,
     /// The [`m_InterpolationMethod`](Self::m_InterpolationMethod) chosen during gameplay: the
     /// fractional sim step accumulates in `m_RunningFrameFraction` and [`UpdateGame`](Self::UpdateGame)
     /// runs at most once per render frame. The method names are descriptive; the engine uses bare
@@ -43,8 +47,9 @@ pub type Game {
     /// plays, [`INTERPOLATION_METHOD_SINGLE_STEP`](Self::INTERPOLATION_METHOD_SINGLE_STEP) otherwise,
     /// or [`m_InterpolationOverride`](Self::m_InterpolationOverride) when that is non-negative.
     pub m_InterpolationMethod: u32,
-    /// The method used on the previous frame; a change resets the accumulators. Set to `-1` when
-    /// the frame takes the paused path.
+    /// The method used on the previous frame; a change resets the accumulators. Set to
+    /// [`INTERPOLATION_METHOD_PAUSED`](Self::INTERPOLATION_METHOD_PAUSED) when the frame takes the
+    /// paused path.
     pub m_PrevInterpolationMethod: u32,
     /// A console override for [`m_InterpolationMethod`](Self::m_InterpolationMethod);
     /// [`INTERPOLATION_OVERRIDE_NONE`](Self::INTERPOLATION_OVERRIDE_NONE) when unset.
