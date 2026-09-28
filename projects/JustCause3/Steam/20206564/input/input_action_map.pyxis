@@ -1,3 +1,5 @@
+use types::std_vector::Vector;
+
 /// The digital state of an [`InputDeviceEffector`].
 #[copyable]
 pub enum EffectorState: u32 {
@@ -18,6 +20,22 @@ pub enum EffectorState: u32 {
 /// One input effector slot. The pointer [`InputActionMap::GetActionEffector`] returns is the head of a
 /// linked-list node whose extra id / next fields follow this struct; reading the effector itself uses
 /// only these fields.
+///
+/// The device poll (`CInputDeviceEffector::Update`) runs once per
+/// [`InputDeviceManager::Update`](input::input_device_manager::InputDeviceManager::Update) for every
+/// effector bound to a device. It overwrites [`m_Value`](Self::m_Value) with the device's reading and
+/// advances [`m_State`](Self::m_State) against the device's button threshold:
+/// [`Idle`](EffectorState::Idle) moves to [`Idle2`](EffectorState::Idle2);
+/// [`Idle2`](EffectorState::Idle2) accumulates [`m_StateTime`](Self::m_StateTime) and becomes
+/// [`Clicked`](EffectorState::Clicked) above the threshold; [`Clicked`](EffectorState::Clicked)
+/// zeroes the time and becomes [`Pressed`](EffectorState::Pressed) or
+/// [`Released`](EffectorState::Released); [`Pressed`](EffectorState::Pressed) accumulates the time
+/// and becomes [`Released`](EffectorState::Released) at or below the threshold; and
+/// [`Released`](EffectorState::Released) becomes [`Clicked`](EffectorState::Clicked) or
+/// [`Idle`](EffectorState::Idle). The readers report [`m_StateTime`](Self::m_StateTime) as the time
+/// pressed only in [`Pressed`](EffectorState::Pressed), and as the time pressed before release
+/// only in [`Released`](EffectorState::Released); "pressed" means
+/// [`Pressed`](EffectorState::Pressed) or [`Clicked`](EffectorState::Clicked).
 ///
 /// The `m_Value`, `m_State`, and `m_StateTime` offsets are confirmed against their uses.
 #[size(0x14), align(4)]
@@ -40,7 +58,11 @@ impl InputDeviceEffector {
     #[address(0x140_2EE_630)]
     pub fn Click(&mut self);
 
-    /// Sets `m_Value` and drives the [`EffectorState::Pressed`] state.
+    /// Sets `m_Value` and drives the [`EffectorState::Pressed`] state, zeroing
+    /// [`m_PrevValue`](Self::m_PrevValue) and [`m_StateTime`](Self::m_StateTime). The next device
+    /// poll moves a pressed effector whose device reads nothing to
+    /// [`EffectorState::Released`], so a press repeated every frame reads as pressed with a hold
+    /// time that never grows. Does nothing on the [`null_effector`].
     #[address(0x140_2EE_660)]
     pub fn Press(&mut self, value: f32);
 
@@ -318,15 +340,76 @@ pub enum Action: i32 {
     GUI_USE_BUTTON = 0xFE,
 }
 
-/// Maps action IDs to effector slots.
-pub type InputActionMap;
-impl InputActionMap {
-    #[address(0x140_2F4_3B0)]
-    pub fn GetActionEffector(&mut self, action_id: i32, device_index: i32) -> *mut InputDeviceEffector;
+/// A bit of [`InputActionMap::m_Disabled`]: one independent reason for blocking a map's input. The
+/// map is blocked while any bit is set. `CSteering::Enable` and `CInputActionMap::SetEnabled` set and
+/// clear one bit each.
+#[copyable]
+pub enum InputSystemBlocker: u32 {
+    /// Set while a game UI screen has input priority: the highest-priority screen's input handler
+    /// (`CUIBase::OnManageInput`) sets it on the player map every frame, and `CUIManager::PreUpdate`
+    /// clears it on a frame with no such screen. The map, the commlink, the pause menu, and the other
+    /// full-screen menus all own input this way.
+    Ui = 0x1,
 }
 
+/// Maps action IDs to effector slots (`Input::CInputActionMap`). Each action owns a linked list of
+/// effectors, one per device that binds it; the lookups pick one of them.
+#[min_size(0x4B0)]
+pub type InputActionMap {
+    /// Actions that stay readable while the map is blocked.
+    pub m_ExceptionList: Vector<i32>,
+
+    /// Actions blocked individually, regardless of [`m_Disabled`](Self::m_Disabled).
+    #[address(0x488)]
+    pub m_DisabledActions: Vector<i32>,
+
+    /// The blocker bits (see [`InputSystemBlocker`]). While any bit is set and
+    /// [`m_OverrideBlocker`](Self::m_OverrideBlocker) is clear, lookups for actions outside
+    /// [`m_ExceptionList`](Self::m_ExceptionList) return the [`null_effector`].
+    #[address(0x4A8)]
+    pub m_Disabled: u32,
+    /// Suspends [`m_Disabled`](Self::m_Disabled) for lookups while set. `CSteering::OverrideBlocker`
+    /// sets it around the reads that must work while the map is blocked, such as the pause and
+    /// commlink toggles.
+    pub m_OverrideBlocker: bool,
+}
+impl InputActionMap {
+    /// `GetActionEffector(action, device)`: the four-argument lookup with the blockers honoured.
+    #[address(0x140_2F4_3B0)]
+    pub fn GetActionEffector(&mut self, action_id: i32, device_index: i32) -> *mut InputDeviceEffector;
+
+    /// The full `GetActionEffector(action, device, ignore_blockers)` lookup. Unless
+    /// `ignore_blockers` is set, it first returns the [`null_effector`] when the map is blocked (see
+    /// [`m_Disabled`](Self::m_Disabled)) or the action is in
+    /// [`m_DisabledActions`](Self::m_DisabledActions). With `device_index` of `-1` it walks the
+    /// action's effector list and returns the effector with the largest
+    /// [`m_Value`](InputDeviceEffector::m_Value), preferring a later
+    /// [`Released`](EffectorState::Released) one over an earlier one that is not, and returns the
+    /// [`null_effector`] for an action no device binds. With a device index it returns that device's
+    /// effector, allocating and linking a new one when the device has none.
+    #[address(0x140_2F3_3A0)]
+    pub fn GetActionEffectorIgnoringBlockers(&mut self, action: Action, device_index: i32, ignore_blockers: bool) -> *mut InputDeviceEffector;
+
+    /// `GetActionEffector(action)`: the lookup with device `-1` and the blockers honoured, which is
+    /// how every `CSteering` reader resolves an action.
+    #[address(0x140_2F4_3C0)]
+    pub fn GetActionEffectorForAction(&mut self, action: Action) -> *mut InputDeviceEffector;
+}
+
+/// The shared effector every lookup returns when it finds nothing. The effector setters check for
+/// it and write nothing.
+#[address(0x142_D4B_2D0)]
+pub extern null_effector: InputDeviceEffector;
+/// The UI action map (`CSteeringUI::m_ActionMapUI`), created by `CSteeringUI::LoadActionMap` with
+/// the GUI bindings. The UI screens read their navigation, confirm, cancel, tab, and page actions
+/// from it through the UI steering; null before the UI steering exists.
+#[address(0x142_F38_750)]
+pub extern ui_action_map: *mut InputActionMap;
+
 /// The local player's action map: a write-side wrapper that drives effectors by [`Action`]. Invalid
-/// action IDs resolve to a shared null-effector sentinel, which the setters guard against.
+/// action IDs resolve to the [`null_effector`], which the setters guard against. The singleton is
+/// `CSteeringPlayer::m_ActionMapPlayer`: the pointer is the player steering's [`InputActionMap`]
+/// itself, so the two types describe one object.
 #[singleton(0x142_F38_740)]
 pub type LocalPlayerActionMap;
 impl LocalPlayerActionMap {
@@ -338,7 +421,9 @@ impl LocalPlayerActionMap {
     #[address(0x140_2F4_3C0)]
     pub fn GetActionEffector(&mut self, action: Action) -> *mut InputDeviceEffector;
 
-    /// Drives an analog or held action: sets the effector's value and presses it.
+    /// Drives an analog or held action through [`InputDeviceEffector::Press`] on the effector
+    /// [`GetActionEffector`](Self::GetActionEffector) resolves, which zeroes the effector's hold
+    /// time.
     #[address(0x140_C12_4B0)]
     pub fn ForceSetPressed(&mut self, action: Action, value: f32);
 
@@ -351,3 +436,13 @@ impl LocalPlayerActionMap {
 /// by the `CSteeringUtil` action/string map constructors.
 #[address(0x142_D99_370)]
 pub extern action_name_table: [*const u8; 255];
+
+#[cfg(backend = "rust")]
+epilogue for LocalPlayerActionMap r#"
+impl LocalPlayerActionMap {
+    /// The map as the `InputActionMap` it is: the singleton points at the action map itself.
+    pub fn as_input_action_map(&mut self) -> &mut InputActionMap {
+        unsafe { &mut *(self as *mut Self as *mut InputActionMap) }
+    }
+}
+"#;

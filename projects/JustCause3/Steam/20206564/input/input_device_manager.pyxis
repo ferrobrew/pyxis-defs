@@ -24,9 +24,11 @@ pub type InputDeviceManager {
     pub m_Enabled: bool,
 }
 impl InputDeviceManager {
-    /// The per-frame device poll: reads all devices, refreshes their effector states, and then runs
-    /// [`UpdateForceClicks`](Self::UpdateForceClicks). The poll overwrites effector values written
-    /// before it runs.
+    /// The per-frame device poll: reads all devices and refreshes their effector states (see
+    /// [`InputDeviceEffector`](input::input_action_map::InputDeviceEffector)). `CGameState::PreUpdate`
+    /// calls it, then [`UpdateForceClicks`](Self::UpdateForceClicks), before the frame's world
+    /// update. The poll overwrites effector values written before it runs, and skips the devices when
+    /// the clock's real time is unchanged since the previous poll.
     #[address(0x140_2F2_0C0)]
     pub fn Update(&mut self, dt: f32);
 
