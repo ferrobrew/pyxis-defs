@@ -1,0 +1,97 @@
+use types::math::Matrix4;
+use types::math::Vector3;
+
+/// The world placement handed to a playing attached effect (`SEffectTransformInfo`): a transform,
+/// the velocity of the attachment, and what the transform is used for. Resolved per instance each
+/// update by the instance's transform function and copied whole into
+/// [`AttachedInstance::m_TransformInfo`].
+#[size(0x60), align(16)]
+pub type EffectTransformInfo {
+    /// The world transform (in a union with a custom speaker mix for audio spatialization).
+    pub m_Transform: Matrix4,
+
+    /// The attachment's velocity.
+    #[address(0x40)]
+    pub m_Velocity: Vector3,
+
+    /// What the transform drives (`SEffectTransformInfo::ETransformType`): 0 is a 3D transform;
+    /// the others are audio, reverb, and echo spatialization, and 4 is invalid.
+    #[address(0x50)]
+    pub m_Type: i32,
+}
+
+/// One playing attached effect or sound (`NAttachedEffectContainer::SAttachedInstance`): an offset
+/// and a transform function that resolves where it is attached (typically a bone or socket on the
+/// owner's model, such as a weapon muzzle), the effect and sound instances, and the resolved
+/// placement. The container links its playing instances through
+/// [`m_NextPlaying`](Self::m_NextPlaying).
+#[min_size(0x170), align(16)]
+pub type AttachedInstance {
+    /// The instance's offset from its attachment point.
+    pub m_Offset: Matrix4,
+
+    /// Resolves the attachment's world placement: called with the result buffer, the owning
+    /// container, this instance, and [`m_TransformExtraData`](Self::m_TransformExtraData).
+    #[address(0x40)]
+    pub m_TransformFunc: *mut void,
+
+    /// How the instance's rotation follows the attachment (`CAttachedEffectContainer::ERotationMode`).
+    #[address(0x4C)]
+    pub m_RotationMode: i32,
+
+    /// How the instance's translation follows the attachment
+    /// (`CAttachedEffectContainer::ETranslationMode`).
+    #[address(0x50)]
+    pub m_TranslationMode: i32,
+
+    /// The next playing instance in the owning container's list, or null.
+    #[address(0x98)]
+    pub m_NextPlaying: *mut AttachedInstance,
+
+    /// The resolved placement, refreshed by [`UpdateTransform`](Self::UpdateTransform).
+    #[address(0xF0)]
+    pub m_TransformInfo: EffectTransformInfo,
+
+    /// The per-update velocity of the placement's translation: the position delta scaled by 30
+    /// (the fixed simulation rate), or zero for a non-3D transform.
+    #[address(0x150)]
+    pub m_MeasuredVelocity: Vector3,
+
+    /// The opaque argument passed to [`m_TransformFunc`](Self::m_TransformFunc).
+    #[address(0x160)]
+    pub m_TransformExtraData: u64,
+}
+impl AttachedInstance {
+    /// Re-resolves the instance's placement for `container`. When the rotation mode is 0 or 2 or
+    /// the translation mode is 0, it calls [`m_TransformFunc`](Self::m_TransformFunc) and copies
+    /// the 0x60-byte [`EffectTransformInfo`] it returns into
+    /// [`m_TransformInfo`](Self::m_TransformInfo); it then applies the transform modes and derives
+    /// [`m_MeasuredVelocity`](Self::m_MeasuredVelocity) from the translation delta.
+    #[address(0x140_453_D00)]
+    pub fn UpdateTransform(&mut self, container: *mut AttachedEffectContainer);
+}
+
+/// A game object's set of attached effects and sounds (`CAttachedEffectContainer`, a base of weapons,
+/// the grappling hook, and other game objects), with the effect parameter sources that feed them.
+#[min_size(0x90)]
+pub type AttachedEffectContainer {
+    /// The head of the parameter-source list.
+    #[address(0x28)]
+    pub m_ParameterSources: *mut void,
+
+    /// The head of the playing-instance list.
+    #[address(0x30)]
+    pub m_PlayingInstances: *mut AttachedInstance,
+
+    /// The container's accumulated time, advanced by [`UpdateAttachedEffects`](Self::UpdateAttachedEffects).
+    #[address(0x88)]
+    pub m_CurrentTime: f32,
+}
+impl AttachedEffectContainer {
+    /// Advances the container by `dt`: for each playing instance, runs
+    /// [`AttachedInstance::UpdateTransform`] and the instance update, and frees instances whose
+    /// effects and sounds have all finished; then re-evaluates the parameter sources and pushes
+    /// changed values to their sound and effect outputs.
+    #[address(0x140_466_F30)]
+    pub fn UpdateAttachedEffects(&mut self, dt: f32);
+}

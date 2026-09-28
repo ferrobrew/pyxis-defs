@@ -82,6 +82,55 @@ impl RenderTargetData {
 /// viewport, and [`ComputeSafeArea`](Self::ComputeSafeArea) derives the UI safe area.
 #[singleton(0x142_E5B_620), size(0x14A8)]
 pub type UIManager {
+    /// The `IUIManager` interface vtable (`CUIManager`'s primary vtable, at `0x1424E2778`). Each
+    /// slot's `CUIManager` implementation is also bound by address below, under the slot's name
+    /// with an `Impl` suffix.
+    vftable {
+        /// Returns the UI render context.
+        #[index(0)]
+        pub fn GetUIContext(&mut self) -> *mut void;
+
+        /// Slot 1 (`+0x8`); see [`StartRenderImpl`](Self::StartRenderImpl).
+        #[index(1)]
+        pub fn StartRender(&mut self, context: *const HContext_t);
+
+        /// Slot 2 (`+0x10`); see [`SyncRenderImpl`](Self::SyncRenderImpl).
+        #[index(2)]
+        pub fn SyncRender(&mut self);
+
+        /// Slot 3 (`+0x18`); see [`SubmitImpl`](Self::SubmitImpl).
+        #[index(3)]
+        pub fn Submit(&mut self);
+
+        /// Slot 4 (`+0x20`); see [`RenderImpl`](Self::RenderImpl).
+        #[index(4)]
+        pub fn Render(&mut self, context: *mut HContext_t);
+
+        /// Slot 5 (`+0x28`); see [`RenderOffScreenTexturesImpl`](Self::RenderOffScreenTexturesImpl).
+        #[index(5)]
+        pub fn RenderOffScreenTextures(&mut self, ctx: *mut *mut HContext_t);
+
+        /// Slot 6 (`+0x30`); see [`RenderStaticBackGroundImpl`](Self::RenderStaticBackGroundImpl).
+        #[index(6)]
+        pub fn RenderStaticBackGround(&mut self);
+
+        /// Releases device-dependent UI resources before a device reset.
+        #[index(7)]
+        pub fn PrepareForReset(&mut self);
+
+        /// Slot 8 (`+0x40`); see [`RestoreAfterResetImpl`](Self::RestoreAfterResetImpl).
+        #[index(8)]
+        pub fn RestoreAfterReset(&mut self);
+
+        /// Shows the UI.
+        #[index(9)]
+        pub fn Show(&mut self);
+
+        /// Hides the UI.
+        #[index(10)]
+        pub fn Hide(&mut self);
+    },
+
     /// The horizontal mouse letterbox offset from the engine's `MovieScaleInfo`
     /// (`m_MouseDeltaX`), in movie-viewport pixels.
     /// [`GetMovieSpaceMouseCursor`](Self::GetMovieSpaceMouseCursor) maps a movie-viewport
@@ -137,6 +186,11 @@ pub type UIManager {
     /// [`m_MouseX`](Self::m_MouseX).
     #[address(0xB8)]
     pub m_MouseY: i32,
+
+    /// The grab-screen timer (seconds); `CHUDUI::OnOmniDamage` sets it to
+    /// [`OMNI_DAMAGE_GRAB_SCREEN_TIME`](ui::hud_ui::HUDUI::OMNI_DAMAGE_GRAB_SCREEN_TIME).
+    #[address(0xD4)]
+    pub m_GrabScreenTimer: f32,
 
     /// Whether the render system is initialized. One of the three gates `Render` checks before
     /// drawing.
@@ -243,9 +297,9 @@ impl UIManager {
     /// queue, binds the display render target, and draws the movie's latest captured display tree
     /// (`GetDisplayHandle` -> `RTHandle::NextCapture` -> `HAL::Draw`) within a
     /// `BeginFrame`/`BeginScene` pair. Runs on a CPU-fragment worker (kicked by `StartRender`,
-    /// joined by `SyncRender`). `IUIManager` vtable slot 4.
+    /// joined by `SyncRender`).
     #[address(0x141_007_B70)]
-    pub fn Render(&mut self, context: *mut HContext_t);
+    pub fn RenderImpl(&mut self, context: *mut HContext_t);
 
     #[address(0x140_F69_6E0)]
     pub fn InitPlatformRT(&mut self, a2: i32);
@@ -254,7 +308,7 @@ impl UIManager {
     /// recomputes the movie size, sets the movie viewport, and recomputes the safe area. Gated by an
     /// internal reset counter, so a direct call may no-op if the counter is not at 1.
     #[address(0x140_FA9_C70)]
-    pub fn RestoreAfterReset(&mut self);
+    pub fn RestoreAfterResetImpl(&mut self);
 
     /// Recomputes the movie render rectangle ([`m_MovieScaleWidth`](Self::m_MovieScaleWidth) /
     /// [`m_MovieScaleHeight`](Self::m_MovieScaleHeight)). It first refreshes the cached stage and
@@ -305,23 +359,23 @@ impl UIManager {
 
     /// Begins the UI render job, posting to the async render thread.
     #[address(0x140_F1B_030)]
-    pub fn StartRender(&mut self, context: *const HContext_t);
+    pub fn StartRenderImpl(&mut self, context: *const HContext_t);
 
     /// A barrier that spin-waits until the async UI render job has finished.
     #[address(0x140_F1B_0C0)]
-    pub fn SyncRender(&mut self);
+    pub fn SyncRenderImpl(&mut self);
 
     /// The final commit: submits the render HAL's output under a graphics scoped lock.
     #[address(0x140_F1B_0D0)]
-    pub fn Submit(&mut self);
+    pub fn SubmitImpl(&mut self);
 
     /// Draws the pause / menu static background.
     #[address(0x140_F46_C20)]
-    pub fn RenderStaticBackGround(&mut self);
+    pub fn RenderStaticBackGroundImpl(&mut self);
 
     /// Renders Scaleform UI to offscreen textures for in-world screens. This is not the HUD.
     #[address(0x141_007_6C0)]
-    pub fn RenderOffScreenTextures(&mut self, ctx: *mut *mut HContext_t);
+    pub fn RenderOffScreenTexturesImpl(&mut self, ctx: *mut *mut HContext_t);
 
     /// Whether a static background is being shown.
     #[address(0x140_F1B_4C0)]

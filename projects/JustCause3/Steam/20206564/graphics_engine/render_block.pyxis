@@ -1,5 +1,5 @@
 use graphics_engine::graphics_engine::{HContext_t, HTexture_t, HVertexDeclaration_t, RenderContext};
-use graphics_engine::render_engine::RenderBlockTypeBase;
+use graphics_engine::render_engine::{RenderBlockTypeBase, ResourceContext};
 use graphics_engine::texture::Texture;
 use types::math::{Matrix4, Vector3};
 
@@ -8,7 +8,8 @@ use types::math::{Matrix4, Vector3};
 /// translation in the final three floats, others three 4-float rows with the translation in each
 /// row's fourth element. The 3x3 rotation is orthonormal under the correct reading, which is how
 /// a consumer can detect the layout. The skinning palette is an array of these, one per skeleton
-/// bone, built per frame by `CPoseProducer::MakeSkinningPalette`.
+/// bone, built per frame by
+/// [`PoseProducer::MakeSkinningPalette`](animation::pose_producer::PoseProducer::MakeSkinningPalette).
 #[size(0x30), copyable]
 pub type Matrix3x4 {
     pub m: [f32; 12],
@@ -33,7 +34,7 @@ pub type SkinBatch {
 pub type RBIInfo;
 impl RBIInfo {
     /// Writes the instance world transform for the given transform slot into `out` (also returned).
-    /// The render blocks pass [`RenderContext::m_TransformIndex`](graphics_engine::graphics_engine::RenderContext::m_TransformIndex)
+    /// The render blocks pass [`RenderContext::m_RenderFrameIndex`](graphics_engine::graphics_engine::RenderContext::m_RenderFrameIndex)
     /// as the slot for the current dispatch.
     #[address(0x140_0B1_850)]
     pub fn GetMatrix(&self, out: *mut Matrix4, index: i32) -> *mut Matrix4;
@@ -52,6 +53,11 @@ pub type RenderBlockCharacter {
     pub m_SkinBatchesEnd: *mut SkinBatch,
 }
 impl RenderBlockCharacter {
+    /// The per-block setup (`IRenderBlock::Setup`). Binds the forward lighting resources through
+    /// [`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources).
+    #[address(0x140_12A_890)]
+    pub fn Setup(&self, render_context: *mut RenderContext, sort_id: u64, change: u64);
+
     /// Draws the block for the current pass. Shadow passes
     /// ([`RenderContext::m_RenderStatus`](graphics_engine::graphics_engine::RenderContext::m_RenderStatus) `& 6`)
     /// take a depth-only path with the depth vertex shaders; other passes run the full material
@@ -259,10 +265,66 @@ pub type RenderBlockTypeTerrain {
     pub m_BackPatchCullThreshold: f32,
 }
 
+/// The hull-clip variant a [`RenderBlockTerrain`] draws with
+/// (`NRenderBlockTerrain::ETerrainHullClipType`), returned by
+/// [`HullClipType`](RenderBlockTerrain::HullClipType). It indexes the type's hull-program table.
+#[copyable]
+pub enum TerrainHullClipType: i32 {
+    /// No clipping.
+    TERRAIN_HULL_CLIP_DISABLED = 0x0,
+    /// The LOD clip: the hull discards a patch whose footprint a finer-LOD tile has fully faded in
+    /// over, read from the global terrain visibility mask.
+    TERRAIN_HULL_CLIP_BETWEEN_LODS = 0x1,
+    /// The water clip: the hull discards patches below the cached water level.
+    TERRAIN_HULL_CLIP_UNDER_WATER = 0x2,
+    /// The detail clip.
+    TERRAIN_HULL_CLIP_DETAIL = 0x3,
+    TERRAIN_HULL_CLIP_TYPE_COUNT = 0x4,
+}
+
 /// A base VolumetricTerrain render block instance (`CRenderBlockTerrain`): one per terrain tile/sector.
 pub type RenderBlockTerrain;
 impl RenderBlockTerrain {
-    /// Returns the hull-clip type (`ETerrainHullClipType`: 0, 1, or 2) that selects the hull program
+    /// The per-block colour-pass setup (`IRenderBlock::Setup`): binds the tessellation programs,
+    /// including the hull program [`HullClipType`](Self::HullClipType) selects.
+    #[address(0x140_32B_6D0)]
+    pub fn Setup(&self, render_context: *mut RenderContext, sort_id: u64, change: u64);
+
+    /// The per-block depth-pass setup (`IRenderBlock::SetupZ`), selecting the hull program the same
+    /// way as [`Setup`](Self::Setup).
+    #[address(0x140_32B_4D0)]
+    pub fn SetupZ(&self, render_context: *mut RenderContext, sort_id: u64, change: u64);
+
+    /// Issues the tile's tessellated geometry. The depth prepass and the colour pass both draw through
+    /// this entry.
+    #[address(0x140_32B_B80)]
+    pub fn Draw(&self, render_context: *mut RenderContext, info: *const RBIInfo);
+
+    /// The depth-only draw entry (`IRenderBlock::DrawZ`); compiled to an empty function in the release
+    /// build.
+    #[address(0x140_32B_B70)]
+    pub fn DrawZ(&self, render_context: *mut RenderContext, info: *const RBIInfo);
+
+    /// Rebuilds the block's sort identifier from the camera translation. Called by the base terrain
+    /// patch system's per-patch update fragment (`TerrainPatchUpdate`).
+    #[address(0x141_0C9_090)]
+    pub fn UpdateSortID(&mut self, camera_translation: *const Vector3);
+
+    /// Advances the tile's LOD-blend alpha by `delta` when LOD blending is enabled, then updates the
+    /// global terrain mask ([`UpdateGlobalMask`](Self::UpdateGlobalMask)).
+    #[address(0x140_32B_ED0)]
+    pub fn UpdateAlpha(&mut self, delta: f32);
+
+    /// Sets the tile's LOD-blend alpha and fade direction, then updates the global terrain mask.
+    #[address(0x140_32B_F40)]
+    pub fn SetAlpha(&mut self, alpha: f32, dir: f32);
+
+    /// Writes the tile's value into the global terrain visibility mask that the LOD-clip hull
+    /// programs sample.
+    #[address(0x140_32B_DB0)]
+    pub fn UpdateGlobalMask(&self, val: u8);
+
+    /// Returns the hull-clip type ([`TerrainHullClipType`]: 0, 1, or 2) that selects the hull program
     /// `Setup`, `SetupZ`, and `Draw` bind (`m_HullProgram[clip + 4*scheme]`). Type 1 is the LOD clip:
     /// its hull samples the global terrain mask (the `VisibilityMask` texture bound from
     /// `SGlobalRBTerrainContext`) at the patch's four corners and zeroes the tessellation factors —
@@ -275,7 +337,7 @@ impl RenderBlockTerrain {
     /// `CWaterPatchManager::m_EnableWaterRenderPass` is clear, base-LOD tiles also resolve to type 1.
     /// The same selection runs in every pass (depth prepass and color alike).
     #[address(0x140_32B_450)]
-    pub fn HullClipType(&self, render_context: *mut RenderContext) -> i64;
+    pub fn HullClipType(&self, render_context: *mut RenderContext) -> TerrainHullClipType;
 }
 
 /// One volumetric-terrain patch instance (`NGraphicsEngine::CRenderBlockTerrainPatch`): the
@@ -325,7 +387,7 @@ impl RenderBlockTerrainPatch {
     /// [`m_ActiveRenderPass`](graphics_engine::graphics_engine::RenderContext::m_ActiveRenderPass):
     ///
     /// - Passes **56 and 57** (the near tessellating passes) draw GPU-indirect via
-    ///   `DrawIndexedInstancedIndirectNoMutex`: the per-patch instance count comes from the terrain
+    ///   [`DrawInstancedIndirect`](graphics_engine::draw::DrawInstancedIndirect): the per-patch instance count comes from the terrain
     ///   patch system's GPU compute output, so no instance count is known CPU-side. Each stages a
     ///   one-`float4` control constant on vertex slot 3 (`{ m_DetailPatchIndex, mode, 0, 0 }`, `mode` = 2
     ///   for 56, 3 for 57) and binds the shared global detail index/vertex texture buffers before the
@@ -467,18 +529,82 @@ impl RenderBlockBark {
     /// `m_OffsetViewProjection` verbatim for the instanced/billboard cases (the per-instance model
     /// matrix is then applied in-shader). The global `m_VPGlobals` is bound at `cb0` for wind/time
     /// globals only, not the view-projection. One of three draw kinds is selected from the instance-data
-    /// pointer in [`CRBIInfo`](RBIInfo): a non-instanced [`DrawIndexed`], a CPU-instanced
-    /// [`DrawIndexedInstanced`] (per-instance stream at slot 2), or a GPU-indirect `DrawIndexedNoMutex`
+    /// pointer in [`CRBIInfo`](RBIInfo): a non-instanced
+    /// [`DrawIndexedWithBoundState`](graphics_engine::draw::DrawIndexedWithBoundState), a CPU-instanced
+    /// [`DrawIndexedInstanced`] (per-instance stream at slot 2), or a GPU-indirect
+    /// [`DrawIndexedInstancedIndirect`](graphics_engine::draw::DrawIndexedInstancedIndirect)
     /// whose instance count lives in the type's `m_InstDrawParams` buffer. `m_RenderStatus` bits select
     /// bounce/GI, billboard, and geometry-program permutations.
+    ///
+    /// Besides the clip transform, `cb1` carries register 4 = the opacity/fade and UV parameters,
+    /// registers 5..8 = the raw instance model matrix
+    /// ([`RBIInfo::GetMatrix`] at
+    /// [`m_RenderFrameIndex`](graphics_engine::graphics_engine::RenderContext::m_RenderFrameIndex)), and
+    /// registers 9..12 = [`m_View`](graphics_engine::graphics_engine::RenderContext::m_View). The draw
+    /// kind is chosen from the instance data the `CRBIInfo` points at: with no instance data, a
+    /// non-instanced draw; otherwise its flags word (at instance-data `+0x18`) selects the
+    /// CPU-instanced draw when bit 3 (`0x8`) is set and the GPU-indirect draw when it is clear.
     #[address(0x140_136_F90)]
     pub fn Draw(&self, render_context: *mut RenderContext, info: *const RBIInfo);
 
     /// Issues the depth-prepass and depth-and-velocity geometry. Same cb1-baked transform as
-    /// [`Draw`](Self::Draw); the velocity pass additionally bakes the previous frame's
-    /// world-view-projection into `cb1` registers 5..8 from `m_PreviousOffsetViewProjection`.
+    /// [`Draw`](Self::Draw); the velocity pass (pass id 50) additionally bakes the previous frame's
+    /// world-view-projection into `cb1` registers 5..8: `m_PreviousOffsetViewProjection` for the
+    /// instanced kinds, or the instance's previous-frame matrix (at
+    /// [`m_PreviousRenderFrameIndex`](graphics_engine::graphics_engine::RenderContext::m_PreviousRenderFrameIndex))
+    /// through `CRenderBlock::CalculateOffsetWorldViewProjectionMatrixPrev` for the non-instanced
+    /// kind.
     #[address(0x140_136_A90)]
     pub fn DrawZ(&self, render_context: *mut RenderContext, info: *const RBIInfo);
+}
+
+/// The bark render block *type* (`NGraphicsEngine::CRenderBlockBark::CRenderBlockBarkType`).
+pub type RenderBlockBarkType;
+impl RenderBlockBarkType {
+    /// Creates the type's GPU resources (IRenderBlockType vtable slot 1).
+    #[address(0x140_152_DF0)]
+    pub fn Create(&mut self, resource_context: *const ResourceContext);
+
+    /// Binds the per-pass constant buffers (IRenderBlockType vtable slot 11): the global
+    /// `m_VPGlobals`/`m_FPGlobals` at `cb0`, with the fragment `cb2` sized for the bark material
+    /// constants on the colour pass.
+    #[address(0x140_102_B40)]
+    pub fn SetupConstantBuffers(&self, render_context: *mut RenderContext);
+}
+
+/// The foliage render block *type* (`NGraphicsEngine::CRenderBlockFoliage::CRenderBlockFoliageType`).
+/// The release IDB's symbol table labels its `Setup` as `CRenderBlockTypeWindow::Setup`; the vtable
+/// and body (the wind and interaction parameter upload) identify it.
+pub type RenderBlockFoliageType;
+impl RenderBlockFoliageType {
+    /// Binds the per-pass constant buffers (IRenderBlockType vtable slot 11): `m_VPGlobals` at vertex
+    /// `cb0`, a vertex `cb2`, and `m_FPGlobals` at fragment `cb0`.
+    #[address(0x140_10C_B00)]
+    pub fn SetupConstantBuffers(&self, render_context: *mut RenderContext);
+
+    /// The type-level per-pass setup (IRenderBlockType vtable slot 12): uploads the vertex wind and
+    /// interaction parameters, selects the depth/shadow, reflective-shadow, or colour program
+    /// permutations from `m_RenderStatus`, and for the forward-lit colour passes binds the forward
+    /// lighting resources ([`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources)).
+    #[address(0x140_12D_7A0)]
+    pub fn Setup(&self, render_context: *mut RenderContext);
+}
+
+/// The window render block *type* (`NGraphicsEngine::CRenderBlockWindow::CRenderBlockTypeWindow`). The
+/// release IDB's symbol table labels its `Setup` as `CRenderBlockFoliageType::Setup`; the vtable and
+/// body identify it.
+pub type RenderBlockTypeWindow;
+impl RenderBlockTypeWindow {
+    /// Binds the per-pass constant buffers (IRenderBlockType vtable slot 11).
+    #[address(0x140_172_AC0)]
+    pub fn SetupConstantBuffers(&self, render_context: *mut RenderContext);
+
+    /// The type-level per-pass setup (IRenderBlockType vtable slot 12): binds the reflection
+    /// textures, the forward lighting resources
+    /// ([`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources)),
+    /// and the alpha-blended, depth-tested, depth-write-off state.
+    #[address(0x140_184_7F0)]
+    pub fn Setup(&self, render_context: *mut RenderContext);
 }
 
 /// The grass/foliage render block (`NGraphicsEngine::CRenderBlockFoliage`, registered name
@@ -492,10 +618,10 @@ impl RenderBlockFoliage {
     /// the global `cb0[29..32]`), so the vertex shader composes `clip = world · OffsetVP` from `cb2`
     /// rather than reading `cb0`. `SetupConstantBuffers` binds `cb0 = m_VPGlobals` but only for globals.
     /// One of three draw kinds is selected from the instance-data flags: a CPU-instanced
-    /// `DrawIndexedInstancedNoMutex` (instance count a CPU `u16`), the dominant grass path
-    /// [`DrawIndexedInstancedIndirect`] (instance count in the type's GPU-only `m_InstDrawParams` args
+    /// [`DrawIndexedInstancedNoMutex`](graphics_engine::draw::DrawIndexedInstancedNoMutex) (instance count a CPU `u16`), the dominant grass path
+    /// [`DrawIndexedInstancedIndirectNoMutex`](graphics_engine::draw::DrawIndexedInstancedIndirectNoMutex) (instance count in the type's GPU-only `m_InstDrawParams` args
     /// buffer, populated by the vegetation draw-indirect compute pass), or a non-instanced
-    /// `DrawIndexedNoMutex`. The pass is forward-lit: the type's `Setup` binds the clustered-lighting
+    /// [`DrawIndexedNoMutex`](graphics_engine::draw::DrawIndexedNoMutex). The pass is forward-lit: the type's `Setup` binds the clustered-lighting
     /// constant buffer, the light-cluster index texture, GI, reflection, and sun-shadow-cascade
     /// resources to the fragment stage.
     #[address(0x140_12D_DA0)]
@@ -508,8 +634,11 @@ impl RenderBlockFoliage {
     /// — plus the fade/detail scalars at registers 8..10; on the velocity pass (pass id 50) it
     /// additionally stages the previous frame's offset view-projection at registers 11..14, which the
     /// vertex shader differences against the current one to produce the motion vector. Selects between a
-    /// CPU-instanced `DrawIndexedInstancedNoMutex` and a `DrawInstanced` fed by two vertex texture
-    /// buffers, on the same instance-data flags [`Draw`](Self::Draw) routes on.
+    /// CPU-instanced [`DrawIndexedInstancedNoMutex`](graphics_engine::draw::DrawIndexedInstancedNoMutex),
+    /// a GPU-indirect
+    /// [`DrawIndexedInstancedIndirectNoMutex`](graphics_engine::draw::DrawIndexedInstancedIndirectNoMutex)
+    /// fed by two vertex texture buffers, and a non-instanced
+    /// [`DrawIndexedNoMutex`](graphics_engine::draw::DrawIndexedNoMutex), on the same instance-data flags [`Draw`](Self::Draw) routes on.
     #[address(0x140_12D_9B0)]
     pub fn DrawZ(&self, render_context: *mut RenderContext, info: *const RBIInfo);
 }
@@ -531,6 +660,15 @@ impl TreeImpostorRB {
     pub fn Draw(&self, render_context: *mut RenderContext, info: *const RBIInfo);
 }
 
+/// The tree-impostor render block *type* (`CTreeImpostorRB::CTreeImpostorRBType`).
+pub type TreeImpostorRBType;
+impl TreeImpostorRBType {
+    /// Creates the type's GPU resources (IRenderBlockType vtable slot 1): builds the static quad
+    /// index buffer the impostor cards draw from and loads the program permutations.
+    #[address(0x140_34E_BD0)]
+    pub fn Create(&mut self, resource_context: *const ResourceContext);
+}
+
 /// The occluder render block (`NGraphicsEngine::CRenderBlockOccluder`, registered name `"Occluder"`): a
 /// unit-cube depth proxy scaled per scene occluder, injected once per frame into `RP_Z_OCCLUDERS`
 /// (pass 47) to prime the main camera depth buffer so later Z and G-buffer passes early-Z reject
@@ -541,7 +679,8 @@ pub type RenderBlockOccluder;
 impl RenderBlockOccluder {
     /// Issues the occluder-box depth geometry. The non-instanced path bakes
     /// `WVP = (world - camera_offset) · m_OffsetViewProjection` (via
-    /// `CRenderBlock::CalculateOffsetWorldViewProjectionMatrix`, `0x140136070`) into vertex `cb1`
+    /// [`CalculateOffsetWorldViewProjectionMatrix`](graphics_engine::render_pass::CalculateOffsetWorldViewProjectionMatrix))
+    /// into vertex `cb1`
     /// registers 0..3, register 4 a depth bias, then [`DrawIndexed`] per box. The instanced path
     /// (`gfx.occluders.use_instancing`) instead reads the global `m_VPGlobals` view-projection at `cb0`
     /// with per-instance world rows from a vertex stream and issues one [`DrawIndexedInstanced`].
@@ -663,6 +802,11 @@ pub type RenderBlockCharacterSkin {
     pub m_SkinBatchesEnd: *mut SkinBatch,
 }
 impl RenderBlockCharacterSkin {
+    /// The per-block setup (`IRenderBlock::Setup`). Binds the forward lighting resources through
+    /// [`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources).
+    #[address(0x140_12B_A70)]
+    pub fn Setup(&self, render_context: *mut RenderContext, sort_id: u64, change: u64);
+
     /// Draws the block for the current pass; see [`RenderBlockCharacter::Draw`].
     #[address(0x140_13B_580)]
     pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
@@ -830,10 +974,40 @@ pub type RenderBlockTerrainDetail {
     /// The patch origin's world Z (see `m_WorldPatchX`).
     #[address(0x34)]
     pub m_WorldPatchZ: f32,
+
+    /// The patch's index into the terrain setup type's detail draw list.
+    #[address(0x40)]
+    pub m_DetailPatchIndex: i32,
+
+    /// The patch's detail LOD (0 or 1), the minor index into the detail draw list.
+    #[address(0x44)]
+    pub m_DetailLod: i32,
+}
+
+/// The terrain detail render block *type* (`NGraphicsEngine::CTerrainRenderBlockDetail::CDetailRBType`).
+pub type DetailRBType;
+impl DetailRBType {
+    /// The type-level per-pass setup (IRenderBlockType vtable slot 12).
+    #[address(0x140_349_C40)]
+    pub fn Setup(&self, render_context: *mut RenderContext);
+}
+
+/// The terrain setup render block *type* (`CRenderBlockTerrainSetup::CRenderBlockTypeTerrainSetup`):
+/// owns the structured buffers the terrain compute passes fill (patch, triangle, quad, and detail
+/// draw lists) and the compute programs that fill them.
+#[singleton(0x142_EED_240), min_size(0x70)]
+pub type RenderBlockTypeTerrainSetup {
+    /// The detail draw list: the per-patch, per-detail-LOD 16-byte indirect draw-argument slots the
+    /// terrain compute passes write and [`RenderBlockTerrainDetail::Draw`] draws from.
+    #[address(0x68)]
+    pub m_DetailDrawList: *mut void,
 }
 impl RenderBlockTerrainDetail {
-    /// Issues the colour-pass draw: a single [`DrawIndexedInstancedIndirect`] over the compute-generated
-    /// detail geometry, using the `cb1` transform staged by `Setup`.
+    /// Issues the colour-pass draw: a single
+    /// [`DrawInstancedIndirect`](graphics_engine::draw::DrawInstancedIndirect) over the
+    /// compute-generated detail geometry, reading its arguments from the 16-byte slot
+    /// `m_DetailLod + 2 * m_DetailPatchIndex` of
+    /// [`RenderBlockTypeTerrainSetup::m_DetailDrawList`], using the `cb1` transform staged by `Setup`.
     #[address(0x140_326_050)]
     pub fn Draw(&mut self, ctx: *mut RenderContext, info: *const RBIInfo);
 }
@@ -1169,4 +1343,161 @@ impl RenderBlockSSDecal {
     /// here restages it.
     #[address(0x140_17F_D40)]
     pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
+}
+
+/// The `RenderBlockBavariumShield` render block *type* (`NGraphicsEngine::CRenderBlockBavariumShield::CRenderBlockTypeBavariumShield`).
+pub type RenderBlockTypeBavariumShield;
+impl RenderBlockTypeBavariumShield {
+    /// The type-level per-pass setup (IRenderBlockType vtable slot 12). Binds the forward lighting
+    /// resources through
+    /// [`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources).
+    #[address(0x140_103_750)]
+    pub fn Setup(&self, render_context: *mut RenderContext);
+}
+
+/// The `RenderBlockBuildingJC3` render block *type* (`NGraphicsEngine::CRenderBlockBuildingJC3::CRenderBlockTypeBuildingJC3`).
+pub type RenderBlockTypeBuildingJC3;
+impl RenderBlockTypeBuildingJC3 {
+    /// The type-level per-pass setup (IRenderBlockType vtable slot 12). Binds the forward lighting
+    /// resources through
+    /// [`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources).
+    #[address(0x140_104_4C0)]
+    pub fn Setup(&self, render_context: *mut RenderContext);
+}
+
+/// The `RenderBlockCarLight` render block *type* (`NGraphicsEngine::CRenderBlockCarLight::CRenderBlockTypeCarLight`).
+pub type RenderBlockTypeCarLight;
+impl RenderBlockTypeCarLight {
+    /// The type-level per-pass setup (IRenderBlockType vtable slot 12). Binds the forward lighting
+    /// resources through
+    /// [`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources).
+    #[address(0x140_105_B90)]
+    pub fn Setup(&self, render_context: *mut RenderContext);
+}
+
+/// The `RenderBlockCarPaintMM` render block *type* (`NGraphicsEngine::CRenderBlockCarPaintMM::CRenderBlockTypeCarPaintMM`).
+pub type RenderBlockTypeCarPaintMM;
+impl RenderBlockTypeCarPaintMM {
+    /// The type-level per-pass setup (IRenderBlockType vtable slot 12). Binds the forward lighting
+    /// resources through
+    /// [`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources).
+    #[address(0x140_106_DB0)]
+    pub fn Setup(&self, render_context: *mut RenderContext);
+}
+
+/// The `RenderBlockGeneral` render block *type* (`NGraphicsEngine::CRenderBlockGeneral::CRenderBlockTypeGeneral`).
+pub type RenderBlockTypeGeneral;
+impl RenderBlockTypeGeneral {
+    /// The type-level per-pass setup (IRenderBlockType vtable slot 12). Binds the forward lighting
+    /// resources through
+    /// [`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources).
+    #[address(0x140_10E_950)]
+    pub fn Setup(&self, render_context: *mut RenderContext);
+}
+
+/// The `RenderBlockGeneralJC3` render block *type* (`NGraphicsEngine::CRenderBlockGeneralJC3::CRenderBlockTypeGeneralJC3`).
+pub type RenderBlockTypeGeneralJC3;
+impl RenderBlockTypeGeneralJC3 {
+    /// The type-level per-pass setup (IRenderBlockType vtable slot 12). Binds the forward lighting
+    /// resources through
+    /// [`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources).
+    #[address(0x140_10F_8A0)]
+    pub fn Setup(&self, render_context: *mut RenderContext);
+}
+
+/// The `RenderBlockGeneralMaskedJC3` render block *type* (`NGraphicsEngine::CRenderBlockGeneralMaskedJC3::CRenderBlockTypeGeneralMaskedJC3`).
+pub type RenderBlockTypeGeneralMaskedJC3;
+impl RenderBlockTypeGeneralMaskedJC3 {
+    /// The type-level per-pass setup (IRenderBlockType vtable slot 12). Binds the forward lighting
+    /// resources through
+    /// [`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources).
+    #[address(0x140_110_160)]
+    pub fn Setup(&self, render_context: *mut RenderContext);
+}
+
+/// The `RenderBlockLayered` render block *type* (`NGraphicsEngine::CRenderBlockLayered::CRenderBlockTypeLayered`).
+pub type RenderBlockTypeLayered;
+impl RenderBlockTypeLayered {
+    /// The type-level per-pass setup (IRenderBlockType vtable slot 12). Binds the forward lighting
+    /// resources through
+    /// [`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources).
+    #[address(0x140_113_3C0)]
+    pub fn Setup(&self, render_context: *mut RenderContext);
+}
+
+/// The `RenderBlockGeneralMkIII` render block *type* (`NGraphicsEngine::CRenderBlockGeneralMkIII::CRenderBlockTypeGeneralMkIII`).
+pub type RenderBlockTypeGeneralMkIII;
+impl RenderBlockTypeGeneralMkIII {
+    /// The type-level per-pass setup (IRenderBlockType vtable slot 12). Binds the forward lighting
+    /// resources through
+    /// [`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources).
+    #[address(0x140_12F_E40)]
+    pub fn Setup(&self, render_context: *mut RenderContext);
+}
+
+/// The `RenderBlockMaterialTune` render block *type* (`NGraphicsEngine::CRenderBlockMaterialTune::CRenderBlockTypeMaterialTune`).
+pub type RenderBlockTypeMaterialTune;
+impl RenderBlockTypeMaterialTune {
+    /// The type-level per-pass setup (IRenderBlockType vtable slot 12). Binds the forward lighting
+    /// resources through
+    /// [`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources).
+    #[address(0x140_167_FB0)]
+    pub fn Setup(&self, render_context: *mut RenderContext);
+}
+
+/// The `RenderBlockMeshParticle` render block *type* (`NGraphicsEngine::CRenderBlockMeshParticle::CRenderBlockTypeMeshParticle`).
+pub type RenderBlockTypeMeshParticle;
+impl RenderBlockTypeMeshParticle {
+    /// The type-level per-pass setup (IRenderBlockType vtable slot 12). Binds the forward lighting
+    /// resources through
+    /// [`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources).
+    #[address(0x140_168_A60)]
+    pub fn Setup(&self, render_context: *mut RenderContext);
+}
+
+/// The `RenderBlockProp` render block *type* (`NGraphicsEngine::CRenderBlockProp::CRenderBlockTypeProp`).
+pub type RenderBlockTypeProp;
+impl RenderBlockTypeProp {
+    /// The type-level per-pass setup (IRenderBlockType vtable slot 12). Binds the forward lighting
+    /// resources through
+    /// [`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources).
+    #[address(0x140_16A_CC0)]
+    pub fn Setup(&self, render_context: *mut RenderContext);
+}
+
+/// The `RenderBlockSkidmarks` render block *type* (`NGraphicsEngine::CRenderBlockSkidmarks::CRenderBlockTypeSkidmarks`).
+pub type RenderBlockTypeSkidmarks;
+impl RenderBlockTypeSkidmarks {
+    /// The type-level per-pass setup (IRenderBlockType vtable slot 12). Binds the forward lighting
+    /// resources through
+    /// [`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources).
+    #[address(0x140_16E_4E0)]
+    pub fn Setup(&self, render_context: *mut RenderContext);
+}
+
+/// The `RenderBlockWeather` render block *type* (`NGraphicsEngine::CRenderBlockWeather::CRenderBlockTypeWeather`).
+pub type RenderBlockTypeWeather;
+impl RenderBlockTypeWeather {
+    /// The type-level per-pass setup (IRenderBlockType vtable slot 12). Binds the forward lighting
+    /// resources through
+    /// [`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources).
+    #[address(0x140_39F_BA0)]
+    pub fn Setup(&self, render_context: *mut RenderContext);
+}
+
+impl RenderBlockTypeParticle {
+    /// The type-level per-pass setup (IRenderBlockType vtable slot 12). Binds the forward lighting
+    /// resources through
+    /// [`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources).
+    #[address(0x140_47E_D00)]
+    pub fn Setup(&self, render_context: *mut RenderContext);
+}
+
+/// The road-junction render block (`NGraphicsEngine::CRenderBlockRoadJunction`).
+pub type RenderBlockRoadJunction;
+impl RenderBlockRoadJunction {
+    /// The per-block setup (`IRenderBlock::Setup`). Binds the forward lighting resources through
+    /// [`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources).
+    #[address(0x140_16C_420)]
+    pub fn Setup(&self, render_context: *mut RenderContext, sort_id: u64, change: u64);
 }

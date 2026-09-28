@@ -1,0 +1,19 @@
+use types::math::Vector3;
+
+/// A behavior-tree action callback (`AIMechFireGravityGun`), dispatched from
+/// `BtCallbackHandler`: fires the gravity gun (the magnet weapon component) of the mech the AI
+/// entity drives. It picks nearby physics objects and bodies to attract (restricting the magnet
+/// component to them) using perception, faction relations, and the mech's turret yaw. `tree` is the
+/// `STreeInstance`, `registry` the `SAiEntityRegistry`, and `target` the target position; the
+/// return value is the behavior-tree node result.
+#[address(0x140_623_1E0)]
+pub fn AIMechFireGravityGun(p0: u32, p1: *mut void, tree: *mut void, registry: *mut void, target: *const Vector3, p5: f32, p6: f32) -> u32;
+
+/// `_AiGetClosestEntityInRange`: finds the AI entity of `entity_type` (1-based category) closest
+/// to `point` within `range`, accepted by `faction` (and, with `alive_only`, alive), skipping
+/// `ignore_entity` and the entity owned by `owner_go`. Writes the found entity handle to
+/// `found_entity` (0 when none) and returns whether one was found. The release IDB labels this
+/// address `CAIPerception::GetCharacterWithMentalState`; its body and signature match the symbol
+/// dump's `_AiGetClosestEntityInRange` instead.
+#[address(0x140_5F9_7F0)]
+pub fn AiGetClosestEntityInRange(point: *const Vector3, entity_type: u32, faction: i32, alive_only: u32, range: f32, ignore_entity: u32, found_entity: *mut u32, registry: *mut void, owner_go: *mut void) -> bool;

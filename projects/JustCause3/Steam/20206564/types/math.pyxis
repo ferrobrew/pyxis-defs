@@ -86,6 +86,12 @@ impl Matrix4 {
     /// the far plane.
     #[address(0x140_039_0E0)]
     pub fn PerspectiveFovInverse(&mut self, fov: f32, aspect: f32, far: f32, near: f32) -> *mut Matrix4;
+
+    /// Builds a look-at orientation into `self` (also returned): the direction is
+    /// `normalize(eye_pos - at_pos)`, and the basis is completed from `up_dir` by the private
+    /// `CMatrix4f::Orientate`, with `eye_pos` as the translation.
+    #[address(0x140_02E_3F0)]
+    pub fn CreateOrientation(&mut self, eye_pos: *const Vector3, at_pos: *const Vector3, up_dir: *const Vector3) -> *mut Matrix4;
 }
 
 #[cfg(backend = "rust")]
@@ -246,6 +252,16 @@ epilogue for Vector2 r#"
 #[copyable, defaultable, align(4)]
 pub type Vector3 {
     pub data: [f32; 3],
+}
+
+/// The engine's world up axis, `(0, 1, 0)` (`CVector3f::UP`). `CRenderEngine::SetGlobalShaderConstants`
+/// clamps the staged sun direction's elevation against it.
+#[address(0x142_D39_890)]
+pub extern vector3_up: Vector3;
+impl Vector3 {
+    /// Linearly interpolates `self` toward `other` in place: `self += (other - self) * weight`.
+    #[address(0x140_031_ED0)]
+    pub fn Lerp(&mut self, weight: f32, other: *const Vector3);
 }
 
 #[cfg(backend = "rust")]

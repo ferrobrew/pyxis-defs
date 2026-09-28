@@ -1,7 +1,9 @@
 use animation::ik::HumanIK;
 use animation::rule_system::AnimationRuleSystem;
 use blackboard::ObjectBlackboard;
-use character::inventory::Inventory;
+use character::avatar::{Avatar, MentalState};
+use character::control_parameters::ControlParameters;
+use character::inventory::{Inventory, WeaponSlot};
 use character::swim_action_params::SwimActionParams;
 use equipment::grappling_hook::GrapplingHook;
 use physics::PfxCharacterInstance;
@@ -11,29 +13,56 @@ use types::shared_ptr::SharedPtr;
 use types::std_vector::Vector;
 use types::vector_math::AlignedVector3;
 use types::vector_math::AlignedQuat;
+use vehicle::vehicle::Vehicle;
 
-/// The character's aiming state, written each frame by
-/// [`HandleAimingInputPlayer`](Character::HandleAimingInputPlayer) for the player. The locomotion
-/// state machine reads it to choose aim-relative (strafe) movement over run/steer:
-/// `m_AimingWeapon` (or `m_AimingGrapple`) is the switch that makes the body face the aim direction
-/// and turns the directional keys into strafes. `m_WasAiming` reflects the state as of the start of
-/// this frame. Bits `0x01`/`0x02` and `0x40`/`0x80` are unmapped.
+/// The character's packed aiming and presentation bit-flags (one byte of `CCharacter` bitfields).
+/// [`HandleAimingInputPlayer`](Character::HandleAimingInputPlayer) writes the aim bits each frame for
+/// the player; the locomotion state machine reads them to choose aim-relative (strafe) movement over
+/// run/steer: `m_AimingWeapon` (or `m_AimingGrapple`) is the switch that makes the body face the aim
+/// direction and turns the directional keys into strafes. `m_WasAiming` reflects the state as of the
+/// start of this frame. The other bits are unrelated flags that share the byte.
 #[copyable]
 pub bitflags AimState: u8 {
+    /// `m_WasVisible`: the previous frame's visibility, cleared and re-latched by
+    /// `CCharacter::UpdateModelVisibility`.
+    m_WasVisible = 0b0000_0001,
+    /// `m_UseFinalTransparency`: whether the character's models render with the final-transparency
+    /// setting. Written by `CCharacter::SetUseFinalTransparency`.
+    m_UseFinalTransparency = 0b0000_0010,
     m_AimingEnabled = 0b0000_0100,
+    /// `m_WeaponAimActive`.
     m_AimingWeapon = 0b0000_1000,
+    /// `m_GrappleAimActive`.
     m_AimingGrapple = 0b0001_0000,
     m_WasAiming = 0b0010_0000,
+    /// `m_GodModeSequence`: the sequence-scoped god mode. `CCharacter::SetupForSequence` sets it
+    /// for the player when [`GOD_MODE`](DamageStateFlags::GOD_MODE) is off, and
+    /// [`SetGodMode`](Character::SetGodMode) clears it.
+    m_GodModeSequence = 0b0100_0000,
+    /// `m_InCargoBay`: the character is riding in a vehicle's cargo bay. Read by
+    /// [`IsInCargoBay`](Character::IsInCargoBay).
+    m_InCargoBay = 0b1000_0000,
 }
 
-/// Per-character damage-handling bit-flags. Only the god-mode bit is mapped; the others cover the
-/// related invulnerability variants (`m_JesusMode` and the sequence-scoped god mode among them).
+/// A byte of `CCharacter` bitfields holding the visibility, invulnerability, and weapons-enabled
+/// flags. Not every bit is mapped: `0x08` (`Enabled`), `0x10` (`m_GhostMode`), and `0x20`
+/// (`m_PermanentGhostMode`) are the symbol dump's names for the remaining bits and are unverified in
+/// this build.
 #[copyable]
 pub bitflags DamageStateFlags: u8 {
+    /// `Visible`: whether the character's models are shown. Read by `CCharacter::IsVisible`.
+    VISIBLE = 0b0000_0001,
     /// God mode: the character takes no damage. Written by [`SetGodMode`](Character::SetGodMode);
     /// the player object re-applies its own god-mode flag through that setter whenever the two
     /// disagree.
     GOD_MODE = 0b0000_0010,
+    /// `m_JesusMode`: the damage-immune variant written by `CCharacter::SetJesusMode`, which, when
+    /// enabling it on a living character, also restores health and forces the neutral state.
+    JESUS_MODE = 0b0000_0100,
+    /// `m_WeaponsEnabled`: whether the character may use its weapons. Written by
+    /// [`SetWeaponsEnabled`](Character::SetWeaponsEnabled); `HandleAimingInputNPC` only lets an
+    /// aim-capable weapon refresh the aim timer while it is set.
+    WEAPONS_ENABLED = 0b0100_0000,
 }
 
 /// Per-character LOD/update-gating flags. Checked before the SIM-phase animation and IK work:
@@ -44,12 +73,53 @@ pub bitflags CharacterLodFlags: u8 {
     REDUCED_LOD = 0b0000_0010,
 }
 
+/// A byte of `CCharacter` bitfields that enable traversal abilities, each written by its own
+/// setter. `CGameWorld::TeleportPlayerInstant` sets
+/// [`m_IsStuntAutoExitEnabled`](Self::m_IsStuntAutoExitEnabled) on the player character as part of
+/// the teleport.
+#[copyable]
+pub bitflags AbilityFlags: u8 {
+    /// Whether the character may deploy the parachute. Written by
+    /// [`SetParachuteEnabled`](Character::SetParachuteEnabled).
+    m_IsParachuteEnabled = 0b0000_0001,
+    /// Whether the character may use the wingsuit. Written by
+    /// [`SetWingsuitEnabled`](Character::SetWingsuitEnabled).
+    m_IsWingsuitEnabled = 0b0000_0010,
+    /// Whether the character automatically leaves stunt positions. Written by
+    /// [`SetStuntAutoExitEnabled`](Character::SetStuntAutoExitEnabled).
+    m_IsStuntAutoExitEnabled = 0b0000_0100,
+}
+
 #[size(0x3540)]
 pub type Character {
     /// `m_CurrentMotionState` while swimming, written by both swim movement cores every frame.
     pub const MOTION_STATE_SWIMMING: u32 = 0x18,
     /// `m_CurrentMotionState` while ragdolling.
     pub const MOTION_STATE_RAGDOLL: u32 = 0x14,
+    /// The offset of the character's `CGameObject` base subobject. RTTI tests (`IsType`) and the
+    /// `CGameObject` virtuals go through the vtable at this offset rather than the one at offset 0,
+    /// and state tasks recover the character from that subobject by subtracting this offset.
+    pub const GAME_OBJECT_BASE_OFFSET: u64 = 0x8,
+    /// The slot, in the vtable of the [`GAME_OBJECT_BASE_OFFSET`](Self::GAME_OBJECT_BASE_OFFSET)
+    /// subobject, of `CGameObject::InitTransform(const CMatrix4f*)`: it re-bases the object's world
+    /// transform directly. `CGameWorld::TeleportPlayerInstant` moves the player character through it.
+    pub const GAME_OBJECT_INIT_TRANSFORM_SLOT: u64 = 18,
+
+    vftable {
+        /// Attaches the character to a parent (`CCharacter::AttachTo`): `target` is the parent's
+        /// attach frame, `object` the parent object, `attach_type` a `CCharacter::AttachType`, and
+        /// `offset` the character's transform relative to the parent frame. While attached, the
+        /// character's world transform follows the parent instead of the physics proxy.
+        /// [`SetYAlignedAttachTo`](Self::SetYAlignedAttachTo) is the yaw-aligned wrapper.
+        #[index(40)]
+        pub fn AttachTo(&mut self, target: *const Matrix4, object: *mut void, attach_type: u32, offset: *const Matrix4, flags: u32);
+    },
+
+    /// The character's aiming-settings resource (`TResourceCachePtr<SCharacterAimingSettings>`, a
+    /// resource handle resolved through the resource cache). `HandleAimingInputNPC` reads the
+    /// aim-timer refill value from the resolved settings at offset `0x10`.
+    #[address(0x938)]
+    pub m_AimingSettings: *mut u8,
 
     /// The character's embedded equipment inventory.
     #[address(0x980)]
@@ -102,13 +172,51 @@ pub type Character {
     #[address(0x2_62A)]
     pub m_IsLocalCharacter: bool,
 
+    /// The world-space point the character's weapons aim at, written each frame by
+    /// [`UpdateWeaponAiming`](Self::UpdateWeaponAiming) (for the player, from the aim control's
+    /// weapon aim point). The weapons read it as their fire target.
+    #[address(0x2_6BC)]
+    pub m_AimTargetPositionWeapons: Vector3,
+    /// The world-space point thrown grenades aim at, written by
+    /// [`UpdateGrenadeAiming`](Self::UpdateGrenadeAiming).
+    pub m_AimTargetPositionGrenade: Vector3,
+    /// The per-frame weapon input values (fire, precision aim, plant, and the rest), cleared by
+    /// [`UpdateWeapons_Parallel`](Self::UpdateWeapons_Parallel) after the inventory consumes them.
+    pub m_WeaponInputs: [f32; 16],
+    /// Set by [`UpdateWeaponAiming`](Self::UpdateWeaponAiming) and cleared by
+    /// [`UpdateWeapons_Parallel`](Self::UpdateWeapons_Parallel): whether the weapon aim target was
+    /// supplied this frame.
+    pub m_AimTargetPositionWeaponWasSetThisFrame: bool,
+
+    /// The character's animation control parameters, which own the character state-bitflag words
+    /// ([`ControlParameters::m_UserVM`]). Almost every one-bit "what is the character doing"
+    /// predicate on this type reads through this pointer.
+    #[address(0x2_718)]
+    pub m_ControlParameters: *mut ControlParameters,
+
     /// Per-character LOD/update-gating flags; see [`CharacterLodFlags`].
     #[address(0x2_78C)]
     pub m_LodFlags: CharacterLodFlags,
 
+    /// The inventory slot of the weapon the character has selected.
+    #[address(0x2_7A8)]
+    pub m_SelectedWeaponSlot: WeaponSlot,
+
     #[address(0x2_7F0)]
     pub m_WorldMatrixT0: Matrix4,
     pub m_WorldMatrixT1: Matrix4,
+
+    /// The orientation the character is turning toward (`CQuaternion`, `x, y, z, w`).
+    /// [`SetOrientation`](Self::SetOrientation) writes the rotation into
+    /// [`m_WorldMatrixT1`](Self::m_WorldMatrixT1) and stores the same quaternion here.
+    #[address(0x2_934)]
+    pub m_RotationGoal: [f32; 4],
+
+    /// The character's avatar (`CAvatar`), the controller that drives it. For the player it is the
+    /// [`Avatar`] base of the `CPlayer`. Holds the mental state written by
+    /// [`SetMentalState`](Self::SetMentalState).
+    #[address(0x2_9B0)]
+    pub m_Avatar: *mut Avatar,
 
     /// Whether this character is a player character (local or remote). Gates the player-only
     /// side effects of setters such as [`SetUnlimitedAmmo`](Self::SetUnlimitedAmmo).
@@ -122,6 +230,10 @@ pub type Character {
     /// released.
     #[address(0x2_A00)]
     pub m_AimTimer: f32,
+
+    /// The traversal-ability enable bits; see [`AbilityFlags`].
+    #[address(0x2_B08)]
+    pub m_AbilityFlags: AbilityFlags,
 
     /// The idle-variation countdown, in seconds, driven by
     /// [`NStateTask_InputLocoIdleTask::Update`](input::locomotion::NStateTask_InputLocoIdleTask::Update):
@@ -212,7 +324,247 @@ impl Character {
     /// transitions; unmatched acts are dropped at the end of the frame.
     #[address(0x140_75D_F10)]
     pub fn QueueAct(&mut self, act: *const u32);
+
+    /// Whether the character is flying the wingsuit:
+    /// [`SB_IS_WINGSUIT`](state::StateBitFlag::SB_IS_WINGSUIT), and only
+    /// once [`AnimatedModel::m_InstanceData`] exists (false before the animation instance is created).
+    #[address(0x140_75F_630)]
+    pub fn IsUsingWingsuit(&self) -> bool;
+
+    /// Whether the parachute is deployed:
+    /// [`SB_IS_PARACHUTING`](state::StateBitFlag::SB_IS_PARACHUTING).
+    #[address(0x140_75F_550)]
+    pub fn IsUsingParachute(&self) -> bool;
+
+    /// Whether the character is in free fall:
+    /// [`SB_IS_FREE_FALLING`](state::StateBitFlag::SB_IS_FREE_FALLING).
+    #[address(0x140_75F_570)]
+    pub fn IsFreefalling(&self) -> bool;
+
+    /// Whether the character is in a fast (dive) fall:
+    /// [`SB_IS_FASTFALLING`](state::StateBitFlag::SB_IS_FASTFALLING).
+    #[address(0x140_75F_910)]
+    pub fn IsFastfalling(&self) -> bool;
+
+    /// Whether a grapple reel-in traversal is in progress:
+    /// [`SB_IN_REELING_IN`](state::StateBitFlag::SB_IN_REELING_IN).
+    #[address(0x140_75F_530)]
+    pub fn IsReelingIn(&self) -> bool;
+
+    /// Whether the character is riding a motorcycle:
+    /// [`SB_IS_RIDING_MOTORBIKE`](state::StateBitFlag::SB_IS_RIDING_MOTORBIKE).
+    #[address(0x140_75F_380)]
+    pub fn IsRidingMC(&self) -> bool;
+
+    /// Whether the character is swimming (surface or underwater):
+    /// [`SB_IS_SWIMMING`](state::StateBitFlag::SB_IS_SWIMMING).
+    #[address(0x140_75F_450)]
+    pub fn IsSwimming(&self) -> bool;
+
+    /// Whether the character is swimming underwater:
+    /// [`SB_IS_UW_SWIMMING`](state::StateBitFlag::SB_IS_UW_SWIMMING).
+    #[address(0x140_75F_470)]
+    pub fn IsUnderwaterSwimming(&self) -> bool;
+
+    /// Whether the character hangs from a vehicle-attached parachute:
+    /// [`SB_IN_ATTACHED_TO_PARACHUTE`](state::StateBitFlag::SB_IN_ATTACHED_TO_PARACHUTE).
+    #[address(0x140_75F_7C0)]
+    pub fn IsInAttachedToParachute(&self) -> bool;
+
+    /// Whether the character is in the reel-in wind-up:
+    /// [`SB_IN_PRE_REEL`](state::StateBitFlag::SB_IN_PRE_REEL).
+    #[address(0x140_75F_770)]
+    pub fn IsPreReelingIn(&self) -> bool;
+
+    /// Whether the character is in the wind-up to a grapple hang:
+    /// [`SB_IN_PRE_HANG`](state::StateBitFlag::SB_IN_PRE_HANG).
+    #[address(0x140_75F_790)]
+    pub fn IsPreHang(&self) -> bool;
+
+    /// Whether the character is seated and riding a vehicle:
+    /// [`SB_IS_RIDING_MOTORBIKE`](state::StateBitFlag::SB_IS_RIDING_MOTORBIKE),
+    /// or the body rule system's current state is one of eight riding states (idle, driver,
+    /// passenger, and reverse variants). Reads game-thread animation state.
+    #[address(0x140_77E_A60)]
+    pub fn IsInRidingInVehicleState(&self) -> bool;
+
+    /// Whether the character is in a driver-seat driving state:
+    /// [`SB_IS_RIDING_MOTORBIKE`](state::StateBitFlag::SB_IS_RIDING_MOTORBIKE),
+    /// or the body rule system's current state is one of four driving states. Reads game-thread
+    /// animation state.
+    #[address(0x140_77E_AF0)]
+    pub fn IsInDrivingVehicleState(&self) -> bool;
+
+    /// Whether the character is reeled onto an attach point: the grappling hook's state is one of
+    /// the four reeled states (3 to 6), and either
+    /// [`SB_IN_GRAPPLE_ATTACHED`](state::StateBitFlag::SB_IN_GRAPPLE_ATTACHED)
+    /// or [`SB_IS_GRAPPLE_UPSIDEDOWN`](state::StateBitFlag::SB_IS_GRAPPLE_UPSIDEDOWN)
+    /// is set or the body rule system is in one of eight reeled-in stunt and hang states.
+    #[address(0x140_77E_D10)]
+    pub fn IsReeledIn(&self) -> bool;
+
+    /// Whether the character hangs from a reeled grapple: with a hook present, the body rule
+    /// system is in `S_GRAPPLE_HANG` or `S_IDLE_HANG_STUNT`, the hook's state is the reeled-hang
+    /// state (4), or
+    /// [`SB_IS_GRAPPLE_UPSIDEDOWN`](state::StateBitFlag::SB_IS_GRAPPLE_UPSIDEDOWN)
+    /// is set.
+    #[address(0x140_79E_290)]
+    pub fn IsGrappleHanging(&self) -> bool;
+
+    /// Whether the body rule system is in one of the four stunt-position traversal states
+    /// (`S_STUNT_FWD`, `S_STUNT_RIGHT`, `S_STUNT_LEFT`, `S_STUNT_BWD`).
+    #[address(0x140_77E_F60)]
+    pub fn IsStuntTraversing(&self) -> bool;
+
+    /// Whether the character mans a mounted gun: the weapon in the
+    /// [`E_SLOT_HEAVY`](WeaponSlot::E_SLOT_HEAVY) slot is in its mounted weapon state.
+    #[address(0x140_7B0_F60)]
+    pub fn IsInMountedGunState(&self) -> bool;
+
+    /// Fills `out` with the vehicle the character is attached to, found by walking the interaction
+    /// graph's top root object and casting it to `CVehicle`; empty when there is none. Takes a
+    /// reference on the vehicle.
+    #[address(0x140_7D5_D90)]
+    pub fn GetVehicle(&self, out: *mut SharedPtr<Vehicle>) -> *mut SharedPtr<Vehicle>;
+
+    /// The raw-pointer form of [`GetVehicle`](Self::GetVehicle); still takes and releases a
+    /// reference internally.
+    #[address(0x140_7D5_E30)]
+    pub fn GetVehiclePtr(&self) -> *mut Vehicle;
+
+    /// Whether the character is attached to any vehicle through the interaction graph.
+    #[address(0x140_7D5_EA0)]
+    pub fn IsAttachedToVehicle(&self) -> bool;
+
+    /// Whether the attached vehicle is a `CLandVehicle` (cars and motorcycles), by RTTI `IsType`.
+    #[address(0x140_7D5_FA0)]
+    pub fn IsAttachedToLandVehicle(&self) -> bool;
+
+    /// Whether the attached vehicle is a `CAirVehicle` (planes and helicopters), by RTTI `IsType`.
+    #[address(0x140_7D6_060)]
+    pub fn IsAttachedToAirVehicle(&self) -> bool;
+
+    /// Whether the attached vehicle is a `CSeaVehicle` (boats and jetskis), by RTTI `IsType`.
+    #[address(0x140_7D6_120)]
+    pub fn IsAttachedToSeaVehicle(&self) -> bool;
+
+    /// Whether the attached vehicle is a `CHelicopter`, by RTTI `IsType`.
+    #[address(0x140_7D6_1E0)]
+    pub fn IsAttachedToHelicopter(&self) -> bool;
+
+    /// Whether the attached vehicle is a mech ([`Vehicle::IsMech`]).
+    #[address(0x140_7D6_2A0)]
+    pub fn IsAttachedToMech(&self) -> bool;
+
+    /// Stores `target` in [`m_AimTargetPositionWeapons`](Self::m_AimTargetPositionWeapons) and
+    /// sets [`m_AimTargetPositionWeaponWasSetThisFrame`](Self::m_AimTargetPositionWeaponWasSetThisFrame).
+    #[address(0x140_760_2C0)]
+    pub fn UpdateWeaponAiming(&mut self, target: *const Vector3);
+
+    /// Stores `target` in [`m_AimTargetPositionGrenade`](Self::m_AimTargetPositionGrenade).
+    #[address(0x140_760_2F0)]
+    pub fn UpdateGrenadeAiming(&mut self, target: *const Vector3);
+
+    /// Runs the inventory's parallel weapon update
+    /// ([`Inventory::Update_Parallel`](character::inventory::Inventory::Update_Parallel)) with the
+    /// weapon and grenade aim targets, then clears [`m_WeaponInputs`](Self::m_WeaponInputs) and
+    /// the aim-target-set flag.
+    #[address(0x140_760_660)]
+    pub fn UpdateWeapons_Parallel(&mut self, dt: f32);
+
+    /// Whether the equipped weapon and the character state allow precision (down-sights) aiming.
+    #[address(0x140_7D9_200)]
+    pub fn CanPrecisionAim(&self) -> bool;
+
+    /// The per-frame aiming-input update for non-player characters: refreshes and counts down
+    /// [`m_AimTimer`](Self::m_AimTimer) (the refill value comes from
+    /// [`m_AimingSettings`](Self::m_AimingSettings)), writes the weapon-aim bit of
+    /// [`m_AimFlags`](Self::m_AimFlags), mirrors it into
+    /// [`SB_IS_AIMING_WPN_OR_GRPL`](state::StateBitFlag::SB_IS_AIMING_WPN_OR_GRPL),
+    /// and queues the matching aim-transition act.
+    #[address(0x140_7F0_160)]
+    pub fn HandleAimingInputNPC(&mut self, dt: f32);
+
+    /// The pre-simulation grapple update: runs the hook's own pre-sim update and recomputes the
+    /// grapple-aim bit of [`m_AimFlags`](Self::m_AimFlags).
+    #[address(0x140_79D_420)]
+    pub fn PreSimUpdateGrapple(&mut self, dt: f32);
+
+    /// Whether the character is trying to aim (an aim input is active and aiming is permitted).
+    #[address(0x140_7F5_140)]
+    pub fn IsTryingToAim(&self) -> bool;
+
+    /// Whether any weapon fire input is active: fire, precision-aim fire, or explosive planting.
+    /// `ignore_animation` skips the inventory's animation-permission checks.
+    #[address(0x140_7F2_AF0)]
+    pub fn IsTryingToFireAnyWeapons(&self, ignore_animation: bool) -> bool;
+
+    /// Whether any weapon input is active this frame.
+    #[address(0x140_7F2_D10)]
+    pub fn HasAnyWeaponInput(&self) -> bool;
+
+    /// Sets the character's mental state on its [`m_Avatar`](Self::m_Avatar) with a hold `timer`.
+    /// Unless `force` is set, the write happens only once the avatar's current timer has run out.
+    #[address(0x140_760_BE0)]
+    pub fn SetMentalState(&mut self, state: MentalState, force: bool, timer: f32);
+
+    /// Draws the selected weapon when the inventory's animation state allows it: selects a valid
+    /// weapon, queues the draw act, and blocks drawing and grenades until the animation re-enables
+    /// them.
+    #[address(0x140_760_8A0)]
+    pub fn DrawWeapon(&mut self, p1: bool, p2: bool);
+
+    /// Holsters the current weapon when the inventory's animation state allows it by queuing the
+    /// holster act.
+    #[address(0x140_7F2_D80)]
+    pub fn HolsterWeapon(&mut self);
+
+    /// Forces the character's animation and control state back to neutral (on foot, idle).
+    #[address(0x140_7FD_120)]
+    pub fn ForceNeutralState(&mut self);
+
+    /// Sets the character's orientation from a quaternion (`CQuaternion`, `x, y, z, w`): writes
+    /// the rotation into [`m_WorldMatrixT1`](Self::m_WorldMatrixT1), keeping its translation, and
+    /// stores the quaternion in [`m_RotationGoal`](Self::m_RotationGoal). A direct world-matrix
+    /// write; it does not go through the physics proxy.
+    #[address(0x140_75F_D90)]
+    pub fn SetOrientation(&mut self, orientation: *const [f32; 4]);
+
+    /// Attaches the character to `target` with a yaw-only alignment: computes the yaw between the
+    /// character's and the target's forward directions and calls the
+    /// [`AttachTo`](Self::AttachTo) virtual with that rotation as the offset.
+    #[address(0x140_79D_540)]
+    pub fn SetYAlignedAttachTo(&mut self, target: *mut Matrix4, object: *mut void, attach_type: u32, flags: u32);
+
+    /// Whether the character rides in a vehicle's cargo bay
+    /// ([`m_InCargoBay`](AimState::m_InCargoBay)).
+    #[address(0x140_75A_EB0)]
+    pub fn IsInCargoBay(&self) -> bool;
+
+    /// Sets [`WEAPONS_ENABLED`](DamageStateFlags::WEAPONS_ENABLED).
+    #[address(0x140_818_810)]
+    pub fn SetWeaponsEnabled(&mut self, enable: bool);
+
+    /// Sets [`m_IsParachuteEnabled`](AbilityFlags::m_IsParachuteEnabled).
+    #[address(0x140_818_830)]
+    pub fn SetParachuteEnabled(&mut self, enabled: bool);
+
+    /// Sets [`m_IsWingsuitEnabled`](AbilityFlags::m_IsWingsuitEnabled).
+    #[address(0x140_8B8_440)]
+    pub fn SetWingsuitEnabled(&mut self, enabled: bool);
+
+    /// Sets [`m_IsStuntAutoExitEnabled`](AbilityFlags::m_IsStuntAutoExitEnabled).
+    #[address(0x140_9AA_6E0)]
+    pub fn SetStuntAutoExitEnabled(&mut self, enabled: bool);
 }
+
+/// `CCharacter::GetRenderTransform`, a `CGameObject` virtual reached through the
+/// [`GAME_OBJECT_BASE_OFFSET`](Character::GAME_OBJECT_BASE_OFFSET) subobject (`game_object` is the
+/// character plus that offset): writes the render transform, the lerp of
+/// [`m_WorldMatrixT0`](Character::m_WorldMatrixT0) to [`m_WorldMatrixT1`](Character::m_WorldMatrixT1)
+/// by `dtf`, into `out`, and returns true.
+#[address(0x140_75D_E50)]
+pub fn Character_GetRenderTransform(game_object: *mut u8, out: *mut Matrix4, dtf: f32) -> bool;
 
 #[size(0x240)]
 pub type AnimatedModel {
@@ -235,6 +587,12 @@ pub type AnimatedModel {
 
     #[address(0x178)]
     pub m_AnimationController: *mut AnimationController,
+
+    /// The model's animation instance data (`SAnimatedModelInstanceData*`), null until the animation
+    /// instance is created (the first frames after spawn or stream-in). Some character-state
+    /// predicates, [`Character::IsUsingWingsuit`] among them, report false while it is null.
+    #[address(0x1D8)]
+    pub m_InstanceData: *mut u8,
 
     /// The model-instance slots (`NModelSystem::CModelInstance*`, null when unused): the base
     /// body model plus attachments and variants. `CAnimatedModel::GetModel`/`SetModel` index this
@@ -286,6 +644,15 @@ impl AnimationController {
     /// character's animation pass. A `dt` of `0` holds the animation clocks, producing a static pose.
     #[address(0x140_77E_200)]
     pub fn UpdateAnimations(&mut self, dt: f32, num_of_bones: i32);
+
+    /// The render-phase skinning update (`CAnimationControl::UpdateSkinning`): hands the pose
+    /// producer's skinning job to
+    /// [`PoseProducer::MakeSkinningPalette`](animation::pose_producer::PoseProducer::MakeSkinningPalette)
+    /// with `dtf` and the current frame's palette buffer (the control double-buffers its palettes by
+    /// frame parity). `world_matrix` is unused in this build. `CCharacter::UpdateRender` calls it
+    /// (the character-level `UpdateSkinning` is inlined there).
+    #[address(0x140_43F_CA0)]
+    pub fn UpdateSkinning(&mut self, dtf: f32, world_matrix: *mut Matrix4);
 }
 
 #[copyable, defaultable, align(16), size(0x30)]
@@ -301,6 +668,14 @@ pub type Joint {
 pub extern Character_GoreEnabled: bool;
 #[address(0x142_F2F_300)]
 pub extern Character_EnableLocoStrafing: bool;
+/// `CCharacter::m_ForceCombat`: while set, `CPlayer::UpdateMentalState` holds the player in the
+/// combat mental state.
+#[address(0x142_F2F_2FE)]
+pub extern Character_ForceCombat: bool;
+/// `CCharacter::m_ForceNonCombat`: while set, `CPlayer::UpdateMentalState` holds the player in the
+/// relaxed mental state. Checked before [`Character_ForceCombat`].
+#[address(0x142_F2F_2FF)]
+pub extern Character_ForceNonCombat: bool;
 /// The global HumanIK enable (`CCharacter::m_EnableHIK`): the engine gates the whole IK pass in
 /// [`UpdatePassFinalizePose_Parallel`](Character::UpdatePassFinalizePose_Parallel) on it.
 #[address(0x142_D62_1C8)]

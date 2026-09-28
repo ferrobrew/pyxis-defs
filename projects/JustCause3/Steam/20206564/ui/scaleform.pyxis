@@ -466,6 +466,12 @@ pub type MovieImpl {
     pub const SM_NO_BORDER: u32 = 3,
 
     vftable {
+        /// Advances the movie by `delta_t` seconds (`GFx::Movie` vtable slot 24): processes queued
+        /// input, runs the timeline and AS3 frame, and, when `capture` is set, finishes with
+        /// [`CaptureImpl`](Self::CaptureImpl). Returns the time until the next frame is due.
+        #[index(24)]
+        pub fn Advance(&mut self, delta_t: f32, frame_catch_up_count: u32, capture: bool) -> f32;
+
         /// Snapshots the display tree for the render thread (`GFx::Movie` vtable slot 25). Must be
         /// called from the current capture thread (see
         /// [`SetCaptureThread`](Self::SetCaptureThread)); `if_changed = false` forces a fresh
@@ -484,6 +490,12 @@ pub type MovieImpl {
         /// (`RenderOffScreenTextures` does exactly this per frame).
         #[index(27)]
         pub fn SetCaptureThread(&mut self, thread_id: u32);
+
+        /// Shuts down the movie's render context (`GFx::Movie` vtable slot 28): a thunk into
+        /// `Render::ContextImpl::Context::Shutdown` on the context embedded at `+0x5350`. `wait`
+        /// blocks until the render thread has released the context.
+        #[index(28)]
+        pub fn ShutdownRendering(&mut self, wait: bool);
 
         /// Routes a `GFx::Event` to the movie (`GFx::Movie` vtable slot 35). For a
         /// [`MouseEvent`] the movie records the new mouse state, which the next `Advance`
@@ -524,6 +536,10 @@ pub type MovieImpl {
         /// device exists and `0` otherwise.
         #[index(43)]
         pub fn SetMouseCursorCount(&mut self, count: u32);
+
+        /// Returns the movie's memory heap (`GFx::Movie` vtable slot 48), the pointer at `+0x40`.
+        #[index(48)]
+        pub fn GetHeap(&self) -> *mut MemoryHeap;
     },
 
     /// The AS3 `MovieRoot` (the [`Movie`] interface): SetVariable, Invoke, and the display tree.
@@ -1031,3 +1047,16 @@ epilogue for AmpMovieObjectDesc r#"
 /// `CCommStatsUI` -> `comm_stats`, `CCommBragsFeatsUI` -> `comm_brags_feats`,
 /// `CCommStoreUI` -> `comm_store`, `CRewardUI` -> `reward`, `CROMUI` -> (none).
 pub type ScaleformInfo;
+
+/// `GFx::Loader`: the Scaleform movie loader.
+pub type Loader {
+    /// The load flag that skips import binding: `MovieBindProcess::BindNextFrame` tests it before
+    /// resolving a movie's imported symbol libraries (`LoadDisableImports`).
+    pub const LOAD_DISABLE_IMPORTS: u32 = 0x100000,
+}
+impl Loader {
+    /// Loads (or fetches from the resource library) the movie definition at `filename` with the
+    /// given load flags.
+    #[address(0x141_976_DD0)]
+    pub fn CreateMovie(&mut self, filename: *const u8, load_constants: u32, memory_arena: u64) -> *mut void;
+}

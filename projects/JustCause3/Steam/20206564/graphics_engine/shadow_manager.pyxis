@@ -1,15 +1,39 @@
-use graphics_engine::graphics_engine::RenderContext;
+use camera::camera::Camera;
+use graphics_engine::graphics_engine::{HRenderSetup_t, RenderContext, ShadowCascades};
 use graphics_engine::render_pass::RenderPass;
 use graphics_engine::texture::Texture;
+use types::math::Matrix4;
 
-/// One cascade's bookkeeping in [`ShadowManager`]: the render passes that draw its atlas slice,
-/// followed by the per-parity fit state.
+/// The per-parity render-pass settings of one shadow frustum (`SShadowRenderPassSettings`): which
+/// atlas slices its dynamic and static passes draw into.
+#[size(0x14), align(4)]
+pub type ShadowRenderPassSettings {
+    /// The atlas slice the static-geometry pass draws into, or negative when it does not draw.
+    /// [`ShadowManager::CommitRenderPassSettings`] points the static pass at
+    /// [`m_DepthRenderSetup`](ShadowManager::m_DepthRenderSetup) of this slice.
+    pub m_SliceIndexStatic: i32,
+    /// The atlas slice the dynamic-geometry pass draws into.
+    pub m_SliceIndexDynamic: i32,
+    /// The static slice the dynamic slice is seeded from.
+    pub m_CopyFromStaticSliceIndex: i32,
+    pub m_SlotUse: i32,
+    pub m_StaticGeneration: i32,
+}
+
+/// One shadow frustum's bookkeeping in [`ShadowManager`] (`SShadowFrustum`): the render passes that
+/// draw its atlas slice, followed by the per-parity pass settings and fit state.
 #[min_size(0x460)]
 pub type CascadeData {
     /// The pair of render passes that draw this cascade's atlas slice (dynamic and static
     /// geometry). [`ShadowManager::CommitRenderPassSettings`] gates them per dispatch via
     /// [`RenderPassState::m_Enabled`](graphics_engine::render_pass::RenderPassState::m_Enabled).
     pub m_Passes: [*mut RenderPass; 2],
+
+    /// The pass settings for each frame parity (`[m_FrameIndex & 1]`), the stride-20 per-parity slice
+    /// indices [`ShadowManager::CommitRenderPassSettings`] reads to re-point the passes' render
+    /// setups.
+    #[address(0x38)]
+    pub m_RenderPassSettings: [ShadowRenderPassSettings; 2],
 }
 
 /// The cascaded sun-shadow system. Each sim frame, [`UpdateRender`](Self::UpdateRender)
@@ -17,7 +41,7 @@ pub type CascadeData {
 /// dispatch, [`CommitRenderPassSettings`](Self::CommitRenderPassSettings) enables the
 /// scheduled atlas passes. Cascade re-renders are amortised across frames by an update pattern, so
 /// an unscheduled cascade keeps its previous fit and contents.
-#[min_size(0x6200)]
+#[min_size(0x6208)]
 pub type ShadowManager {
     /// The settings-side enable flag. The per-frame [`UpdateRender`](Self::UpdateRender)
     /// syncs the engine to it via [`SetEnabled`](Self::SetEnabled) whenever it differs
@@ -25,13 +49,29 @@ pub type ShadowManager {
     #[address(0x4)]
     pub m_Enabled: bool,
 
+    /// The number of active sun cascades for each frame parity. [`RenderPass::SetRenderContextCamera`]
+    /// copies the parity's entry into
+    /// [`RenderContext::m_ActiveCascadeCount`](graphics_engine::graphics_engine::RenderContext::m_ActiveCascadeCount).
+    #[address(0x7)]
+    pub m_ActiveCascades: [u8; 2],
+
+    /// The number of active shadow passes (cascades plus spot shadows) for each frame parity.
+    #[address(0x9)]
+    pub m_ActiveShadowPassCount: [u8; 2],
+
     /// The sun-shadow cascade atlas: a single depth `Texture2DArray` whose slices hold every cascade's
     /// (and the spot shadows') fitted shadow map. Created by [`SetEnabled`](Self::SetEnabled)
-    /// (`CreateShadowDepthTexture`, one render target per array slice). The atlas is parity double-
-    /// buffered: [`m_SliceBase`](Self::m_SliceBase) gives the base slice for each parity, so the
-    /// scheduled cascades render into (and the material shaders sample) the parity's half of the array.
+    /// (`CreateShadowDepthTexture`, one render target per array slice). Which slice each pass draws
+    /// into is chosen per frame parity by the frustum's
+    /// [`m_RenderPassSettings`](CascadeData::m_RenderPassSettings).
     #[address(0x60)]
     pub m_AtlasTexture: *mut Texture,
+
+    /// One render setup per atlas slice. [`CommitRenderPassSettings`](Self::CommitRenderPassSettings)
+    /// points each enabled pass at the setup of the slice its
+    /// [`ShadowRenderPassSettings`] names.
+    #[address(0xC8)]
+    pub m_DepthRenderSetup: [*mut HRenderSetup_t; 12],
 
     /// The per-cascade slots (passes plus fit bookkeeping).
     #[address(0x130)]
@@ -47,15 +87,76 @@ pub type ShadowManager {
     #[address(0x2_468)]
     pub m_CascadeUpdateLevels: [i32; 6],
 
-    /// The base atlas array slice for each frame parity (`m_SliceBase[render_frame_counters.m_FrameIndex
-    /// & 1]`). `CommitRenderPassSettings` points the parity's render passes at this half, and
-    /// `SetGlobalShaderConstants` stages it as the slice the material shaders sample. The two halves hold
-    /// the shadow maps rendered on alternate frames -- the source of the per-parity sampling difference.
+    /// The global sun-shadow transparency (0 = opaque shadows, 1 = no shadows), registered as the
+    /// console variable `"Dev|Graphics|Shadows|Transparency"` and defaulting to 0.
+    /// [`GetShadowFade`](Self::GetShadowFade) returns it while the shadow system is enabled.
+    #[address(0x3_25C)]
+    pub m_ShadowTransparency: f32,
+
+    /// The forward-material cascade blocks for each frame parity, written by
+    /// [`UpdateRender`](Self::UpdateRender). [`RenderPass::SetRenderContextCamera`] copies the
+    /// parity's block into
+    /// [`RenderContext::m_ShadowCascades`](graphics_engine::graphics_engine::RenderContext::m_ShadowCascades).
+    #[address(0x3_260)]
+    pub m_ShadowCascades: [ShadowCascades; 2],
+
+    /// The shadow light camera the static-shadow passes draw with; the uniform-light update rebuilds
+    /// it from the cascade's matrices each dispatch.
+    #[address(0x3_4A0)]
+    pub m_ScratchCamera: Camera,
+
+    /// The per-slice projective shadow transforms for each frame parity (`[parity][slice]`),
+    /// written by [`UpdateRender`](Self::UpdateRender). [`RenderPass::SetRenderContextCamera`] copies
+    /// the parity's eight into
+    /// [`RenderContext::m_ShadowMatrices`](graphics_engine::graphics_engine::RenderContext::m_ShadowMatrices).
+    #[address(0x3_A50)]
+    pub m_ShadowTextureMatrix: [[Matrix4; 8]; 2],
+
+    /// The terrain horizon maps, `[map][parity]`. [`RenderPass::SetRenderContextCamera`] copies the
+    /// parity's pair into
+    /// [`RenderContext::m_HorizonMap0`](graphics_engine::graphics_engine::RenderContext::m_HorizonMap0)
+    /// and [`m_HorizonMap1`](graphics_engine::graphics_engine::RenderContext::m_HorizonMap1).
+    #[address(0x6_1D0)]
+    pub m_HorizonMaps: [[*mut Texture; 2]; 2],
+
+    /// The horizon-map blend time for each frame parity, staged by `SetGlobalShaderConstants` into
+    /// the vertex GlobalConstants (row 4 `.w`) as `m_HorizonTime[m_RenderFrameNo & 1]`.
     #[address(0x6_1F0)]
-    pub m_SliceBase: [u32; 2],
+    pub m_HorizonTime: [f32; 2],
+
+    /// The horizon-map occlusion scale, staged by `SetGlobalShaderConstants` into the vertex
+    /// GlobalConstants (row 5 `.w`) when [`m_EnableHorizonMapping`](Self::m_EnableHorizonMapping) is
+    /// set, and 0 otherwise.
+    #[address(0x6_1F8)]
+    pub m_HorizonScale: f32,
+
+    /// Whether horizon mapping is enabled.
+    #[address(0x6_1FC)]
+    pub m_EnableHorizonMapping: bool,
+
+    /// The texture of the manager's black texture holder (`m_BlackTexture`), bound in place of a null
+    /// horizon map by
+    /// [`SetupLightingTextures`](graphics_engine::render_engine::RenderBlockTypeBase::SetupLightingTextures).
+    #[address(0x6_200)]
+    pub m_HorizonMapFallback: *mut Texture,
 }
+
+/// The shadow system's global enable (`CShadowManager::m_SystemEnabled`). It gates
+/// [`ShadowManager::GetShadowFade`] and the per-dispatch
+/// [`ShadowManager::CommitRenderPassSettings`] call.
+#[address(0x142_ED7_5BB)]
+pub extern shadow_system_enabled: bool;
 impl ShadowManager {
-    /// The global sun-shadow fade factor staged into the shader constants.
+    /// Initializes the shadow system at startup (called by `CGraphicsEngine::InitializeSystem` on
+    /// [`GraphicsEngine::m_ShadowManager`](graphics_engine::graphics_engine::GraphicsEngine::m_ShadowManager)):
+    /// sets the 1024-texel map size, clears [`shadow_system_enabled`], enables the manager through
+    /// [`SetEnabled`](Self::SetEnabled), and starts the horizon-map streams.
+    #[address(0x140_1A1_E20)]
+    pub fn InitializeSystem(&mut self, ctx: *const void) -> bool;
+
+    /// The global sun-shadow fade factor staged into the shader constants:
+    /// [`m_ShadowTransparency`](Self::m_ShadowTransparency) while the shadow system is enabled
+    /// ([`shadow_system_enabled`]), otherwise 1.
     #[address(0x140_177_940)]
     pub fn GetShadowFade(&self) -> f32;
 

@@ -1,4 +1,4 @@
-use graphics_engine::graphics_engine::RenderContext;
+use graphics_engine::graphics_engine::{HContext_t, RenderContext};
 use graphics_engine::render_engine::{RenderBlockTypeBase, RenderPassId};
 use camera::camera::Camera;
 use types::math::{Matrix4, Vector3};
@@ -171,6 +171,13 @@ pub bitflags RenderPassSortState: u16 {
 /// Specialized passes derive from it, so only the base extent is claimed here.
 #[min_size(0x8C0)]
 pub type RenderPass {
+    /// The first squared depth-bucket boundary `CRenderEngine::InitializeSystem` registers on the
+    /// Z-and-velocity pass (40 metres, squared) in [`m_DepthSqTable`](Self::m_DepthSqTable).
+    pub const Z_AND_VELOCITY_DEPTH_SQ_NEAR: f32 = 1600.0,
+    /// The second squared depth-bucket boundary registered on the Z-and-velocity pass (120 metres,
+    /// squared).
+    pub const Z_AND_VELOCITY_DEPTH_SQ_FAR: f32 = 14400.0,
+
     /// The list that new render-block-items append to this frame. Each rotation,
     /// [`SaveRenderFrameData`](Self::SaveRenderFrameData) re-points it at the new parity's list
     /// and zeroes its count; zeroing that count is how a pass's draw-time additions are reset.
@@ -188,6 +195,44 @@ pub type RenderPass {
     /// method resolves to `BackToFront` when set, `FrontToBackBucketed` otherwise.
     #[address(0x48)]
     pub m_RenderBackToFront: i32,
+
+    /// The pass's stencil depth-fail operation (`RenderSettings[8]`, a `Graphics::EStencilOp`).
+    /// [`PreDraw`](Self::PreDraw) applies the pass's stencil state
+    /// ([`SetStencilOp`](graphics_engine::draw::SetStencilOp) and siblings) when
+    /// [`m_StencilTestEnable`](Self::m_StencilTestEnable) is 1, and copies these settings into the
+    /// render context's stencil settings either way.
+    #[address(0x58)]
+    pub m_StencilOpZFail: u32,
+
+    /// The stencil depth-pass operation (`RenderSettings[9]`).
+    #[address(0x5C)]
+    pub m_StencilOpZPass: u32,
+
+    /// The stencil fail operation (`RenderSettings[10]`).
+    #[address(0x60)]
+    pub m_StencilOpSFail: u32,
+
+    /// The stencil comparison function (`RenderSettings[11]`, a `Graphics::EStencilFunc`).
+    #[address(0x64)]
+    pub m_StencilFunc: u32,
+
+    /// The stencil read mask (`RenderSettings[12]`).
+    #[address(0x68)]
+    pub m_StencilMask: u32,
+
+    /// The stencil write mask (`RenderSettings[13]`).
+    #[address(0x6C)]
+    pub m_StencilWriteMask: u32,
+
+    /// The stencil reference value (`RenderSettings[14]`).
+    #[address(0x70)]
+    pub m_StencilRef: u32,
+
+    /// Whether the pass stencil-tests (`RenderSettings[15]`, 1 = enabled). The per-pass settings
+    /// are shipped data; the engine also clears it in code for a few passes (the depth downsample
+    /// and the outline blur).
+    #[address(0x74)]
+    pub m_StencilTestEnable: u32,
 
     /// Pass state flags. [`m_Enabled`](RenderPassState::m_Enabled) gates whether the pass draws;
     /// [`ShadowManager::CommitRenderPassSettings`](graphics_engine::shadow_manager::ShadowManager::CommitRenderPassSettings)
@@ -235,6 +280,22 @@ impl RenderPass {
     #[address(0x140_48C_4E0)]
     pub fn SetupRenderFrameData(a1: *mut void, count: i32, a3: *mut void, items: *mut void);
 
+    /// Stamps the per-pass render-context state (`CRenderPass::SetupRenderContext`, static): the
+    /// render-status shadow and reflection bits from the render engine's `m_IsRendering*` flags, the
+    /// render camera's world position
+    /// ([`m_RenderCameraPosition`](graphics_engine::graphics_engine::RenderContext::m_RenderCameraPosition)),
+    /// the frame counter and its ring slots
+    /// ([`m_RenderFrameNo`](graphics_engine::graphics_engine::RenderContext::m_RenderFrameNo),
+    /// [`m_RenderFrameIndex`](graphics_engine::graphics_engine::RenderContext::m_RenderFrameIndex),
+    /// [`m_PreviousRenderFrameIndex`](graphics_engine::graphics_engine::RenderContext::m_PreviousRenderFrameIndex)),
+    /// the active light counts, global light and sun vectors, the display size, the time of day and
+    /// its light modulator, the underwater flag, the weather scalars, and the active pass id
+    /// (`pass` may be null, giving `RP_NONE`). It finishes with
+    /// `CRenderEngine::UpdateRenderContextGlobals`, which copies the global constant buffers,
+    /// scene copies, reflection textures, and the light manager's per-frame resources.
+    #[address(0x140_174_060)]
+    pub fn SetupRenderContext(ctx: *mut RenderContext, pass: *mut RenderPass, context: *mut HContext_t);
+
     /// Fills the per-view render context from `camera` (the render camera, or a shadow or reflective
     /// light camera selected by the pass flags): the view, projection, and translation-free offset
     /// view-projection via [`CalculateOffsetViewProjectionMatrix`], the separate camera world
@@ -245,6 +306,7 @@ impl RenderPass {
     /// The per-pass half of the list rotation, driven by the per-frame `CKeep1000Frames` call in the
     /// `CGraphicsEngine::Draw` prologue: points `m_CurrentAddList` at the new parity's list, the draw
     /// list at the other, and zeroes the new add-list's element count. Also snapshots the pass camera.
+    /// Occupies vtable slot 3 of the pass vtable.
     #[address(0x140_194_480)]
     pub fn SaveRenderFrameData(&mut self, parity: u32);
 
@@ -261,12 +323,19 @@ impl RenderPass {
     #[address(0x140_194_540)]
     pub fn Draw(&mut self);
 
+    /// The per-pass pre-draw (vtable slot 1): resolves the back buffer and depth buffer when the pass
+    /// asks for them, binds the pass's render setup, applies its stencil state (see
+    /// [`m_StencilTestEnable`](Self::m_StencilTestEnable)) and depth bias, and issues the pass's
+    /// colour, depth, and stencil clears ([`ClearFlags`](graphics_engine::draw::ClearFlags)).
+    #[address(0x140_186_DB0)]
+    pub fn PreDraw(&mut self, ctx: *mut RenderContext);
+
     /// Draws the current draw list, walking `min(m_ListSize, m_NumElements)` blocks and
     /// vtable-dispatching each. Non-destructive -- never writes `m_NumElements`. Calls
     /// [`SortList`](Self::SortList) lazily before drawing. Consecutive blocks of one type
     /// form a type run: [`ChangeRenderBlockType`](Self::ChangeRenderBlockType) switches
     /// between runs, and the tail closes the final run (its type-level restore and its scope
-    /// marker).
+    /// marker). Occupies vtable slot 2 of the pass vtable (after `Draw` and `PreDraw`).
     #[address(0x140_1AC_7A0)]
     pub fn DoDraw(&mut self, ctx: *mut RenderContext, color_mask: u32) -> bool;
 
@@ -300,6 +369,15 @@ impl RenderPass {
 /// opaque geometry actually uses; the camera world position is supplied separately. Static.
 #[address(0x140_136_020)]
 pub fn CalculateOffsetViewProjectionMatrix(src: *const Matrix4, proj: *const Matrix4, dst: *mut Matrix4);
+
+/// Copies the world matrix `world` into `dst`, makes its translation row relative to
+/// [`RenderContext::m_CameraPosition`](graphics_engine::graphics_engine::RenderContext::m_CameraPosition)
+/// (with `w = 1`), and multiplies it by
+/// [`RenderContext::m_OffsetViewProjection`](graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection):
+/// the camera-relative world-view-projection the render blocks bake into their constant buffers
+/// (`CRenderBlock::CalculateOffsetWorldViewProjectionMatrix`). Static.
+#[address(0x140_136_070)]
+pub fn CalculateOffsetWorldViewProjectionMatrix(ctx: *const RenderContext, world: *const Matrix4, dst: *mut Matrix4);
 
 #[address(0x142_ED7_680)]
 pub extern current_add_buffer: u32;

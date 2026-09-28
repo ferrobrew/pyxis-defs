@@ -1,5 +1,9 @@
 #[singleton(0x142_ED0_E78), size(0x70)]
 pub type Clock {
+    /// The seconds-per-frame value [`GetSPF`](Self::GetSPF) returns while the clock is stopped and
+    /// `ignore_pause` is false.
+    pub const PAUSED_SPF: f32 = 0.000001,
+
     pub __vftable: u64,
     pub m_HasBeenInitialized: bool,
 
@@ -14,10 +18,23 @@ pub type Clock {
     pub m_Stop: bool,
     pub m_ForceToFps: bool,
 
+    /// Real elapsed milliseconds, advanced by every [`Update`](Self::Update) regardless of pause.
     #[address(0x30)]
-    pub m_Time: u64,
-    pub m_RealTimeAtUpdateGame: u64,
-    pub m_PauseTimeAtUpdateGame: u64,
+    pub m_Time: u32,
+    /// Real elapsed milliseconds as of the last [`Update`](Self::Update), advanced regardless of
+    /// pause.
+    pub m_RealTimeAtUpdate: u32,
+    /// The game-side counterpart of [`m_RealTimeAtUpdate`](Self::m_RealTimeAtUpdate).
+    pub m_RealTimeAtUpdateGame: u32,
+    /// The value of [`m_RealTimeAtUpdate`](Self::m_RealTimeAtUpdate) latched when the clock
+    /// enters pause; `GetRealTimeAtUpdate` returns it instead while paused.
+    pub m_PauseTimeAtUpdate: u32,
+    /// The value of [`m_RealTimeAtUpdateGame`](Self::m_RealTimeAtUpdateGame) latched when the
+    /// clock enters pause.
+    pub m_PauseTimeAtUpdateGame: u32,
+    /// Elapsed milliseconds that advance only while the clock is not stopped; `GetTime` returns it
+    /// unless asked to ignore pause.
+    pub m_PauseTime: u32,
     pub m_GameTimeMicro: u64,
     pub m_GameRunTimeMicro: u64,
     pub m_ElapsedTime: u64,
@@ -25,9 +42,13 @@ pub type Clock {
     pub m_CpuFrequency: u64,
 }
 impl Clock {
+    /// Returns [`PAUSED_SPF`](Self::PAUSED_SPF) while stopped (unless `ignore_pause`), the forced
+    /// SPF when forcing a frame rate, and `m_SPF` otherwise.
     #[address(0x140_091_C10)]
     pub fn GetSPF(&self, ignore_pause: bool) -> f32;
 
+    /// Sets `m_Stop`; on the transition into pause, latches the real-time-at-update counters into
+    /// their pause-time counterparts.
     #[address(0x140_091_BB0)]
     pub fn Pause(&mut self, pause: bool);
 

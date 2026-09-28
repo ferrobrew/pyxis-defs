@@ -1,15 +1,147 @@
-use types::math::Matrix4;
+use aim::target::Target;
+use aim::target::TargetType;
+use character::character::Character;
+use equipment::weapon::WeaponBase;
 use state::StateContext;
+use types::math::Matrix4;
+use types::math::Vector3;
+use types::shared_ptr::SharedPtr;
 
-pub type WeaponBase;
-impl WeaponBase {
-    /// Writes the grip transform for the given `hand` (a `E_WEAPON_GRIP_HAND_*` value).
-    #[address(0x140_966_840)]
-    pub fn GetGripPosition(&self, hand: i32, matrix: *mut Matrix4) -> bool;
+/// How the player's aim is assisted (`CPlayerAimControl::EAimType`), stored in
+/// [`PlayerAimControl::m_AimType`]. `CPlayer::SetAimMode` selects normal aim in precision aim
+/// (unless the weapon keeps aim assist in precision aim) and auto aim otherwise, and forces normal
+/// aim when the aim-assist setting is off.
+#[copyable]
+pub enum AimType: i32 {
+    ENone = 0x0,
+    /// Aim without assist.
+    ENormal = 0x1,
+    /// Aim with assist.
+    EAuto = 0x2,
 }
 
-/// Player aim control. In normal third-person play the aim is camera-derived.
-pub type PlayerAimControl;
+/// The raycast variant used for an aim slot (`CPlayerAimControl::ERayType`), stored per
+/// [`TargetType`] in [`PlayerAimControl::m_RayTypeSetting`]. It selects which of the direct-aim
+/// ray's recorded hits fills the slot.
+#[copyable]
+pub enum RayType: i32 {
+    /// Stop at holey (see-through) geometry.
+    HIT_HOLEY = 0x0,
+    /// Pass through holey geometry.
+    SKIP_HOLEY = 0x1,
+    /// Take the hit recorded below the minimum-distance fraction.
+    HIT_MIN_DISTANCE = 0x2,
+}
+
+/// The local player's aim state (`CPlayerAimControl`, an `ITargetSystemListener`), owned by the
+/// player. It is a target cache indexed by [`TargetType`]: every per-purpose array holds one slot
+/// per target type, filled each tick from one camera-derived raycast
+/// ([`UpdateDirectAim`](Self::UpdateDirectAim)) and the target system's fitness scoring
+/// ([`UpdateAllTargets`](Self::UpdateAllTargets)). The weapons, grapple, melee, and grenade code
+/// read their own slot. In normal third-person play the aim is camera-derived.
+pub type PlayerAimControl {
+    pub __vftable: u64,
+
+    /// Per slot, whether the direct-aim ray hit something within the slot's range.
+    #[address(0x8)]
+    pub m_DirectHits: [bool; 6],
+
+    /// Per slot, the surface normal of the last direct-aim hit.
+    #[address(0x10)]
+    pub m_LastDirectAimHitNormals: [Vector3; 6],
+
+    /// Per slot, the target the direct-aim ray hit, or null.
+    #[address(0x58)]
+    pub m_DirectTargets: [*mut Target; 6],
+
+    /// Per slot, the selected target: the direct target or the best-scoring candidate from aim
+    /// assist, or null.
+    #[address(0x88)]
+    pub m_Target: [*mut Target; 6],
+
+    /// Per slot, the ray variant that fills the slot.
+    #[address(0xE8)]
+    pub m_RayTypeSetting: [RayType; 6],
+
+    /// Per slot, the direct-aim hit position, or the point at the slot's range along the ray when
+    /// nothing was hit.
+    #[address(0x100)]
+    pub m_DirectPositions: [Vector3; 6],
+
+    /// Whether the direct grapple hit is on a grapplable surface.
+    #[address(0x148)]
+    pub m_DirectGrapplePosIsGrapplable: bool,
+
+    /// Per slot, the world-space aim position: the direct position, pulled toward the selected
+    /// target by aim assist. Slot [`TARGET_WEAPONS`](TargetType::TARGET_WEAPONS) is the point every
+    /// weapon aims at, and slot [`TARGET_GRAPPLE`](TargetType::TARGET_GRAPPLE) is the grapple aim
+    /// point.
+    #[address(0x14C)]
+    pub m_AimPos: [Vector3; 6],
+
+    /// Per slot, [`m_AimPos`](Self::m_AimPos) as of the previous tick. The grapple reticle
+    /// interpolates from it toward the current position.
+    #[address(0x194)]
+    pub m_LastAimPos: [Vector3; 6],
+
+    /// Per slot, whether the aim position is within the slot's range.
+    #[address(0x1DC)]
+    pub m_IsInRange: [bool; 6],
+
+    /// Per slot, whether the direct position is within the slot's range.
+    #[address(0x1E2)]
+    pub m_DirectPosIsInRange: [bool; 6],
+
+    /// Whether the grapple slot uses the direct position rather than a target; the grapple reticle
+    /// is then centred on the screen instead of projected.
+    #[address(0x1EE)]
+    pub m_IsGrappleUsingDirectPos: bool,
+
+    /// Whether the last-valid grapple cache below holds a target.
+    #[address(0x1EF)]
+    pub m_HasLastValidGrapple: bool,
+
+    /// The cached grapple aim position, kept so a momentarily lost grapple target persists.
+    #[address(0x1F0)]
+    pub m_LastValidGrappleAimPos: Vector3,
+
+    /// The surface normal at [`m_LastValidGrappleAimPos`](Self::m_LastValidGrappleAimPos).
+    #[address(0x1FC)]
+    pub m_LastValidGrappleNormal: Vector3,
+
+    /// The cached grapple target, or null.
+    #[address(0x208)]
+    pub m_LastValidGrappleTarget: *mut Target,
+
+    /// The cached grapple game object (a `boost::weak_ptr<CGameObject>`: object pointer and weak
+    /// control block).
+    #[address(0x210)]
+    pub m_LastHitGrappleTargetGO: [*mut void; 2],
+
+    /// The length of the direct-aim ray: the override distance when positive, otherwise the larger
+    /// of the weapon and grapple slots' maximum aim distances.
+    #[address(0x280)]
+    pub m_RayCastDistance: f32,
+
+    /// Per slot, the maximum aim distance, recomputed by [`UpdateRange`](Self::UpdateRange): the
+    /// weapon slot takes the largest weapon range over the selected, wingsuit, and vehicle weapons
+    /// (default 100), the sticky and snap slots copy it, the grapple slot takes the grapple
+    /// tuning's range, the grenade slot the grenade weapon's range, and the melee slot is zero.
+    #[address(0x284)]
+    pub m_MaxAimDistance: [f32; 6],
+
+    /// A ray length that replaces the computed one when positive.
+    #[address(0x29C)]
+    pub m_OverrideRayCastDistance: f32,
+
+    /// Whether and how aim assist applies.
+    #[address(0x2A4)]
+    pub m_AimType: AimType,
+
+    /// The character this aim control serves.
+    #[address(0x2D8)]
+    pub m_Owner: *mut Character,
+}
 impl PlayerAimControl {
     /// Returns the matrix used by the aim raycast: in aim-down-sights it reads the alternate-aim
     /// transform, otherwise the camera transform. `weapon` adds an optional ballistic pitch. The
@@ -20,6 +152,109 @@ impl PlayerAimControl {
     /// Raycasts from the camera position along camera-forward to find the aim target.
     #[address(0x140_CE5_350)]
     pub fn UpdateDirectAim(&mut self);
+
+    /// The per-tick aim update after the camera for `character`: runs
+    /// [`UpdateInput`](Self::UpdateInput), [`UpdateRange`](Self::UpdateRange),
+    /// [`UpdateDirectAim`](Self::UpdateDirectAim), [`UpdateAllTargets`](Self::UpdateAllTargets),
+    /// and `UpdateLastValidGrappleTarget`.
+    #[address(0x140_CF5_C50)]
+    pub fn UpdatePostSim(&mut self, dt: f32, character: *mut Character);
+
+    /// The pre-simulation aim update, which polls the aim control's pending raycast requests for
+    /// completion.
+    #[address(0x140_C65_920)]
+    pub fn UpdatePreSim(&mut self);
+
+    /// Folds the aim stick input and applies the yaw and pitch dead zones.
+    #[address(0x140_CE9_210)]
+    pub fn UpdateInput(&mut self, dt: f32);
+
+    /// Recomputes [`m_MaxAimDistance`](Self::m_MaxAimDistance) and
+    /// [`m_RayCastDistance`](Self::m_RayCastDistance) from the current weapon, wingsuit, vehicle,
+    /// grapple, and grenade tuning.
+    #[address(0x140_CA8_8C0)]
+    pub fn UpdateRange(&mut self);
+
+    /// Target selection and aim assist: scores the target system's candidates per slot with the
+    /// per-purpose fitness functions, picks [`m_Target`](Self::m_Target), and pulls
+    /// [`m_AimPos`](Self::m_AimPos) toward the selected targets.
+    #[address(0x140_CE7_690)]
+    pub fn UpdateAllTargets(&mut self, dt: f32);
+
+    /// Distributes the direct-aim ray's hit into every slot except melee: fills
+    /// [`m_DirectHits`](Self::m_DirectHits), [`m_DirectPositions`](Self::m_DirectPositions),
+    /// [`m_AimPos`](Self::m_AimPos), [`m_IsInRange`](Self::m_IsInRange), and
+    /// [`m_DirectTargets`](Self::m_DirectTargets) per slot according to its
+    /// [`m_RayTypeSetting`](Self::m_RayTypeSetting) and range. `collector` is the ray's
+    /// `CPlayerAimRaycastFilterCacheFirstHoleyHitAndMinDistanceHit` filter and `non_holey_info`
+    /// its `CCastRayInfo`.
+    #[address(0x140_CE4_BB0)]
+    pub fn CheckDirectTargets(&mut self, collector: *const void, non_holey_info: *mut void, ray_start: *const Vector3, ray_dir: *const Vector3);
+
+    /// Updates the per-slot crosshair look (`CPlayerAimControl::ECrosshairLook`: in range with a
+    /// neutral, allied, or hostile target, in range with no target, or out of range).
+    #[address(0x140_CE8_BE0)]
+    pub fn UpdateCrosshairLook(&mut self);
+
+    /// Returns the weapon that serves `target_type` through `result`, or a null pointer.
+    #[address(0x140_C65_E10)]
+    pub fn GetCurrentWeapon(&self, result: *mut SharedPtr<WeaponBase>, target_type: TargetType) -> *mut SharedPtr<WeaponBase>;
+
+    /// Returns the camera position moved 0.1 units along camera-forward, from the unadjusted
+    /// camera matrix. The aim-distance measurements use it; the raycast computes its own origin.
+    #[address(0x140_C2B_610)]
+    pub fn GetRaycastStartPosition(&self, result: *mut Vector3) -> *mut Vector3;
+
+    /// Returns a start point blended from the wielded weapon's barrel and the character's head,
+    /// against the aim matrix `aim_mat`. The raycast uses its distance along the ray as the
+    /// minimum-distance hit fraction.
+    #[address(0x140_C65_B10)]
+    pub fn GetRaycastMinDistanceStartPosition(&self, result: *mut Vector3, aim_mat: *mut Matrix4) -> *mut Vector3;
+
+    /// Returns a target's body aim position through `result`, optionally for a grenade throw,
+    /// with an adjusted height, or clamped to the hip.
+    #[address(0x140_CDA_570)]
+    pub fn GetTargetBodyPosition(result: *mut Vector3, target: *mut Target, for_grenade: bool, adjust_y_pos: bool, clamp_to_hip: bool) -> *mut Vector3;
+
+    /// Copies the weapon slot's aim position (`m_AimPos[TARGET_WEAPONS]`) to `result`. The
+    /// release body matches the dump's accessor and sits beside
+    /// [`GetActiveGrappleTargetPosition`](Self::GetActiveGrappleTargetPosition) in the same order
+    /// as in the dump; it has no direct callers, as callers read the field inline.
+    #[address(0x140_C14_230)]
+    pub fn GetAverageWeaponTargetPosition(&self, result: *mut Vector3) -> *mut Vector3;
+
+    /// Returns a pointer to the grapple slot's aim position (`m_AimPos[TARGET_GRAPPLE]`).
+    #[address(0x140_C14_250)]
+    pub fn GetActiveGrappleTargetPosition(&self) -> *const Vector3;
+
+    /// Returns the cached grapple game object, or null unless
+    /// [`m_HasLastValidGrapple`](Self::m_HasLastValidGrapple) and the grapple slot's
+    /// [`m_IsInRange`](Self::m_IsInRange) are both set.
+    #[address(0x140_C55_4B0)]
+    pub fn GetCurrentGrappleTargetGO(&self) -> *mut void;
+
+    /// The weak-pointer form of [`GetCurrentGrappleTargetGO`](Self::GetCurrentGrappleTargetGO):
+    /// copies [`m_LastHitGrappleTargetGO`](Self::m_LastHitGrappleTargetGO) into `result` under the
+    /// same conditions, and a null weak pointer otherwise.
+    #[address(0x140_C2B_5C0)]
+    pub fn GetCurrentGrappleTargetWeakGO(&self, result: *mut [*mut void; 2]) -> *mut [*mut void; 2];
+
+    /// Re-validates the last-valid grapple cache against the current camera: rejects it when out
+    /// of the grapple range from the camera or outside the grapple tuning's view angles, and
+    /// otherwise re-queues its visibility raycast.
+    #[address(0x140_C3E_5F0)]
+    pub fn IsLastValidGrappleAimPosStillValid(&mut self) -> bool;
+}
+
+/// The animation-graph condition that the evaluating character is the player's current weapon
+/// target (`CPlayerIsAutoAimingCondition`). Its layout is unmapped.
+pub type PlayerIsAutoAimingCondition;
+impl PlayerIsAutoAimingCondition {
+    /// Evaluates the condition for the character owning `instance` (a
+    /// `NAnimationSystem::CStateMachineInstance`): true when the player's
+    /// `m_Target[TARGET_WEAPONS]` is that character and is not also the direct target.
+    #[address(0x140_7E0_620)]
+    pub fn Evaluate(&self, instance: *const void) -> bool;
 }
 
 /// The character-state task that overrides the aim direction toward a locked target.

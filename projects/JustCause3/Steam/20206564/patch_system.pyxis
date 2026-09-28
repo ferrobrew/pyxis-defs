@@ -1,3 +1,4 @@
+use types::math::Vector3;
 use graphics_engine::render_block::RenderBlockTerrain;
 
 /// A patch's bookkeeping header within a patch map (the Avalanche `patchsystem` dependency
@@ -6,6 +7,10 @@ use graphics_engine::render_block::RenderBlockTerrain;
 /// terrain patch-update fragment reads are mapped.
 #[min_size(0x2A)]
 pub type PatchHeader {
+    /// The patch's dynamic memory size; reset to 0 when the patch finishes destruction.
+    #[address(0xC)]
+    pub m_DynamicSize: u32,
+
     /// The patch's X coordinate in its map grid. The patch's world X derives as
     /// `(m_PatchX << m_Lod) + world_origin_x`, scaled by the world context's inverse XZ scale.
     #[address(0x10)]
@@ -33,7 +38,10 @@ pub type PatchHeader {
 
     /// Per-frustum visibility bits, written by the patch system's BFBC cull step each update: bit
     /// `i` is set when the patch's AABB passed the cull for frustum entry `i` of the update's view
-    /// description ([`PatchViewDesc::m_FrustumIDs`] maps entries to frustum ids). The patch-update
+    /// description ([`PatchViewDesc::m_FrustumIDs`] maps entries to frustum ids). For the landscape
+    /// patch system entry 0, and so bit 0, is always the main cull camera
+    /// ([`PatchFrustumId::FRUSTUM_ID_MAIN_CAMERA`]); the last populated bit is its second run
+    /// ([`PatchFrustumId::FRUSTUM_ID_DEPTH_PREPASS`]). The patch-update
     /// fragments read these to decide which render passes receive the patch's render block.
     #[address(0x1C)]
     pub m_VisibilityBits: u16,
@@ -49,9 +57,14 @@ pub type PatchHeader {
 /// (`CLandscapeManager::UpdatePatchSystem`) the entries are: entry 0 = the occluder manager's main
 /// cull camera (frustum id 0), entries 1..=N = the active shadow cascades (ids 1..=8), then two
 /// reflective-shadow frusta (ids 9..=10), and a final second run of the same main cull camera
-/// (id 12). Partial mapping.
+/// (id 12); see [`PatchFrustumId`]. Partial mapping.
 #[min_size(0x40)]
 pub type PatchViewDesc {
+    /// The capacity of the frustum-entry arrays `CLandscapeManager::UpdatePatchSystem` fills: the
+    /// main camera, up to eight shadow passes, two reflective-shadow frusta, and the second main
+    /// camera run.
+    pub const MAX_FRUSTUMS: u32 = 12,
+
     /// The frustum id for each entry, indexed by the same entry index as the patch's
     /// [`PatchHeader::m_VisibilityBits`] bit.
     #[address(0x30)]
@@ -60,6 +73,32 @@ pub type PatchViewDesc {
     /// The number of frustum entries this update (also the number of populated visibility bits).
     #[address(0x38)]
     pub m_FrustumCount: u32,
+}
+
+/// The frustum ids `CLandscapeManager::UpdatePatchSystem` assigns to the entries of a landscape
+/// patch-system update ([`PatchViewDesc::m_FrustumIDs`]). The per-patch fragments route a patch to
+/// render passes by the id of each set [`PatchHeader::m_VisibilityBits`] bit.
+#[copyable]
+pub enum PatchFrustumId: u32 {
+    /// The occluder manager's main cull camera (entry 0); routes to the colour passes.
+    FRUSTUM_ID_MAIN_CAMERA = 0,
+    /// The first shadow pass. Shadow pass `i` (for each active cascade of the current frame
+    /// parity, at most eight) uses id `1 + i`, routing to the shadow passes.
+    FRUSTUM_ID_SHADOW_PASS_0 = 1,
+    FRUSTUM_ID_SHADOW_PASS_1 = 2,
+    FRUSTUM_ID_SHADOW_PASS_2 = 3,
+    FRUSTUM_ID_SHADOW_PASS_3 = 4,
+    FRUSTUM_ID_SHADOW_PASS_4 = 5,
+    FRUSTUM_ID_SHADOW_PASS_5 = 6,
+    FRUSTUM_ID_SHADOW_PASS_6 = 7,
+    FRUSTUM_ID_SHADOW_PASS_7 = 8,
+    /// The first reflective-shadow-map frustum.
+    FRUSTUM_ID_REFLECTIVE_SHADOW_0 = 9,
+    /// The second reflective-shadow-map frustum.
+    FRUSTUM_ID_REFLECTIVE_SHADOW_1 = 10,
+    /// A second run of the main cull camera (the final entry, sharing the main camera's cached
+    /// BFBC parameters); routes to the depth prepass.
+    FRUSTUM_ID_DEPTH_PREPASS = 12,
 }
 
 /// The argument block passed to a patch map's per-patch CPU update fragment. Partial: only the
@@ -107,3 +146,37 @@ pub fn TerrainPatchUpdate(patch_context: *mut PatchContext, fragment_context: *m
 /// per-quadrant sub-blocks to the near/tessellation passes.
 #[address(0x141_0CA_C50)]
 pub fn TerrainPatchSystemFragment(patch_context: *mut PatchContext, fragment_context: *mut void);
+
+/// A per-patch CPU fragment with no per-patch work (the symbol dump's `TreeDataPatch`; identical
+/// bodies may share this address): it only completes pending lifecycle transitions, finishing a
+/// pending destruction (clearing [`PatchHeader::m_DynamicSize`] and setting the destruction-complete
+/// status bit) or a pending construction (setting the construction-complete bit).
+#[address(0x141_0C8_FA0)]
+pub fn TreeDataPatch(patch_context: *mut PatchContext, fragment_context: *mut void);
+
+/// The base VolumetricTerrain patch system's construction-time setup
+/// (`OldTerrainPatchSystem::TerrainPatchSystemCreateLayers`): for each of the four base LODs it
+/// allocates the map's `CRenderBlockTerrain` array in constant memory, creates the blocks, and
+/// registers the `terrain_patch_lod%d` patch map (fragment [`TerrainPatchUpdate`]) with a
+/// dependency on the previous layer.
+#[address(0x140_32F_AB0)]
+pub fn TerrainPatchSystemCreateLayers(ctx: *const void, system: *mut void);
+
+/// The landscape manager (`CLandscapeManager`). Opaque.
+pub type LandscapeManager;
+impl LandscapeManager {
+    /// Assembles the landscape patch system's cull frusta (see [`PatchFrustumId`] and
+    /// [`PatchViewDesc::MAX_FRUSTUMS`]) from the occluder manager's main cull camera, the active
+    /// shadow passes of the current frame parity, and the two reflective-shadow frusta, then runs
+    /// the patch system update with them. Skipped unless the previous patch-system frame is
+    /// complete or `force` is set.
+    #[address(0x140_34B_2F0)]
+    pub fn UpdatePatchSystem(&mut self, dt: f32, force: bool);
+}
+
+/// Computes a streamed terrain patch's tessellated triangle count for the camera at `cam_pos`
+/// (`patch` is the `STerrainStreamPatch`): with `metric_type` 2 it scales each quad's tessellation
+/// by the camera's distance beyond the patch bounds divided by `tess_factor_edge`. The terrain
+/// patch update stores the result on the patch's render block.
+#[address(0x141_0C9_690)]
+pub fn UpdateTessellatedTriangles(patch: *const void, cam_pos: *const Vector3, metric_type: i32, manual_metric_value: f32, num_indices: u32, tess_factor_edge: f32) -> u64;

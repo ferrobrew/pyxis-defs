@@ -3,6 +3,11 @@ use types::math::Matrix4;
 
 #[singleton(0x142_F18_6B0), size(0x758)]
 pub type GameCameraManager {
+    /// The camera hint `CPlayer::SetAimMode` adds through [`AddHint`](Self::AddHint) on entering
+    /// precision aim (aim mode 1) and removes on leaving it; the zoom lives in the camera state
+    /// that reacts to the hint.
+    pub const PRECISION_AIM_HINT_ID: u32 = 0x53AE3A35,
+
     #[address(0xE0)]
     pub m_ControlContext: CameraControlContext,
 }
@@ -53,4 +58,16 @@ impl GameCameraManager {
     /// water level at the camera.
     #[address(0x140_7F4_560)]
     pub fn UpdateRender(&mut self, dt: f32, dtf: f32, blend: f32) -> u64;
+
+    /// Adds a reference to camera hint `hint` in the manager's hint table (a hash of hint id to
+    /// reference count), inserting it with a count of one if absent. Camera states read the table
+    /// to select hinted behaviour. `debug_name` is unused in release.
+    #[address(0x140_7AE_2F0)]
+    pub fn AddHint(&mut self, hint: u32, debug_name: *const u8);
+
+    /// Resets the camera control context, the camera director, and the camera tree; when
+    /// `transform` is non-null, also initializes the camera manager's transform to it and stores it
+    /// as the reset transform. Called on player teleports.
+    #[address(0x140_77B_CE0)]
+    pub fn ResetCamera(&mut self, transform: *const Matrix4);
 }

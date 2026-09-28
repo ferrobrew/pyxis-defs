@@ -184,6 +184,16 @@ pub type CreateSurfaceAliasParams {
 /// appear here — a render setup's size is whatever its bound targets carry.
 #[size(0xE0), align(8)]
 pub type CreateRenderSetupParams {
+    /// The [`m_Mask`](Self::m_Mask) value enabling writes to all four colour channels, which
+    /// [`CreateRenderSetups`](graphics_engine::graphics_engine::GraphicsEngine::CreateRenderSetups)
+    /// passes for its setups.
+    pub const MASK_ALL_CHANNELS: u32 = 15,
+    /// The [`m_Flags`](Self::m_Flags) value
+    /// [`CreateRenderSetups`](graphics_engine::graphics_engine::GraphicsEngine::CreateRenderSetups)
+    /// passes for its setups, including both back-buffer setups: `m_AutoResolve = 1`,
+    /// `m_EDRAMLayout = 0`, and `m_UAVStart = 15` (immediately after the colour targets).
+    pub const DEFAULT_FLAGS: u32 = 0x79,
+
     /// The depth-stencil target, or null for a colour-only setup.
     pub m_DepthTarget: *mut HTexture_t,
 

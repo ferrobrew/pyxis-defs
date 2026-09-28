@@ -1,7 +1,8 @@
 use camera::camera::Camera;
 use graphics_engine::graphics_engine::{HContext_t, HDevice_t, HRenderSetup_t, HTexture_t, RenderContext};
+use graphics_engine::gpu_profiler::RenderPassGpuTimingQuery;
 use graphics_engine::render_pass::RenderPass;
-use types::math::{Matrix4, Vector4};
+use types::math::{Matrix4, Vector3, Vector4};
 use types::std_vector::Vector;
 
 /// The flat, contiguous render-pass id enum. Every pass / first / last index in the render engine is
@@ -267,17 +268,128 @@ pub fn TerrainPatchSystemUpdate(handle: *mut STerrainPatchSystem, ctx: *mut void
 
 #[singleton(0x142_ED0_E18), size(0x2220)]
 pub type RenderEngine {
+    /// The particle tessellation factor scale, adapted each frame by
+    /// [`BeginParticlePassGpuTimingQuery`](Self::BeginParticlePassGpuTimingQuery): lowered by 0.1 while
+    /// the particle pass's average GPU time exceeds 5 ms, raised by 0.1 below 4 ms, and clamped to at
+    /// most 1.
+    #[address(0x40)]
+    pub m_TessFactorScale: f32,
+
+    /// Set while the particle pass's average GPU time is above the heavy-load threshold, cleared once
+    /// it falls below 5 ms.
+    #[address(0x44)]
+    pub m_ParticlePassGpuIntense: bool,
+
+    /// The GPU timing query bracketing the particle pass.
+    #[address(0x48)]
+    pub m_ParticlePassGpuTimingQuery: RenderPassGpuTimingQuery,
+
     /// The per-pass render-block-item lists: one vector of [`RenderPass`] pointers per pass id.
     /// [`DrawRenderPassRange`](Self::DrawRenderPassRange) and the per-frame list rotation walk
     /// this.
     #[address(0x80)]
     pub m_RenderPasses: [Vector<*mut RenderPass>; 157],
 
-    /// The per-Draw constant-buffer ring index (feeding `CalculateConstantBufferIndices`): each `Draw`
-    /// selects a constant-buffer pool slot from this and advances it, wrapping at the limit in the `u32`
-    /// immediately after. It advances independently of the engine frame counters.
+    /// The time of day in hours, copied per pass into
+    /// [`RenderContext::m_TimeOfDay`](graphics_engine::graphics_engine::RenderContext::m_TimeOfDay).
+    #[address(0x1_470)]
+    pub m_TimeOfDay: f32,
+
+    /// The frame delta time in seconds, copied per pass into
+    /// [`RenderContext::m_Dt`](graphics_engine::graphics_engine::RenderContext::m_Dt).
+    #[address(0x1_474)]
+    pub m_Dt: f32,
+
+    /// The wind animation phase, copied per pass into
+    /// [`RenderContext::m_WindAnimation`](graphics_engine::graphics_engine::RenderContext::m_WindAnimation).
+    #[address(0x1_478)]
+    pub m_WindAnimation: f32,
+
+    /// The accumulated frame time, copied per pass into the render context and staged as the
+    /// GlobalConstants frame-time term.
+    #[address(0x1_47C)]
+    pub m_AccFrameTime: u32,
+
+    /// The precipitation density, copied per pass into
+    /// [`RenderContext::m_PrecipitationDensity`](graphics_engine::graphics_engine::RenderContext::m_PrecipitationDensity).
+    #[address(0x1_558)]
+    pub m_PrecipitationDensity: f32,
+
+    /// The sun direction, copied per pass into
+    /// [`RenderContext::m_SunVector`](graphics_engine::graphics_engine::RenderContext::m_SunVector).
+    #[address(0x1_55C)]
+    pub m_SunVector: Vector3,
+
+    /// The wind strength, copied per pass into
+    /// [`RenderContext::m_WindStrength`](graphics_engine::graphics_engine::RenderContext::m_WindStrength).
+    #[address(0x1_568)]
+    pub m_WindStrength: f32,
+
+    /// The sun backlight colour. [`SetGlobalShaderConstants`](Self::SetGlobalShaderConstants) stages
+    /// it scaled by [`m_SunBacklightDiffuseMultiplier`](Self::m_SunBacklightDiffuseMultiplier) and
+    /// [`m_SunBacklightSpecularMultiplier`](Self::m_SunBacklightSpecularMultiplier) into the fragment
+    /// GlobalConstants.
+    #[address(0x1_5F0)]
+    pub m_SunBacklightColor: Vector3,
+
+    /// The diffuse multiplier of [`m_SunBacklightColor`](Self::m_SunBacklightColor).
+    #[address(0x1_5FC)]
+    pub m_SunBacklightDiffuseMultiplier: f32,
+
+    /// The specular multiplier of [`m_SunBacklightColor`](Self::m_SunBacklightColor).
+    #[address(0x1_600)]
+    pub m_SunBacklightSpecularMultiplier: f32,
+
+    /// The minimum sun elevation angle in radians. [`SetGlobalShaderConstants`](Self::SetGlobalShaderConstants)
+    /// rotates the staged sun direction up toward [`vector3_up`](types::math::vector3_up) whenever its elevation is below
+    /// this angle.
+    #[address(0x1_604)]
+    pub m_SunBacklightHeightClamp: f32,
+
+    /// The sun shadow colour, staged scaled by
+    /// [`m_SunShadowDiffuseMultiplier`](Self::m_SunShadowDiffuseMultiplier) and
+    /// [`m_SunShadowSpecularMultiplier`](Self::m_SunShadowSpecularMultiplier).
+    #[address(0x1_608)]
+    pub m_SunShadowColor: Vector3,
+
+    /// The diffuse multiplier of [`m_SunShadowColor`](Self::m_SunShadowColor).
+    #[address(0x1_614)]
+    pub m_SunShadowDiffuseMultiplier: f32,
+
+    /// The specular multiplier of [`m_SunShadowColor`](Self::m_SunShadowColor).
+    #[address(0x1_618)]
+    pub m_SunShadowSpecularMultiplier: f32,
+
+    /// The ring of scene-colour copies (the screen-space refraction source).
+    /// `CRenderEngine::UpdateRenderContextGlobals` hands the current one to
+    /// [`RenderContext::m_BackBufferTexture`](graphics_engine::graphics_engine::RenderContext::m_BackBufferTexture).
+    #[address(0x1_6A0)]
+    pub m_BackBufferCopy: [*mut HTexture_t; 4],
+
+    /// The current slot of [`m_BackBufferCopy`](Self::m_BackBufferCopy). The
+    /// [`GraphicsEngine::Draw`](graphics_engine::graphics_engine::GraphicsEngine::Draw) prologue
+    /// advances it once per frame, wrapping at [`m_BackBufferCopyCount`](Self::m_BackBufferCopyCount).
     #[address(0x1_6C0)]
-    pub m_ConstantBufferRingIndex: u32,
+    pub m_CurrBackBufferCopy: u32,
+
+    /// The number of slots in use in [`m_BackBufferCopy`](Self::m_BackBufferCopy).
+    #[address(0x1_6C4)]
+    pub m_BackBufferCopyCount: u32,
+
+    /// The scene depth copy, handed to
+    /// [`RenderContext::m_DepthBufferTexture`](graphics_engine::graphics_engine::RenderContext::m_DepthBufferTexture).
+    #[address(0x1_6C8)]
+    pub m_DepthBufferCopy: *mut HTexture_t,
+
+    /// The vertex GlobalConstants constant buffer
+    /// ([`RenderContext::m_VPGlobals`](graphics_engine::graphics_engine::RenderContext::m_VPGlobals)).
+    #[address(0x1_6D0)]
+    pub m_VPGlobals: *mut void,
+
+    /// The fragment GlobalConstants constant buffer
+    /// ([`RenderContext::m_FPGlobals`](graphics_engine::graphics_engine::RenderContext::m_FPGlobals)).
+    #[address(0x1_6D8)]
+    pub m_FPGlobals: *mut void,
 
     /// The render engine's embedded [`ResourceContext`]. `RecreateRenderBlockTypes` passes a
     /// pointer to this field to every type's [`Recreate`](RenderBlockTypeBase::Recreate), and each
@@ -298,6 +410,23 @@ pub type RenderEngine {
     /// (the matrix camera-relative opaque geometry multiplies by), 33--36 the previous
     /// view-projection, 37 frame time and dt, 38--43 the frustum planes, 44--47 the previous
     /// offset view-projection, and 48 the previous camera position.
+    /// Set while the planar/environment reflection passes draw; `CRenderPass::SetupRenderContext`
+    /// maps it to render-status bit `0x8`.
+    #[address(0x1_8F8)]
+    pub m_IsRenderingReflections: bool,
+
+    /// Set while the dynamic shadow passes draw (render-status bit `0x4`).
+    #[address(0x1_8F9)]
+    pub m_IsRenderingDynamicShadowMap: bool,
+
+    /// Set while the static shadow passes draw (render-status bit `0x2`).
+    #[address(0x1_8FA)]
+    pub m_IsRenderingStaticShadowMap: bool,
+
+    /// Set while the reflective shadow map passes draw (render-status bit `0x40`).
+    #[address(0x1_8FB)]
+    pub m_IsRenderingReflectiveShadowMap: bool,
+
     #[address(0x1_91C)]
     pub m_VPGlobalConstData: [Vector4; 49],
 
@@ -305,11 +434,35 @@ pub type RenderEngine {
     /// `GlobalConstants` cbuffer at fragment slot 0, `FP_GLOBAL_SIZE` = 95 float4 rows): lighting,
     /// wetness, shadow, and per-view camera rows filled by
     /// [`SetGlobalShaderConstants`](Self::SetGlobalShaderConstants), uploaded by
-    /// [`SetAllGlobalShaderProgramConstants`](Self::SetAllGlobalShaderProgramConstants).
+    /// [`SetAllGlobalShaderProgramConstants`](Self::SetAllGlobalShaderProgramConstants). Row 0 `.w`
+    /// is the sea level, and row 8 `.zw` is `(1 / DisplayWidth, 1 / DisplayHeight)` from
+    /// `Graphics::GetDeviceInfo` (the device display size, not the bound render setup's).
     #[address(0x1_C2C)]
     pub m_FPGlobalConstData: [Vector4; 95],
 }
 impl RenderEngine {
+    /// The one-time startup of the render engine (`CRenderEngine::InitializeSystem`). Among its setup
+    /// of the render passes it registers the Z-and-velocity pass's two depth buckets
+    /// ([`RenderPass::Z_AND_VELOCITY_DEPTH_SQ_NEAR`] and
+    /// [`RenderPass::Z_AND_VELOCITY_DEPTH_SQ_FAR`]).
+    #[address(0x140_1AD_550)]
+    pub fn InitializeSystem(&mut self, ctx: *const void) -> bool;
+
+    /// Begins the particle pass's GPU timing query and adapts
+    /// [`m_TessFactorScale`](Self::m_TessFactorScale) and
+    /// [`m_ParticlePassGpuIntense`](Self::m_ParticlePassGpuIntense) from its average GPU time.
+    #[address(0x140_173_960)]
+    pub fn BeginParticlePassGpuTimingQuery(&mut self, ctx: *mut HContext_t);
+
+    /// Builds the two-layer fog GlobalConstants from the render engine's time-of-day fog colours and
+    /// distance and height ramps, using the render camera height
+    /// ([`RenderContext::m_RenderCameraPosition`](graphics_engine::graphics_engine::RenderContext::m_RenderCameraPosition)`.y`).
+    /// `reflected` substitutes a fixed height of 1024 for the camera height (the reflection passes).
+    /// Called at the tail of [`SetGlobalShaderConstants`](Self::SetGlobalShaderConstants) and
+    /// [`SetGlobalShaderProgramCameraConstants`](Self::SetGlobalShaderProgramCameraConstants).
+    #[address(0x140_184_F40)]
+    pub fn SetFog(&mut self, ctx: *const RenderContext, reflected: bool);
+
     /// The late render-pass step: finalizes and copies render targets under the context mutex.
     #[address(0x140_1C2_350)]
     pub fn PostDraw(&mut self, context: *const HContext_t);
@@ -331,7 +484,8 @@ impl RenderEngine {
     #[address(0x140_186_760)]
     pub fn PreDraw(&mut self, ctx: *mut HContext_t) -> u64;
 
-    /// The GBuffer fill: binds two global textures, then draws the GBuffer pass range (the depth and
+    /// The GBuffer fill: binds two global textures on fragment texture slots 40 and 41 (and a sampler
+    /// on slot 9), then draws the GBuffer pass range (the depth and
     /// velocity prefix, static and dynamic models, and decals).
     #[address(0x140_186_810)]
     pub fn DrawGBuffer(&mut self, ctx: *mut HContext_t, a3: i64, a4: *mut HTexture_t);
@@ -419,6 +573,11 @@ pub type ResourceContext {
     pub m_MaxAniso: i32,
 }
 
+/// Returns the display name of render pass `pass` and writes its category (`ERenderPassCategory`) to
+/// `out_category` and the name to `out_name`; unknown ids give `"NONE"` and category 0.
+#[address(0x140_174_3A0)]
+pub fn GetRenderPassInfo(pass: RenderPassId, out_category: *mut i32, out_name: *mut *const u8) -> *const u8;
+
 /// The abstract render-block type interface (`NGraphicsEngine::IRenderBlockType`): the per-type
 /// singleton every render block's `GetType` returns, holding the type's shaders and per-pass setup.
 /// Mapped by vtable only.
@@ -470,6 +629,25 @@ pub type RenderBlockTypeBase {
         #[index(20)]
         pub fn Disable(&mut self);
     },
+}
+impl RenderBlockTypeBase {
+    /// Binds the per-frame lighting textures and samplers every lit render block type shares
+    /// (`CRenderBlockType::SetupLightingTextures`, static): the lighting samplers on fragment sampler
+    /// slots 10 and 11, the environment cube map on fragment texture slot 11 (cleared when null), the
+    /// light falloff texture on slot 12, [`RenderContext::m_LightLookup`] on slot 31, and the terrain
+    /// horizon maps [`RenderContext::m_HorizonMap0`] and [`RenderContext::m_HorizonMap1`] on slots 44
+    /// and 45 (each replaced by
+    /// [`ShadowManager::m_HorizonMapFallback`](graphics_engine::shadow_manager::ShadowManager::m_HorizonMapFallback)
+    /// when null).
+    #[address(0x140_101_160)]
+    pub fn SetupLightingTextures(ctx: *const RenderContext);
+
+    /// Binds the forward-lighting resources (`CRenderBlockType::SetupForwardLightingResources`,
+    /// static): [`RenderContext::m_LightBuffer`] as fragment constant buffer 3, the first GBuffer
+    /// texture ([`GraphicsEngine::m_GBufferTexture`](graphics_engine::graphics_engine::GraphicsEngine::m_GBufferTexture)`[0]`)
+    /// on fragment texture slot 15, then [`SetupLightingTextures`](Self::SetupLightingTextures).
+    #[address(0x140_101_250)]
+    pub fn SetupForwardLightingResources(ctx: *const RenderContext);
 }
 
 /// One entry in the global render-block-type registry: the type's hash (its `GetHash`) and the

@@ -1,0 +1,539 @@
+use character::character::AnimatedModel;
+use types::math::Matrix4;
+use types::math::Vector3;
+use types::std_vector::Vector;
+
+/// The situation a weapon is in (`CWeaponData::EWeaponState`), stored on the weapon as
+/// [`WeaponBase::m_State`]. It selects the weapon's attach bone
+/// ([`WeaponData::m_lBoneAttachementPerWeaponState`] is indexed by it) and, when holstered, the
+/// holstered scale applied to the weapon's world matrix.
+#[copyable]
+pub enum WeaponState: i32 {
+    E_WS_DROPPED = 0x0,
+    E_WS_WIELDING = 0x1,
+    E_WS_DUAL_WIELDING = 0x2,
+    /// Holstered on the body. `CWeaponData::GetWorldMatrixT1` and the render update scale the
+    /// weapon's matrix by [`WeaponData::m_HolsteredScaleValue`] in this state.
+    E_WS_HOLSTERED = 0x3,
+    E_WS_HOLSTERED_INVISIBLE = 0x4,
+    E_WS_MOUNTED = 0x5,
+    E_WS_TURRET = 0x6,
+    E_WS_VEHICLE = 0x7,
+    E_WS_PICKING_UP = 0x8,
+    E_WS_WEAPON_RACK = 0x9,
+    E_WS_WINGSUIT_WEAPON = 0xA,
+    /// The number of weapon states, and so the length of
+    /// [`WeaponData::m_lBoneAttachementPerWeaponState`].
+    E_WS_NUM = 0xB,
+}
+
+/// How a weapon orients its projectiles (`CWeaponBase::EProjectileFireDirectionMode`), read by
+/// [`WeaponBase::GetShotMatrix`] from [`WeaponBase::m_ProjectileTempFireDirection`], falling back to
+/// [`WeaponBase::m_ProjectileFireDirection`] while the temporary mode is unset.
+#[copyable]
+pub enum ProjectileFireDirectionMode: i32 {
+    /// No mode set; the reader falls back to the other mode field.
+    E_PROJECTILE_FIRE_DIRECTION_UNSET = -1,
+    /// Fire from the muzzle toward the weapon's aim target.
+    E_PROJECTILE_FIRE_DIRECTION_AIM_POS = 0x0,
+    /// Fire along the weapon's own barrel, ignoring the aim target.
+    E_PROJECTILE_FIRE_DIRECTION_BARREL = 0x1,
+}
+
+/// A weapon's tuning record (`SWeaponTuning`), an ADF resource shared by every instance of a weapon
+/// type and reached through [`WeaponBase::m_Tuning`]. Only the fields read by the mapped functions
+/// are bound.
+#[min_size(0x70)]
+pub type WeaponTuning {
+    /// The magazine capacity. Negative means the weapon has no magazine limit.
+    #[address(0x40)]
+    pub m_magazine_size: i32,
+
+    /// The weapon's maximum aim range in metres. The player's aim control takes the largest of
+    /// these over the wielded, wingsuit, and vehicle weapons as the weapon slot's maximum aim
+    /// distance.
+    #[address(0x44)]
+    pub m_max_range: f32,
+
+    /// A per-weapon replacement for the character's aim-timer refill value; non-negative values
+    /// override the character's aim settings (see [`WeaponBase::GetAimTimerOverride`]).
+    #[address(0x6C)]
+    pub m_aim_timer_override: f32,
+}
+
+/// One muzzle fire point of a weapon model (`CWeaponData::SInternalFireInformation`): the muzzle
+/// transform relative to the weapon, the muzzle-flash effect bound to it, and the time since it
+/// last fired.
+#[size(0x50)]
+pub type InternalFireInformation {
+    /// The fire point's transform in weapon space. The shot origin is this matrix composed with
+    /// the weapon's world matrix.
+    pub m_Position: Matrix4,
+
+    /// The attached fire effect played at this fire point.
+    #[address(0x40)]
+    pub m_FireEffect: *mut void,
+
+    /// Seconds since this fire point last fired; reset to zero when the fire point is used.
+    #[address(0x48)]
+    pub m_TimeSinceLastFire: f32,
+}
+
+/// The weapon's list of [`WeaponData`] entries (an engine `TArray<CWeaponData*>`): begin, end, and
+/// capacity-end pointers followed by a user-allocated flag.
+#[min_size(0x20)]
+pub type WeaponDataArray {
+    /// The first entry.
+    pub m_Begin: *mut *mut WeaponData,
+
+    /// One past the last live entry.
+    #[address(0x8)]
+    pub m_End: *mut *mut WeaponData,
+
+    /// One past the allocated capacity.
+    #[address(0x10)]
+    pub m_Last: *mut *mut WeaponData,
+}
+
+/// One physical gun of a weapon (`CWeaponData`, a `CCombinedAttachedEffectContainer`): its model,
+/// attach bones, muzzle fire points, cached world matrices, and fire effects. A weapon holds one per
+/// gun in [`WeaponBase::m_lWeaponData`]; a dual-wield weapon holds two.
+#[min_size(0x2E8)]
+pub type WeaponData {
+    /// The weapon this gun belongs to.
+    #[address(0xC0)]
+    pub m_Owner: *mut WeaponBase,
+
+    /// The attach bone (an `NBone::ESafeBoneIndex`) this gun rides for each [`WeaponState`],
+    /// indexed by [`WeaponBase::m_State`].
+    #[address(0xD0)]
+    pub m_lBoneAttachementPerWeaponState: [u32; 11],
+
+    /// The gun's muzzle fire points, one per barrel.
+    #[address(0x100)]
+    pub m_InternalFirePositions: Vector<InternalFireInformation>,
+
+    /// The fire-point cursor: the index into
+    /// [`m_InternalFirePositions`](Self::m_InternalFirePositions) that
+    /// [`WeaponBase::GetFireFromPosition`] uses as the muzzle. The tail of
+    /// [`WeaponBase::Fire_Projectile`] advances it modulo the fire-point count after each shot.
+    #[address(0x120)]
+    pub m_InternalFirePositionCurrentIndex: i32,
+
+    /// The gun's animated model, when it has one; its skinning is updated in the render phase.
+    #[address(0x128)]
+    pub m_AnimatedModel: *mut AnimatedModel,
+
+    /// The gun's base model instance (an `NModelSystem::CModelInstance`). The render update pushes
+    /// the interpolated world matrix to it.
+    #[address(0x130)]
+    pub m_BaseModelInstance: *mut void,
+
+    /// The gun's world matrix as of the previous simulation tick.
+    #[address(0x158)]
+    pub m_WorldMatrixT0: Matrix4,
+
+    /// The gun's world matrix as of the current simulation tick, refreshed from the attach bone by
+    /// the model-instance attachment update. Sim-side readers such as the fire origin read it
+    /// through [`GetWorldMatrixT1`](Self::GetWorldMatrixT1); the render update interpolates from
+    /// [`m_WorldMatrixT0`](Self::m_WorldMatrixT0) toward it.
+    #[address(0x198)]
+    pub m_WorldMatrixT1: Matrix4,
+
+    /// Seconds since this gun last fired; reset by [`WeaponBase::Fire_Projectile`].
+    #[address(0x2A8)]
+    pub m_TimeSinceLastFire: f32,
+
+    /// The uniform scale applied to the gun's world matrix while holstered.
+    #[address(0x2DC)]
+    pub m_HolsteredScaleValue: f32,
+
+    /// Whether this gun leads a multi-gun first shot: [`WeaponBase::Fire_Projectile`] clears it on
+    /// every gun and sets it on the firing one.
+    #[address(0x2E6)]
+    pub m_IsLeadingWeaponFire: bool,
+}
+impl WeaponData {
+    /// Returns [`m_WorldMatrixT1`](Self::m_WorldMatrixT1), scaled by
+    /// [`m_HolsteredScaleValue`](Self::m_HolsteredScaleValue) when the owning weapon is
+    /// [`E_WS_HOLSTERED`](WeaponState::E_WS_HOLSTERED). The result is written through `result`
+    /// and returned.
+    #[address(0x140_960_1E0)]
+    pub fn GetWorldMatrixT1(&self, result: *mut Matrix4) -> *mut Matrix4;
+}
+
+/// The base class of every weapon (`CWeaponBase`, a `CPhysicsGameObject`): fire input and timing,
+/// ammunition, recoil, heat, aim target, tuning, and the list of physical guns
+/// ([`WeaponData`]) it drives. The `CGameObject` subobject sits at `+0x8`.
+pub type WeaponBase {
+    /// The seconds a blocked trigger pull stays buffered in
+    /// [`m_InputBufferTimer`](Self::m_InputBufferTimer).
+    pub const INPUT_BUFFER_TIME: f32 = 0.5,
+
+    vftable {
+        /// Writes the muzzle position for `weapon_data`: the gun's world matrix composed with its
+        /// current fire point ([`WeaponData::m_InternalFirePositionCurrentIndex`]). The base
+        /// implementation is [`GetFireFromPositionBase`](Self::GetFireFromPositionBase).
+        #[index(25)]
+        pub fn GetFireFromPosition(&self, result: *mut Vector3, weapon_data: *mut WeaponData) -> *mut Vector3;
+
+        /// Fires one shot from `weapon_data`. The base implementation is
+        /// [`Fire_ProjectileBase`](Self::Fire_ProjectileBase); subclasses such as
+        /// `CBulletWeaponBase` spawn their projectile and then call it.
+        #[index(28)]
+        pub fn Fire_Projectile(&mut self, weapon_data: *mut WeaponData);
+
+        /// Deducts `count` rounds of ammunition for `weapon_data`.
+        #[index(45)]
+        pub fn ConsumeAmmo(&mut self, weapon_data: *mut WeaponData, count: i32);
+
+        /// Whether the weapon is being aimed: the base implementation
+        /// ([`IsWeaponAimingBase`](Self::IsWeaponAimingBase)) returns
+        /// [`m_IsTryingToFire`](Self::m_IsTryingToFire) or
+        /// [`m_IsFeatheringTrigger`](Self::m_IsFeatheringTrigger). The character's aim-input
+        /// handling refills its aim timer while this holds.
+        #[index(47)]
+        pub fn IsWeaponAiming(&self) -> bool;
+
+        /// Applies the holder's aim mode (0 normal, 1 precision aim). `CPlayer::SetAimMode` calls
+        /// it after changing the player's aim mode.
+        #[index(48)]
+        pub fn SetAimMode(&mut self, aim_mode: i32);
+
+        /// The per-tick weapon update from its user after simulation: validates `aim_position` and
+        /// stores it as [`m_AimTargetPosition`](Self::m_AimTargetPosition), then processes the
+        /// fire inputs. The base implementation is
+        /// [`UpdateFromUserPostSim_ParallelBase`](Self::UpdateFromUserPostSim_ParallelBase).
+        #[index(54)]
+        pub fn UpdateFromUserPostSim_Parallel(&mut self, dt: f32, aim_position: *const Vector3, input: *const void);
+
+        /// Returns the weapon type's tuning block (`SWeaponTuningBase`), from which the fire code
+        /// reads recoil, scatter, and spread ranges.
+        #[index(57)]
+        pub fn GetTuningBase(&self) -> *const void;
+    },
+
+    /// Whether the current shot is the first of a trigger pull; first shots use the tuning's
+    /// first-shot recoil scale.
+    #[address(0x158)]
+    pub m_IsFirstShot: bool,
+
+    /// Whether the weapon is firing.
+    #[address(0x159)]
+    pub m_IsFiring: bool,
+
+    /// Whether the fire input currently requests a shot, after trigger sensitivity, semi-automatic
+    /// gating, and forced fire.
+    #[address(0x15A)]
+    pub m_IsTryingToFire: bool,
+
+    /// Whether the trigger input is past the tuning's pull threshold (with hysteresis once pulled).
+    #[address(0x15B)]
+    pub m_IsTriggerPulled: bool,
+
+    /// Whether firing is cancelled until the trigger is released.
+    #[address(0x15C)]
+    pub m_IsFiringCancelled: bool,
+
+    /// Whether the trigger input is above zero.
+    #[address(0x15D)]
+    pub m_IsFeatheringTrigger: bool,
+
+    /// Whether the current trigger pull has already fired; semi-automatic weapons fire once per
+    /// pull.
+    #[address(0x15E)]
+    pub m_FiredThisInput: bool,
+
+    /// The index into [`m_lWeaponData`](Self::m_lWeaponData) of the gun that fires next, which
+    /// [`GetFireFromPositionBase`](Self::GetFireFromPositionBase) reads to pick the muzzle. The
+    /// tail of [`Fire_ProjectileBase`](Self::Fire_ProjectileBase) (`MarkNextWeaponComponentForFire`,
+    /// inlined in this build) advances it modulo the gun count after each shot.
+    #[address(0x160)]
+    pub m_NextWeaponToFire: u8,
+
+    /// The index of the gun that fired last, recorded before
+    /// [`m_NextWeaponToFire`](Self::m_NextWeaponToFire) advances.
+    #[address(0x161)]
+    pub m_LastWeaponToFire: u8,
+
+    /// Whether firing this weapon adds no heat (wanted level) to the user.
+    #[address(0x163)]
+    pub m_NoHeatOnFiring: bool,
+
+    /// The weapon's persistent projectile direction mode.
+    #[address(0x168)]
+    pub m_ProjectileFireDirection: ProjectileFireDirectionMode,
+
+    /// A temporary override of [`m_ProjectileFireDirection`](Self::m_ProjectileFireDirection);
+    /// [`E_PROJECTILE_FIRE_DIRECTION_UNSET`](ProjectileFireDirectionMode::E_PROJECTILE_FIRE_DIRECTION_UNSET)
+    /// defers to it.
+    #[address(0x16C)]
+    pub m_ProjectileTempFireDirection: ProjectileFireDirectionMode,
+
+    /// Seconds of forced fire remaining; the weapon fires regardless of input while positive.
+    #[address(0x17C)]
+    pub m_ForceFireTimer: f32,
+
+    /// Shots of forced fire remaining; decremented once per
+    /// [`Fire_ProjectileBase`](Self::Fire_ProjectileBase) call.
+    #[address(0x180)]
+    pub m_ForceFireCount: i32,
+
+    /// Seconds a blocked trigger pull stays buffered. A pull blocked by wall penetration or by the
+    /// aim-angle check sets it to [`INPUT_BUFFER_TIME`](Self::INPUT_BUFFER_TIME), so the shot fires
+    /// if the block clears within that window; a shot resets it to zero.
+    #[address(0x184)]
+    pub m_InputBufferTimer: f32,
+
+    /// Seconds since the weapon last fired.
+    #[address(0x198)]
+    pub m_TimeSinceLastFire: f32,
+
+    /// The radius of the spread ring [`GetShotMatrix`](Self::GetShotMatrix) offsets the aim point
+    /// by, while [`m_ProjectileOffsetFireCount`](Self::m_ProjectileOffsetFireCount) shots remain.
+    #[address(0x1A4)]
+    pub m_ProjectileOffsetFromAimPos: f32,
+
+    /// Shots remaining that use the spread ring; decremented once per shot.
+    #[address(0x1AC)]
+    pub m_ProjectileOffsetFireCount: i32,
+
+    /// The accumulated scatter, raised by each shot up to the tuning's maximum and scaling the
+    /// shot's scatter rotation.
+    #[address(0x268)]
+    pub m_CurrentScatterValue: f32,
+
+    /// The recoil pitch still to be recovered, raised by each shot.
+    #[address(0x26C)]
+    pub m_CurrentRecoilPitchValueToRecover: f32,
+
+    /// The physical recoil impulse strength; a non-zero value defers a physical recoil after each
+    /// shot.
+    #[address(0x270)]
+    pub m_PhysicalRecoilStrength: f32,
+
+    /// The accumulated recoil yaw, kicked left or right at random by each shot.
+    #[address(0x274)]
+    pub m_RecoilYaw: f32,
+
+    /// The accumulated recoil pitch, raised by each shot.
+    #[address(0x278)]
+    pub m_RecoilPitch: f32,
+
+    /// Whether the weapon overheats.
+    #[address(0x38C)]
+    pub m_CanBeOverheated: bool,
+
+    /// Whether the weapon is overheated and cannot fire.
+    #[address(0x38D)]
+    pub m_IsOverheated: bool,
+
+    /// The heat level in `[0, 1]`; each shot adds heat and reaching 1 overheats the weapon.
+    #[address(0x390)]
+    pub m_CurrentHeatValue: f32,
+
+    /// Whether the weapon can be aimed at all; `CCharacter::IsAimingWeaponPossible` requires it.
+    #[address(0x3F8)]
+    pub m_AimingWeaponIsPossible: bool,
+
+    /// The weapon's aim target in world space, written each tick by
+    /// [`UpdateFromUserPostSim_Parallel`](Self::UpdateFromUserPostSim_Parallel) from the point the
+    /// holder passes in. [`GetShotMatrix`](Self::GetShotMatrix) aims every fire point of the
+    /// weapon at it.
+    #[address(0x3FC)]
+    pub m_AimTargetPosition: Vector3,
+
+    /// Whether aim assist stays on in precision aim. `CPlayer::SetAimMode` leaves the aim
+    /// control's aim type untouched when entering precision aim with a weapon that sets this.
+    #[address(0x40A)]
+    pub m_IsAutoAimInPrecisionAimEnabled: bool,
+
+    /// The inventory slot the weapon is equipped in (a `CInventory::EWeaponSlot`; 0 is dual wield,
+    /// 1 two-handed).
+    #[address(0x420)]
+    pub m_EquipSlot: i32,
+
+    /// The weapon's state.
+    #[address(0x424)]
+    pub m_State: WeaponState,
+
+    /// Whether precision aim is disabled for this weapon; the player's aim-input handling zeroes
+    /// the aim timer while it is set.
+    #[address(0x466)]
+    pub m_IsPrecisionAimDisabled: bool,
+
+    /// Whether the weapon is registered for pre-simulation updates; the fire path sets it and
+    /// registers the weapon when a deferred action is queued.
+    #[address(0x47C)]
+    pub m_RequiresPreSimUpdates: bool,
+
+    /// The weapon type's tuning, or null.
+    #[address(0x490)]
+    pub m_Tuning: *const WeaponTuning,
+
+    /// The character using the weapon (a `boost::weak_ptr<CCharacter>`: object pointer and weak
+    /// control block).
+    #[address(0x4F8)]
+    pub m_User: [*mut void; 2],
+
+    /// Whether the weapon blocks firing while its barrel penetrates a wall in aim.
+    #[address(0x560)]
+    pub m_IsWeaponPenetratingWallIfInAim: bool,
+
+    /// Whether the weapon's barrel penetrates a character in aim;
+    /// [`GetShotMatrix`](Self::GetShotMatrix) skips the near-muzzle barrel fallback while set.
+    #[address(0x561)]
+    pub m_IsWeaponPenetratingCharacterIfInAim: bool,
+
+    /// Whether the holder can lean over an obstruction to fire, which lifts the wall-penetration
+    /// block.
+    #[address(0x562)]
+    pub m_IsLeanOverFirePossible: bool,
+
+    /// The weapon's physical guns, one [`WeaponData`] per gun.
+    #[address(0x568)]
+    pub m_lWeaponData: WeaponDataArray,
+}
+impl WeaponBase {
+    /// Writes the grip transform for the given `hand` (a `E_WEAPON_GRIP_HAND_*` value).
+    #[address(0x140_966_840)]
+    pub fn GetGripPosition(&self, hand: i32, matrix: *mut Matrix4) -> bool;
+
+    /// Builds the launch transform for a shot from `weapon_data` into `shot_matrix`. The origin is
+    /// the muzzle ([`GetFireFromPosition`](Self::GetFireFromPosition)); the direction points at
+    /// [`m_AimTargetPosition`](Self::m_AimTargetPosition) (for a remote player, the network
+    /// component's aim point). It falls back to 10 m along the barrel when the aim point is within
+    /// about 0.3 m of the muzzle, in barrel fire-direction mode, or with `force_barrel_direction`.
+    /// While projectile-offset shots remain it offsets the aim point by
+    /// [`m_ProjectileOffsetFromAimPos`](Self::m_ProjectileOffsetFromAimPos) on a random ring, and
+    /// it layers the scatter rotation on top unless `ignore_scatter`.
+    #[address(0x140_985_AA0)]
+    pub fn GetShotMatrix(&mut self, weapon_data: *mut WeaponData, shot_matrix: *mut Matrix4, ignore_scatter: bool, force_barrel_direction: bool) -> bool;
+
+    /// The base implementation of the [`GetFireFromPosition`](Self::GetFireFromPosition) virtual.
+    #[address(0x140_966_940)]
+    pub fn GetFireFromPositionBase(&self, result: *mut Vector3, weapon_data: *mut WeaponData) -> *mut Vector3;
+
+    /// The base implementation of the [`Fire_Projectile`](Self::Fire_Projectile) virtual: consumes
+    /// ammunition, resets the fire timers, applies recoil, scatter, and heat, plays the fire effect
+    /// on `weapon_data`, decrements the forced-fire and projectile-offset counts, and then advances
+    /// the fire-point cursor of the gun at [`m_NextWeaponToFire`](Self::m_NextWeaponToFire) and the
+    /// gun index itself.
+    #[address(0x140_991_FF0)]
+    pub fn Fire_ProjectileBase(&mut self, weapon_data: *mut WeaponData);
+
+    /// The base implementation of the [`IsWeaponAiming`](Self::IsWeaponAiming) virtual.
+    #[address(0x140_950_F90)]
+    pub fn IsWeaponAimingBase(&self) -> bool;
+
+    /// The base implementation of the
+    /// [`UpdateFromUserPostSim_Parallel`](Self::UpdateFromUserPostSim_Parallel) virtual.
+    #[address(0x140_9A3_C50)]
+    pub fn UpdateFromUserPostSim_ParallelBase(&mut self, dt: f32, aim_position: *const Vector3, input: *const void);
+
+    /// The per-gun fire-input update: cools heat, reads the trigger against the tuning's
+    /// sensitivities, applies semi-automatic, forced-fire, wall-penetration, and aim-angle gating,
+    /// and starts or stops fire on `weapon_data`.
+    #[address(0x140_992_B00)]
+    pub fn UpdateWeapon_Parallel(&mut self, dt: f32, weapon_data: *mut WeaponData, input: *const void) -> bool;
+
+    /// Returns the tuning's aim-timer override
+    /// ([`WeaponTuning::m_aim_timer_override`]), or zero without tuning.
+    #[address(0x140_958_F70)]
+    pub fn GetAimTimerOverride(&self) -> f32;
+
+    /// Returns the tuning's magazine size ([`WeaponTuning::m_magazine_size`]), or zero without
+    /// tuning.
+    #[address(0x140_958_690)]
+    pub fn GetMagazineSize(&self) -> i32;
+
+    /// Sets every weapon-state attach bone of gun `weapon_index` to `bone` (an
+    /// `NBone::ESafeBoneIndex`).
+    #[address(0x140_958_AF0)]
+    pub fn ChangeBoneAttachement(&mut self, bone: u32, weapon_index: i32);
+
+    /// Returns the attach bone of gun `weapon_index` for the weapon's current
+    /// [`m_State`](Self::m_State), or an invalid-bone value when the index is out of range.
+    #[address(0x140_958_B30)]
+    pub fn GetCurrentBoneAttachement(&self, weapon_index: i32) -> u32;
+
+    /// The `CGameObject::GetTransform` override: copies the first gun's
+    /// [`WeaponData::GetWorldMatrixT1`] into `transform`. `game_object` is the weapon's
+    /// `CGameObject` subobject (the weapon plus `0x8`).
+    #[address(0x140_964_E50)]
+    pub fn GetTransform(game_object: *const void, transform: *mut Matrix4) -> bool;
+
+    /// The render-phase `CGameObject::UpdateRender` override. For each gun it interpolates
+    /// [`WeaponData::m_WorldMatrixT0`] toward [`WeaponData::m_WorldMatrixT1`] by the render
+    /// context's interpolation factor, applies the holstered scale when holstered, pushes the
+    /// result to [`WeaponData::m_BaseModelInstance`], and updates the gun's animated-model
+    /// skinning; it then renders the weapon's components. `game_object` is the weapon's
+    /// `CGameObject` subobject (the weapon plus `0x8`).
+    #[address(0x140_966_380)]
+    pub fn UpdateRender(game_object: *mut void, context: *mut void);
+}
+
+/// `CBulletWeaponBase`: the base of the fast-projectile weapons. Its layout is unmapped.
+pub type BulletWeaponBase;
+impl BulletWeaponBase {
+    /// The bullet weapons' [`WeaponBase::Fire_Projectile`] override: spawns the bullet projectile
+    /// and then calls [`WeaponBase::Fire_ProjectileBase`]. It is the only caller of
+    /// [`NWeaponUtil::Trajectory_GetAngleToHitPosition`].
+    #[address(0x140_927_550)]
+    pub fn Fire_Projectile(&mut self, weapon_data: *mut WeaponData);
+
+    /// Returns the bullet weapon's tuning (`SBulletWeaponTunings`), which selects explosive and
+    /// water behaviour for its projectiles.
+    #[address(0x140_914_7D0)]
+    pub fn GetTuning(&self) -> *const void;
+}
+
+/// `CSniperWeapon`: a precision-aim rifle. Its layout is unmapped.
+pub type SniperWeapon;
+impl SniperWeapon {
+    /// The [`WeaponBase::SetAimMode`] override: in precision aim (mode 1) it shows the HUD sniper
+    /// overlay and hides the holder, and in mode 0 it reverses both.
+    #[address(0x140_97F_120)]
+    pub fn SetAimMode(&mut self, aim_mode: i32);
+}
+
+/// The weapon ballistics helpers (`NWeaponUtil`).
+pub type NWeaponUtil;
+impl NWeaponUtil {
+    /// Solves the launch pitch that carries a projectile of speed `velocity` from `start_pos` to
+    /// `end_pos` under `gravity_factor` times world gravity, writing the high and low solutions.
+    /// Returns whether a solution exists. Only the bullet weapons' fire path calls it.
+    #[address(0x140_959_D70)]
+    pub fn Trajectory_GetAngleToHitPosition(start_pos: *const Vector3, end_pos: *const Vector3, velocity: f32, high_angle: *mut f32, low_angle: *mut f32, gravity_factor: f32) -> bool;
+
+    /// Solves the launch velocity that carries a projectile from `start_pos` to `end_pos` in
+    /// `time` seconds under `gravity_factor` times world gravity.
+    #[address(0x140_959_E90)]
+    pub fn Trajectory_GetVelocityToHitPosition(result: *mut Vector3, start_pos: *const Vector3, end_pos: *const Vector3, time: f32, gravity_factor: f32) -> *mut Vector3;
+}
+
+/// The animation-graph condition `C_IS_TRYING_TO_FIRE` (`CWeapoIsTryingToFireCondition`, the name
+/// is misspelt in the game). Its layout is unmapped.
+pub type WeapoIsTryingToFireCondition;
+impl WeapoIsTryingToFireCondition {
+    /// Evaluates the condition for the character owning `instance` (a
+    /// `NAnimationSystem::CStateMachineInstance`). True when the character holds a selected weapon
+    /// in a wielding, dual-wielding, or mounted state (or is planting an explosive) and a fire input
+    /// is present that the animation allows: the fire input with shooting allowed, the
+    /// precision-aim input with precision aim possible and allowed, or the plant input while
+    /// planting.
+    #[address(0x140_7F3_FF0)]
+    pub fn Evaluate(&self, instance: *const void) -> bool;
+}
+
+/// `CTurretWeaponComponent`: a weapon component that rotates a turret toward its weapon's target.
+/// Its layout is unmapped.
+pub type TurretWeaponComponent;
+impl TurretWeaponComponent {
+    /// The per-tick turret update, called from the component's pre-simulation update: selects the
+    /// turret's target (faction and heat checks, characters, vehicles, and rigid objects) and
+    /// rotates the turret toward the owning weapon's aim target at a rate-limited speed, so the
+    /// barrel lags the aim point.
+    #[address(0x140_93F_EC0)]
+    pub fn UpdateTurretAiming(&mut self, dt: f32);
+}

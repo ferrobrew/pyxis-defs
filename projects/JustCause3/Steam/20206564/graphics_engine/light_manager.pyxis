@@ -1,3 +1,8 @@
+use graphics_engine::graphics_engine::{HRenderSetup_t, RenderContext};
+use graphics_engine::render_pass::RenderPass;
+use graphics_engine::texture::Texture;
+use types::math::Vector3;
+
 /// Whether the engine renders volumetric spot-light cones at reduced resolution (the engine's
 /// `g_EnableLowResSpotLightVolume`). When set — the default — the per-frame light gather routes the
 /// spot-light-cone render block through a quarter-resolution render setup, enables the low-res
@@ -9,9 +14,113 @@
 pub extern enable_low_res_spot_light_volume: bool;
 
 /// The scene light manager: gathers the frame's visible lights and prepares the per-frame lighting
-/// render state.
-pub type LightManager;
+/// render state. Its release layout differs from the 2016 symbol dump's past the global light; only
+/// the fields below are verified.
+#[singleton(0x142_ED0_E70), min_size(0x1BEA88)]
+pub type LightManager {
+    /// The edge length in pixels of the clustered light grid's screen tiles:
+    /// `CRenderBlockDeferredLighting::DrawClustered` divides the display size by it to get the tile
+    /// counts, and the light-grid lookup addresses tiles as `SV_Position >> 6`.
+    pub const LIGHT_GRID_TILE_SIZE: u32 = 64,
+
+    /// The global light's (sun or moon) diffuse colour, the `Diffuse` of the embedded global light's
+    /// `SLight`. `CRenderPass::SetupRenderContext` copies it into
+    /// [`RenderContext::m_GlobalLightDiffuse`](graphics_engine::graphics_engine::RenderContext::m_GlobalLightDiffuse).
+    #[address(0xC)]
+    pub m_GlobalLightDiffuse: Vector3,
+
+    /// The direction toward the global light, the `Direction` of the embedded global light's
+    /// `SLight`. `CRenderPass::SetupRenderContext` copies it into
+    /// [`RenderContext::m_GlobalLightVector`](graphics_engine::graphics_engine::RenderContext::m_GlobalLightVector),
+    /// and `CRenderEngine::SetGlobalShaderConstants` stages it (raw and elevation-clamped) as the
+    /// shaders' sun direction.
+    #[address(0x24)]
+    pub m_GlobalLightDirection: Vector3,
+
+    /// The 24-entry per-hour night-light reference table (`SetNightLightReferences`).
+    #[address(0x11_0D0)]
+    pub m_NightLightReferences: *const f32,
+
+    /// The time-of-day light modulator, returned by `GetTimeOfDayLightModulator`.
+    /// `CRenderPass::SetupRenderContext` copies it into
+    /// [`RenderContext::m_TimeOfDayEmissiveScale`](graphics_engine::graphics_engine::RenderContext::m_TimeOfDayEmissiveScale).
+    #[address(0x11_0D8)]
+    pub m_TimeOfDayLightModulator: f32,
+
+    /// The environment-light intensity scale (`SetEnvLightIntensityScaleFactor`).
+    #[address(0x11_0E0)]
+    pub m_EnvLightIntensityScaleFactor: f32,
+
+    /// The VFX-light intensity scale (`SetVFXLightIntensityScaleFactor` /
+    /// `GetVFXLightIntensityScaleFactor`).
+    #[address(0x11_0E4)]
+    pub m_VFXLightIntensityScaleFactor: f32,
+
+    /// The clustered-lighting frame constant buffer, copied into
+    /// [`RenderContext::m_LightBuffer`](graphics_engine::graphics_engine::RenderContext::m_LightBuffer).
+    #[address(0x1BE_A30)]
+    pub m_LightBuffer: *mut void,
+
+    /// The three-slot per-frame light-grid lookup ring, indexed by the render frame modulo three.
+    #[address(0x1BE_A38)]
+    pub m_LightLookup: [*mut void; 3],
+
+    /// The light-grid lookup the clustered light assignment writes; used instead of
+    /// [`m_LightLookup`](Self::m_LightLookup) while
+    /// [`m_UseClusteredLightAssignment`](Self::m_UseClusteredLightAssignment) is set.
+    #[address(0x1BE_A50)]
+    pub m_LightAssignmentLookup: *mut void,
+
+    /// The fill-phase render setup of the clustered light assignment.
+    #[address(0x1BE_A60)]
+    pub m_LightAssignmentFillRenderSetup: *mut HRenderSetup_t,
+
+    /// The first light-assignment phase's output texture.
+    #[address(0x1BE_A68)]
+    pub m_LightAssignmentTexture: *mut Texture,
+
+    /// The first light-assignment phase's render setup.
+    #[address(0x1BE_A78)]
+    pub m_LightAssignmentRenderSetup: *mut HRenderSetup_t,
+
+    /// Whether the clustered light-assignment path is active. `UpdateRenderContext` mirrors it into
+    /// [`RenderContextFlags::m_UseClusteredLightAssignment`](graphics_engine::graphics_engine::RenderContextFlags::m_UseClusteredLightAssignment).
+    #[address(0x1BE_A80)]
+    pub m_UseClusteredLightAssignment: bool,
+}
 impl LightManager {
+    /// Copies the light manager's per-frame lighting resources into `ctx`: the frame constant
+    /// buffer, the light-grid lookup and light-assignment targets, the frame's point and spot light
+    /// records and counts, the night-light reference, the light falloff texture, and the lighting
+    /// samplers.
+    #[address(0x140_0A5_090)]
+    pub fn UpdateRenderContext(&mut self, ctx: *mut RenderContext);
+
+    /// Binds the forward-lighting resources
+    /// ([`RenderBlockTypeBase::SetupForwardLightingResources`](graphics_engine::render_engine::RenderBlockTypeBase::SetupForwardLightingResources)),
+    /// then the global-illumination textures when GI is active.
+    #[address(0x140_0B9_8B0)]
+    pub fn SetupForwardLightingResources(&self, ctx: *const RenderContext);
+
+    /// Binds the lighting textures
+    /// ([`RenderBlockTypeBase::SetupLightingTextures`](graphics_engine::render_engine::RenderBlockTypeBase::SetupLightingTextures)),
+    /// then the global-illumination textures when GI is active.
+    #[address(0x140_0B9_910)]
+    pub fn SetupLightingTextures(&self, ctx: *const RenderContext);
+
+    /// Adds the far lights to `render_pass`, culled against the active camera.
+    #[address(0x140_0B9_C10)]
+    pub fn AddFarLightsToPass(&mut self, render_pass: *mut RenderPass);
+
+    /// The per-frame render-side update of the light manager; `sun_shadow_cascades` is the number
+    /// of shadow-atlas slices the sun cascades occupy.
+    #[address(0x140_0CF_EE0)]
+    pub fn UpdateRender(&mut self, dt: f32, unused: f32, sun_shadow_cascades: u32);
+
+    /// Creates the deferred-lighting render block and pass.
+    #[address(0x140_0E9_C10)]
+    pub fn InitDeferredLighting(&mut self);
+
     /// Copies the frame's visible point and spot lights into the parity-buffered update lists and
     /// configures the volumetric-lighting passes. Reads
     /// [`enable_low_res_spot_light_volume`] (and whether any volumetric spot lights are present this

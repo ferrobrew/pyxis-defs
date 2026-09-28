@@ -55,6 +55,19 @@ pub type ObjectBlackboard {
     /// `m_AnimatedTurnBaseDir`/`m_AnimatedTurnTargetDir` pair the swim movement actuators slerp
     /// between across the angle-correction animation segment.
     pub const SWIM_TURN_ANGLE_ID: u32 = 2828323117,
+    /// The id of the float master weight (clamped to 0-1) of the player's per-arm aim IK, read by
+    /// `NRightArmAimIK::Update` and `NReelInAimIK::Update` (the IK is skipped while it is zero). The
+    /// animation data writes it, not the aim logic.
+    pub const AIM_IK_WEIGHT_ID: u32 = 0xE812F93E,
+    /// The id of the previous target direction (`CVector3f`), written by
+    /// `NStateTask_InputLocoSetTargetDirTask::SetupTargetDir` and read by
+    /// `NStateTask_LocoUtil::EvaluateCharacterDisplacement` as the code-driven displacement
+    /// direction inside its special segments.
+    pub const PREVIOUS_TARGET_DIR_ID: u32 = 0x370A3A61,
+    /// The id of a float marker (written as `1.0` by the stunt set-target-direction task) whose
+    /// presence makes `NStateTask_LocoUtil::EvaluateCharacterDisplacement` skip the animation
+    /// root-motion branch and apply the [`MOVE_DIR_ID`](Self::MOVE_DIR_ID) direction instantly.
+    pub const APPLY_TARGET_DIR_INSTANTLY_ID: u32 = 0xE844061C,
 
     /// The key table, [`m_KeyInfoCapacity`](Self::m_KeyInfoCapacity) slots; keys are
     /// assigned as they are first written.

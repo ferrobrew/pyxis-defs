@@ -48,3 +48,71 @@ pub type GameWorld {
         pub fn IsTeleporting(&mut self) -> bool;
     },
 }
+impl GameWorld {
+    /// `CGameWorld::TeleportPlayer`, the implementation behind the
+    /// [`TeleportPlayer`](Self::TeleportPlayer) virtual (vtable slot 19): copies the request into
+    /// the world's teleport state and arms the `TELEPORT_*` state machine
+    /// [`UpdateTeleport`] services; starts the overlay fade-to-black when `use_fade` is set and
+    /// [`TELEPORT_FLAG_NO_FADE`](Self::TELEPORT_FLAG_NO_FADE) is clear.
+    #[address(0x140_9AF_820)]
+    pub fn TeleportPlayerImpl(&mut self, world: *const Matrix4, state: *const HashString, use_load_state: bool, use_fade: bool, fade_in_time: f32, fade_out_time: f32, flags: u32, teleport_done_event: *mut u8, use_load_screen: bool);
+
+    /// `CGameWorld::TeleportPlayerInstant`, the implementation behind the
+    /// [`TeleportPlayerInstant`](Self::TeleportPlayerInstant) virtual (vtable slot 20). Writes the
+    /// character's transform through its world-transform virtual, calls
+    /// `CCharacter::ForceNeutralState`, sets the character's teleported flag bit, and resets the
+    /// camera through [`GameCameraManager::ResetCamera`](camera::game_camera_manager::GameCameraManager::ResetCamera),
+    /// bracketed by the `game_teleporting_initiated` and `game_teleporting_completed` posted
+    /// events.
+    #[address(0x140_A12_6C0)]
+    pub fn TeleportPlayerInstantImpl(&mut self, world: *const Matrix4, state: *const HashString, flags: u32);
+
+    /// `CGameWorld::IsTeleporting`, the implementation behind the
+    /// [`IsTeleporting`](Self::IsTeleporting) virtual (vtable slot 21): whether the teleport state
+    /// machine is not idle.
+    #[address(0x140_9AF_810)]
+    pub fn IsTeleportingImpl(&self) -> bool;
+}
+
+/// `CGameWorld::UpdateTeleport`: advances the deferred-teleport state machine a
+/// [`GameWorld::TeleportPlayer`] request armed (fade, optional load state, character placement,
+/// fade back in). Called from `CGameWorld::UpdatePostSim` each sim tick. `game_world` is the full
+/// `CGameWorld` object, whose [`GameWorld`] interface subobject (the singleton) sits at `+0x10`.
+#[address(0x140_A12_8A0)]
+pub fn UpdateTeleport(game_world: *mut u8, dt: f32);
+
+/// `CTeleport`: a placed game object that teleports the player to its own transform when
+/// triggered by its teleport event, through [`GameWorld::TeleportPlayer`]. Only the fields
+/// [`Teleport`](Self::Teleport) reads are mapped.
+#[min_size(0x160)]
+pub type Teleport {
+    /// The object's local transform.
+    #[address(0xC8)]
+    pub m_LocalTransform: Matrix4,
+    /// The object's world transform: the teleport destination.
+    pub m_WorldMatrix: Matrix4,
+
+    /// The optional object whose arrival state is checked before teleporting.
+    #[address(0x148)]
+    pub m_TeleportObjectId: u64,
+    pub m_FadeInTime: f32,
+    pub m_FadeOutTime: f32,
+    /// The character state to enter on arrival.
+    pub m_State: HashString,
+    /// Packed flags (`m_Enabled`, `m_ForceInstant`, `m_Teleport`, `m_UseFade`, `m_IgnoreFade`,
+    /// `m_LeavePlayerDisabled`, `m_bUseLoadingScreen`, from bit 0 upward).
+    pub m_Flags: u8,
+}
+impl Teleport {
+    /// `CTeleport::SetTransform`: copies `world_matrix` into
+    /// [`m_WorldMatrix`](Self::m_WorldMatrix).
+    #[address(0x140_4CE_CE0)]
+    pub fn SetTransform(&mut self, world_matrix: *const Matrix4);
+
+    /// `CTeleport::Teleport`: issues [`GameWorld::TeleportPlayer`] to
+    /// [`m_WorldMatrix`](Self::m_WorldMatrix) with the object's state, fade times, and flags, posts
+    /// the teleport message, and clears the pending-teleport bit. Called from
+    /// `CTeleport::UpdatePreSim` when a teleport is pending.
+    #[address(0x140_50E_360)]
+    pub fn Teleport(&mut self);
+}

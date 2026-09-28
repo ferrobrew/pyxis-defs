@@ -1,0 +1,14 @@
+/// A pose producer (`CPoseProducer`): owns an animated model's blenders and the `T0`/`T1` poses
+/// the skinning palette is built from.
+pub type PoseProducer;
+impl PoseProducer {
+    /// Queues a skinning-palette job for this producer: advances the time of any time-updatable
+    /// blender, then records the skeleton's bone count, `dtf`, and the two poses into the next slot
+    /// of the global skinning job table (up to 0x1000 jobs per frame) together with the output
+    /// `palette` buffer. The skinning job later blends the `T0` and `T1` poses by `dtf` into the
+    /// palette. Reached from
+    /// [`AnimationController::UpdateSkinning`](character::character::AnimationController::UpdateSkinning)
+    /// in the render phase.
+    #[address(0x141_E69_600)]
+    pub fn MakeSkinningPalette(&mut self, dtf: f32, palette: *mut void);
+}

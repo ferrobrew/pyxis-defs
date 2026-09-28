@@ -1,0 +1,73 @@
+use character::character::Character;
+use character::player::Player;
+
+/// `CHUDUI::EHUDState`: which parts of the HUD are shown. [`HUDUI::Update`] skips most per-frame
+/// element updates (reticles, health, vehicle, points of interest, button hints) in
+/// [`HUD_HIDE_ALL`](Self::HUD_HIDE_ALL) and
+/// [`HUD_HIDE_ALL_NON_OVERLAY`](Self::HUD_HIDE_ALL_NON_OVERLAY).
+#[copyable]
+pub enum HUDState: u32 {
+    HUD_SHOW_ALL = 0x0,
+    HUD_CINEMATIC = 0x1,
+    /// Hides the whole HUD.
+    HUD_HIDE_ALL = 0x2,
+    HUD_ROM = 0x3,
+    HUD_MISSION_B = 0x4,
+    /// Hides the main HUD while keeping the overlay elements (the state used by the pause menu
+    /// and the comm-link).
+    HUD_HIDE_ALL_NON_OVERLAY = 0x5,
+    HUD_REWARD_SEQUENCE = 0x6,
+    HUD_ALL_DISABLED = 0x7,
+    HUD_ALL_DISABLED_KEEP_RETICLE = 0x8,
+}
+
+/// The in-game HUD (`CHUDUI`, a `CUIBase` Scaleform movie wrapper). Only the fields and methods
+/// below are mapped.
+#[singleton(0x142_F38_820), min_size(0x220)]
+pub type HUDUI {
+    /// The value `OnOmniDamage` writes into [`UIManager::m_GrabScreenTimer`](ui::ui_manager::UIManager::m_GrabScreenTimer) (seconds) when
+    /// omnidirectional damage is taken.
+    pub const OMNI_DAMAGE_GRAB_SCREEN_TIME: f32 = 2.0,
+
+    /// The current HUD visibility state.
+    #[address(0x184)]
+    pub m_State: HUDState,
+
+    /// Whether the sniper-scope overlay is shown, set by [`ShowSniperOverlay`](Self::ShowSniperOverlay)
+    /// and cleared by [`HideSniperOverlay`](Self::HideSniperOverlay).
+    #[address(0x218)]
+    pub m_ShowingSniperOverlay: bool,
+}
+impl HUDUI {
+    /// The per-frame HUD update: refreshes [`m_State`](Self::m_State) through `UpdateState`, then,
+    /// unless the state hides the HUD, updates the reticles, health, vehicle, wingsuit, points of
+    /// interest, tethers, heat, button hints, subtitles, and notifications.
+    #[address(0x140_F11_D40)]
+    pub fn Update(&mut self, dt: f32, dtf: f32);
+
+    /// Sets [`m_ShowingSniperOverlay`](Self::m_ShowingSniperOverlay) and invokes the movie's
+    /// `ShowSniperOverlay`.
+    #[address(0x140_DFA_3D0)]
+    pub fn ShowSniperOverlay(&mut self);
+
+    /// Clears [`m_ShowingSniperOverlay`](Self::m_ShowingSniperOverlay) and invokes the movie's
+    /// `HideSniperOverlay`.
+    #[address(0x140_DFA_410)]
+    pub fn HideSniperOverlay(&mut self);
+
+    /// Updates the weapon reticle for the local player's character: shape, spread, and hit and
+    /// target feedback, pushed to the movie.
+    #[address(0x140_E28_890)]
+    pub fn UpdateWeaponReticle(&mut self, player: *mut Player, character: *mut Character, dt: f32, dtf: f32);
+
+    /// Updates the grapple reticle: projects the grapple aim and active-wire attachment points to
+    /// the screen through `CUIManager::Convert3DCoords` and pushes them to the movie.
+    #[address(0x140_E29_410)]
+    pub fn UpdateGrappleReticle(&mut self, player: *mut Player, character: *mut Character, dt: f32, dtf: f32);
+
+    /// Sets the UI manager's grab-screen timer to
+    /// [`OMNI_DAMAGE_GRAB_SCREEN_TIME`](Self::OMNI_DAMAGE_GRAB_SCREEN_TIME) and invokes the movie's
+    /// `OnOmniDamage`.
+    #[address(0x140_E2C_DB0)]
+    pub fn OnOmniDamage(&mut self);
+}

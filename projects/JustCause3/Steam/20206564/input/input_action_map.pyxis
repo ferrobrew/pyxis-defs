@@ -59,6 +59,10 @@ impl InputDeviceEffector {
 /// into the action parameters.
 #[copyable]
 pub enum Action: i32 {
+    /// The number of action ids: the length of [`action_name_table`], and the action value
+    /// meaning "no action" in the button-mapping table.
+    pub const COUNT: i32 = 255,
+
     PAUSE = 0x0,
     LOOK_UP = 0x1,
     LOOK_DOWN = 0x2,
@@ -345,5 +349,7 @@ impl LocalPlayerActionMap {
     pub fn ForceSetClicked(&mut self, action: Action);
 }
 
+/// The action-name table: [`Action::COUNT`] name-string pointers indexed by action id, iterated
+/// by the `CSteeringUtil` action/string map constructors.
 #[address(0x142_D99_370)]
-pub extern action_name_table: *const u8;
+pub extern action_name_table: [*const u8; 255];

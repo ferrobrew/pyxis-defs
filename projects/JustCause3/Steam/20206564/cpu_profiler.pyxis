@@ -28,10 +28,10 @@ pub enum CpuScopeId: i32 {
 /// In the release build the machinery is dead: [`Update`](Self::Update) is compiled to an
 /// empty function, and the phase brackets that write [`m_Counters`](Self::m_Counters) are
 /// compiled out of `CGame::Update` and the game states, so every field stays zero. The consumers
-/// remain -- `CBorkReport`'s telemetry serialises [`m_Time`](Self::m_Time) via
+/// remain -- [`BorkReport`](bork_report::BorkReport)'s telemetry serialises [`m_Time`](Self::m_Time) via
 /// [`GetScopeName`](Self::GetScopeName), and `CGraphicsEngine::DispatchDraw` forwards
 /// [`m_Index`](Self::m_Index) to the draw task -- but they only ever read zeros.
-#[singleton(0x142_E5A_DF0), size(0x390), align(8)]
+#[size(0x390), align(8)]
 pub type CpuProfiler {
     /// The last completed frame's milliseconds per phase, converted from
     /// [`m_Counters`](Self::m_Counters) by [`Update`](Self::Update).
@@ -67,3 +67,9 @@ impl CpuProfiler {
     #[address(0x140_062_4A0)]
     pub fn GetScopeName(&self, id: CpuScopeId) -> *const u8;
 }
+
+/// The engine's CPU profiler instance (`g_CpuProfiler`), a statically allocated object rather than a
+/// pointer: [`BorkReport::WriteMetrics`](bork_report::BorkReport::WriteMetrics) passes its address
+/// directly as `this` to [`CpuProfiler::GetScopeName`].
+#[address(0x142_E5A_DF0)]
+pub extern cpu_profiler: CpuProfiler;

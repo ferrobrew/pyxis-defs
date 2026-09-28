@@ -1,0 +1,77 @@
+use types::math::Matrix4;
+use types::math::Vector3;
+
+/// A thrown or placed explosive object (`CExplosive`, a `CGameObjectAmmunition<CDamageable>`): its
+/// physics body, trail effect, detonation timers, and the deferred launch that
+/// [`PropelToward`](Self::PropelToward) sets up for the physics body to apply later.
+pub type Explosive {
+    /// The explosive's world matrix as of the current simulation tick. Its translation row is the
+    /// launch start position [`PropelToward`](Self::PropelToward) solves from.
+    #[address(0x540)]
+    pub m_WorldMatrixT1: Matrix4,
+
+    /// The velocity of the thrower when the explosive was launched, stored by
+    /// [`PropelToward`](Self::PropelToward).
+    #[address(0x5DC)]
+    pub m_RelativeVelocity: Vector3,
+
+    /// Whether a launch is pending: set by [`PropelToward`](Self::PropelToward) and applied to the
+    /// physics body with [`m_DeferredInitialVelocity`](Self::m_DeferredInitialVelocity) on a later
+    /// update.
+    #[address(0x5E9)]
+    pub m_DeferredPropelTowards: bool,
+
+    /// The solved launch velocity awaiting application to the physics body, written by
+    /// [`PropelToward`](Self::PropelToward) from the virtual `VelocityToHitTarget`.
+    #[address(0x5EC)]
+    pub m_DeferredInitialVelocity: Vector3,
+
+    /// Seconds since the explosive was thrown; [`PropelToward`](Self::PropelToward) resets it.
+    #[address(0x604)]
+    pub m_TimeSinceThrow: f32,
+}
+impl Explosive {
+    /// Launches the explosive toward `target_position`: when it has a physics body, stores
+    /// `relative_velocity` in [`m_RelativeVelocity`](Self::m_RelativeVelocity), raises
+    /// [`m_DeferredPropelTowards`](Self::m_DeferredPropelTowards), solves the launch velocity from
+    /// its current position with the virtual `VelocityToHitTarget` into
+    /// [`m_DeferredInitialVelocity`](Self::m_DeferredInitialVelocity), starts the trail effect,
+    /// and resets [`m_TimeSinceThrow`](Self::m_TimeSinceThrow). The target point is the only aim
+    /// input; the solver chooses the flight time.
+    #[address(0x140_8E4_D50)]
+    pub fn PropelToward(&mut self, target_position: *const Vector3, relative_velocity: *const Vector3, target_is_on_roof: bool, exact_target_aiming: bool);
+
+    /// Solves the launch velocity from `start_pos` to `aim_pos`: clamps the target to
+    /// `max_range`, chooses a flight time from the grenade weapon's arc tuning (flat, up, and down
+    /// times blended by distance and elevation; roof targets use a height-based time), and solves
+    /// with [`NWeaponUtil::Trajectory_GetVelocityToHitPosition`](equipment::weapon::NWeaponUtil::Trajectory_GetVelocityToHitPosition)
+    /// under world gravity.
+    #[address(0x140_91E_C50)]
+    pub fn VelocityToHitTarget(&mut self, result: *mut Vector3, aim_pos: *const Vector3, start_pos: *const Vector3, max_range: f32, roof_target: bool, exact_target_aiming: bool) -> *mut Vector3;
+}
+
+/// A hand grenade (`CGrenade`, a [`Explosive`]): adds bounce counting, homing and smart-fuse
+/// targets, extra trail effects, and the landing position.
+#[min_size(0x730)]
+pub type Grenade {
+    /// Whether the grenade applies the thrower's grenade upgrades (homing and similar).
+    #[address(0x620)]
+    pub m_CanUseUpgrades: bool,
+
+    /// The target position the grenade was thrown at, recorded by
+    /// [`PropelToward`](Self::PropelToward).
+    #[address(0x720)]
+    pub m_InitialLandingPos: Vector3,
+}
+impl Grenade {
+    /// The [`Explosive::PropelToward`] override: calls it, records `target_position` in
+    /// [`m_InitialLandingPos`](Self::m_InitialLandingPos), plays the extra trail effects, and, with
+    /// upgrades enabled and the homing upgrade owned, starts the homing-target search.
+    #[address(0x140_91F_5C0)]
+    pub fn PropelToward(&mut self, target_position: *const Vector3, relative_velocity: *const Vector3, target_is_on_roof: bool, exact_target_aiming: bool);
+
+    /// The [`Explosive::VelocityToHitTarget`] override: wraps it and adds the thrower's relative
+    /// velocity unless the grenade has a homing target or `exact_target_aiming` is set.
+    #[address(0x140_91F_780)]
+    pub fn VelocityToHitTarget(&mut self, result: *mut Vector3, aim_pos: *const Vector3, start_pos: *const Vector3, max_range: f32, roof_target: bool, exact_target_aiming: bool) -> *mut Vector3;
+}

@@ -1,0 +1,24 @@
+/// A BFBC (beam-frustum-based-culling) occluder frustum: a set of planes the cull tests boxes
+/// against. Opaque.
+pub type BFBCOccluderFrustum;
+
+/// The occluder collection the BFBC occluder-frustum build draws candidates from. Opaque.
+pub type BFBCOccluderCollection;
+
+/// The settings for the BFBC occluder-frustum build. Opaque.
+pub type BFBCOccluderFrustumSettings;
+
+/// A BFBC process state. Opaque.
+pub type BFBCProcessState;
+
+/// Builds a six-plane camera cull frustum into `out` from a row-major view matrix and projection
+/// matrix: it multiplies them and extracts the planes from the product (Gribb–Hartmann), so the
+/// result is independent of the projection's handedness and depth convention.
+#[address(0x141_E3B_930)]
+pub fn BFBCCalculateCameraFrustum(view: *const f32, projection: *const f32, out: *mut BFBCOccluderFrustum);
+
+/// Builds the occluder frustums for a cull: selects occluder candidates from `collection` with
+/// `settings`, then builds a frustum per chosen occluder into `out_frustums`. Returns the number of
+/// frustums built.
+#[address(0x141_E46_CA0)]
+pub fn BFBCCalculateOccluderFrustums(collection: *mut BFBCOccluderCollection, settings: *const BFBCOccluderFrustumSettings, state: *mut BFBCProcessState, out_frustums: *mut BFBCOccluderFrustum) -> i32;

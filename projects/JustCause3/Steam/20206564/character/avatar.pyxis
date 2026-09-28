@@ -1,0 +1,24 @@
+/// A character's mental (alertness) state (`CAvatar::EMentalState`). The player's is driven each
+/// frame by `CPlayer::UpdateMentalState` from its weapon use, and written through
+/// [`Character::SetMentalState`](character::character::Character::SetMentalState).
+pub enum MentalState: i32 {
+    E_RELAXED = 0x0,
+    E_CONCERNED = 0x1,
+    E_PANIC = 0x2,
+    E_READY_FOR_COMBAT = 0x3,
+    E_COMBAT = 0x4,
+    E_SEARCH = 0x5,
+}
+
+/// The controller behind a character (`CAvatar`): the player object for the player, a behavior
+/// tree avatar for NPCs. [`Character::m_Avatar`](character::character::Character::m_Avatar) points
+/// at it. Only the mental-state members are bound.
+#[min_size(0x74)]
+pub type Avatar {
+    /// The current mental state.
+    #[address(0x6C)]
+    pub m_MentalState: MentalState,
+    /// How long, in seconds, the current mental state holds before a non-forced
+    /// [`SetMentalState`](character::character::Character::SetMentalState) may replace it.
+    pub m_MentalStateTimer: f32,
+}
