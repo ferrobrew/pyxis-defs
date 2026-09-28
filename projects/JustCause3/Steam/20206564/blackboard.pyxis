@@ -93,6 +93,32 @@ pub type ObjectBlackboard {
     /// presence makes `NStateTask_LocoUtil::EvaluateCharacterDisplacement` skip the animation
     /// root-motion branch and apply the [`MOVE_DIR_ID`](Self::MOVE_DIR_ID) direction instantly.
     pub const APPLY_TARGET_DIR_INSTANTLY_ID: u32 = 0xE844061C,
+    /// The id of the float weight of the right wrist's `SECONDARY`-pass position target, read by
+    /// [`Character::UpdateSecondaryHandIKPass`](character::character::Character::UpdateSecondaryHandIKPass),
+    /// which targets the wrist only while it is positive. The parachute handle IK task writes it.
+    pub const SECONDARY_HAND_WEIGHT_RIGHT_ID: u32 = 0x711CDCA0,
+    /// The id of the float weight of the left wrist's `SECONDARY`-pass position target (see
+    /// [`SECONDARY_HAND_WEIGHT_RIGHT_ID`](Self::SECONDARY_HAND_WEIGHT_RIGHT_ID)). The grapple
+    /// fire-arm IK task and the parachute handle IK task write it.
+    pub const SECONDARY_HAND_WEIGHT_LEFT_ID: u32 = 0xD60F0D21,
+    /// The id of the right wrist's world-space `SECONDARY`-pass target position (`CVector3f`),
+    /// preferred over [`SECONDARY_HAND_POSITION_LS_RIGHT_ID`](Self::SECONDARY_HAND_POSITION_LS_RIGHT_ID)
+    /// when present.
+    pub const SECONDARY_HAND_POSITION_WS_RIGHT_ID: u32 = 0x6E4DB9F6,
+    /// The id of the left wrist's world-space `SECONDARY`-pass target position (`CVector3f`).
+    pub const SECONDARY_HAND_POSITION_WS_LEFT_ID: u32 = 0x95E56A97,
+    /// The id of the right wrist's model-space `SECONDARY`-pass target position (`CVector3f`).
+    pub const SECONDARY_HAND_POSITION_LS_RIGHT_ID: u32 = 0x646E37B1,
+    /// The id of the left wrist's model-space `SECONDARY`-pass target position (`CVector3f`).
+    pub const SECONDARY_HAND_POSITION_LS_LEFT_ID: u32 = 0xA9D5F210,
+    /// The id of the float weight of the weapon off-hand grip, written by the weapon off-hand IK
+    /// task (ramping up while its segment is active) and read by
+    /// [`Character::UpdateSecondaryHandIKPass`](character::character::Character::UpdateSecondaryHandIKPass),
+    /// which places the off-hand on the weapon's grip only while it is positive.
+    pub const OFFHAND_IK_WEIGHT_ID: u32 = 0xF67ED342,
+    /// The id of the `int` naming the hand the weapon off-hand grip places: nonzero is the right
+    /// hand, zero the left.
+    pub const OFFHAND_IK_HAND_ID: u32 = 0x9B1DE28F,
 
     /// The key table, [`m_KeyInfoCapacity`](Self::m_KeyInfoCapacity) slots; keys are
     /// assigned as they are first written.
@@ -135,6 +161,17 @@ impl ObjectBlackboard {
     /// `persistence` is recorded when the call creates the key, and is
     /// [`PERSISTENCE_LOCAL_FRAME`](PersistenceType::PERSISTENCE_LOCAL_FRAME) at every observed
     /// call site; `name` is an optional debug label, null in every observed call.
+    /// The `GetBlackboardValue<int>` template instantiation. Returns whether the id was present
+    /// with an integer type; the value is written through `value`.
+    #[address(0x140_5C5_7E0)]
+    pub fn GetInt(&mut self, id: u32, value: *mut i32) -> bool;
+
+    /// The `SetBlackboardValue<float>` template instantiation. Overwrites the value when the id is
+    /// present, and otherwise creates the key with `persistence`; returns false only when the key
+    /// table or the value arena is full.
+    #[address(0x140_5C6_850)]
+    pub fn SetFloat(&mut self, id: u32, value: f32, persistence: PersistenceType) -> bool;
+
     #[address(0x140_5C6_A70)]
     pub fn SetVector3(&mut self, id: u32, value: *const Vector3, persistence: PersistenceType, name: *const u8) -> bool;
 }

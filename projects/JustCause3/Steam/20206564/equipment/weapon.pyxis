@@ -1,6 +1,7 @@
 use aim::aim::AimMode;
 use character::character::AnimatedModel;
 use character::inventory::WeaponSlot;
+use game::GameObjectRenderContext;
 use types::math::Matrix4;
 use types::math::Vector3;
 use types::std_vector::Vector;
@@ -172,6 +173,10 @@ pub type WeaponBase {
     /// The seconds a blocked trigger pull stays buffered in
     /// [`m_InputBufferTimer`](Self::m_InputBufferTimer).
     pub const INPUT_BUFFER_TIME: f32 = 0.5,
+    /// The offset of the embedded `CGameObject` subobject, which the `CGameObject` overrides
+    /// ([`GetTransform`](Self::GetTransform), [`UpdateRender`](Self::UpdateRender)) receive as
+    /// their `game_object` in place of the weapon.
+    pub const GAME_OBJECT_BASE_OFFSET: u64 = 0x8,
 
     vftable {
         /// Writes the muzzle position for `weapon_data`: the gun's world matrix composed with its
@@ -472,7 +477,7 @@ impl WeaponBase {
     /// skinning; it then renders the weapon's components. `game_object` is the weapon's
     /// `CGameObject` subobject, not the start of the weapon.
     #[address(0x140_966_380)]
-    pub fn UpdateRender(game_object: *mut void, context: *mut void);
+    pub fn UpdateRender(game_object: *mut void, context: *const GameObjectRenderContext);
 }
 
 /// `CBulletWeaponBase`: the base of the fast-projectile weapons. Its layout is unmapped.

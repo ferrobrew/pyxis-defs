@@ -301,6 +301,29 @@ impl Character {
     #[address(0x140_7C2_380)]
     pub fn UpdatePropEffects(&mut self, dt: f32);
 
+    /// The `SECONDARY` HumanIK pass, called from
+    /// [`UpdatePassFinalizePose_Parallel`](Self::UpdatePassFinalizePose_Parallel) after the `MAIN`
+    /// solve. It is driven entirely by one-frame keys on [`m_Blackboard`](Self::m_Blackboard).
+    /// For each wrist whose weight key
+    /// ([`SECONDARY_HAND_WEIGHT_RIGHT_ID`](ObjectBlackboard::SECONDARY_HAND_WEIGHT_RIGHT_ID),
+    /// [`SECONDARY_HAND_WEIGHT_LEFT_ID`](ObjectBlackboard::SECONDARY_HAND_WEIGHT_LEFT_ID)) is
+    /// positive, it queues a position target on that wrist's effector, taken from the hand's
+    /// world-space key transformed into model space or, when that key is absent, from the hand's
+    /// model-space key, with the weight as the reach. It then places the off-hand on the selected
+    /// weapon's grip: while
+    /// [`OFFHAND_IK_WEIGHT_ID`](ObjectBlackboard::OFFHAND_IK_WEIGHT_ID) is positive and
+    /// `CWeaponBase::GetGripPosition` succeeds for the hand named by
+    /// [`OFFHAND_IK_HAND_ID`](ObjectBlackboard::OFFHAND_IK_HAND_ID), it targets that wrist so that
+    /// the hand's second attach bone
+    /// ([`ATTACH_HAND_LEFT2`](SafeBoneIndex::ATTACH_HAND_LEFT2) or
+    /// [`ATTACH_HAND_RIGHT2`](SafeBoneIndex::ATTACH_HAND_RIGHT2)) lands on the grip point. The
+    /// weapon is the explosive slot while planting, otherwise the selected slot, and only while its
+    /// state is wielding, dual-wielding, or mounted. When anything was queued it solves from the
+    /// `MAIN`-solved pose and refreshes the inventory's attachment transforms; it always clears the
+    /// pass's targets afterwards.
+    #[address(0x140_7EF_690)]
+    pub fn UpdateSecondaryHandIKPass(&mut self, dt: f32, ik_has_run: *mut bool);
+
     /// The per-tick aiming-input update of a character driven by player input. Called from
     /// `UpdatePassPreStateMachines_Parallel` on the branch that also runs the player's global input
     /// and the inventory's pre-state update; other characters run
