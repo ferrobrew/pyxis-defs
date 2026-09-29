@@ -194,3 +194,32 @@ pub fn ApplyConventionalParachuteVelocities(character: *mut Character, dt: f32, 
 /// from [`UpdateParachutePhysics`].
 #[address(0x140_775_1E0)]
 pub fn ApplyAnimationVelocityWithSteering(character: *mut Character, dt: f32, para_settings: *const CharacterParachuteSettings, transform: *const Matrix4, blend: f32, velocity_out: *mut Vector3);
+
+/// The wingsuit's per-frame update. It reads the move half-axes as a stick vector (`MOVE_RIGHT`
+/// minus `MOVE_LEFT` across, `MOVE_BACKWARD` minus `MOVE_FORWARD` along) and hands it to
+/// [`NAirMovement_UpdateAirPhysics`] with the wingsuit's air settings. The function carries the
+/// build's tamper-check markers.
+pub type NStateTask_MovementWingSuitTask;
+impl NStateTask_MovementWingSuitTask {
+    #[address(0x140_82D_DD0)]
+    pub fn Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
+}
+
+/// `NAirMovement::UpdateAirPhysics`: the air movement core shared by the wingsuit, falling, and
+/// free-falling tasks. It maps the stick vector `input` through the settings'
+/// `m_XInputYawPitchRollAmount` and `m_YInputYawPitchRollAmount` into a yaw, pitch, and roll
+/// steering vector and, for the local player outside an alignment segment, adds the camera
+/// look-steer from [`NAirMovement_UpdateStdLookSteering`] to it.
+#[address(0x140_7E1_680)]
+pub fn NAirMovement_UpdateAirPhysics(character: *mut Character, dt: f32, input: *const Vector2, settings: *const CharacterAirMovementSettings);
+
+/// `NAirMovement::UpdateStdLookSteering`: the camera look-steer of the air movement, called only
+/// from [`NAirMovement_UpdateAirPhysics`]. It reads the camera input matrix
+/// (`GameCameraManager::GetInputMatrix`, inlined), takes the pitch and yaw differences between the
+/// camera and the character (`char_pitch`, `char_yaw`), shapes each through the settings'
+/// look-steer deadzone, range, and exponent, and mixes them through `m_XLookYawPitchRollAmount` and
+/// `m_YLookYawPitchRollAmount` into the yaw, pitch, and roll vector `out`. Each component is then
+/// reduced against `target_steering` where the two oppose. It has no other side effects; the
+/// caller adds `out` into its steering vector.
+#[address(0x140_791_300)]
+pub fn NAirMovement_UpdateStdLookSteering(out: *mut Vector3, target_steering: *const Vector3, char_pitch: f32, char_yaw: f32, settings: *const CharacterAirMovementSettings);
