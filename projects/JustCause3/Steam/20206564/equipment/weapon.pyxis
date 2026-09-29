@@ -39,6 +39,28 @@ pub enum WeaponState: i32 {
     E_WS_NUM = 0xB,
 }
 
+/// A weapon's class (`CWeaponBase::EWeaponClass`), stored on the weapon as [`WeaponBase::m_Class`].
+/// Type-specific code compares it, for example the character's level-of-detail update, which keeps
+/// full detail for a character wielding a rocket launcher or a sniper rifle.
+#[copyable]
+pub enum WeaponClass: i32 {
+    E_WEAPON_CLASS_NONE = 0x3E8,
+    E_WEAPON_CLASS_PISTOL = 0x3E9,
+    E_WEAPON_CLASS_SMG = 0x3EA,
+    E_WEAPON_CLASS_ASSAULT_RIFLE = 0x3EB,
+    E_WEAPON_CLASS_SHOTGUN = 0x3EC,
+    /// A scoped rifle ([`SniperWeapon`]).
+    E_WEAPON_CLASS_SNIPER = 0x3ED,
+    E_WEAPON_CLASS_GRENADE_LAUNCHER = 0x3EE,
+    E_WEAPON_CLASS_RPG = 0x3EF,
+    E_WEAPON_CLASS_MINIGUN = 0x3F0,
+    E_WEAPON_CLASS_AA_GUN = 0x3F1,
+    E_WEAPON_CLASS_MORTAR = 0x3F2,
+    E_WEAPON_CLASS_50CAL = 0x3F3,
+    E_WEAPON_CLASS_SPECIAL = 0x3F4,
+    E_WEAPON_CLASS_REVOLVER = 0x3F5,
+}
+
 /// How a weapon orients its projectiles (`CWeaponBase::EProjectileFireDirectionMode`), read by
 /// [`WeaponBase::GetShotMatrix`] from [`WeaponBase::m_ProjectileTempFireDirection`], falling back to
 /// [`WeaponBase::m_ProjectileFireDirection`] while the temporary mode is unset.
@@ -434,6 +456,11 @@ pub type WeaponBase {
     #[address(0x424)]
     pub m_State: WeaponState,
 
+    /// The weapon's class, [`E_WEAPON_CLASS_NONE`](WeaponClass::E_WEAPON_CLASS_NONE) until the
+    /// weapon type's data sets it.
+    #[address(0x42C)]
+    pub m_Class: WeaponClass,
+
     /// The hash of the weapon type's name, which identifies the weapon type (the damage messages
     /// carry it, and type-specific code compares it against named hashes).
     #[address(0x460)]
@@ -443,6 +470,10 @@ pub type WeaponBase {
     /// the aim timer while it is set.
     #[address(0x466)]
     pub m_IsPrecisionAimDisabled: bool,
+    /// Whether the weapon supports precision aim. The player's weapon handling
+    /// (`CInventory::UpdateWeaponHandling`) enters precision aim on the precision-aim input only
+    /// for a weapon that sets it.
+    pub m_SupportsPrecisionAim: bool,
 
     /// Whether the weapon is registered for pre-simulation updates; the fire path sets it and
     /// registers the weapon when a deferred action is queued.
