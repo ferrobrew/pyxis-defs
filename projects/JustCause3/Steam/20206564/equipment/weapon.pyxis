@@ -6,6 +6,14 @@ use types::math::Matrix4;
 use types::math::Vector3;
 use types::std_vector::Vector;
 
+/// The hand a weapon grip-table entry is for (`EWeaponGripHand`), as
+/// [`WeaponBase::GetGripPosition`] takes it.
+#[copyable]
+pub enum WeaponGripHand: i32 {
+    E_WEAPON_GRIP_HAND_LEFT = 0x0,
+    E_WEAPON_GRIP_HAND_RIGHT = 0x1,
+}
+
 /// The situation a weapon is in (`CWeaponData::EWeaponState`), stored on the weapon as
 /// [`WeaponBase::m_State`]. It selects the weapon's attach bone
 /// ([`WeaponData::m_lBoneAttachementPerWeaponState`] is indexed by it) and, when holstered, the
@@ -416,9 +424,14 @@ pub type WeaponBase {
     pub m_lWeaponData: WeaponDataArray,
 }
 impl WeaponBase {
-    /// Writes the grip transform for the given `hand` (a `E_WEAPON_GRIP_HAND_*` value).
+    /// Writes the world transform of the weapon's grip point for `hand` into `matrix`: the
+    /// weapon's grip-table entry for that hand (the entry for the mounted state while
+    /// [`m_State`](Self::m_State) is [`E_WS_MOUNTED`](WeaponState::E_WS_MOUNTED)), a translation in
+    /// the first gun's frame, composed with that gun's current world matrix. Returns false, writing
+    /// nothing, when the weapon has no entry for that hand. The secondary hand IK pass and the hand
+    /// IK tasks place a hand on a held weapon through it.
     #[address(0x140_966_840)]
-    pub fn GetGripPosition(&self, hand: i32, matrix: *mut Matrix4) -> bool;
+    pub fn GetGripPosition(&self, hand: WeaponGripHand, matrix: *mut Matrix4) -> bool;
 
     /// Builds the launch transform for a shot from `weapon_data` into `shot_matrix`. The origin is
     /// the muzzle ([`GetFireFromPosition`](Self::GetFireFromPosition)); the direction points at
