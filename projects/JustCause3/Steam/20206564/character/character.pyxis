@@ -648,6 +648,14 @@ impl Character {
     #[address(0x140_7F2_D80)]
     pub fn HolsterWeapon(&mut self);
 
+    /// Whether the character may start a melee attack: the melee block bit that dropping a heavy
+    /// weapon sets is clear, the inventory's animation permission allows melee, the character is not
+    /// squeezing valid dual tethers while the gamepad is the active input device, and it is on the
+    /// ground or in a stunt position. `NStateTask_InputMeleeTask` tests it before the melee input
+    /// and the hammer ability ([`hash_ability_hammer`](character::player::hash_ability_hammer)).
+    #[address(0x140_7FA_D40)]
+    pub fn CanUseMelee(&self) -> bool;
+
     /// Forces the character's animation and control state back to neutral (on foot, idle).
     #[address(0x140_7FD_120)]
     pub fn ForceNeutralState(&mut self);

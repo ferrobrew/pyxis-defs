@@ -19,6 +19,8 @@ pub enum AimMode: i32 {
 pub type Player {
     /// The offset of the [`Avatar`] base within the player.
     pub const AVATAR_BASE_OFFSET: u64 = 0x10,
+    /// The offset of the player's [`AbilitiesHandler`] within the player.
+    pub const ABILITIES_OFFSET: u64 = 0x178,
 
     /// The player's character.
     #[address(0x110)]
@@ -57,6 +59,23 @@ impl Player {
     #[address(0x140_C3D_100)]
     pub fn UpdateAimMode(&mut self);
 }
+
+/// The player's ability table (`CAbilitiesHandler`): the status of each unlockable ability, keyed
+/// by the ability's hash. It sits at [`Player::ABILITIES_OFFSET`] within the player. Its layout is
+/// unmapped.
+pub type AbilitiesHandler;
+impl AbilitiesHandler {
+    /// Whether the ability `ability` (a `CHashString` hash, passed by reference) is enabled: its
+    /// status is forced on, or it is unlocked and not forced off. The ability must be registered,
+    /// as the game's own abilities are.
+    #[address(0x140_C7E_250)]
+    pub fn IsAbilityEnabled(&self, ability: *const u32) -> bool;
+}
+
+/// The hash of the hammer ability (`hash_ability_hammer`), which gates the player's melee attack
+/// in `NStateTask_InputMeleeTask`.
+#[address(0x142_DA7_988)]
+pub extern hash_ability_hammer: u32;
 
 /// `CPlayer::UpdatePostCamera`, the player's override of the `CAvatar::UpdatePostCamera` virtual;
 /// `avatar` is the player's [`Avatar`] base. Runs the aim control's post-simulation update, then

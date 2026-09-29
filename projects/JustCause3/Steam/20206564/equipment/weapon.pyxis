@@ -4,6 +4,7 @@ use character::inventory::WeaponSlot;
 use game::GameObjectRenderContext;
 use types::math::Matrix4;
 use types::math::Vector3;
+use types::shared_ptr::WeakPtrGameObject;
 use types::std_vector::Vector;
 
 /// The hand a weapon grip-table entry is for (`EWeaponGripHand`), as
@@ -230,6 +231,12 @@ pub type WeaponBase {
         #[index(28)]
         pub fn Fire_Projectile(&mut self, weapon_data: *mut WeaponData);
 
+        /// The ammunition the weapon can still use: its magazine plus the holder's inventory stock
+        /// of its ammunition type. The thrown grenade weapon adds one while it holds a primed
+        /// grenade ([`ThrownGrenadeWeapon::m_PrimedGrenade`]).
+        #[index(38)]
+        pub fn GetTotalAmmo(&self) -> i32;
+
         /// Deducts `count` rounds of ammunition for `weapon_data`.
         #[index(45)]
         pub fn ConsumeAmmo(&mut self, weapon_data: *mut WeaponData, count: i32);
@@ -325,6 +332,13 @@ pub type WeaponBase {
     /// defers to it.
     #[address(0x16C)]
     pub m_ProjectileTempFireDirection: ProjectileFireDirectionMode,
+
+    /// A one-shot fire request: while set, the next
+    /// [`UpdateWeapon_Parallel`](Self::UpdateWeapon_Parallel) clears it and calls
+    /// [`Fire_Projectile`](Self::Fire_Projectile) once for each gun, whatever the fire input and the
+    /// aim angle. Animation track messages raise it at the release point of a throw.
+    #[address(0x178)]
+    pub m_ForceFireProjectile: bool,
 
     /// Seconds of forced fire remaining; the weapon fires regardless of input while positive.
     #[address(0x17C)]
@@ -586,6 +600,63 @@ impl SniperWeapon {
     /// [`AIM_NORMAL`](AimMode::AIM_NORMAL) it reverses both.
     #[address(0x140_97F_120)]
     pub fn SetAimMode(&mut self, aim_mode: AimMode);
+}
+
+/// `CThrownGrenadeWeapon`: the hand grenade weapon, a [`WeaponBase`] held in the grenade slot. A
+/// throw primes a grenade (spawning it live and consuming one grenade), keeps it at the weapon's
+/// attachment while held, and releases it through [`WeaponBase::Fire_Projectile`], which launches
+/// it with [`Grenade::PropelToward`](equipment::explosive::Grenade::PropelToward). The throw
+/// animation's track messages drive both steps: one raises [`m_PrimeGrenade`](Self::m_PrimeGrenade)
+/// and a later one raises [`WeaponBase::m_ForceFireProjectile`]. Only some members are mapped, at
+/// their offsets from the start of the weapon.
+#[min_size(0x7CA)]
+pub type ThrownGrenadeWeapon {
+    /// The primed grenade: the live [`Grenade`](equipment::explosive::Grenade) spawned by
+    /// [`PrimeGrenade`](Self::PrimeGrenade) and not yet thrown, or null. `px` is the grenade's
+    /// `CGameObject` subobject
+    /// ([`Explosive::GAME_OBJECT_BASE_OFFSET`](equipment::explosive::Explosive::GAME_OBJECT_BASE_OFFSET)).
+    /// [`Fire_Projectile`](WeaponBase::Fire_Projectile) clears it when it launches the grenade.
+    #[address(0x708)]
+    pub m_PrimedGrenade: WeakPtrGameObject,
+
+    /// A pending prime request: [`UpdateFromUserPostSim_Parallel`](Self::UpdateFromUserPostSim_Parallel)
+    /// calls [`PrimeGrenade`](Self::PrimeGrenade) after the base weapon update when it is set, and
+    /// clears it.
+    #[address(0x7C9)]
+    pub m_PrimeGrenade: bool,
+}
+impl ThrownGrenadeWeapon {
+    /// The weapon's per-tick update from its user (its override of
+    /// [`WeaponBase::UpdateFromUserPostSim_Parallel`]): runs
+    /// [`UpdateFromUserPostSim_ParallelBase`](WeaponBase::UpdateFromUserPostSim_ParallelBase),
+    /// which consumes [`WeaponBase::m_ForceFireProjectile`] among the fire inputs, and then services
+    /// [`m_PrimeGrenade`](Self::m_PrimeGrenade). A throw released and a prime requested in the same
+    /// call therefore release nothing and prime afterwards.
+    #[address(0x140_9A7_770)]
+    pub fn UpdateFromUserPostSim_Parallel(&mut self, dt: f32, aim_position: *const Vector3, input: *const WeaponInputs);
+
+    /// Primes a grenade (`CreatePrimed<CGrenade>`): consumes one grenade, allocates a
+    /// [`Grenade`](equipment::explosive::Grenade) from the ammunition pool at the weapon's world
+    /// matrix (returning null when the pool is full), plays the priming effect, stores it in
+    /// [`m_PrimedGrenade`](Self::m_PrimedGrenade), and adds it to the update. The grenade's
+    /// detonation timer runs from this point
+    /// ([`Explosive::m_DetonationTimer`](equipment::explosive::Explosive::m_DetonationTimer)), so a
+    /// grenade held for longer than its fuse explodes before it is thrown.
+    #[address(0x140_989_470)]
+    pub fn PrimeGrenade(&mut self, weapon_data: *mut WeaponData) -> *mut void;
+
+    /// Removes the primed grenade, if any, clears [`m_PrimedGrenade`](Self::m_PrimedGrenade), and
+    /// returns one grenade to the user's inventory. The disassembler mislabels it
+    /// `rtti_cast<CThrownGrenadeWeapon,CWeaponBase>`; the function it labels
+    /// `CThrownGrenadeWeapon::CancelPrimedGrenade` clears a hash table.
+    #[address(0x140_97F_A50)]
+    pub fn CancelPrimedGrenade(&mut self);
+
+    /// Places the weapon's attachments (its override of the `UpdateAttachmentTransforms` virtual):
+    /// after the base placement it sets the primed grenade's transform to the weapon's world
+    /// matrix, so a held grenade rides the weapon's attach bone.
+    #[address(0x140_99E_B70)]
+    pub fn UpdateAttachmentTransforms(&mut self, p2: f32, p3: f32, transform_type: u32);
 }
 
 /// The weapon ballistics helpers (`NWeaponUtil`).

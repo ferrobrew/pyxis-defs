@@ -5,10 +5,34 @@ use types::math::Vector3;
 /// physics body, trail effect, detonation timers, and the deferred launch that
 /// [`PropelToward`](Self::PropelToward) sets up for the physics body to apply later.
 pub type Explosive {
+    /// The offset of the embedded `CGameObject` subobject. Weak references to the explosive (such
+    /// as [`ThrownGrenadeWeapon::m_PrimedGrenade`](equipment::weapon::ThrownGrenadeWeapon::m_PrimedGrenade))
+    /// point there rather than at the start of the explosive.
+    pub const GAME_OBJECT_BASE_OFFSET: u64 = 0x70,
+
+    /// The explosive's physics body (`CPfxRigidBody`, the pointer of a shared pointer), or null
+    /// until the first `UpdatePostSimFromManager` after the explosive spawns creates it.
+    /// [`PropelToward`](Self::PropelToward) and [`SetPhysicsTransform`](Self::SetPhysicsTransform)
+    /// do nothing without it.
+    #[address(0x4B8)]
+    pub m_PfxInstance: *mut void,
+
     /// The explosive's world matrix as of the current simulation tick. Its translation row is the
-    /// launch start position [`PropelToward`](Self::PropelToward) solves from.
+    /// launch start position [`PropelToward`](Self::PropelToward) solves from. The `CGameObject`
+    /// transform setter writes it, and the post-simulation update moves a physics body that is not
+    /// simulating to it.
     #[address(0x540)]
     pub m_WorldMatrixT1: Matrix4,
+
+    /// Whether [`m_DeferredPhysicsTransform`](Self::m_DeferredPhysicsTransform) is pending: set by
+    /// [`SetPhysicsTransform`](Self::SetPhysicsTransform) and applied to the physics body, then
+    /// cleared, by the next `UpdatePostSimFromManager`, before a pending launch.
+    #[address(0x580)]
+    pub m_DeferredSetPhysicsTransform: bool,
+
+    /// The transform awaiting application to the physics body.
+    #[address(0x584)]
+    pub m_DeferredPhysicsTransform: Matrix4,
 
     /// The velocity of the thrower when the explosive was launched, stored by
     /// [`PropelToward`](Self::PropelToward).
@@ -29,8 +53,23 @@ pub type Explosive {
     /// Seconds since the explosive was thrown; [`PropelToward`](Self::PropelToward) resets it.
     #[address(0x604)]
     pub m_TimeSinceThrow: f32,
+    /// Seconds until the explosive detonates. The constructor sets it to the grenade weapon's
+    /// detonation time; the post-simulation update counts it down by the tick delta while the
+    /// virtual `ShouldTickDetonationTimer` holds (a hand grenade's does from the moment it spawns,
+    /// primed or thrown) and calls the virtual `Detonate` once it reaches zero.
+    pub m_DetonationTimer: f32,
+    /// The detonation time [`m_DetonationTimer`](Self::m_DetonationTimer) started from.
+    pub m_StartDetonationTimer: f32,
 }
 impl Explosive {
+    /// Queues `transform` for the physics body: when the explosive has a
+    /// [`m_PfxInstance`](Self::m_PfxInstance), copies it to
+    /// [`m_DeferredPhysicsTransform`](Self::m_DeferredPhysicsTransform) and raises
+    /// [`m_DeferredSetPhysicsTransform`](Self::m_DeferredSetPhysicsTransform). A later call before
+    /// the body applies it replaces it.
+    #[address(0x140_8C8_180)]
+    pub fn SetPhysicsTransform(&mut self, transform: *const Matrix4);
+
     /// Launches the explosive toward `target_position`: when it has a physics body, stores
     /// `relative_velocity` in [`m_RelativeVelocity`](Self::m_RelativeVelocity), raises
     /// [`m_DeferredPropelTowards`](Self::m_DeferredPropelTowards), solves the launch velocity from

@@ -41,6 +41,18 @@ pub type Inventory {
     /// [`GetAnimationAllowsShooting`](Self::GetAnimationAllowsShooting).
     #[address(0x184)]
     pub m_DoesAnimationAllowShooting: bool,
+    /// Whether the character may reload: recomputed by
+    /// [`UpdateInventoryPermissions`](Self::UpdateInventoryPermissions), and cleared by the
+    /// [`SB_DISABLE_RELOAD`](state::StateBitFlag::SB_DISABLE_RELOAD) state bit.
+    pub m_DoesAnimationAllowReloading: bool,
+    /// Whether the character may use grenades: recomputed by
+    /// [`UpdateInventoryPermissions`](Self::UpdateInventoryPermissions) (off while planting an
+    /// explosive, while a camera hint of the wielded weapon is active, while the grapple is busy, and
+    /// without the grenade ability), and cleared by the
+    /// [`SB_DISABLE_USE_GRENADES`](state::StateBitFlag::SB_DISABLE_USE_GRENADES) state bit.
+    /// [`UpdateWeapons_Parallel`](Self::UpdateWeapons_Parallel) zeroes the grenade input while it
+    /// is clear.
+    pub m_DoesAnimationAllowGrenades: bool,
 
     /// The character that owns the inventory.
     #[address(0x3E0)]

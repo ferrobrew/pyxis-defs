@@ -1,3 +1,5 @@
+use types::shared_ptr::WeakPtrGameObject;
+
 /// The aim purpose a target or aim slot serves (`CTarget::ETargetType`). The target system scores
 /// every candidate once per purpose, and the player's aim control keeps one slot per purpose in each
 /// of its per-purpose arrays (see [`PlayerAimControl`](aim::aim::PlayerAimControl)), indexed by
@@ -20,8 +22,84 @@ pub enum TargetType: i32 {
     NOF_TARGET_TYPES = 0x6,
 }
 
-/// A scored aim candidate (`CTarget`) registered with the target system: a weak reference to its
+/// How a target stands toward the player (`EFactionRelation`), in
+/// [`Target::m_PlayerFactionRelation`].
+#[copyable]
+pub enum FactionRelation: i32 {
+    E_RELATION_NONE = -1,
+    E_RELATION_ALLIED = 0x0,
+    E_RELATION_HOSTILE = 0x1,
+    NOF_RELATIONS = 0x2,
+}
+
+/// A scored aim candidate (`CTarget`) registered with the [`TargetSystem`]: a weak reference to its
 /// game object, its local- and world-space aim positions, per-[`TargetType`] fitness and validity,
 /// and a visibility raycast. Characters, vehicles, vehicle parts, rigid objects, and destruction
-/// objects each own one. The layout is unmapped.
-pub type Target;
+/// objects each own one. Only some members are mapped.
+#[min_size(0x214)]
+pub type Target {
+    /// The object the target belongs to. `px` is the object's `CGameObject` subobject; for a
+    /// character it sits
+    /// [`Character::GAME_OBJECT_BASE_OFFSET`](character::character::Character::GAME_OBJECT_BASE_OFFSET)
+    /// into the `CCharacter`.
+    pub m_GameObject: WeakPtrGameObject,
+
+    /// The per-[`TargetType`] fitness scores, reset at the start of each
+    /// [`PlayerAimControl::UpdateAllTargets`](aim::aim::PlayerAimControl::UpdateAllTargets) pass and
+    /// written by the per-purpose fitness functions.
+    #[address(0x44)]
+    pub m_Fitness: [f32; 6],
+    /// The per-[`TargetType`] validity flags the per-purpose fitness passes set.
+    pub m_IsValid: [bool; 6],
+
+    /// A per-target scale of the aim-assist cone, which
+    /// [`PlayerAimControl::GetFitnessScore`](aim::aim::PlayerAimControl::GetFitnessScore) applies.
+    #[address(0x64)]
+    pub m_AutoAimScaleSizeValue: f32,
+
+    /// The target's relation to the player, refreshed from its faction as each
+    /// [`PlayerAimControl::UpdateAllTargets`](aim::aim::PlayerAimControl::UpdateAllTargets) pass visits it.
+    #[address(0x210)]
+    pub m_PlayerFactionRelation: FactionRelation,
+}
+
+/// A node of one of the [`TargetSystem`]'s target sets (a `std::set<CTarget *>` red-black tree
+/// node). The set's head node is a sentinel with [`m_IsNil`](Self::m_IsNil) set: its
+/// [`m_Left`](Self::m_Left) is the first element, and an element's missing child points back at it.
+#[size(0x28)]
+pub type TargetSetNode {
+    pub m_Left: *mut TargetSetNode,
+    pub m_Parent: *mut TargetSetNode,
+    pub m_Right: *mut TargetSetNode,
+    pub m_Value: *mut Target,
+    pub m_Color: u8,
+    pub m_IsNil: bool,
+}
+
+/// The registry of aim candidates (`CTargetSystem`): every live [`Target`], kept in one set per
+/// kind. [`PlayerAimControl::UpdateAllTargets`](aim::aim::PlayerAimControl::UpdateAllTargets) walks
+/// the sets whose include flags the wielded weapon's aim-assist tuning sets, scoring each target
+/// for every purpose. Only some members are mapped.
+#[singleton(0x142_F30_020), min_size(0x78)]
+pub type TargetSystem {
+    /// Whether the current target walk includes [`m_CharacterTargetsHead`](Self::m_CharacterTargetsHead)'s
+    /// set, as the aim control last set it.
+    #[address(0x14)]
+    pub m_IncludeCharacters: bool,
+    /// Whether the walk includes the vehicle set.
+    pub m_IncludeVehicles: bool,
+    /// Whether the walk includes the set of other objects.
+    pub m_IncludeOtherObjects: bool,
+
+    /// The head node of the set of character targets.
+    #[address(0x20)]
+    pub m_CharacterTargetsHead: *mut TargetSetNode,
+
+    /// The head node of the set of vehicle targets.
+    #[address(0x40)]
+    pub m_VehicleTargetsHead: *mut TargetSetNode,
+
+    /// The head node of the set of the other objects' targets.
+    #[address(0x60)]
+    pub m_OtherTargetsHead: *mut TargetSetNode,
+}
