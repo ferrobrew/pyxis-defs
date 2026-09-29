@@ -1,6 +1,19 @@
-/// The opaque per-task state-machine context passed to character and task update functions. Used only
-/// behind pointers; the layout is not yet mapped.
-pub type StateContext;
+/// The per-task state-machine context (`SStateContext`) passed to character and task update
+/// functions. Only the leading members are bound.
+#[min_size(0x1C)]
+pub type StateContext {
+    /// The object the state machine runs for: the `CGameObject` base subobject of a character,
+    /// which sits [`Character::GAME_OBJECT_BASE_OFFSET`](character::character::Character::GAME_OBJECT_BASE_OFFSET)
+    /// bytes into the character.
+    pub m_User: *mut void,
+
+    /// The sub-frame interpolation fraction of the update.
+    #[address(0x14)]
+    pub m_Dtf: f32,
+    /// The simulation time step of the update, seconds. The movement tasks integrate their
+    /// orientation steps and speed blends with it.
+    pub m_Dt: f32,
+}
 
 /// `SUserVM::EStateBitFlag`: the index of a bit in the character's animation state-bit words, which
 /// state tasks in the animation graph set and clear and which game code and graph conditions read.

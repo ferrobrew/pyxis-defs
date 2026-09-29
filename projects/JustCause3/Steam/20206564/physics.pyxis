@@ -230,15 +230,39 @@ impl hknpWorld {
 pub type CharacterInput {
     pub jump: bool,
     /// Whether [`wantedVelocity`](Self::wantedVelocity) is game-controlled. The on-foot locomotion
-    /// task sets it when it takes its velocity from the blackboard's code-driven path and clears it
-    /// otherwise.
+    /// task sets it while the proxy is supported on stairs
+    /// ([`PfxCharacterInstance::m_IsSupportedOnStairs`]) and the character's blackboard carries a
+    /// slope direction, and clears it otherwise. The proxy update rotates the wanted velocity by
+    /// the proxy's rotation only while it is set; otherwise it hands the vector to the character
+    /// state as it stands.
     pub gameControledVelocity: bool,
 
-    /// The velocity the proxy should move at (world space). The on-foot locomotion task
+    /// The velocity the proxy should move at, metres per second, in the character's local frame
+    /// (not world space). The on-foot locomotion task
     /// (`NStateTask_MovementLocomotionTask::Update`) writes its solved velocity here every tick,
-    /// including standing idle.
+    /// including standing idle, and returns without writing while the character is attached to a
+    /// vehicle. [`Character::SetWantedWorldVelocity`](character::character::Character::SetWantedWorldVelocity)
+    /// and [`Character::GetWantedWorldVelocity`](character::character::Character::GetWantedWorldVelocity)
+    /// convert it from and to world space.
     #[address(0x4)]
     pub wantedVelocity: Vector3,
+}
+
+/// `CPfxCharacterInstance::EProxyState`: the character proxy's state, each with its own pre-built
+/// collision shape. Every character has the shape of every state. The crouching shape is a
+/// shortened capsule with the non-player standing radius; the player stands in
+/// [`PLAYER_STANDING`](Self::PLAYER_STANDING), whose capsule has the player's own radius.
+pub enum ProxyState: i32 {
+    STANDING = 0x0,
+    CROUCHING = 0x1,
+    SWIMMING = 0x2,
+    ROTATED_AND_OFFSETTED = 0x3,
+    ROTATING_CROUCHING = 0x4,
+    QUADRUPED_LARGE = 0x5,
+    QUADRUPED_SMALL = 0x6,
+    QUADRUPED_TINY = 0x7,
+    PLAYER_STANDING = 0x8,
+    WINGSUITING = 0x9,
 }
 
 /// `CPfxCharacterInstance`: the character's physics-side body instance (the Havok character proxy),
@@ -253,8 +277,13 @@ pub type PfxCharacterInstance {
     #[address(0x38)]
     pub m_Input: CharacterInput,
 
-    /// The current proxy state (`CPfxCharacterInstance::EProxyState`), which selects the proxy's
-    /// collision shape. Written by [`SetProxyState`](Self::SetProxyState).
+    /// Whether the proxy is standing on stairs. The on-foot locomotion task takes its velocity
+    /// along the blackboard's slope direction while it is set.
+    #[address(0xC4)]
+    pub m_IsSupportedOnStairs: bool,
+
+    /// The current proxy state, a [`ProxyState`] value, which selects the proxy's collision shape.
+    /// Written by [`SetProxyState`](Self::SetProxyState).
     #[address(0xC8)]
     pub m_ProxyState: i32,
 

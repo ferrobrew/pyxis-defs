@@ -6,7 +6,7 @@ use character::control_parameters::ControlParameters;
 use character::inventory::{Inventory, WeaponSlot};
 use character::swim_action_params::SwimActionParams;
 use equipment::grappling_hook::GrapplingHook;
-use physics::PfxCharacterInstance;
+use physics::{PfxCharacterInstance, ProxyState};
 use types::math::Matrix4;
 use types::math::Vector3;
 use types::shared_ptr::SharedPtr;
@@ -98,6 +98,11 @@ pub type Character {
     pub const MOTION_STATE_SWIMMING: u32 = 0x18,
     /// `m_CurrentMotionState` while ragdolling.
     pub const MOTION_STATE_RAGDOLL: u32 = 0x14,
+    /// `m_CurrentMotionState` while a movement task drives the proxy velocity itself. The on-foot
+    /// locomotion task (`NStateTask_MovementLocomotionTask::Update`) sets it on every update in
+    /// which it writes the proxy's wanted velocity, and leaves the value alone when it returns
+    /// early because the character is attached to a vehicle.
+    pub const MOTION_STATE_TASK_DEFINED: u32 = 0x19,
     /// The offset of the character's `CGameObject` base subobject. RTTI tests (`IsType`) and the
     /// `CGameObject` virtuals go through the vtable at this offset rather than the primary one,
     /// and state tasks recover the character from that subobject by subtracting this offset.
@@ -163,11 +168,24 @@ pub type Character {
     #[address(0x2_0F1)]
     pub m_AimFlags: AimState,
 
+    /// The proxy state requested for the character, a [`ProxyState`] value.
+    /// [`SetProxyState`](Self::SetProxyState) writes it, and
+    /// [`UpdateProxyState`](Self::UpdateProxyState) applies it to the physics proxy on the
+    /// simulation thread. The animation graph's proxy-state task requests states on its state's
+    /// entry and exit.
+    #[address(0x2_134)]
+    pub m_PendingProxyState: i32,
+    /// The proxy state the character returns to, a [`ProxyState`] value. The graph's proxy-state
+    /// restores and the paratrooper logic request it. The player's is
+    /// [`PLAYER_STANDING`](ProxyState::PLAYER_STANDING), set at player initialization through
+    /// [`SetDefaultProxyState`](Self::SetDefaultProxyState).
+    pub m_DefaultProxyState: i32,
+
     /// How the character's motion is integrated this frame (`CCharacter::EMotionState`), read by
     /// the dispatch in `CCharacter::UpdateIntegratingPhysics`. Each movement actuator sets it as
     /// part of its per-frame update. Left as a raw integer because only a few of its ~25 values have
-    /// been confirmed: `MOTION_STATE_SWIMMING` and `MOTION_STATE_RAGDOLL`
-    /// on this type.
+    /// been confirmed: `MOTION_STATE_SWIMMING`, `MOTION_STATE_RAGDOLL`, and
+    /// `MOTION_STATE_TASK_DEFINED` on this type.
     #[address(0x2_494)]
     pub m_CurrentMotionState: u32,
 
@@ -498,6 +516,36 @@ impl Character {
     /// Whether the character is attached to any vehicle through the interaction graph.
     #[address(0x140_7D5_EA0)]
     pub fn IsAttachedToVehicle(&self) -> bool;
+
+    /// Requests proxy state `state` (a [`ProxyState`] value) by writing
+    /// [`m_PendingProxyState`](Self::m_PendingProxyState); the physics proxy changes shape when
+    /// [`UpdateProxyState`](Self::UpdateProxyState) next runs.
+    #[address(0x140_75E_B20)]
+    pub fn SetProxyState(&mut self, state: i32);
+
+    /// Sets [`m_DefaultProxyState`](Self::m_DefaultProxyState) to `state`, and also requests it as
+    /// the pending state when the proxy was in the previous default.
+    #[address(0x140_77D_6C0)]
+    pub fn SetDefaultProxyState(&mut self, state: i32);
+
+    /// Applies [`m_PendingProxyState`](Self::m_PendingProxyState) to the physics proxy when it
+    /// differs from the proxy's current state
+    /// ([`PfxCharacterInstance::SetProxyState`](physics::PfxCharacterInstance::SetProxyState)),
+    /// then refreshes the character's obstacle in the AI pathfinder. The same body is inlined at the
+    /// end of the character's serial state-machine pass, after the state tasks run.
+    #[address(0x140_77E_4D0)]
+    pub fn UpdateProxyState(&mut self);
+
+    /// Writes the proxy's wanted velocity ([`CharacterInput::wantedVelocity`](physics::CharacterInput::wantedVelocity),
+    /// character-local) rotated into world space by [`m_WorldMatrixT1`](Self::m_WorldMatrixT1) to
+    /// `out`, and returns `out`.
+    #[address(0x140_77E_9A0)]
+    pub fn GetWantedWorldVelocity(&self, out: *mut Vector3) -> *mut Vector3;
+
+    /// Sets the proxy's wanted velocity from the world-space `velocity`, converting it into the
+    /// character-local frame with the inverse of the proxy's transform.
+    #[address(0x140_77E_9F0)]
+    pub fn SetWantedWorldVelocity(&mut self, velocity: *const Vector3);
 
     /// Whether the attached vehicle is a `CLandVehicle` (cars and motorcycles), by RTTI `IsType`.
     #[address(0x140_7D5_FA0)]
