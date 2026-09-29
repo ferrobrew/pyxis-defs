@@ -1,0 +1,19 @@
+use camera::camera_context::{CameraContext, CameraPipelineContext};
+
+/// The camera modifier that applies the local player's weapon to the camera
+/// (`CWeaponCameraModifier`). Its layout is unmapped.
+pub type WeaponCameraModifier;
+impl WeaponCameraModifier {
+    /// The modifier's camera pass. With a local player character it runs the snap-aim camera
+    /// assist when the modifier's settings enable it, turns the pipeline's camera boom by the held
+    /// weapon's per-tick recoil
+    /// ([`WeaponBase::m_RecoilYaw`](equipment::weapon::WeaponBase::m_RecoilYaw) and
+    /// [`WeaponBase::m_RecoilPitch`](equipment::weapon::WeaponBase::m_RecoilPitch), through
+    /// [`BoomTransform::DeltaTransform`](camera::input_to_orbit::BoomTransform::DeltaTransform)) for
+    /// the weapon being planted or the selected weapon while wielded, dual-wielded, or mounted, and
+    /// then writes the pipeline's camera transform into `out`
+    /// ([`CameraPipelineContext::CalculateCameraTransform`]). Without a local player it does
+    /// nothing. Because the boom persists, the recoil also turns the camera's lasting yaw and pitch.
+    #[address(0x140_7EC_200)]
+    pub fn ProcessCameraContext(&mut self, pipeline: *mut CameraPipelineContext, previous: *const CameraContext, out: *mut CameraContext);
+}

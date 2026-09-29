@@ -85,3 +85,10 @@ pub type CameraControlContext {
 
 /// The opaque per-frame camera pipeline context.
 pub type CameraPipelineContext;
+impl CameraPipelineContext {
+    /// Writes the pipeline's camera transform, the camera boom's transform composed with the
+    /// pipeline's base transform, into `transform`: the camera modifiers end their pass with it,
+    /// writing their output context's [`m_CameraTransform`](CameraContext::m_CameraTransform).
+    #[address(0x140_448_800)]
+    pub fn CalculateCameraTransform(&self, transform: *mut Matrix4);
+}

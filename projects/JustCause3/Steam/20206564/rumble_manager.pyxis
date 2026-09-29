@@ -1,0 +1,30 @@
+use types::math::Vector3;
+
+/// How a rumble's strength depends on where it happens (`CRumbleEffect::EType`).
+#[copyable]
+pub enum RumbleEffectType: i32 {
+    /// Positioned in the world: the strength falls off as one minus the squared distance from the
+    /// listener over the squared maximum distance, reaching zero at the maximum distance.
+    EType_Spatial = 0x0,
+    /// Felt at full strength wherever it happens.
+    EType_Absolute = 0x1,
+    EType_Disabled = 0x2,
+}
+
+/// The controller rumble manager (`CRumbleManager`), owned by the effect system. It sums the
+/// active rumbles into the gamepad's two body motors and two trigger motors. Its layout is
+/// unmapped.
+pub type RumbleManager;
+impl RumbleManager {
+    /// Starts a one-off rumble lasting `time` seconds with the given strength for each motor,
+    /// unless `time` or the motors' sum is not positive. `position` and `max_distance` place an
+    /// [`EType_Spatial`](RumbleEffectType::EType_Spatial) rumble; `debug_name` names the source.
+    /// Every one-off rumble goes through it: the weapon fire rumble
+    /// ([`WeaponBase::RumbleFire`](equipment::weapon::WeaponBase::RumbleFire)), the player's damage
+    /// rumbles (`CPlayer::OnDamage`: impacts, bullets, and drowning), the character's vehicle
+    /// collisions, rumbles on animation track messages and melee hits, the reel-in kick, the
+    /// underwater swim, the force pulse, and event-driven rumbles. It may be called from any
+    /// thread; it locks the manager.
+    #[address(0x140_48E_AD0)]
+    pub fn SpawnRumble(&mut self, effect_type: RumbleEffectType, position: *const Vector3, left_motor_value: f32, right_motor_value: f32, max_distance: f32, time: f32, debug_name: *const u8, left_trigger_motor_value: f32, right_trigger_motor_value: f32);
+}

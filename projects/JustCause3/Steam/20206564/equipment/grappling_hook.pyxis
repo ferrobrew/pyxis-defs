@@ -1,5 +1,6 @@
 use aim::target::TargetType;
 use character::character::Character;
+use physics::PfxRigidBody;
 use equipment::wire_end::HookTargetInfo;
 use state::StateContext;
 use types::math::Vector3;
@@ -29,6 +30,24 @@ pub enum GrapplingHookState: i32 {
 /// far/hook), the physics constraint, and the wire rendering. Only referenced through
 /// [`GrapplingHook::m_ActiveWire`] here; the layout is unmapped.
 pub type GrapplingHookWire;
+
+/// The physics proxy a character hangs from under a grapple line (`CGrapplingHangPhysicsProxy`, a
+/// `CGrapplePointProxy`): a rigid body the hang task swings, with the character attached to it.
+/// Only some members are bound.
+#[min_size(0x30)]
+pub type GrapplingHangPhysicsProxy {
+    vftable {
+        /// Whether the proxy is set up and its body live. The hang task
+        /// ([`NStateTask_GrapplingHangTask::Update`]) acts on the proxy only while it holds.
+        #[index(3)]
+        pub fn IsOk(&self) -> bool;
+    },
+
+    /// The proxy's rigid body, which the character hangs from. The hang task sets its angular
+    /// velocity and applies its impulses to it.
+    #[address(0x20)]
+    pub m_PfxProxyBody: SharedPtr<PfxRigidBody>,
+}
 
 /// The grappling-hook equipment item (`CGrapplingHook`, a `CGameObject`): owns the wires, the
 /// reel/tether state machine, and the cached fire target. A character's hook is held by its
@@ -78,6 +97,11 @@ pub type GrapplingHook {
     /// readers null-check this before interpreting [`m_State`](Self::m_State).
     #[address(0x3C8)]
     pub m_ActiveWire: SharedPtr<GrapplingHookWire>,
+
+    /// The physics proxy the character hangs from while reeled into a hang
+    /// ([`GHS_REELED_HANG`](GrapplingHookState::GHS_REELED_HANG)).
+    #[address(0x3F0)]
+    pub m_GrapplingHangProxy: GrapplingHangPhysicsProxy,
 }
 impl GrapplingHook {
     /// Latches the `player`'s (a `CPlayer`) aim slot `target_type` into `target_info`: reads the
@@ -160,3 +184,42 @@ impl NStateTask_InAirGrappleFireMotionTask {
     #[address(0x140_810_B60)]
     pub fn OnEnter(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
 }
+
+/// The hang task (`NStateTask_GrapplingHangTask`): the character state task that runs while the
+/// character hangs under a grapple line.
+pub type NStateTask_GrapplingHangTask;
+impl NStateTask_GrapplingHangTask {
+    /// The per-tick update. While the hook's
+    /// [`m_GrapplingHangProxy`](GrapplingHook::m_GrapplingHangProxy) is
+    /// [`IsOk`](GrapplingHangPhysicsProxy::IsOk), it post-updates the proxy for the context's
+    /// time step, reads the move stick (squared to a circle and turned into the world through the
+    /// camera's input matrix), and blends the proxy body's angular velocity toward a yaw rate: toward
+    /// the weapon aim point while the character aims a weapon or the grapple or throws a grenade,
+    /// and toward zero otherwise. A gun held in a hand that fired within the last tenth of a second
+    /// pushes the body back along the weapon's forward axis at that hand. Two stick-driven swings
+    /// follow, each behind its own flag: a discrete swing impulse
+    /// ([`GrapplingHangTask_EnableDiscreteSwing`]) and a continuous one scaled by the stick's
+    /// magnitude ([`GrapplingHangTask_EnableSmallImpulseSwing`],
+    /// [`GrapplingHangTask_SmallImpulseSwingMagnitude`]), both applied at the hips
+    /// ([`Character::GetHipsPosition`](character::character::Character::GetHipsPosition)) with
+    /// [`PfxRigidBody::ApplyImpulse`]. Nothing in this build sets either flag, so the stick does not
+    /// swing a hanging character. Without a valid proxy it runs the drop-out alignment instead, or
+    /// cancels the hang.
+    #[address(0x140_815_1D0)]
+    pub fn Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
+}
+
+/// Enables the hang task's discrete stick swing (`NStateTask_GrapplingHangTask::s_enable_discrete_swing`).
+/// Zero-initialised and written by no code in this build.
+#[address(0x142_F30_E90)]
+pub extern GrapplingHangTask_EnableDiscreteSwing: bool;
+/// Enables the hang task's continuous stick swing
+/// (`NStateTask_GrapplingHangTask::s_enable_small_impulse_swing`). Zero-initialised and written by
+/// no code in this build.
+#[address(0x142_F30_E84)]
+pub extern GrapplingHangTask_EnableSmallImpulseSwing: bool;
+/// The continuous stick swing's impulse at full stick deflection
+/// ([`GrapplingHangTask_EnableSmallImpulseSwing`]), applied once per hang-task tick and scaled by
+/// the stick's magnitude.
+#[address(0x142_D65_A80)]
+pub extern GrapplingHangTask_SmallImpulseSwingMagnitude: f32;

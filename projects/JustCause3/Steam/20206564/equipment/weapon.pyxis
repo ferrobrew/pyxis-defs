@@ -51,6 +51,18 @@ pub enum ProjectileFireDirectionMode: i32 {
     E_PROJECTILE_FIRE_DIRECTION_BARREL = 0x1,
 }
 
+/// The fire inputs a weapon's user hands its per-tick update (`SWeaponInputs`), each `0..=1`. The
+/// base update ([`WeaponBase::UpdateFromUserPostSim_ParallelBase`]) copies them before passing them
+/// on to [`WeaponBase::UpdateWeapon_Parallel`].
+#[size(0x8), copyable]
+pub type WeaponInputs {
+    /// The primary trigger, compared against the tuning's
+    /// [`m_trigger_sensitivity`](WeaponTuning::m_trigger_sensitivity).
+    pub m_PrimaryFireInput: f32,
+    /// The secondary trigger, for weapons with a secondary action.
+    pub m_SecondaryFireInput: f32,
+}
+
 /// A weapon's tuning record (`SWeaponTuning`), an ADF resource shared by every instance of a weapon
 /// type and reached through [`WeaponBase::m_Tuning`]. Only the fields read by the mapped functions
 /// are bound.
@@ -65,6 +77,25 @@ pub type WeaponTuning {
     /// distance.
     #[address(0x44)]
     pub m_max_range: f32,
+
+    /// The seconds between shots: [`WeaponBase::UpdateWeapon_Parallel`] starts a shot only once
+    /// [`WeaponBase::m_TimeSinceLastFire`] has reached it. The interval is weapon-wide, so the guns
+    /// of a multi-gun weapon share it.
+    #[address(0x50)]
+    pub m_fire_rate: f32,
+    /// The replacement for [`m_fire_rate`](Self::m_fire_rate) once the player owns the weapon's
+    /// fire-rate upgrade.
+    pub m_fire_rate_level_2: f32,
+
+    /// Whether a held trigger keeps firing. Otherwise a local player's weapon fires once per pull
+    /// ([`WeaponBase::m_FiredThisInput`]); other users always fire while the trigger is pulled.
+    #[address(0x60)]
+    pub m_fully_automatic: bool,
+
+    /// The trigger thresholds: index 0 is the value a released trigger must exceed to count as
+    /// pulled, index 1 the lower value a pulled trigger must stay above.
+    #[address(0x64)]
+    pub m_trigger_sensitivity: [f32; 2],
 
     /// A per-weapon replacement for the character's aim-timer refill value; non-negative values
     /// override the character's aim settings (see [`WeaponBase::GetAimTimerOverride`]).
@@ -221,7 +252,7 @@ pub type WeaponBase {
         /// fire inputs. The base implementation is
         /// [`UpdateFromUserPostSim_ParallelBase`](Self::UpdateFromUserPostSim_ParallelBase).
         #[index(54)]
-        pub fn UpdateFromUserPostSim_Parallel(&mut self, dt: f32, aim_position: *const Vector3, input: *const void);
+        pub fn UpdateFromUserPostSim_Parallel(&mut self, dt: f32, aim_position: *const Vector3, input: *const WeaponInputs);
 
         /// The serial counterpart of
         /// [`UpdateFromUserPostSim_Parallel`](Self::UpdateFromUserPostSim_Parallel), called with the
@@ -230,7 +261,7 @@ pub type WeaponBase {
         /// It does not write
         /// [`m_AimTargetPosition`](Self::m_AimTargetPosition).
         #[index(55)]
-        pub fn UpdateFromUserPostSim_Serial(&mut self, dt: f32, aim_position: *const Vector3, input: *const void);
+        pub fn UpdateFromUserPostSim_Serial(&mut self, dt: f32, aim_position: *const Vector3, input: *const WeaponInputs);
 
         /// Returns the weapon type's tuning block (`SWeaponTuningBase`), from which the fire code
         /// reads recoil, scatter, and spread ranges.
@@ -337,11 +368,19 @@ pub type WeaponBase {
     #[address(0x270)]
     pub m_PhysicalRecoilStrength: f32,
 
-    /// The accumulated recoil yaw, kicked left or right at random by each shot.
+    /// This tick's recoil yaw, radians: the base update
+    /// ([`UpdateFromUserPostSim_ParallelBase`](Self::UpdateFromUserPostSim_ParallelBase)) zeroes it
+    /// at the start of every tick, and each shot ([`Fire_ProjectileBase`](Self::Fire_ProjectileBase))
+    /// kicks it left or right at random. The weapon camera modifier
+    /// ([`WeaponCameraModifier::ProcessCameraContext`](camera::weapon_camera_modifier::WeaponCameraModifier::ProcessCameraContext))
+    /// turns the camera boom by it.
     #[address(0x274)]
     pub m_RecoilYaw: f32,
 
-    /// The accumulated recoil pitch, raised by each shot.
+    /// This tick's recoil pitch, radians: the base update zeroes it at the start of every tick and
+    /// then, while [`m_CurrentRecoilPitchValueToRecover`](Self::m_CurrentRecoilPitchValueToRecover)
+    /// is positive, sets it to the negated share recovered this tick; each shot raises it by the
+    /// shot's pitch kick. The weapon camera modifier pitches the camera boom by it.
     #[address(0x278)]
     pub m_RecoilPitch: f32,
 
@@ -405,6 +444,12 @@ pub type WeaponBase {
     #[address(0x4F8)]
     pub m_User: [*mut void; 2],
 
+    /// Whether the weapon's user is the local player. The trigger's semi-automatic rule, the fire
+    /// rumble ([`RumbleFire`](Self::RumbleFire)), and the fire camera shake apply only while it is
+    /// set.
+    #[address(0x519)]
+    pub m_IsUserLocalPlayer: bool,
+
     /// Whether the weapon blocks firing while its barrel penetrates a wall in aim.
     #[address(0x560)]
     pub m_IsWeaponPenetratingWallIfInAim: bool,
@@ -456,6 +501,17 @@ impl WeaponBase {
     #[address(0x140_991_FF0)]
     pub fn Fire_ProjectileBase(&mut self, weapon_data: *mut WeaponData);
 
+    /// Spawns the fire rumble for a shot through [`RumbleManager::SpawnRumble`](rumble_manager::RumbleManager::SpawnRumble),
+    /// named `"WeaponFire"`, with the tuning's rumble strength and time, when the user is the local
+    /// player ([`m_IsUserLocalPlayer`](Self::m_IsUserLocalPlayer)) and the strength is positive. On
+    /// the dual-wield slot the gun about to fire ([`m_NextWeaponToFire`](Self::m_NextWeaponToFire))
+    /// picks the motor: gun 1 drives the left motor only, and any other gun the right motor only.
+    /// Called only from [`Fire_ProjectileBase`](Self::Fire_ProjectileBase), after the shot's recoil
+    /// is added to [`m_RecoilPitch`](Self::m_RecoilPitch) and [`m_RecoilYaw`](Self::m_RecoilYaw)
+    /// and before the gun index advances.
+    #[address(0x140_951_0C0)]
+    pub fn RumbleFire(&mut self);
+
     /// The base implementation of the [`IsWeaponAiming`](Self::IsWeaponAiming) virtual.
     #[address(0x140_950_F90)]
     pub fn IsWeaponAimingBase(&self) -> bool;
@@ -463,13 +519,13 @@ impl WeaponBase {
     /// The base implementation of the
     /// [`UpdateFromUserPostSim_Parallel`](Self::UpdateFromUserPostSim_Parallel) virtual.
     #[address(0x140_9A3_C50)]
-    pub fn UpdateFromUserPostSim_ParallelBase(&mut self, dt: f32, aim_position: *const Vector3, input: *const void);
+    pub fn UpdateFromUserPostSim_ParallelBase(&mut self, dt: f32, aim_position: *const Vector3, input: *const WeaponInputs);
 
     /// The per-gun fire-input update: cools heat, reads the trigger against the tuning's
     /// sensitivities, applies semi-automatic, forced-fire, wall-penetration, and aim-angle gating,
     /// and starts or stops fire on `weapon_data`.
     #[address(0x140_992_B00)]
-    pub fn UpdateWeapon_Parallel(&mut self, dt: f32, weapon_data: *mut WeaponData, input: *const void) -> bool;
+    pub fn UpdateWeapon_Parallel(&mut self, dt: f32, weapon_data: *mut WeaponData, input: *const WeaponInputs) -> bool;
 
     /// Returns the tuning's aim-timer override
     /// ([`WeaponTuning::m_aim_timer_override`]), or zero without tuning.

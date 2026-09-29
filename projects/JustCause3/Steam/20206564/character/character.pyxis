@@ -542,6 +542,12 @@ impl Character {
     #[address(0x140_77E_9A0)]
     pub fn GetWantedWorldVelocity(&self, out: *mut Vector3) -> *mut Vector3;
 
+    /// Writes the world position of the hips bone to `out` and returns `out`: the bone's model-space
+    /// matrix, looked up by the bone's name hash, composed with the
+    /// character's world matrix.
+    #[address(0x140_7AF_370)]
+    pub fn GetHipsPosition(&self, out: *mut Vector3) -> *mut Vector3;
+
     /// Sets the proxy's wanted velocity from the world-space `velocity`, converting it into the
     /// character-local frame with the inverse of the proxy's transform.
     #[address(0x140_77E_9F0)]

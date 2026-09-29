@@ -333,6 +333,17 @@ impl PfxCharacterInstance {
     pub fn BuildDefaultCharacterContext(&mut self);
 }
 
+/// `CPfxRigidBody`: the engine's wrapper around a Havok rigid body in the physics system's world.
+/// Only some members are bound.
+pub type PfxRigidBody;
+impl PfxRigidBody {
+    /// Applies the linear impulse `impulse` (world space) to the body at the world point
+    /// `position`, through `hknpWorld::applyBodyImpulseAt`, and then notifies the body's own
+    /// impulse virtual. The last argument only scales the debug display of the impulse.
+    #[address(0x140_24E_D80)]
+    pub fn ApplyImpulse(&mut self, impulse: *const Vector3, position: *const Vector3, debug_scale: f32);
+}
+
 /// `SweptSphereCast`: a free-function sphere sweep that fills `result` (`CCastResult`). The
 /// meaning of its scalar parameters is not established.
 #[address(0x140_738_670)]
