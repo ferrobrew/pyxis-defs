@@ -1,0 +1,14 @@
+use input::input_action_map::InputActionMap;
+
+/// The common steering interface passed to gameplay and UI input handlers. Its action map stores
+/// the device effectors that the steering readers query.
+#[min_size(0x10)]
+pub type Steering {
+    /// The common steering vtable.
+    #[address(0x0)]
+    pub __vftable: u64,
+
+    /// The action map used by the steering readers to resolve input actions.
+    #[address(0x8)]
+    pub ActionMap: *mut InputActionMap,
+}

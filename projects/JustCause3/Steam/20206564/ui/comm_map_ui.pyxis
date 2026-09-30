@@ -1,0 +1,20 @@
+use input::steering::Steering;
+
+/// The map screen UI (`CCommMapUI`). It handles map navigation, zooming, cursor movement, icon
+/// selection, and context actions from the active steering input.
+#[min_size(0x10)]
+pub type CommMapUI {
+}
+impl CommMapUI {
+    /// Handles one frame of map input. Mouse input updates the map cursor and map actions, while
+    /// steering input handles navigation, zoom, selection, and context actions. The map delegates
+    /// common UI input handling after its map-specific processing.
+    #[address(0x140_E46_970)]
+    pub fn OnManageInput(&mut self, steering: *mut Steering, dt: f32, check_for_freeze: bool);
+
+    /// Advances the visible map UI for one frame. It updates the base UI, map initialization,
+    /// navigation-path and zoom state, map elements, the cursor display, and the periodic UI
+    /// garbage-collection timer while holding the map visibility lock.
+    #[address(0x140_EFB_DA0)]
+    pub fn Update(&mut self, dt: f32, dtf: f32);
+}

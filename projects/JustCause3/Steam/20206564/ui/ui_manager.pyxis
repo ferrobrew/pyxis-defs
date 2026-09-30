@@ -1,5 +1,6 @@
 use graphics_engine::device::CRITICAL_SECTION;
 use graphics_engine::graphics_engine::HContext_t;
+use input::steering::Steering;
 use types::math::{Vector2, Vector3, Matrix4};
 use ui::scaleform::{MovieImpl, RenderHAL};
 
@@ -210,7 +211,7 @@ pub type UIManager {
     /// polls for the mouse-button actions ([`MOUSE1`](input::input_action_map::Action::MOUSE1) and
     /// [`MOUSE2`](input::input_action_map::Action::MOUSE2)).
     #[address(0x220)]
-    pub m_Steering: *mut void,
+    pub m_Steering: *mut Steering,
 
     /// The lock serializing the UI update (`PreRender`: `Advance` + `Capture`) against the UI
     /// render (`Render`, `RenderOffScreenTextures`). A Win32 critical section, so re-entrant on
