@@ -98,7 +98,8 @@ pub type PauseUI {
     pub m_RefreshSettings: bool,
 
     /// Set by every [`COMMAND_SET_SETTING_VALUE`](Self::COMMAND_SET_SETTING_VALUE); tells
-    /// [`PersistChanges`](Self::PersistChanges) there is something to save.
+    /// [`PersistChanges`](Self::PersistChanges) and [`OnDeactivateImpl`](Self::OnDeactivateImpl)
+    /// there is something to save.
     #[address(0x12C)]
     pub m_AnySettingsChanged: bool,
 
@@ -130,6 +131,22 @@ impl PauseUI {
     /// root movie's advance.
     #[address(0x140_F15_600)]
     pub fn OnActiveImpl(&mut self);
+
+    /// The [`OnDeactivate`](UIBase::OnDeactivate) override: when
+    /// [`m_AnySettingsChanged`](Self::m_AnySettingsChanged) is set, has the settings manager
+    /// persist its settings (`CSettingsManager::PersistChanges`) and clears the flag, then stops
+    /// observing the login manager. Every deactivation of the loaded pause menu runs it, whether
+    /// or not the movie's settings screen sent [`COMMAND_PERSIST_CHANGES`](Self::COMMAND_PERSIST_CHANGES)
+    /// first.
+    #[address(0x140_E50_8A0)]
+    pub fn OnDeactivateImpl(&mut self);
+
+    /// The [`OnInactive`](UIBase::OnInactive) override: empties and releases two cached AS3
+    /// arrays, calls the base, freezes a set of input actions' device effectors, and has the
+    /// overlay screen show its game messages again, and clears
+    /// [`m_ShowingFullScreenVideo`](Self::m_ShowingFullScreenVideo).
+    #[address(0x140_E31_B20)]
+    pub fn OnInactiveImpl(&mut self);
 
     /// The [`HandleCommand`](UIBase::HandleCommand) override: dispatches the pause movie's
     /// commands (the `COMMAND_*` constants on this type) and falls back to

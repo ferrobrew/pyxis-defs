@@ -41,6 +41,20 @@ pub type UIBase {
         #[index(7)]
         pub fn OnActive(&mut self);
 
+        /// Called by [`Deactivate`](UIBase::Deactivate) when a deactivation is requested while the
+        /// screen is not [`INACTIVE`](ui::overlay_ui::UIBaseState::INACTIVE), before
+        /// [`m_Current`](UIBase::m_Current) moves to
+        /// [`DEACTIVATING`](ui::overlay_ui::UIBaseState::DEACTIVATING) and the root movie is asked
+        /// to unload the clip. The clip is still loaded. Runs on the thread that requested the
+        /// deactivation, which is not necessarily the capture thread.
+        #[index(8)]
+        pub fn OnDeactivate(&mut self);
+
+        /// Called by the [`COMMAND_INACTIVE`](UIBase::COMMAND_INACTIVE) handling once the root
+        /// movie has unloaded the clip, before [`m_Clip`](UIBase::m_Clip) is released.
+        #[index(9)]
+        pub fn OnInactive(&mut self);
+
         /// Handles an ExternalInterface command from the clip. `command` is the `hashlittle` hash
         /// of the command name (the part after the colon), `args` the call's arguments, and
         /// `movie` the calling movie, through which a command that returns a value sets it with
@@ -80,11 +94,24 @@ impl UIBase {
     /// The base [`HandleCommand`](UIBase::HandleCommand): the commands shared by every screen.
     /// [`COMMAND_ACTIVE`](UIBase::COMMAND_ACTIVE) stores the clip and calls
     /// [`OnActive`](UIBase::OnActive); [`COMMAND_INACTIVE`](UIBase::COMMAND_INACTIVE) calls
-    /// `OnInactive` and releases it; [`COMMAND_EVENT`](UIBase::COMMAND_EVENT) posts an engine event;
+    /// [`OnInactive`](UIBase::OnInactive) and releases it; [`COMMAND_EVENT`](UIBase::COMMAND_EVENT) posts an engine event;
     /// the rest cover activation of other screens, tweens, localized-string lookups, and input
     /// priority.
     #[address(0x140_FF8_E10)]
     pub fn BaseHandleCommand(&mut self, command: u32, args: *const Value, num_args: u32, movie: *mut MovieImpl);
+
+    /// Requests the screen's deactivation: sets [`m_Desired`](UIBase::m_Desired) to
+    /// [`INACTIVE`](ui::overlay_ui::UIBaseState::INACTIVE) and, unless the screen is already
+    /// inactive, calls [`OnDeactivate`](UIBase::OnDeactivate), moves
+    /// [`m_Current`](UIBase::m_Current) to
+    /// [`DEACTIVATING`](ui::overlay_ui::UIBaseState::DEACTIVATING), clears the command queue and
+    /// the tweens, and, when `unload` is set, has the root movie unload the clip (its
+    /// `root.Deactivate` or `root.DeactivateDyn`), which ends in
+    /// [`COMMAND_INACTIVE`](UIBase::COMMAND_INACTIVE). The engine's deactivation requests go
+    /// through it: the movies' deactivate commands, `CUIManager::ForceDeactivatePause`, the UI manager's
+    /// event handling, and the game-state transitions.
+    #[address(0x140_FF8_0D0)]
+    pub fn Deactivate(&mut self, unload: bool);
 
     /// The [`Invoke`](UIBase::Invoke) implementation. When the screen is
     /// [`ACTIVE`](ui::overlay_ui::UIBaseState::ACTIVE), `delay` is zero, and the caller is the
