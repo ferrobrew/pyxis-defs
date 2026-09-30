@@ -1,0 +1,206 @@
+use input::steering::Steering;
+use ui::scaleform::{MovieImpl, Value};
+use ui::ui_base::UIBase;
+
+/// `CPauseUI::EPauseMenuType`: which of the pause movie's menus is shown. The movie keeps one
+/// list of main-menu entries per type and switches between them with its `SwitchToMenu` method.
+#[copyable]
+pub enum PauseMenuType: i32 {
+    /// The in-game pause menu.
+    PAUSE_SHIP = 0x0,
+    /// The developer menu.
+    PAUSE_DEV = 0x1,
+    /// The proctor (test) menu.
+    PAUSE_PROCTOR = 0x2,
+    /// The options menu (graphics, sound, gameplay, controller, keyboard, credits, and DLC
+    /// entries), reached from the in-game and front-end menus.
+    PAUSE_OPTIONS = 0x3,
+    /// The front-end (title) menu.
+    PAUSE_FRONTEND = 0x4,
+    /// The main-menu submenu of the in-game pause menu.
+    PAUSE_MAIN_MENU = 0x5,
+    /// The controller-mapping category list.
+    PAUSE_CONTROLS = 0x6,
+}
+
+/// The pause and options menu (`CPauseUI`), whose movie is `ui/pause.gfx`. The movie's document
+/// class (`pause`) holds the menus as lists of entries shown on a column of main buttons, and a
+/// settings screen that lists one page of settings rows at a time. The engine fills the movie at
+/// [`OnActiveImpl`](Self::OnActiveImpl) (the `InitMenu` and `SwitchToMenu` calls), fills the
+/// settings pages on request through [`PopulateSettings`](Self::PopulateSettings), and receives
+/// the movie's changes through [`HandleCommandImpl`](Self::HandleCommandImpl). The instance is
+/// created once and survives across pauses; the movie itself is loaded on every activation and
+/// unloaded on deactivation.
+#[singleton(0x142_F38_860), size(0x298)]
+pub type PauseUI {
+    /// The `CPauseUI` vtable (the [`UIBase`] virtuals).
+    pub const VFTABLE: u64 = 0x1424BE2F8,
+    /// The command hash for `populate_settings`: the movie is about to show the settings screen
+    /// and asks for its pages ([`PopulateSettings`](Self::PopulateSettings)).
+    pub const COMMAND_POPULATE_SETTINGS: u32 = 0x7392B19C,
+    /// The command hash for `set_setting_value`: `(type, value)`, both ints, a settings row's new
+    /// value. Sets [`m_AnySettingsChanged`](Self::m_AnySettingsChanged) and calls
+    /// [`SettingsManager::SetValue`](settings_manager::SettingsManager::SetValue).
+    pub const COMMAND_SET_SETTING_VALUE: u32 = 0x716C41DA,
+    /// The command hash for `get_setting_value`: `(type)`, returning the setting's value.
+    pub const COMMAND_GET_SETTING_VALUE: u32 = 0x91AF2AF3,
+    /// The command hash for `set_upgrade_value`: `(type, value)` from a row on the DLC page; loads
+    /// the player's gear upgrade for the chosen DLC.
+    pub const COMMAND_SET_UPGRADE_VALUE: u32 = 0x61F90FB3,
+    /// The command hash for `persist_changes`: the settings or controls screen is closing
+    /// ([`PersistChanges`](Self::PersistChanges)).
+    pub const COMMAND_PERSIST_CHANGES: u32 = 0x38CD305C,
+    /// The command hash for `restore_default_keymap`: the key-binding rows' "reset all" was
+    /// confirmed ([`RestoreDefaultMapping`](Self::RestoreDefaultMapping)).
+    pub const COMMAND_RESTORE_DEFAULT_KEYMAP: u32 = 0xA7787CFE,
+    /// The command hash for `get_key_for_action`: `(action)`, a key-binding row was selected. The
+    /// settings manager starts capturing the next key for the action, and
+    /// [`m_Waitingforkey`](Self::m_Waitingforkey) is set until it arrives.
+    pub const COMMAND_GET_KEY_FOR_ACTION: u32 = 0x6424E825,
+    /// The command hash for `load_controller_mapping`: `(screen)`, the controls screen changed
+    /// category; stored in [`m_CurrentScreen`](Self::m_CurrentScreen).
+    pub const COMMAND_LOAD_CONTROLLER_MAPPING: u32 = 0x358F4B2E,
+    /// The command hash for `show_fullscreen_video`.
+    pub const COMMAND_SHOW_FULLSCREEN_VIDEO: u32 = 0x401CEC9B,
+    /// The command hash for `hide_fullscreen_video`.
+    pub const COMMAND_HIDE_FULLSCREEN_VIDEO: u32 = 0x648C532E,
+    /// The command hash for `request_new_infocast`.
+    pub const COMMAND_REQUEST_NEW_INFOCAST: u32 = 0xCBD7292F,
+    /// The command hash for `check_dlc_sell_messages`.
+    pub const COMMAND_CHECK_DLC_SELL_MESSAGES: u32 = 0x4F9D677E,
+    /// The movie's `OptionClass.m_Type` for the options menu's graphics entry: selecting an entry
+    /// of this type opens the settings screen on the
+    /// [`PAGE_GRAPHICS`](SettingsUI::PAGE_GRAPHICS) page. The value is a constant of the movie's
+    /// `pause` class.
+    pub const OPTION_GRAPHICS: i32 = 11,
+
+    #[base]
+    pub base: UIBase,
+
+    /// The menu the movie was last switched to on activation.
+    #[address(0x120)]
+    pub m_CurrentMenuType: PauseMenuType,
+
+    /// Which menus are available this activation, indexed by [`PauseMenuType`]; passed to the
+    /// movie's `InitMenu`.
+    #[address(0x124)]
+    pub m_IsValidMenu: [bool; 7],
+
+    /// Set when the settings changed outside the menu; the next [`UpdateImpl`](Self::UpdateImpl)
+    /// runs [`PopulateSettings`](Self::PopulateSettings) and has the movie redraw the shown page
+    /// (its `RefreshCurrentSettings` method), then clears it.
+    #[address(0x12B)]
+    pub m_RefreshSettings: bool,
+
+    /// Set by every [`COMMAND_SET_SETTING_VALUE`](Self::COMMAND_SET_SETTING_VALUE); tells
+    /// [`PersistChanges`](Self::PersistChanges) there is something to save.
+    #[address(0x12C)]
+    pub m_AnySettingsChanged: bool,
+
+    /// Set while the settings manager captures a key for
+    /// [`COMMAND_GET_KEY_FOR_ACTION`](Self::COMMAND_GET_KEY_FOR_ACTION).
+    #[address(0x12D)]
+    pub m_Waitingforkey: bool,
+
+    /// Set between [`COMMAND_SHOW_FULLSCREEN_VIDEO`](Self::COMMAND_SHOW_FULLSCREEN_VIDEO) and
+    /// [`COMMAND_HIDE_FULLSCREEN_VIDEO`](Self::COMMAND_HIDE_FULLSCREEN_VIDEO).
+    #[address(0x133)]
+    pub m_ShowingFullScreenVideo: bool,
+
+    /// The controller-mapping category the controls screen shows.
+    #[address(0x134)]
+    pub m_CurrentScreen: i32,
+
+    /// The helper that builds the settings pages.
+    #[address(0x178)]
+    pub m_SettingsUI: SettingsUI,
+}
+impl PauseUI {
+    /// The [`OnActive`](UIBase::OnActive) override. Calls the base, then fills the freshly loaded
+    /// movie: `InitMenu` with [`m_IsValidMenu`](Self::m_IsValidMenu) and the installed-DLC flags
+    /// (which builds each valid menu's fixed entries, the options menu among them), the
+    /// engine-owned entries of the in-game, front-end, and main menus (through the movie's
+    /// `AddEventOption`), the player info and infocast, and finally `SwitchToMenu` with
+    /// [`m_CurrentMenuType`](Self::m_CurrentMenuType). Runs on the capture thread, inside the
+    /// root movie's advance.
+    #[address(0x140_F15_600)]
+    pub fn OnActiveImpl(&mut self);
+
+    /// The [`HandleCommand`](UIBase::HandleCommand) override: dispatches the pause movie's
+    /// commands (the `COMMAND_*` constants on this type) and falls back to
+    /// [`UIBase::BaseHandleCommand`] for the rest. The movie's calls arrive synchronously from
+    /// inside AS3, so the movie resumes with any change this makes already applied.
+    #[address(0x140_F06_EE0)]
+    pub fn HandleCommandImpl(&mut self, command: u32, args: *const Value, num_args: u32, movie: *mut MovieImpl);
+
+    /// The per-frame update: tracks install, login, and store state for the menu entries it
+    /// enables, finishes a key capture, and services
+    /// [`m_RefreshSettings`](Self::m_RefreshSettings).
+    #[address(0x140_EBB_1D0)]
+    pub fn UpdateImpl(&mut self, dt: f32, dtf: f32);
+
+    /// The [`OnManageInput`](UIBase::OnManageInput) override: the base input mapping plus the
+    /// gamepad-only select and cancel handlers of the membership page.
+    #[address(0x140_EBB_5A0)]
+    pub fn OnManageInputImpl(&mut self, steering: *mut Steering, dt: f32, check_for_freeze: bool);
+
+    /// When the screen is [`ACTIVE`](ui::overlay_ui::UIBaseState::ACTIVE), empties the clip's
+    /// `m_SettingsArray` and refills it through
+    /// [`SettingsUI::PopulateSettingsMenu`]. Called by
+    /// [`COMMAND_POPULATE_SETTINGS`](PauseUI::COMMAND_POPULATE_SETTINGS) and by
+    /// [`UpdateImpl`](Self::UpdateImpl) for [`m_RefreshSettings`](Self::m_RefreshSettings).
+    #[address(0x140_E8B_D10)]
+    pub fn PopulateSettings(&mut self);
+
+    /// When [`m_AnySettingsChanged`](Self::m_AnySettingsChanged) is set, has the settings manager
+    /// persist its settings (`CSettingsManager::PersistChanges`) and clears the flag.
+    #[address(0x140_DFB_A30)]
+    pub fn PersistChanges(&mut self);
+
+    /// Restores the default key bindings.
+    #[address(0x140_EBB_920)]
+    pub fn RestoreDefaultMapping(&mut self);
+}
+
+/// The settings-page builder (`CSettingsUI`), embedded in [`PauseUI`] and holding only its owner.
+/// [`PopulateSettingsMenu`](Self::PopulateSettingsMenu) fills the pause movie's
+/// `m_SettingsArray` with one AS3 object per page, `{m_Name, m_Settings}`, where `m_Settings` is
+/// an array of row objects. A row carries `m_Name` (the label), `m_Type` (the
+/// [`SettingType`](settings_manager::SettingType) the movie sends back with its new value),
+/// `m_Format` (one of the `WIDGET_*` constants), `m_Value`, `m_DefaultValue`, and
+/// `m_NeedConfirm`; a toggle adds the parallel `m_Labels` and `m_Values` arrays, and a slider adds
+/// `m_MinValue` and `m_MaxValue`.
+#[size(0x8)]
+pub type SettingsUI {
+    /// The `m_Format` of a toggle row: the value is one of `m_Values`, shown as the matching entry
+    /// of `m_Labels` and chosen from a pop-up list.
+    pub const WIDGET_TOGGLE: i32 = 0,
+    /// The `m_Format` of a slider row: an integer between `m_MinValue` and `m_MaxValue`.
+    pub const WIDGET_SLIDER: i32 = 1,
+    /// The `m_Format` of a key-binding row (used by the controls screen's pages).
+    pub const WIDGET_KEY: i32 = 2,
+    /// The page index of the graphics settings in `m_SettingsArray`.
+    pub const PAGE_GRAPHICS: i32 = 0,
+    /// The page index of the sound settings.
+    pub const PAGE_SOUND: i32 = 1,
+    /// The page index of the gameplay settings.
+    pub const PAGE_GAMEPLAY: i32 = 2,
+    /// The page index of the DLC settings, whose rows the movie sends back as
+    /// [`COMMAND_SET_UPGRADE_VALUE`](PauseUI::COMMAND_SET_UPGRADE_VALUE) rather than
+    /// [`COMMAND_SET_SETTING_VALUE`](PauseUI::COMMAND_SET_SETTING_VALUE).
+    pub const PAGE_DLC: i32 = 3,
+
+    /// The owning screen, whose movie creates the page objects.
+    pub m_Owner: *mut UIBase,
+}
+impl SettingsUI {
+    /// Appends the four pages, in `PAGE_*` order, to `settings` (the movie's `m_SettingsArray`),
+    /// each named by a localized string and filled by its category's builder.
+    #[address(0x140_E7B_1C0)]
+    pub fn PopulateSettingsMenu(&mut self, settings: *mut Value);
+
+    /// Appends a [`WIDGET_TOGGLE`](SettingsUI::WIDGET_TOGGLE) row for `setting` to `page_rows`, with the
+    /// current and default values read from the settings manager.
+    #[address(0x140_E13_E30)]
+    pub fn AppendSettingToggle(&mut self, page_rows: *mut Value, setting: i32, name: *const u8, labels: *const Value, values: *const Value, need_confirm: bool);
+}

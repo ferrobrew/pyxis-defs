@@ -1,0 +1,112 @@
+use input::steering::Steering;
+use ui::overlay_ui::UIBaseState;
+use ui::scaleform::{MovieImpl, Value};
+
+/// The base of every Scaleform screen (`CUIBase`): one per screen class (`CPauseUI`, `CHUDUI`,
+/// ...), each driving its own clip inside the shared root movie. The root movie's AS3 loads the
+/// screen's movie when the screen activates, then reports the loaded clip back through the
+/// ExternalInterface command [`COMMAND_ACTIVE`](Self::COMMAND_ACTIVE), which
+/// [`HandleCommand`](Self::HandleCommand) stores in [`m_Clip`](Self::m_Clip) before calling the
+/// [`OnActive`](Self::OnActive) virtual. From then on the engine calls AS3 methods on the clip
+/// through [`Invoke`](Self::Invoke), and the clip calls back into the screen with ExternalInterface
+/// calls named `"<class name>:<command>"`, which
+/// [`ScaleformEIHandler::Callback`](ui::scaleform::ScaleformEIHandler::Callback) routes to the
+/// screen's [`HandleCommand`](Self::HandleCommand) virtual as the command's `hashlittle` hash.
+#[size(0xF0)]
+pub type UIBase {
+    /// The ExternalInterface command hash for `active`: the root movie reports the screen's loaded
+    /// clip (the single argument).
+    pub const COMMAND_ACTIVE: u32 = 0xBAACE199,
+    /// The command hash for `inactive`: the root movie has unloaded the screen's clip.
+    pub const COMMAND_INACTIVE: u32 = 0xE36CBE11,
+    /// The command hash for `event`: the clip posts the string argument as an engine event
+    /// (`NEvent::CPostEvent::PostMsg`), which is how AS3 `SendEvent` and `PlaySound` reach native
+    /// code.
+    pub const COMMAND_EVENT: u32 = 0xCB0CC3F4,
+
+    vftable {
+        /// Runs the screen's per-frame input: reads the steering's UI actions and calls the
+        /// matching AS3 handler on the clip through [`Invoke`](UIBase::Invoke) (`OnUp`, `OnDown`,
+        /// `OnLeft`, `OnRight`, the `OnDpad*` family, `OnSelect`, `OnCancel`, `OnSpecialButton`,
+        /// `OnYButton`, `OnNextTabButton`, `OnPrevTabButton`, `OnNextPageButton`,
+        /// `OnPrevPageButton`, and the rest of the `uibase` input methods). Only the screen with
+        /// the highest input priority is called each frame.
+        #[index(3)]
+        pub fn OnManageInput(&mut self, steering: *mut Steering, dt: f32, check_for_freeze: bool);
+
+        /// Called when the screen's clip has loaded and been stored in [`m_Clip`](UIBase::m_Clip),
+        /// with [`m_Current`](UIBase::m_Current) already
+        /// [`ACTIVE`](ui::overlay_ui::UIBaseState::ACTIVE). Screens push their initial data to
+        /// the clip here.
+        #[index(7)]
+        pub fn OnActive(&mut self);
+
+        /// Handles an ExternalInterface command from the clip. `command` is the `hashlittle` hash
+        /// of the command name (the part after the colon), `args` the call's arguments, and
+        /// `movie` the calling movie, through which a command that returns a value sets it with
+        /// [`SetExternalInterfaceRetVal`](ui::scaleform::MovieImpl::SetExternalInterfaceRetVal).
+        /// The base implementation is [`BaseHandleCommand`](UIBase::BaseHandleCommand); screens
+        /// override it and fall back to it for commands they do not handle.
+        #[index(13)]
+        pub fn HandleCommand(&mut self, command: u32, args: *const Value, num_args: u32, movie: *mut MovieImpl);
+
+        /// Calls the AS3 method `method` on the clip. The implementation is
+        /// [`InvokeImpl`](UIBase::InvokeImpl), shared by every screen.
+        #[index(14)]
+        pub fn Invoke(&mut self, method: *const u8, args: *const Value, num_args: u32, result: *mut Value, delay: f32) -> bool;
+    },
+
+    /// The screen's activation state.
+    #[address(0x14)]
+    pub m_Current: UIBaseState,
+
+    /// The state the screen is moving towards; activation and deactivation requests set it, and
+    /// the root movie's load and unload reports move [`m_Current`](Self::m_Current) to it.
+    #[address(0x18)]
+    pub m_Desired: UIBaseState,
+
+    /// The screen's own AS3 clip (the document class instance of its movie, for example `pause`
+    /// for `CPauseUI`), a managed display-object value. Set by [`COMMAND_ACTIVE`](Self::COMMAND_ACTIVE)
+    /// and released by [`COMMAND_INACTIVE`](Self::COMMAND_INACTIVE); null while the screen is not
+    /// loaded.
+    #[address(0x80)]
+    pub m_Clip: Value,
+
+    /// The root movie the clip lives in.
+    #[address(0xB0)]
+    pub m_Movie: *mut MovieImpl,
+}
+impl UIBase {
+    /// The base [`HandleCommand`](UIBase::HandleCommand): the commands shared by every screen.
+    /// [`COMMAND_ACTIVE`](UIBase::COMMAND_ACTIVE) stores the clip and calls
+    /// [`OnActive`](UIBase::OnActive); [`COMMAND_INACTIVE`](UIBase::COMMAND_INACTIVE) calls
+    /// `OnInactive` and releases it; [`COMMAND_EVENT`](UIBase::COMMAND_EVENT) posts an engine event;
+    /// the rest cover activation of other screens, tweens, localized-string lookups, and input
+    /// priority.
+    #[address(0x140_FF8_E10)]
+    pub fn BaseHandleCommand(&mut self, command: u32, args: *const Value, num_args: u32, movie: *mut MovieImpl);
+
+    /// The [`Invoke`](UIBase::Invoke) implementation. When the screen is
+    /// [`ACTIVE`](ui::overlay_ui::UIBaseState::ACTIVE), `delay` is zero, and the caller is the
+    /// UI manager's capture thread (or asks for a `result`), it calls the method on
+    /// [`m_Clip`](UIBase::m_Clip) at once through
+    /// [`ValueObjectInterface::Invoke`](ui::scaleform::ValueObjectInterface::Invoke). Otherwise,
+    /// and only when no `result` is wanted, it copies the call into the screen's command queue,
+    /// which the screen's update drains on the capture thread; a queued call from another thread
+    /// gets a minimal delay. Returns false only for a deferred call that wants a result.
+    #[address(0x140_FF8_300)]
+    pub fn InvokeImpl(&mut self, method: *const u8, args: *const Value, num_args: u32, result: *mut Value, delay: f32) -> bool;
+
+    /// The base [`OnManageInput`](UIBase::OnManageInput): maps the steering's UI actions to the
+    /// clip's AS3 input handlers.
+    #[address(0x140_F19_CB0)]
+    pub fn BaseOnManageInput(&mut self, steering: *mut Steering, dt: f32, check_for_freeze: bool);
+
+    /// Creates an empty AS3 `Object` in [`m_Movie`](UIBase::m_Movie) into `value`.
+    #[address(0x140_F1A_6E0)]
+    pub fn CreateObject(&mut self, value: *mut Value);
+
+    /// Creates an empty AS3 `Array` in [`m_Movie`](UIBase::m_Movie) into `value`.
+    #[address(0x140_F1A_6D0)]
+    pub fn CreateArray(&mut self, value: *mut Value);
+}

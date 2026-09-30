@@ -95,4 +95,13 @@ impl SettingsManager {
     /// few settings whose values live elsewhere (see [`SettingType`]).
     #[address(0x140_D3B_3C0)]
     pub fn GetValue(&self, setting: SettingType) -> i32;
+
+    /// Sets `setting` to `value` when the value is allowed for it: writes the entry in
+    /// [`m_Settings`](Self::m_Settings) (a few settings keep their value elsewhere) and raises the
+    /// update flag of the setting's category (graphics, display, controller, mouse, sound, and so
+    /// on), which a later update applies to the owning system. A value that is not allowed changes
+    /// nothing. The pause menu's `set_setting_value` command calls it with the type and value a
+    /// settings row sends. Disassemblers may name this function `CommandLineParser::getEntity`.
+    #[address(0x140_D4E_080)]
+    pub fn SetValue(&mut self, setting: SettingType, value: i32);
 }

@@ -719,6 +719,34 @@ pub type MovieImpl {
     pub RenderContext: RenderContext,
 }
 impl MovieImpl {
+    /// Creates an AS3 string value in the movie (`GFx::Movie::CreateString`, forwarding to the
+    /// AS3 movie root at [`pASMovieRoot`](Self::pASMovieRoot)).
+    #[address(0x141_97E_4E0)]
+    pub fn CreateString(&mut self, value: *mut Value, string: *const u8);
+
+    /// Constructs an instance of the AS3 class `class_name` (`Object` when null) with `num_args`
+    /// constructor arguments into `value` (`GFx::Movie::CreateObject`). The class is looked up in
+    /// the application domain of the running AS3 code, or the VM's default domain when none is
+    /// running, so every class a loaded movie defines is reachable by its qualified name. A
+    /// constructor that throws is logged and leaves `value` undefined.
+    #[address(0x141_97E_500)]
+    pub fn CreateObject(&mut self, value: *mut Value, class_name: *const u8, args: *const Value, num_args: u32);
+
+    /// Creates an empty AS3 `Array` into `value` (`GFx::Movie::CreateArray`).
+    #[address(0x141_97E_520)]
+    pub fn CreateArray(&mut self, value: *mut Value);
+
+    /// Wraps a native `GFx::FunctionHandler` in an AS3 function object into `value`
+    /// (`GFx::Movie::CreateFunction`). The AS3 movie root adds a reference to `handler` and keeps
+    /// `user_data` beside it for the handler's calls.
+    #[address(0x141_97E_530)]
+    pub fn CreateFunction(&mut self, value: *mut Value, handler: *mut void, user_data: *mut void);
+
+    /// Sets the return value of the ExternalInterface call being handled
+    /// (`GFx::Movie::SetExternalInterfaceRetVal`).
+    #[address(0x141_97E_550)]
+    pub fn SetExternalInterfaceRetVal(&mut self, value: *const Value);
+
     /// The concrete implementation behind the [`Capture`](Self::Capture) virtual: gates on `Context::HasChanges` when `if_changed` is set, suspends the GC, and
     /// runs `Render::Context::Capture` to publish the frame's display-tree changes as the pending
     /// snapshot. `CUIManager::PreRender` calls it right after `Advance`, on the game update
@@ -968,6 +996,52 @@ impl ValueObjectInterface {
     /// [`mValue`](Value::mValue) payload.
     #[address(0x141_BC8_D70)]
     pub fn ObjectRelease(&mut self, value: *mut Value, data: *mut void);
+
+    /// Adds a reference to a managed value that is being copied into `value` (which must already
+    /// carry the owning interface). `data` is the value's [`mValue`](Value::mValue) payload.
+    #[address(0x141_BB8_560)]
+    pub fn ObjectAddRef(&mut self, value: *mut Value, data: *mut void);
+
+    /// Reads the AS3 member `name` of the object `data` into `value`, releasing whatever `value`
+    /// held. `is_display_object` is whether the object is a display object (its
+    /// [`Type`](Value::Type) is [`VT_DISPLAY_OBJECT`](Value::VT_DISPLAY_OBJECT)); the engine
+    /// passes that test inline. Returns false when the member is not found.
+    #[address(0x141_C4C_E20)]
+    pub fn GetMember(&self, data: *mut void, name: *const u8, value: *mut Value, is_display_object: bool) -> bool;
+
+    /// Writes `value` to the AS3 member `name` of the object `data`. `is_display_object` as for
+    /// [`GetMember`](Self::GetMember).
+    #[address(0x141_C45_B00)]
+    pub fn SetMember(&mut self, data: *mut void, name: *const u8, value: *const Value, is_display_object: bool) -> bool;
+
+    /// Calls the AS3 method `name` of the object `data` with `num_args` arguments, storing the
+    /// return value in `result` when it is not null. `is_display_object` as for
+    /// [`GetMember`](Self::GetMember). Runs the method to completion before returning; call on
+    /// the capture thread.
+    #[address(0x141_C4D_380)]
+    pub fn Invoke(&mut self, data: *mut void, result: *mut Value, name: *const u8, args: *const Value, num_args: u64, is_display_object: bool) -> bool;
+
+    /// Appends `value` to the AS3 array `data`.
+    #[address(0x141_BE3_820)]
+    pub fn PushBack(&mut self, data: *mut void, value: *const Value) -> bool;
+
+    /// Removes `count` elements of the AS3 array `data` starting at `index`; a negative `count`
+    /// removes through the end.
+    #[address(0x141_BA0_E30)]
+    pub fn RemoveElements(&mut self, data: *mut void, index: u32, count: i32) -> bool;
+
+    /// Reads element `index` of the AS3 array `data` into `value`, releasing whatever `value`
+    /// held. Returns false past the end.
+    #[address(0x141_C4E_830)]
+    pub fn GetElement(&self, data: *mut void, index: u32, value: *mut Value) -> bool;
+
+    /// Writes `value` to element `index` of the AS3 array `data`, growing the array as needed.
+    #[address(0x141_BE3_720)]
+    pub fn SetElement(&mut self, data: *mut void, index: u32, value: *const Value) -> bool;
+
+    /// The length of the AS3 array `data`.
+    #[address(0x141_B92_1B0)]
+    pub fn GetArraySize(&self, data: *mut void) -> u32;
 }
 
 /// A display object's presentation state, read and written through
@@ -1137,4 +1211,37 @@ impl Loader {
     /// given load flags.
     #[address(0x141_976_DD0)]
     pub fn CreateMovie(&mut self, filename: *const u8, load_constants: u32, memory_arena: u64) -> *mut void;
+}
+
+/// The engine's ExternalInterface handler (`CScaleformEIHandler`), installed on the UI loader so
+/// every movie it creates shares it. AS3 `ExternalInterface.call("<class name>:<command>", ...)`
+/// arrives at [`Callback`](Self::Callback).
+#[min_size(0x20)]
+pub type ScaleformEIHandler {
+    /// The `GetFastHash` of `"ROOT"`: calls with this prefix come from the root movie's own AS3
+    /// and are not dispatched.
+    #[address(0x18)]
+    pub m_RootHash: u32,
+}
+impl ScaleformEIHandler {
+    /// Splits `method_name` at the colon and hashes both halves with `GetFastHash`. Unless the
+    /// prefix is the root's, finds the target screen: the movie's user data when set, otherwise
+    /// the screen registered under the prefix (`CUIManager::FindUI`). Calls the screen's
+    /// [`HandleCommand`](ui::ui_base::UIBase::HandleCommand) with the command hash and the
+    /// arguments; a call with an unknown prefix is dropped. Runs synchronously inside the calling
+    /// AS3 code, on the capture thread.
+    #[address(0x140_F1C_940)]
+    pub fn Callback(&mut self, movie: *mut MovieImpl, method_name: *const u8, args: *const Value, num_args: u32);
+}
+
+/// The engine's Scaleform file opener (`CScaleformFileOpener`), installed on the UI loader: every
+/// file a movie loads (movies, imports, images) opens through [`OpenFile`](Self::OpenFile).
+pub type ScaleformFileOpener;
+impl ScaleformFileOpener {
+    /// Opens `url` as a `Scaleform::File`. Returns the UI manager's file cache entry for `url`
+    /// when there is one (adding a reference); otherwise sizes the file on the game's virtual
+    /// file system, reads it into a new `CScaleformCachedFile`, and offers that to the file cache,
+    /// which keeps only a fixed set of movies. Returns null when the file does not exist.
+    #[address(0x141_035_600)]
+    pub fn OpenFile(&mut self, url: *const u8) -> *mut void;
 }
