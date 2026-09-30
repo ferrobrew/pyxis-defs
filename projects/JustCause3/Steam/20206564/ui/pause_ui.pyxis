@@ -73,6 +73,11 @@ pub type PauseUI {
     /// [`PAGE_GRAPHICS`](SettingsUI::PAGE_GRAPHICS) page. The value is a constant of the movie's
     /// `pause` class.
     pub const OPTION_GRAPHICS: i32 = 11,
+    /// The number of main buttons the movie lays a menu's entries out on
+    /// (`MCI_button_container.MCI_root.MCI_button_00` onwards, each holding a
+    /// `stat_category_button` as `MCI_button`). The movie's `SetMainMenuOption` shows the first
+    /// entries of a list on them and silently drops the rest.
+    pub const MAIN_BUTTON_COUNT: i32 = 11,
 
     #[base]
     pub base: UIBase,
@@ -189,6 +194,11 @@ pub type SettingsUI {
     /// [`COMMAND_SET_UPGRADE_VALUE`](PauseUI::COMMAND_SET_UPGRADE_VALUE) rather than
     /// [`COMMAND_SET_SETTING_VALUE`](PauseUI::COMMAND_SET_SETTING_VALUE).
     pub const PAGE_DLC: i32 = 3,
+    /// The number of `pause_code.controls_row` row clips the settings screen's list manager
+    /// (`MCI_settings_screen.MCI_panel.MCI_container.MCI_root.MCI_manager`) draws a page's rows on,
+    /// named `MCI_controls_row_00` onwards. The clips show a scrolling window of the page, and each
+    /// clip's `GetData()` returns the row object it currently shows (null for an empty clip).
+    pub const ROW_CLIP_COUNT: i32 = 13,
 
     /// The owning screen, whose movie creates the page objects.
     pub m_Owner: *mut UIBase,

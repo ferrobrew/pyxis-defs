@@ -110,3 +110,17 @@ impl UIBase {
     #[address(0x140_F1A_6D0)]
     pub fn CreateArray(&mut self, value: *mut Value);
 }
+
+/// `CUIBase::SetIntField` (static): sets the member `name` of the AS3 object `object` to `value`,
+/// passing an unmanaged int value to
+/// [`ValueObjectInterface::SetMember`](ui::scaleform::ValueObjectInterface::SetMember). The
+/// settings-page builders fill their row objects with it.
+#[address(0x140_F68_ED0)]
+pub fn SetIntField(object: *mut Value, name: *const u8, value: i32);
+
+/// `CUIBase::SetStringField` (static): sets the member `name` of the AS3 object `object` to the
+/// C string `value`, passed as an unmanaged string value (the pointer itself, which the movie
+/// copies into an AS3 string) to
+/// [`ValueObjectInterface::SetMember`](ui::scaleform::ValueObjectInterface::SetMember).
+#[address(0x140_F69_0F0)]
+pub fn SetStringField(object: *mut Value, name: *const u8, value: *const u8);
