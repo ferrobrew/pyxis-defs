@@ -375,6 +375,8 @@ pub type InputActionMap {
 }
 impl InputActionMap {
     /// `GetActionEffector(action, device)`: the four-argument lookup with the blockers honoured.
+    /// Every [`Steering`](input::steering::Steering) reader resolves its action through this form,
+    /// with the steering's [`m_DeviceIndex`](input::steering::Steering::m_DeviceIndex).
     #[address(0x140_2F4_3B0)]
     pub fn GetActionEffector(&mut self, action_id: i32, device_index: i32) -> *mut InputDeviceEffector;
 
@@ -390,8 +392,8 @@ impl InputActionMap {
     #[address(0x140_2F3_3A0)]
     pub fn GetActionEffectorIgnoringBlockers(&mut self, action: Action, device_index: i32, ignore_blockers: bool) -> *mut InputDeviceEffector;
 
-    /// `GetActionEffector(action)`: the lookup with device `-1` and the blockers honoured, which is
-    /// how every `CSteering` reader resolves an action.
+    /// `GetActionEffector(action)`: the lookup with device `-1` and the blockers honoured. The
+    /// [`LocalPlayerActionMap`] readers and setters and several camera and script readers use it.
     #[address(0x140_2F4_3C0)]
     pub fn GetActionEffectorForAction(&mut self, action: Action) -> *mut InputDeviceEffector;
 }

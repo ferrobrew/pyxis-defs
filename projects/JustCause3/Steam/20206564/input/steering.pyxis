@@ -1,8 +1,13 @@
 use input::input_action_map::InputActionMap;
 
-/// The common steering interface passed to gameplay and UI input handlers. Its action map stores
-/// the device effectors that the steering readers query.
-#[min_size(0x10)]
+/// The common steering interface (`CSteering`) passed to gameplay and UI input handlers. Its
+/// readers (`IsClicked`, `IsPressed`, `IsReleased`, `GetValue`, and the rest of the vtable) resolve
+/// each action through
+/// [`InputActionMap::GetActionEffector`](input::input_action_map::InputActionMap::GetActionEffector)
+/// on [`ActionMap`](Self::ActionMap) with [`m_DeviceIndex`](Self::m_DeviceIndex) as the device
+/// selector. While any of the steering's own blocker bits is set and its blocker override is clear,
+/// the readers report nothing for actions outside the steering's exception list.
+#[min_size(0x38)]
 pub type Steering {
     /// The common steering vtable.
     #[address(0x0)]
@@ -11,4 +16,11 @@ pub type Steering {
     /// The action map used by the steering readers to resolve input actions.
     #[address(0x8)]
     pub ActionMap: *mut InputActionMap,
+
+    /// The device selector every steering reader passes to the action-map lookup: a packed
+    /// selector like the one derived from an
+    /// [`InputDeviceId`](input::input_device_manager::InputDeviceId), or `-1`, which the lookup
+    /// treats as any device.
+    #[address(0x30)]
+    pub m_DeviceIndex: i32,
 }
