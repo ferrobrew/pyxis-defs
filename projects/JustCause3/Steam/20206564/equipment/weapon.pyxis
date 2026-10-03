@@ -209,6 +209,26 @@ pub type WeaponData {
     #[address(0x2A8)]
     pub m_TimeSinceLastFire: f32,
 
+    /// The gun's shot counter for tracers: the bullet weapons' shot
+    /// ([`BulletWeaponBase::Fire_Projectile`]) increments it per bullet and draws a tracer every
+    /// tuning-set number of bullets. [`WeaponBase::Fire_StartBase`] resets it at the first shot of
+    /// a pull, and [`WeaponBase::UpdateWeapon_Parallel`] resets it after a long enough pause in
+    /// fire.
+    #[address(0x2AC)]
+    pub m_TracerCounter: u16,
+
+    /// The gun's counter of tracers, which the bullet weapons' shot increments per tracer to give
+    /// every tuning-set number of tracers a smoke trail. Reset with
+    /// [`m_TracerCounter`](Self::m_TracerCounter).
+    #[address(0x2AE)]
+    pub m_SmokeTrailCounter: u16,
+
+    /// Shots of the gun's current burst still to fire. [`WeaponBase::Fire_StartBase`] loads it
+    /// from the tuning at the first shot of a pull, and while it is non-zero
+    /// [`WeaponBase::UpdateWeapon_Parallel`] tries to fire this gun whatever the trigger input.
+    #[address(0x2B0)]
+    pub m_BurstShotsLeft: u32,
+
     /// The uniform scale applied to the gun's world matrix while holstered.
     #[address(0x2DC)]
     pub m_HolsteredScaleValue: f32,
@@ -246,6 +266,15 @@ pub type WeaponBase {
         /// implementation is [`GetFireFromPositionBase`](Self::GetFireFromPositionBase).
         #[index(25)]
         pub fn GetFireFromPosition(&self, result: *mut Vector3, weapon_data: *mut WeaponData) -> *mut Vector3;
+
+        /// Starts fire on one gun, `weapon_data`. The base implementation is
+        /// [`Fire_StartBase`](Self::Fire_StartBase).
+        #[index(26)]
+        pub fn Fire_Start(&mut self, weapon_data: *mut WeaponData);
+
+        /// Stops fire. The base implementation is [`Fire_StopBase`](Self::Fire_StopBase).
+        #[index(27)]
+        pub fn Fire_Stop(&mut self, weapon_data: *mut WeaponData);
 
         /// Fires one shot from `weapon_data`. The base implementation is
         /// [`Fire_ProjectileBase`](Self::Fire_ProjectileBase); subclasses such as
@@ -562,15 +591,72 @@ impl WeaponBase {
     pub fn IsWeaponAimingBase(&self) -> bool;
 
     /// The base implementation of the
-    /// [`UpdateFromUserPostSim_Parallel`](Self::UpdateFromUserPostSim_Parallel) virtual.
+    /// [`UpdateFromUserPostSim_Parallel`](Self::UpdateFromUserPostSim_Parallel) virtual. It returns
+    /// early, processing no input, when any gun's muzzle is within about 0.1 m of `aim_position`.
+    /// After the aim target, the recoil recovery, and the fire timer, it reads
+    /// [`m_NextWeaponToFire`](Self::m_NextWeaponToFire) once and walks
+    /// [`m_lWeaponData`](Self::m_lWeaponData): only the gun at that index gets
+    /// [`UpdateWeapon_Parallel`](Self::UpdateWeapon_Parallel), and so only that gun can start a
+    /// shot this tick, while every gun gets its attached-effect update. A weapon owned by a remote
+    /// peer skips the per-gun update and fires from its network component's fire flags instead.
     #[address(0x140_9A3_C50)]
     pub fn UpdateFromUserPostSim_ParallelBase(&mut self, dt: f32, aim_position: *const Vector3, input: *const WeaponInputs);
 
     /// The per-gun fire-input update: cools heat, reads the trigger against the tuning's
     /// sensitivities, applies semi-automatic, forced-fire, wall-penetration, and aim-angle gating,
-    /// and starts or stops fire on `weapon_data`.
+    /// and starts or stops fire on `weapon_data`. The trigger, semi-automatic, cancel, and buffer
+    /// state it keeps ([`m_IsTriggerPulled`](Self::m_IsTriggerPulled),
+    /// [`m_FiredThisInput`](Self::m_FiredThisInput),
+    /// [`m_IsFiringCancelled`](Self::m_IsFiringCancelled), and
+    /// [`m_InputBufferTimer`](Self::m_InputBufferTimer)) and the fire interval
+    /// ([`m_TimeSinceLastFire`](Self::m_TimeSinceLastFire)) are the weapon's, shared by its guns;
+    /// only the burst counter ([`WeaponData::m_BurstShotsLeft`]) is the gun's. A shot it allows
+    /// calls [`Fire_Start`](Self::Fire_Start) once, on `weapon_data` alone; with no shot while
+    /// firing, it calls [`Fire_Stop`](Self::Fire_Stop) on every gun.
     #[address(0x140_992_B00)]
     pub fn UpdateWeapon_Parallel(&mut self, dt: f32, weapon_data: *mut WeaponData, input: *const WeaponInputs) -> bool;
+
+    /// The base implementation of the [`Fire_Start`](Self::Fire_Start) virtual. At the first shot
+    /// of a pull (the weapon not yet [`m_IsFiring`](Self::m_IsFiring)) it sets
+    /// [`m_IsFirstShot`](Self::m_IsFirstShot), resets the gun's tracer counters
+    /// ([`WeaponData::m_TracerCounter`]), and loads its burst
+    /// ([`WeaponData::m_BurstShotsLeft`]) from the tuning. It then sets `m_IsFiring`, runs the
+    /// enabled weapon components' fire start on `weapon_data`, and fires one shot from it through
+    /// [`Fire_Projectile`](Self::Fire_Projectile). The mech's magnet and machine-gun weapons skip
+    /// all of it under conditions on game-wide state.
+    #[address(0x140_965_620)]
+    pub fn Fire_StartBase(&mut self, weapon_data: *mut WeaponData);
+
+    /// The base implementation of the [`Fire_Stop`](Self::Fire_Stop) virtual: clears
+    /// [`m_IsFiring`](Self::m_IsFiring) and runs the enabled weapon components' fire stop on
+    /// `weapon_data`. The disassembler mislabels it `CEffectInstance::Release`.
+    #[address(0x140_965_820)]
+    pub fn Fire_StopBase(&mut self, weapon_data: *mut WeaponData);
+
+    /// The base implementation of the
+    /// [`UpdateFromUserPostSim_Serial`](Self::UpdateFromUserPostSim_Serial) virtual. Like the
+    /// parallel base, it reads [`m_NextWeaponToFire`](Self::m_NextWeaponToFire) once and calls
+    /// [`UpdateWeapon_Serial`](Self::UpdateWeapon_Serial) only for the gun at that index, and only
+    /// for a weapon owned locally.
+    #[address(0x140_96E_3B0)]
+    pub fn UpdateFromUserPostSim_SerialBase(&mut self, dt: f32, aim_position: *const Vector3, input: *const WeaponInputs);
+
+    /// The serial per-gun update: runs the enabled weapon components' serial update on
+    /// `weapon_data` and, for the local player's weapon, refreshes a readiness flag. It never
+    /// starts or stops fire.
+    #[address(0x140_965_BF0)]
+    pub fn UpdateWeapon_Serial(&mut self, dt: f32, weapon_data: *mut WeaponData, input: *const WeaponInputs);
+
+    /// Writes the start point of a projectile fired from `weapon_data` into `result` and returns
+    /// it: the gun's fire point at its current fire-point cursor
+    /// ([`WeaponData::m_InternalFirePositionCurrentIndex`]), composed with the gun's world matrix
+    /// of the previous simulation tick ([`WeaponData::m_WorldMatrixT0`]). In the
+    /// [`E_WS_WINGSUIT_WEAPON`](WeaponState::E_WS_WINGSUIT_WEAPON) state it is the translation of
+    /// the gun's current world matrix instead. The projectile weapons' shots read it after
+    /// [`Fire_ProjectileBase`](Self::Fire_ProjectileBase) has advanced the gun index and the
+    /// cursor.
+    #[address(0x140_966_B50)]
+    pub fn GetLastFireFromPosition(&self, result: *mut Vector3, weapon_data: *mut WeaponData) -> *mut Vector3;
 
     /// Returns the tuning's aim-timer override
     /// ([`WeaponTuning::m_aim_timer_override`]), or zero without tuning.
