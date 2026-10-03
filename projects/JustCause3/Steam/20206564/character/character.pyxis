@@ -1,5 +1,5 @@
 use animation::ik::HumanIK;
-use animation::rule_system::AnimationRuleSystem;
+use animation::rule_system::{AnimationModifierType, AnimationRuleSystem};
 use blackboard::ObjectBlackboard;
 use character::avatar::{Avatar, MentalState};
 use character::control_parameters::ControlParameters;
@@ -617,6 +617,33 @@ impl Character {
     /// Whether the character is trying to aim (an aim input is active and aiming is permitted).
     #[address(0x140_7F5_140)]
     pub fn IsTryingToAim(&self) -> bool;
+
+    /// Sets the character's frame-bound animation modifiers for this tick, which select the variant
+    /// clips of the animation set's nodes. Called once per tick from the pre-state-machine pass,
+    /// after the aim input and before the state tasks. In order: the grapple modifier on every rule
+    /// system while the hook is in its aiming state
+    /// ([`GrapplingHook::IsHookAimingState`](equipment::grappling_hook::GrapplingHook::IsHookAimingState));
+    /// then, for the wielded weapon (the planted explosive while planting, otherwise the selected
+    /// slot's weapon while it is wielded, dual-wielded, or mounted, or the weapon being switched to
+    /// or drawn), through [`SetModifier`](Self::SetModifier), the weapon's
+    /// [`m_AimAnimationModifier`](equipment::weapon::WeaponBase::m_AimAnimationModifier) when
+    /// [`IsTryingToAim`](Self::IsTryingToAim) holds and the hook is not aiming, its
+    /// [`m_AnimationModifier`](equipment::weapon::WeaponBase::m_AnimationModifier) otherwise, and
+    /// always its
+    /// [`m_EquippedAnimationModifier`](equipment::weapon::WeaponBase::m_EquippedAnimationModifier);
+    /// for a character other than the player, a faction or ghost modifier; the relaxed modifier
+    /// while the avatar's mental state is relaxed; and a stunt modifier (combat with a weapon,
+    /// non-combat without) while attached to a vehicle or while stunt mode is forced. Rico's on-foot
+    /// idle node picks its unarmed relaxed clip with no weapon modifier, the weapon's held stance
+    /// with its plain modifier, and the aimed stance with its aim modifier, the grapple modifier,
+    /// or the explosive's modifier.
+    #[address(0x140_7F5_2E0)]
+    pub fn SetCharacterModifiers(&mut self);
+
+    /// Marks an animation modifier active with `modifier_type` on every rule system of the
+    /// character's animated model, through [`AnimationRuleSystem::SetModifier`].
+    #[address(0x140_79A_7B0)]
+    pub fn SetModifier(&mut self, modifier: *const u32, modifier_type: AnimationModifierType);
 
     /// Whether any weapon fire input is active: fire, precision-aim fire, or explosive planting.
     /// `ignore_animation` skips the inventory's animation-permission checks.

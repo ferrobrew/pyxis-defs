@@ -28,3 +28,26 @@ pub type AnimationRuleSystem {
     #[address(0x48)]
     pub m_StateMachineInstance: SharedPtr<StateMachineInstance>,
 }
+impl AnimationRuleSystem {
+    /// Marks an animation modifier (`ava::idstring<NAnimationSystem::SModifierIdTag>`, passed as a
+    /// pointer to its id) active on this rule system: it sets the bit for `modifier_type` in the
+    /// rule system's modifier-to-type-mask map. The animation set's nodes select their variant clips
+    /// by the active modifiers (an `ANIM_*` node lists one variant per modifier combination, such as
+    /// a weapon's held or aimed stance). [`Character::SetModifier`](character::character::Character::SetModifier)
+    /// forwards to this for every rule system of the character's animated model.
+    #[address(0x140_479_A10)]
+    pub fn SetModifier(&mut self, modifier: *const u32, modifier_type: AnimationModifierType);
+}
+
+/// How long a modifier set through [`AnimationRuleSystem::SetModifier`] stays active
+/// (`CAnimationRuleSystem::EAnimationModifierType`). Each value is a bit index in the rule system's
+/// per-modifier type mask.
+#[copyable]
+pub enum AnimationModifierType: i32 {
+    /// Active for the current frame; [`Character::SetCharacterModifiers`](character::character::Character::SetCharacterModifiers)
+    /// re-sets every modifier it owns each tick with this type.
+    FRAME_BOUND = 0x0,
+    /// Active for the current state; the ragdoll get-up task's entry sets a modifier from its
+    /// properties with this type.
+    STATE_BOUND = 0x1,
+}

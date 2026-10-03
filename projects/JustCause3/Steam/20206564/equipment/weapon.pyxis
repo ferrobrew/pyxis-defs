@@ -419,6 +419,25 @@ pub type WeaponBase {
     #[address(0x1AC)]
     pub m_ProjectileOffsetFireCount: i32,
 
+    /// The animation modifier id (`ava::idstring<NAnimationSystem::SModifierIdTag>`) for holding
+    /// this weapon without aiming.
+    /// [`Character::SetCharacterModifiers`](character::character::Character::SetCharacterModifiers)
+    /// sets it for the wielded weapon while the holder is not trying to aim.
+    #[address(0x254)]
+    pub m_AnimationModifier: u32,
+
+    /// The animation modifier id for aiming this weapon, set by
+    /// [`Character::SetCharacterModifiers`](character::character::Character::SetCharacterModifiers)
+    /// in place of [`m_AnimationModifier`](Self::m_AnimationModifier) while the holder is trying
+    /// to aim.
+    #[address(0x258)]
+    pub m_AimAnimationModifier: u32,
+
+    /// The animation modifier id for having this weapon equipped, set alongside the held or aimed
+    /// modifier every tick the weapon is wielded.
+    #[address(0x25C)]
+    pub m_EquippedAnimationModifier: u32,
+
     /// The accumulated scatter, raised by each shot up to the tuning's maximum and scaling the
     /// shot's scatter rotation.
     #[address(0x268)]
