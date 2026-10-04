@@ -1,16 +1,66 @@
 use input::steering::Steering;
+use types::math::Vector2;
 
 /// The map screen UI (`CCommMapUI`). It handles map navigation, zooming, cursor movement, icon
 /// selection, and context actions from the active steering input.
-#[min_size(0x1E8)]
+///
+/// Positions on the map come in two spaces: UI positions, which are stage coordinates of the UI
+/// movie, and UI-map positions, which are offsets from [`m_MapCenterUiPosition`](Self::m_MapCenterUiPosition)
+/// divided by [`m_MapScale`](Self::m_MapScale). The gamepad selects at a fixed stage point, the
+/// gamepad cursor at the centre of the stage, and pans the map under it; the mouse selects at the
+/// stage point it clicks.
+#[min_size(0x208)]
 pub type CommMapUI {
     /// Whether a mouse drag of the map is in progress. [`OnManageInput`](Self::OnManageInput) sets
     /// it when the held [`MOUSE1`](input::input_action_map::Action::MOUSE1) moves the cursor or the
     /// mouse far enough from the press point, and pans the map from the cursor while it is set. A
     /// [`Released`](input::input_action_map::EffectorState::Released) `MOUSE1` clears it and ends the
-    /// drag instead of selecting; nothing else clears it.
+    /// drag instead of selecting; nothing else clears it. The cursor threshold is a few stage
+    /// pixels, measured from [`m_MouseClickUiMapPosition`](Self::m_MouseClickUiMapPosition).
     #[address(0x1E1)]
     pub m_MouseDragging: bool,
+
+    /// Whether the mouse branch of [`OnManageInput`](Self::OnManageInput) made a selection this
+    /// frame: a released [`MOUSE1`](input::input_action_map::Action::MOUSE1) outside a drag, or a
+    /// released [`MOUSE2`](input::input_action_map::Action::MOUSE2). Either writes the cursor to
+    /// [`m_MouseCursorUiPosition`](Self::m_MouseCursorUiPosition) and sets this flag, and while it
+    /// is set the same call picks the icon or province at that point. `OnManageInput` clears it,
+    /// together with [`m_ActivateCtxMenu`](Self::m_ActivateCtxMenu), at the start of every call.
+    #[address(0x1E2)]
+    pub m_MouseCursorPositionUpdated: bool,
+
+    /// Whether the context menu (the waypoint, fast travel, and icon actions) opens this frame.
+    /// [`OnManageInput`](Self::OnManageInput) sets it in either branch for a clicked
+    /// [`GUI_OK`](input::input_action_map::Action::GUI_OK), which it then freezes, and in the mouse
+    /// branch for a released [`MOUSE2`](input::input_action_map::Action::MOUSE2). Only the
+    /// `MOUSE2` path also selects at the cursor; `GUI_OK` opens the menu for whatever the last
+    /// selection picked. The map's update calls [`ActivateCtxMenu`](Self::ActivateCtxMenu) while
+    /// it is set.
+    #[address(0x1E3)]
+    pub m_ActivateCtxMenu: bool,
+
+    /// The UI position of the map's origin. Panning moves it; the drag sets it so the UI-map point
+    /// pressed stays under the cursor.
+    #[address(0x1E8)]
+    pub m_MapCenterUiPosition: Vector2,
+
+    /// The mouse selection point, a UI position. Only the selecting releases described on
+    /// [`m_MouseCursorPositionUpdated`](Self::m_MouseCursorPositionUpdated) write it, so between
+    /// selections it keeps the last one: moving the mouse does not change it. With
+    /// [`UIManager::m_IsUsingGamepad`](ui::ui_manager::UIManager::m_IsUsingGamepad) clear, the
+    /// context menu opens here and the selection-relative map elements are placed from it.
+    #[address(0x1F0)]
+    pub m_MouseCursorUiPosition: Vector2,
+
+    /// The map's current zoom: the UI-space size of one UI-map unit.
+    #[address(0x1F8)]
+    pub m_MapScale: f32,
+
+    /// The UI-map position under the cursor when [`MOUSE1`](input::input_action_map::Action::MOUSE1)
+    /// was clicked. A drag keeps this point under the cursor, and the cursor's distance from it
+    /// decides when a held press becomes a drag (see [`m_MouseDragging`](Self::m_MouseDragging)).
+    #[address(0x200)]
+    pub m_MouseClickUiMapPosition: Vector2,
 }
 impl CommMapUI {
     /// Handles one frame of map input.
@@ -23,11 +73,27 @@ impl CommMapUI {
     /// device (see [`m_MouseDragging`](Self::m_MouseDragging)), and the GUI zoom actions through the
     /// steering, each click stepping the snapped zoom level by one, with the mouse wheel taking
     /// precedence. A released `MOUSE1` outside a drag selects at the cursor, and a released `MOUSE2`
-    /// selects and opens the context menu. With the flag set it pans from the steering's stick
-    /// actions and zooms continuously around the map centre. Both branches then pick the icon or
-    /// province under the selection point and delegate the common UI input handling.
+    /// selects and opens the context menu (see
+    /// [`m_MouseCursorPositionUpdated`](Self::m_MouseCursorPositionUpdated)). With the flag set it
+    /// pans from the steering's left-stick GUI actions and zooms continuously around the gamepad
+    /// cursor. In both branches a clicked [`GUI_OK`](input::input_action_map::Action::GUI_OK)
+    /// requests the context menu (see [`m_ActivateCtxMenu`](Self::m_ActivateCtxMenu)), and
+    /// [`GUI_RECENTER`](input::input_action_map::Action::GUI_RECENTER) and
+    /// [`GUI_FOCUS`](input::input_action_map::Action::GUI_FOCUS) auto-move the map, to the player
+    /// (or from the player to the user waypoint) and to the next mission. The gamepad branch picks the icon or province under the gamepad cursor
+    /// whenever the map moves or zooms; the mouse branch picks only on a selection. It then
+    /// delegates the common UI input handling.
     #[address(0x140_E46_970)]
     pub fn OnManageInput(&mut self, steering: *mut Steering, dt: f32, check_for_freeze: bool);
+
+    /// Opens the map's context menu for the selected icon or province. It places the menu at the
+    /// gamepad cursor while
+    /// [`UIManager::m_IsUsingGamepad`](ui::ui_manager::UIManager::m_IsUsingGamepad) is set, and at
+    /// [`m_MouseCursorUiPosition`](Self::m_MouseCursorUiPosition) while it is clear. The map's
+    /// element update calls it from [`Update`](Self::Update) while
+    /// [`m_ActivateCtxMenu`](Self::m_ActivateCtxMenu) is set; a running tutorial can refuse it.
+    #[address(0x140_E25_3A0)]
+    pub fn ActivateCtxMenu(&mut self);
 
     /// Advances the visible map UI for one frame. `UIManager::PreRender` calls it, not
     /// [`UIManager::PreUpdate`](ui::ui_manager::UIManager::PreUpdate), so it runs after the frame's
@@ -35,8 +101,10 @@ impl CommMapUI {
     /// map elements, the cursor display, and the periodic UI garbage-collection timer while holding
     /// the map visibility lock. It reads no input actions. The map elements it updates read
     /// [`UIManager::m_IsUsingGamepad`](ui::ui_manager::UIManager::m_IsUsingGamepad): with the flag
-    /// set the gamepad reticle is shown and the cursor-relative elements follow the map centre, and
-    /// with it clear the reticle is hidden and they follow the mouse cursor.
+    /// set the gamepad reticle is shown and the cursor-relative elements follow the gamepad cursor,
+    /// and with it clear the reticle is hidden and they follow
+    /// [`m_MouseCursorUiPosition`](Self::m_MouseCursorUiPosition). The element update also opens
+    /// the context menu (see [`ActivateCtxMenu`](Self::ActivateCtxMenu)).
     #[address(0x140_EFB_DA0)]
     pub fn Update(&mut self, dt: f32, dtf: f32);
 }
