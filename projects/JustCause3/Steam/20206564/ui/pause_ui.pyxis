@@ -73,6 +73,18 @@ pub type PauseUI {
     /// [`PAGE_GRAPHICS`](SettingsUI::PAGE_GRAPHICS) page. The value is a constant of the movie's
     /// `pause` class.
     pub const OPTION_GRAPHICS: i32 = 11,
+    /// The movie's `OptionClass.m_Type` for an event entry, the type a new `OptionClass` starts
+    /// with. Selecting one posts its `m_Event` string through [`COMMAND_EVENT`](UIBase::COMMAND_EVENT)
+    /// (after a confirmation box when its `m_NeedConfirm` is set) and closes the menu when its
+    /// `m_CloseMenu` is set. The engine's `AddEventOption` entries are of this type. The value is a
+    /// constant of the movie's `pause` class.
+    pub const OPTION_EVENT: i32 = 0,
+    /// The movie's `OptionClass.m_Type` for the in-game menu's main-menu entry: selecting it
+    /// switches to the [`PAUSE_MAIN_MENU`](PauseMenuType::PAUSE_MAIN_MENU) list. The movie's
+    /// `InitMenuShip` adds the entry, labelled with the localisation key `&pause_main_menu`, after
+    /// the options entry, and only when that list was initialised first. The value is a constant
+    /// of the movie's `pause` class.
+    pub const OPTION_MAIN_MENU: i32 = 10,
     /// The number of main buttons the movie lays a menu's entries out on
     /// (`MCI_button_container.MCI_root.MCI_button_00` onwards, each holding a
     /// `stat_category_button` as `MCI_button`). The movie's `SetMainMenuOption` shows the first
@@ -87,7 +99,8 @@ pub type PauseUI {
     pub m_CurrentMenuType: PauseMenuType,
 
     /// Which menus are available this activation, indexed by [`PauseMenuType`]; passed to the
-    /// movie's `InitMenu`.
+    /// movie's `InitMenu` as an array of booleans. Set by [`SetPauseGameMenu`](Self::SetPauseGameMenu)
+    /// or [`SetFrontEndMenu`](Self::SetFrontEndMenu) before the menu activates.
     #[address(0x124)]
     pub m_IsValidMenu: [bool; 7],
 
@@ -182,6 +195,43 @@ impl PauseUI {
     /// Restores the default key bindings.
     #[address(0x140_EBB_920)]
     pub fn RestoreDefaultMapping(&mut self);
+
+    /// Makes [`m_IsValidMenu`](Self::m_IsValidMenu) the in-game set: the in-game, options, and
+    /// controller-mapping menus, and the main-menu submenu except on Boom Island; not the
+    /// developer, proctor, or front-end menus.
+    #[address(0x140_DFB_9D0)]
+    pub fn SetPauseGameMenu(&mut self);
+
+    /// Makes [`m_IsValidMenu`](Self::m_IsValidMenu) the title-screen set: the front-end, options,
+    /// and controller-mapping menus only.
+    #[address(0x140_DFB_9B0)]
+    pub fn SetFrontEndMenu(&mut self);
+
+    /// Calls the movie's `AddEventOption`: adds an [`OPTION_EVENT`](Self::OPTION_EVENT) entry
+    /// labelled `entry` to `menu`'s list (inside the folder `folder` when it is not empty), at
+    /// the top of the list when `add_to_top` is set and at the end otherwise, posting `event` when
+    /// selected, after the confirmation `confirm` when `need_confirm` is set, and closing the menu
+    /// afterwards when `close_menu` is set.
+    #[address(0x140_E31_E90)]
+    pub fn AddEventOption(&mut self, add_to_top: bool, menu: PauseMenuType, folder: *const u8, entry: *const u8, event: *const u8, need_confirm: bool, confirm: *const u8, close_menu: bool);
+
+    /// Adds the engine's entries to the in-game menu's list, after the movie's `InitMenu` has
+    /// added its own (the options entry, then the main-menu entry). Each is added to the top of
+    /// the list, in this order, so the last added is the first shown: quit and restart the active
+    /// challenge, restart from the last checkpoint and quit the active mission (when the mission
+    /// allows them), skip the playing video or cutscene, and resume. The go-online entry is the
+    /// one added at the end, after the movie's entries, when reconnecting is not enabled. The
+    /// quit, restart, and go-online entries are left out while a cutscene or a full-screen video
+    /// plays.
+    #[address(0x140_E4F_8C0)]
+    pub fn InitShipMenu(&mut self);
+
+    /// Adds the engine's entries to the front-end menu's list, after the movie's `InitMenu` has
+    /// added its own (the options entry, then the membership link for SKUs that show it): the
+    /// start or continue entry and the others above them, and the go-online and exit entries at
+    /// the end.
+    #[address(0x140_E4F_410)]
+    pub fn InitFrontEndMenu(&mut self);
 }
 
 /// The settings-page builder (`CSettingsUI`), embedded in [`PauseUI`] and holding only its owner.
