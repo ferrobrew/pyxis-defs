@@ -1,5 +1,5 @@
 use graphics_engine::render_pass::{RBIInfo, RenderBlock, RenderPass};
-use types::math::Matrix4;
+use types::math::{Matrix4, Vector3};
 
 /// Whether the per-render-block draw-list build frustum-tests each render block's world bounding
 /// box (`g_useBoundingBoxModelRBView`). Together with [`enable_coarse_pre_z_models`] it selects which
@@ -43,6 +43,12 @@ impl ModelInstance {
     /// bounding box (a tail call to `UpdateMatrixAndAABB`).
     #[address(0x140_316_5A0)]
     pub fn UpdateMatrix(&mut self, matrix: *const Matrix4);
+
+    /// Writes the model's bounding box, in the model's own space, to `min` and `max`. It is the
+    /// box the shared model resource carries, and the box [`UpdateMatrix`](Self::UpdateMatrix)
+    /// transforms into the instance's world bounding box.
+    #[address(0x140_313_F70)]
+    pub fn GetModelSpaceBoundingBox(&self, min: *mut Vector3, max: *mut Vector3);
 
     /// `NModelSystem::ForEachRb<1, 1>`: walks `count` render blocks, frustum-tests each block's
     /// world bounding box against the context camera (`CCamera::IsBoxVisible`), skipping failing

@@ -1,5 +1,6 @@
 use character::character::Character;
 use types::math::{Matrix4, Vector3};
+use vehicle::parts::PfxBreakable;
 
 /// The engine's vehicle classification (`NVehicle::EVehicleType`), stored on a vehicle as
 /// `CVehicle::m_VehicleType` and returned by `CVehicle::GetVehicleType`, which is inlined at every
@@ -45,6 +46,24 @@ pub type Vehicle {
     /// The number of entries in [`m_Seats`](Self::m_Seats).
     pub const MAX_SEATS: u64 = 42,
 
+    /// The signed steering amount the vehicle's controller last applied
+    /// (`m_SteeringValues.Turn`). It is the value of the vehicle's `steering_turn` variable, which
+    /// value-driven effects and hinged parts can be driven by.
+    #[address(0x454)]
+    pub m_SteeringTurn: f32,
+
+    /// The vehicle's world transform at the start of the current simulation step, as the engine's
+    /// row-major matrix.
+    #[address(0x478)]
+    pub m_WorldMatrixT0: Matrix4,
+    /// The vehicle's world transform at the end of the current simulation step.
+    pub m_WorldMatrixT1: Matrix4,
+    /// The render transform: [`m_WorldMatrixT0`](Self::m_WorldMatrixT0) and
+    /// [`m_WorldMatrixT1`](Self::m_WorldMatrixT1) interpolated by the render update's frame
+    /// fraction. `CVehicle::UpdateRender_Parallel` hands it to
+    /// [`UpdateRender_ModelMatrices`](Self::UpdateRender_ModelMatrices).
+    pub m_InterpolatedWorldMatrix: Matrix4,
+
     /// The vehicle's seats, indexed by [`Seat`].
     #[address(0xB28)]
     pub m_Seats: [VehicleSeat; 42],
@@ -65,10 +84,11 @@ pub type Vehicle {
     #[address(0x4_D48)]
     pub m_AIVehicleWeaponAimTimeout: f32,
 
-    /// The vehicle's physics body (`CPfxVehicle*`). [`IsMech`](Self::IsMech) tests its strafing
-    /// wheel-steering controller.
+    /// The vehicle's physics body (`CPfxVehicle*`), whose breakable base, with the vehicle's
+    /// parts, is at offset zero. [`IsMech`](Self::IsMech) tests its strafing wheel-steering
+    /// controller.
     #[address(0x4_DD0)]
-    pub m_PfxVehicle: *mut u8,
+    pub m_PfxVehicle: *mut PfxBreakable,
 
     /// The hash of the vehicle's type name (`HashString` of names such as
     /// `v1706_boat_na_rocketboat`), compared by [`IsRocketBoat`](Self::IsRocketBoat).
@@ -100,6 +120,18 @@ impl Vehicle {
     /// of the turret part; `0` when the vehicle has no turret.
     #[address(0x140_F90_FC0)]
     pub fn GetWeaponTurretCurrentYawAngle(&self) -> f32;
+
+    /// Sets the model matrix of every valid, unbroken part with a model to the part's
+    /// [`m_RootSpaceTransform`](vehicle::parts::PartInstance::m_RootSpaceTransform) times
+    /// `transform` (through `NPfxBreakable::ForEachValidRenderablePart`), then copies the root-space
+    /// transforms of the parts that attached objects hang from into those attachments. A zero
+    /// `dtf`, or a vehicle flagged to snap, initialises each model matrix instead of updating it.
+    /// Called from
+    /// `CVehicle::UpdateRender_Parallel` with
+    /// [`m_InterpolatedWorldMatrix`](Self::m_InterpolatedWorldMatrix) on the parallel render update,
+    /// and from `CVehicle::InitTransform`.
+    #[address(0x140_F90_740)]
+    pub fn UpdateRender_ModelMatrices(&mut self, transform: *const Matrix4, dtf: f32);
 
     /// Whether the vehicle is the rocket boat: [`m_VehicleTypeNameHash`](Self::m_VehicleTypeNameHash)
     /// equals the hash of `v1706_boat_na_rocketboat` (computed once and cached). The sea-vehicle
