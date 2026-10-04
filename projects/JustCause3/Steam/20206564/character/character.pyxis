@@ -824,6 +824,9 @@ pub enum WeaponInput: i32 {
     E_INPUT_PLANT_EXPLOSIVES = 0x3,
     E_INPUT_RELOAD = 0x4,
     E_INPUT_PRECISION_AIM = 0x5,
+    /// Use an item: the weapon input task sets it on a click of the `USE_ITEM` action.
+    /// [`Inventory::UpdateWeaponHandling`](character::inventory::Inventory::UpdateWeaponHandling)
+    /// picks up a weapon in the world on it.
     E_INPUT_USE_ITEM = 0x6,
     E_INPUT_PICKUP_ITEM = 0x7,
     E_INPUT_SELECT_DUEL_WIELD = 0x8,

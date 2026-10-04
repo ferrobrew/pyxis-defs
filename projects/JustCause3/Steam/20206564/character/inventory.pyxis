@@ -54,6 +54,13 @@ pub type Inventory {
     /// is clear.
     pub m_DoesAnimationAllowGrenades: bool,
 
+    /// Whether the current animation permits picking up a weapon; one half of
+    /// [`GetAnimationAllowsPickup`](Self::GetAnimationAllowsPickup).
+    /// [`UpdateWeaponHandling`](Self::UpdateWeaponHandling) acts on the use-item input only while
+    /// it is set.
+    #[address(0x188)]
+    pub m_DoesAnimationAllowPickup: bool,
+
     /// Whether the current animation permits switching weapons: recomputed by
     /// [`UpdateInventoryPermissions`](Self::UpdateInventoryPermissions). A deferred switch, a
     /// committed slot selection (`CCharacter::SwitchWeapon`), and
@@ -154,8 +161,27 @@ impl Inventory {
     /// [`Character::QueueAct`](character::character::Character::QueueAct). The relaxed branch
     /// fires every tick its conditions hold, and it is how the player's holster input takes
     /// effect, since the player's `HolsterWeapon` only forces the relaxed state.
+    ///
+    /// It is also where a weapon in the world is picked up. While
+    /// [`GetAnimationAllowsPickup`](Self::GetAnimationAllowsPickup) holds and the use-item input
+    /// ([`E_INPUT_USE_ITEM`](character::character::WeaponInput::E_INPUT_USE_ITEM)) is positive, a
+    /// character on land queues `ACT_PICKUP_WEAPON`, the full-body pickup animation. The weapon's
+    /// pickup interaction starts the pickup when it executes
+    /// ([`WeaponBase::PickupStart`](equipment::weapon::WeaponBase::PickupStart)), and the weapon's
+    /// pickup track message completes it
+    /// ([`WeaponBase::PickupItem`](equipment::weapon::WeaponBase::PickupItem)).
+    /// A swimming character instead takes the first weapon among its interaction user proxy's
+    /// valid entries (or the weapon of a weapon placement rule among them), picks it up at once
+    /// with `PickupItem`, and queues `ACT_PICKUP_WEAPON_PARTIAL`.
     #[address(0x140_932_F10)]
     pub fn UpdateWeaponHandling(&mut self, dt: f32);
+
+    /// Whether the character may pick up a weapon now:
+    /// [`m_DoesAnimationAllowPickup`](Self::m_DoesAnimationAllowPickup) is set and the owner's
+    /// [`SB_DISABLE_PICKUP`](state::StateBitFlag::SB_DISABLE_PICKUP) state bit is clear. The weapon
+    /// pickup interaction tests it before it starts a pickup.
+    #[address(0x140_8BB_6F0)]
+    pub fn GetAnimationAllowsPickup(&self) -> bool;
 
     /// Switches to the first weapon that still has ammunition, in a fixed order: the
     /// [`E_SLOT_TWO_HANDED`](WeaponSlot::E_SLOT_TWO_HANDED) weapon, then the

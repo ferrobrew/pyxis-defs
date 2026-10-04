@@ -1,7 +1,7 @@
 use character::character::Character;
 use damage::DamageMsg;
 use types::math::{Matrix4, Vector3};
-use types::vector_math::AlignedVector3;
+use types::vector_math::{AlignedQuat, AlignedVector3};
 
 /// The physics system (`CPhysicsSystem`), a `Base::CSingle` singleton that owns the Havok world and
 /// serves the engine's scene queries. The queries are sim-phase calls against the live Havok world.
@@ -251,8 +251,34 @@ impl RagdollProxyPhantom {
     pub fn GetHitNameHash(&mut self, info: *const CastRayInfoBase) -> u32;
 }
 
-/// The Havok physics world (`hknpWorld`). Only some members are bound.
-pub type hknpWorld;
+/// The Havok physics world (`hknpWorld`, Havok Physics 2014.1). Its body manager is embedded at
+/// the start; bodies and motions live in arrays indexed by body id and motion id. Only some members
+/// are bound.
+#[min_size(0xE8)]
+pub type hknpWorld {
+    /// The body property that holds a body's engine instance ([`PfxInstance`]), as the physics
+    /// queries read it to report the body's owner.
+    pub const BODY_PROPERTY_PFX_INSTANCE: u16 = 1,
+
+    /// The body manager's body array, indexed by body id. A body id below or at
+    /// [`m_peakBodyIndex`](Self::m_peakBodyIndex) has a slot; a freed slot's
+    /// [`hknpBody::m_motionId`] is [`hknpBody::INVALID_MOTION_ID`].
+    #[address(0x20)]
+    pub m_bodies: *mut hknpBody,
+
+    /// The body manager's property buffers: per-property arrays indexed by body id, looked up by
+    /// property key ([`hknpBodyPropertyMap::getWithDefault`]).
+    #[address(0x58)]
+    pub m_bodyProperties: hknpBodyPropertyMap,
+
+    /// The highest body id the body manager has allocated.
+    #[address(0x70)]
+    pub m_peakBodyIndex: u32,
+
+    /// The motion manager's motion array, indexed by [`hknpBody::m_motionId`].
+    #[address(0xE0)]
+    pub m_motions: *mut hknpMotion,
+}
 impl hknpWorld {
     /// Casts a ray query (`hknpRayCastQuery`) and reports hits to `collector`
     /// (`hknpCollisionQueryCollector`).
@@ -266,9 +292,116 @@ impl hknpWorld {
     #[address(0x141_4CC_B30)]
     pub fn applyBodyImpulseAt(&mut self, body_id: u32, impulse: *const AlignedVector3, position: *const AlignedVector3);
 
+    /// Sets the linear and angular velocity (world space, the angular one rotated into the
+    /// motion's frame) of the dynamic body `body_id`'s motion, waking the body if it sleeps. A body
+    /// that is not dynamic is left alone, and so is a call that changes neither velocity. The
+    /// disassembler mislabels it `hknpWorld::getBodyVelocity`.
+    #[address(0x141_4CC_540)]
+    pub fn setBodyVelocity(&mut self, body_id: u32, linear: *const AlignedVector3, angular: *const AlignedVector3);
+
+    /// Sets the linear velocity (world space) of the dynamic body `body_id`'s motion, waking the
+    /// body if it sleeps; as [`setBodyVelocity`](Self::setBodyVelocity) for the linear part.
+    #[address(0x141_4CC_710)]
+    pub fn setBodyLinearVelocity(&mut self, body_id: u32, linear: *const AlignedVector3);
+
+    /// Sets the angular velocity (world space) of the dynamic body `body_id`'s motion, waking the
+    /// body if it sleeps; as [`setBodyVelocity`](Self::setBodyVelocity) for the angular part.
+    #[address(0x141_4CC_7D0)]
+    pub fn setBodyAngularVelocity(&mut self, body_id: u32, angular: *const AlignedVector3);
+
     /// Replaces the shape (`hknpShape*`) of the body `body_id` on the live world.
     #[address(0x141_4CF_370)]
     pub fn setBodyShape(&mut self, body_id: u32, shape: *const void);
+}
+
+/// A Havok body (`hknpBody`): its transform, collision data, and the motion that moves it. Only
+/// some members are bound.
+#[size(0x90), align(16)]
+pub type hknpBody {
+    /// The [`m_flags`](Self::m_flags) bit of a dynamic body, the only kind the velocity and impulse
+    /// setters ([`hknpWorld::setBodyVelocity`], [`hknpWorld::applyBodyImpulseAt`]) act on.
+    pub const IS_DYNAMIC: u32 = 0x2,
+    /// The [`m_motionId`](Self::m_motionId) of a freed body slot.
+    pub const INVALID_MOTION_ID: u32 = 0x7FFFFFFF,
+
+    /// The body's flags; see [`IS_DYNAMIC`](Self::IS_DYNAMIC).
+    #[address(0x40)]
+    pub m_flags: u32,
+
+    /// The body's motion in [`hknpWorld::m_motions`]; bodies attached to one another share it.
+    #[address(0x68)]
+    pub m_motionId: u32,
+}
+
+/// A Havok motion (`hknpMotion`): the mass properties and velocities that move one body or a set
+/// of attached bodies. Positions are Havok space: the game-space position less
+/// [`PhysicsSystem::m_AccumulatedShift`]. Only some members are bound.
+#[size(0x80), align(16)]
+pub type hknpMotion {
+    /// The centre of mass.
+    pub m_centerOfMass: AlignedVector3,
+    /// The orientation of the motion's frame, a unit quaternion `(x, y, z, w)`.
+    pub m_orientation: AlignedQuat,
+    /// The inverse inertia about the motion frame's axes and the inverse mass, as four `hkHalf`s
+    /// (each the upper 16 bits of an `f32`): `x`, `y`, `z`, then the inverse mass. A zero inverse
+    /// mass is infinite mass.
+    pub m_inverseInertia: [u16; 4],
+
+    /// The linear velocity, world space.
+    #[address(0x40)]
+    pub m_linearVelocity: AlignedVector3,
+    /// The angular velocity, in the motion's frame.
+    pub m_angularVelocity: AlignedVector3,
+}
+
+/// The body manager's map from body property key to [`hknpBodyPropertyBuffer`]
+/// (`hkMap<hkUint16, hknpBodyManager::PropertyBuffer*>`), an open-addressed hash map. Only its
+/// lookup is bound.
+#[size(0x10), align(8)]
+pub type hknpBodyPropertyMap;
+impl hknpBodyPropertyMap {
+    /// The property buffer for property `key`, or `default` when there is none.
+    #[address(0x140_1E8_7D0)]
+    pub fn getWithDefault(&self, key: u16, default: *mut hknpBodyPropertyBuffer) -> *mut hknpBodyPropertyBuffer;
+}
+
+/// One body property's values (`hknpBodyManager::PropertyBuffer`), indexed by body id: a body has
+/// the property when its bit is set in [`m_occupancy`](Self::m_occupancy), and its value is at
+/// that index of [`m_data`](Self::m_data), whose element size is the property's. Only some members
+/// are bound.
+pub type hknpBodyPropertyBuffer {
+    /// One bit per body id, 32 to a word.
+    #[address(0x8)]
+    pub m_occupancy: *const u32,
+
+    /// The number of body ids the buffer covers.
+    #[address(0x18)]
+    pub m_capacity: u32,
+
+    /// The values.
+    #[address(0x20)]
+    pub m_data: *mut u8,
+}
+
+/// An engine physics instance (`IPfxInstance`), the object behind a body's
+/// [`BODY_PROPERTY_PFX_INSTANCE`](hknpWorld::BODY_PROPERTY_PFX_INSTANCE) property. Only one member
+/// is bound.
+pub type PfxInstance {
+    /// The instance's owner (`IPfxGameObject*`): the [`PhysicsGameObject`] a physics query reports
+    /// for a hit on the instance's bodies ([`CastRayInfo::m_GameObject`]).
+    #[address(0x28)]
+    pub m_GameObject: *mut void,
+}
+
+/// A rigid object (`CRigidObject`): a [`PhysicsGameObject`] with one rigid body, such as a crate,
+/// a barrel, a gas canister, or a piece of debris. Its body may be static, fixed, keyframed, or
+/// dynamic. Characters, vehicles, and weapons are not rigid objects. Only its type id is bound.
+pub type RigidObject;
+impl RigidObject {
+    /// `CRigidObject::TYPE_ID`: the run-time type id of `CRigidObject`, for
+    /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use.
+    #[address(0x140_60F_1F0)]
+    pub fn TYPE_ID() -> *const u32;
 }
 
 /// The Havok-facing input of a character proxy (`CPfxCharacterInstance::CCharacterInput`), read by

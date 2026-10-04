@@ -119,6 +119,9 @@ pub enum Action: i32 {
     JUMP = 0x21,
     CHALLENGE_RESET_VEHICLE = 0x22,
     ENTER_VEHICLE = 0x23,
+    /// Use an item. The player's weapon input task turns a click into
+    /// [`E_INPUT_USE_ITEM`](character::character::WeaponInput::E_INPUT_USE_ITEM), on which the
+    /// inventory picks up a weapon in the world.
     USE_ITEM = 0x24,
     ACCELERATE = 0x25,
     REVERSE = 0x26,
