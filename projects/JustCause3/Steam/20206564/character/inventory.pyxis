@@ -60,6 +60,16 @@ pub type Inventory {
     /// [`TryToSwitchToValidWeapon`](Self::TryToSwitchToValidWeapon) all wait on it.
     #[address(0x189)]
     pub m_DoesAnimationAllowSwitchingWeapons: bool,
+    /// Whether the character may plant explosives: recomputed by
+    /// [`UpdateInventoryPermissions`](Self::UpdateInventoryPermissions), and off for the player
+    /// without the planted-explosives ability. One half of
+    /// [`GetAnimationAllowsPlantingExplosives`](Self::GetAnimationAllowsPlantingExplosives).
+    pub m_DoesAnimationAllowPlantingExplosives: bool,
+    /// Whether the character may detonate its placed explosives: recomputed by
+    /// [`UpdateInventoryPermissions`](Self::UpdateInventoryPermissions), and off for the player
+    /// without the planted-explosives ability. One half of
+    /// [`GetAnimationAllowsTriggeringExplosives`](Self::GetAnimationAllowsTriggeringExplosives).
+    pub m_DoesAnimationAllowTriggeringExplosives: bool,
 
     /// The character that owns the inventory.
     #[address(0x3E0)]
@@ -96,6 +106,22 @@ impl Inventory {
     /// bit is clear.
     #[address(0x140_8BB_630)]
     pub fn GetAnimationAllowsShooting(&self) -> bool;
+
+    /// Whether the character may plant explosives:
+    /// [`m_DoesAnimationAllowPlantingExplosives`](Self::m_DoesAnimationAllowPlantingExplosives) is
+    /// set and the owner's
+    /// [`SB_DISABLE_PLANT_EXPLOSIVES`](state::StateBitFlag::SB_DISABLE_PLANT_EXPLOSIVES) state bit
+    /// is clear.
+    #[address(0x140_8BB_7B0)]
+    pub fn GetAnimationAllowsPlantingExplosives(&self) -> bool;
+
+    /// Whether the character may detonate its placed explosives:
+    /// [`m_DoesAnimationAllowTriggeringExplosives`](Self::m_DoesAnimationAllowTriggeringExplosives)
+    /// is set and the owner's
+    /// [`SB_DISABLE_TRIGGER_EXPLOSIVES`](state::StateBitFlag::SB_DISABLE_TRIGGER_EXPLOSIVES) state
+    /// bit is clear.
+    #[address(0x140_8BB_7E0)]
+    pub fn GetAnimationAllowsTriggeringExplosives(&self) -> bool;
 
     /// Recomputes the inventory's per-frame permissions from the owner's state (it consults the
     /// grapple reel-in predicates among others).

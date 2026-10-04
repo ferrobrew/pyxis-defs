@@ -206,8 +206,9 @@ pub type Character {
     /// The world-space point thrown grenades aim at, written by
     /// [`UpdateGrenadeAiming`](Self::UpdateGrenadeAiming).
     pub m_AimTargetPositionGrenade: Vector3,
-    /// The per-frame weapon input values (fire, precision aim, plant, and the rest), cleared by
-    /// [`UpdateWeapons_Parallel`](Self::UpdateWeapons_Parallel) after the inventory consumes them.
+    /// The per-frame weapon input values (fire, precision aim, plant, and the rest), indexed by
+    /// [`WeaponInput`], cleared by [`UpdateWeapons_Parallel`](Self::UpdateWeapons_Parallel) after
+    /// the inventory consumes them.
     pub m_WeaponInputs: [f32; 16],
     /// Set by [`UpdateWeaponAiming`](Self::UpdateWeaponAiming) and cleared by
     /// [`UpdateWeapons_Parallel`](Self::UpdateWeapons_Parallel): whether the weapon aim target was
@@ -237,6 +238,12 @@ pub type Character {
     /// [`m_WorldMatrixT1`](Self::m_WorldMatrixT1) and stores the same quaternion here.
     #[address(0x2_934)]
     pub m_RotationGoal: [f32; 4],
+
+    /// The character's measured world velocity, metres per second.
+    /// [`PlantedExplosiveWeapon::Fire_Projectile`](equipment::weapon::PlantedExplosiveWeapon::Fire_Projectile)
+    /// drops a charge with it under a parachute.
+    #[address(0x2_968)]
+    pub m_MeasuredWorldVelocity: Vector3,
 
     /// The character's avatar (`CAvatar`), the controller that drives it. For the player it is the
     /// [`Avatar`] base of the `CPlayer`. Holds the mental state written by
@@ -428,6 +435,11 @@ impl Character {
     /// [`SB_IS_PARACHUTING`](state::StateBitFlag::SB_IS_PARACHUTING).
     #[address(0x140_75F_550)]
     pub fn IsUsingParachute(&self) -> bool;
+
+    /// Whether the character is playing the detonate act:
+    /// [`SB_IS_DETONATING_EXPLOSIVES`](state::StateBitFlag::SB_IS_DETONATING_EXPLOSIVES).
+    #[address(0x140_75F_4B0)]
+    pub fn IsDetonatingExplosives(&self) -> bool;
 
     /// Whether the character is in free fall:
     /// [`SB_IS_FREE_FALLING`](state::StateBitFlag::SB_IS_FREE_FALLING).
@@ -746,6 +758,35 @@ impl Character {
 /// by `dtf`, into `out`, and returns true.
 #[address(0x140_75D_E50)]
 pub fn Character_GetRenderTransform(game_object: *mut u8, out: *mut Matrix4, dtf: f32) -> bool;
+
+/// An index into [`Character::m_WeaponInputs`] (`CCharacter::EWeaponInput`). The player's weapon
+/// input state task writes the fire, grenade, detonate, plant, reload, precision-aim, and use-item
+/// entries from the action map each frame, and the global input update the weapon-select entries.
+#[copyable]
+pub enum WeaponInput: i32 {
+    E_INPUT_MAIN_WEAPON = 0x0,
+    E_INPUT_GRENADE = 0x1,
+    /// Detonate the placed charges. Under the gamepad rules
+    /// ([`EPCUseGamepad`](settings_manager::SettingType::EPCUseGamepad)) the weapon input task sets
+    /// it while `DETONATE_EXPLOSIVE` has been held past the hold threshold; otherwise a press of
+    /// `DETONATE_EXPLOSIVE_TAP` sets it too.
+    E_INPUT_DETONATE_EXPLOSIVES = 0x2,
+    E_INPUT_PLANT_EXPLOSIVES = 0x3,
+    E_INPUT_RELOAD = 0x4,
+    E_INPUT_PRECISION_AIM = 0x5,
+    E_INPUT_USE_ITEM = 0x6,
+    E_INPUT_PICKUP_ITEM = 0x7,
+    E_INPUT_SELECT_DUEL_WIELD = 0x8,
+    E_INPUT_SELECT_TWO_HANDED = 0x9,
+    E_INPUT_SELECT_TWO_HANDED_SPECIAL = 0xA,
+    E_INPUT_SELECT_PLANT_EXPLOSIVES = 0xB,
+    E_INPUT_SELECT_PREVIOUS_WEAPON = 0xC,
+    E_INPUT_SELECT_NEXT_WEAPON = 0xD,
+    E_INPUT_BAVARIUM_WINGSUIT_MAIN = 0xE,
+    E_INPUT_BAVARIUM_WINGSUIT_SECONDARY = 0xF,
+    /// The number of weapon inputs, and so the length of [`Character::m_WeaponInputs`].
+    E_INPUT_COUNT = 0x10,
+}
 
 /// A character's animation layers (`CCharacter::s_LayerNames`). `CCharacter::InitAnimationModel`
 /// creates layer *i* from the *i*-th state-machine file of the character's construction info, named

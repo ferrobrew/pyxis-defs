@@ -884,6 +884,143 @@ impl ThrownGrenadeWeapon {
     pub fn UpdateAttachmentTransforms(&mut self, p2: f32, p3: f32, transform_type: u32);
 }
 
+/// `CPlantedExplosiveWeapon`: the C4 weapon, a [`WeaponBase`] held in the
+/// [`E_SLOT_PLANTED_EXPLOSIVE`](character::inventory::WeaponSlot::E_SLOT_PLANTED_EXPLOSIVE) slot.
+/// It owns the charges the character has placed and their remote detonation.
+///
+/// Placing a charge runs through the planting mode, which equipping the weapon enters
+/// ([`m_IsInPlantingMode`](Self::m_IsInPlantingMode)): an animation track message primes a charge
+/// into [`m_PrimedExplosive`](Self::m_PrimedExplosive) with
+/// [`PrimeExplosive`](Self::PrimeExplosive), the fire input places it at the aimed surface
+/// (`CPlantedExplosive::PlaceExplosiveAtPosition`, outside a parachute) and queues the throw act,
+/// and a later track message calls [`Fire_Projectile`](Self::Fire_Projectile), which makes the
+/// charge live. The weapon refuses to place a charge once
+/// [`NumActiveExplosives`](Self::NumActiveExplosives) reaches
+/// [`MaxActiveExplosives`](Self::MaxActiveExplosives); placed charges do not consume an inventory
+/// stock.
+///
+/// Detonation does not need the planting mode: the inventory runs the weapon's
+/// [`UpdateFromUserPostSim_Serial`](Self::UpdateFromUserPostSim_Serial) every frame whatever is
+/// wielded, and it starts a detonation from the character's detonate input. Only some members
+/// are mapped, at their offsets from the start of the weapon.
+#[min_size(0x80D)]
+pub type PlantedExplosiveWeapon {
+    /// The primed charge: the live [`PlantedExplosive`](equipment::explosive::PlantedExplosive)
+    /// spawned by [`PrimeExplosive`](Self::PrimeExplosive) and not yet placed, or null. `px` is
+    /// the charge's `CGameObject` subobject
+    /// ([`Explosive::GAME_OBJECT_BASE_OFFSET`](equipment::explosive::Explosive::GAME_OBJECT_BASE_OFFSET)).
+    /// [`Fire_Projectile`](Self::Fire_Projectile) moves it to
+    /// [`m_LastPlantedExplosive`](Self::m_LastPlantedExplosive) and clears it;
+    /// [`DespawnPrimedExplosive`](Self::DespawnPrimedExplosive) removes the charge and clears it.
+    #[address(0x738)]
+    pub m_PrimedExplosive: WeakPtrGameObject,
+
+    /// The charge [`Fire_Projectile`](Self::Fire_Projectile) made live most recently.
+    #[address(0x748)]
+    pub m_LastPlantedExplosive: WeakPtrGameObject,
+
+    /// The most charges that may be live at once, at each explosives-capacity upgrade level;
+    /// [`MaxActiveExplosives`](Self::MaxActiveExplosives) picks the entry for the player's
+    /// upgrades.
+    #[address(0x758)]
+    pub m_MaxActiveExplosivesAtLevel: [i32; 3],
+
+    /// Whether the weapon is in the planting mode: set when the weapon is equipped, and cleared by
+    /// the weapon's `StopUsing`, which also despawns a primed charge.
+    #[address(0x808)]
+    pub m_IsInPlantingMode: bool,
+
+    /// Set when [`UpdateFromUserPostSim_Serial`](Self::UpdateFromUserPostSim_Serial) starts a
+    /// detonation, and cleared by it once the character's detonate input
+    /// ([`E_INPUT_DETONATE_EXPLOSIVES`](character::character::WeaponInput::E_INPUT_DETONATE_EXPLOSIVES))
+    /// is zero, so a held input detonates once.
+    #[address(0x80B)]
+    pub m_AlreadyDetonatedOnThisInput: bool,
+}
+impl PlantedExplosiveWeapon {
+    /// The weapon's serial per-frame update from its user (its override of
+    /// [`WeaponBase::UpdateFromUserPostSim_Serial`]). The inventory runs it for the planted
+    /// explosive slot's weapon every frame, wielded or not
+    /// ([`Inventory::UpdateWeapons_Serial`](character::inventory::Inventory::UpdateWeapons_Serial)).
+    ///
+    /// Among the rest, it reads the holder's detonate input
+    /// ([`Character::m_WeaponInputs`](character::character::Character::m_WeaponInputs) at
+    /// [`E_INPUT_DETONATE_EXPLOSIVES`](character::character::WeaponInput::E_INPUT_DETONATE_EXPLOSIVES))
+    /// directly rather than through `input`. While the input is positive, the inventory allows
+    /// triggering explosives
+    /// ([`Inventory::GetAnimationAllowsTriggeringExplosives`](character::inventory::Inventory::GetAnimationAllowsTriggeringExplosives)),
+    /// the character is not already detonating
+    /// ([`Character::IsDetonatingExplosives`](character::character::Character::IsDetonatingExplosives)),
+    /// and [`m_AlreadyDetonatedOnThisInput`](Self::m_AlreadyDetonatedOnThisInput) is clear, it
+    /// queues the upper-body detonate act when the character can take it (cancelling a reload when
+    /// it cannot), adds heat when charges are live, and sets
+    /// [`m_AlreadyDetonatedOnThisInput`](Self::m_AlreadyDetonatedOnThisInput). The act's animation
+    /// sends the track message that schedules the live charges for detonation. Outside the
+    /// planting mode it neither primes nor despawns a charge.
+    #[address(0x140_98E_BE0)]
+    pub fn UpdateFromUserPostSim_Serial(&mut self, dt: f32, aim_position: *const Vector3, input: *const WeaponInputs);
+
+    /// Primes a charge: puts the weapon in the
+    /// [`E_WS_WIELDING`](WeaponState::E_WS_WIELDING) state when it is not (adding its models to
+    /// the world) and hides it, then allocates a
+    /// [`PlantedExplosive`](equipment::explosive::PlantedExplosive) from the ammunition pool at
+    /// the weapon's shot matrix ([`WeaponBase::GetShotMatrix`]), sets up its trail effect, adds it
+    /// to the update, and stores it in [`m_PrimedExplosive`](Self::m_PrimedExplosive). Nothing is
+    /// spawned when the shot matrix is unavailable or the pool is full. It consumes nothing and
+    /// does not check the planting mode; the planting mode's track message is its caller.
+    #[address(0x140_990_A40)]
+    pub fn PrimeExplosive(&mut self, weapon_data: *mut WeaponData);
+
+    /// Makes the primed charge live (its override of [`WeaponBase::Fire_Projectile`]). A charge
+    /// whose parent is a vehicle with an active bavarium shield is removed instead. Otherwise it
+    /// calls [`PlantedExplosive::Activate`](equipment::explosive::PlantedExplosive::Activate); under
+    /// a deployed parachute ([`Character::IsUsingParachute`](character::character::Character::IsUsingParachute))
+    /// it also moves the charge to the right-hand bone (the transform setter and
+    /// [`Explosive::SetPhysicsTransform`](equipment::explosive::Explosive::SetPhysicsTransform)),
+    /// drops it ([`PlantedExplosive::DropExplosive`](equipment::explosive::PlantedExplosive::DropExplosive)),
+    /// gives it the character's
+    /// [`m_MeasuredWorldVelocity`](character::character::Character::m_MeasuredWorldVelocity) with
+    /// one metre per second downward ([`PlantedExplosive::SetVelocity`](equipment::explosive::PlantedExplosive::SetVelocity)),
+    /// and plays its trail ([`Explosive::PlayTrailEffect`](equipment::explosive::Explosive::PlayTrailEffect)).
+    /// It then adds heat, runs [`Fire_ProjectileBase`](WeaponBase::Fire_ProjectileBase), adds the
+    /// charge to the live list (which the charge's detonation timer and HUD hint come from, and
+    /// which ignores a charge beyond [`MaxActiveExplosives`](Self::MaxActiveExplosives)), adds it
+    /// to the update, and moves [`m_PrimedExplosive`](Self::m_PrimedExplosive) to
+    /// [`m_LastPlantedExplosive`](Self::m_LastPlantedExplosive).
+    #[address(0x140_9A0_1E0)]
+    pub fn Fire_Projectile(&mut self, weapon_data: *mut WeaponData);
+
+    /// Removes the primed charge, if any, and clears
+    /// [`m_PrimedExplosive`](Self::m_PrimedExplosive).
+    #[address(0x140_980_EA0)]
+    pub fn DespawnPrimedExplosive(&mut self);
+
+    /// Places the weapon's attachments (its override of the `UpdateAttachmentTransforms` virtual):
+    /// after the base placement, while the weapon has a user, it puts the primed charge's
+    /// in-hand model on the user's right-hand bone
+    /// ([`PlantedExplosive::SetInactiveModelMatrix`](equipment::explosive::PlantedExplosive::SetInactiveModelMatrix)).
+    /// The inventory's attachment pass calls it for every slot weapon
+    /// ([`Inventory::UpdateAttachmentTransforms`](character::inventory::Inventory::UpdateAttachmentTransforms)).
+    #[address(0x140_99F_F80)]
+    pub fn UpdateAttachmentTransforms(&mut self, p2: f32, p3: f32, transform_type: u32);
+
+    /// How many placed charges are live.
+    #[address(0x140_957_F10)]
+    pub fn NumActiveExplosives(&self) -> i32;
+
+    /// The most charges that may be live at once: for the player, the entry of
+    /// [`m_MaxActiveExplosivesAtLevel`](Self::m_MaxActiveExplosivesAtLevel) for the highest
+    /// explosives-capacity upgrade bought and enabled; for any other holder, the first entry.
+    #[address(0x140_980_F70)]
+    pub fn MaxActiveExplosives(&self) -> i32;
+
+    /// Whether another charge may be placed:
+    /// [`NumActiveExplosives`](Self::NumActiveExplosives) is below
+    /// [`MaxActiveExplosives`](Self::MaxActiveExplosives).
+    #[address(0x140_990_2D0)]
+    pub fn CanPlantExplosive(&self) -> bool;
+}
+
 /// The weapon ballistics helpers (`NWeaponUtil`).
 pub type NWeaponUtil;
 impl NWeaponUtil {

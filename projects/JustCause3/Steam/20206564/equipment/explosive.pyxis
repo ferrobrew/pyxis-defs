@@ -87,6 +87,59 @@ impl Explosive {
     /// under world gravity.
     #[address(0x140_91E_C50)]
     pub fn VelocityToHitTarget(&mut self, result: *mut Vector3, aim_pos: *const Vector3, start_pos: *const Vector3, max_range: f32, roof_target: bool, exact_target_aiming: bool) -> *mut Vector3;
+
+    /// Plays the explosive's trail effect at [`m_WorldMatrixT1`](Self::m_WorldMatrixT1), when it
+    /// has one.
+    #[address(0x140_8D6_E20)]
+    pub fn PlayTrailEffect(&mut self);
+}
+
+/// A C4 charge (`CPlantedExplosive`, a [`Explosive`]), spawned and owned by the
+/// [`PlantedExplosiveWeapon`](equipment::weapon::PlantedExplosiveWeapon). It has two models: the
+/// in-hand model, shown while the charge is primed and placed at
+/// [`m_InactiveModelWorldMatrixT1`](Self::m_InactiveModelWorldMatrixT1), and the live model at
+/// the explosive's own transform, which [`Activate`](Self::Activate) shows in its place.
+///
+/// The charge keeps the base explosive's collision handler (the grenade overrides it): on a
+/// collision it moves the charge to the contact point, oriented by the
+/// contact normal, and attaches itself to the object it hit (or plays its stick effect against the
+/// world), so a charge that is dropped
+/// ([`DropExplosive`](Self::DropExplosive)) sticks where it lands.
+#[min_size(0x6B5)]
+pub type PlantedExplosive {
+    /// The in-hand model's world matrix, written by
+    /// [`SetInactiveModelMatrix`](Self::SetInactiveModelMatrix). The pre-simulation update copies
+    /// it to the previous frame's matrix, and the render update draws the in-hand model between
+    /// the two.
+    #[address(0x668)]
+    pub m_InactiveModelWorldMatrixT1: Matrix4,
+
+    /// Whether the charge is live, set by [`Activate`](Self::Activate).
+    #[address(0x6B4)]
+    pub m_ExplosiveIsPlanted: bool,
+}
+impl PlantedExplosive {
+    /// Makes the charge live: sets [`m_ExplosiveIsPlanted`](Self::m_ExplosiveIsPlanted), plays the
+    /// stick effect, shows the live model, and hides the in-hand model.
+    #[address(0x140_922_BE0)]
+    pub fn Activate(&mut self);
+
+    /// Drops the charge into the simulation: makes its physics body dynamic in the world, disables
+    /// collision between it and the thrower's character body, and, under a parachute, moves the body
+    /// into the thrower's collision group. The body must exist
+    /// ([`Explosive::m_PfxInstance`]).
+    #[address(0x140_922_CD0)]
+    pub fn DropExplosive(&mut self);
+
+    /// Sets the physics body's linear velocity, world axes, metres per second. The body must exist
+    /// ([`Explosive::m_PfxInstance`]); the call dereferences it unchecked. The velocity is a
+    /// by-value `CVector3f`, which the calling convention passes by address.
+    #[address(0x140_8C8_870)]
+    pub fn SetVelocity(&mut self, velocity: *const Vector3);
+
+    /// Copies `world_matrix` to [`m_InactiveModelWorldMatrixT1`](Self::m_InactiveModelWorldMatrixT1).
+    #[address(0x140_8BC_C40)]
+    pub fn SetInactiveModelMatrix(&mut self, world_matrix: *const Matrix4);
 }
 
 /// A hand grenade (`CGrenade`, a [`Explosive`]): adds bounce counting, homing and smart-fuse
