@@ -67,6 +67,10 @@ pub type InputDeviceManager {
         pub fn Destructor(&mut self);
     },
 
+    /// Whether the device poll runs. [`Update`](Self::Update) reads every device and refreshes their
+    /// effectors only while it is set; while it is clear, `Update` only checks the XInput pads for
+    /// activity, and every effector keeps the value and state it last had. `SetEnabled` and
+    /// `IsEnabled` (virtual) write and read it.
     #[address(0xC)]
     pub m_Enabled: bool,
 }
