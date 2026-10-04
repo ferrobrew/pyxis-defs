@@ -7,10 +7,11 @@ use character::control_parameters::ControlParameters;
 use character::inventory::{Inventory, WeaponSlot};
 use character::swim_action_params::SwimActionParams;
 use equipment::grappling_hook::GrapplingHook;
+use equipment::weapon::WeaponBase;
 use physics::{PfxCharacterInstance, ProxyState};
 use types::math::Matrix4;
 use types::math::Vector3;
-use types::shared_ptr::SharedPtr;
+use types::shared_ptr::{SharedPtr, WeakPtrGameObject};
 use types::std_vector::Vector;
 use types::vector_math::AlignedVector3;
 use types::vector_math::AlignedQuat;
@@ -127,6 +128,12 @@ pub type Character {
         #[index(40)]
         pub fn AttachTo(&mut self, target: *const Matrix4, object: *mut void, attach_type: u32, offset: *const Matrix4, flags: u32);
     },
+
+    /// A weak reference to the character itself (`m_WeakThis`), from which the engine takes the
+    /// references it hands out to the character, such as a damage message's
+    /// [`m_Damager`](damage::DamageMsg::m_Damager).
+    #[address(0x68)]
+    pub m_WeakThis: WeakPtrGameObject,
 
     /// The character's aiming-settings resource (`TResourceCachePtr<SCharacterAimingSettings>`, a
     /// resource handle resolved through the resource cache). Both aim-input updates read the
@@ -285,6 +292,37 @@ pub type Character {
 impl Character {
     #[address(0x140_7D5_B00)]
     pub fn GetLocalPlayerCharacter() -> *mut Character;
+
+    /// `CCharacter::TYPE_ID`: the run-time type id of `CCharacter`, for
+    /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use.
+    #[address(0x140_60F_370)]
+    pub fn TYPE_ID() -> *const u32;
+
+    /// The character's faction: its avatar's when it has one ([`m_Avatar`](Self::m_Avatar)),
+    /// otherwise the character's own.
+    #[address(0x140_75F_BF0)]
+    pub fn GetFaction(&self) -> i32;
+
+    /// What the character is doing, as a damage message's
+    /// [`m_DamagerSourceStateInfo`](damage::DamageMsg::m_DamagerSourceStateInfo) records it: in a
+    /// stunt, under the parachute, flying, aiming down the sights, near death, in a vehicle of each
+    /// class, reeled in, swimming, or hanging from the grapple.
+    #[address(0x140_7F5_7D0)]
+    pub fn GetCurrentDamageSourceStateInfo(&self) -> i32;
+
+    /// Handles a message from the character's animation tracks (`data`, an
+    /// `NAnimationSystem::SAnimationMessageData`), dispatching on its id. The melee hit message
+    /// deals the player's melee: with a character as the link target, it sends that character a
+    /// [`DMG_TYPE_MELEE`](damage::DamageFlags::DMG_TYPE_MELEE) [`DamageMsg`](damage::DamageMsg) of
+    /// [`Player::m_MeleeDamage`](character::player::Player::m_MeleeDamage) and no impulse, and
+    /// clears the link target; with none, it finds the objects in a box in front of the chest
+    /// ([`PhysicsSystem::CollideBox`](physics::PhysicsSystem::CollideBox)), damages each (a
+    /// vehicle once), and pushes each body forward by
+    /// [`Player::m_MeleeImpulse`](character::player::Player::m_MeleeImpulse)
+    /// ([`hknpWorld::applyBodyImpulseAt`](physics::hknpWorld::applyBodyImpulseAt)). Both paths
+    /// spawn a rumble and the hit effect.
+    #[address(0x140_7FA_DD0)]
+    pub fn HandleTrackMessage(&mut self, data: *mut void);
 
     /// Whether the character is attached to a vehicle (riding, or in the mount/dismount
     /// transitions), read from the animation rule system's current state. The state machine

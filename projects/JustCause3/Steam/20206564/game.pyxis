@@ -171,3 +171,17 @@ impl GameState {
     #[address(0x140_A00_E90)]
     pub fn PostUpdateRender(update_contexts: *const UpdateContexts);
 }
+
+/// A game object's `CGameObject` subobject, through which the engine's run-time type tests go. A
+/// [`PhysicsGameObject`](physics::PhysicsGameObject) carries it at
+/// [`GAME_OBJECT_BASE_OFFSET`](physics::PhysicsGameObject::GAME_OBJECT_BASE_OFFSET). Only one
+/// virtual is bound.
+pub type GameObject {
+    vftable {
+        /// `CRtti::IsType`: whether the object is of the class `type_id` names or derives from it.
+        /// `type_id` points at the class's run-time type id, as a class's `TYPE_ID` function
+        /// returns it (such as [`Character::TYPE_ID`](character::character::Character::TYPE_ID)).
+        #[index(2)]
+        pub fn IsType(&self, type_id: *const u32) -> bool;
+    },
+}

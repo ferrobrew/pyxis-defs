@@ -1,0 +1,85 @@
+use types::math::Vector3;
+use types::shared_ptr::WeakPtrGameObject;
+
+/// The damage-type and damage-property bits of [`DamageMsg::m_DamageFlags`]. Only the bits whose
+/// use is established are bound; the type bits each name one damage source, and the hit reaction
+/// scales a hit's impulse by a per-type factor chosen by the lowest type bit set.
+#[copyable]
+pub bitflags DamageFlags: u32 {
+    /// The type [`DamageMsg::Clear`] resets a message to.
+    DMG_TYPE_UNKNOWN = 0x1,
+    /// Melee damage: the type the player's melee hit message
+    /// ([`Character::HandleTrackMessage`](character::character::Character::HandleTrackMessage))
+    /// sends, to the struck character and to the objects its box query finds.
+    DMG_TYPE_MELEE = 0x40,
+}
+
+/// A damage message (`CDamageMsg`): who dealt the damage, where and in which direction it struck,
+/// how much damage and impulse it carries, and its type. The engine builds one on the stack for
+/// each hit: the [`VFTABLE`](Self::VFTABLE) pointer, its three smart pointers cleared, then
+/// [`Clear`](Self::Clear); it fills the fields, hands the message to the target's
+/// [`PhysicsGameObject::OnDamage`](physics::PhysicsGameObject::OnDamage), and destroys it with
+/// [`Destruct`](Self::Destruct), which releases the smart pointers. Only some members are bound.
+#[size(0xC8), align(8)]
+pub type DamageMsg {
+    /// The address of the `CDamageMsg` virtual table.
+    pub const VFTABLE: u64 = 0x142383070,
+
+    pub __vftable: u64,
+
+    /// The object that dealt the damage (a weak reference). The struck character resolves it to a
+    /// character or a vehicle to tell whether the local player dealt the damage.
+    #[address(0x10)]
+    pub m_Damager: WeakPtrGameObject,
+
+    /// The Havok body id of the damaging body; [`Clear`](Self::Clear) sets the invalid id.
+    #[address(0x20)]
+    pub m_DamagerRigidBodyID: u32,
+
+    /// The weapon that dealt the damage (a weak reference), or null.
+    #[address(0x28)]
+    pub m_DamagerWeapon: WeakPtrGameObject,
+
+    /// Where the damage struck, world space. The hit reaction applies its impulse here.
+    #[address(0x38)]
+    pub m_Position: Vector3,
+    /// The direction the damage travels, world space, normalized. The hit reaction pushes the
+    /// struck character along it.
+    pub m_Direction: Vector3,
+    /// The damager's position, world space.
+    pub m_DamagerPosition: Vector3,
+    /// The impulse the damage carries. The struck character's hit reaction scales it by the
+    /// damage type's factor and compares it against its stumble and ragdoll thresholds; zero
+    /// leaves the reaction to the acts the attacker queued.
+    pub m_Impulse: f32,
+    /// The damage, in health points.
+    pub m_Damage: i16,
+
+    /// The damage type and properties.
+    #[address(0x64)]
+    pub m_DamageFlags: DamageFlags,
+    /// The damager's faction, as [`Character::GetFaction`](character::character::Character::GetFaction)
+    /// reports it; [`Clear`](Self::Clear) sets `-1`. The struck character compares it with its own.
+    pub m_Faction: i32,
+    /// What the damager was doing (in a stunt, under the parachute, aiming down the sights, and so
+    /// on), as [`Character::GetCurrentDamageSourceStateInfo`](character::character::Character::GetCurrentDamageSourceStateInfo)
+    /// reports it.
+    pub m_DamagerSourceStateInfo: i32,
+
+    /// The damage before any armour or scaling, in health points.
+    #[address(0x98)]
+    pub m_OriginalDamage: i16,
+}
+impl DamageMsg {
+    /// `CDamageMsg::Clear`: resets the message for reuse: releases the damager and weapon
+    /// references and the damage-chain data, zeroes the positions, impulse, and damage, and sets
+    /// the invalid damager body, [`DMG_TYPE_UNKNOWN`](DamageFlags::DMG_TYPE_UNKNOWN), and faction
+    /// `-1`. The smart pointers must already hold a valid value (null or a live reference).
+    #[address(0x140_4ED_DC0)]
+    pub fn Clear(&mut self);
+
+    /// `CDamageMsg::~CDamageMsg`: releases the damager and weapon references and the damage-chain
+    /// data.
+    #[address(0x140_4ED_F50)]
+    pub fn Destruct(&mut self);
+}

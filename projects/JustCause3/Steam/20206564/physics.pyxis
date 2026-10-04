@@ -1,10 +1,12 @@
 use character::character::Character;
+use damage::DamageMsg;
 use types::math::{Matrix4, Vector3};
+use types::vector_math::AlignedVector3;
 
 /// The physics system (`CPhysicsSystem`), a `Base::CSingle` singleton that owns the Havok world and
 /// serves the engine's scene queries. The queries are sim-phase calls against the live Havok world.
 /// Only some members are bound.
-#[singleton(0x142_EDC_120), min_size(0x38)]
+#[singleton(0x142_EDC_120), min_size(0x1381D0)]
 pub type PhysicsSystem {
     /// The collision layer [`CastRaySimple`](Self::CastRaySimple) hardcodes, and the one the
     /// player's direct-aim query passes to [`CastRay`](Self::CastRay).
@@ -13,6 +15,13 @@ pub type PhysicsSystem {
     /// The Havok world.
     #[address(0x30)]
     pub m_World: *mut hknpWorld,
+
+    /// The world-origin shift: the Havok world is simulated about a moving origin, and a Havok-space
+    /// position plus this offset is the game-space position. [`CastRay`](Self::CastRay) subtracts it
+    /// from its game-space ray before the Havok query, and the engine adds it back to the positions
+    /// a query reports. [`hknpWorld::applyBodyImpulseAt`] takes a Havok-space position.
+    #[address(0x138_1C4)]
+    pub m_AccumulatedShift: Vector3,
 }
 impl PhysicsSystem {
     /// The general ray query: casts `ray` (world space, normalized direction) from `min_fraction`
@@ -37,6 +46,17 @@ impl PhysicsSystem {
     /// to `hit` and returning whether there was one.
     #[address(0x140_23C_150)]
     pub fn CastRayWaterSurface(&mut self, start: *const Vector3, end: *const Vector3, hit: *mut Vector3) -> bool;
+
+    /// Collects every body overlapping a box of half extents `half_extents` placed by `transform`
+    /// (game space), on collision `layer`, ignoring the bodies of collision system group
+    /// `system_group`, into `collector` (an `hknpCollisionQueryCollector`); returns whether any
+    /// overlapped. Each collected `hknpCollisionResult` carries the Havok-space position and the
+    /// body id of one overlapping body. The player's melee hit message
+    /// ([`Character::HandleTrackMessage`](character::character::Character::HandleTrackMessage))
+    /// runs it with an `hknpAllHitsCollector` to find the objects in front of the character when no
+    /// character is the target, then damages each hit object and pushes its body.
+    #[address(0x140_29A_120)]
+    pub fn CollideBox(&mut self, half_extents: *const Vector3, transform: *const Matrix4, system_group: u32, layer: u32, collector: *mut void) -> bool;
 
     /// Sweeps a sphere of `radius` from `start` to `end`, reporting hits to `collector` (an
     /// `hknpCollisionQueryCollector`).
@@ -187,8 +207,8 @@ pub type CastRayInfo {
     #[base]
     pub base: CastRayInfoBase,
 
-    /// The hit object: the game object that owns the hit physics instance (for a character, the
-    /// `CCharacter`), written by the virtual hit-object setter [`PhysicsSystem::CastRay`] calls. Null
+    /// The hit object: the [`PhysicsGameObject`] that owns the hit physics instance (for a
+    /// character, the `CCharacter`), written by the virtual hit-object setter [`PhysicsSystem::CastRay`] calls. Null
     /// for world geometry and on a miss.
     #[address(0x38)]
     pub m_GameObject: *mut void,
@@ -198,6 +218,26 @@ impl CastRayInfo {
     /// (`EGameMaterialId`), looked up through the physics system's world.
     #[address(0x140_2B3_BA0)]
     pub fn GetHitMaterial(&self) -> i32;
+}
+
+/// A physics game object (`CPhysicsGameObject`): a game object with a physics instance, the owner a
+/// physics query reports for a hit body ([`CastRayInfo::m_GameObject`]). Characters, vehicles,
+/// and rigid props are physics game objects. Its `CGameObject` subobject sits at
+/// [`GAME_OBJECT_BASE_OFFSET`](Self::GAME_OBJECT_BASE_OFFSET), and its run-time type test goes
+/// through that subobject ([`GameObject::IsType`](game::GameObject::IsType)). Only one virtual is
+/// bound.
+pub type PhysicsGameObject {
+    /// The offset of the `CGameObject` subobject.
+    pub const GAME_OBJECT_BASE_OFFSET: u64 = 0x8,
+
+    vftable {
+        /// Takes the damage in `msg` and returns the damage dealt. Each kind of object overrides
+        /// it: a character (`CCharacter::OnDamage`) takes the health, sends the hit effects, and
+        /// runs its hit reaction from the message's impulse, position, and direction; a rigid
+        /// object (`CRigidObject::OnDamage`) takes the health of its damage controller.
+        #[index(20)]
+        pub fn OnDamage(&mut self, msg: *mut DamageMsg) -> i16;
+    },
 }
 
 /// The ragdoll's proxy phantom (`CRagdollProxyPhantom`), the shape set that stands in for a
@@ -218,6 +258,13 @@ impl hknpWorld {
     /// (`hknpCollisionQueryCollector`).
     #[address(0x141_500_BE0)]
     pub fn castRay(&self, query: *const void, collector: *mut void);
+
+    /// Applies the linear impulse `impulse` to the body `body_id` at the Havok-space point
+    /// `position` (the game-space point less [`PhysicsSystem::m_AccumulatedShift`]), changing both
+    /// its linear and angular velocity, and wakes the body if it sleeps. It acts only on a dynamic
+    /// body: a static or keyframed body is left alone.
+    #[address(0x141_4CC_B30)]
+    pub fn applyBodyImpulseAt(&mut self, body_id: u32, impulse: *const AlignedVector3, position: *const AlignedVector3);
 
     /// Replaces the shape (`hknpShape*`) of the body `body_id` on the live world.
     #[address(0x141_4CF_370)]
