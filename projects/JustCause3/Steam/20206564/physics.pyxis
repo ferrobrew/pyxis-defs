@@ -288,7 +288,10 @@ impl hknpWorld {
     /// Applies the linear impulse `impulse` to the body `body_id` at the Havok-space point
     /// `position` (the game-space point less [`PhysicsSystem::m_AccumulatedShift`]), changing both
     /// its linear and angular velocity, and wakes the body if it sleeps. It acts only on a dynamic
-    /// body: a static or keyframed body is left alone.
+    /// body: a static or keyframed body is left alone. The linear velocity gains the impulse times
+    /// the inverse mass; the angular velocity gains the impulse's moment about the centre of mass,
+    /// turned into the motion's frame and scaled axis by axis by the inverse inertia
+    /// ([`hknpMotion::m_inverseInertia`]).
     #[address(0x141_4CC_B30)]
     pub fn applyBodyImpulseAt(&mut self, body_id: u32, impulse: *const AlignedVector3, position: *const AlignedVector3);
 
@@ -344,7 +347,9 @@ pub type hknpMotion {
     pub m_orientation: AlignedQuat,
     /// The inverse inertia about the motion frame's axes and the inverse mass, as four `hkHalf`s
     /// (each the upper 16 bits of an `f32`): `x`, `y`, `z`, then the inverse mass. A zero inverse
-    /// mass is infinite mass.
+    /// mass is infinite mass. The motion's frame is the body's principal frame, so the inertia is
+    /// diagonal in it: the world-space inverse inertia is this diagonal turned by
+    /// [`m_orientation`](Self::m_orientation).
     pub m_inverseInertia: [u16; 4],
 
     /// The linear velocity, world space.
@@ -401,6 +406,20 @@ impl RigidObject {
     /// `CRigidObject::TYPE_ID`: the run-time type id of `CRigidObject`, for
     /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use.
     #[address(0x140_60F_1F0)]
+    pub fn TYPE_ID() -> *const u32;
+}
+
+/// A physics constraint placed in the world (`CConstraint`): a game object that joins two objects'
+/// bodies with a Havok constraint, made from its data's kind (fixed, deformable fixed, ball and
+/// socket, stiff spring, hinge, limited hinge, ragdoll, wheel, or prismatic), optionally motored
+/// (position, spring-damper, or velocity motors) and breakable. It names the two objects by object
+/// id and connects them once both exist; the physics step then resolves the constraint with the
+/// bodies' other contacts. Only its type id is bound.
+pub type Constraint;
+impl Constraint {
+    /// `CConstraint::TYPE_ID`: the run-time type id of `CConstraint`, for
+    /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use.
+    #[address(0x140_977_BC0)]
     pub fn TYPE_ID() -> *const u32;
 }
 
