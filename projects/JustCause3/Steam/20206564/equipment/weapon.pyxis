@@ -233,6 +233,15 @@ pub type WeaponData {
     #[address(0x2DC)]
     pub m_HolsteredScaleValue: f32,
 
+    /// Whether the gun's next placement skips the render interpolation: when set, the gun's
+    /// attachment placement copies the new world matrix into
+    /// [`m_WorldMatrixT0`](Self::m_WorldMatrixT0) as well, so the render update draws the gun
+    /// at its new place without blending from the old. Set by
+    /// [`WeaponBase::SkipRenderInterpolationForOneFrame`] and cleared by
+    /// [`WeaponBase::UpdatePostFinalizePose`].
+    #[address(0x2E5)]
+    pub m_SkipRenderInterpolation: bool,
+
     /// Whether this gun leads a multi-gun first shot: [`WeaponBase::Fire_Projectile`] clears it on
     /// every gun and sets it on the firing one.
     #[address(0x2E6)]
@@ -287,6 +296,21 @@ pub type WeaponBase {
         /// grenade ([`ThrownGrenadeWeapon::m_PrimedGrenade`]).
         #[index(38)]
         pub fn GetTotalAmmo(&self) -> i32;
+
+        /// Whether the weapon can start a reload: it has a magazine limit, the magazine is below
+        /// it, and the weapon has unlimited ammunition or its living holder's inventory holds
+        /// ammunition of its type. A weapon whose magazine and stock are both empty cannot.
+        /// `CCharacter::StartReloadingWieldingWeapon` queues the reload act only when it holds.
+        #[index(41)]
+        pub fn CanReload(&self) -> bool;
+
+        /// The per-gun ammunition check, called by
+        /// [`UpdateWeapon_Parallel`](Self::UpdateWeapon_Parallel) for `weapon_data` with the
+        /// tick's fire decision in `should_try_to_fire` and whether the trigger was already pulled
+        /// before this tick. The base implementation is
+        /// [`CheckIfReloadShouldBeTriggeredBase`](Self::CheckIfReloadShouldBeTriggeredBase).
+        #[index(43)]
+        pub fn CheckIfReloadShouldBeTriggered(&mut self, weapon_data: *mut WeaponData, should_try_to_fire: *mut bool, was_trigger_pulled: bool);
 
         /// Deducts `count` rounds of ammunition for `weapon_data`.
         #[index(45)]
@@ -418,6 +442,11 @@ pub type WeaponBase {
     /// Shots remaining that use the spread ring; decremented once per shot.
     #[address(0x1AC)]
     pub m_ProjectileOffsetFireCount: i32,
+
+    /// The rounds in the magazine. A shot consumes from it; a reload refills it from the holder's
+    /// inventory stock of the weapon's ammunition type. The guns of a multi-gun weapon share it.
+    #[address(0x228)]
+    pub m_MagazineAmmo: i32,
 
     /// The animation modifier id (`ava::idstring<NAnimationSystem::SModifierIdTag>`) for holding
     /// this weapon without aiming.
@@ -605,6 +634,33 @@ impl WeaponBase {
     #[address(0x140_951_0C0)]
     pub fn RumbleFire(&mut self);
 
+    /// The base implementation of the
+    /// [`CheckIfReloadShouldBeTriggered`](Self::CheckIfReloadShouldBeTriggered) virtual; the
+    /// rocket launcher's and the sniper rifle's overrides call it. It clears `should_try_to_fire`
+    /// while the holder reloads, draws, or holsters. For a player's weapon with limited
+    /// ammunition and an empty magazine ([`m_MagazineAmmo`](Self::m_MagazineAmmo); a weapon whose
+    /// tuning sets no magazine size counts as empty only while the holder has no stock of its
+    /// ammunition), while no reload is running, it starts a reload when
+    /// [`CanReload`](Self::CanReload) holds and the animation allows one, whether or not the
+    /// trigger is pulled. When the weapon cannot reload and the shot was requested, it:
+    ///
+    /// - except for the hand grenade and the planted explosive, calls
+    ///   [`Inventory::TryToSwitchToValidWeapon`](character::inventory::Inventory::TryToSwitchToValidWeapon),
+    ///   the automatic switch to a weapon with ammunition;
+    /// - at the pull's press edge (`was_trigger_pulled` clear) only, for the local player's weapon
+    ///   and when no switch happened, calls
+    ///   [`HUDUI::OnOutOfAmmoFire`](ui::hud_ui::HUDUI::OnOutOfAmmoFire) (or the grenade
+    ///   counterpart for the hand grenade), and, whether or not a switch happened, activates the
+    ///   gun's `OutOfAmmoFire` attached-effect usage on `weapon_data`;
+    ///
+    /// and in either case it clears `should_try_to_fire`, so an empty weapon never fires. The
+    /// switch is tried on every tick the shot is requested, while the out-of-ammo feedback plays
+    /// once per pull. It goes on to cancel a reload that should not continue, clear
+    /// `should_try_to_fire` while the holder may not fire, and start a predicted reload of a
+    /// partly empty magazine.
+    #[address(0x140_965_CF0)]
+    pub fn CheckIfReloadShouldBeTriggeredBase(&mut self, weapon_data: *mut WeaponData, should_try_to_fire: *mut bool, was_trigger_pulled: bool);
+
     /// The base implementation of the [`IsWeaponAiming`](Self::IsWeaponAiming) virtual.
     #[address(0x140_950_F90)]
     pub fn IsWeaponAimingBase(&self) -> bool;
@@ -691,6 +747,39 @@ impl WeaponBase {
     /// `NBone::ESafeBoneIndex`).
     #[address(0x140_958_AF0)]
     pub fn ChangeBoneAttachement(&mut self, bone: u32, weapon_index: i32);
+
+    /// Sets [`WeaponData::m_SkipRenderInterpolation`] on gun `weapon_data_index`, and makes the
+    /// weapon's model-attachment components for that gun skip theirs, so the gun's next
+    /// attachment placement is drawn without interpolation. `-1` does so for every gun and every
+    /// model-attachment component. The flag lasts until
+    /// [`UpdatePostFinalizePose`](Self::UpdatePostFinalizePose), so it acts on placements made
+    /// before the end of the holder's pose-finalization pass. The holster and predefined-bone
+    /// state tasks call it when they move a gun between bones.
+    #[address(0x140_982_240)]
+    pub fn SkipRenderInterpolationForOneFrame(&mut self, weapon_data_index: i32);
+
+    /// The weapon's post-pose-finalization update, run for every inventory weapon by
+    /// [`Inventory::UpdateInventoryPostFinalizePose`](character::inventory::Inventory::UpdateInventoryPostFinalizePose)
+    /// at the end of the holder's pose-finalization pass. It clears every gun's
+    /// [`WeaponData::m_SkipRenderInterpolation`], rewrites every gun's
+    /// [`WeaponData::m_lBoneAttachementPerWeaponState`] entries for the
+    /// [`E_WS_WIELDING`](WeaponState::E_WS_WIELDING) to
+    /// [`E_WS_HOLSTERED_INVISIBLE`](WeaponState::E_WS_HOLSTERED_INVISIBLE) states from
+    /// [`m_EquipSlot`](Self::m_EquipSlot) (the `SetupWeaponAttachementBones` table, inlined), and
+    /// runs the enabled weapon components' post-finalization hook. For the
+    /// [`E_SLOT_DUAL_WIELD`](WeaponSlot::E_SLOT_DUAL_WIELD) slot the table puts the first gun on
+    /// [`ATTACH_HAND_RIGHT`](character::character::SafeBoneIndex::ATTACH_HAND_RIGHT) when wielding
+    /// or dual-wielding and on
+    /// [`RIGHT_HOLSTER`](character::character::SafeBoneIndex::RIGHT_HOLSTER) when holstered, and
+    /// the second gun on
+    /// [`LEFT_HOLSTER`](character::character::SafeBoneIndex::LEFT_HOLSTER) except when
+    /// dual-wielding, where it rides
+    /// [`ATTACH_HAND_LEFT`](character::character::SafeBoneIndex::ATTACH_HAND_LEFT); with a single
+    /// gun wielded the second waits on its holster. A bone a state task moves a gun to lasts only
+    /// until the end of the pass it was written in. The
+    /// disassembler mislabels it `CWeaponBase::CalculateAttachOffsets`.
+    #[address(0x140_9A5_010)]
+    pub fn UpdatePostFinalizePose(&mut self);
 
     /// Returns the attach bone of gun `weapon_index` for the weapon's current
     /// [`m_State`](Self::m_State), or an invalid-bone value when the index is out of range.

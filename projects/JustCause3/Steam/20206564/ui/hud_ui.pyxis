@@ -70,4 +70,11 @@ impl HUDUI {
     /// `OnOmniDamage`.
     #[address(0x140_E2C_DB0)]
     pub fn OnOmniDamage(&mut self);
+
+    /// Invokes the movie's `OnOutOfAmmoFire`, the out-of-ammunition notice. Its only caller is
+    /// [`WeaponBase::CheckIfReloadShouldBeTriggeredBase`](equipment::weapon::WeaponBase::CheckIfReloadShouldBeTriggeredBase),
+    /// at a trigger pull of the local player's weapon that is empty, cannot reload, and found no
+    /// weapon to switch to.
+    #[address(0x140_DFA_520)]
+    pub fn OnOutOfAmmoFire(&mut self);
 }

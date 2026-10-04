@@ -54,6 +54,13 @@ pub type Inventory {
     /// is clear.
     pub m_DoesAnimationAllowGrenades: bool,
 
+    /// Whether the current animation permits switching weapons: recomputed by
+    /// [`UpdateInventoryPermissions`](Self::UpdateInventoryPermissions). A deferred switch, a
+    /// committed slot selection (`CCharacter::SwitchWeapon`), and
+    /// [`TryToSwitchToValidWeapon`](Self::TryToSwitchToValidWeapon) all wait on it.
+    #[address(0x189)]
+    pub m_DoesAnimationAllowSwitchingWeapons: bool,
+
     /// The character that owns the inventory.
     #[address(0x3E0)]
     pub m_Character: *mut Character,
@@ -114,6 +121,52 @@ impl Inventory {
     /// effect, since the player's `HolsterWeapon` only forces the relaxed state.
     #[address(0x140_932_F10)]
     pub fn UpdateWeaponHandling(&mut self, dt: f32);
+
+    /// Switches to the first weapon that still has ammunition, in a fixed order: the
+    /// [`E_SLOT_TWO_HANDED`](WeaponSlot::E_SLOT_TWO_HANDED) weapon, then the
+    /// [`E_SLOT_DUAL_WIELD`](WeaponSlot::E_SLOT_DUAL_WIELD) weapon, then the
+    /// [`E_SLOT_TWO_HANDED_SPECIAL`](WeaponSlot::E_SLOT_TWO_HANDED_SPECIAL) weapon. A weapon
+    /// qualifies when its magazine is not empty or the inventory holds ammunition of its type; the
+    /// order does not depend on the wielded slot, which is skipped only because it is empty. The
+    /// first that qualifies is switched to through `CCharacter::SelectWeapon`, and the function
+    /// returns true. It does nothing and returns false while
+    /// [`m_DoesAnimationAllowSwitchingWeapons`](Self::m_DoesAnimationAllowSwitchingWeapons) is
+    /// clear, while the owner's
+    /// [`SB_DISABLE_SWITCH_WEAPONS`](state::StateBitFlag::SB_DISABLE_SWITCH_WEAPONS) state bit is
+    /// set, or when no weapon qualifies.
+    ///
+    /// It has two callers. [`WeaponBase::CheckIfReloadShouldBeTriggeredBase`](equipment::weapon::WeaponBase::CheckIfReloadShouldBeTriggeredBase)
+    /// calls it when the player pulls the trigger of a weapon that is empty and cannot reload,
+    /// which is the game's automatic switch away from an empty weapon. The `NWeaponEquipTask`
+    /// state task calls it on entry when its character wields nothing and the task is not
+    /// configured to equip a fixed slot.
+    #[address(0x140_8D6_1F0)]
+    pub fn TryToSwitchToValidWeapon(&mut self) -> bool;
+
+    /// Places the inventory's weapons on the character
+    /// (`CInventory::UpdateAttachmentTransforms`): calls each slot weapon's attachment-transform
+    /// virtual, which sets every gun's current world matrix
+    /// ([`WeaponData::m_WorldMatrixT1`](equipment::weapon::WeaponData::m_WorldMatrixT1)) from the
+    /// bone its attach-bone table
+    /// ([`WeaponData::m_lBoneAttachementPerWeaponState`](equipment::weapon::WeaponData::m_lBoneAttachementPerWeaponState))
+    /// names for the weapon's state, then places the hand-held hijacking props, the boost
+    /// wingsuit's guns while wingsuiting, and the hijacking explosive. The character's pose-finalization pass
+    /// ([`Character::UpdatePassFinalizePose_Parallel`](character::character::Character::UpdatePassFinalizePose_Parallel))
+    /// calls it after its state tasks and again after the `MAIN` IK solve;
+    /// [`Character::UpdateSecondaryHandIKPass`](character::character::Character::UpdateSecondaryHandIKPass)
+    /// and the character's prop-transform update call it too. The `p3` and `p4` floats are
+    /// passed through to the weapons unchanged.
+    #[address(0x140_8E4_6A0)]
+    pub fn UpdateAttachmentTransforms(&mut self, character: *const Character, p3: f32, p4: f32, transform_type: u32);
+
+    /// Runs each slot weapon's
+    /// [`UpdatePostFinalizePose`](equipment::weapon::WeaponBase::UpdatePostFinalizePose), which
+    /// rewrites every gun's attach-bone table from the weapon's slot. The character's
+    /// pose-finalization pass calls it after the attachment placement and the IK passes, so a
+    /// table entry written by the character's state tasks or by any other writer lasts until this
+    /// call.
+    #[address(0x140_8C6_960)]
+    pub fn UpdateInventoryPostFinalizePose(&mut self);
 
     /// Updates the inventory's attached effect container (the wielded weapon's muzzle flash,
     /// casings, and sounds), when it has one.
