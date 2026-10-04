@@ -679,6 +679,18 @@ impl Character {
     #[address(0x140_7F2_AF0)]
     pub fn IsTryingToFireAnyWeapons(&self, ignore_animation: bool) -> bool;
 
+    /// The weapon the character wields: the selected slot's weapon while it is
+    /// [`E_WS_WIELDING`](equipment::weapon::WeaponState::E_WS_WIELDING),
+    /// [`E_WS_DUAL_WIELDING`](equipment::weapon::WeaponState::E_WS_DUAL_WIELDING), or
+    /// [`E_WS_MOUNTED`](equipment::weapon::WeaponState::E_WS_MOUNTED), and otherwise a shared
+    /// empty pointer. While the character plants an explosive it is the planted explosive slot's
+    /// weapon, or the empty pointer with `ignore_planting`. The result points into the inventory or
+    /// at a static, so it outlives the call.
+    /// [`Inventory::UpdateWeaponHandling`](character::inventory::Inventory::UpdateWeaponHandling)
+    /// reads it to decide whether a weapon input draws a weapon.
+    #[address(0x140_7D8_520)]
+    pub fn GetWieldingWeapon(&self, ignore_planting: bool) -> *const SharedPtr<WeaponBase>;
+
     /// Whether any weapon input is active this frame.
     #[address(0x140_7F2_D10)]
     pub fn HasAnyWeaponInput(&self) -> bool;

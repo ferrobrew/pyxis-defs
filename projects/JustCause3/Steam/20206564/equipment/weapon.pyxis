@@ -733,6 +733,14 @@ impl WeaponBase {
     #[address(0x140_966_B50)]
     pub fn GetLastFireFromPosition(&self, result: *mut Vector3, weapon_data: *mut WeaponData) -> *mut Vector3;
 
+    /// The scatter a shot is given: [`m_CurrentScatterValue`](Self::m_CurrentScatterValue),
+    /// multiplied by a tuning factor while the player holding the weapon is in precision aim and
+    /// by another while the holder moves faster than a metre per second; zero without a holder.
+    /// [`GetShotMatrix`](Self::GetShotMatrix) multiplies the tuning's yaw and pitch scatter ranges
+    /// by it, unless asked to ignore the scatter.
+    #[address(0x140_981_EC0)]
+    pub fn GetCurrentScatterValue(&self) -> f32;
+
     /// Returns the tuning's aim-timer override
     /// ([`WeaponTuning::m_aim_timer_override`]), or zero without tuning.
     #[address(0x140_958_F70)]
@@ -796,8 +804,10 @@ impl WeaponBase {
     /// [`WeaponData::m_WorldMatrixT0`] toward [`WeaponData::m_WorldMatrixT1`] by the render
     /// context's interpolation factor, applies the holstered scale when holstered, pushes the
     /// result to [`WeaponData::m_BaseModelInstance`], and updates the gun's animated-model
-    /// skinning; it then renders the weapon's components. `game_object` is the weapon's
-    /// `CGameObject` subobject, not the start of the weapon.
+    /// skinning; it then renders the weapon's components, among them the separate model parts of
+    /// its guns ([`ModelAttachementWeaponComponent::UpdateRender`]), which interpolate their own
+    /// cached matrices. `game_object` is the weapon's `CGameObject` subobject, not the start of
+    /// the weapon.
     #[address(0x140_966_380)]
     pub fn UpdateRender(game_object: *mut void, context: *const GameObjectRenderContext);
 }
@@ -1077,6 +1087,122 @@ impl WallPenetrationWeaponComponent {
     /// again. The box follows the holder's animated pose, not the weapon's own transform.
     #[address(0x140_92F_930)]
     pub fn UpdateWeapon_Serial(&mut self, dt: f32, weapon_data: *mut WeaponData, p3: f32);
+}
+
+/// `CModelAttachementWeaponComponent`: a weapon component that draws a separate model part of a
+/// gun, such as a magazine, at a fixed offset from the gun or on one of the holder's bones. The
+/// barrel recoil and barrel spin components (`CBarrelRecoilWeaponComponent`,
+/// `CBarrelSpinWeaponComponent`) derive from it: their attachment placement runs this one's and
+/// then moves the part, and their vtables share its render update.
+///
+/// The part keeps its own pair of cached world matrices, like a gun's
+/// ([`WeaponData::m_WorldMatrixT0`] and [`WeaponData::m_WorldMatrixT1`]):
+/// [`UpdateAttachmentTransforms`](Self::UpdateAttachmentTransforms) places it in the simulation,
+/// and [`UpdateRender`](Self::UpdateRender) interpolates between the two and pushes the result to
+/// its own model instance. Only some members are mapped, at their offsets from the start of the
+/// component.
+#[min_size(0x1D8)]
+pub type ModelAttachementWeaponComponent {
+    /// The value of [`m_CharacterBone`](Self::m_CharacterBone) while the part rides its gun rather
+    /// than a bone of the holder.
+    pub const NO_CHARACTER_BONE: u32 = 0xFFFFFFFF,
+
+    /// The weapon the component belongs to (`CWeaponComponentBase::m_Owner`).
+    #[address(0xD0)]
+    pub m_Owner: *mut WeaponBase,
+
+    /// The index into the owner's [`m_lWeaponData`](WeaponBase::m_lWeaponData) of the gun the part
+    /// belongs to.
+    #[address(0xF8)]
+    pub m_WeaponDataIndex: u32,
+
+    /// Whether the next placement skips the render interpolation: when set,
+    /// [`UpdateAttachmentTransforms`](Self::UpdateAttachmentTransforms) copies
+    /// [`m_WorldMatrix`](Self::m_WorldMatrix) into
+    /// [`m_WorldMatrixSaved`](Self::m_WorldMatrixSaved) as well. Set through
+    /// [`WeaponBase::SkipRenderInterpolationForOneFrame`] and cleared by
+    /// [`UpdatePostFinalizePose`](Self::UpdatePostFinalizePose).
+    #[address(0x100)]
+    pub m_SkipRenderInterpolation: bool,
+
+    /// The snow cover written by the attachment placement, which the render update hands the
+    /// model's environmental metadata.
+    #[address(0x104)]
+    pub m_SnowFactor: f32,
+    /// The wetness written by the attachment placement, which the render update hands the model's
+    /// environmental metadata while the snow cover is zero.
+    pub m_WaterFactor: f32,
+
+    /// The holder's bone (an `NBone::ESafeBoneIndex`) the part rides instead of its gun, or
+    /// [`NO_CHARACTER_BONE`](Self::NO_CHARACTER_BONE). Set by
+    /// [`AttachToCharacterBone`](Self::AttachToCharacterBone), which the animation's
+    /// model-attachment bone task (`NWeaponModelAttachementSetBoneTask`) calls inside the holder's
+    /// pose-finalization pass, and reset by
+    /// [`UpdatePostFinalizePose`](Self::UpdatePostFinalizePose) at the end of that pass, so it is
+    /// set only between the task and the end of the pass that placed the part.
+    #[address(0x10C)]
+    pub m_CharacterBone: u32,
+
+    /// The part's transform relative to its gun.
+    #[address(0x110)]
+    pub m_Offset: Matrix4,
+
+    /// The part's world matrix as of the current placement:
+    /// [`m_Offset`](Self::m_Offset) composed with the gun's
+    /// [`GetWorldMatrixT1`](WeaponData::GetWorldMatrixT1) and orthonormalized, or the holder's bone
+    /// while [`m_CharacterBone`](Self::m_CharacterBone) names one.
+    #[address(0x150)]
+    pub m_WorldMatrix: Matrix4,
+
+    /// The part's world matrix as of the previous placement, which the render update interpolates
+    /// from toward [`m_WorldMatrix`](Self::m_WorldMatrix).
+    #[address(0x190)]
+    pub m_WorldMatrixSaved: Matrix4,
+
+    /// The part's model instance (an `NModelSystem::CModelInstance`), or null.
+    #[address(0x1D0)]
+    pub m_BaseModelInstance: *mut void,
+}
+impl ModelAttachementWeaponComponent {
+    /// Places the part (the component's override of the `UpdateAttachmentTransforms` weapon
+    /// component virtual, which the weapon's attachment placement calls for each component). It
+    /// stores `snow_factor` and `water_factor`; for the advancing placement (`transform_type` 2)
+    /// it first copies [`m_WorldMatrix`](Self::m_WorldMatrix) into
+    /// [`m_WorldMatrixSaved`](Self::m_WorldMatrixSaved). It then writes
+    /// [`m_WorldMatrix`](Self::m_WorldMatrix) from the gun's world matrix and
+    /// [`m_Offset`](Self::m_Offset), or from the holder's bone while
+    /// [`m_CharacterBone`](Self::m_CharacterBone) names one. While
+    /// [`m_SkipRenderInterpolation`](Self::m_SkipRenderInterpolation) is set, and for the initial
+    /// placement (`transform_type` 0), it copies the new matrix into
+    /// [`m_WorldMatrixSaved`](Self::m_WorldMatrixSaved) as well.
+    #[address(0x140_92E_B80)]
+    pub fn UpdateAttachmentTransforms(&mut self, snow_factor: f32, water_factor: f32, transform_type: u32);
+
+    /// The render-phase update (the `CGameObject::UpdateRender` virtual), called for each of a
+    /// weapon's components from the weapon's render update ([`WeaponBase::UpdateRender`]). It
+    /// interpolates [`m_WorldMatrixSaved`](Self::m_WorldMatrixSaved) toward
+    /// [`m_WorldMatrix`](Self::m_WorldMatrix) by the render context's interpolation factor (the
+    /// engine's `CTransform::Lerp`), scales the result by the gun's holstered scale while the
+    /// owner is [`E_WS_HOLSTERED`](WeaponState::E_WS_HOLSTERED), pushes it to
+    /// [`m_BaseModelInstance`](Self::m_BaseModelInstance) with
+    /// [`ModelInstance::UpdateMatrix`](graphics_engine::model_instance::ModelInstance::UpdateMatrix),
+    /// and hands the model the snow and wetness. The disassembler mislabels it
+    /// `NInteractionGraphExitTasks::NAnimationDrivenOnlyMotion::Update`, and puts this function's
+    /// name on a function that reads a gun's ([`WeaponData`]) fields instead.
+    #[address(0x140_8E0_9F0)]
+    pub fn UpdateRender(&mut self, context: *const GameObjectRenderContext);
+
+    /// Rides the part on the holder's bone `bone` (an `NBone::ESafeBoneIndex`) for the rest of the
+    /// pose-finalization pass: sets [`m_CharacterBone`](Self::m_CharacterBone).
+    #[address(0x140_8BF_DA0)]
+    pub fn AttachToCharacterBone(&mut self, bone: u32);
+
+    /// The component's post-pose-finalization hook, run from [`WeaponBase::UpdatePostFinalizePose`]
+    /// for an enabled component: clears [`m_SkipRenderInterpolation`](Self::m_SkipRenderInterpolation)
+    /// and resets [`m_CharacterBone`](Self::m_CharacterBone) to
+    /// [`NO_CHARACTER_BONE`](Self::NO_CHARACTER_BONE). The disassembler leaves it unnamed.
+    #[address(0x140_8BF_D80)]
+    pub fn UpdatePostFinalizePose(&mut self);
 }
 
 /// `CTurretWeaponComponent`: a weapon component that rotates a turret toward its weapon's target.
