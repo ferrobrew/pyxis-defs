@@ -112,7 +112,8 @@ pub type ObjectBlackboard {
     /// The id of the left wrist's model-space `SECONDARY`-pass target position (`CVector3f`).
     pub const SECONDARY_HAND_POSITION_LS_LEFT_ID: u32 = 0xA9D5F210,
     /// The id of the float weight of the weapon off-hand grip, written by the weapon off-hand IK
-    /// task (ramping up while its segment is active) and read by
+    /// task ([`NWeaponOffhandIKTask_Update`](animation::arm_aim_ik::NWeaponOffhandIKTask_Update),
+    /// inside the pose-finalization pass, ramping up while its segment is active) and read by
     /// [`Character::UpdateSecondaryHandIKPass`](character::character::Character::UpdateSecondaryHandIKPass),
     /// which places the off-hand on the weapon's grip only while it is positive.
     pub const OFFHAND_IK_WEIGHT_ID: u32 = 0xF67ED342,

@@ -139,8 +139,13 @@ pub enum StateBitFlag: u32 {
     /// [`Inventory::UpdateWeaponHandling`](character::inventory::Inventory::UpdateWeaponHandling)
     /// tests both the latch and the live bit.
     SB_DISABLE_MENTAL_STATE_DRAW_WEAPON = 0x55,
+    /// Stands the weapon off-hand IK task down
+    /// ([`NWeaponOffhandIKTask_Update`](animation::arm_aim_ik::NWeaponOffhandIKTask_Update)): while
+    /// set, the task writes no off-hand grip keys and clears both hand bits.
     SB_DISABLE_WEAPON_OFFHAND_IK = 0x56,
+    /// The weapon off-hand IK task is placing the left hand on the weapon's grip this frame.
     SB_WEAPON_OFFHAND_IK_LEFT = 0x57,
+    /// The weapon off-hand IK task is placing the right hand on the weapon's grip this frame.
     SB_WEAPON_OFFHAND_IK_RIGHT = 0x58,
     SB_IN_TRANSITION_TO_WINGSUIT = 0x59,
     /// Hanging from a vehicle-attached parachute; read by [`Character::IsInAttachedToParachute`](character::character::Character::IsInAttachedToParachute).

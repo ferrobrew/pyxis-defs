@@ -138,3 +138,20 @@ pub fn NLookAtIKTask_Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void
 /// effector targets through [`HumanIK::AddEffectorTargetPosition`].
 #[address(0x140_826_480)]
 pub fn NLocoIKTask_Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
+
+/// The per-frame update of the weapon off-hand IK task (`NWeaponOffhandIKTask::Update`). Registered
+/// in [`Character::FINALIZE_POSE_STATE_TASK_RANGE`](Character::FINALIZE_POSE_STATE_TASK_RANGE), so
+/// it runs inside [`Character::UpdatePassFinalizePose_Parallel`] after the pass's entry and before
+/// the IK solve. Unless
+/// [`StateBitFlag::SB_DISABLE_WEAPON_OFFHAND_IK`](state::StateBitFlag::SB_DISABLE_WEAPON_OFFHAND_IK)
+/// is set, the task's segment (when it names one) is not playing on the base layer, or the
+/// character's flags rule it out, it sets
+/// [`StateBitFlag::SB_WEAPON_OFFHAND_IK_LEFT`](state::StateBitFlag::SB_WEAPON_OFFHAND_IK_LEFT) or
+/// [`StateBitFlag::SB_WEAPON_OFFHAND_IK_RIGHT`](state::StateBitFlag::SB_WEAPON_OFFHAND_IK_RIGHT)
+/// by the task's hand property and writes the one-frame
+/// [`OFFHAND_IK_HAND_ID`](blackboard::ObjectBlackboard::OFFHAND_IK_HAND_ID) and
+/// [`OFFHAND_IK_WEIGHT_ID`](blackboard::ObjectBlackboard::OFFHAND_IK_WEIGHT_ID) keys, the weight
+/// ramping up from the state's entry when the task asks for it. Otherwise it clears both hand bits.
+/// [`Character::UpdateSecondaryHandIKPass`] reads the keys.
+#[address(0x140_851_6B0)]
+pub fn NWeaponOffhandIKTask_Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);

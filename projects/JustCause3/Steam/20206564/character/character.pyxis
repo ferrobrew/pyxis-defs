@@ -1,4 +1,5 @@
 use animation::ik::HumanIK;
+use animation::pose_producer::AnimatedBodyPart;
 use animation::rule_system::{AnimationModifierType, AnimationRuleSystem};
 use blackboard::ObjectBlackboard;
 use character::avatar::{Avatar, MentalState};
@@ -107,6 +108,11 @@ pub type Character {
     /// `CGameObject` virtuals go through the vtable at this offset rather than the primary one,
     /// and state tasks recover the character from that subobject by subtracting this offset.
     pub const GAME_OBJECT_BASE_OFFSET: u64 = 0x8,
+    /// The state-task range that
+    /// [`UpdatePassFinalizePose_Parallel`](Self::UpdatePassFinalizePose_Parallel) runs at its start,
+    /// before the IK solve: the range the aim IK, look-at IK, grapple-fire arm IK, and weapon
+    /// off-hand IK tasks are registered in.
+    pub const FINALIZE_POSE_STATE_TASK_RANGE: u32 = 0x9B810CE7,
     /// The slot, in the vtable of the [`GAME_OBJECT_BASE_OFFSET`](Self::GAME_OBJECT_BASE_OFFSET)
     /// subobject, of `CGameObject::InitTransform(const CMatrix4f*)`: it re-bases the object's world
     /// transform directly. `CGameWorld::TeleportPlayerInstant` moves the player character through it.
@@ -305,13 +311,24 @@ impl Character {
     pub fn GetSafeBoneMatrix(&self, safe_index: SafeBoneIndex, matrix: *mut Matrix4);
 
     /// The character's SIM-phase pose-finalization pass. After the animation graph has finalized the
-    /// local pose, this drives the [`HumanIK`](Self::m_HIK) solve (the `MAIN` body pass, gated
-    /// on [`HumanIK::HasTargets`], followed by the `SECONDARY` hand pass), then computes the
+    /// local pose, this first runs the current states' tasks registered in the
+    /// [`FINALIZE_POSE_STATE_TASK_RANGE`](Self::FINALIZE_POSE_STATE_TASK_RANGE) through
+    /// [`UpdateStateTasksInRange`](Self::UpdateStateTasksInRange) (the aim, look-at, grapple-fire
+    /// arm, and weapon off-hand IK tasks among them), then drives the [`HumanIK`](Self::m_HIK) solve
+    /// (the `MAIN` body pass, gated on [`HumanIK::HasTargets`], followed by
+    /// [`UpdateSecondaryHandIKPass`](Self::UpdateSecondaryHandIKPass)), then computes the
     /// model-space pose (`CalculateModelSpacePose`), and finally calls
     /// [`UpdatePropEffects`](Self::UpdatePropEffects). Effector targets queued before this runs
-    /// are solved into the pose the same frame.
+    /// are solved into the pose the same frame; blackboard keys those tasks write are written after
+    /// its entry.
     #[address(0x140_7F9_B10)]
     pub fn UpdatePassFinalizePose_Parallel(&mut self, context: *mut void);
+
+    /// Runs the update of every task of each rule system's current state that is registered in the
+    /// state-task range `range_id` (`CAnimatedModel::StateTaskUpdate`), with `dt` as the step. Each
+    /// update pass of the character runs its own range.
+    #[address(0x140_75E_710)]
+    pub fn UpdateStateTasksInRange(&mut self, dt: f32, range_id: u32);
 
     /// The per-frame update of the character's attached prop visual effects. Runs last in
     /// [`UpdatePassFinalizePose_Parallel`](Self::UpdatePassFinalizePose_Parallel), after the IK
@@ -730,6 +747,27 @@ impl Character {
 #[address(0x140_75D_E50)]
 pub fn Character_GetRenderTransform(game_object: *mut u8, out: *mut Matrix4, dtf: f32) -> bool;
 
+/// A character's animation layers (`CCharacter::s_LayerNames`). `CCharacter::InitAnimationModel`
+/// creates layer *i* from the *i*-th state-machine file of the character's construction info, named
+/// by this enum, and stops at the first missing file; the layer's rule system, body part, and
+/// blender all sit at index *i*. The engine's level of detail (`CCharacter::UpdateLOD`) switches
+/// the partial and additive layers' body parts off by these indices for distant characters.
+#[copyable]
+pub enum AnimationLayer: u32 {
+    /// The full-body base graph (the locomotion, the stunts, and the weapon-modifier clip variants
+    /// of both).
+    MAINBODY = 0,
+    /// The upper-body partial graph synchronised to the base graph's locomotion.
+    SYNCED_PARTIAL = 1,
+    /// The upper-body partial graph for one-off actions: draw, holster, switch, reload, pump, bolt,
+    /// pickup, and throws.
+    GLOBAL_PARTIAL = 2,
+    /// The additive graph synchronised to the base graph.
+    SYNCED_ADDITIVE = 3,
+    GLOBAL_ADDITIVE = 4,
+    VOCALS = 5,
+}
+
 #[size(0x240)]
 pub type AnimatedModel {
     /// The number of [`m_ModelInstances`](Self::m_ModelInstances) slots. Keep in sync
@@ -775,7 +813,15 @@ impl AnimatedModel {
     pub fn TryAct(&mut self, act: *const u32) -> bool;
 }
 
-pub type AnimationController;
+/// A character's animation controller (`NCharacterSystem::CAnimationControl`): the skeleton, the
+/// pose producer, and one body part per animation layer.
+pub type AnimationController {
+    /// The animation layers' body parts, in layer order: index *i* belongs to the layer named by
+    /// [`AnimationLayer`] *i*, alongside the rule system at the same index of
+    /// [`AnimatedModel::m_RuleSystems`].
+    #[address(0xC8)]
+    pub m_BodyParts: Vector<SharedPtr<AnimatedBodyPart>>,
+}
 impl AnimationController {
     #[address(0x140_434_E30)]
     pub fn GetBoneIndex(&self, hash: u32) -> u32;
