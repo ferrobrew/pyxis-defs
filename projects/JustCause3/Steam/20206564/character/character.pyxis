@@ -120,6 +120,11 @@ pub type Character {
     pub const GAME_OBJECT_INIT_TRANSFORM_SLOT: u64 = 18,
 
     vftable {
+        /// The character's current health (`CDamageable::GetHealth`, returning `m_CurHealth`).
+        /// [`HUDUI::UpdateHealth`](ui::hud_ui::HUDUI::UpdateHealth) reads it every frame.
+        #[index(27)]
+        pub fn GetHealth(&self) -> i16;
+
         /// Attaches the character to a parent (`CCharacter::AttachTo`): `target` is the parent's
         /// attach frame, `object` the parent object, `attach_type` a `CCharacter::AttachType`, and
         /// `offset` the character's transform relative to the parent frame. While attached, the
@@ -134,6 +139,12 @@ pub type Character {
     /// [`m_Damager`](damage::DamageMsg::m_Damager).
     #[address(0x68)]
     pub m_WeakThis: WeakPtrGameObject,
+
+    /// The character's maximum health (`CDamageable::m_MaxHealth`), the scale of
+    /// [`GetHealth`](Self::GetHealth). [`HUDUI::InitHealth`](ui::hud_ui::HUDUI::InitHealth) passes
+    /// the local player character's to the movie.
+    #[address(0x1B0)]
+    pub m_MaxHealth: i16,
 
     /// The character's aiming-settings resource (`TResourceCachePtr<SCharacterAimingSettings>`, a
     /// resource handle resolved through the resource cache). Both aim-input updates read the
@@ -753,6 +764,62 @@ impl Character {
     /// animated model directly when the inventory's animation state allows holstering.
     #[address(0x140_7F2_D80)]
     pub fn HolsterWeapon(&mut self);
+
+    /// Starts a reload of the wielded weapon: queues the upper-body reload act (`UB_ACT_RELOAD`)
+    /// and blocks grenades, when the inventory allows reloading
+    /// ([`Inventory::GetAnimationAllowsReloading`](character::inventory::Inventory::GetAnimationAllowsReloading)),
+    /// the detonate input
+    /// ([`E_INPUT_DETONATE_EXPLOSIVES`](WeaponInput::E_INPUT_DETONATE_EXPLOSIVES)) is zero, a
+    /// weapon is wielded ([`GetWieldingWeapon`](Self::GetWieldingWeapon)), and that weapon
+    /// [`CanReload`](equipment::weapon::WeaponBase::CanReload). Otherwise it does nothing. The
+    /// act's callback runs the weapon's
+    /// [`StartReloadSequence`](equipment::weapon::WeaponBase::StartReloadSequence) once the act
+    /// is accepted; the ammunition itself moves later, when the reload clip's track message calls
+    /// [`Reload`](equipment::weapon::WeaponBase::Reload). The reload state raises
+    /// [`SB_IS_RELOADING`](state::StateBitFlag::SB_IS_RELOADING).
+    ///
+    /// Every animated reload starts here. Its callers are:
+    ///
+    /// - [`Inventory::UpdateWeaponHandling`](character::inventory::Inventory::UpdateWeaponHandling),
+    ///   on a positive reload input ([`E_INPUT_RELOAD`](WeaponInput::E_INPUT_RELOAD)) while the
+    ///   inventory allows reloading;
+    /// - [`WeaponBase::CheckIfReloadShouldBeTriggeredBase`](equipment::weapon::WeaponBase::CheckIfReloadShouldBeTriggeredBase),
+    ///   for the automatic reload of a player's empty magazine, on every tick while the magazine
+    ///   is out ([`m_WeaponIsWithoutMagazine`](equipment::weapon::WeaponBase::m_WeaponIsWithoutMagazine)),
+    ///   and for the predicted reload of the local player's idle weapon;
+    /// - [`Inventory::SetAmmoCount`](character::inventory::Inventory::SetAmmoCount),
+    ///   [`Inventory::GiveMaxAmmo`](character::inventory::Inventory::GiveMaxAmmo),
+    ///   `CInventory::GiveMaxAmmoToAllWeaponInInventory`, `CInventory::SetMaxBeaconsByLevel`, and
+    ///   `CInventory::SetMaxFlaresByLevel`, when a reserve is refilled from empty while the
+    ///   wielded weapon of that kind has an empty magazine;
+    /// - [`WeaponBase::HandleTrackMessage`](equipment::weapon::WeaponBase::HandleTrackMessage),
+    ///   for the [`TRACK_MESSAGE_START_RELOAD`](equipment::weapon::WeaponBase::TRACK_MESSAGE_START_RELOAD)
+    ///   and [`TRACK_MESSAGE_START_RELOAD_IF_EMPTY`](equipment::weapon::WeaponBase::TRACK_MESSAGE_START_RELOAD_IF_EMPTY)
+    ///   messages;
+    /// - the rocket launcher's [`Fire_Start`](equipment::weapon::RPGWeapon::Fire_Start), firing an
+    ///   unloaded launcher, and its
+    ///   [`CheckIfReloadShouldBeTriggered`](equipment::weapon::RPGWeapon::CheckIfReloadShouldBeTriggered),
+    ///   for a holder that is not a player;
+    /// - the sniper rifle's per-tick update, after a shot that emptied the magazine with a
+    ///   reserve left.
+    #[address(0x140_7D8_F50)]
+    pub fn StartReloadingWieldingWeapon(&mut self);
+
+    /// Cancels a running reload: while
+    /// [`SB_IS_RELOADING`](state::StateBitFlag::SB_IS_RELOADING) is set, queues the cancel act
+    /// (`UB_ACT_CANCEL_RELOAD`) and clears the inventory's reload permission
+    /// ([`Inventory::m_DoesAnimationAllowReloading`](character::inventory::Inventory::m_DoesAnimationAllowReloading)).
+    /// The ammunition check calls it for a weapon that does not reload by magazine once
+    /// [`m_KeepReloading`](equipment::weapon::WeaponBase::m_KeepReloading) is clear, and the
+    /// planted explosive's detonation calls it when the detonate act cannot be taken.
+    #[address(0x140_760_850)]
+    pub fn CancelReload(&mut self);
+
+    /// Whether the character is reloading: the
+    /// [`SB_IS_RELOADING`](state::StateBitFlag::SB_IS_RELOADING) state bit, which the reload
+    /// state of the animation graph raises.
+    #[address(0x140_75F_3A0)]
+    pub fn IsReloading(&self) -> bool;
 
     /// Whether the character may start a melee attack: the melee block bit that dropping a heavy
     /// weapon sets is clear, the inventory's animation permission allows melee, the character is not

@@ -44,6 +44,16 @@ pub enum ScreenPos: u32 {
     SCREEN_POS_OFFSCREEN_NO_CLAMP_BEHIND_CAMERA = 0xA,
 }
 
+/// A rectangle in movie stage coordinates (`Scaleform::Render::Rect<float>`): left, top, right,
+/// bottom.
+#[copyable, defaultable, size(0x10), align(4)]
+pub type StageRect {
+    pub x1: f32,
+    pub y1: f32,
+    pub x2: f32,
+    pub y2: f32,
+}
+
 /// A Scaleform render buffer: what [`UIManager::m_RenderBuffer`] points at. It holds the
 /// render-target and depth-stencil views the UI HAL renders into; [`UpdateData`](Self::UpdateData)
 /// rebinds those views, and is not tied to startup.
@@ -239,6 +249,20 @@ pub type UIManager {
     #[address(0x1_328)]
     pub m_RenderHAL: *mut RenderHAL,
 
+    /// The UI safe area in stage coordinates (`m_SafeArea`), which
+    /// [`ComputeSafeArea`](Self::ComputeSafeArea) derives and pushes to every UI (`CUIBase::UpdateSafeArea`),
+    /// whose movies anchor their edge containers to it. [`Get2DInfo`](Self::Get2DInfo)'s on-screen
+    /// test and edge clamp use it, shrunk by the margin.
+    #[address(0x1_340)]
+    pub m_SafeArea: StageRect,
+    /// The game view area in stage coordinates (`m_GameViewArea`), from
+    /// [`ComputeGameViewArea`](Self::ComputeGameViewArea).
+    pub m_GameViewArea: StageRect,
+    /// The fraction of the stage kept clear at its edges (`m_SafeAreaPercentage`), from the safe-area
+    /// setting. [`ComputeSafeArea`](Self::ComputeSafeArea) insets the safe area by half of it on
+    /// each side.
+    pub m_SafeAreaPercentage: f32,
+
     /// The UI render worker's command queue; `Render` executes it (and stamps its
     /// [`m_RenderThreadId`](UiThreadCommandQueue::m_RenderThreadId)) at the top of every call.
     #[address(0x1_368)]
@@ -278,6 +302,18 @@ pub type UIManager {
     /// The movie stage's authored height; see [`m_CachedStageWidth`](Self::m_CachedStageWidth).
     #[address(0x1_488)]
     pub m_CachedStageHeight: f32,
+
+    /// The movie stage's height over its width (`m_CachedStageRatio`), refreshed with
+    /// [`m_CachedStageWidth`](Self::m_CachedStageWidth). [`Convert3DCoords`](Self::Convert3DCoords)
+    /// compares it with [`m_CachedViewportRatio`](Self::m_CachedViewportRatio): when the viewport is
+    /// relatively taller it scales the projected y by `viewport ratio / stage ratio`, and when it
+    /// is relatively wider it scales x by `stage ratio / viewport ratio`, so the stage keeps its
+    /// shape and the visible frame extends past the stage on the longer axis.
+    #[address(0x1_48C)]
+    pub m_CachedStageRatio: f32,
+    /// The centre of the stage in stage coordinates (`m_CachedScreenCenter`).
+    /// [`HUDUI::UpdatePOIs`](ui::hud_ui::HUDUI::UpdatePOIs) measures each marker's label box from it.
+    pub m_CachedScreenCenter: Vector2,
 
     /// The cached viewport width (`m_CachedViewportSize.x`), refreshed every frame from the graphics
     /// device's display resolution. [`ComputeSafeArea`](Self::ComputeSafeArea) reads it to expand
@@ -334,7 +370,15 @@ impl UIManager {
     #[address(0x140_F1B_260)]
     pub fn SetMovieViewport(&mut self, width: i32, height: i32);
 
-    /// Computes the safe-area rectangle from the current movie viewport.
+    /// Computes [`m_SafeArea`](Self::m_SafeArea) and pushes it to every UI. The safe area is the
+    /// stage inset by half of [`m_SafeAreaPercentage`](Self::m_SafeAreaPercentage) of its size on
+    /// each side, then widened on the axis where the viewport (from
+    /// [`m_CachedViewportWidth`](Self::m_CachedViewportWidth) and
+    /// [`m_CachedViewportHeight`](Self::m_CachedViewportHeight)) is relatively longer than the
+    /// stage, by half the extra extent the viewport covers at the stage's scale. So with a viewport
+    /// taller than the stage's aspect, the safe area reaches above and below the stage into the
+    /// visible frame. It reads the cached viewport size, not the movie viewport, so the two can
+    /// differ.
     #[address(0x140_F89_B30)]
     pub fn ComputeSafeArea(&mut self);
 
@@ -353,11 +397,21 @@ impl UIManager {
     #[address(0x140_F89_9A0)]
     pub fn Convert3DCoordsDefault(&mut self, world: *const Vector3, out_x: *mut f32, out_y: *mut f32) -> bool;
 
-    /// Marker placement: [`Convert3DCoords`](Self::Convert3DCoords) with the supplied `vp`, plus
-    /// an on-screen test and an off-screen edge-clamp via [`ClampToScreen`](Self::ClampToScreen).
-    /// Gameplay markers route through here.
+    /// Marker placement: projects `world` with [`Convert3DCoords`](Self::Convert3DCoords) through
+    /// `vp` and adds `offset` (stage pixels). A point in front of the camera inside
+    /// [`m_SafeArea`](Self::m_SafeArea) shrunk by `margin` is
+    /// [`SCREEN_POS_ONSCREEN`](ScreenPos::SCREEN_POS_ONSCREEN). Otherwise, without
+    /// `clamp_to_screen` the result is
+    /// [`SCREEN_POS_OFFSCREEN_NO_CLAMP_IN_FRONT_CAMERA`](ScreenPos::SCREEN_POS_OFFSCREEN_NO_CLAMP_IN_FRONT_CAMERA)
+    /// or [`SCREEN_POS_OFFSCREEN_NO_CLAMP_BEHIND_CAMERA`](ScreenPos::SCREEN_POS_OFFSCREEN_NO_CLAMP_BEHIND_CAMERA);
+    /// with it, a point outside the camera's horizontal field of view (`fov`, radians, with the
+    /// `camera` transform giving the view direction) is first swung back toward the view by its
+    /// yaw beyond the half-angle and re-projected, and the result is clamped to the shrunk safe
+    /// area by [`ClampToScreen`](Self::ClampToScreen), which also sets the edge code.
+    /// [`HUDUI::UpdatePOIs`](ui::hud_ui::HUDUI::UpdatePOIs) places every point of interest
+    /// through it.
     #[address(0x140_F69_CB0)]
-    pub fn Get2DInfo(&self, world: *const Vector3, vp: *const Matrix4, camera: *const Matrix4, a5: f32, out_x: *mut f32, out_y: *mut f32, out_pos: *mut ScreenPos, margin: f32, a10: bool, offset: Vector2);
+    pub fn Get2DInfo(&self, world: *const Vector3, vp: *const Matrix4, camera: *const Matrix4, fov: f32, out_x: *mut f32, out_y: *mut f32, out_pos: *mut ScreenPos, margin: f32, clamp_to_screen: bool, offset: Vector2);
 
     /// Clamps an off-screen point to the screen-rect edge or corner and sets the position code.
     /// Static.

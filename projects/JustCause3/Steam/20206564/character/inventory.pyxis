@@ -1,6 +1,6 @@
 use character::character::Character;
 use equipment::grappling_hook::GrapplingHook;
-use equipment::weapon::WeaponBase;
+use equipment::weapon::{AmmunitionType, WeaponBase};
 use types::math::Vector3;
 use types::shared_ptr::SharedPtr;
 
@@ -78,11 +78,62 @@ pub type Inventory {
     /// [`GetAnimationAllowsTriggeringExplosives`](Self::GetAnimationAllowsTriggeringExplosives).
     pub m_DoesAnimationAllowTriggeringExplosives: bool,
 
+    /// The character's reserve of each kind of ammunition, indexed by [`AmmunitionType`] (up to
+    /// [`NOF_AMMO_TYPES`](AmmunitionType::NOF_AMMO_TYPES)). A weapon's magazine
+    /// ([`WeaponBase::m_MagazineAmmo`](equipment::weapon::WeaponBase::m_MagazineAmmo)) is separate;
+    /// a reload moves rounds from here into it. Read it through
+    /// [`GetAmmoCount`](Self::GetAmmoCount) and write it through
+    /// [`SetAmmoCount`](Self::SetAmmoCount), which keeps the HUD current.
+    #[address(0x1B0)]
+    pub m_Ammunition: [i32; 17],
+
+    /// The cap on each entry of [`m_Ammunition`](Self::m_Ammunition), indexed the same way; the
+    /// ammunition upgrades raise it.
+    #[address(0x1F4)]
+    pub m_MaxAmmunition: [i32; 17],
+
     /// The character that owns the inventory.
     #[address(0x3E0)]
     pub m_Character: *mut Character,
 }
 impl Inventory {
+    /// The reserve of `ammo_type`: its entry of [`m_Ammunition`](Self::m_Ammunition).
+    #[address(0x140_8BB_460)]
+    pub fn GetAmmoCount(&self, ammo_type: AmmunitionType) -> i32;
+
+    /// Sets the reserve of `ammo_type` to `count`, capped at its
+    /// [`m_MaxAmmunition`](Self::m_MaxAmmunition) entry. For the locally controlled owner it pushes
+    /// the new reserve to the HUD (`CHUDUI::OnSetSelectedInventoryAmmo`) when it is the selected
+    /// weapon's kind, or refreshes the grenade count for
+    /// [`AMMO_HAND_GRENADE`](AmmunitionType::AMMO_HAND_GRENADE); for
+    /// [`AMMO_BEACON`](AmmunitionType::AMMO_BEACON) and [`AMMO_FLARE`](AmmunitionType::AMMO_FLARE)
+    /// it sends the resupply-point refresh event and, when the count changed and `save_game` is
+    /// set, autosaves.
+    ///
+    /// A refill from empty (the old reserve zero, `count` positive) reloads: when the wielded
+    /// weapon uses `ammo_type` and its magazine is empty it calls
+    /// [`Character::StartReloadingWieldingWeapon`](character::character::Character::StartReloadingWieldingWeapon),
+    /// and for [`AMMO_HAND_GRENADE`](AmmunitionType::AMMO_HAND_GRENADE) it calls the hand-grenade
+    /// weapon's [`Reload`](equipment::weapon::WeaponBase::Reload) directly when that weapon's
+    /// magazine is empty. [`WeaponBase::Reload`](equipment::weapon::WeaponBase::Reload) writes the
+    /// reserve back through it.
+    #[address(0x140_8C6_670)]
+    pub fn SetAmmoCount(&mut self, ammo_type: AmmunitionType, count: i32, save_game: bool);
+
+    /// Fills every reserve to its [`m_MaxAmmunition`](Self::m_MaxAmmunition) entry, with the same
+    /// HUD updates, events, autosave, and refill-from-empty reloads as
+    /// [`SetAmmoCount`](Self::SetAmmoCount) for each kind.
+    #[address(0x140_8D5_ED0)]
+    pub fn GiveMaxAmmo(&mut self);
+
+    /// Whether the character may reload:
+    /// [`m_DoesAnimationAllowReloading`](Self::m_DoesAnimationAllowReloading) is set and the
+    /// owner's [`SB_DISABLE_RELOAD`](state::StateBitFlag::SB_DISABLE_RELOAD) state bit is clear.
+    /// [`Character::StartReloadingWieldingWeapon`](character::character::Character::StartReloadingWieldingWeapon)
+    /// and the ammunition check require it.
+    #[address(0x140_8BB_660)]
+    pub fn GetAnimationAllowsReloading(&self) -> bool;
+
     /// The inventory's parallel per-frame update. `muzzle_target` and `grenade_target` point at
     /// by-value `CVector3f` copies of the owner's weapon and grenade aim targets.
     #[address(0x140_942_920)]

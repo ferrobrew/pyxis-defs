@@ -27,6 +27,17 @@ pub type EventIdSymbolTable {
     /// [`Character::HolsterWeapon`](character::character::Character::HolsterWeapon) for other
     /// characters, and by `NWeaponUnequipTask` on entering its state.
     pub const UB_ACT_HOLSTER: cstr = c"UB_ACT_HOLSTER",
+    /// The gun-side pump act: the pump shotgun's (`w151`) own state machine plays the pump on
+    /// the gun's model for it. The shotgun's gun-facing do-act component
+    /// ([`DoActWeaponComponent`](equipment::weapon::DoActWeaponComponent)) sends it to the gun
+    /// ([`WeaponData::DoAct`](equipment::weapon::WeaponData::DoAct)) at each shot, alongside the
+    /// holder's `UB_ACT_SHOTGUN_PUMP`.
+    pub const ACT_SHOTGUN_PUMP: cstr = c"ACT_SHOTGUN_PUMP",
+    /// The gun-side bolt act, handled by the state machines of the bolt-action rifles that cycle a
+    /// bolt on the gun's own model (`w162` and `w163`). The holder's counterpart is
+    /// `UB_ACT_SNIPER_BOLT_ACTION`, which the rifle's per-tick update queues
+    /// ([`SniperWeapon::UpdateFromUserPostSim_Parallel`](equipment::weapon::SniperWeapon::UpdateFromUserPostSim_Parallel)).
+    pub const ACT_SNIPER_BOLT_ACTION: cstr = c"ACT_SNIPER_BOLT_ACTION",
     /// The left melee stumble, for a character struck from the front. The
     /// player's melee input task
     /// ([`NStateTask_InputMeleeTask::Update`](input::locomotion::NStateTask_InputMeleeTask::Update))
