@@ -1,6 +1,8 @@
 use character::character::Character;
+use character::inventory::WeaponSlot;
 use character::player::Player;
 use graphics_engine::device::CRITICAL_SECTION;
+use types::math::Vector4;
 use types::shared_ptr::SharedPtr;
 use ui::poi::{POI, WeakPtrPOI};
 use ui::scaleform::Value;
@@ -52,6 +54,35 @@ pub type POIListNode {
     pub m_Next: *mut POIListNode,
     pub m_Prev: *mut POIListNode,
     pub m_Record: POIRecord,
+}
+
+/// The weapon selection's state as [`Inventory::UpdateWeaponHandling`](character::inventory::Inventory::UpdateWeaponHandling)
+/// computes it each frame for the player (`CHUDUI::SWeaponSelectionParams`), passed to
+/// [`HUDUI::UpdateWeaponSelection`].
+#[copyable, size(0xC), align(4)]
+pub type WeaponSelectionParams {
+    /// Whether the selection is shown: while a slot-select input is held (always under gamepad
+    /// semantics; under keyboard semantics not for the planted explosive), and for a short while
+    /// after a release whose commit is still pending or a weapon cycle step.
+    pub m_Show: bool,
+
+    /// The highlighted slot: the winning slot-select input's slot, the pending or cycled slot, or
+    /// [`E_NONE`](WeaponSlot::E_NONE) when the winner holds no weapon.
+    #[address(0x4)]
+    pub m_SelectedSlot: WeaponSlot,
+    /// Whether the [`E_SLOT_DUAL_WIELD`](WeaponSlot::E_SLOT_DUAL_WIELD) slot is offered: it holds a
+    /// weapon.
+    pub m_DualWieldIsValid: bool,
+    /// Whether the [`E_SLOT_TWO_HANDED`](WeaponSlot::E_SLOT_TWO_HANDED) slot is offered: it holds a
+    /// weapon.
+    pub m_TwoHandedIsValid: bool,
+    /// Whether the [`E_SLOT_TWO_HANDED_SPECIAL`](WeaponSlot::E_SLOT_TWO_HANDED_SPECIAL) slot is
+    /// offered: it holds a weapon, other than a mortar whose mortar mode is unavailable.
+    pub m_TwoHandedSpecialIsValid: bool,
+    /// Whether the [`E_SLOT_PLANTED_EXPLOSIVE`](WeaponSlot::E_SLOT_PLANTED_EXPLOSIVE) slot is
+    /// offered (see
+    /// [`Inventory::m_DoesAnimationAllowSwitchToPlantedExplosive`](character::inventory::Inventory::m_DoesAnimationAllowSwitchToPlantedExplosive)).
+    pub m_PlantedExplosiveIsValid: bool,
 }
 
 /// The in-game HUD (`CHUDUI`, a `CUIBase` Scaleform movie wrapper). Only the fields and methods
@@ -109,6 +140,25 @@ pub type HUDUI {
     /// and cleared by [`HideSniperOverlay`](Self::HideSniperOverlay).
     #[address(0x218)]
     pub m_ShowingSniperOverlay: bool,
+
+    /// The selection state last pushed to the movie by
+    /// [`UpdateWeaponSelection`](Self::UpdateWeaponSelection).
+    #[address(0x21C)]
+    pub m_LastWeaponSelectionParams: WeaponSelectionParams,
+    /// The movie's weapon selection clip, `MCI_weapon_selection_wheel`: a managed display-object
+    /// value. [`UpdateWeaponSelectionPlacement`](Self::UpdateWeaponSelectionPlacement) writes its
+    /// position each frame.
+    pub m_SelectionWheelUi: Value,
+
+    /// The selection clip's extent around its position for the current layout, in stage pixels, as
+    /// the movie's `GetWeaponSelectionWheelBB{Bottom,Top,Left,Right}` report it, in that order (`x`
+    /// to `w`). [`RecalculateWheelBB`](Self::RecalculateWheelBB) refreshes it.
+    /// [`UpdateWeaponSelectionPlacement`](Self::UpdateWeaponSelectionPlacement) keeps the clip's x
+    /// between the safe area's left minus `z` and its right minus `w`, and its y between the safe
+    /// area's top minus `y` and its bottom minus `x`, so each component is an edge's signed offset
+    /// from the clip's position.
+    #[address(0x270)]
+    pub m_SelectionWheelBB: Vector4,
 
     /// The health last pushed to the movie by [`UpdateHealth`](Self::UpdateHealth);
     /// [`InitHealth`](Self::InitHealth) resets it to -1 so the next update pushes again.
@@ -199,4 +249,31 @@ impl HUDUI {
     /// weapon to switch to.
     #[address(0x140_DFA_520)]
     pub fn OnOutOfAmmoFire(&mut self);
+
+    /// Pushes the weapon selection to the movie's `UpdateWeaponSelection` (the selected slot, the
+    /// shown flag, and the four valid flags) when any field differs from
+    /// [`m_LastWeaponSelectionParams`](Self::m_LastWeaponSelectionParams), and stores it there. Its
+    /// only caller is [`Inventory::UpdateWeaponHandling`](character::inventory::Inventory::UpdateWeaponHandling),
+    /// which calls it every frame for the player, so it runs in the characters' parallel update. In
+    /// the movie, a show edge tweens the arms out, the shown selection highlights the selected arm
+    /// and dims the others, and a hide edge fades the selected arm out while scaling it up.
+    #[address(0x140_E2B_CA0)]
+    pub fn UpdateWeaponSelection(&mut self, params: *const WeaponSelectionParams);
+
+    /// Places the weapon selection clip ([`m_SelectionWheelUi`](Self::m_SelectionWheelUi)) over
+    /// `character`'s hips. It takes the hips bone's world position, projects it through the render
+    /// camera's view-projection with [`UIManager::Convert3DCoords`](ui::ui_manager::UIManager::Convert3DCoords),
+    /// clamps it so that [`m_SelectionWheelBB`](Self::m_SelectionWheelBB) stays inside
+    /// [`UIManager::m_SafeArea`](ui::ui_manager::UIManager::m_SafeArea) (or, when the point does not
+    /// project, centres it horizontally at the bottom of the safe area), averages it with the last
+    /// three positions, and writes the clip's x and y through
+    /// [`SetDisplayInfo`](ui::scaleform::ValueObjectInterface::SetDisplayInfo). Called every frame
+    /// from [`Update`](Self::Update); it does not read `dt`.
+    #[address(0x140_E2B_F20)]
+    pub fn UpdateWeaponSelectionPlacement(&mut self, character: *mut Character, dt: f32);
+
+    /// Refreshes [`m_SelectionWheelBB`](Self::m_SelectionWheelBB) from the movie. Called when the
+    /// weapons are initialised and when gamepad use changes, which changes the clip's layout.
+    #[address(0x140_E11_7E0)]
+    pub fn RecalculateWheelBB(&mut self);
 }

@@ -24,7 +24,7 @@ pub enum WeaponSlot: i32 {
 /// The character's equipment inventory (`CInventory`), embedded in `CCharacter`
 /// ([`Character::m_Inventory`](character::character::Character::m_Inventory)). Only some members
 /// are mapped.
-#[min_size(0x3E8)]
+#[min_size(0x478)]
 pub type Inventory {
     /// The weapon in each slot, indexed by [`WeaponSlot`] (up to
     /// [`E_NUM_WEAPON_SLOTS`](WeaponSlot::E_NUM_WEAPON_SLOTS)); a null pointer for an empty slot.
@@ -78,6 +78,42 @@ pub type Inventory {
     /// [`GetAnimationAllowsTriggeringExplosives`](Self::GetAnimationAllowsTriggeringExplosives).
     pub m_DoesAnimationAllowTriggeringExplosives: bool,
 
+    /// Whether the current animation permits the weapon-selection input; one half of
+    /// [`GetAnimationAllowsSwitchWeaponGUI`](Self::GetAnimationAllowsSwitchWeaponGUI).
+    #[address(0x192)]
+    pub m_DoesAnimationAllowSwitchWeaponGUI: bool,
+    /// Whether the current animation permits selecting the planted explosive.
+    /// [`UpdateWeaponHandling`](Self::UpdateWeaponHandling) offers the
+    /// [`E_SLOT_PLANTED_EXPLOSIVE`](WeaponSlot::E_SLOT_PLANTED_EXPLOSIVE) slot to the selection only
+    /// while it is set, the slot holds a weapon, the player has the planted-explosives ability, and
+    /// the owner's
+    /// [`SB_DISABLE_SWITCH_TO_PLANTED_EXPLOSIVE`](state::StateBitFlag::SB_DISABLE_SWITCH_TO_PLANTED_EXPLOSIVE)
+    /// state bit is clear.
+    pub m_DoesAnimationAllowSwitchToPlantedExplosive: bool,
+
+    /// Set by a holster click in [`UpdateWeaponHandling`](Self::UpdateWeaponHandling): while set,
+    /// the weapon selection is hidden and records no slot
+    /// ([`m_SlotToSelectOnRelease`](Self::m_SlotToSelectOnRelease) stays
+    /// [`E_NONE`](WeaponSlot::E_NONE)). It clears once every slot-select input is zero.
+    #[address(0x19C)]
+    pub m_WeaponSwitchInputConsumed: bool,
+
+    /// Seconds a pending selection has waited: while
+    /// [`m_SlotToSelectOnRelease`](Self::m_SlotToSelectOnRelease) is set with no select input held,
+    /// [`UpdateWeaponHandling`](Self::UpdateWeaponHandling) counts it up and shows the pending slot
+    /// alone on the HUD until it passes two seconds. Zero otherwise.
+    #[address(0x1A0)]
+    pub m_WeaponSwitchQueuedTimer: f32,
+    /// The slot the last weapon cycle step (`PREV_WEAPON` / `NEXT_WEAPON`) chose.
+    pub m_LastCycleSelectedWeaponSlot: WeaponSlot,
+    /// The slot a weapon cycle step queued, or [`E_NONE`](WeaponSlot::E_NONE). Once
+    /// [`m_CycleSelectedWeaponTimer`](Self::m_CycleSelectedWeaponTimer) reaches half a second with
+    /// no further step, it becomes [`m_SlotToSelectOnRelease`](Self::m_SlotToSelectOnRelease)
+    /// (or is dropped when it is the selected slot), and a held slot-select input clears it.
+    pub m_QueuedCycleSelectedWeaponSlot: WeaponSlot,
+    /// Seconds since the last weapon cycle step.
+    pub m_CycleSelectedWeaponTimer: f32,
+
     /// The character's reserve of each kind of ammunition, indexed by [`AmmunitionType`] (up to
     /// [`NOF_AMMO_TYPES`](AmmunitionType::NOF_AMMO_TYPES)). A weapon's magazine
     /// ([`WeaponBase::m_MagazineAmmo`](equipment::weapon::WeaponBase::m_MagazineAmmo)) is separate;
@@ -95,6 +131,24 @@ pub type Inventory {
     /// The character that owns the inventory.
     #[address(0x3E0)]
     pub m_Character: *mut Character,
+
+    /// The slot the weapon selection commits when every slot-select input is released, or
+    /// [`E_NONE`](WeaponSlot::E_NONE). While a slot-select input is held,
+    /// [`UpdateWeaponHandling`](Self::UpdateWeaponHandling) rewrites it every frame with the winning
+    /// slot, or with [`E_NONE`](WeaponSlot::E_NONE) when the winner is the wielded weapon's slot or
+    /// holds no weapon. On a frame with every slot-select input zero and this set, it switches to
+    /// the slot (`CCharacter::SwitchWeapon`) when the animation allows switching, or selects and
+    /// draws it with nothing wielded, and resets it to [`E_NONE`](WeaponSlot::E_NONE); otherwise it
+    /// stays set and the commit is retried every frame. Entering a vehicle seat other than a
+    /// motorcycle's resets it.
+    #[address(0x3F4)]
+    pub m_SlotToSelectOnRelease: WeaponSlot,
+
+    /// Under keyboard semantics, whether the planted explosive is offered to the weapon selection.
+    /// [`UpdateWeaponHandling`](Self::UpdateWeaponHandling) sets it on any frame the explosives
+    /// select input reads zero; under gamepad semantics it is not consulted.
+    #[address(0x470)]
+    pub m_CanSelectExplosiveOnRelease: bool,
 }
 impl Inventory {
     /// The reserve of `ammo_type`: its entry of [`m_Ammunition`](Self::m_Ammunition).
@@ -233,6 +287,16 @@ impl Inventory {
     /// pickup interaction tests it before it starts a pickup.
     #[address(0x140_8BB_6F0)]
     pub fn GetAnimationAllowsPickup(&self) -> bool;
+
+    /// Whether the weapon-selection input is read:
+    /// [`m_DoesAnimationAllowSwitchWeaponGUI`](Self::m_DoesAnimationAllowSwitchWeaponGUI) is set
+    /// and the owner's
+    /// [`SB_DISABLE_SWITCH_WEAPON_GUI`](state::StateBitFlag::SB_DISABLE_SWITCH_WEAPON_GUI) state bit
+    /// is clear. Its one caller, the player's global input update, folds the slot-select and cycle
+    /// actions into [`Character::m_WeaponInputs`](character::character::Character::m_WeaponInputs)
+    /// only while it holds, so while it is false those inputs read zero.
+    #[address(0x140_8BB_750)]
+    pub fn GetAnimationAllowsSwitchWeaponGUI(&self) -> bool;
 
     /// Switches to the first weapon that still has ammunition, in a fixed order: the
     /// [`E_SLOT_TWO_HANDED`](WeaponSlot::E_SLOT_TWO_HANDED) weapon, then the

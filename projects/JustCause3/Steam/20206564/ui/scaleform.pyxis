@@ -1052,17 +1052,37 @@ impl ValueObjectInterface {
 
 /// A display object's presentation state, read and written through
 /// [`ValueObjectInterface::GetDisplayInfo`] / [`SetDisplayInfo`](ValueObjectInterface::SetDisplayInfo).
-/// [`VarsSet`](Self::VarsSet) selects which fields a write applies.
+/// [`VarsSet`](Self::VarsSet) selects which fields a write applies; a read sets every bit it filled.
+/// A write converts [`X`](Self::X) and [`Y`](Self::Y) to whole twips (rounding down), and moves a
+/// text field's text rectangle rather than the field itself.
 #[defaultable, size(0xE0), align(16)]
 pub type DisplayInfo {
+    /// The [`VarsSet`](Self::VarsSet) bit selecting [`X`](Self::X).
+    pub const V_X: u32 = 0x1,
+    /// The [`VarsSet`](Self::VarsSet) bit selecting [`Y`](Self::Y).
+    pub const V_Y: u32 = 0x2,
+    /// The [`VarsSet`](Self::VarsSet) bit selecting [`Rotation`](Self::Rotation).
+    pub const V_ROTATION: u32 = 0x4,
+    /// The [`VarsSet`](Self::VarsSet) bit selecting [`XScale`](Self::XScale).
+    pub const V_XSCALE: u32 = 0x8,
+    /// The [`VarsSet`](Self::VarsSet) bit selecting [`YScale`](Self::YScale).
+    pub const V_YSCALE: u32 = 0x10,
+    /// The [`VarsSet`](Self::VarsSet) bit selecting [`Alpha`](Self::Alpha).
+    pub const V_ALPHA: u32 = 0x20,
     /// The [`VarsSet`](Self::VarsSet) bit selecting [`Visible`](Self::Visible).
     pub const V_VISIBLE: u32 = 0x40,
 
+    /// The position in the parent's space, in pixels.
     pub X: f64,
+    /// The position in the parent's space, in pixels.
     pub Y: f64,
+    /// The rotation, in degrees.
     pub Rotation: f64,
+    /// The horizontal scale, in percent (100 is unscaled).
     pub XScale: f64,
+    /// The vertical scale, in percent (100 is unscaled).
     pub YScale: f64,
+    /// The opacity, in percent (100 is opaque).
     pub Alpha: f64,
     pub Z: f64,
     pub XRotation: f64,
