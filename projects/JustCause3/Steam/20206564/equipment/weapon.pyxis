@@ -378,6 +378,28 @@ impl WeaponData {
     #[address(0x140_960_1E0)]
     pub fn GetWorldMatrixT1(&self, result: *mut Matrix4) -> *mut Matrix4;
 
+    /// Places the gun for `state` (`CWeaponData::UpdateAttachmentTransforms`), writing
+    /// [`m_WorldMatrixT1`](Self::m_WorldMatrixT1). With `update_type` 2 (advance) it first copies
+    /// the current matrix into [`m_WorldMatrixT0`](Self::m_WorldMatrixT0). Held by a vehicle, the
+    /// gun follows its anchor or part; while wingsuiting it is built from the holder's reference
+    /// and head bones and its flight direction; dropped, mounted, or on a turret it follows its own
+    /// rigid body when that is in the world; on a weapon rack it follows its placement rule.
+    /// Otherwise, held by a character, it takes the world matrix of the bone its attach-bone table
+    /// ([`m_lBoneAttachementPerWeaponState`](Self::m_lBoneAttachementPerWeaponState)) names for
+    /// `state`
+    /// ([`Character::GetWorldMatrixForBone`](character::character::Character::GetWorldMatrixForBone)):
+    /// a hand attach bone's matrix as it is, and a holster or back bone's composed with the gun's
+    /// attach offset when the weapon's attach tuning asks for it. So a hand-held gun's pose in the
+    /// hand is the attach bone's pose relative to the wrist, which the animation sets. While
+    /// [`m_SkipRenderInterpolation`](Self::m_SkipRenderInterpolation) or
+    /// `skip_render_interpolation` is set, and for the initial placement (`update_type` 0), it
+    /// copies the new matrix into [`m_WorldMatrixT0`](Self::m_WorldMatrixT0) too. Each weapon's
+    /// placement calls it for every gun; the character's pose-finalization pass places the weapons
+    /// through
+    /// [`Inventory::UpdateAttachmentTransforms`](character::inventory::Inventory::UpdateAttachmentTransforms).
+    #[address(0x140_986_F80)]
+    pub fn UpdateAttachmentTransforms(&mut self, holder: *mut GameObject, snow_factor: f32, water_factor: f32, state: WeaponState, skip_render_interpolation: bool, update_type: u32);
+
     /// Drops the gun's spare magazine ([`m_MagazineObject`](Self::m_MagazineObject)) as a physics
     /// prop, for `character` holding the gun. `model_name_hash` picks where the magazine leaves
     /// from:

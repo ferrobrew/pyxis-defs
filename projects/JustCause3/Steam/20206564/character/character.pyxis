@@ -366,6 +366,15 @@ impl Character {
     #[address(0x140_79A_C30)]
     pub fn GetSafeBoneMatrix(&self, safe_index: SafeBoneIndex, matrix: *mut Matrix4);
 
+    /// Writes the world matrix of the safe bone `safe_index` through `matrix`: the bone's
+    /// model-space matrix from the animation controller's current pose
+    /// ([`AnimationController::GetBoneMatrix`]) composed with the character's
+    /// [`m_WorldMatrixT1`](Self::m_WorldMatrixT1). A gun's attachment placement
+    /// ([`WeaponData::UpdateAttachmentTransforms`](equipment::weapon::WeaponData::UpdateAttachmentTransforms))
+    /// takes a hand-held gun's world matrix from it.
+    #[address(0x140_79A_EB0)]
+    pub fn GetWorldMatrixForBone(&self, safe_index: SafeBoneIndex, matrix: *mut Matrix4);
+
     /// The character's SIM-phase pose-finalization pass. After the animation graph has finalized the
     /// local pose, this first runs the current states' tasks registered in the
     /// [`FINALIZE_POSE_STATE_TASK_RANGE`](Self::FINALIZE_POSE_STATE_TASK_RANGE) through
@@ -1003,6 +1012,13 @@ impl AnimationController {
     #[address(0x140_43F_FF0)]
     pub fn SetJoint(&mut self, index: u32, joint: *mut Joint);
 
+    /// Writes the model-space matrix of bone `index` in the skeleton's bind pose through `matrix`
+    /// (`CAnimationControl::GetBindPoseBoneMatrix`, through `CSkeleton::GetJoint`). The bind pose
+    /// belongs to the skeleton resource and does not change with the animation, so two bones' bind
+    /// matrices give their rest-pose relation.
+    #[address(0x140_440_000)]
+    pub fn GetBindPoseBoneMatrix(&self, index: u32, matrix: *mut Matrix4);
+
     /// Advances the playback clocks of the controller's time-updatable blenders by `dt` (via
     /// `CPoseProducer::UpdateBlendersTimeInRange`) without recomputing the pose. Runs each SIM frame
     /// in the character's animation pass, before [`UpdateAnimations`](Self::UpdateAnimations).
@@ -1052,6 +1068,7 @@ pub extern Character_ForceNonCombat: bool;
 #[address(0x142_D62_1C8)]
 pub extern Character_EnableHIK: bool;
 
+#[copyable]
 pub enum SafeBoneIndex: u32 {
     REFERENCE = 0x8EB2FD7C,
     OFFSET = 0x4AAA87DB,
@@ -1075,9 +1092,20 @@ pub enum SafeBoneIndex: u32 {
     EQUIPPED_EXPLOSIVE = 0xA76A3A31,
     LEFT_HOLSTER = 0x63ABE53F,
     RIGHT_HOLSTER = 0x7BD7F313,
+    /// The right hand's primary attach point (`AttachHandRight`): the bone whose world matrix a gun
+    /// held in the right hand takes as its own, with no further offset. It is an animated bone of
+    /// the skeleton like any other, so a clip that keys it moves the gun in the hand.
     ATTACH_HAND_RIGHT = 0x65C5D2EB,
+    /// The left hand's primary attach point (`AttachHandLeft`), as
+    /// [`ATTACH_HAND_RIGHT`](Self::ATTACH_HAND_RIGHT) for the left hand.
     ATTACH_HAND_LEFT = 0x4190BFF7,
+    /// The right hand's second attach point (`AttachHandRight2`): the point
+    /// [`Character::UpdateSecondaryHandIKPass`] brings to a weapon's grip point when the right
+    /// hand is the support hand. A gun can also ride it, through a weapon's attach-bone table.
     ATTACH_HAND_RIGHT2 = 0x7BF80F49,
+    /// The left hand's second attach point (`AttachHandLeft2`), as
+    /// [`ATTACH_HAND_RIGHT2`](Self::ATTACH_HAND_RIGHT2) for the left hand: the support hand's grip
+    /// point for a right-handed weapon.
     ATTACH_HAND_LEFT2 = 0x5DF39D10,
     RIGHT_HAND_IK_TARGET = 0xF7EEABA9,
     LEFT_HAND_IK_TARGET = 0xA73E08C1,
