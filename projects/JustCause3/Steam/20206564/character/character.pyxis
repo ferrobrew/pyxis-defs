@@ -1,5 +1,6 @@
 use animation::ik::HumanIK;
-use animation::pose_producer::AnimatedBodyPart;
+use animation::pose_producer::{AnimatedBodyPart, PoseProducer};
+use animation::skeleton::Skeleton;
 use animation::rule_system::{AnimationModifierType, AnimationRuleSystem};
 use blackboard::ObjectBlackboard;
 use character::avatar::{Avatar, MentalState};
@@ -986,6 +987,17 @@ impl AnimatedModel {
 /// A character's animation controller (`NCharacterSystem::CAnimationControl`): the skeleton, the
 /// pose producer, and one body part per animation layer.
 pub type AnimationController {
+    /// The skeleton resource, through which [`GetBoneIndex`](Self::GetBoneIndex) resolves a bone by
+    /// the hash of its name.
+    #[address(0xA0)]
+    pub m_Skeleton: *mut Skeleton,
+
+    /// The pose producer, whose [`m_PoseT1`](animation::pose_producer::PoseProducer::m_PoseT1) the
+    /// joint accessors ([`GetJoint`](Self::GetJoint) and [`SetJoint`](Self::SetJoint)) read and
+    /// write.
+    #[address(0xB8)]
+    pub m_PoseProducer: *mut PoseProducer,
+
     /// The animation layers' body parts, in layer order: index *i* belongs to the layer named by
     /// [`AnimationLayer`] *i*, alongside the rule system at the same index of
     /// [`AnimatedModel::m_RuleSystems`].

@@ -1,3 +1,4 @@
+use animation::skeleton::HkaPose;
 use types::shared_ptr::SharedPtr;
 use types::vector_math::{AlignedQuat, AlignedVector3};
 
@@ -12,7 +13,26 @@ use types::vector_math::{AlignedQuat, AlignedVector3};
 /// unchanged. The blenders are added in the order of the animation controller's body parts
 /// ([`AnimationController::m_BodyParts`](character::character::AnimationController::m_BodyParts)),
 /// one per layer.
-pub type PoseProducer;
+///
+/// The two poses are a tick-spaced pair. Kicking the pose job (`CPoseProducer::KickUpdateJob`)
+/// swaps them and queues `PoseUpdate_fragment` on a CPU fragment worker, so the pose the job
+/// writes this tick is the buffer that held the tick before last, and the previous
+/// tick's result (with every change made to it after the job, the HumanIK solve and joint writes
+/// included) becomes [`m_PoseT0`](Self::m_PoseT0) untouched. The skinning job blends `T0` to `T1`.
+#[min_size(0x30)]
+pub type PoseProducer {
+    /// The previous tick's pose.
+    #[address(0x20)]
+    pub m_PoseT0: *mut HkaPose,
+
+    /// The current tick's pose: the one the pose job writes, and the one the animation controller's
+    /// joint accessors
+    /// ([`AnimationController::GetJoint`](character::character::AnimationController::GetJoint) and
+    /// [`SetJoint`](character::character::AnimationController::SetJoint)) read and write in model
+    /// space.
+    #[address(0x28)]
+    pub m_PoseT1: *mut HkaPose,
+}
 impl PoseProducer {
     /// Queues a skinning-palette job for this producer: advances the time of any time-updatable
     /// blender, then records the skeleton's bone count, `dtf`, and the two poses into the next slot

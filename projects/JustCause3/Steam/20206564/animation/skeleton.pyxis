@@ -1,0 +1,91 @@
+use animation::pose_producer::QsTransform;
+
+/// A Havok dynamic array (`hkArray<T>`): a data pointer, the element count, and the capacity, whose
+/// top bits carry the array's ownership flags.
+#[size(0x10), align(8)]
+pub type HkArray<T> {
+    /// The first element.
+    pub data: *mut T,
+
+    /// The number of live elements.
+    #[address(0x8)]
+    pub size: i32,
+
+    /// The allocated capacity in the low bits and the ownership flags in the top two bits.
+    #[address(0xC)]
+    pub capacity_and_flags: i32,
+}
+
+/// A skeleton bone (`hkaBone`): its name and whether its translation is locked.
+#[size(0x10), align(8)]
+pub type HkaBone {
+    /// The bone's name (`hkStringPtr`). The lowest bit of the pointer is the string's ownership
+    /// flag, so the characters start at the pointer with that bit cleared.
+    pub m_Name: *const u8,
+
+    /// Whether animation leaves the bone's translation at the reference pose's.
+    #[address(0x8)]
+    pub m_LockTranslation: bool,
+}
+
+/// A Havok animation skeleton (`hkaSkeleton`): the bone hierarchy and its reference pose. Bone `i`
+/// of every array below is the same bone, and a pose of this skeleton indexes its transforms the
+/// same way. Parents come before their children.
+#[min_size(0x58), align(8)]
+pub type HkaSkeleton {
+    /// The skeleton's name (`hkStringPtr`, with the ownership flag in its lowest bit).
+    #[address(0x10)]
+    pub m_Name: *const u8,
+
+    /// Each bone's parent index, `-1` for a root.
+    #[address(0x18)]
+    pub m_ParentIndices: HkArray<i16>,
+
+    /// The bones, in hierarchy order.
+    #[address(0x28)]
+    pub m_Bones: HkArray<HkaBone>,
+
+    /// The reference pose: each bone's transform relative to its parent. The pose job samples the
+    /// first animation layer over it, so a bone no clip keys takes this transform.
+    #[address(0x38)]
+    pub m_ReferencePose: HkArray<QsTransform>,
+
+    /// The reference values of the skeleton's float slots.
+    #[address(0x48)]
+    pub m_ReferenceFloats: HkArray<f32>,
+}
+
+/// A pose of a skeleton (`hkaPose`): the bones' transforms in local space (relative to the parent)
+/// and in model space (relative to the character's root), kept in sync lazily through per-bone
+/// flags. A read of a bone's model-space transform whose flag marks it dirty first recomputes it
+/// from its ancestors' local transforms, and a model-space write recomputes the descendants it
+/// propagates to.
+#[min_size(0x38), align(8)]
+pub type HkaPose {
+    /// The skeleton the pose is of.
+    pub m_Skeleton: *const HkaSkeleton,
+
+    /// Each bone's transform relative to its parent.
+    #[address(0x8)]
+    pub m_LocalPose: HkArray<QsTransform>,
+
+    /// Each bone's transform relative to the model root.
+    #[address(0x18)]
+    pub m_ModelPose: HkArray<QsTransform>,
+
+    /// Each bone's sync flags, among them the flag that marks its model-space transform as stale.
+    #[address(0x28)]
+    pub m_BoneFlags: HkArray<u32>,
+}
+
+/// The engine's skeleton resource (`CSkeleton`): the Havok skeleton and a table of its bones'
+/// hashed names, which `GetBoneIndexByHashedName` searches to resolve a bone by the hash of its
+/// name.
+pub type Skeleton {
+    /// The Havok skeleton.
+    pub m_HavokSkeleton: *const HkaSkeleton,
+
+    /// Each bone's hashed name, indexed like the Havok skeleton's bones.
+    #[address(0x18)]
+    pub m_BoneNameHashes: *const u32,
+}
