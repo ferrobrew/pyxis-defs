@@ -1,0 +1,5 @@
+/// The engine's global `operator new`: allocates `size` bytes, 16-byte aligned, from the engine
+/// allocator (`MemoryAlloc`). Engine objects allocated with it are freed by their deleting
+/// destructors.
+#[address(0x140_002_350)]
+pub fn OperatorNew(size: u64) -> *mut void;

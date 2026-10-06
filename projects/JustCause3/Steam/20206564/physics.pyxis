@@ -1,5 +1,6 @@
 use character::character::Character;
 use damage::DamageMsg;
+use havok::{hknpBodyCinfo, hknpMotionCinfo};
 use types::math::{Matrix4, Vector3};
 use types::vector_math::{AlignedQuat, AlignedVector3};
 
@@ -11,6 +12,9 @@ pub type PhysicsSystem {
     /// The collision layer [`CastRaySimple`](Self::CastRaySimple) hardcodes, and the one the
     /// player's direct-aim query passes to [`CastRay`](Self::CastRay).
     pub const QUERY_LAYER: i32 = 21,
+    /// The simulation step, seconds. [`Update`](Self::Update) steps the world once per call by
+    /// exactly this, whatever time it is given.
+    pub const STEP_SECONDS: f32 = 0.033333335,
 
     /// The Havok world.
     #[address(0x30)]
@@ -24,6 +28,33 @@ pub type PhysicsSystem {
     pub m_AccumulatedShift: Vector3,
 }
 impl PhysicsSystem {
+    /// Advances the physics by one step. It fires the pre-update signal, clears the collision
+    /// array, and updates the bodies that do not simulate; then, unless one of its two suspend
+    /// flags is set (`CGameStateRun::Update` sets one from its update context's pause), and when
+    /// the world exists and `dt` is above a small threshold, it fires the pre-simulation callbacks
+    /// ([`AddPreSimulationCallback`](Self::AddPreSimulationCallback)) with the world and `dt`, and
+    /// steps the world once by [`STEP_SECONDS`](Self::STEP_SECONDS) on the physics thread pool,
+    /// joining the pool before it returns. The game states' updates
+    /// (`CGameStateRun::Update` and the loading and front-end states' updates) call it inline on
+    /// the thread that runs them, through the physics update, which dispatches the queued
+    /// collisions and the damage listeners' events after it.
+    #[address(0x140_2D1_B40)]
+    pub fn Update(&mut self, dt: f32);
+
+    /// Appends `callback` to the pre-simulation callbacks [`Update`](Self::Update) fires before
+    /// each step, a plain `std::vector` push. The ragdolls, the grappling hook's wire, and the AI
+    /// world register themselves this way. A callback added while the callbacks fire would
+    /// invalidate the walk over them.
+    #[address(0x140_2BE_A00)]
+    pub fn AddPreSimulationCallback(&mut self, callback: *mut PfxPreSimulationCallback);
+
+    /// Clears every entry of the pre-simulation callbacks that is `callback`. The entry is not
+    /// erased at once: the next walk over the callbacks (before a step, or on a world shift)
+    /// compacts the cleared entries away, so a callback may remove itself, or another, while they
+    /// fire.
+    #[address(0x140_286_FC0)]
+    pub fn RemovePreSimulationCallback(&mut self, callback: *mut PfxPreSimulationCallback);
+
     /// The general ray query: casts `ray` (world space, normalized direction) from `min_fraction`
     /// out to `max_distance` along its direction against collision `layer`, returning whether it
     /// hit. `info`, when non-null, receives the closest hit; `filter`, when non-null, replaces the
@@ -280,6 +311,14 @@ pub type hknpWorld {
     pub m_motions: *mut hknpMotion,
 }
 impl hknpWorld {
+    /// Creates a dynamic body from `cinfo` with a new motion from `motion_cinfo`, writes the new
+    /// body id to `out`, and returns `out`. The body takes its own reference to the shape. With
+    /// [`DO_NOT_ADD`](hknpAdditionMode::DO_NOT_ADD) the body exists but is not in the simulation
+    /// until it is added; any other `mode` adds it through the world's body addition with `flags`.
+    /// The disassembler names the body creation it calls `hknpWorld::setBodyShape`.
+    #[address(0x140_1E9_B20)]
+    pub fn createDynamicBody(&mut self, out: *mut u32, cinfo: *const hknpBodyCinfo, motion_cinfo: *const hknpMotionCinfo, mode: hknpAdditionMode, flags: u8) -> *mut u32;
+
     /// Casts a ray query (`hknpRayCastQuery`) and reports hits to `collector`
     /// (`hknpCollisionQueryCollector`).
     #[address(0x141_500_BE0)]
@@ -330,6 +369,9 @@ pub type hknpBody {
     /// The body's flags; see [`IS_DYNAMIC`](Self::IS_DYNAMIC).
     #[address(0x40)]
     pub m_flags: u32,
+    /// The body's collision-filter word, read by the world's collision filter; see
+    /// [`CustomGroupCollisionFilter`] for its fields.
+    pub m_collisionFilterInfo: u32,
 
     /// The body's motion in [`hknpWorld::m_motions`]; bodies attached to one another share it.
     #[address(0x68)]
@@ -532,15 +574,190 @@ impl PfxCharacterInstance {
     pub fn BuildDefaultCharacterContext(&mut self);
 }
 
-/// `CPfxRigidBody`: the engine's wrapper around a Havok rigid body in the physics system's world.
-/// Only some members are bound.
-pub type PfxRigidBody;
+/// `CPfxRigidBody`: the engine's wrapper around a Havok rigid body in the physics system's world,
+/// an engine physics instance ([`PfxInstance`]) for one body. It is allocated with the engine's
+/// [`OperatorNew`](memory::OperatorNew) and destroyed through its deleting destructor
+/// ([`Destruct`](Self::Destruct)), which removes the body from the world and destroys it. Only some
+/// members are bound.
+#[size(0xC0), align(16)]
+pub type PfxRigidBody {
+    /// The [`Destruct`](Self::Destruct) flag that frees the wrapper's memory.
+    pub const DESTRUCT_FREE: u8 = 0x1,
+
+    vftable {
+        /// The deleting destructor: removes the body from the world when it is in it, clears the
+        /// body's instance property, destroys the body, releases the wrapper's own references, and
+        /// with [`DESTRUCT_FREE`](Self::DESTRUCT_FREE) in `flags` frees the wrapper's memory to the
+        /// engine allocator. The disassembler mislabels it `CPfxRagdollProxyPhantom::Destruct`.
+        #[index(0)]
+        pub fn Destruct(&mut self, flags: u8) -> *mut PfxRigidBody;
+
+        /// Whether the body is in the simulation.
+        #[index(9)]
+        pub fn IsAddedToWorld(&self) -> bool;
+
+        /// Adds the body, and any body attached to it, to the simulation at once
+        /// (`hknpWorld::addBodies`) when it is not already in it. The disassembler mislabels it
+        /// `CRagdollProxyPhantom::AddToWorld`.
+        #[index(10)]
+        pub fn AddToWorld(&mut self);
+
+        /// Removes the body, and any body attached to it, from the simulation
+        /// (`hknpWorld::removeBodies`); the body still exists and can be added again. Bit 0 of
+        /// `flags` selects the activation mode of the removal.
+        #[index(12)]
+        pub fn RemoveFromWorld(&mut self, flags: u8);
+
+        /// Writes the body's transform to `out`, game space: the body's rotation in the rows and
+        /// its Havok-space position plus [`PhysicsSystem::m_AccumulatedShift`] in the translation.
+        #[index(14)]
+        pub fn GetTransform(&self, out: *mut Matrix4);
+
+        /// Places the body at `transform`, game space, through `hknpWorld::setBodyTransform`. The
+        /// velocities are kept. The disassembler mislabels it `CPartInstance::ClearWindowDamage`.
+        #[index(15)]
+        pub fn SetTransform(&mut self, transform: *const Matrix4);
+    },
+
+    /// The body's id in the physics system's world.
+    #[address(0x40)]
+    pub m_BodyId: u32,
+}
 impl PfxRigidBody {
+    /// `CPfxRigidBody::CPfxRigidBody`: wraps the existing body `*body_id` of the physics system's
+    /// world. It sets the body's instance property
+    /// ([`BODY_PROPERTY_PFX_INSTANCE`](hknpWorld::BODY_PROPERTY_PFX_INSTANCE)) to the wrapper, sets
+    /// a body flag, and writes the body's collision-filter word to
+    /// [`NO_COLLISION`](PfxLayer::NO_COLLISION). `data` is a `boost::shared_ptr<CDataCacheWrapper>`
+    /// the wrapper keeps; the grappling hook's hang proxy passes an empty one (two null words) and
+    /// `false` for `add_flag`, which the wrapper passes as the flags of its later body additions.
+    /// The instance's owner ([`PfxInstance::m_GameObject`]) starts null.
+    #[address(0x140_294_0D0)]
+    pub fn Construct(&mut self, body_id: *const u32, data: *const [u64; 2], add_flag: bool) -> *mut PfxRigidBody;
+
+    /// Replaces the collision layer of the body's collision-filter word with `layer` (a
+    /// [`PfxLayer`]), keeping its other fields, and refreshes the body's collision state in the
+    /// world. The disassembler mislabels it `boost::shared_ptr<CAnimationRuleSystem>::operator->`.
+    #[address(0x140_24F_4A0)]
+    pub fn SetCollisionLayer(&mut self, layer: u32);
+
+    /// Replaces the system group of the body's collision-filter word with `group`, keeping its
+    /// other fields; see [`CustomGroupCollisionFilter`].
+    #[address(0x140_24F_410)]
+    pub fn SetCollisionSystemGroup(&mut self, group: u32);
+
+    /// Sets the factor of gravity on the body's motion: copies the motion's current motion
+    /// properties into the wrapper, sets their gravity factor, and gives the motion the properties
+    /// so changed. It acts only on a body that is neither static nor keyframed.
+    #[address(0x140_27F_E60)]
+    pub fn SetGravityFactor(&mut self, factor: f32);
+
     /// Applies the linear impulse `impulse` (world space) to the body at the world point
     /// `position`, through `hknpWorld::applyBodyImpulseAt`, and then notifies the body's own
     /// impulse virtual. The last argument only scales the debug display of the impulse.
     #[address(0x140_24E_D80)]
     pub fn ApplyImpulse(&mut self, impulse: *const Vector3, position: *const Vector3, debug_scale: f32);
+}
+
+/// The engine's collision layers (`EPfxLayer`), the low field of a body's collision-filter word
+/// ([`CustomGroupCollisionFilter`]). The physics system's constructor fills the filter's layer table
+/// with the pairs of layers that collide; only the layers in it collide at all. The query layers
+/// (the raycast and shape-query layers) are what a query passes as its own layer.
+pub enum PfxLayer: u32 {
+    /// Collides with everything.
+    FULL_COLLISION = 0x0,
+    /// Collides with nothing. [`PfxRigidBody::Construct`] gives a new wrapper's body this layer.
+    NO_COLLISION = 0x1,
+    STATIC = 0x2,
+    TERRAIN = 0x3,
+    DYNAMIC = 0x4,
+    DESTRUCTION = 0x5,
+    /// The character proxies, the player's included.
+    CHARACTER_COLLISION = 0x6,
+    CHARACTER_GHOST_MODE = 0x7,
+    CHARACTER_RAGDOLL = 0x8,
+    CHARACTER_RAGDOLL_KEYFRAMED = 0x9,
+    CHARACTER_ATTACHED_DYNAMIC_RB = 0xA,
+    CHARACTER_RAGDOLL_PROXIES = 0xB,
+    PARTICLE = 0xC,
+    EXPLOSIVE = 0xD,
+    PROJECTILE = 0xE,
+    /// Weapons. It collides with the static, terrain, dynamic, destruction, character collision,
+    /// character ragdoll, and character-attached dynamic layers, the vehicle collision layers, the
+    /// vehicle raycast layer, and the listener-effects layer, and with nothing else: not with
+    /// itself, and not with the raycast or shape-query layers.
+    WEAPONS = 0xF,
+    VEHICLE_COLLISION_WHEEL = 0x10,
+    VEHICLE_COLLISION_DYNAMIC_ONLY = 0x11,
+    VEHICLE_COLLISION = 0x12,
+    VEHICLE_RAYCAST = 0x13,
+    RAYCAST_DEFAULT = 0x14,
+    /// The layer of [`PhysicsSystem::QUERY_LAYER`].
+    RAYCAST_EVERYTHING_PHYSICAL = 0x15,
+    RAYCAST_WHEELS = 0x16,
+    SHAPEQUERY_DEFAULT = 0x17,
+    SHAPEQUERY_TRIGGER = 0x18,
+    SHAPEQUERY_EXPLOSION = 0x19,
+    SHAPEQUERY_VEHICLES = 0x1A,
+    STATIC_AND_DESTRUCTION = 0x1B,
+    ALL_DYNAMIC_OBJECTS = 0x1C,
+    LISTENER_EFFECTS = 0x1D,
+}
+
+/// The world's collision filter (`CCustomGroupCollisionFilter`), behind the constraint collision
+/// filter that also keeps constrained bodies apart. It reads each body's collision-filter word
+/// ([`hknpBody::m_collisionFilterInfo`]), whose fields are the layer
+/// ([`LAYER_MASK`](Self::LAYER_MASK), a [`PfxLayer`]), the subsystem id and the no-collide id (each
+/// [`FIELD_MASK`](Self::FIELD_MASK) wide, from [`SUBSYSTEM_SHIFT`](Self::SUBSYSTEM_SHIFT) and
+/// [`NO_COLLIDE_SHIFT`](Self::NO_COLLIDE_SHIFT)), and the system group (from
+/// [`SYSTEM_GROUP_SHIFT`](Self::SYSTEM_GROUP_SHIFT)). Two bodies in different system groups, or in
+/// system group zero, collide when the layer table says their layers do. Two bodies in the same
+/// non-zero system group collide only when their layers are equal, at least one has a non-zero
+/// subsystem id, and neither's subsystem id is the other's no-collide id. Only the word's layout is
+/// bound.
+pub type CustomGroupCollisionFilter {
+    /// The layer field of a collision-filter word.
+    pub const LAYER_MASK: u32 = 0x1F,
+    /// The width of the subsystem-id and no-collide-id fields.
+    pub const FIELD_MASK: u32 = 0x1F,
+    /// Where the subsystem-id field begins.
+    pub const SUBSYSTEM_SHIFT: u32 = 5,
+    /// Where the no-collide-id field begins.
+    pub const NO_COLLIDE_SHIFT: u32 = 10,
+    /// Where the system-group field, the word's high half, begins.
+    pub const SYSTEM_GROUP_SHIFT: u32 = 16,
+}
+
+/// `hknpWorld::AdditionMode`: whether [`hknpWorld::createDynamicBody`] adds the new body to the
+/// simulation. Only the value that leaves it out is bound.
+pub enum hknpAdditionMode: i32 {
+    /// The body is created but not added; it is added later, as [`PfxRigidBody::AddToWorld`]
+    /// does.
+    DO_NOT_ADD = 0x0,
+}
+
+/// A pre-simulation callback (`CPfxPreSimulationCallback`), an object the physics system calls
+/// before each step ([`PhysicsSystem::AddPreSimulationCallback`]). The engine never deletes one;
+/// its owner removes it ([`PhysicsSystem::RemovePreSimulationCallback`]) and frees it.
+pub type PfxPreSimulationCallback {
+    vftable {
+        /// The destructor.
+        #[index(0)]
+        pub fn Destructor(&mut self, flags: u8);
+
+        /// Called by [`PhysicsSystem::Update`] before each step, on the thread that runs it, with
+        /// the world and the time the update was given, outside the step: the world may be changed
+        /// here, and the step that follows integrates the velocities set here. The callbacks fire
+        /// in the order they were added.
+        #[index(1)]
+        pub fn preSimulationCallback(&mut self, world: *mut hknpWorld, dt: f32);
+
+        /// Called when the world's origin moves (`CPhysicsSystem::RecenterWorld`), after every
+        /// body has been moved, with the shift added to every Havok-space position. A callback
+        /// that keeps Havok-space positions of its own moves them here.
+        #[index(2)]
+        pub fn onWorldShiftCallback(&mut self, shift: *const AlignedVector3);
+    },
 }
 
 /// `SweptSphereCast`: a free-function sphere sweep that fills `result` (`CCastResult`). The

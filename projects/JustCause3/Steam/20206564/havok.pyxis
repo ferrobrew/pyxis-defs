@@ -1,0 +1,99 @@
+use types::vector_math::{AlignedQuat, AlignedVector3};
+
+/// A Havok reference-counted object (`hkReferencedObject`), the base of Havok shapes, constraint
+/// data, and most Havok heap objects. Only its reference count is bound.
+#[size(0x10), align(8)]
+pub type hkReferencedObject {
+    /// The reference-count half of [`m_memSizeAndRefCount`](Self::m_memSizeAndRefCount).
+    pub const REFERENCE_COUNT_MASK: u32 = 0xFFFF,
+    /// Where the allocation-size half of [`m_memSizeAndRefCount`](Self::m_memSizeAndRefCount) begins.
+    pub const MEMORY_SIZE_SHIFT: u32 = 16,
+
+    vftable {
+        /// Destroys the object and returns its memory to the Havok heap it came from. The engine
+        /// calls it when a release drops the last reference.
+        #[index(3)]
+        pub fn deleteThisReferencedObject(&mut self);
+    },
+
+    /// The allocation size and the reference count in one word: the low half
+    /// ([`REFERENCE_COUNT_MASK`](Self::REFERENCE_COUNT_MASK)) counts the references, and the high
+    /// half (from [`MEMORY_SIZE_SHIFT`](Self::MEMORY_SIZE_SHIFT)) is the size of the object's Havok
+    /// heap allocation. An object whose size half is zero is not counted: it was not allocated from
+    /// the heap, and a release leaves it alone. A release atomically decrements the low half
+    /// without touching the high half, and an object whose count was one is destroyed through
+    /// [`deleteThisReferencedObject`](Self::deleteThisReferencedObject). A new heap object starts
+    /// with a count of one.
+    #[address(0x8)]
+    pub m_memSizeAndRefCount: u32,
+}
+
+/// A Havok collision shape (`hknpShape`), a [`hkReferencedObject`] allocated from the Havok heap of
+/// the thread that creates it. A body holds its own reference to its shape. Only the reference
+/// count is bound.
+#[min_size(0x10), align(8)]
+pub type hknpShape {
+    #[base]
+    pub base: hkReferencedObject,
+}
+
+/// A capsule shape (`hknpCapsuleShape`): the points within a radius of a segment, built as a convex
+/// polytope with that radius as its convex radius.
+pub type hknpCapsuleShape;
+impl hknpCapsuleShape {
+    /// Allocates a capsule from the calling thread's Havok heap, with the segment from `a` to `b`
+    /// (body space) and `radius`, and returns it with one reference, the caller's. The grappling
+    /// hook's hang proxy (`CGrapplingHangPhysicsProxy::Init`) builds its body's capsule with it and
+    /// releases its own reference once the body is created.
+    #[address(0x141_537_F70)]
+    pub fn createCapsuleShape(a: *const AlignedVector3, b: *const AlignedVector3, radius: f32) -> *mut hknpShape;
+}
+
+/// The construction info of a Havok body (`hknpBodyCinfo`), read by
+/// [`hknpWorld::createDynamicBody`](physics::hknpWorld::createDynamicBody). Positions are Havok
+/// space: the game-space position less
+/// [`PhysicsSystem::m_AccumulatedShift`](physics::PhysicsSystem::m_AccumulatedShift). Only some
+/// members are bound; [`Construct`](Self::Construct) sets the others to their defaults: no reserved
+/// body id, no motion, the default quality and material, a zero collision-filter word, no name, no
+/// local frame, and the identity orientation.
+#[size(0x60), align(16)]
+pub type hknpBodyCinfo {
+    /// The body's shape. Creating the body takes a reference of its own.
+    pub m_shape: *mut hknpShape,
+
+    /// The body's position.
+    #[address(0x30)]
+    pub m_position: AlignedVector3,
+    /// The body's orientation, a unit quaternion `(x, y, z, w)`.
+    pub m_orientation: AlignedQuat,
+}
+impl hknpBodyCinfo {
+    /// `hknpBodyCinfo::hknpBodyCinfo`: constructs the info with its defaults.
+    #[address(0x141_500_080)]
+    pub fn Construct(&mut self) -> *mut hknpBodyCinfo;
+}
+
+/// The construction info of a Havok motion (`hknpMotionCinfo`), the mass properties and velocities
+/// of a dynamic body, read by
+/// [`hknpWorld::createDynamicBody`](physics::hknpWorld::createDynamicBody). Only some members are
+/// bound; [`Construct`](Self::Construct) sets the default motion properties, unit mass, the
+/// identity orientation, and zero velocities, with deactivation enabled.
+#[size(0x70), align(16)]
+pub type hknpMotionCinfo {
+    /// Whether the motion may be deactivated: a body at rest for a while is put to sleep, and is
+    /// not simulated until something wakes it.
+    #[address(0x2)]
+    pub m_enableDeactivation: bool,
+}
+impl hknpMotionCinfo {
+    /// `hknpMotionCinfo::hknpMotionCinfo`: constructs the info with its defaults.
+    #[address(0x141_505_D20)]
+    pub fn Construct(&mut self) -> *mut hknpMotionCinfo;
+
+    /// Fills the mass properties for the `num_bodies` bodies at `bodies` sharing one motion, with a
+    /// total of `mass` kilograms: the inverse mass, the inverse inertia from the bodies' shapes, and
+    /// the centre of mass and orientation from the bodies' poses. The bodies' shapes, positions,
+    /// and orientations must already be set.
+    #[address(0x141_506_480)]
+    pub fn initializeWithMass(&mut self, bodies: *const hknpBodyCinfo, num_bodies: i32, mass: f32);
+}
