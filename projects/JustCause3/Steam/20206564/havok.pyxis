@@ -97,3 +97,57 @@ impl hknpMotionCinfo {
     #[address(0x141_506_480)]
     pub fn initializeWithMass(&mut self, bodies: *const hknpBodyCinfo, num_bodies: i32, mass: f32);
 }
+
+/// A Havok transform (`hkTransformf`): a rotation as three column vectors, the images of the local
+/// axes, and a translation.
+#[copyable, size(0x40), align(16)]
+pub type hkTransformf {
+    pub m_rotation: [AlignedVector3; 3],
+    pub m_translation: AlignedVector3,
+}
+
+/// The construction info of a constraint (`hknpConstraintCinfo`), read by
+/// [`hknpWorld::createConstraint`](physics::hknpWorld::createConstraint).
+#[size(0x18), align(8)]
+pub type hknpConstraintCinfo {
+    /// The constraint's data, such as a [`hkpFixedConstraintData`] (`hkRefPtr<hkpConstraintData>`).
+    pub m_constraintData: *mut hkReferencedObject,
+    /// The constraint's first body.
+    pub m_bodyA: u32,
+    /// The constraint's second body.
+    pub m_bodyB: u32,
+    /// The constraint's flags; the engine's callers pass zero.
+    pub m_flags: u8,
+}
+
+/// The data of a fixed constraint (`hkpFixedConstraintData`), which holds two bodies in a fixed
+/// pose relative to each other. The magnet weapon
+/// (`CMagnetWeaponComponent::ConstrainBodiesToGravityField`) allocates one from the Havok heap of
+/// the calling thread, constructs it, sets its frames, and creates a constraint from it. The
+/// disassembler names that function `CPartInstance::AttachPartWithConstraint`. Only some members
+/// are bound.
+#[size(0xE0), align(16)]
+pub type hkpFixedConstraintData {
+    #[base]
+    pub base: hkReferencedObject,
+}
+impl hkpFixedConstraintData {
+    /// `hkpFixedConstraintData::hkpFixedConstraintData`: constructs the data with one reference
+    /// and the identity frames.
+    #[address(0x141_354_DB0)]
+    pub fn Construct(&mut self) -> *mut hkpFixedConstraintData;
+
+    /// Sets the constraint's frame in each body's space: `pivot_a` in the first body's, `pivot_b`
+    /// in the second's. The constraint holds the two frames together.
+    #[address(0x141_355_090)]
+    pub fn setInBodySpace(&mut self, pivot_a: *const hkTransformf, pivot_b: *const hkTransformf);
+}
+
+/// A contact-impulse event (`hknpContactImpulseEvent`), raised by the solver for a contact between
+/// two bodies. Only the two bodies are bound; the impulses' layout is not established.
+#[min_size(0x10), align(16)]
+pub type hknpContactImpulseEvent {
+    /// The two bodies, the first and the second.
+    #[address(0x8)]
+    pub m_bodyIds: [u32; 2],
+}
