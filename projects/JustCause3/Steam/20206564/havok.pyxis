@@ -28,6 +28,37 @@ pub type hkReferencedObject {
     pub m_memSizeAndRefCount: u32,
 }
 
+/// A thread's Havok memory router (`hkMemoryRouter`), held in the thread-local storage slot
+/// [`s_memoryRouterSlot`](Self::s_memoryRouterSlot). The game thread and the physics workers have
+/// one; Havok objects are allocated from and freed to the router of the thread that makes or
+/// deletes them. Only some members are bound.
+pub type hkMemoryRouter {
+    /// The thread-local storage slot (`hkMemoryRouter::s_memoryRouter`) that holds each thread's
+    /// router, read with `TlsGetValue`.
+    #[address(0x142_F45_0C8)]
+    pub extern s_memoryRouterSlot: u32,
+
+    /// The heap allocator, which Havok objects and their buffers come from.
+    #[address(0x58)]
+    pub m_heap: *mut hkMemoryAllocator,
+}
+
+/// A Havok memory allocator (`hkMemoryAllocator`). The engine's Havok heap objects come from a
+/// router's [`m_heap`](hkMemoryRouter::m_heap) through [`blockAlloc`](Self::blockAlloc) with the
+/// object's size, and go back through [`blockFree`](Self::blockFree) with the same size, as a
+/// [`hkReferencedObject`]'s deletion does. Only some members are bound.
+pub type hkMemoryAllocator {
+    vftable {
+        /// Allocates `num_bytes` bytes, or returns null.
+        #[index(1)]
+        pub fn blockAlloc(&mut self, num_bytes: i32) -> *mut void;
+
+        /// Frees the block `p` of `num_bytes` bytes.
+        #[index(2)]
+        pub fn blockFree(&mut self, p: *mut void, num_bytes: i32);
+    },
+}
+
 /// A Havok collision shape (`hknpShape`), a [`hkReferencedObject`] allocated from the Havok heap of
 /// the thread that creates it. A body holds its own reference to its shape. Only the reference
 /// count is bound.
@@ -122,10 +153,11 @@ pub type hknpConstraintCinfo {
 
 /// The data of a fixed constraint (`hkpFixedConstraintData`), which holds two bodies in a fixed
 /// pose relative to each other. The magnet weapon
-/// (`CMagnetWeaponComponent::ConstrainBodiesToGravityField`) allocates one from the Havok heap of
-/// the calling thread, constructs it, sets its frames, and creates a constraint from it. The
-/// disassembler names that function `CPartInstance::AttachPartWithConstraint`. Only some members
-/// are bound.
+/// (`CMagnetWeaponComponent::ConstrainBodiesToGravityField`) allocates one of this type's size from
+/// the calling thread's Havok heap ([`hkMemoryAllocator::blockAlloc`]), constructs it, sets its
+/// frames and the stabilized solving method, which the constructor already sets, and creates a
+/// constraint from it. The disassembler names that function
+/// `CPartInstance::AttachPartWithConstraint`. Only some members are bound.
 #[size(0xE0), align(16)]
 pub type hkpFixedConstraintData {
     #[base]
