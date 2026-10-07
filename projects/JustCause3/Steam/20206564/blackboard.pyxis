@@ -157,11 +157,6 @@ impl ObjectBlackboard {
     #[address(0x140_5C5_BA0)]
     pub fn GetFloat(&mut self, id: u32, value: *mut f32) -> bool;
 
-    /// The `SetBlackboardValue<CVector3f>` template instantiation. `value` is by-value `CVector3f`
-    /// at the C++ level, which the MSVC x64 ABI passes by reference — hence the pointer here.
-    /// `persistence` is recorded when the call creates the key, and is
-    /// [`PERSISTENCE_LOCAL_FRAME`](PersistenceType::PERSISTENCE_LOCAL_FRAME) at every observed
-    /// call site; `name` is an optional debug label, null in every observed call.
     /// The `GetBlackboardValue<int>` template instantiation. Returns whether the id was present
     /// with an integer type; the value is written through `value`.
     #[address(0x140_5C5_7E0)]
@@ -173,6 +168,23 @@ impl ObjectBlackboard {
     #[address(0x140_5C6_850)]
     pub fn SetFloat(&mut self, id: u32, value: f32, persistence: PersistenceType) -> bool;
 
+    /// The `SetBlackboardValue<CVector3f>` template instantiation. `value` is by-value `CVector3f`
+    /// at the C++ level, which the MSVC x64 ABI passes by reference — hence the pointer here.
+    /// `persistence` is recorded when the call creates the key; it varies by caller rather than
+    /// being fixed by the function — most writers pass
+    /// [`PERSISTENCE_LOCAL_FRAME`](PersistenceType::PERSISTENCE_LOCAL_FRAME), some AI blackboard
+    /// writes pass [`PERSISTENCE_GLOBAL_FRAME`](PersistenceType::PERSISTENCE_GLOBAL_FRAME), and the
+    /// parachute handle IK task's `SECONDARY`-pass position keys
+    /// ([`SECONDARY_HAND_POSITION_WS_LEFT_ID`](Self::SECONDARY_HAND_POSITION_WS_LEFT_ID) and its
+    /// right twin) are written with
+    /// [`PERSISTENCE_SESSION`](PersistenceType::PERSISTENCE_SESSION) instead (see
+    /// [`NParachuteHandleIKTask::Update`](input::parachute::NParachuteHandleIKTask::Update)); `name`
+    /// is an optional debug label, null in every observed call.
     #[address(0x140_5C6_A70)]
     pub fn SetVector3(&mut self, id: u32, value: *const Vector3, persistence: PersistenceType, name: *const u8) -> bool;
 }
+
+/// Removes a key from a blackboard (`RemoveBlackBoardValue`), under
+/// [`ObjectBlackboard::m_BbLock`](ObjectBlackboard::m_BbLock). Returns whether the id was present.
+#[address(0x140_4D8_6D0)]
+pub fn RemoveBlackBoardValue(bb: *mut ObjectBlackboard, id: u32) -> bool;

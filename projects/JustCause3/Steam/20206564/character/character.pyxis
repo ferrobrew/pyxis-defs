@@ -381,7 +381,8 @@ impl Character {
     /// [`FINALIZE_POSE_STATE_TASK_RANGE`](Self::FINALIZE_POSE_STATE_TASK_RANGE) through
     /// [`UpdateStateTasksInRange`](Self::UpdateStateTasksInRange) (the aim, look-at, grapple-fire
     /// arm, and weapon off-hand IK tasks among them), then drives the [`HumanIK`](Self::m_HIK) solve
-    /// (the `MAIN` body pass, gated on [`HumanIK::HasTargets`], followed by
+    /// (the `MAIN` body pass, gated on [`HumanIK::HasTargets`] and run through
+    /// [`UpdateIKForTargets`](Self::UpdateIKForTargets), followed by
     /// [`UpdateSecondaryHandIKPass`](Self::UpdateSecondaryHandIKPass)), then computes the
     /// model-space pose (`CalculateModelSpacePose`), and finally calls
     /// [`UpdatePropEffects`](Self::UpdatePropEffects). Effector targets queued before this runs
@@ -389,6 +390,27 @@ impl Character {
     /// its entry.
     #[address(0x140_7F9_B10)]
     pub fn UpdatePassFinalizePose_Parallel(&mut self, context: *mut void);
+
+    /// The `MAIN`-pass HumanIK solve, run from
+    /// [`UpdatePassFinalizePose_Parallel`](Self::UpdatePassFinalizePose_Parallel) once
+    /// [`HumanIK::HasTargets`] reports a queued target. Copies the current pose into the solver
+    /// ([`HumanIK::CharacterToIKState`]), pushes the queued targets and control values
+    /// ([`HumanIK::UpdateEffectorsFromTargets`]), runs the solve ([`HumanIK::Solve`]), and writes the
+    /// solved state back into the pose ([`HumanIK::IKToCharacterState`]). The IDB mislabels this
+    /// function `CAnimationRuleSystem::GetState`; its body and call site (the sole caller is
+    /// `UpdatePassFinalizePose_Parallel`) identify it as the character's own IK-for-targets solve.
+    #[address(0x140_77E_040)]
+    pub fn UpdateIKForTargets(&mut self, dt: f32);
+
+    /// The `SECONDARY`-pass HumanIK solve, run from
+    /// [`UpdateSecondaryHandIKPass`](Self::UpdateSecondaryHandIKPass) once that pass has queued a
+    /// target. Runs the same four-step sequence as [`UpdateIKForTargets`](Self::UpdateIKForTargets),
+    /// except that it skips [`HumanIK::CharacterToIKState`] when `ik_has_run` is already set:
+    /// `UpdateSecondaryHandIKPass` passes through the same flag the `MAIN` pass's gate set this
+    /// frame, so the pose copied into the solver by that earlier solve is reused instead of being
+    /// refetched.
+    #[address(0x140_77E_0C0)]
+    pub fn UpdateSecondaryHandIKForTargets(&mut self, dt: f32, ik_has_run: *mut bool);
 
     /// Runs the update of every task of each rule system's current state that is registered in the
     /// state-task range `range_id` (`CAnimatedModel::StateTaskUpdate`), with `dt` as the step. Each
@@ -436,7 +458,11 @@ impl Character {
 
     /// The `SECONDARY` HumanIK pass, called from
     /// [`UpdatePassFinalizePose_Parallel`](Self::UpdatePassFinalizePose_Parallel) after the `MAIN`
-    /// solve. It is driven entirely by one-frame keys on [`m_Blackboard`](Self::m_Blackboard).
+    /// solve. It is driven entirely by keys on [`m_Blackboard`](Self::m_Blackboard); most suppliers
+    /// write theirs fresh every frame, but a key's own persistence class is up to its writer — the
+    /// parachute handle IK task's position and weight keys, for instance, are written once with
+    /// session persistence and left on the blackboard across ticks while the task is active (see
+    /// [`NParachuteHandleIKTask::Update`](input::parachute::NParachuteHandleIKTask::Update)).
     /// For each wrist whose weight key
     /// ([`SECONDARY_HAND_WEIGHT_RIGHT_ID`](ObjectBlackboard::SECONDARY_HAND_WEIGHT_RIGHT_ID),
     /// [`SECONDARY_HAND_WEIGHT_LEFT_ID`](ObjectBlackboard::SECONDARY_HAND_WEIGHT_LEFT_ID)) is

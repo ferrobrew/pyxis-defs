@@ -164,6 +164,68 @@ impl NStateTask_MovementParachuteTask {
     pub fn Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
 }
 
+/// The per-instance loaded properties of [`NParachuteHandleIKTask`]
+/// (`NParachuteHandleIKTask::SProperties`): the blend-in and blend-out animation segments that
+/// gate the task's weight, and which hand or hands it drives.
+#[size(0xC), align(4)]
+pub type ParachuteHandleIKProperties {
+    /// The segment whose local time ramps the blend weight up from zero.
+    pub m_BlendInSegmentId: u32,
+    /// The segment whose local time ramps the blend weight back down to zero.
+    pub m_BlendOutSegmentId: u32,
+    /// Whether the task drives the left wrist.
+    pub m_LeftHand: bool,
+    /// Whether the task drives the right wrist.
+    pub m_RightHand: bool,
+}
+
+/// The per-instance runtime state of [`NParachuteHandleIKTask`]
+/// (`NParachuteHandleIKTask::SInstanceProperties`): the task's current blend weight, written by
+/// [`NParachuteHandleIKTask::Update`] each frame.
+#[size(0x4), align(4)]
+pub type ParachuteHandleIKInstanceProperties {
+    pub m_Weight: f32,
+}
+
+/// The parachute handle IK task (`NParachuteHandleIKTask`). An animation state task that, while
+/// active, moves each hand its [`ParachuteHandleIKProperties::m_LeftHand`] /
+/// [`ParachuteHandleIKProperties::m_RightHand`] flags select onto the parachute rig's handle,
+/// rather than leaving it to the base animation.
+pub type NParachuteHandleIKTask;
+impl NParachuteHandleIKTask {
+    /// The task's per-frame update. Derives the blend weight from the blend-in and blend-out
+    /// segments' local time (ramping up from the former, down across the latter) and writes it to
+    /// [`ParachuteHandleIKInstanceProperties::m_Weight`]. For each selected hand, blends between the
+    /// parachute rig's handle-link bone and the character's hand and second hand-attach bones to
+    /// derive a world-space target position for the wrist, then writes that position to the wrist's
+    /// `SECONDARY`-pass position key
+    /// ([`ObjectBlackboard::SECONDARY_HAND_POSITION_WS_LEFT_ID`](blackboard::ObjectBlackboard::SECONDARY_HAND_POSITION_WS_LEFT_ID)
+    /// or its right twin) and the blend weight to the matching weight key
+    /// ([`ObjectBlackboard::SECONDARY_HAND_WEIGHT_LEFT_ID`](blackboard::ObjectBlackboard::SECONDARY_HAND_WEIGHT_LEFT_ID)
+    /// or its right twin), both with
+    /// [`PersistenceType::PERSISTENCE_SESSION`](blackboard::PersistenceType::PERSISTENCE_SESSION) —
+    /// unlike most blackboard writers, which use
+    /// [`PersistenceType::PERSISTENCE_LOCAL_FRAME`](blackboard::PersistenceType::PERSISTENCE_LOCAL_FRAME).
+    /// [`Character::UpdateSecondaryHandIKPass`](character::character::Character::UpdateSecondaryHandIKPass)
+    /// reads the keys and queues the wrist target on the `SECONDARY` pass.
+    #[address(0x140_82E_510)]
+    pub fn Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
+
+    /// The task's exit: removes all four `SECONDARY`-pass hand keys
+    /// ([`ObjectBlackboard::SECONDARY_HAND_POSITION_WS_LEFT_ID`](blackboard::ObjectBlackboard::SECONDARY_HAND_POSITION_WS_LEFT_ID),
+    /// [`ObjectBlackboard::SECONDARY_HAND_POSITION_WS_RIGHT_ID`](blackboard::ObjectBlackboard::SECONDARY_HAND_POSITION_WS_RIGHT_ID),
+    /// [`ObjectBlackboard::SECONDARY_HAND_WEIGHT_LEFT_ID`](blackboard::ObjectBlackboard::SECONDARY_HAND_WEIGHT_LEFT_ID),
+    /// and [`ObjectBlackboard::SECONDARY_HAND_WEIGHT_RIGHT_ID`](blackboard::ObjectBlackboard::SECONDARY_HAND_WEIGHT_RIGHT_ID))
+    /// through [`RemoveBlackBoardValue`](blackboard::RemoveBlackBoardValue), regardless of which
+    /// hand or hands the instance drove.
+    #[address(0x140_82E_490)]
+    pub fn OnExit(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
+
+    /// Loads [`ParachuteHandleIKProperties`] from the state definition's runtime container.
+    #[address(0x140_835_D40)]
+    pub fn Load(properties: *mut ParachuteHandleIKProperties, container: *const void) -> bool;
+}
+
 /// The parachute flight/steering core, called per frame by
 /// [`NStateTask_MovementParachuteTask::Update`]. Computes the parachute steering values, the
 /// wanted character yaw/pitch/roll, and the camera-relative look steer via
@@ -229,3 +291,27 @@ pub fn NAirMovement_UpdateAirPhysics(character: *mut Character, dt: f32, input: 
 /// caller adds `out` into its steering vector.
 #[address(0x140_791_300)]
 pub fn NAirMovement_UpdateStdLookSteering(out: *mut Vector3, target_steering: *const Vector3, char_pitch: f32, char_yaw: f32, settings: *const CharacterAirMovementSettings);
+
+/// `NParachuteObjectControl::SyncBones`: moves the parachute object's own rig to track the pose of
+/// `owner`, the character it is attached to, and — for the player — poses the character's hand
+/// bones directly onto the rig's handle-link bones. `am` is the parachute's animated model (its
+/// `CAnimationControl` and skeleton); `props` is the parachute object's loaded properties.
+///
+/// Besides the rig-tracking pose (syncing the back-attach bone to the character and blending the
+/// rest of the rig's bones toward their bind pose over a settling segment), the player's hand
+/// placement onto the handle-link bones is conditional per hand: wielding a weapon, grapple-firing,
+/// or the segment carrying a per-hand "no handle placement" tag suppresses that hand's placement,
+/// while a segment carrying a "force handle placement override" tag places both hands regardless
+/// of those conditions. Placed hands follow the handle-link bone with a small trailing offset
+/// driven by its own motion. This runs independently of the `SECONDARY` HumanIK pass that
+/// [`NParachuteHandleIKTask`] drives through the blackboard; the two placement paths pose the same
+/// bones by different means.
+#[address(0x140_CD7_4F0)]
+pub fn NParachuteObjectControl_SyncBones(parachute: *mut void, am: *mut void, owner: *mut Character, props: *mut void);
+
+/// `NParachuteObjectControl::DoSyncAndPlacement`: sets the parachute object's transform from the
+/// owning character's canopy proxy
+/// ([`ParachuteActionParams::m_ParachuteProxy`]) and, once the object has finished initializing,
+/// calls [`NParachuteObjectControl_SyncBones`].
+#[address(0x140_CD8_7A0)]
+pub fn NParachuteObjectControl_DoSyncAndPlacement(parachute: *mut void, props: *mut void);
