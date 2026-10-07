@@ -402,6 +402,38 @@ impl Character {
     #[address(0x140_7C2_380)]
     pub fn UpdatePropEffects(&mut self, dt: f32);
 
+    /// Refreshes the character's ground information. Runs in
+    /// [`UpdatePassFinalizePose_Parallel`](Self::UpdatePassFinalizePose_Parallel) after the
+    /// finalize state-task range and before the weapons' first attachment refresh and the
+    /// HumanIK solve: calls [`DoGroundInfoRaycasts`](Self::DoGroundInfoRaycasts) (always for the
+    /// player, under a state-bit gate for others), resolves the ground material from a grapple,
+    /// helicopter, or stunt attachment, and measures the water depth over the root.
+    #[address(0x140_7F4_D40)]
+    pub fn UpdateGroundInfo(&mut self);
+
+    /// Fills the character's ground information. While the proxy is supported (or sliding), not
+    /// owned by a ragdoll, and not hanging from the grapple, the ground material and normal come
+    /// from the proxy's support and the height over ground is zero, with no ray cast. Otherwise
+    /// it measures the height over ground with
+    /// [`CalculateHeightOverGround`](Self::CalculateHeightOverGround) and, when above the ground,
+    /// the fall distance.
+    #[address(0x140_7F4_9B0)]
+    pub fn DoGroundInfoRaycasts(&mut self);
+
+    /// Casts a ray straight down from just above the character's root (the ragdoll's transform
+    /// when a ragdoll owns the displacement) through
+    /// [`PhysicsSystem::CastRay`](physics::PhysicsSystem::CastRay), with a hit record and a
+    /// character raycast filter (`CCharacterRaycastFilter`, which ignores the character) both
+    /// built on the stack, on [`QUERY_LAYER`](physics::PhysicsSystem::QUERY_LAYER), to 200 metres.
+    /// Records the hit's material, normal, and supporting vehicle, and the height over the ground
+    /// or the water surface ([`PhysicsSystem::CastRayWaterSurface`](physics::PhysicsSystem::CastRayWaterSurface)),
+    /// whichever is nearer. Its call chain from
+    /// [`UpdatePassFinalizePose_Parallel`](Self::UpdatePassFinalizePose_Parallel) makes it the
+    /// engine's scene ray query inside the pose-finalization pass, which the post-physics pass
+    /// queues for the parallel update of every character.
+    #[address(0x140_7D5_5E0)]
+    pub fn CalculateHeightOverGround(&mut self);
+
     /// The `SECONDARY` HumanIK pass, called from
     /// [`UpdatePassFinalizePose_Parallel`](Self::UpdatePassFinalizePose_Parallel) after the `MAIN`
     /// solve. It is driven entirely by one-frame keys on [`m_Blackboard`](Self::m_Blackboard).
@@ -584,6 +616,13 @@ impl Character {
     /// (`S_STUNT_FWD`, `S_STUNT_RIGHT`, `S_STUNT_LEFT`, `S_STUNT_BWD`).
     #[address(0x140_77E_F60)]
     pub fn IsStuntTraversing(&self) -> bool;
+
+    /// Whether the character rides a vehicle in a stunt position: attached to a vehicle, and the
+    /// body rule system is in `S_IDLE_HANG_STUNT`, the interaction-graph node the character is on
+    /// is of node type 4 (not yet named), or
+    /// [`SB_IS_GRAPPLE_UPSIDEDOWN`](state::StateBitFlag::SB_IS_GRAPPLE_UPSIDEDOWN) is set.
+    #[address(0x140_7F5_080)]
+    pub fn IsInStuntPosition(&self) -> bool;
 
     /// Whether the character mans a mounted gun: the weapon in the
     /// [`E_SLOT_HEAVY`](WeaponSlot::E_SLOT_HEAVY) slot is in its mounted weapon state.
