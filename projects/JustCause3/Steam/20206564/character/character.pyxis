@@ -270,6 +270,14 @@ pub type Character {
     #[address(0x2_9B0)]
     pub m_Avatar: *mut Avatar,
 
+    /// Whether a scripted sequence (`CSequenceObject2`) drives the character. Set by
+    /// [`SetupForSequence`](Self::SetupForSequence) when a sequence takes the character over and
+    /// cleared by [`ResetAfterSequence3`](Self::ResetAfterSequence3) when it hands it back; while
+    /// it is set, the sequence's transform tracks place the character and its animation layers run
+    /// the sequence's own state machines.
+    #[address(0x2_9C8)]
+    pub m_InSequence: bool,
+
     /// Whether this character is a player character (local or remote). Gates the player-only
     /// side effects of setters such as [`SetUnlimitedAmmo`](Self::SetUnlimitedAmmo).
     #[address(0x2_9D0)]
@@ -908,6 +916,34 @@ impl Character {
     #[address(0x140_7FD_120)]
     pub fn ForceNeutralState(&mut self);
 
+    /// Hands the character to a scripted sequence: forces the neutral state
+    /// ([`ForceNeutralState`](Self::ForceNeutralState)), pauses a behaviour-tree avatar, sets
+    /// [`m_InSequence`](Self::m_InSequence), and makes a player invulnerable for the sequence unless
+    /// the god mode already holds. Called from `CSequenceObject2::UpdateSequencePreSim` for each
+    /// character the sequence drives.
+    #[address(0x140_7FD_730)]
+    pub fn SetupForSequence(&mut self);
+
+    /// Hands the character back from a scripted sequence: lifts the sequence's invulnerability,
+    /// restores each default animation layer's state machine and animation set, unpauses a
+    /// behaviour-tree avatar, and clears [`m_InSequence`](Self::m_InSequence). Called by
+    /// `CSequenceObject2::ResetGameObject`, by [`ForceNeutralState`](Self::ForceNeutralState), and
+    /// on entering the cinematic mode.
+    #[address(0x140_7D6_590)]
+    pub fn ResetAfterSequence3(&mut self);
+
+    /// Reacts to a hit's impulse along `direction`, scaled per damage type and capped. Accumulates
+    /// the impulse, and from the character's thresholds picks the reaction: a ragdoll, a knock-back
+    /// ([`ACT_HITREACT_FLY`](animation::symbol_table::EventIdSymbolTable::ACT_HITREACT_FLY), from
+    /// an explosion), a stumble
+    /// ([`ACT_HITREACT_STUMBLE`](animation::symbol_table::EventIdSymbolTable::ACT_HITREACT_STUMBLE)
+    /// and its bullet and melee variants), or a flinch, queued on
+    /// [`m_AnimatedModel`](Self::m_AnimatedModel) with [`AnimatedModel::QueueAct`]. A player and
+    /// other characters take different branches. `zone` is the hit body-part group's `idstring`,
+    /// passed by address and released by the callee.
+    #[address(0x140_7D7_980)]
+    pub fn HitReaction(&mut self, hit_position: *const Vector3, direction: *const Vector3, impulse: f32, killing_blow: bool, zone: *mut u32, damage_flags: u32, damaged_by_vehicle: bool);
+
     /// Sets the character's orientation from a quaternion (`CQuaternion`, `x, y, z, w`): writes
     /// the rotation into [`m_WorldMatrixT1`](Self::m_WorldMatrixT1), keeping its translation, and
     /// stores the quaternion in [`m_RotationGoal`](Self::m_RotationGoal). A direct world-matrix
@@ -1047,6 +1083,14 @@ impl AnimatedModel {
     /// [`Character::QueueAct`] to pick a supported act.
     #[address(0x140_4B2_E00)]
     pub fn TryAct(&mut self, act: *const u32) -> bool;
+
+    /// Queues an act (`act` points at the runtime `idstring` value) on the model's state machines,
+    /// appending it to the model's act queue, which holds at most 32 acts; an act queued with the
+    /// queue full is dropped. [`Character::QueueAct`] forwards here for
+    /// [`Character::m_AnimatedModel`], and engine code that holds the model, such as
+    /// [`Character::HitReaction`], calls it directly.
+    #[address(0x140_4C8_DA0)]
+    pub fn QueueAct(&mut self, act: *const u32);
 }
 
 /// A character's animation controller (`NCharacterSystem::CAnimationControl`): the skeleton, the
