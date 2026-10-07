@@ -667,6 +667,24 @@ impl Character {
     #[address(0x140_79E_290)]
     pub fn IsGrappleHanging(&self) -> bool;
 
+    /// Whether the character is in the air: its proxy has no valid ground body
+    /// ([`PfxCharacterInstance::IsGroundBodyValid`]), or is neither supported
+    /// ([`PfxCharacterInstance::IsSupported`]) nor sliding, or it has a ragdoll that does not
+    /// follow the character; and a flag of the control parameters (not yet named) is clear.
+    #[address(0x140_79E_3C0)]
+    pub fn IsInAir(&self) -> bool;
+
+    /// The character's serial pre-physics update pass: the queued impulses, the pre-physics state
+    /// tasks (the on-foot movement task among them), the ragdoll's pre-physics update, and the
+    /// integrating-physics update, which runs the proxy's update
+    /// ([`PfxCharacterInstance::UpdateContext`]). The character registers it in the game world's
+    /// pre-simulation update queue after its state-machine passes, which the queue runs in order
+    /// of registration priority, so each tick the state machines evaluate their conditions on the
+    /// proxy's support as the previous tick's proxy update left it, and the physics system's
+    /// pre-simulation callbacks run after this pass.
+    #[address(0x140_7F4_710)]
+    pub fn UpdatePassPrePhysics_Serial(&mut self, context: *mut void);
+
     /// Whether the body rule system is in one of the four stunt-position traversal states
     /// (`S_STUNT_FWD`, `S_STUNT_RIGHT`, `S_STUNT_LEFT`, `S_STUNT_BWD`).
     #[address(0x140_77E_F60)]

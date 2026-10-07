@@ -137,6 +137,12 @@ pub type hkTransformf {
     pub m_translation: AlignedVector3,
 }
 
+/// A Havok SIMD scalar (`hkSimdFloat32`): one value held in all four lanes of a vector register.
+#[copyable, size(0x10), align(16)]
+pub type hkSimdFloat32 {
+    pub m_real: [f32; 4],
+}
+
 /// The construction info of a constraint (`hknpConstraintCinfo`), read by
 /// [`hknpWorld::createConstraint`](physics::hknpWorld::createConstraint).
 #[size(0x18), align(8)]

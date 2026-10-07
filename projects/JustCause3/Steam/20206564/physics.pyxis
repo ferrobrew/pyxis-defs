@@ -1,6 +1,6 @@
 use character::character::Character;
 use damage::DamageMsg;
-use havok::{hkReferencedObject, hkTransformf, hknpBodyCinfo, hknpConstraintCinfo, hknpContactImpulseEvent, hknpMotionCinfo};
+use havok::{hkReferencedObject, hkSimdFloat32, hkTransformf, hknpBodyCinfo, hknpConstraintCinfo, hknpContactImpulseEvent, hknpMotionCinfo};
 use types::math::{Matrix4, Vector3};
 use types::vector_math::{AlignedQuat, AlignedVector3};
 
@@ -394,6 +394,10 @@ impl hknpWorld {
 /// some members are bound.
 #[size(0x90), align(16)]
 pub type hknpBody {
+    /// The [`m_flags`](Self::m_flags) bit of a static body. A slot with neither this nor
+    /// [`IS_DYNAMIC`](Self::IS_DYNAMIC) holds no valid body, which is how
+    /// [`PfxCharacterInstance::IsGroundBodyValid`] tells a body from an empty slot.
+    pub const IS_STATIC: u32 = 0x1,
     /// The [`m_flags`](Self::m_flags) bit of a dynamic body, the only kind the velocity and impulse
     /// setters ([`hknpWorld::setBodyVelocity`], [`hknpWorld::applyBodyImpulseAt`]) act on.
     pub const IS_DYNAMIC: u32 = 0x2,
@@ -401,6 +405,10 @@ pub type hknpBody {
     /// [`hknpContactImpulseEvent`](havok::hknpContactImpulseEvent) for the body's contacts.
     /// [`PfxRigidBody::SetContactImpulseEventActive`] sets and clears it.
     pub const RAISE_CONTACT_IMPULSE_EVENTS: u32 = 0x80,
+    /// The [`m_flags`](Self::m_flags) bit of a keyframed body: one moved along a set path that
+    /// collisions do not push. `CPfxCharacterInstance::IsGroundBodyStaticOrKeyFramed` tests it with
+    /// [`IS_STATIC`](Self::IS_STATIC).
+    pub const IS_KEYFRAMED: u32 = 0x4,
     /// The [`m_motionId`](Self::m_motionId) of a freed body slot.
     pub const INVALID_MOTION_ID: u32 = 0x7FFFFFFF,
 
@@ -617,7 +625,7 @@ pub enum ProxyState: i32 {
 
 /// `CPfxCharacterInstance`: the character's physics-side body instance (the Havok character proxy),
 /// owned by `CCharacter` through a `boost::shared_ptr`. Only some members are bound.
-#[min_size(0xF8)]
+#[min_size(0x100), align(16)]
 pub type PfxCharacterInstance {
     /// Havok's invalid body id, which [`GetCharacterRigidBodyId`](Self::GetCharacterRigidBodyId)
     /// reports when there is no body.
@@ -626,6 +634,24 @@ pub type PfxCharacterInstance {
     /// The proxy input the physics step reads; see [`CharacterInput`].
     #[address(0x38)]
     pub m_Input: CharacterInput,
+
+    /// What the proxy stands on, as [`CheckSupportCustom`](Self::CheckSupportCustom) last found
+    /// it: whether it is supported, sliding, or unsupported, and the surface's normal and
+    /// velocity. Written at the start of each proxy update ([`UpdateContext`](Self::UpdateContext)),
+    /// before the physics step, and read until the next: the state machines' ground-contact
+    /// condition and [`IsSupported`](Self::IsSupported) read its supported state.
+    #[address(0x70)]
+    pub m_GroundInformation: hknpCharacterSurfaceInfo,
+    /// The game material of the surface the proxy stands on; cleared with the ground body when
+    /// the proxy has no support.
+    pub m_ContactMaterialId: i32,
+    /// The body the proxy stands on, or [`INVALID_BODY_ID`](Self::INVALID_BODY_ID) without
+    /// support. [`IsGroundBodyValid`](Self::IsGroundBodyValid) checks it names a body, and the
+    /// ground raycasts (`CCharacter::DoGroundInfoRaycasts`) look up its owner to tell a vehicle
+    /// underfoot.
+    pub m_GroundBodyId: u32,
+    /// The last valid [`m_GroundBodyId`](Self::m_GroundBodyId), kept across ticks without support.
+    pub m_LastValidGroundBodyId: u32,
 
     /// Whether the proxy is standing on stairs. The on-foot locomotion task takes its velocity
     /// along the blackboard's slope direction while it is set.
@@ -637,10 +663,10 @@ pub type PfxCharacterInstance {
     #[address(0xC8)]
     pub m_ProxyState: i32,
 
-    /// The Havok character rigid body (`hknpCharacterRigidBody*`), which holds the body id that
+    /// The Havok character rigid body, which holds the body id that
     /// [`GetCharacterRigidBodyId`](Self::GetCharacterRigidBodyId) reads.
     #[address(0xD0)]
-    pub m_CharacterRigidBody: *mut void,
+    pub m_CharacterRigidBody: *mut hknpCharacterRigidBody,
 
     /// The character rigid-body listener (`CCustomCharacterRBListener*`).
     #[address(0xE8)]
@@ -681,6 +707,91 @@ impl PfxCharacterInstance {
     /// on-ground, in-air, and jumping states registered. It does not set the capsule dimensions.
     #[address(0x140_24D_370)]
     pub fn BuildDefaultCharacterContext(&mut self);
+
+    /// Whether the proxy is supported: the supported state of
+    /// [`m_GroundInformation`](Self::m_GroundInformation) is
+    /// [`SUPPORTED`](hknpCharacterSurfaceInfo::SUPPORTED). The state machines' ground-contact
+    /// condition (`CSuperGroundContactCondition`) is this call, and `CCharacter::UpdateFalling`,
+    /// the ground raycasts, and [`Character::IsInAir`](character::character::Character::IsInAir)
+    /// read it.
+    #[address(0x140_24D_770)]
+    pub fn IsSupported(&self) -> bool;
+
+    /// Whether [`m_GroundBodyId`](Self::m_GroundBodyId) names a body of the world: an id below the
+    /// body array's capacity whose slot holds a static or dynamic body. The disassembler mislabels
+    /// it `CPfxCharacterInstance::GetSurfaceNormal`.
+    #[address(0x140_24D_930)]
+    pub fn IsGroundBodyValid(&self) -> bool;
+
+    /// Finds the proxy's support from the character rigid body's contacts and writes it to
+    /// [`m_GroundInformation`](Self::m_GroundInformation), with the ground body; without support it
+    /// sets [`m_GroundBodyId`](Self::m_GroundBodyId) to
+    /// [`INVALID_BODY_ID`](Self::INVALID_BODY_ID) and clears the contact material. A valid ground
+    /// body is also kept in [`m_LastValidGroundBodyId`](Self::m_LastValidGroundBodyId).
+    #[address(0x140_2B1_150)]
+    pub fn CheckSupportCustom(&mut self, dt: f32);
+
+    /// The proxy's update before the physics step, from the character's integrating-physics
+    /// update in its pre-physics pass: it finds the support
+    /// ([`CheckSupportCustom`](Self::CheckSupportCustom)), runs the Havok character context on
+    /// the support and [`m_Input`](Self::m_Input), and sets the character rigid body's velocity to
+    /// the context's output ([`hknpCharacterRigidBody::setLinearVelocity`]). A proxy whose body is
+    /// not active is left unsupported.
+    #[address(0x140_2BB_DA0)]
+    pub fn UpdateContext(&mut self, dt: f32, input: *mut CharacterInput);
+}
+
+/// What a Havok character stands on (`hknpCharacterSurfaceInfo`), as its support check finds it.
+#[size(0x30), align(16)]
+pub type hknpCharacterSurfaceInfo {
+    /// [`m_supportedState`](Self::m_supportedState): no support.
+    pub const UNSUPPORTED: u8 = 0x0,
+    /// [`m_supportedState`](Self::m_supportedState): on a surface too steep to stand on.
+    pub const SLIDING: u8 = 0x1,
+    /// [`m_supportedState`](Self::m_supportedState): standing on a surface.
+    pub const SUPPORTED: u8 = 0x2,
+
+    /// Whether the surface is a dynamic body.
+    pub m_isSurfaceDynamic: bool,
+    /// The support: [`UNSUPPORTED`](Self::UNSUPPORTED), [`SLIDING`](Self::SLIDING), or
+    /// [`SUPPORTED`](Self::SUPPORTED).
+    pub m_supportedState: u8,
+
+    /// How far the character is above the surface beyond the support distance, metres.
+    #[address(0x4)]
+    pub m_surfaceDistanceExcess: f32,
+
+    /// The surface's normal, Havok space.
+    #[address(0x10)]
+    pub m_surfaceNormal: AlignedVector3,
+    /// The surface's velocity, world space. A supported proxy's update carries it into the
+    /// velocity the proxy inherits from its ground.
+    pub m_surfaceVelocity: AlignedVector3,
+}
+
+/// A Havok character rigid body (`hknpCharacterRigidBody`): the dynamic body of a character proxy
+/// ([`PfxCharacterInstance::m_CharacterRigidBody`]), whose velocity the character context sets
+/// before each step. Only some members are bound.
+#[min_size(0x28), align(16)]
+pub type hknpCharacterRigidBody {
+    /// The body's id in [`m_world`](Self::m_world).
+    #[address(0x10)]
+    pub m_bodyId: u32,
+
+    /// The world the body is in.
+    #[address(0x20)]
+    pub m_world: *mut hknpWorld,
+}
+impl hknpCharacterRigidBody {
+    /// Sets the body's linear velocity to `velocity` (world space), keeping its angular velocity
+    /// ([`hknpWorld::setBodyVelocity`]), and keeps the change over `timestep` as the body's
+    /// acceleration. A change too small to matter only activates the body, and only with
+    /// `force_activate`. The proxy's update
+    /// ([`PfxCharacterInstance::UpdateContext`]) calls it with the character context's output. The
+    /// disassembler mislabels it `CPfxCharacterInstance::CCharacterInput::SetWantedVelocity`, and
+    /// gives this function's name to an unrelated lookup.
+    #[address(0x141_521_600)]
+    pub fn setLinearVelocity(&mut self, velocity: *const AlignedVector3, timestep: *const hkSimdFloat32, force_activate: bool);
 }
 
 /// `CPfxRigidBody`: the engine's wrapper around a Havok rigid body in the physics system's world,
