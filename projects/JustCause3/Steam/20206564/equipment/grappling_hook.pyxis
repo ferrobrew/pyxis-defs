@@ -185,6 +185,29 @@ impl NStateTask_InAirGrappleFireMotionTask {
     pub fn OnEnter(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
 }
 
+/// The reeled-in ledge climb's motion task (`NStateTask_ReeledInLedgeClimbMotionTask`): the
+/// character state task that carries the character over a ledge it has reeled in to. The grapple's
+/// climb (`ACT_GRPL_CLIMB` into `S_GRAPPLE_CLIMB_START` in `rico_base.afsmb`) is the only ledge
+/// climb the player's state machine has: no state machine under `animations/jc_statemachine` uses
+/// the vault or obstacle-climb acts.
+pub type NStateTask_ReeledInLedgeClimbMotionTask;
+impl NStateTask_ReeledInLedgeClimbMotionTask {
+    /// Enters the task: records the character's upright orientation and its measured world
+    /// velocity, and reads the climb's speed tuning from the character's blackboard.
+    #[address(0x140_845_520)]
+    pub fn OnEnter(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
+
+    /// The per-tick update. Runs the non-swimming movement update, then drives the character over
+    /// the ledge with a code-controlled velocity: projected along the climb from the climb
+    /// segment's local time (`NGrapplingMotionUtils::ProjectClimbOverVelocityAtTime`) while the
+    /// segment plays, the animation's root velocity after it, plus the velocity the character
+    /// entered with. It sets the motion state to
+    /// [`MOTION_STATE_TASK_DEFINED`](character::character::Character::MOTION_STATE_TASK_DEFINED)
+    /// and writes the proxy's wanted velocity. It runs on every tick its state is active.
+    #[address(0x140_845_630)]
+    pub fn Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
+}
+
 /// The hang task (`NStateTask_GrapplingHangTask`): the character state task that runs while the
 /// character hangs under a grapple line.
 pub type NStateTask_GrapplingHangTask;
