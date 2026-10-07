@@ -1,6 +1,6 @@
 use character::character::Character;
 use damage::DamageMsg;
-use havok::{hknpBodyCinfo, hknpConstraintCinfo, hknpMotionCinfo};
+use havok::{hknpBodyCinfo, hknpConstraintCinfo, hknpContactImpulseEvent, hknpMotionCinfo};
 use types::math::{Matrix4, Vector3};
 use types::vector_math::{AlignedQuat, AlignedVector3};
 
@@ -325,6 +325,15 @@ impl hknpWorld {
     #[address(0x141_4E7_370)]
     pub fn destroyConstraints(&mut self, ids: *const u32, count: i32);
 
+    /// The solve half of a step (`*solver_data` from the collide half, `hknpSolverData`): it
+    /// generates the solve's task graphs, runs a graph of one task on the calling thread and any
+    /// other on `task_queue` (`hkTaskQueue`), joining it, and repeats until no task remains. The
+    /// last graph is the post-solve phase alone, which dispatches the step's events, so the
+    /// world's event listeners run on the calling thread, inside the step.
+    /// [`PhysicsSystem::Update`] calls it on the game thread.
+    #[address(0x141_4ED_B40)]
+    pub fn stepSolve(&mut self, solver_data: *mut *mut void, task_queue: *mut void);
+
     /// Creates a dynamic body from `cinfo` with a new motion from `motion_cinfo`, writes the new
     /// body id to `out`, and returns `out`. The body takes its own reference to the shape. With
     /// [`DO_NOT_ADD`](hknpAdditionMode::DO_NOT_ADD) the body exists but is not in the simulation
@@ -377,6 +386,10 @@ pub type hknpBody {
     /// The [`m_flags`](Self::m_flags) bit of a dynamic body, the only kind the velocity and impulse
     /// setters ([`hknpWorld::setBodyVelocity`], [`hknpWorld::applyBodyImpulseAt`]) act on.
     pub const IS_DYNAMIC: u32 = 0x2,
+    /// The [`m_flags`](Self::m_flags) bit that has the solver raise a
+    /// [`hknpContactImpulseEvent`](havok::hknpContactImpulseEvent) for the body's contacts.
+    /// [`PfxRigidBody::SetContactImpulseEventActive`] sets and clears it.
+    pub const RAISE_CONTACT_IMPULSE_EVENTS: u32 = 0x80,
     /// The [`m_motionId`](Self::m_motionId) of a freed body slot.
     pub const INVALID_MOTION_ID: u32 = 0x7FFFFFFF,
 
@@ -463,10 +476,10 @@ pub type PfxInstance {
 
         /// Called for a contact-impulse event between one of the instance's bodies and another
         /// while [`m_IsContactImpulseEventActive`](Self::m_IsContactImpulseEventActive) is set.
-        /// `input` is the event handler input (`hknpEventHandlerInput`) and `event` the event
-        /// ([`hknpContactImpulseEvent`](havok::hknpContactImpulseEvent)).
+        /// `input` is the event handler input (`hknpEventHandlerInput`). The listener calls it from
+        /// the world's event dispatch, inside [`hknpWorld::stepSolve`].
         #[index(21)]
-        pub fn OnContactImpulseEvent(&mut self, input: *const void, event: *const void, other: *mut PfxInstance, is_body_a: bool);
+        pub fn OnContactImpulseEvent(&mut self, input: *const void, event: *const hknpContactImpulseEvent, other: *mut PfxInstance, is_body_a: bool);
     },
 
     /// The instance's owner (`IPfxGameObject*`): the [`PhysicsGameObject`] a physics query reports
@@ -624,7 +637,11 @@ impl PfxCharacterInstance {
 pub type PfxRigidBody {
     /// The [`Destruct`](Self::Destruct) flag that frees the wrapper's memory.
     pub const DESTRUCT_FREE: u8 = 0x1,
+    /// The address of the `CPfxRigidBody` virtual table, which
+    /// [`Construct`](Self::Construct) installs. It has as many slots as the vftable below.
+    pub const VFTABLE: u64 = 0x142350E38,
 
+    #[size(44)]
     vftable {
         /// The deleting destructor: removes the body from the world when it is in it, clears the
         /// body's instance property, destroys the body, releases the wrapper's own references, and
@@ -658,6 +675,18 @@ pub type PfxRigidBody {
         /// velocities are kept. The disassembler mislabels it `CPartInstance::ClearWindowDamage`.
         #[index(15)]
         pub fn SetTransform(&mut self, transform: *const Matrix4);
+
+        /// [`PfxInstance::OnContactImpulseEvent`]; the wrapper's own does nothing.
+        #[index(21)]
+        pub fn OnContactImpulseEvent(&mut self, input: *const void, event: *const hknpContactImpulseEvent, other: *mut PfxInstance, is_body_a: bool);
+
+        /// Sets [`PfxInstance::m_IsContactImpulseEventActive`] to `active`, and sets or clears the
+        /// body's [`RAISE_CONTACT_IMPULSE_EVENTS`](hknpBody::RAISE_CONTACT_IMPULSE_EVENTS) flag
+        /// through the world's body flag setters (`hknpWorld::enableBodyFlags` and
+        /// `disableBodyFlags`, which the disassembler mislabels `CPfxRigidBody::CPfxRigidBody` and
+        /// a `hkSignal2::subscribe`), which rebuild the body's collision caches.
+        #[index(24)]
+        pub fn SetContactImpulseEventActive(&mut self, active: bool);
     },
 
     /// The body's id in the physics system's world.

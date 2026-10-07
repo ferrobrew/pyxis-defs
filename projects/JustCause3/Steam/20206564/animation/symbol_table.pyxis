@@ -193,3 +193,24 @@ impl EventIdSymbolTable {
     #[address(0x140_413_020)]
     pub fn string_to_id(&mut self, name: *const u8) -> i32;
 }
+
+/// A ragdoll rigid-body group id (`ava::idstring<NAnimationSystem::SRagdollRBGroupIdTag>`), which
+/// names the part of a character's body a hit struck. Every live value holds a use of the group
+/// symbol table: [`init_ptr`](Self::init_ptr) takes one, creating the table on first use, and the
+/// value's destructor gives it back, destroying the table when the last use goes. A function that
+/// takes an id by value destroys it, so its caller copies the id and takes a use for the copy
+/// first.
+#[copyable, size(0x4), align(4)]
+pub type RagdollRBGroupId {
+    /// The id a character's damage handler gives a hit it finds no group for, as it gives every
+    /// melee hit.
+    pub const NONE: u32 = 0,
+
+    /// The id.
+    pub m_id: u32,
+}
+impl RagdollRBGroupId {
+    /// Takes a use of the group symbol table for this value.
+    #[address(0x140_416_A70)]
+    pub fn init_ptr(&mut self);
+}
