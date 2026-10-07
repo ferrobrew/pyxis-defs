@@ -3,3 +3,9 @@
 /// destructors.
 #[address(0x140_002_350)]
 pub fn OperatorNew(size: u64) -> *mut void;
+
+/// The engine's global free: returns `pointer`'s memory to the engine allocator, doing nothing for
+/// a null pointer. It frees what [`OperatorNew`] allocated; the engine's deleting destructors call
+/// it through a jump stub.
+#[address(0x140_054_FB0)]
+pub fn MemoryFree(pointer: *mut void) -> u64;
