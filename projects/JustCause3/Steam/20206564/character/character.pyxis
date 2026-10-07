@@ -7,6 +7,7 @@ use character::avatar::{Avatar, MentalState};
 use character::control_parameters::ControlParameters;
 use character::inventory::{Inventory, WeaponSlot};
 use character::swim_action_params::SwimActionParams;
+use input::locomotion::CharacterMovementSettings;
 use equipment::grappling_hook::GrapplingHook;
 use equipment::weapon::WeaponBase;
 use physics::{PfxCharacterInstance, ProxyState};
@@ -446,6 +447,27 @@ impl Character {
     /// update pass of the character runs its own range.
     #[address(0x140_75E_710)]
     pub fn UpdateStateTasksInRange(&mut self, dt: f32, range_id: u32);
+
+    /// Places the character's weapons and props on its current pose: calls
+    /// [`Inventory::UpdateAttachmentTransforms`](character::inventory::Inventory::UpdateAttachmentTransforms)
+    /// with the character's snow and water factors and `transform_type`, unless a character flag
+    /// beside [`m_LodFlags`](Self::m_LodFlags) (unmapped) switches the placement off.
+    /// [`UpdatePassFinalizePose_Parallel`](Self::UpdatePassFinalizePose_Parallel) makes the same
+    /// call inline twice: with the advancing placement (`transform_type` 2) after the finalize
+    /// state tasks, and with `transform_type` 1 after the `MAIN` HumanIK solve, which runs only
+    /// when [`HumanIK::HasTargets`] reports a queued target.
+    #[address(0x140_75E_AA0)]
+    pub fn UpdatePropTransforms(&mut self, transform_type: u32);
+
+    /// Whether the on-foot input should stop the character short of a drop ahead
+    /// (`CCharacter::ShouldPreventFall`): false when `predicted_fall_height` is below the
+    /// movement settings' [`m_PredictedFallHeightTolerance`](input::locomotion::CharacterOnFootSettings::m_PredictedFallHeightTolerance),
+    /// and otherwise true unless the player holds a player action (unmapped), read as an analog
+    /// value or a digital state by a game setting.
+    /// [`NStateTask_InputLocoSetTargetSpeedsTask::SetupTargetSpeeds`](input::locomotion::NStateTask_InputLocoSetTargetSpeedsTask::SetupTargetSpeeds)
+    /// calls it with the predicted fall height from the character's blackboard.
+    #[address(0x140_75F_9D0)]
+    pub fn ShouldPreventFall(&mut self, predicted_fall_height: f32, settings: *const CharacterMovementSettings) -> bool;
 
     /// The per-frame update of the character's attached prop visual effects. Runs last in
     /// [`UpdatePassFinalizePose_Parallel`](Self::UpdatePassFinalizePose_Parallel), after the IK
