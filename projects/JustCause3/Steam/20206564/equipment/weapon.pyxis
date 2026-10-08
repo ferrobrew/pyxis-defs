@@ -265,6 +265,15 @@ pub type WeaponData {
     pub const NO_MAGAZINE_MODEL_NAME_HASH: u32 = 0x193737A9,
     /// The [`m_MagazineUniqueTag`](Self::m_MagazineUniqueTag) of a gun without a magazine prop.
     pub const NO_MAGAZINE_UNIQUE_TAG: i32 = -1,
+    /// The name hash (`hashlittle` of `Pump`) of the pump bone in a pump-action gun's own skeleton,
+    /// the U-Rys 96's: the skeleton's one bone besides its `Reference` root, which carries the pump
+    /// and which the gun's pump clip moves. Resolved to an index through the gun's animation
+    /// controller ([`AnimationController::GetBoneIndex`](character::character::AnimationController::GetBoneIndex)).
+    pub const PUMP_BONE_HASH: u32 = 0x964E9E67,
+    /// The name hash (`hashlittle` of `Slider`) of the bolt bone in a bolt-action rifle's own
+    /// skeleton, the CS111 Archangel's and the Final Argument's: the skeleton's one bone besides its
+    /// `Reference` root, which carries the bolt and which the rifle's bolt-action clip moves.
+    pub const SLIDER_BONE_HASH: u32 = 0x7B1541DB,
 
     /// The weapon this gun belongs to.
     #[address(0xC0)]
@@ -286,7 +295,8 @@ pub type WeaponData {
     #[address(0x120)]
     pub m_InternalFirePositionCurrentIndex: i32,
 
-    /// The gun's animated model, when it has one; its skinning is updated in the render phase.
+    /// The gun's animated model, when it has one; its pose is computed in
+    /// [`UpdatePreSim`](Self::UpdatePreSim) and its skinning is updated in the render phase.
     #[address(0x128)]
     pub m_AnimatedModel: *mut AnimatedModel,
 
@@ -397,6 +407,23 @@ impl WeaponData {
     /// and returned.
     #[address(0x140_960_1E0)]
     pub fn GetWorldMatrixT1(&self, result: *mut Matrix4) -> *mut Matrix4;
+
+    /// The gun's pre-simulation update (`CWeaponData::UpdatePreSim`), run for each gun by the
+    /// weapon's own pre-simulation update (`CWeaponBase::UpdatePreSim`). When the gun has an
+    /// animated model ([`m_AnimatedModel`](Self::m_AnimatedModel)) and the weapon's LOD does not
+    /// switch its animation off, it advances the model's clips, track messages, rule systems, and
+    /// state tasks by the context's step, then computes the model-space pose
+    /// (`CPoseProducer::CalculateModelSpacePose`), which the joint accessors of the model's
+    /// animation controller
+    /// ([`AnimationController::GetJoint`](character::character::AnimationController::GetJoint) and
+    /// [`SetJoint`](character::character::AnimationController::SetJoint)) read and write and which
+    /// the render phase skins. It then measures the gun's velocities from its two cached world
+    /// matrices ([`m_MeasuredWorldVelocity`](Self::m_MeasuredWorldVelocity) and
+    /// [`m_MeasuredAngularVelocity`](Self::m_MeasuredAngularVelocity)). Returns whether the
+    /// animated model was updated. `context` is the game object update context, whose first field
+    /// is the step in seconds.
+    #[address(0x140_959_160)]
+    pub fn UpdatePreSim(&mut self, context: *mut void) -> bool;
 
     /// Places the gun for `state` (`CWeaponData::UpdateAttachmentTransforms`), writing
     /// [`m_WorldMatrixT1`](Self::m_WorldMatrixT1). With `update_type` 2 (advance) it first copies
