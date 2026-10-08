@@ -3,6 +3,7 @@ use animation::message::AnimationMessageData;
 use character::character::{AnimatedModel, Character};
 use character::inventory::WeaponSlot;
 use game::{GameObject, GameObjectRenderContext};
+use graphics_engine::model_instance::ModelInstance;
 use physics::{PfxRigidBody, RigidObject};
 use types::math::Matrix4;
 use types::math::Vector3;
@@ -300,10 +301,12 @@ pub type WeaponData {
     #[address(0x128)]
     pub m_AnimatedModel: *mut AnimatedModel,
 
-    /// The gun's base model instance (an `NModelSystem::CModelInstance`). The render update pushes
-    /// the interpolated world matrix to it.
+    /// The gun's base model instance. The render update pushes the interpolated world matrix to
+    /// it ([`ModelInstance::UpdateMatrix`]), scaled by the holstered scale while holstered, so the
+    /// model's own space ([`ModelInstance::GetModelSpaceBoundingBox`]) is the frame of
+    /// [`m_WorldMatrixT1`](Self::m_WorldMatrixT1).
     #[address(0x130)]
-    pub m_BaseModelInstance: *mut void,
+    pub m_BaseModelInstance: *mut ModelInstance,
 
     /// The gun's own rigid body. It is in the physics world only while the weapon's state keeps
     /// the weapon's bodies there (dropped, mounted, or turret; see [`WeaponState`]), and its id
@@ -1982,9 +1985,9 @@ pub type ModelAttachementWeaponComponent {
     #[address(0x190)]
     pub m_WorldMatrixSaved: Matrix4,
 
-    /// The part's model instance (an `NModelSystem::CModelInstance`), or null.
+    /// The part's model instance, or null.
     #[address(0x1D0)]
-    pub m_BaseModelInstance: *mut void,
+    pub m_BaseModelInstance: *mut ModelInstance,
 }
 impl ModelAttachementWeaponComponent {
     /// `CModelAttachementWeaponComponent::TYPE_ID`: the run-time type id of the class, for
