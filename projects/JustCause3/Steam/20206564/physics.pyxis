@@ -251,6 +251,17 @@ impl CastRayInfo {
     pub fn GetHitMaterial(&self) -> i32;
 }
 
+/// A game material (`EGameMaterialId`): the surface kind a physics shape is tagged with, which
+/// picks the impact effects and sounds played against it. Only the values the melee hit's impact
+/// lookup uses are bound.
+#[copyable]
+pub enum GameMaterialId: u32 {
+    /// A character's body, the material a melee hit on a character plays its impact against.
+    EGameMaterialId_Flesh = 0x19,
+    /// The fallback material: a lookup with no entry for a material uses this one's.
+    EGameMaterialId_Default = 0x1F,
+}
+
 /// A physics game object (`CPhysicsGameObject`): a game object with a physics instance, the owner a
 /// physics query reports for a hit body ([`CastRayInfo::m_GameObject`]). Characters, vehicles,
 /// and rigid props are physics game objects. Its `CGameObject` subobject sits at

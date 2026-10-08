@@ -1,5 +1,7 @@
+use physics::GameMaterialId;
 use types::math::Matrix4;
 use types::math::Vector3;
+use types::shared_ptr::SharedPtr;
 
 /// What an [`EffectTransformInfo`] transform drives (`SEffectTransformInfo::ETransformType`).
 #[copyable]
@@ -111,6 +113,17 @@ impl AttachedInstance {
 /// the grappling hook, and other game objects), with the effect parameter sources that feed them.
 #[min_size(0x90)]
 pub type AttachedEffectContainer {
+    /// The usage hash of a character's melee impact effects (`hashlittle("MeleeImpact")`): the
+    /// effect and sound a character's melee hit plays where it lands, picked by the struck
+    /// surface's material. The melee hit track message in `CCharacter::HandleTrackMessage` looks
+    /// it up on the attacking character's own container with
+    /// [`GetDynamicAttachedEffects`](Self::GetDynamicAttachedEffects), against
+    /// [`EGameMaterialId_Flesh`](GameMaterialId::EGameMaterialId_Flesh) for a character and the
+    /// hit shape's material for anything else, and plays the result with
+    /// [`EffectAndSoundPair::PlayOneOffs`] at a [`CreateCollisionMatrix`] facing back along the
+    /// hit.
+    pub const MELEE_IMPACT_USAGE: u32 = 0xD2F7574C,
+
     /// The head of the parameter-source list.
     #[address(0x28)]
     pub m_ParameterSources: *mut void,
@@ -130,4 +143,49 @@ impl AttachedEffectContainer {
     /// changed values to their sound and effect outputs.
     #[address(0x140_466_F30)]
     pub fn UpdateAttachedEffects(&mut self, dt: f32);
+
+    /// The one-off effect and sound the container's dynamic usage `usage_hash` plays against
+    /// `target_material` (an `EGameMaterialId`), for the usage's variant whose source material is
+    /// `source_material`, falling back to its
+    /// [`EGameMaterialId_Default`](GameMaterialId::EGameMaterialId_Default) variant. Writes the
+    /// variant's retrigger time to `retrigger_time` when it is not null. A usage the container has
+    /// not loaded returns a shared empty pair, both of whose pointers are null.
+    #[address(0x140_453_900)]
+    pub fn GetDynamicAttachedEffects(&mut self, usage_hash: u32, source_material: GameMaterialId, target_material: u32, retrigger_time: *mut f32) -> *const EffectAndSoundPair;
 }
+
+/// A one-off effect and sound (`SEffectAndSoundPair`): a particle effect resource and an FMOD
+/// sound resource, either of which may be null. Material effect tables and dynamic attached
+/// effect usages resolve to these.
+#[size(0x20)]
+pub type EffectAndSoundPair {
+    /// The particle effect (`boost::shared_ptr<SEffectResourceDataWrapper>`).
+    pub m_Effect: SharedPtr<void>,
+    /// The sound (`boost::shared_ptr<CSoundResource>`).
+    pub m_Sound: SharedPtr<void>,
+}
+impl EffectAndSoundPair {
+    /// Fires the pair once at `transform`, without keeping a handle to either instance: with
+    /// [`EffectCull::m_PlayEffect`], plays the effect there (projecting decals onto
+    /// `decal_models` along `decal_normal`, both of which may be null) and sets its velocity
+    /// parameter from `velocity`; with [`EffectCull::m_PlaySound`], starts the sound as a 3D
+    /// event at `transform` moving at `velocity` and releases it to play out. Bullet impacts,
+    /// melee hits, ricochets, explosions, and the grapple's impacts play their material effects
+    /// through it.
+    #[address(0x140_4B0_740)]
+    pub fn PlayOneOffs(&self, transform: *const Matrix4, velocity: *const Vector3, cull: *const EffectCull, decal_models: *const void, decal_normal: *const Vector3);
+}
+
+/// Which halves of an [`EffectAndSoundPair`] [`PlayOneOffs`](EffectAndSoundPair::PlayOneOffs)
+/// plays (`SEffectCull`). `SEffectCull::ALWAYS_PLAY` sets both.
+#[copyable, defaultable, size(0x2), align(1)]
+pub type EffectCull {
+    pub m_PlayEffect: bool,
+    pub m_PlaySound: bool,
+}
+
+/// A transform for an effect at a collision (`CreateCollisionMatrix`): translated to `position`,
+/// its up axis along `normal`, rolled about it by a random angle from the effect system's own
+/// random sequence. Writes it to `result` and returns `result`.
+#[address(0x140_48B_390)]
+pub fn CreateCollisionMatrix(result: *mut Matrix4, position: *const Vector3, normal: *const Vector3) -> *mut Matrix4;

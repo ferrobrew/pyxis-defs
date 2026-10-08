@@ -9,6 +9,7 @@ use character::inventory::{Inventory, WeaponSlot};
 use character::swim_action_params::SwimActionParams;
 use input::locomotion::CharacterMovementSettings;
 use interaction::InteractionUserProxy;
+use equipment::attached_effects::AttachedEffectContainer;
 use equipment::grappling_hook::GrapplingHook;
 use equipment::weapon::WeaponBase;
 use physics::{PfxCharacterInstance, ProxyState};
@@ -156,6 +157,13 @@ pub type Character {
     /// the local player character's to the movie.
     #[address(0x1B0)]
     pub m_MaxHealth: i16,
+
+    /// The character's attached effects (the `CAttachedEffectContainer` base of its
+    /// `CCombinedAttachedEffectContainer` base): its bone-attached effects and its dynamic usages,
+    /// such as the melee impact
+    /// ([`MELEE_IMPACT_USAGE`](equipment::attached_effects::AttachedEffectContainer::MELEE_IMPACT_USAGE)).
+    #[address(0x260)]
+    pub m_AttachedEffects: AttachedEffectContainer,
 
     /// The hit reaction's per-type impulse scales: [`HitReaction`](Self::HitReaction) scales a
     /// hit's impulse by the entry of the lowest [`DamageFlags`](damage::DamageFlags) type bit set
