@@ -697,6 +697,14 @@ pub type WeaponBase {
         /// reads recoil, scatter, and spread ranges.
         #[index(57)]
         pub fn GetTuningBase(&self) -> *const void;
+
+        /// Shows or hides the weapon's guns and their components. Showing with `fade` fades the
+        /// guns' models in. A weapon in the
+        /// [`E_WS_HOLSTERED_INVISIBLE`](WeaponState::E_WS_HOLSTERED_INVISIBLE) state is shown only
+        /// with `force`. Hiding takes effect at once. A hand grenade picked up hides itself this
+        /// way before it despawns, and a placement rule hides a weapon it places invisible.
+        #[index(59)]
+        pub fn SetVisible(&mut self, visible: bool, fade: bool, force: bool);
     },
 
     /// Whether the current shot is the first of a trigger pull; first shots use the tuning's

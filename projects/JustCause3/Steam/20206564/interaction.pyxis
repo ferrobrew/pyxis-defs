@@ -1,0 +1,67 @@
+use types::shared_ptr::WeakPtrGameObject;
+
+/// A character's user side of the interaction system (`CInteractionUserProxy`), embedded in the
+/// character ([`Character::m_InteractionUserProxy`](character::character::Character::m_InteractionUserProxy)).
+/// It tracks the interaction graphs near the character and which of their entries the character
+/// could take. Only some members are mapped.
+#[min_size(0x228)]
+pub type InteractionUserProxy {
+    /// The entries of nearby interaction graphs that the character could enter now. The player's
+    /// weapon readout and a swimming character's weapon pickup
+    /// ([`Inventory::UpdateWeaponHandling`](character::inventory::Inventory::UpdateWeaponHandling))
+    /// walk it for the weapon the first entry offers.
+    #[address(0x218)]
+    pub m_ValidEntries: InteractionGraphEntryArray,
+}
+
+/// A `TArray<CInteractionGraphEntry *>`: the start and the end of its element array.
+#[min_size(0x10)]
+pub type InteractionGraphEntryArray {
+    pub m_Begin: *mut *mut InteractionGraphEntry,
+
+    #[address(0x8)]
+    pub m_End: *mut *mut InteractionGraphEntry,
+}
+
+/// One way into an interaction graph (`CInteractionGraphEntry`). Only some members are mapped.
+pub type InteractionGraphEntry {
+    /// The index of the graph node the entry leads to, for
+    /// [`InteractionGraph::GetNodeByIndex`].
+    #[address(0x8)]
+    pub m_EntryNodeIndex: u64,
+
+    /// The graph the entry belongs to.
+    #[address(0x60)]
+    pub m_Graph: *mut InteractionGraph,
+}
+
+/// A graph of interaction nodes (`CInteractionGraph`), owned by an interaction context. Only some
+/// members are mapped.
+pub type InteractionGraph {
+    /// The context that owns the graph.
+    #[address(0x60)]
+    pub m_Context: *mut InteractionContext,
+}
+impl InteractionGraph {
+    /// The graph's node at `index`, or null when the index is past the graph's last node.
+    #[address(0x140_A37_D60)]
+    pub fn GetNodeByIndex(&mut self, index: u64) -> *mut InteractionGraphNode;
+}
+
+/// The game object that holds a set of interaction graphs (`CInteractionContext`). Only some
+/// members are mapped.
+pub type InteractionContext {
+    /// The game object the context belongs to (`CGameObject::m_Parent`), such as the weapon whose
+    /// pickup interaction the context carries.
+    #[address(0x70)]
+    pub m_Parent: WeakPtrGameObject,
+}
+
+/// One node of an interaction graph (`CInteractionGraphNode`). Only some members are mapped.
+#[size(0x70), align(16)]
+pub type InteractionGraphNode {
+    /// The game object the node stands for, such as the weapon placement rule of a weapon rack's
+    /// pickup, or null.
+    #[address(0x50)]
+    pub m_GameObject: WeakPtrGameObject,
+}

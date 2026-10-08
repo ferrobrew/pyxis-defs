@@ -8,6 +8,7 @@ use character::control_parameters::ControlParameters;
 use character::inventory::{Inventory, WeaponSlot};
 use character::swim_action_params::SwimActionParams;
 use input::locomotion::CharacterMovementSettings;
+use interaction::InteractionUserProxy;
 use equipment::grappling_hook::GrapplingHook;
 use equipment::weapon::WeaponBase;
 use physics::{PfxCharacterInstance, ProxyState};
@@ -196,6 +197,12 @@ pub type Character {
 
     #[address(0x1_780)]
     pub m_AnimatedModel: AnimatedModel,
+
+    /// The character's user side of the interaction system: the interaction graphs near it and
+    /// the entries it could take. Its getter (`CCharacter::GetInteractionUserProxy`) is mislabelled
+    /// `CContextAction::GetSecondaryOccupant` by the disassembler.
+    #[address(0x1_A08)]
+    pub m_InteractionUserProxy: InteractionUserProxy,
 
     /// The character's physics-side body instance. The movement actuators drive the character
     /// through it: they write the wanted velocity into its input and its orientation through
