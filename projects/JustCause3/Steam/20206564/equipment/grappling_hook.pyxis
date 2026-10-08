@@ -49,6 +49,59 @@ pub type GrapplingHangPhysicsProxy {
     pub m_PfxProxyBody: SharedPtr<PfxRigidBody>,
 }
 
+/// The grappling hook's tuning (`SGrappleTuning`), a resource the hook reads through its tuning
+/// handle. The reel-in fields below are the ones the reel's velocity update
+/// ([`NStateTask_ReelIn::UpdateReelVelocity`]) reads; the rest of the layout (the grapple range,
+/// the hold time, the tether spring and break settings, the wire's look, and the auto-aim, push,
+/// kick, and wire settings) is unmapped.
+#[copyable, min_size(0x4C)]
+pub type GrappleTuning {
+    /// The reel's top speed along the line (metres per second): a reel moving faster is slowed by
+    /// [`m_ReelInClampAccel`](Self::m_ReelInClampAccel).
+    #[address(0x28)]
+    pub m_ReelInSpeedMax: f32,
+
+    /// The reel's top speed while the reel boost applies (metres per second): the retract
+    /// accelerates the reel ([`GrapplingHook::GetRetractAcceleratesReelIn`]) and the retract has
+    /// been held ([`GrapplingHook::m_TimeHoldingRetract`]) for longer than a tenth of a second.
+    #[address(0x2C)]
+    pub m_RetractReelInSpeedMax: f32,
+
+    /// The reel's least speed along the line (metres per second): a reel moving slower is sped up
+    /// by [`m_ReelInClampAccel`](Self::m_ReelInClampAccel).
+    #[address(0x30)]
+    pub m_ReelInSpeedMin: f32,
+
+    /// The acceleration (metres per second squared) that brings the reel's speed back between
+    /// [`m_ReelInSpeedMin`](Self::m_ReelInSpeedMin) and the top speed.
+    #[address(0x34)]
+    pub m_ReelInClampAccel: f32,
+
+    /// The reel's acceleration along the line (metres per second squared).
+    #[address(0x38)]
+    pub m_ReelInAccel: f32,
+
+    /// The reel's acceleration along the line while the character's control parameters hold the
+    /// retract context flag (metres per second squared). It replaces
+    /// [`m_ReelInAccel`](Self::m_ReelInAccel) rather than adding to it, and applies only beyond
+    /// [`m_ReelInDragMaxDistance`](Self::m_ReelInDragMaxDistance) from the target.
+    #[address(0x3C)]
+    pub m_RetractReelInAccel: f32,
+
+    /// The drag on the reel's velocity across the line, per second.
+    #[address(0x40)]
+    pub m_ReelInPerpDrag: f32,
+
+    /// The distance from the target (metres) within which the reel stops at the target rather
+    /// than pass it in one step.
+    #[address(0x44)]
+    pub m_ReelInDragMaxDistance: f32,
+
+    /// The distance from the target (metres) at which the reel counts as arrived and finishes.
+    #[address(0x48)]
+    pub m_ReelInArrivedDistance: f32,
+}
+
 /// The grappling-hook equipment item (`CGrapplingHook`, a `CGameObject`): owns the wires, the
 /// reel/tether state machine, and the cached fire target. A character's hook is held by its
 /// inventory ([`Inventory::m_GrapplingHook`](character::inventory::Inventory::m_GrapplingHook)).
@@ -92,6 +145,26 @@ pub type GrapplingHook {
     /// unconfirmed.
     #[address(0x318)]
     pub m_CachedReelTargetPosition: Vector3,
+
+    /// Whether the dual tethers were squeezed on the last update: set by
+    /// [`SqueezeDualTethers`](Self::SqueezeDualTethers) when its squeeze value is above zero, and
+    /// cleared when it is zero or no tether exists.
+    #[address(0x38C)]
+    pub m_IsSqueezingDualTethers: bool,
+
+    /// How long the retract input (`RETRACT_GRAPPLE`) has been released, seconds: counted up by
+    /// [`UpdateDualTetherHandling`](Self::UpdateDualTetherHandling) while the input's value is zero
+    /// and reset to zero while it is above.
+    #[address(0x390)]
+    pub m_TimeSinceRetractHeld: f32,
+
+    /// How long the retract input (`RETRACT_GRAPPLE`) has been held, seconds: counted up by
+    /// [`UpdateDualTetherHandling`](Self::UpdateDualTetherHandling) while the input's value is above
+    /// zero and reset to zero while it is zero. It ramps the tether squeeze in, and the reel's
+    /// boosted top speed ([`GrappleTuning::m_RetractReelInSpeedMax`]) applies once it passes a
+    /// tenth of a second.
+    #[address(0x394)]
+    pub m_TimeHoldingRetract: f32,
 
     /// The wire currently driving the reel/attach flow, or null when none is live. The state
     /// readers null-check this before interpreting [`m_State`](Self::m_State).
@@ -172,6 +245,71 @@ impl GrapplingHook {
     /// Pushes the wires' tension and attach-type data to the HUD (`CHUDUI::UpdateWireData`).
     #[address(0x140_902_DC0)]
     pub fn PushWireDataToUI(&self);
+
+    /// The number of dual tethers: the wires of the hook's tether list that are neither invalid
+    /// nor broken and have neither end retracting. The tether release reads it.
+    #[address(0x140_8E5_030)]
+    pub fn GetNumDualTethers(&self) -> i32;
+
+    /// The highest tension fraction among the dual tethers that
+    /// [`GetNumDualTethers`](Self::GetNumDualTethers) counts, or zero without one. A wire's tension
+    /// fraction is updated with its constraint (`CGrapplingHookWire::UpdateWireTension`). The
+    /// player's camera shake and rumble (`CPlayer::UpdateCameraShakeRumble`) read it while the
+    /// tethers are squeezed, with a stronger effect above four fifths.
+    #[address(0x140_8E5_090)]
+    pub fn GetHighestWireTension(&self) -> f32;
+
+    /// Whether the hook's tether list holds a wire that is neither invalid nor broken and has both
+    /// ends attached.
+    #[address(0x140_8E5_100)]
+    pub fn HasValidTethers(&self) -> bool;
+
+    /// Whether the retract accelerates a reel: the hook's own retract-accelerates flag is set and
+    /// the retract reel-in boost upgrade is purchased and enabled.
+    #[address(0x140_8BD_090)]
+    pub fn GetRetractAcceleratesReelIn(&self) -> bool;
+
+    /// The per-tick tether input. It reads the retract input's value (`RETRACT_GRAPPLE`, `0..=1`)
+    /// and the release input's click (`RELEASE_GRAPPLE`) from `action_map` (a `CActionMap`), and
+    /// counts [`m_TimeHoldingRetract`](Self::m_TimeHoldingRetract) and
+    /// [`m_TimeSinceRetractHeld`](Self::m_TimeSinceRetractHeld). A release click releases the
+    /// tethers. Otherwise the squeeze value is the cube of the retract value, while the hook is
+    /// neither initialising, reeling in, nor holding a custom wire, the character can retract the
+    /// grapple, and the player has the tether retract ability, and zero otherwise. Unless a game
+    /// setting selects otherwise, the squeeze is scaled by a ramp of the hold time, from a tenth of
+    /// the squeeze to all of it over the three tenths of a second after the first three. The value
+    /// goes to [`SqueezeDualTethers`](Self::SqueezeDualTethers).
+    #[address(0x140_93A_290)]
+    pub fn UpdateDualTetherHandling(&mut self, holder: *const SharedPtr<Character>, player: *mut void, tuning: *const GrappleTuning, action_map: *mut void, dt: f32);
+
+    /// Squeezes every wire of the tether list by `squeeze_value` (`0..=1`): each wire rebuilds its
+    /// constraint toward a shorter length and smooths its squeeze factor toward the value. It sets
+    /// [`m_IsSqueezingDualTethers`](Self::m_IsSqueezingDualTethers).
+    #[address(0x140_923_E00)]
+    pub fn SqueezeDualTethers(&mut self, player: *mut void, tuning: *const GrappleTuning, squeeze_value: f32, dt: f32);
+}
+
+/// The reel-in state task (`NStateTask_ReelIn`): the character state task that carries the
+/// character along the grapple line to its target while the hook is
+/// [`GHS_REELING_IN`](GrapplingHookState::GHS_REELING_IN).
+pub type NStateTask_ReelIn;
+impl NStateTask_ReelIn {
+    /// Advances the reel's velocity by `dt`. It accelerates `velocity` (in and out: the
+    /// character's world velocity less the velocity it inherited) along `wanted_reel_direction` by
+    /// [`GrappleTuning::m_ReelInAccel`], or [`GrappleTuning::m_RetractReelInAccel`] while the
+    /// character's control parameters hold the retract context flag, adds the wind-up,
+    /// collision-avoidance, and
+    /// vehicle-entry pushes, drags the velocity across the line, clamps its speed along the line
+    /// between [`GrappleTuning::m_ReelInSpeedMin`] and the top speed
+    /// ([`GrappleTuning::m_ReelInSpeedMax`], or [`GrappleTuning::m_RetractReelInSpeedMax`] while the
+    /// reel boost applies), stops at the target within [`GrappleTuning::m_ReelInDragMaxDistance`],
+    /// and adds back the blended inherited velocity. `current_position` is the character's
+    /// position and `distance_to_target` its distance from the target. The reel task's update
+    /// calls it once per tick, and the trajectory prediction (`SimulateImmediateTrajectory`) calls
+    /// it per predicted step with `is_simulating` set, which only suppresses its debug drawing. The
+    /// disassembler mislabels it `NStateTask_ReelIn::DoPreReelBlockCheck`.
+    #[address(0x140_83A_0D0)]
+    pub fn UpdateReelVelocity(character: *mut Character, hook: *const SharedPtr<GrapplingHook>, velocity: *mut Vector3, instance_properties: *mut void, current_position: *const Vector3, wanted_reel_direction: *const Vector3, distance_to_target: f32, tuning: *const GrappleTuning, dt: f32, is_simulating: bool);
 }
 
 /// The in-air grapple fire motion state task (`NStateTask_InAirGrappleFireMotionTask`). Like the
