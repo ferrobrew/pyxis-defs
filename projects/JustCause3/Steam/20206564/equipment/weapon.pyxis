@@ -730,6 +730,15 @@ pub type WeaponBase {
     #[address(0x1AC)]
     pub m_ProjectileOffsetFireCount: i32,
 
+    /// Whether picking the weapon up gives the character a copy rather than the weapon itself.
+    /// [`PickupStart`](Self::PickupStart) then calls `CInventory::GivePlayerWeapon` with the
+    /// weapon's spawn tag, and [`PickupItem`](Self::PickupItem) puts nothing into the inventory:
+    /// it only plays the pickup vocal and clears
+    /// [`m_StoredNonMagazineAmmo`](Self::m_StoredNonMagazineAmmo). The weapon's pickup handling
+    /// leaves its pickup interaction enabled while it is set.
+    #[address(0x217)]
+    pub m_InfinitePickup: bool,
+
     /// Whether the magazine is out of the weapon. Only the throw-away-magazine track message
     /// ([`TRACK_MESSAGE_THROW_AWAY_MAGAZINE`](Self::TRACK_MESSAGE_THROW_AWAY_MAGAZINE)) sets it,
     /// and only [`Reload`](Self::Reload) clears it. While it is set the ammunition check
@@ -1004,8 +1013,15 @@ impl WeaponBase {
 
     /// Completes a pickup for `activator` (a character's `CGameObject` subobject): unequips the
     /// wielded weapon, puts this one into the inventory and equips it, selects its slot, adds its
-    /// stored ammunition to the inventory, and plays the pickup vocal. A hand grenade is left to
-    /// [`PickupStart`](Self::PickupStart). Called by the weapon's pickup track message, and
+    /// stored ammunition to the inventory, and plays the pickup vocal. It does not refill the
+    /// magazine. Putting the weapon into the inventory runs its pickup virtual (the holder is set,
+    /// the state becomes holstered, which takes its bodies out of the physics world, and its pickup
+    /// interaction is disabled) and its equip virtual (the state becomes wielding, or
+    /// dual-wielding for the player's dual-wield slot), with no animation act. A weapon already in
+    /// the slot is dropped or despawned by the inventory's add. A hand grenade is left to
+    /// [`PickupStart`](Self::PickupStart), and a weapon with
+    /// [`m_InfinitePickup`](Self::m_InfinitePickup) set is not put into the inventory at all; both
+    /// still lose their stored ammunition. Called by the weapon's pickup track message, and
     /// directly by [`Inventory::UpdateWeaponHandling`](character::inventory::Inventory::UpdateWeaponHandling)
     /// for a swimming character.
     #[address(0x140_979_8C0)]
