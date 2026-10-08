@@ -1,4 +1,5 @@
 use character::character::Character;
+use game::GameObjectUpdateContext;
 use types::math::{Matrix4, Vector3};
 use vehicle::parts::{PartInstance, PfxBreakable};
 
@@ -46,6 +47,16 @@ pub type Vehicle {
     /// The number of entries in [`m_Seats`](Self::m_Seats).
     pub const MAX_SEATS: u64 = 42,
 
+    /// The signed throttle the vehicle's input reader last applied (`m_SteeringValues.Acceleration`).
+    /// A plane's reader ([`AirPlane::UpdateVehicleInputsFromActionMap`]) sets it to the
+    /// `PLANE_INC_TRUST` value less the `PLANE_DEC_TRUST` value, so it is negative while braking.
+    /// [`UpdateLandingGearVariables`](Self::UpdateLandingGearVariables) reads it.
+    #[address(0x440)]
+    pub m_SteeringAcceleration: f32,
+    /// The brake the vehicle's input reader last applied (`m_SteeringValues.Brake`), `0..=1`: a
+    /// plane's is the `PLANE_DEC_TRUST` value.
+    pub m_SteeringBrake: f32,
+
     /// The signed steering amount the vehicle's controller last applied
     /// (`m_SteeringValues.Turn`). It is the value of the vehicle's `steering_turn` variable, which
     /// value-driven effects and hinged parts can be driven by.
@@ -77,10 +88,21 @@ pub type Vehicle {
     #[address(0x1_668)]
     pub m_VehicleDoorController: VehicleDoorController,
 
+    /// Whether the landing gear should be down. While the local player drives,
+    /// [`UpdateLandingGearVariables`](Self::UpdateLandingGearVariables) rewrites it on every update;
+    /// otherwise it keeps the value the AI steering last set.
+    #[address(0x1_81D)]
+    pub m_DesiredLandingGearState: bool,
+
     /// The world-space point the vehicle's weapons aim at, written by
     /// [`SetAimTargetPosition`](Self::SetAimTargetPosition).
     #[address(0x4_C34)]
     pub m_AimingTargetPosition: Vector3,
+
+    /// The nitrous input, `0..=1`: a plane's input reader raises it to the thrust input while that
+    /// is above [`AirPlane::NITROUS_THRUST_THRESHOLD`].
+    #[address(0x4_CCC)]
+    pub m_NitrousInput: f32,
 
     /// How long, in seconds, AI-controlled vehicle weapons keep an externally supplied aim target.
     /// [`SetAimTargetPosition`](Self::SetAimTargetPosition) sets it to `-1` when the local player
@@ -167,6 +189,41 @@ impl Vehicle {
     /// here is descriptive.
     #[address(0x140_F6F_8F0)]
     pub fn IsRocketBoat(&self) -> bool;
+
+    /// Moves the landing gear and its hatches toward
+    /// [`m_DesiredLandingGearState`](Self::m_DesiredLandingGearState), and plays the gear's attached
+    /// effects as they open, close, and lock. While the local player drives, it first chooses the
+    /// desired state itself: down while the vehicle is low over the ground, slower than a deploy
+    /// speed that the throttle in [`m_SteeringAcceleration`](Self::m_SteeringAcceleration) moves
+    /// between the vehicle's take-off and landing speeds, and not tilted past the vehicle's landing
+    /// tilt in the air; up otherwise while airborne. There is no player input for the gear.
+    #[address(0x140_F6F_1D0)]
+    pub fn UpdateLandingGearVariables(&mut self, context: *const GameObjectUpdateContext);
+}
+
+/// A plane (`CAirPlane`): a [`Vehicle`] with fixed wings. Only some members are bound.
+#[min_size(0x53A4)]
+pub type AirPlane {
+    /// The thrust input above which a plane's input reader feeds the nitrous
+    /// ([`Vehicle::m_NitrousInput`]): the plane's nitrous is a full `PLANE_INC_TRUST` rather than an
+    /// input of its own.
+    pub const NITROUS_THRUST_THRESHOLD: f32 = 0.9,
+
+    /// The plane's vehicle base.
+    pub vehicle: Vehicle,
+}
+impl AirPlane {
+    /// The plane's per-tick input reader, on top of the vehicle's own. Unless the plane is
+    /// destroyed, its driver is knocked out or dead, an AI's input is stale, or it is under an EMP,
+    /// it reads `action_map` (a `CActionMap`): the turn from `PLANE_TURN_LEFT` and
+    /// `PLANE_TURN_RIGHT`, the roll from `PLANE_ROLL_LEFT` and `PLANE_ROLL_RIGHT`, the pitch from
+    /// `PLANE_PITCH_UP` and `PLANE_PITCH_DOWN`, and the throttle into
+    /// [`Vehicle::m_SteeringAcceleration`] and [`Vehicle::m_SteeringBrake`] (no acceleration while
+    /// the movement is locked). With a living driver and the plane in control, a `PLANE_INC_TRUST`
+    /// value above [`NITROUS_THRUST_THRESHOLD`](Self::NITROUS_THRUST_THRESHOLD) raises
+    /// [`Vehicle::m_NitrousInput`] to it; otherwise the nitrous input is kept.
+    #[address(0x141_060_950)]
+    pub fn UpdateVehicleInputsFromActionMap(&mut self, action_map: *mut void);
 }
 
 /// `NStateTask_InputVehicleExitTask::TeleportUpwards`, run from the vehicle-exit animation event
