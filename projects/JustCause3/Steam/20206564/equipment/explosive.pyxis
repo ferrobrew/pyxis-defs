@@ -1,3 +1,4 @@
+use physics::PfxRigidBody;
 use types::math::Matrix4;
 use types::math::Vector3;
 
@@ -10,12 +11,12 @@ pub type Explosive {
     /// point there rather than at the start of the explosive.
     pub const GAME_OBJECT_BASE_OFFSET: u64 = 0x70,
 
-    /// The explosive's physics body (`CPfxRigidBody`, the pointer of a shared pointer), or null
-    /// until the first `UpdatePostSimFromManager` after the explosive spawns creates it.
+    /// The explosive's physics body (the pointer of a shared pointer), or null until the first
+    /// `UpdatePostSimFromManager` after the explosive spawns creates it.
     /// [`PropelToward`](Self::PropelToward) and [`SetPhysicsTransform`](Self::SetPhysicsTransform)
     /// do nothing without it.
     #[address(0x4B8)]
-    pub m_PfxInstance: *mut void,
+    pub m_PfxInstance: *mut PfxRigidBody,
 
     /// The explosive's world matrix as of the current simulation tick. Its translation row is the
     /// launch start position [`PropelToward`](Self::PropelToward) solves from. The `CGameObject`
@@ -154,8 +155,21 @@ pub type Grenade {
     /// [`PropelToward`](Self::PropelToward).
     #[address(0x720)]
     pub m_InitialLandingPos: Vector3,
+
+    /// What the grenade's override of the virtual `ShouldTickDetonationTimer` returns, so whether
+    /// its post-simulation update counts [`Explosive::m_DetonationTimer`] down. The constructor
+    /// sets it, so a hand grenade's fuse runs from the moment it spawns, primed in the hand or
+    /// thrown; the beacon weapon clears it on the beacon it primes, whose timer then never runs.
+    #[address(0x72E)]
+    pub m_ShouldTickDetonationTimer: bool,
 }
 impl Grenade {
+    /// `CGrenade::TYPE_ID`: the run-time type id of `CGrenade`, for
+    /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use. The thrown
+    /// grenade weapon checks its primed object against it before treating it as a grenade.
+    #[address(0x140_60F_D60)]
+    pub fn TYPE_ID() -> *const u32;
+
     /// The [`Explosive::PropelToward`] override: calls it, records `target_position` in
     /// [`m_InitialLandingPos`](Self::m_InitialLandingPos), plays the extra trail effects, and, with
     /// upgrades enabled and the homing upgrade owned, starts the homing-target search.
