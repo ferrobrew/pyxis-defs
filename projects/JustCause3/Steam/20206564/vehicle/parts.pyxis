@@ -1,5 +1,7 @@
 use graphics_engine::model_instance::ModelInstance;
+use physics::PfxRigidBody;
 use types::math::Matrix4;
+use vehicle::vehicle::Vehicle;
 
 /// `SHashString` as the ADF resources store it: a pointer to the string and its `hashlittle`
 /// hash, both resolved when the resource is loaded.
@@ -56,6 +58,10 @@ pub type PartInstance {
     /// The part this one hangs from, or null for the root part.
     pub m_ParentPart: *mut PartInstance,
 
+    /// The part's index in its body's part instances, the same as its [`Part::m_part_index`].
+    #[address(0x20)]
+    pub m_PartInstanceIndex: u32,
+
     /// The owner the part reports damage to (`IDamagePartOwner*`). For a vehicle's part this is
     /// the vehicle's damage-part-owner interface; the vehicle's render update only draws parts
     /// whose owner it is.
@@ -90,6 +96,19 @@ impl PartInstance {
     /// walking [`m_ParentPart`](Self::m_ParentPart) to the root.
     #[address(0x140_1D0_670)]
     pub fn BrokeOffOrAncestorBrokeOff(&self) -> bool;
+
+    /// Whether the part hangs from its parent by its own constraint: the part's constraint id is
+    /// valid and the world's constraint is enabled. A loosened part, such as an open door, does; a
+    /// part merged into the body, or one that broke off, does not.
+    #[address(0x140_1DF_050)]
+    pub fn IsConstraintActive(&self) -> bool;
+
+    /// The part's own body, a `CPfxVehiclePart` (a [`PfxRigidBody`](physics::PfxRigidBody)), when
+    /// the part has been loosened or broken off into one; null while the part is merged into its
+    /// body's own rigid body. It reads the part's world-collision rigid body and keeps it only when
+    /// its type test says it is a vehicle part.
+    #[address(0x140_1F0_810)]
+    pub fn GetPfxVehiclePartIfAny(&mut self) -> *mut PfxRigidBody;
 }
 
 /// `CPfxBreakable`: a rigid body made of [`PartInstance`]s that can deform, loosen, and break
@@ -112,4 +131,47 @@ impl PfxBreakable {
     /// count.
     #[address(0x140_237_A60)]
     pub fn GetPartByIndex(&mut self, index: u32) -> *mut PartInstance;
+
+    /// Loosens the merged part `part` into a body of its own (`CPartInstance::EnablePart`): the
+    /// part's owner spawns its physical part (for a vehicle, `CVehicle::SpawnPhysicalPart`, which
+    /// makes a [`VehiclePartGameObject`] and its body), and with `keep_constraint` the part's
+    /// constraint from the physics prototype is cloned to hang it from its parent, such as a door
+    /// on its hinge; otherwise the part breaks off. A part already hanging by its constraint
+    /// ([`PartInstance::IsConstraintActive`]) is left alone with `keep_constraint`, and broken off
+    /// without it. Runs synchronously on the calling thread, outside the physics step.
+    #[address(0x140_237_DE0)]
+    pub fn EnablePart(&mut self, part: *mut PartInstance, reason: PartEventReason, keep_constraint: bool);
+
+    /// The hinge angle of the part at index `index` above the hinge's smallest angle, radians, from
+    /// the world's constraint of a part that hangs by an enabled hinge; zero for a part without one.
+    #[address(0x140_24C_170)]
+    pub fn GetHingeAngleAboveMin(&mut self, index: i32) -> f32;
+}
+
+/// Why a breakable body's part changed (`NPfxBreakable::EPartEventReason`), passed to
+/// [`PfxBreakable::EnablePart`] and on to the part's loosened and broken-off events.
+#[copyable]
+pub enum PartEventReason: i32 {
+    /// The part took damage.
+    EPER_PartDamaged = 0x0,
+    /// The part was worked on purpose, as a door the door controller opens.
+    EPER_PartOperated = 0x1,
+    /// The part starts in this state when the body is made.
+    EPER_PartInitialState = 0x2,
+}
+
+/// `CVehiclePartGameObject`: the rigid object (`CRigidObject`) a vehicle spawns for a part that
+/// loosens or breaks off (`CVehicle::SpawnPhysicalPart`), such as an open door: it owns the part's
+/// own body and draws the part. Only some members are bound.
+pub type VehiclePartGameObject;
+impl VehiclePartGameObject {
+    /// `CVehiclePartGameObject::TYPE_ID`: the run-time type id of `CVehiclePartGameObject`, for
+    /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use.
+    #[address(0x140_733_650)]
+    pub fn TYPE_ID() -> *const u32;
+
+    /// The vehicle the part came from, through the object's weak reference to it; null once the
+    /// vehicle is gone.
+    #[address(0x140_C54_4F0)]
+    pub fn GetVehicle(&mut self) -> *mut Vehicle;
 }

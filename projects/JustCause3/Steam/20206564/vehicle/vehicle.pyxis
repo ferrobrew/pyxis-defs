@@ -1,6 +1,6 @@
 use character::character::Character;
 use types::math::{Matrix4, Vector3};
-use vehicle::parts::PfxBreakable;
+use vehicle::parts::{PartInstance, PfxBreakable};
 
 /// The engine's vehicle classification (`NVehicle::EVehicleType`), stored on a vehicle as
 /// `CVehicle::m_VehicleType` and returned by `CVehicle::GetVehicleType`, which is inlined at every
@@ -73,6 +73,10 @@ pub type Vehicle {
     #[address(0x1_5DC)]
     pub m_LocalPlayerSeat: Seat,
 
+    /// The vehicle's doors, hood, trunk, hatches, and other opening parts, and their state.
+    #[address(0x1_668)]
+    pub m_VehicleDoorController: VehicleDoorController,
+
     /// The world-space point the vehicle's weapons aim at, written by
     /// [`SetAimTargetPosition`](Self::SetAimTargetPosition).
     #[address(0x4_C34)]
@@ -96,6 +100,29 @@ pub type Vehicle {
     pub m_VehicleTypeNameHash: u32,
 }
 impl Vehicle {
+    /// `CVehicle::TYPE_ID`: the run-time type id of `CVehicle`, for
+    /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use.
+    #[address(0x140_60F_3F0)]
+    pub fn TYPE_ID() -> *const u32;
+
+    /// Asks every door of `slot` to open: makes sure the vehicle's physics body is in the world
+    /// and the vehicle is in the update, then sets each [`DoorInfo`] of the slot's
+    /// [`m_PendingState`](DoorInfo::m_PendingState) to [`DoorState::DOOR_OPENING`] and clears its
+    /// [`m_Flags`](DoorInfo::m_Flags). With `keep_open`, the door is held open at least
+    /// `keep_open_angle_deg` below its hinge's largest angle and reopens when pushed back
+    /// ([`DoorInfo::FLAG_KEEP_OPEN`]). The door controller acts on the request in the vehicle's
+    /// post-simulation update (`CVehicle::UpdatePostSim_Doors`), which loosens the part onto its
+    /// hinge ([`PfxBreakable::EnablePart`](vehicle::parts::PfxBreakable::EnablePart)) and turns
+    /// the hinge with a motor to the open angle.
+    #[address(0x140_FC7_320)]
+    pub fn OpenDoor(&mut self, slot: DoorSlot, keep_open: bool, keep_open_angle_deg: f32);
+
+    /// Asks every door of `slot` to close, the same way [`OpenDoor`](Self::OpenDoor) asks it to
+    /// open: the door controller turns the hinge's motor back to its smallest angle and merges the
+    /// part into the body there.
+    #[address(0x140_FC7_2B0)]
+    pub fn CloseDoor(&mut self, slot: DoorSlot);
+
     /// Sets [`m_AimingTargetPosition`](Self::m_AimingTargetPosition) and refreshes
     /// [`m_AIVehicleWeaponAimTimeout`](Self::m_AIVehicleWeaponAimTimeout).
     #[address(0x140_F24_B00)]
@@ -148,3 +175,124 @@ impl Vehicle {
 /// the physics proxy (the placement itself is inferred from the call shape).
 #[address(0x140_81A_3C0)]
 pub fn NStateTask_InputVehicleExitTask_TeleportUpwards(character: *mut Character);
+
+/// The door slots of a vehicle (`NVehicle::EDoorSlot`): which opening a [`DoorInfo`] is. A slot
+/// may hold several door parts that open together.
+#[copyable]
+pub enum DoorSlot: i32 {
+    FRONT_LEFT = 0x0,
+    FRONT_RIGHT = 0x1,
+    REAR_LEFT = 0x2,
+    REAR_RIGHT = 0x3,
+    CENTER_LEFT = 0x4,
+    CENTER_RIGHT = 0x5,
+    TURRET_DOOR = 0x6,
+    TRUNK = 0x7,
+    HOOD = 0x8,
+    REAR_DOOR = 0x9,
+    CARGO_BAY_DOOR = 0xA,
+    FOLDING_WING = 0xB,
+    MISSILE_HATCH = 0xC,
+}
+
+/// A door's state (`NVehicle::EDoorState`), as [`DoorInfo::m_State`] and
+/// [`DoorInfo::m_PendingState`] hold it.
+#[copyable]
+pub enum DoorState: i32 {
+    /// Open: the part is loose on its hinge, swinging freely or held open by the hinge's motor.
+    DOOR_OPEN = 0x0,
+    /// Being turned open by the hinge's motor.
+    DOOR_OPENING = 0x1,
+    /// Being turned shut by the hinge's motor.
+    DOOR_CLOSING = 0x2,
+    /// The part broke off.
+    DOOR_MISSING = 0x3,
+    /// Closed: the part is merged into the vehicle's body. As a pending state, it means that no
+    /// request is pending.
+    DOOR_CLOSED = 0x4,
+}
+
+/// `CDoorInfo`: one door part of a vehicle's [`VehicleDoorController`] and its state. A closed door
+/// is merged into the vehicle's body; opening it loosens the part onto the hinge constraint of the
+/// vehicle's physics prototype, as a body of its own
+/// ([`PartInstance::GetPfxVehiclePartIfAny`](vehicle::parts::PartInstance::GetPfxVehiclePartIfAny))
+/// owned by a [`VehiclePartGameObject`](vehicle::parts::VehiclePartGameObject).
+///
+/// Each post-simulation update, the controller acts on [`m_PendingState`](Self::m_PendingState).
+/// An opening request loosens the part
+/// ([`PfxBreakable::EnablePart`](vehicle::parts::PfxBreakable::EnablePart) with
+/// [`PartEventReason::EPER_PartOperated`](vehicle::parts::PartEventReason::EPER_PartOperated)),
+/// and both requests convert the hinge to a powered one whose motor turns it toward the open or the
+/// closed angle. A door that has opened stops its motor, unless it is kept open, and then swings
+/// freely on its hinge. A freely swinging door whose hinge angle above its minimum
+/// ([`PfxBreakable::GetHingeAngleAboveMin`](vehicle::parts::PfxBreakable::GetHingeAngleAboveMin))
+/// falls below a small angle while it swings shut faster than a threshold speed is merged back into
+/// the body (`CPartInstance::MergePart`): a door swung shut hard latches. A door the motor closes
+/// is merged once it reaches its smallest angle. Only some members are bound.
+#[size(0x50)]
+pub type DoorInfo {
+    /// The flag of [`m_Flags`](Self::m_Flags) an opening request that keeps the door open sets.
+    pub const FLAG_KEEP_OPEN: u32 = 0x2,
+
+    /// The state the controller moves the door to on its next update, or
+    /// [`DoorState::DOOR_CLOSED`] when nothing is pending.
+    pub m_PendingState: DoorState,
+    pub m_State: DoorState,
+    pub m_DoorSlot: DoorSlot,
+
+    /// The door's part instance in the vehicle's physics body.
+    #[address(0x10)]
+    pub m_PartInstance: *mut PartInstance,
+
+    /// The hinge's smallest angle, radians.
+    #[address(0x1C)]
+    pub m_HingeMinAngle_Rad: f32,
+    /// The hinge's largest angle, radians.
+    pub m_HingeMaxAngle_Rad: f32,
+
+    /// The smallest angle a door kept open is held at, radians.
+    #[address(0x28)]
+    pub m_KeepOpenMinAngle_Rad: f32,
+    /// A freely swinging door's hinge angle above its minimum on the controller's last update,
+    /// degrees, from which it measures how fast the door swings shut.
+    pub m_PreviousAngle_Deg: f32,
+
+    #[address(0x3C)]
+    pub m_Flags: u32,
+}
+
+/// `CVehicleDoorController`: a vehicle's doors ([`DoorInfo`]), kept in a
+/// `std::map<NVehicle::EDoorSlot, std::vector<CDoorInfo>>` keyed by [`DoorSlot`], and updated from
+/// the vehicle's post-simulation update. Only some members are bound.
+#[min_size(0x28)]
+pub type VehicleDoorController {
+    /// The map's head node (`_Myhead`): its [`m_Parent`](DoorMapNode::m_Parent) is the tree's
+    /// root, and the tree's leaf links point back at it.
+    #[address(0x8)]
+    pub m_DoorMapHead: *mut DoorMapNode,
+
+    /// The vehicle the doors belong to.
+    #[address(0x20)]
+    pub m_Vehicle: *mut Vehicle,
+}
+
+/// One node of the red-black tree behind [`VehicleDoorController`]'s door map
+/// (`std::_Tree_nod<...>::_Node`): a slot and its doors.
+#[min_size(0x42)]
+pub type DoorMapNode {
+    pub m_Left: *mut DoorMapNode,
+    pub m_Parent: *mut DoorMapNode,
+    pub m_Right: *mut DoorMapNode,
+    /// The slot this node holds.
+    pub m_DoorSlot: DoorSlot,
+
+    /// The first of the slot's doors (the vector's `_Myfirst`).
+    #[address(0x20)]
+    pub m_DoorsBegin: *mut DoorInfo,
+    /// One past the last of the slot's doors (`_Mylast`).
+    pub m_DoorsEnd: *mut DoorInfo,
+
+    /// Whether the node is the head, the tree's sentinel, rather than a slot (`_Isnil`).
+    #[address(0x41)]
+    pub m_IsNil: bool,
+}
