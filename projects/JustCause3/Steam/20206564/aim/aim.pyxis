@@ -88,8 +88,9 @@ pub type PlayerAimControl {
 
     /// Per slot, the world-space aim position: the direct position, pulled toward the selected
     /// target by aim assist. Slot [`TARGET_WEAPONS`](TargetType::TARGET_WEAPONS) is the point every
-    /// weapon aims at, and slot [`TARGET_GRAPPLE`](TargetType::TARGET_GRAPPLE) is the grapple aim
-    /// point.
+    /// weapon aims at, and the point the seated upper-body aim blend turns toward
+    /// ([`VehicleAimBlendState::UpdateSamplers`]); slot [`TARGET_GRAPPLE`](TargetType::TARGET_GRAPPLE)
+    /// is the grapple aim point.
     #[address(0x14C)]
     pub m_AimPos: [Vector3; 6],
 
@@ -363,3 +364,21 @@ impl PlayerIsAutoAimingCondition {
 /// The character-state task that overrides the aim direction toward a locked target.
 #[address(0x140_809_C60)]
 fn NAutoAimToTarget_Update(ctx: *mut StateContext, p: *mut void);
+
+/// The player's upper-body aim blend while seated in a vehicle (`CVehicleAimBlendState`), an
+/// animation-graph state over four directional aim samplers. Its layout is unmapped.
+pub type VehicleAimBlendState;
+impl VehicleAimBlendState {
+    /// Weights the state's samplers for the character owning `instance` (a
+    /// `NAnimationSystem::CStateMachineInstance`) over `dt`. It reads the weapon aim point of the
+    /// player's aim control ([`Player::m_AimControl`](character::player::Player::m_AimControl), the
+    /// [`TARGET_WEAPONS`](TargetType::TARGET_WEAPONS) slot of
+    /// [`m_AimPos`](PlayerAimControl::m_AimPos)), turns its horizontal direction from the
+    /// character into a signed yaw against the character's heading carried by the animation's delta
+    /// rotation, and its direction from the right attach bone (or the head) into a pitch, and blends
+    /// the front, side, and back samplers by the yaw and the up and down ones by the pitch. The
+    /// disassembler labels it `CJumpAimBlendState::UpdateSamplers`; the vehicle aim blend state's
+    /// virtual table points at it.
+    #[address(0x140_86F_4F0)]
+    pub fn UpdateSamplers(&mut self, instance: *mut void, dt: f32, samplers: *mut void);
+}
