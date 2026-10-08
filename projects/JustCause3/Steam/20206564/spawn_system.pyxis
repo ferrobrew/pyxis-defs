@@ -151,6 +151,17 @@ impl SpawnSystem {
     /// [`GetBFBCFrustumParamsForCameraAndTime`](graphics_engine::graphics_engine::OccluderCollectionManager::GetBFBCFrustumParamsForCameraAndTime),
     /// storing the result in [`m_SpawnBFBCParams`](Self::m_SpawnBFBCParams) and
     /// [`m_SpawnBFBCState`](Self::m_SpawnBFBCState) for the factory's visibility gate.
+    ///
+    /// The despawn ranking visits every spawned object of every resource definition. An object
+    /// whose own weak reference's control block (for a weapon,
+    /// [`WeaponBase::m_WeakThis`](equipment::weapon::WeaponBase::m_WeakThis)) has a strong count
+    /// other than one, the spawn system's own reference, is held by something else: it is given
+    /// rank zero and is never queued for despawn, nor chosen when its pool is over budget. Any
+    /// other object is ranked by `CalcDespawnRank` from its position, whether it is dead, and its
+    /// interest; its mission-critical flag protects it only while a mission or an encounter is
+    /// active, and is cleared otherwise. An object whose rank exceeds its pool's despawn threshold
+    /// is queued for despawn; otherwise the pool's highest-ranked object is remembered and queued
+    /// when the pool's instance count is over its limit.
     #[address(0x140_EFE_E90)]
     pub fn Update(&mut self);
 
@@ -172,6 +183,33 @@ impl SpawnSystem {
     /// objects.
     #[address(0x140_E97_DA0)]
     pub fn Spawn(&mut self, tags: *const u8, transform: *const Matrix4, flags: u32, callback: SpawnCallback, userdata: *mut u8);
+
+    /// Queues an asynchronous spawn request for the spawn tag `tag_index`, a type as
+    /// [`GameObject::GetUniqueSpawnTagIndex`](game::GameObject::GetUniqueSpawnTagIndex) names it
+    /// (the tag-index overload of `CSpawnSystem::Spawn`). The request is queued under the system's
+    /// request lock and serviced on a later frame, as for [`Spawn`](Self::Spawn), and `callback`
+    /// then fires with the spawned objects and `userdata`. The inventory's respawn of a slot
+    /// passes [`FF_HIGH_PRIO_SPAWN_CHECKS`](Self::FF_HIGH_PRIO_SPAWN_CHECKS) for the player and
+    /// [`FF_SECONDARY_SPAWN_CHECKS`](Self::FF_SECONDARY_SPAWN_CHECKS) otherwise, the character's
+    /// transform, and `-1` for `p7`.
+    #[address(0x140_E97_EE0)]
+    pub fn SpawnTagIndex(&mut self, tag_index: i32, transform: *const Matrix4, flags: u32, callback: SpawnCallback, userdata: *mut u8, p7: i32);
+
+    /// The hash of the spawn tag `tag_index`, or zero for an index out of range.
+    #[address(0x140_E0D_2C0)]
+    pub fn GetTagHashFromTagIndex(&self, tag_index: i32) -> u32;
+
+    /// The index of the spawn tag whose hash is `tag_hash`, or `-1` when no loaded tag has it.
+    #[address(0x140_E5D_5A0)]
+    pub fn GetTagIndexFromTagHash(&self, tag_hash: u32) -> i32;
+
+    /// Resets the system: waits for its spawn job, sends `spawn.reset_all_spawn_rules` at once,
+    /// destroys every pending spawn request and its factory, releases the system's references to
+    /// every spawned object of every resource definition and every object queued for despawn, and
+    /// posts `spawn.post_reset_all_spawn_rules`, which its receivers handle later. An object that
+    /// something else still holds a strong reference to outlives the reset, outside the system.
+    #[address(0x140_ECC_450)]
+    pub fn ResetSystem(&mut self) -> i32;
 }
 
 /// An opaque `CSpawnSystem::SResourceDef`: one spawnable resource's definition.

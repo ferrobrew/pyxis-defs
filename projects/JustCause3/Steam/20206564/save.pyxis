@@ -1,0 +1,34 @@
+use character::player::Player;
+
+/// The player's part of a save (`SPlayerSaveData`): a reference to the player whose state it
+/// stores and restores.
+#[size(0x8)]
+pub type PlayerSaveData {
+    pub m_Player: *mut Player,
+}
+
+/// Stores the player's save data into a binary output archive
+/// (`ArStore<NAr::CBinaryOutputArchive<NSaveLoad::CUserDataStream>>(const SPlayerSaveData&)`),
+/// from the player's character's inventory: the spawn tag hash of each slot's weapon
+/// ([`SpawnSystem::GetTagHashFromTagIndex`](spawn_system::SpawnSystem::GetTagHashFromTagIndex)),
+/// zero for an empty slot and always zero for the
+/// [`E_SLOT_HEAVY`](character::inventory::WeaponSlot::E_SLOT_HEAVY) slot; every reserve
+/// ([`Inventory::GetAmmoCount`](character::inventory::Inventory::GetAmmoCount)); the grappling
+/// device's tag hash; the player's upgrade name; two bavarium upgrade flags; and the downloadable
+/// content bits. No magazine, selected slot, or other per-weapon state is stored. The archive's
+/// store of a player save data calls it.
+#[address(0x140_CAD_C80)]
+pub fn StorePlayerSaveData(save_data: *const PlayerSaveData, archive: *mut void);
+
+/// Loads the player's save data from a versioned binary input archive of `version`. While a flag
+/// of the player is set, it reads the slots' tag hashes and the reserves, resets the inventory's
+/// respawn table, writes each known slot type's tag index
+/// ([`SpawnSystem::GetTagIndexFromTagHash`](spawn_system::SpawnSystem::GetTagIndexFromTagHash))
+/// into [`Inventory::m_WeaponToSpawn`](character::inventory::Inventory::m_WeaponToSpawn) with a
+/// full magazine to give, and sets each reserve
+/// ([`Inventory::SetAmmoCount`](character::inventory::Inventory::SetAmmoCount)); then the
+/// grappling device, the upgrade name, and the flags. It spawns nothing: the inventory's handler
+/// of the spawn system's post-reset event spawns the respawn table. The disassembler mislabels it
+/// as the load-schema visitor's load.
+#[address(0x140_CA6_FA0)]
+pub fn LoadPlayerSaveData(save_data: *mut PlayerSaveData, archive: *mut void, version: u8);

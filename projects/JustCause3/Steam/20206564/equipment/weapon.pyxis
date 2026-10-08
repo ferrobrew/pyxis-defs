@@ -705,7 +705,26 @@ pub type WeaponBase {
         /// way before it despawns, and a placement rule hides a weapon it places invisible.
         #[index(59)]
         pub fn SetVisible(&mut self, visible: bool, fade: bool, force: bool);
+
+        /// Places the weapon's guns for its state: the base implementation
+        /// (`CWeaponBase::UpdateAttachmentTransforms`) locks the holder
+        /// ([`m_Holder`](Self::m_Holder)) and runs
+        /// [`WeaponData::UpdateAttachmentTransforms`] for every gun with it, then places the
+        /// weapon's components. `p2` and `p3` are the snow and water factors the gun placement
+        /// takes, and `transform_type` its update type. The inventory's placement
+        /// ([`Inventory::UpdateAttachmentTransforms`](character::inventory::Inventory::UpdateAttachmentTransforms))
+        /// calls it for each slot's weapon.
+        #[index(61)]
+        pub fn UpdateAttachmentTransforms(&mut self, p2: f32, p3: f32, transform_type: u32);
     },
+
+    /// A weak reference to the weapon itself (`m_WeakThis` of its `CGameObject` subobject),
+    /// referring to that subobject. The spawn system's per-frame despawn ranking
+    /// ([`SpawnSystem::Update`](spawn_system::SpawnSystem::Update)) reads the strong count of its
+    /// control block, and the weapon hands out references to itself from it (the HUD's pickup
+    /// display, the pickup hint).
+    #[address(0x68)]
+    pub m_WeakThis: WeakPtrGameObject,
 
     /// Whether the current shot is the first of a trigger pull; first shots use the tuning's
     /// first-shot recoil scale.
@@ -987,6 +1006,14 @@ pub type WeaponBase {
     /// control block).
     #[address(0x4F8)]
     pub m_User: [*mut void; 2],
+
+    /// The object holding the weapon (`m_Holder`, a weak reference to its `CGameObject`
+    /// subobject): a character or a vehicle. [`OnPickup`](Self::OnPickup) sets it and
+    /// [`OnDrop`](Self::OnDrop) clears it. The weapon's placement
+    /// ([`UpdateAttachmentTransforms`](Self::UpdateAttachmentTransforms)) places its guns on the
+    /// holder's bones.
+    #[address(0x508)]
+    pub m_Holder: WeakPtrGameObject,
 
     /// Whether the weapon's user is the local player. The trigger's semi-automatic rule, the fire
     /// rumble ([`RumbleFire`](Self::RumbleFire)), and the fire camera shake apply only while it is

@@ -1,6 +1,7 @@
 use character::character::Character;
 use character::inventory::WeaponSlot;
 use character::player::Player;
+use equipment::weapon::WeaponBase;
 use graphics_engine::device::CRITICAL_SECTION;
 use types::math::Vector4;
 use types::shared_ptr::SharedPtr;
@@ -166,6 +167,19 @@ pub type HUDUI {
     pub m_LastHealth: i16,
 }
 impl HUDUI {
+    /// Rebuilds the weapon selection's list from the local player's inventory: each slot's weapon
+    /// icon and name, or none for an empty slot, then shows the selected weapon. The inventory's
+    /// pre-reset event handler calls it while the HUD is up.
+    #[address(0x140_E4A_D30)]
+    pub fn InitWeapons(&mut self);
+
+    /// Shows `weapon` in its slot's entry of the weapon selection: the weapon's icon, slot, and
+    /// name ([`WeaponBase::m_WeaponNameHash`](equipment::weapon::WeaponBase::m_WeaponNameHash)).
+    /// [`WeaponBase::OnPickup`](equipment::weapon::WeaponBase::OnPickup) calls it when a locally
+    /// controlled character takes a weapon.
+    #[address(0x140_E2A_460)]
+    pub fn OnPickupWeapon(&mut self, weapon: *const SharedPtr<WeaponBase>);
+
     /// The per-frame HUD update: refreshes [`m_State`](Self::m_State) through `UpdateState`, then,
     /// unless the state hides the HUD, updates the reticles, health, vehicle, wingsuit, points of
     /// interest, tethers, heat, button hints, subtitles, and notifications. `CUIManager::PreRender`

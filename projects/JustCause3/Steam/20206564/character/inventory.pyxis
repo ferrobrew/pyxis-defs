@@ -1,6 +1,7 @@
 use character::character::Character;
 use equipment::grappling_hook::GrapplingHook;
 use equipment::weapon::{AmmunitionType, WeaponBase};
+use event::{EventImpl, ReceiveEvent};
 use types::math::Vector3;
 use types::shared_ptr::SharedPtr;
 
@@ -21,6 +22,17 @@ pub enum WeaponSlot: i32 {
     E_NONE = 0x9,
 }
 
+/// How [`Inventory::AddWeapon`] equips the weapon it adds (`CInventory::EEquipMode`).
+#[copyable]
+pub enum EquipMode: i32 {
+    /// Store the weapon in its slot without equipping it.
+    E_DONT_EQUIP = 0x0,
+    /// Equip the weapon: the wielded weapon is unequipped first.
+    E_EQUIP = 0x1,
+    /// Equip the weapon only when its slot is the character's selected slot.
+    E_EQUIP_IF_IN_SELECTED_SLOT = 0x2,
+}
+
 /// The character's equipment inventory (`CInventory`), embedded in `CCharacter`
 /// ([`Character::m_Inventory`](character::character::Character::m_Inventory)). Only some members
 /// are mapped.
@@ -36,6 +48,19 @@ pub type Inventory {
     /// `CCharacter::GetGrapplingHook` returns a reference to this field.
     #[address(0xC0)]
     pub m_GrapplingHook: SharedPtr<GrapplingHook>,
+
+    /// The respawn table's weapon type for each slot (`m_WeaponToSpawn`), indexed by
+    /// [`WeaponSlot`]: a spawn tag index
+    /// ([`GameObject::GetUniqueSpawnTagIndex`](game::GameObject::GetUniqueSpawnTagIndex)), or zero
+    /// for none. The spawn system's pre-reset event
+    /// ([`m_SpawnSystemPreReset`](Self::m_SpawnSystemPreReset)) records each occupied slot's
+    /// weapon type here when the slot has no entry yet, the player save data's load
+    /// ([`LoadPlayerSaveData`](save::LoadPlayerSaveData)) writes the saved types here, and the
+    /// post-reset event ([`m_SpawnSystemPostReset`](Self::m_SpawnSystemPostReset)) requests a spawn
+    /// of each entry; each spawned weapon replaces the slot's occupant through the character's
+    /// pickup.
+    #[address(0xE8)]
+    pub m_WeaponToSpawn: [i32; 8],
 
     /// Whether the current animation permits shooting; one half of
     /// [`GetAnimationAllowsShooting`](Self::GetAnimationAllowsShooting).
@@ -141,6 +166,20 @@ pub type Inventory {
     /// The character that owns the inventory.
     #[address(0x3E0)]
     pub m_Character: *mut Character,
+
+    /// The subscription to the spawn system's `spawn.reset_all_spawn_rules` event, sent at once
+    /// when the spawn system resets ([`ResetSystem`](spawn_system::SpawnSystem::ResetSystem)),
+    /// before it releases its references to the spawned objects.
+    /// [`HandleEvent`](Self::HandleEvent) then records the slots' weapons into the respawn table
+    /// ([`m_WeaponToSpawn`](Self::m_WeaponToSpawn)) and the selected slot, and refreshes the HUD's
+    /// weapon list.
+    #[address(0x3E8)]
+    pub m_SpawnSystemPreReset: ReceiveEvent,
+    /// The subscription to the spawn system's `spawn.post_reset_all_spawn_rules` event, posted at
+    /// the end of the reset and so handled later. [`HandleEvent`](Self::HandleEvent) then marks
+    /// every slot's occupant for removal, clears the character's next selected slot, and requests a
+    /// spawn of every slot's respawn entry and of the grappling device.
+    pub m_SpawnSystemPostReset: ReceiveEvent,
 
     /// The slot the weapon selection commits when every slot-select input is released, or
     /// [`E_NONE`](WeaponSlot::E_NONE). While a slot-select input is held,
@@ -386,4 +425,45 @@ impl Inventory {
     /// casings, and sounds), when it has one.
     #[address(0x140_8C6_D30)]
     pub fn UpdateAttachmentEffects(&mut self, dt: f32);
+
+    /// Takes the weapon out of `slot` without dropping it (`CInventory::RemoveWeapon`): clears the
+    /// slot's reference and releases it, and clears the character's next selected slot when it was
+    /// `slot`. The weapon's state, holder
+    /// ([`WeaponBase::m_Holder`](equipment::weapon::WeaponBase::m_Holder)), and user are left as
+    /// they were, so a weapon that has another strong reference stays as it
+    /// is, holstered on the character, outside the inventory.
+    #[address(0x140_8EC_E00)]
+    pub fn RemoveWeapon(&mut self, slot: WeaponSlot);
+
+    /// Puts `weapon` into its slot
+    /// ([`WeaponBase::m_EquipSlot`](equipment::weapon::WeaponBase::m_EquipSlot))
+    /// (`CInventory::AddWeapon`). A different weapon already in the slot is dropped through
+    /// [`DropWeapon`](Self::DropWeapon) when the slot's drop-old flag of the respawn table is set,
+    /// and despawned otherwise. The slot then takes a reference to `weapon`, and the weapon's
+    /// [`OnPickup`](equipment::weapon::WeaponBase::OnPickup) runs with the character's
+    /// `CGameObject` subobject as its holder. With [`E_EQUIP`](EquipMode::E_EQUIP), or
+    /// [`E_EQUIP_IF_IN_SELECTED_SLOT`](EquipMode::E_EQUIP_IF_IN_SELECTED_SLOT) on the selected
+    /// slot, the wielded weapon is unequipped
+    /// ([`OnUnequip`](equipment::weapon::WeaponBase::OnUnequip)), `weapon` is equipped
+    /// ([`OnEquip`](equipment::weapon::WeaponBase::OnEquip)), and the HUD shows it as selected for
+    /// a locally controlled character. A hand grenade, a planted explosive, or a beacon is started
+    /// in use. The weapon's visibility is set to the character's. A weapon in the mounted state
+    /// only takes the slot and becomes the selected slot. Adding the slot's own occupant again does
+    /// nothing.
+    #[address(0x140_932_8B0)]
+    pub fn AddWeapon(&mut self, weapon: *const SharedPtr<WeaponBase>, mode: EquipMode);
+
+    /// The inventory's event handler (`CInventory::HandleEvent`), reached through its event
+    /// handler's vtable for the events it subscribes: the spawn system's pre-reset
+    /// ([`m_SpawnSystemPreReset`](Self::m_SpawnSystemPreReset)) and post-reset
+    /// ([`m_SpawnSystemPostReset`](Self::m_SpawnSystemPostReset)) events, told apart with
+    /// [`EventMatches`](event::EventMatches).
+    #[address(0x140_942_5D0)]
+    pub fn HandleEvent(&mut self, event: *const EventImpl, data: *mut void);
+
+    /// Shows or hides every slot's weapon: calls each one's
+    /// [`SetVisible`](equipment::weapon::WeaponBase::SetVisible) with `visible` and neither fade nor
+    /// force. The character calls it when its own visibility changes.
+    #[address(0x140_8C6_D50)]
+    pub fn UpdateWeaponVisibility(&mut self, visible: bool);
 }
