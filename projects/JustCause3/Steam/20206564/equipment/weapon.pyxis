@@ -379,6 +379,18 @@ pub type WeaponData {
     pub m_IsLeadingWeaponFire: bool,
 }
 impl WeaponData {
+    /// Puts the gun's own body ([`m_PfxInstance`](Self::m_PfxInstance)) into the physics world
+    /// (`CWeaponData::AddToWorld`, which the disassembler names `CPfxVehicle::OnStoppedTrailing`).
+    /// It keeps the body's collision system group, or takes a fresh one when the group is zero,
+    /// sets its collision layer for the owning weapon's state, makes it dynamic, and places it at
+    /// the gun's world matrix ([`m_WorldMatrixT1`](Self::m_WorldMatrixT1)), so the body's frame is
+    /// the gun's model frame and its shape is in that frame. The weapon's own world addition
+    /// calls it for each gun but a dual-wielded weapon's second (`CWeaponBase::AddToWorld`, which
+    /// the disassembler names `CWeaponBase::RemoveFromWorld`; the disassembler's
+    /// `CWeaponBase::AddToWorld` is the removal).
+    #[address(0x140_959_570)]
+    pub fn AddToWorld(&mut self);
+
     /// Returns [`m_WorldMatrixT1`](Self::m_WorldMatrixT1), scaled by
     /// [`m_HolsteredScaleValue`](Self::m_HolsteredScaleValue) when the owning weapon is
     /// [`E_WS_HOLSTERED`](WeaponState::E_WS_HOLSTERED). The result is written through `result`

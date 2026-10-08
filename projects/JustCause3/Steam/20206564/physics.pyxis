@@ -1,6 +1,6 @@
 use character::character::Character;
 use damage::DamageMsg;
-use havok::{hkReferencedObject, hkSimdFloat32, hkTransformf, hknpBodyCinfo, hknpConstraintCinfo, hknpContactImpulseEvent, hknpMotionCinfo};
+use havok::{hkReferencedObject, hkSimdFloat32, hkTransformf, hknpBodyCinfo, hknpConstraintCinfo, hknpContactImpulseEvent, hknpMotionCinfo, hknpShape};
 use types::math::{Matrix4, Vector3};
 use types::vector_math::{AlignedQuat, AlignedVector3};
 
@@ -440,6 +440,11 @@ pub type hknpBody {
     /// The body's collision-filter word, read by the world's collision filter; see
     /// [`CustomGroupCollisionFilter`] for its fields.
     pub m_collisionFilterInfo: u32,
+    /// The body's collision shape, in body space. The body holds a reference of its own to it,
+    /// taken from the construction info's shape
+    /// ([`hknpBodyCinfo::m_shape`](havok::hknpBodyCinfo::m_shape)) when the body is created
+    /// and released when it is destroyed, so several bodies may share one shape.
+    pub m_shape: *mut hknpShape,
 
     /// The body's motion in [`hknpWorld::m_motions`]; bodies attached to one another share it.
     #[address(0x68)]
