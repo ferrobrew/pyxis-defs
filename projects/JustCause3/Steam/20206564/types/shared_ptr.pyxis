@@ -1,3 +1,5 @@
+use game::GameObject;
+
 /// A `boost::shared_ptr<T>`: the owned object pointer (`px`) and its reference-count control block
 /// (`pn`).
 #[min_size(0x10)]
@@ -77,4 +79,19 @@ impl WeakPtrGameObject {
     /// pointer releases `self`.
     #[address(0x140_4D0_BC0)]
     pub fn Assign(&mut self, other: *const WeakPtrGameObject) -> *mut WeakPtrGameObject;
+
+    /// `boost::weak_ptr<CGameObject>::lock`: writes into `result` a strong reference to the
+    /// object, taken by raising the control block's strong count with an atomic compare-and-swap
+    /// while that count is above zero, and returns `result`. An object whose strong count already
+    /// reached zero (one that is being or has been destroyed), or a null pointer, yields a null
+    /// `result`. The strong reference keeps the object alive until it is released with
+    /// [`ReleaseSharedPtrGameObject`].
+    #[address(0x140_44C_C90)]
+    pub fn Lock(&self, result: *mut SharedPtr<GameObject>) -> *mut SharedPtr<GameObject>;
 }
+
+/// `boost::shared_ptr<CGameObject>::~shared_ptr`: releases the strong reference `ptr` holds. When
+/// it was the last strong reference the object is disposed, and when no weak reference remains
+/// either the control block is destroyed too. `ptr` itself is not cleared.
+#[address(0x140_43E_940)]
+pub fn ReleaseSharedPtrGameObject(ptr: *mut SharedPtr<GameObject>);
