@@ -2,6 +2,7 @@ use character::character::Character;
 use game::GameObjectUpdateContext;
 use types::math::{Matrix4, Vector3};
 use vehicle::parts::{PartInstance, PfxBreakable};
+use vehicle::stunt_areas::StuntAreas;
 
 /// The engine's vehicle classification (`NVehicle::EVehicleType`), stored on a vehicle as
 /// `CVehicle::m_VehicleType` and returned by `CVehicle::GetVehicleType`, which is inlined at every
@@ -93,6 +94,12 @@ pub type Vehicle {
     /// otherwise it keeps the value the AI steering last set.
     #[address(0x1_81D)]
     pub m_DesiredLandingGearState: bool,
+
+    /// The vehicle's stunt areas: where a character in a stunt position stands on it. A
+    /// helicopter's stunt position is a hang from the airframe instead, entered through the
+    /// vehicle's interaction context rather than an area.
+    #[address(0x1_830)]
+    pub m_StuntAreas: StuntAreas,
 
     /// The world-space point the vehicle's weapons aim at, written by
     /// [`SetAimTargetPosition`](Self::SetAimTargetPosition).
@@ -199,6 +206,15 @@ impl Vehicle {
     /// tilt in the air; up otherwise while airborne. There is no player input for the gear.
     #[address(0x140_F6F_1D0)]
     pub fn UpdateLandingGearVariables(&mut self, context: *const GameObjectUpdateContext);
+}
+
+/// A helicopter (`CHelicopter`): a [`Vehicle`] flown by its rotors. Only its run-time type is bound.
+pub type Helicopter;
+impl Helicopter {
+    /// `CHelicopter::TYPE_ID`: the run-time type id of `CHelicopter`, for
+    /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use.
+    #[address(0x140_610_050)]
+    pub fn TYPE_ID() -> *const u32;
 }
 
 /// A plane (`CAirPlane`): a [`Vehicle`] with fixed wings. Only some members are bound.

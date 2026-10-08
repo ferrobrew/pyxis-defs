@@ -735,6 +735,54 @@ impl Character {
     #[address(0x140_7F5_080)]
     pub fn IsInStuntPosition(&self) -> bool;
 
+    /// Whether the character stands in a stunt area of a vehicle: attached to a vehicle, and the
+    /// interaction-graph node it is on is a stunt-area node (node type 4, the type
+    /// [`IsInStuntPosition`](Self::IsInStuntPosition) also accepts).
+    #[address(0x140_7F1_FA0)]
+    pub fn IsInStuntArea(&self) -> bool;
+
+    /// Whether the character hangs from a helicopter in its stunt position: the vehicle it is
+    /// attached to ([`GetVehicle`](Self::GetVehicle)) is a
+    /// [`Helicopter`](vehicle::vehicle::Helicopter), and the body rule system is in one of the
+    /// stunt idles (`S_IDLE_STUNT`, `S_IDLE_HANG_STUNT`, or one of the five `S_IDLE_STUNT_FIRE_*`
+    /// states). A helicopter has no stunt areas to stand on; its stunt position is this hang.
+    #[address(0x140_7F1_2D0)]
+    pub fn IsStuntHanging(&self) -> bool;
+
+    /// Attaches the character to `vehicle` in a stunt position near `from_position`, returning
+    /// whether it did. On a [`Helicopter`](vehicle::vehicle::Helicopter) it runs the components of
+    /// the vehicle interaction context's hang interaction, which puts the character in the hang
+    /// ([`IsStuntHanging`](Self::IsStuntHanging)); it fails when the helicopter has none. On any
+    /// other vehicle it finds the stunt area nearest `from_position`
+    /// ([`GetNearestStuntArea_World`](vehicle::stunt_areas::GetNearestStuntArea_World) over
+    /// [`Vehicle::m_StuntAreas`](vehicle::vehicle::Vehicle::m_StuntAreas)) and that area's node in
+    /// the vehicle's interaction graph, runs the context's stunt interaction, enters the node,
+    /// hands the character's velocity to the game (the physics input state's game-controlled
+    /// velocity flag), turns the character and its proxy to the vehicle's orientation
+    /// ([`SetOrientation`](Self::SetOrientation)), and places it on the area at the nearest point,
+    /// or at the node's centre when `from_position` is outside the area, as the interaction user's
+    /// local matrix and the move action's capsule position. It fails for a vehicle without areas,
+    /// an area without a node, or a context without the stunt interaction. The graph-script node
+    /// `NGSONodes::TryAttachToClosestStuntArea` calls it; the on-foot movement tasks attach a
+    /// character that lands on a vehicle through
+    /// [`AutoAttachToStuntAreaOnVehicleBelow`](Self::AutoAttachToStuntAreaOnVehicleBelow) instead.
+    #[address(0x140_7C8_CD0)]
+    pub fn AutoAttachToClosestStuntAreaOnVehicle(&mut self, vehicle: *mut Vehicle, from_position: *const Vector3) -> bool;
+
+    /// Attaches a character that stands on a vehicle to its nearest stunt area, returning whether
+    /// it did: with the character's vehicle-below flag set and the vehicle it names not upside
+    /// down, and the character not yet attached to a vehicle, the area the character's position
+    /// projects onto, if the projection is close enough; a point near the area's edge is pulled in
+    /// toward the node's centre. It joins the area's interaction-graph node as an active user
+    /// (`CInteractionGraph::AddUser`, which the IDB labels
+    /// `CGrapplingHook::DoReReelToStaticPosition`), hands the character's
+    /// velocity to the game, and places it there as
+    /// [`AutoAttachToClosestStuntAreaOnVehicle`](Self::AutoAttachToClosestStuntAreaOnVehicle)
+    /// does, without turning it. The on-foot locomotion and stunting movement tasks and the NPC
+    /// path-follow and on-spot tasks call it each update.
+    #[address(0x140_7F1_A30)]
+    pub fn AutoAttachToStuntAreaOnVehicleBelow(&mut self) -> bool;
+
     /// Whether the character mans a mounted gun: the weapon in the
     /// [`E_SLOT_HEAVY`](WeaponSlot::E_SLOT_HEAVY) slot is in its mounted weapon state.
     #[address(0x140_7B0_F60)]
