@@ -1088,6 +1088,19 @@ impl WeaponBase {
     #[address(0x140_979_8C0)]
     pub fn PickupItem(&mut self, activator: *mut GameObject);
 
+    /// Starts `character` using the weapon: sets the user ([`m_User`](Self::m_User)) and
+    /// [`m_IsUserLocalPlayer`](Self::m_IsUserLocalPlayer) and
+    /// [`m_IsUserPlayer`](Self::m_IsUserPlayer), adds the weapon's camera hint for the locally
+    /// controlled character, and records the use in the statistics. A mounted gun is also put into
+    /// the user's inventory. For the player it leaves precision aim when the weapon does not
+    /// support it ([`m_SupportsPrecisionAim`](Self::m_SupportsPrecisionAim)), and hands the
+    /// player's aim mode to the weapon ([`SetAimMode`](Self::SetAimMode)). It does not change the
+    /// weapon's state. The equip virtual ([`OnEquip`](Self::OnEquip)) calls it, and the inventory's
+    /// add calls it for the hand grenade, the planted explosive, and the beacon, which are in use
+    /// without being wielded.
+    #[address(0x140_982_600)]
+    pub fn StartUsing(&mut self, character: *mut Character);
+
     /// Writes the world transform of the weapon's grip point for `hand` into `matrix`: the
     /// weapon's grip-table entry for that hand (the entry for the mounted state while
     /// [`m_State`](Self::m_State) is [`E_WS_MOUNTED`](WeaponState::E_WS_MOUNTED)), a translation in
