@@ -262,6 +262,12 @@ pub type PhysicsGameObject {
     pub const GAME_OBJECT_BASE_OFFSET: u64 = 0x8,
 
     vftable {
+        /// The object's engine physics instance, or null. A rigid object
+        /// ([`RigidObject`]) returns its one body's wrapper, a [`PfxRigidBody`], whose
+        /// [`PfxInstance::m_GameObject`] is the object.
+        #[index(1)]
+        pub fn GetIPfxInstance(&mut self) -> *mut PfxInstance;
+
         /// Takes the damage in `msg` and returns the damage dealt. Each kind of object overrides
         /// it: a character (`CCharacter::OnDamage`) takes the health, sends the hit effects, and
         /// runs its hit reaction from the message's impulse, position, and direction; a rigid

@@ -174,8 +174,8 @@ impl GameState {
 
 /// A game object's `CGameObject` subobject, through which the engine's run-time type tests go. A
 /// [`PhysicsGameObject`](physics::PhysicsGameObject) carries it at
-/// [`GAME_OBJECT_BASE_OFFSET`](physics::PhysicsGameObject::GAME_OBJECT_BASE_OFFSET). Only one
-/// virtual is bound.
+/// [`GAME_OBJECT_BASE_OFFSET`](physics::PhysicsGameObject::GAME_OBJECT_BASE_OFFSET). Only some
+/// virtuals are bound.
 pub type GameObject {
     vftable {
         /// `CRtti::IsType`: whether the object is of the class `type_id` names or derives from it.
@@ -183,5 +183,15 @@ pub type GameObject {
         /// returns it (such as [`Character::TYPE_ID`](character::character::Character::TYPE_ID)).
         #[index(2)]
         pub fn IsType(&self, type_id: *const u32) -> bool;
+
+        /// Enables or disables the object. A rigid object's override
+        /// ([`RigidObject`](physics::RigidObject)) records the state and, when it changes, adds its
+        /// body to the physics world on enabling and removes it on disabling. A gun's spare
+        /// magazine prop ([`WeaponData::m_MagazineObject`](equipment::weapon::WeaponData::m_MagazineObject))
+        /// is disabled from its spawn until
+        /// [`ThrowAwayMagazineObject`](equipment::weapon::WeaponData::ThrowAwayMagazineObject)
+        /// enables it.
+        #[index(38)]
+        pub fn Enable(&mut self, enable: bool);
     },
 }
