@@ -3,7 +3,7 @@ use animation::message::AnimationMessageData;
 use character::character::{AnimatedModel, Character};
 use character::inventory::WeaponSlot;
 use game::{GameObject, GameObjectRenderContext};
-use physics::RigidObject;
+use physics::{PfxRigidBody, RigidObject};
 use types::math::Matrix4;
 use types::math::Vector3;
 use types::shared_ptr::{SharedPtr, WeakPtrGameObject};
@@ -295,6 +295,14 @@ pub type WeaponData {
     #[address(0x130)]
     pub m_BaseModelInstance: *mut void,
 
+    /// The gun's own rigid body. It is in the physics world only while the weapon's state keeps
+    /// the weapon's bodies there (dropped, mounted, or turret; see [`WeaponState`]), and its id
+    /// ([`PfxRigidBody::m_BodyId`](physics::PfxRigidBody::m_BodyId)) stays the same while it is out.
+    /// The weapon's drop virtual ([`OnDrop`](WeaponBase::OnDrop)) sets the first gun's velocity on
+    /// it, and gives every gun's a fresh collision system group when the holder was a vehicle.
+    #[address(0x138)]
+    pub m_PfxInstance: *mut PfxRigidBody,
+
     /// The gun's spare magazine: a disabled [`RigidObject`] that
     /// [`ThrowAwayMagazineObject`](Self::ThrowAwayMagazineObject) turns into the dropped magazine,
     /// or null. [`SpawnMagazineObject`](Self::SpawnMagazineObject) requests it from the spawn
@@ -511,6 +519,59 @@ pub type WeaponBase {
         /// `CBulletWeaponBase` spawn their projectile and then call it.
         #[index(28)]
         pub fn Fire_Projectile(&mut self, weapon_data: *mut WeaponData);
+
+        /// Takes the weapon into `holder`'s keeping (a character's or vehicle's `CGameObject`
+        /// subobject): sets the holder, and for a weapon outside the heavy slot sets the holstered
+        /// state (holstered-invisible for the hand grenade, the planted explosive, and the beacon),
+        /// which takes its bodies out of the physics world. Unless
+        /// [`m_InfinitePickup`](Self::m_InfinitePickup) is set it disables the weapon's pickup
+        /// interaction and its pickup hint, and for the locally controlled character it sets the
+        /// avatar's mental state to
+        /// [`E_READY_FOR_COMBAT`](character::avatar::MentalState::E_READY_FOR_COMBAT) and shows
+        /// the pickup on the HUD. The inventory's add
+        /// calls it when the weapon goes into a slot.
+        #[index(32)]
+        pub fn OnPickup(&mut self, holder: *mut GameObject);
+
+        /// Equips the weapon for `character`, which must hold it: shows it, runs its components'
+        /// equip, selects its slot, starts using it (the user becomes `character`), puts the
+        /// locally controlled character's avatar into
+        /// [`E_COMBAT`](character::avatar::MentalState::E_COMBAT) and shows the weapon on the HUD, and
+        /// sets the wielding state, or dual-wielding for the dual-wield slot of a player. It plays
+        /// no act: the draw animation comes from the character's draw, not from here. It does
+        /// nothing for a dead character. The inventory's add calls it with the equipping mode.
+        #[index(33)]
+        pub fn OnEquip(&mut self, character: *mut Character);
+
+        /// Unequips the weapon from its user: cancels the user's reload, sets the holstered state
+        /// (which takes its bodies out of the physics world) unless it is mounted, drops it through
+        /// the user's inventory instead when it is in the heavy slot, and then stops using it
+        /// ([`StopUsing`](Self::StopUsing)). It does nothing without a user.
+        #[index(34)]
+        pub fn OnUnequip(&mut self);
+
+        /// Drops the weapon into the world, run by the deferred drop on the weapon's next
+        /// pre-simulation update and directly by a swimming character's pickup on the occupant of
+        /// the slot it picks into. A weapon still wielded or dual-wielded is unequipped first
+        /// ([`OnUnequip`](Self::OnUnequip)), leaving the player's precision aim. It then sets the
+        /// dropped state, adds the bodies to the physics world and wakes them, and sets the first
+        /// gun's body velocity ([`WeaponData::m_PfxInstance`]) from the state the weapon was in by
+        /// then: from holstered, with a character holder, the holder's velocity plus its forward
+        /// direction scaled by the slot (forward for the two-handed slot, backward for the special
+        /// slot, none for the others); from wielding or dual-wielding, the first gun's
+        /// [`m_MeasuredWorldVelocity`](WeaponData::m_MeasuredWorldVelocity) and
+        /// [`m_MeasuredAngularVelocity`](WeaponData::m_MeasuredAngularVelocity). A non-player
+        /// holder's weapon first gets stored ammunition from the holder's dropped-magazine range.
+        /// It clears the holder and enables the weapon's pickup interaction.
+        #[index(35)]
+        pub fn OnDrop(&mut self);
+
+        /// Stops the user using the weapon: stops its fire, its effects, and its components, clears
+        /// the user, and, when the weapon is wielding or dual-wielding outside the heavy slot, sets
+        /// the holstered state. A mounted gun also leaves its user's inventory, which then selects
+        /// another weapon.
+        #[index(36)]
+        pub fn StopUsing(&mut self);
 
         /// The ammunition the weapon can still use: its magazine plus the holder's inventory stock
         /// of its ammunition type. The thrown grenade weapon adds one while it holds a primed

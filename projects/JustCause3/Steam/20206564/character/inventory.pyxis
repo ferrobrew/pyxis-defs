@@ -78,6 +78,16 @@ pub type Inventory {
     /// [`GetAnimationAllowsTriggeringExplosives`](Self::GetAnimationAllowsTriggeringExplosives).
     pub m_DoesAnimationAllowTriggeringExplosives: bool,
 
+    /// Whether the current animation permits holstering the wielded weapon; one half of
+    /// [`GetAnimationAllowsHolstering`](Self::GetAnimationAllowsHolstering).
+    /// [`UpdateWeaponHandling`](Self::UpdateWeaponHandling) holsters on the holster input only
+    /// while it is set, and defers the holster otherwise.
+    #[address(0x18D)]
+    pub m_DoesAnimationAllowHolstering: bool,
+    /// Whether the current animation permits drawing a weapon; one half of
+    /// [`GetAnimationAllowsDrawing`](Self::GetAnimationAllowsDrawing).
+    pub m_DoesAnimationAllowDrawing: bool,
+
     /// Whether the current animation permits the weapon-selection input; one half of
     /// [`GetAnimationAllowsSwitchWeaponGUI`](Self::GetAnimationAllowsSwitchWeaponGUI).
     #[address(0x192)]
@@ -290,6 +300,21 @@ impl Inventory {
     #[address(0x140_8BB_6F0)]
     pub fn GetAnimationAllowsPickup(&self) -> bool;
 
+    /// Whether the character may draw a weapon:
+    /// [`m_DoesAnimationAllowDrawing`](Self::m_DoesAnimationAllowDrawing) is set and the owner's
+    /// [`SB_DISABLE_DRAW_WEAPON`](state::StateBitFlag::SB_DISABLE_DRAW_WEAPON) state bit is clear.
+    /// [`UpdateWeaponHandling`](Self::UpdateWeaponHandling) commits a slot selection with nothing
+    /// wielded only while it holds.
+    #[address(0x140_8BB_840)]
+    pub fn GetAnimationAllowsDrawing(&self) -> bool;
+
+    /// Whether the character may holster the wielded weapon:
+    /// [`m_DoesAnimationAllowHolstering`](Self::m_DoesAnimationAllowHolstering) is set and the
+    /// owner's [`SB_DISABLE_HOLSTER_WEAPON`](state::StateBitFlag::SB_DISABLE_HOLSTER_WEAPON) state
+    /// bit is clear.
+    #[address(0x140_8BB_870)]
+    pub fn GetAnimationAllowsHolstering(&self) -> bool;
+
     /// Whether the weapon-selection input is read:
     /// [`m_DoesAnimationAllowSwitchWeaponGUI`](Self::m_DoesAnimationAllowSwitchWeaponGUI) is set
     /// and the owner's
@@ -345,6 +370,17 @@ impl Inventory {
     /// call.
     #[address(0x140_8C6_960)]
     pub fn UpdateInventoryPostFinalizePose(&mut self);
+
+    /// Drops the weapon in `slot` into the world: clears the slot at once, stops using the weapon
+    /// when it is wielding or dual-wielding ([`WeaponBase::StopUsing`](equipment::weapon::WeaponBase::StopUsing),
+    /// which holsters any weapon but a heavy one), and defers the drop itself
+    /// ([`WeaponBase::OnDrop`](equipment::weapon::WeaponBase::OnDrop)) to the weapon's next
+    /// pre-simulation update. With `select_valid` set and `slot` selected, it then selects another
+    /// weapon. An empty slot is left as it is. The inventory's add drops the
+    /// occupant of a slot this way when the slot's drop flag is set, and the character drops a
+    /// heavy weapon this way when its holster or cancel input is clicked.
+    #[address(0x140_932_710)]
+    pub fn DropWeapon(&mut self, slot: WeaponSlot, select_valid: bool);
 
     /// Updates the inventory's attached effect container (the wielded weapon's muzzle flash,
     /// casings, and sounds), when it has one.
