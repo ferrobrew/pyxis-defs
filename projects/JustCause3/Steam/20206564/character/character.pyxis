@@ -102,6 +102,14 @@ pub type Character {
     pub const MOTION_STATE_SWIMMING: u32 = 0x18,
     /// `m_CurrentMotionState` while ragdolling.
     pub const MOTION_STATE_RAGDOLL: u32 = 0x14,
+    /// The `transform_type` of the weapons' placement after the `MAIN` HumanIK solve in
+    /// [`UpdatePassFinalizePose_Parallel`](Self::UpdatePassFinalizePose_Parallel): it places the
+    /// weapons on the solved pose without advancing their previous-tick matrices.
+    pub const PROP_TRANSFORM_AFTER_SOLVE: u32 = 1,
+    /// The `transform_type` of the advancing weapon placement, which copies each weapon's current
+    /// world matrix into its previous-tick matrix before placing it: the first placement in
+    /// [`UpdatePassFinalizePose_Parallel`](Self::UpdatePassFinalizePose_Parallel).
+    pub const PROP_TRANSFORM_ADVANCE: u32 = 2,
     /// `m_CurrentMotionState` while a movement task drives the proxy velocity itself. The on-foot
     /// locomotion task (`NStateTask_MovementLocomotionTask::Update`) sets it on every update in
     /// which it writes the proxy's wanted velocity, and leaves the value alone when it returns
@@ -453,9 +461,10 @@ impl Character {
     /// with the character's snow and water factors and `transform_type`, unless a character flag
     /// beside [`m_LodFlags`](Self::m_LodFlags) (unmapped) switches the placement off.
     /// [`UpdatePassFinalizePose_Parallel`](Self::UpdatePassFinalizePose_Parallel) makes the same
-    /// call inline twice: with the advancing placement (`transform_type` 2) after the finalize
-    /// state tasks, and with `transform_type` 1 after the `MAIN` HumanIK solve, which runs only
-    /// when [`HumanIK::HasTargets`] reports a queued target.
+    /// call inline twice: with [`PROP_TRANSFORM_ADVANCE`](Self::PROP_TRANSFORM_ADVANCE) after the
+    /// finalize state tasks, and with
+    /// [`PROP_TRANSFORM_AFTER_SOLVE`](Self::PROP_TRANSFORM_AFTER_SOLVE) after the `MAIN` HumanIK
+    /// solve, which runs only when [`HumanIK::HasTargets`] reports a queued target.
     #[address(0x140_75E_AA0)]
     pub fn UpdatePropTransforms(&mut self, transform_type: u32);
 
