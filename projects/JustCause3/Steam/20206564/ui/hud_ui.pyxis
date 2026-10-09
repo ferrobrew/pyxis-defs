@@ -3,8 +3,10 @@ use character::inventory::WeaponSlot;
 use character::player::Player;
 use equipment::weapon::WeaponBase;
 use graphics_engine::device::CRITICAL_SECTION;
+use input::button_mapping::MappingInfo;
 use types::math::Vector4;
 use types::shared_ptr::SharedPtr;
+use types::std_vector::Vector;
 use ui::poi::{POI, WeakPtrPOI};
 use ui::scaleform::Value;
 
@@ -88,7 +90,43 @@ pub type WeaponSelectionParams {
 
 /// The in-game HUD (`CHUDUI`, a `CUIBase` Scaleform movie wrapper). Only the fields and methods
 /// below are mapped.
-#[singleton(0x142_F38_820), min_size(0x488)]
+/// `CHUDUI::EButtonHintType`: where the HUD shows a button hint.
+#[copyable]
+pub enum ButtonHintType: u32 {
+    /// One of the context and systemic hints in the bottom right, at most three of which show.
+    BUTTON_HINT_NORMAL = 0x0,
+    /// The use-item and weapon-pickup prompt.
+    BUTTON_HINT_Y_USE = 0x1,
+    /// The big hint in the centre of the screen. It does not age: it shows until it is removed.
+    BUTTON_HINT_BIG = 0x2,
+}
+
+/// `CHUDUI::SButtonHintRequest`: what a source asks the HUD to show.
+#[size(0x24), align(4), copyable]
+pub type ButtonHintRequest {
+    pub m_Type: ButtonHintType,
+    /// The semantic mapping the hint names: its actions, its interaction, and the `buttonhint_*`
+    /// key of its description.
+    pub m_Mapping: MappingInfo,
+    /// How long the hint shows, seconds; zero or less shows it until it is removed.
+    pub m_Lifetime: f32,
+}
+
+/// `CHUDUI::SButtonHint`: one queued hint.
+#[size(0x34), align(4), copyable]
+pub type ButtonHint {
+    pub m_Request: ButtonHintRequest,
+    /// Two input key ids, left as the request's copy leaves them; the hint's glyphs are built from
+    /// the mapping's actions instead.
+    pub m_KeyId1: u32,
+    pub m_KeyId2: u32,
+    /// Seconds left before a timed hint is removed.
+    pub m_TimeLeft: f32,
+    /// The id [`HUDUI::AddButtonHint`] returned for it, by which its source removes it.
+    pub m_Id: u32,
+}
+
+#[singleton(0x142_F38_820), min_size(0x758)]
 pub type HUDUI {
     /// The value `OnOmniDamage` writes into [`UIManager::m_GrabScreenTimer`](ui::ui_manager::UIManager::m_GrabScreenTimer) (seconds) when
     /// omnidirectional damage is taken.
@@ -165,6 +203,22 @@ pub type HUDUI {
     /// [`InitHealth`](Self::InitHealth) resets it to -1 so the next update pushes again.
     #[address(0x482)]
     pub m_LastHealth: i16,
+
+    /// Whether [`m_ButtonHints`](Self::m_ButtonHints) changed since
+    /// [`UpdateButtonHints`](Self::UpdateButtonHints) last pushed it to the movie.
+    #[address(0x728)]
+    pub m_ButtonHintsNeedsUpdate: bool,
+
+    /// The queued button hints, in the order they were added.
+    #[address(0x730)]
+    pub m_ButtonHints: Vector<ButtonHint>,
+
+    /// The lock guarding [`m_ButtonHints`](Self::m_ButtonHints) and
+    /// [`m_ButtonHintsNeedsUpdate`](Self::m_ButtonHintsNeedsUpdate): hints are added and removed
+    /// from the systems that raise them, and [`UpdateButtonHints`](Self::UpdateButtonHints) holds it
+    /// for its whole walk.
+    #[address(0x750)]
+    pub m_ButtonHintsLock: *mut CRITICAL_SECTION,
 }
 impl HUDUI {
     /// Rebuilds the weapon selection's list from the local player's inventory: each slot's weapon
@@ -187,6 +241,25 @@ impl HUDUI {
     /// captures it once, so each capture follows exactly one HUD update.
     #[address(0x140_F11_D40)]
     pub fn Update(&mut self, dt: f32, dtf: f32);
+
+    /// Queues a button hint under [`m_ButtonHintsLock`](Self::m_ButtonHintsLock): appends it to
+    /// [`m_ButtonHints`](Self::m_ButtonHints) with its lifetime as the time left and the next id of
+    /// a running counter, and sets [`m_ButtonHintsNeedsUpdate`](Self::m_ButtonHintsNeedsUpdate).
+    /// Returns the id.
+    #[address(0x140_EBA_580)]
+    pub fn AddButtonHint(&mut self, request: *const ButtonHintRequest) -> u32;
+
+    /// Ages the queued hints and pushes them to the movie, under
+    /// [`m_ButtonHintsLock`](Self::m_ButtonHintsLock). The first three
+    /// [`BUTTON_HINT_NORMAL`](ButtonHintType::BUTTON_HINT_NORMAL) hints and every other hint
+    /// count down their time left by `dt`, and one that runs out is removed; a big hint, one with
+    /// no time left to begin with, and a normal hint past the third do not age. When the queue
+    /// changed, it builds the movie's three arrays (normal, use, big) of id, two key strings (from
+    /// the mapping's [`m_Action1`](MappingInfo::m_Action1) and [`m_Action2`](MappingInfo::m_Action2)),
+    /// interaction, and localised description, again counting only the first three normal hints,
+    /// and invokes the movie's `UpdateButtonHints`.
+    #[address(0x140_E8A_EA0)]
+    pub fn UpdateButtonHints(&mut self, dt: f32);
 
     /// Projects and places every registered point of interest. Unless
     /// [`m_State`](Self::m_State) is [`HUD_CINEMATIC`](HUDState::HUD_CINEMATIC), it holds
