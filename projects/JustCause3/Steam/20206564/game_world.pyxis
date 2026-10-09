@@ -1,3 +1,4 @@
+use game::GameObjectUpdateContext;
 use hash::HashString;
 use types::math::Matrix4;
 
@@ -19,6 +20,23 @@ pub type GameWorld {
     pub const TELEPORT_FLAG_LEAVE_PLAYER_DISABLED: u32 = 0x4,
 
     vftable {
+        /// Runs the pre-simulation half of the world's update queue (the priorities below 1024)
+        /// with `context`, unless the context is paused. The registered objects' pre-simulation
+        /// updates run here, the characters' state-machine and pre-physics passes among them.
+        /// The run state's update calls it once per tick, before
+        /// [`GameState::UpdatePhysics`](game::GameState::UpdatePhysics).
+        #[index(13)]
+        pub fn UpdatePreSim(&mut self, context: *mut GameObjectUpdateContext);
+
+        /// Advances the deferred teleport ([`UpdateTeleport`]), runs the post-simulation half of
+        /// the world's update queue (the priorities from 1024 to 2047) with `context` unless the
+        /// context is paused, services the object removal queue, and, when the world's water
+        /// extensions are enabled, updates their splashes, wind, and collisions. The run state's
+        /// update calls it once per tick, after
+        /// [`GameState::UpdatePhysics`](game::GameState::UpdatePhysics).
+        #[index(14)]
+        pub fn UpdatePostSim(&mut self, context: *mut GameObjectUpdateContext);
+
         /// Queues a deferred player teleport that `CGameWorld::UpdateTeleport` services over the
         /// following frames through its `TELEPORT_*` state machine. `world` is the destination
         /// transform (the translation row places the character; the rotation sets the facing and
@@ -70,6 +88,18 @@ impl GameWorld {
     /// events.
     #[address(0x140_A12_6C0)]
     pub fn TeleportPlayerInstantImpl(&mut self, world: *const Matrix4, state: *const HashString, flags: u32);
+
+    /// `CGameWorld::UpdatePreSim`, the implementation behind the
+    /// [`UpdatePreSim`](Self::UpdatePreSim) virtual. It takes the interface subobject (the
+    /// singleton) as `self`.
+    #[address(0x140_9C9_FD0)]
+    pub fn UpdatePreSimImpl(&mut self, context: *mut GameObjectUpdateContext);
+
+    /// `CGameWorld::UpdatePostSim`, the implementation behind the
+    /// [`UpdatePostSim`](Self::UpdatePostSim) virtual. It takes the interface subobject (the
+    /// singleton) as `self`.
+    #[address(0x140_A14_B40)]
+    pub fn UpdatePostSimImpl(&mut self, context: *mut GameObjectUpdateContext);
 
     /// `CGameWorld::IsTeleporting`, the implementation behind the
     /// [`IsTeleporting`](Self::IsTeleporting) virtual: whether the teleport state

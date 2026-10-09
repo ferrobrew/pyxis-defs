@@ -21,7 +21,10 @@ pub type Game {
     pub const INTERPOLATION_METHOD_SINGLE_STEP: u32 = 1,
     /// The [`m_InterpolationMethod`](Self::m_InterpolationMethod) chosen while a cutscene plays:
     /// the same accumulator, but [`UpdateGame`](Self::UpdateGame) runs once per whole step
-    /// accumulated (capped), subtracting one per update.
+    /// accumulated, subtracting one per update, up to [`Game_MaxGameUpdatesPerRender`] a frame;
+    /// the frame's contribution to the accumulator is capped at the same count, so a frame that
+    /// would need more ticks loses the time. A filtered-timer guard drops the frame to one tick
+    /// when the recent ticks took longer than a step.
     pub const INTERPOLATION_METHOD_ACCUMULATED: u32 = 2,
     /// The [`m_InterpolationMethod`](Self::m_InterpolationMethod) that derives the number of sim
     /// steps from `QueryPerformanceCounter` wall-clock time since the method was entered, running
@@ -31,7 +34,15 @@ pub type Game {
 
     #[address(0x10)]
     pub m_CountAccumulator: u64,
+    /// The sim tick rate, ticks per second. The constructor writes 30 here and into
+    /// [`m_DefaultUpdateFrequency`](Self::m_DefaultUpdateFrequency). [`Update`](Self::Update)
+    /// reads it every frame (raising it to 1 when it is not positive): the step it derives,
+    /// one over this rate, is each tick's `m_Dt` and `m_OriginalDt` in the update context, and the
+    /// rate the clock is forced to for the duration of the sim. Writing it changes the tick from
+    /// the next frame on. [`PhysicsSystem::Update`](physics::PhysicsSystem::Update) does not
+    /// follow it: it steps the world by its own fixed step.
     pub m_UpdateFrequency: u32,
+    /// The tick rate the constructor sets, kept beside [`m_UpdateFrequency`](Self::m_UpdateFrequency).
     pub m_DefaultUpdateFrequency: u32,
 
     #[address(0x34)]
@@ -73,6 +84,18 @@ impl Game {
     pub fn Draw(&self, dt: f32);
 
     /// The top-level per-frame update: advances the sim and drives rendering. Returns false on exit.
+    ///
+    /// Each frame it derives the sim step as one over [`m_UpdateFrequency`](Self::m_UpdateFrequency),
+    /// builds the update contexts with that step as their `m_Dt`, and, while
+    /// [`E_GUF_UPDATE`](GameUpdateFlags::E_GUF_UPDATE) is set, forces the clock to that rate
+    /// (`CClock::EnableForceToFPS`), so that [`Clock::GetSPF`](clock::Clock::GetSPF) returns the
+    /// step during the sim; it undoes the forcing before [`UpdateRender`](Self::UpdateRender).
+    /// The frame's seconds per frame, capped at half a second, are converted into ticks by
+    /// the chosen [`m_InterpolationMethod`](Self::m_InterpolationMethod), each tick one
+    /// [`UpdateGame`](Self::UpdateGame) call, and the fraction left over is the render context's
+    /// `m_Dtf`. While the clock is paused, or [`m_DecoupleEnabled`](Self::m_DecoupleEnabled) is
+    /// clear, it instead runs one [`UpdateGame`](Self::UpdateGame) with the frame's time as the
+    /// step.
     #[address(0x140_960_4E0)]
     pub fn Update(&mut self) -> bool;
 
@@ -86,6 +109,13 @@ impl Game {
     #[address(0x140_952_1F0)]
     pub fn UpdateGame(&mut self, update_contexts: *mut UpdateContexts);
 }
+
+/// `g_MaxGameUpdatesPerRender`: the most [`Game::UpdateGame`] calls one [`Game::Update`] makes
+/// under [`INTERPOLATION_METHOD_ACCUMULATED`](Game::INTERPOLATION_METHOD_ACCUMULATED) and
+/// [`INTERPOLATION_METHOD_TIME_BASED`](Game::INTERPOLATION_METHOD_TIME_BASED). The image
+/// initializes it to 2.
+#[address(0x142_D6E_A50)]
+pub extern Game_MaxGameUpdatesPerRender: u32;
 
 /// `CGame::EGameUpdateFlags`: the phases of [`Game::Update`] enabled by
 /// [`Game::m_UpdateFlags`].
@@ -170,7 +200,72 @@ pub enum GameState: u32 {
 impl GameState {
     #[address(0x140_A00_E90)]
     pub fn PostUpdateRender(update_contexts: *const UpdateContexts);
+
+    /// `CGameState::UpdatePhysics`: the run state's physics phase, between the game world's
+    /// pre-simulation and post-simulation queues ([`GameWorld::UpdatePreSim`](game_world::GameWorld::UpdatePreSim)
+    /// and [`GameWorld::UpdatePostSim`](game_world::GameWorld::UpdatePostSim)). Unless the clock's
+    /// update speed is below a tenth (deep slow motion, which skips the step), it calls
+    /// [`PhysicsSystem::Update`](physics::PhysicsSystem::Update) with `dt`, the update context's
+    /// `m_Dt`. It then dispatches the queued collisions, clears the collision array, runs the
+    /// vehicles' post-collision update, processes the damage listeners' events, and updates the
+    /// shape sensors.
+    #[address(0x140_9AC_2A0)]
+    pub fn UpdatePhysics(dt: f32);
+
+    /// `CGameState::UpdateDeletionOfObjects`: deletes the queued background objects and the
+    /// locator's queued resources within `budget_us` microseconds. The run state's update calls
+    /// it once per tick, after [`StreamerUpdate`] and [`GameLocationSystemUpdate`], with what is
+    /// left of the tick's streaming budget.
+    #[address(0x140_9BA_410)]
+    pub fn UpdateDeletionOfObjects(budget_us: u32);
 }
+
+/// The resource streamer's update: polls the file system and the decompressors, creates the
+/// loaded resources, and starts the pending requests, within `budget_us` microseconds. The run
+/// state's update calls it once per tick after the physics phase, with a budget of at least
+/// a fixed minimum taken from a reservoir it refills every tick, so the streaming time per second
+/// grows with the tick rate when there is work. Returns the streamer's result code.
+#[address(0x141_18A_180)]
+pub fn StreamerUpdate(budget_us: u32) -> u32;
+
+/// The game location system's update: checks which locations to load and advances their loading
+/// and the landmarks' visibility, within `budget_us` microseconds. The run state's update calls it
+/// once per tick, after [`StreamerUpdate`].
+#[address(0x140_4BC_110)]
+pub fn GameLocationSystemUpdate(budget_us: u32);
+
+/// `RunLightThread`: queues the light manager's update on a CPU fragment, with `dt` the tick's
+/// step, and clears the signal the run state's update later waits on. The run state's update calls
+/// it once per tick after the effects' post-simulation update.
+#[address(0x140_9AE_070)]
+pub fn RunLightThread(dt: f32);
+
+/// `RunAIThread1`: queues [`RunAIThread1_Proxy`] on a CPU fragment with `dt` the tick's step, and
+/// clears its completion signal. The run state's update calls it once per tick after the awareness
+/// events' dispatch, and waits for the signal near the end of the same tick.
+#[address(0x140_9F0_D40)]
+pub fn RunAIThread1(dt: f32);
+
+/// The first AI thread's body, run on a CPU fragment worker (or by a thread that runs queued
+/// fragments while it waits): the per-character AI update, the road graph, traffic, and action
+/// token managers, and the pathfinder's instant-rotation switch. `dt` points at the tick's step.
+/// Returns 1.
+#[address(0x140_9F0_B30)]
+pub fn RunAIThread1_Proxy(dt: *mut f32) -> i32;
+
+/// `RunAIThread2`: caches the game camera's position for the AI pathfinder, then queues
+/// [`RunAIThread2_Proxy`] on a CPU fragment with `dt` the tick's step, and clears its completion
+/// signal. The run state's update calls it last in the tick, so the thread runs alongside the rest
+/// of the frame: the run state's render update waits for the signal before its raycast threads,
+/// and the next tick's update waits for it before its input.
+#[address(0x140_9F0_DE0)]
+pub fn RunAIThread2(dt: f32);
+
+/// The second AI thread's body, run on a CPU fragment worker: the pathfinders' work, the navmesh
+/// pathfinder, the behavior trees, the AI system's update, and the terrain pathfinder; it queues a
+/// further fragment of its own. `dt` points at the tick's step. Returns 1.
+#[address(0x140_9F0_BC0)]
+pub fn RunAIThread2_Proxy(dt: *mut f32) -> i32;
 
 /// A game object's `CGameObject` subobject, through which the engine's run-time type tests go. A
 /// [`PhysicsGameObject`](physics::PhysicsGameObject) carries it at
