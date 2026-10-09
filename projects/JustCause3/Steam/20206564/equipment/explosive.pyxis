@@ -1,3 +1,5 @@
+use game::GameObjectRenderContext;
+use graphics_engine::model_instance::ModelInstance;
 use physics::PfxRigidBody;
 use types::math::Matrix4;
 use types::math::Vector3;
@@ -11,12 +13,23 @@ pub type Explosive {
     /// point there rather than at the start of the explosive.
     pub const GAME_OBJECT_BASE_OFFSET: u64 = 0x70,
 
+    /// The explosive's model instance, or null. [`UpdateRender`](Self::UpdateRender) pushes the
+    /// interpolated world matrix to it.
+    #[address(0x4B0)]
+    pub m_ModelInstance: *mut ModelInstance,
+
     /// The explosive's physics body (the pointer of a shared pointer), or null until the first
     /// `UpdatePostSimFromManager` after the explosive spawns creates it.
     /// [`PropelToward`](Self::PropelToward) and [`SetPhysicsTransform`](Self::SetPhysicsTransform)
     /// do nothing without it.
     #[address(0x4B8)]
     pub m_PfxInstance: *mut PfxRigidBody,
+
+    /// The explosive's world matrix as of the previous simulation tick, which
+    /// [`UpdateRender`](Self::UpdateRender) interpolates from toward
+    /// [`m_WorldMatrixT1`](Self::m_WorldMatrixT1).
+    #[address(0x500)]
+    pub m_WorldMatrixT0: Matrix4,
 
     /// The explosive's world matrix as of the current simulation tick. Its translation row is the
     /// launch start position [`PropelToward`](Self::PropelToward) solves from. The `CGameObject`
@@ -89,6 +102,16 @@ impl Explosive {
     #[address(0x140_91E_C50)]
     pub fn VelocityToHitTarget(&mut self, result: *mut Vector3, aim_pos: *const Vector3, start_pos: *const Vector3, max_range: f32, roof_target: bool, exact_target_aiming: bool) -> *mut Vector3;
 
+    /// The render-phase `CGameObject::UpdateRender` override: interpolates
+    /// [`m_WorldMatrixT0`](Self::m_WorldMatrixT0) toward [`m_WorldMatrixT1`](Self::m_WorldMatrixT1)
+    /// by the render context's interpolation factor (`CTransform::Lerp`) and pushes the result to
+    /// [`m_ModelInstance`](Self::m_ModelInstance) when there is one. `game_object` is the
+    /// explosive's `CGameObject` subobject
+    /// ([`GAME_OBJECT_BASE_OFFSET`](Self::GAME_OBJECT_BASE_OFFSET)), not the start of the
+    /// explosive. [`PlantedExplosive::UpdateRender`] calls it before drawing its in-hand model.
+    #[address(0x140_8C8_1B0)]
+    pub fn UpdateRender(game_object: *mut void, context: *const GameObjectRenderContext);
+
     /// Plays the explosive's trail effect at [`m_WorldMatrixT1`](Self::m_WorldMatrixT1), when it
     /// has one.
     #[address(0x140_8D6_E20)]
@@ -108,12 +131,22 @@ impl Explosive {
 /// ([`DropExplosive`](Self::DropExplosive)) sticks where it lands.
 #[min_size(0x6B5)]
 pub type PlantedExplosive {
+    /// The in-hand model's world matrix as of the previous simulation tick, which
+    /// [`UpdateRender`](Self::UpdateRender) interpolates from toward
+    /// [`m_InactiveModelWorldMatrixT1`](Self::m_InactiveModelWorldMatrixT1).
+    #[address(0x628)]
+    pub m_InactiveModelWorldMatrixT0: Matrix4,
+
     /// The in-hand model's world matrix, written by
     /// [`SetInactiveModelMatrix`](Self::SetInactiveModelMatrix). The pre-simulation update copies
     /// it to the previous frame's matrix, and the render update draws the in-hand model between
     /// the two.
     #[address(0x668)]
     pub m_InactiveModelWorldMatrixT1: Matrix4,
+
+    /// The in-hand model's instance, or null.
+    #[address(0x6A8)]
+    pub m_InactiveModelInstance: *mut ModelInstance,
 
     /// Whether the charge is live, set by [`Activate`](Self::Activate).
     #[address(0x6B4)]
@@ -137,6 +170,17 @@ impl PlantedExplosive {
     /// by-value `CVector3f`, which the calling convention passes by address.
     #[address(0x140_8C8_870)]
     pub fn SetVelocity(&mut self, velocity: *const Vector3);
+
+    /// The render-phase `CGameObject::UpdateRender` override: runs [`Explosive::UpdateRender`]
+    /// for the live model, then interpolates
+    /// [`m_InactiveModelWorldMatrixT0`](Self::m_InactiveModelWorldMatrixT0) toward
+    /// [`m_InactiveModelWorldMatrixT1`](Self::m_InactiveModelWorldMatrixT1) by the render
+    /// context's interpolation factor and pushes the result to
+    /// [`m_InactiveModelInstance`](Self::m_InactiveModelInstance) when there is one.
+    /// `game_object` is the charge's `CGameObject` subobject
+    /// ([`Explosive::GAME_OBJECT_BASE_OFFSET`]), not the start of the charge.
+    #[address(0x140_8C8_920)]
+    pub fn UpdateRender(game_object: *mut void, context: *const GameObjectRenderContext);
 
     /// Copies `world_matrix` to [`m_InactiveModelWorldMatrixT1`](Self::m_InactiveModelWorldMatrixT1).
     #[address(0x140_8BC_C40)]
