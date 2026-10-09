@@ -13,8 +13,18 @@ pub type PhysicsSystem {
     /// player's direct-aim query passes to [`CastRay`](Self::CastRay).
     pub const QUERY_LAYER: i32 = 21,
     /// The simulation step, seconds. [`Update`](Self::Update) steps the world once per call by
-    /// exactly this, whatever time it is given.
+    /// exactly this, whatever time it is given. The value is stored once in the image and shared:
+    /// [`Update`](Self::Update) loads it to pin its step, and the vehicles' parallel post-solve
+    /// update reads it too.
     pub const STEP_SECONDS: f32 = 0.033333335,
+    /// The intra-[`Update`](Self::Update) site of the step pin: after comparing the time it was
+    /// given with [`STEP_SECONDS`](Self::STEP_SECONDS) and skipping ahead when they are equal, a
+    /// `movaps` copies the constant over the time, so every step uses the constant. Without the
+    /// copy the world steps by the time it was given, and the step global the pre-collision
+    /// handler reads carries that time too.
+    pub const UPDATE_STEP_PIN_OFFSET: u64 = 0xC3,
+    /// The length in bytes of the `movaps` at [`UPDATE_STEP_PIN_OFFSET`](Self::UPDATE_STEP_PIN_OFFSET).
+    pub const UPDATE_STEP_PIN_LENGTH: u64 = 3,
 
     /// The Havok world.
     #[address(0x30)]
@@ -32,14 +42,25 @@ impl PhysicsSystem {
     /// array, and updates the bodies that do not simulate; then, unless one of its two suspend
     /// flags is set (`CGameStateRun::Update` sets one from its update context's pause), and when
     /// the world exists and `dt` is above a small threshold, it fires the pre-simulation callbacks
-    /// ([`AddPreSimulationCallback`](Self::AddPreSimulationCallback)) with the world and `dt`, and
-    /// steps the world once by [`STEP_SECONDS`](Self::STEP_SECONDS) on the physics thread pool,
-    /// joining the pool before it returns. The game states' updates
-    /// (`CGameStateRun::Update` and the loading and front-end states' updates) call it inline on
-    /// the thread that runs them, through the physics update, which dispatches the queued
-    /// collisions and the damage listeners' events after it.
+    /// ([`FirePreSimulationCallbacks`](Self::FirePreSimulationCallbacks)) with the world and `dt`
+    /// as given, then replaces `dt` with [`STEP_SECONDS`](Self::STEP_SECONDS) when they differ
+    /// (the pin at [`UPDATE_STEP_PIN_OFFSET`](Self::UPDATE_STEP_PIN_OFFSET)), and steps the world
+    /// once by it on the physics thread pool, joining the pool before it returns. The game states'
+    /// updates (`CGameStateRun::Update` and the loading and front-end states' updates) call it
+    /// inline on the thread that runs them, through the physics update
+    /// ([`GameState::UpdatePhysics`](game::GameState::UpdatePhysics) in the run state), which
+    /// dispatches the queued collisions and the damage listeners' events after it.
     #[address(0x140_2D1_B40)]
     pub fn Update(&mut self, dt: f32);
+
+    /// Calls every pre-simulation callback's
+    /// [`preSimulationCallback`](PfxPreSimulationCallback::preSimulationCallback) with `world` and
+    /// `dt`, in the order they were added, compacting away the entries
+    /// [`RemovePreSimulationCallback`](Self::RemovePreSimulationCallback) cleared as it walks.
+    /// [`Update`](Self::Update) calls it before the step with the time it was given, before that
+    /// time is pinned to [`STEP_SECONDS`](Self::STEP_SECONDS).
+    #[address(0x140_29C_9C0)]
+    pub fn FirePreSimulationCallbacks(&mut self, world: *mut hknpWorld, dt: f32);
 
     /// Appends `callback` to the pre-simulation callbacks [`Update`](Self::Update) fires before
     /// each step, a plain `std::vector` push. The ragdolls, the grappling hook's wire, and the AI
@@ -1026,7 +1047,8 @@ pub type PfxPreSimulationCallback {
         pub fn Destructor(&mut self, flags: u8);
 
         /// Called by [`PhysicsSystem::Update`] before each step, on the thread that runs it, with
-        /// the world and the time the update was given, outside the step: the world may be changed
+        /// the world and the time the update was given (not the step it takes, which is pinned to
+        /// [`PhysicsSystem::STEP_SECONDS`] after the callbacks), outside the step: the world may be changed
         /// here, and the step that follows integrates the velocities set here. The callbacks fire
         /// in the order they were added.
         #[index(1)]
