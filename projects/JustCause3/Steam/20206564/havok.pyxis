@@ -60,17 +60,163 @@ pub type hkMemoryAllocator {
 }
 
 /// A Havok collision shape (`hknpShape`), a [`hkReferencedObject`] allocated from the Havok heap of
-/// the thread that creates it. A body holds its own reference to its shape. Only the reference
-/// count is bound.
-#[min_size(0x10), align(8)]
+/// the thread that creates it. A body holds its own reference to its shape. Its kind is what
+/// [`getType`](Self::getType) returns; the convex kinds are [`hknpConvexShape`] and the types
+/// built on it. Only some members are bound.
+#[min_size(0x30), align(16)]
 pub type hknpShape {
+    /// The [`m_flags`](Self::m_flags) bit of a shape that is an [`hknpConvexShape`].
+    pub const IS_CONVEX_SHAPE: u16 = 0x1,
+    /// The [`m_flags`](Self::m_flags) bit of a shape that is an [`hknpConvexPolytopeShape`].
+    pub const IS_CONVEX_POLYTOPE_SHAPE: u16 = 0x2,
+
+    #[size(5)]
+    vftable {
+        /// As [`hkReferencedObject::deleteThisReferencedObject`].
+        #[index(3)]
+        pub fn deleteThisReferencedObject(&mut self);
+
+        /// The shape's kind, an [`hknpShapeType`] value; each concrete shape class returns its own
+        /// constant.
+        #[index(4)]
+        pub fn getType(&self) -> u32;
+    },
+
     #[base]
     pub base: hkReferencedObject,
+
+    /// The shape's flags (`hknpShape::FlagsEnum`): [`IS_CONVEX_SHAPE`](Self::IS_CONVEX_SHAPE) and
+    /// [`IS_CONVEX_POLYTOPE_SHAPE`](Self::IS_CONVEX_POLYTOPE_SHAPE) mark the convex classes.
+    #[address(0x10)]
+    pub m_flags: u16,
+
+    /// The radius the shape's core is rounded by: every point within it of the core is inside the
+    /// shape. A sphere is a point with its radius here, and a capsule's core is a box around its
+    /// segment with most of its radius here.
+    #[address(0x14)]
+    pub m_convexRadius: f32,
 }
 
-/// A capsule shape (`hknpCapsuleShape`): the points within a radius of a segment, built as a convex
-/// polytope with that radius as its convex radius.
-pub type hknpCapsuleShape;
+/// A shape's kind (`hknpShapeType::Enum`), as [`hknpShape::getType`] returns it. Only the convex
+/// kinds are bound; the compound, mesh, and height-field kinds have other values.
+pub enum hknpShapeType: u32 {
+    /// A convex hull given by its vertices alone ([`hknpConvexShape`]).
+    CONVEX = 0x0,
+    /// A convex hull with its faces ([`hknpConvexPolytopeShape`]).
+    CONVEX_POLYTOPE = 0x1,
+    /// A sphere: an [`hknpConvexShape`] whose vertices are all its centre and whose convex radius
+    /// is its radius.
+    SPHERE = 0x2,
+    /// A capsule ([`hknpCapsuleShape`]).
+    CAPSULE = 0x3,
+}
+
+/// An axis-aligned box (`hkAabb`): its least and greatest corners.
+#[copyable, defaultable, size(0x20), align(16)]
+pub type hkAabb {
+    pub m_min: AlignedVector3,
+    pub m_max: AlignedVector3,
+}
+
+/// A box quantized into a world's integer space (`hkAabb16`): each corner's coordinates as 16-bit
+/// integers, which the world's [`hkIntSpaceUtil`] turns back into Havok-space positions. The two
+/// key halves are not coordinates.
+#[copyable, size(0x10), align(16)]
+pub type hkAabb16 {
+    pub m_min: [u16; 3],
+    pub m_key: u16,
+    pub m_max: [u16; 3],
+    pub m_key1: u16,
+}
+
+/// The mapping between Havok space and a world's integer space (`hkIntSpaceUtil`), in which the
+/// broad phase keeps every body's box ([`hknpBody::m_aabb`](physics::hknpBody::m_aabb)). A
+/// position is quantized as `(position + offset) * scale`, clamped to the 16-bit range, with
+/// [`m_bitOffsetLow`](Self::m_bitOffsetLow) for a box's least corner and
+/// [`m_bitOffsetHigh`](Self::m_bitOffsetHigh) for its greatest, and restored as
+/// `integer * scale_inv - low_offset` for both corners
+/// ([`hknpWorld::getBodyAabb`](physics::hknpWorld::getBodyAabb)). Only the mapping is bound.
+#[min_size(0x40), align(16)]
+pub type hkIntSpaceUtil {
+    pub m_bitOffsetLow: AlignedVector3,
+    pub m_bitOffsetHigh: AlignedVector3,
+    pub m_bitScale: AlignedVector3,
+    pub m_bitScaleInv: AlignedVector3,
+}
+
+/// An array stored inside its owner at a relative position (`hkRelArray`): its elements start
+/// [`m_offset`](Self::m_offset) bytes after the array's own address. The convex shapes keep their
+/// vertices, planes, faces, and indices in such arrays after their fixed members.
+#[copyable, size(0x4), align(2)]
+pub type hkRelArray {
+    /// The number of elements.
+    pub m_size: u16,
+    /// Where the elements start, in bytes from the array's own address.
+    pub m_offset: u16,
+}
+
+/// A convex shape (`hknpConvexShape`): the hull of its vertices, rounded by its convex radius
+/// ([`hknpShape::m_convexRadius`]). Each vertex is a four-lane vector (`hkcdVertex`) whose last
+/// lane holds the vertex's id bits, not a coordinate. Only the vertices are bound.
+#[min_size(0x40), align(16)]
+pub type hknpConvexShape {
+    #[base]
+    pub base: hknpShape,
+
+    /// The vertices, body space, as four-lane vectors.
+    #[address(0x30)]
+    pub m_vertices: hkRelArray,
+}
+
+/// A convex polytope shape (`hknpConvexPolytopeShape`): an [`hknpConvexShape`] with its faces. Each
+/// face ([`hknpConvexPolytopeFace`]) names a run of [`m_indices`](Self::m_indices), each a vertex
+/// index, which go round the face in order, so consecutive indices and the last and first are the
+/// face's edges. The plane array may hold more planes than there are faces.
+#[min_size(0x50), align(16)]
+pub type hknpConvexPolytopeShape {
+    #[base]
+    pub base: hknpConvexShape,
+
+    /// The face planes, as four-lane vectors.
+    #[address(0x40)]
+    pub m_planes: hkRelArray,
+    /// The faces, [`hknpConvexPolytopeFace`]s.
+    pub m_faces: hkRelArray,
+    /// The faces' vertex indices, one byte each.
+    pub m_indices: hkRelArray,
+}
+
+/// One face of an [`hknpConvexPolytopeShape`] (`hknpConvexPolytopeShape::Face`).
+#[copyable, size(0x4), align(2)]
+pub type hknpConvexPolytopeFace {
+    /// The face's first index in [`hknpConvexPolytopeShape::m_indices`].
+    pub m_firstIndex: u16,
+    /// How many indices the face has.
+    pub m_numIndices: u8,
+    /// The face's minimum half-angle as the collision detection keeps it, one byte; its encoding
+    /// is not established.
+    pub m_minHalfAngle: u8,
+}
+
+/// A capsule shape (`hknpCapsuleShape`): the points within a radius of a segment, built as an
+/// [`hknpConvexPolytopeShape`]: a box of eight vertices along the segment, reaching
+/// [`RADIUS_IN_CORE`](Self::RADIUS_IN_CORE) of the radius past it on every side, rounded by the
+/// convex radius ([`hknpShape::m_convexRadius`]), the rest of the radius.
+#[min_size(0x70), align(16)]
+pub type hknpCapsuleShape {
+    /// The share of the capsule's radius its core box reaches past the segment;
+    /// [`hknpShape::m_convexRadius`] is the capsule's radius less that share.
+    pub const RADIUS_IN_CORE: f32 = 0.01,
+
+    #[base]
+    pub base: hknpConvexPolytopeShape,
+
+    /// The segment's first end, body space.
+    #[address(0x50)]
+    pub m_a: AlignedVector3,
+    /// The segment's second end, body space.
+    pub m_b: AlignedVector3,
+}
 impl hknpCapsuleShape {
     /// Allocates a capsule from the calling thread's Havok heap, with the segment from `a` to `b`
     /// (body space) and `radius`, and returns it with one reference, the caller's. The grappling

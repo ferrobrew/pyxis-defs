@@ -1,6 +1,6 @@
 use character::character::Character;
 use damage::DamageMsg;
-use havok::{hkReferencedObject, hkSimdFloat32, hkTransformf, hknpBodyCinfo, hknpConstraintCinfo, hknpContactImpulseEvent, hknpMotionCinfo, hknpShape};
+use havok::{hkAabb, hkAabb16, hkIntSpaceUtil, hkReferencedObject, hkSimdFloat32, hkTransformf, hknpBodyCinfo, hknpConstraintCinfo, hknpContactImpulseEvent, hknpMotionCinfo, hknpShape};
 use types::math::{Matrix4, Vector3};
 use types::vector_math::{AlignedQuat, AlignedVector3};
 
@@ -302,7 +302,7 @@ impl RagdollProxyPhantom {
 /// The Havok physics world (`hknpWorld`, Havok Physics 2014.1). Its body manager is embedded at
 /// the start; bodies and motions live in arrays indexed by body id and motion id. Only some members
 /// are bound.
-#[min_size(0x150)]
+#[min_size(0x1C0), align(16)]
 pub type hknpWorld {
     /// The body property that holds a body's engine instance ([`PfxInstance`]), as the physics
     /// queries read it to report the body's owner.
@@ -330,6 +330,11 @@ pub type hknpWorld {
     /// The world's constraints.
     #[address(0x120)]
     pub m_constraintManager: hknpConstraintManager,
+
+    /// The mapping between Havok space and the integer space the broad phase keeps the bodies'
+    /// boxes in ([`hknpBody::m_aabb`]).
+    #[address(0x180)]
+    pub m_intSpaceUtil: hkIntSpaceUtil,
 }
 impl hknpWorld {
     /// Creates a constraint from `cinfo`, writes its id to `out`, and returns `out`. A constraint
@@ -405,6 +410,12 @@ impl hknpWorld {
     /// Replaces the shape (`hknpShape*`) of the body `body_id` on the live world.
     #[address(0x141_4CF_370)]
     pub fn setBodyShape(&mut self, body_id: u32, shape: *const void);
+
+    /// Writes the body `body_id`'s box as the broad phase holds it to `aabb`, Havok space: its
+    /// [`hknpBody::m_aabb`] restored through [`m_intSpaceUtil`](Self::m_intSpaceUtil), each corner
+    /// as the integer corner times the inverse scale less the low offset.
+    #[address(0x141_4CC_220)]
+    pub fn getBodyAabb(&self, body_id: u32, aabb: *mut hkAabb);
 }
 
 /// A Havok body (`hknpBody`): its transform, collision data, and the motion that moves it. Only
@@ -428,6 +439,9 @@ pub type hknpBody {
     pub const IS_KEYFRAMED: u32 = 0x4,
     /// The [`m_motionId`](Self::m_motionId) of a freed body slot.
     pub const INVALID_MOTION_ID: u32 = 0x7FFFFFFF,
+    /// The [`m_broadPhaseId`](Self::m_broadPhaseId) of a body that is not in the broad phase: one
+    /// created but not added to the simulation, or removed from it.
+    pub const INVALID_BROAD_PHASE_ID: u32 = 0xFFFFFFFF,
 
     /// The body's transform, Havok space: the frame a constraint's pivots are given in
     /// ([`hkpFixedConstraintData::setInBodySpace`](havok::hkpFixedConstraintData::setInBodySpace)).
@@ -445,10 +459,18 @@ pub type hknpBody {
     /// ([`hknpBodyCinfo::m_shape`](havok::hknpBodyCinfo::m_shape)) when the body is created
     /// and released when it is destroyed, so several bodies may share one shape.
     pub m_shape: *mut hknpShape,
+    /// The body's box in the broad phase, quantized into the world's integer space
+    /// ([`hknpWorld::m_intSpaceUtil`]); [`hknpWorld::getBodyAabb`] restores it.
+    pub m_aabb: hkAabb16,
 
     /// The body's motion in [`hknpWorld::m_motions`]; bodies attached to one another share it.
     #[address(0x68)]
     pub m_motionId: u32,
+    /// The body's entry in the broad phase, or
+    /// [`INVALID_BROAD_PHASE_ID`](Self::INVALID_BROAD_PHASE_ID) while it is not in the simulation.
+    /// The engine's body wrapper reports a body as added to the world
+    /// ([`PfxRigidBody::IsAddedToWorld`]) when it has an entry, or an addition pending.
+    pub m_broadPhaseId: u32,
 }
 
 /// A Havok world's constraint manager (`hknpConstraintManager`): a buffer of constraint slots
