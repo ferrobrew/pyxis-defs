@@ -240,6 +240,48 @@ impl NStateTask_LocoUtil {
     #[address(0x140_832_060)]
     pub fn QueueStopTurns(character: *mut Character) -> bool;
 
+    /// Queues the flick, a turn toward a new move direction while a start plays: measures the XZ
+    /// angle from the body forward to the blackboard move direction, and within a sixth of a turn
+    /// to either side queues [`ACT_FLICK_0`](animation::symbol_table::EventIdSymbolTable::ACT_FLICK_0),
+    /// past it the third-turn flick to that side, writing the residual angle correction as
+    /// [`QueueStarts`](Self::QueueStarts) does. Returns false, queuing nothing, without a move
+    /// direction on the blackboard. Called from the starts task in place of
+    /// [`QueueStops`](Self::QueueStops) while the start clip is inside its
+    /// `FLICK_STICK_TURN_VALID_SEG` segment.
+    #[address(0x140_81C_340)]
+    pub fn QueueFlickStick(character: *mut Character) -> bool;
+
+    /// The aiming flicks, called from the aim flick-stick task: measures the XZ angle from the body
+    /// forward to the blackboard move direction and queues
+    /// [`ACT_FLICK_0_AIM`](animation::symbol_table::EventIdSymbolTable::ACT_FLICK_0_AIM) within an
+    /// eighth of a turn, the quarter-turn flick to that side within three eighths, and the half
+    /// turn past that. It writes no angle correction. Returns false, queuing nothing, without a
+    /// move direction on the blackboard.
+    #[address(0x140_81C_430)]
+    pub fn QueueAimFlickStick(character: *mut Character) -> bool;
+
+    /// The stunt turns, for a character standing in a vehicle's stunt area: measures the XZ angle
+    /// from the body forward to the blackboard move direction and queues `ACT_TO_IDLE` when it is
+    /// small, otherwise
+    /// [`ACT_STUNT_TURN_0`](animation::symbol_table::EventIdSymbolTable::ACT_STUNT_TURN_0) up to a
+    /// sixth of a turn and the third-turn stunt turn to that side beyond, writing the residual
+    /// angle correction. The idle, stops, flick-stick, and rotate-on-spot input tasks call it on
+    /// their stunt branch when the state machine would not take `ACT_STUNT_TRANSITION` (a step to
+    /// the next stunt area) or the move is not a start, and only while
+    /// [`Character::ShouldApplyStuntModification`](character::character::Character::ShouldApplyStuntModification)
+    /// holds. Returns false, queuing nothing, without a move direction on the blackboard.
+    #[address(0x140_81C_210)]
+    pub fn QueueStuntTurns(character: *mut Character) -> bool;
+
+    /// The on-spot acts of a player wielding a heavy weapon, called from the idle and move input
+    /// tasks: with the aim (from [`GetAimMoveAngle`](Self::GetAimMoveAngle)) within a sixth of a
+    /// turn of the body's forward it queues `ACT_TO_IDLE`, and past it
+    /// [`ACT_AIM_FOCUS_ROTATE_90L`](animation::symbol_table::EventIdSymbolTable::ACT_AIM_FOCUS_ROTATE_90L)
+    /// or its right-hand counterpart. It writes no angle correction. Returns false for a character
+    /// that is not the player or wields no heavy weapon.
+    #[address(0x140_831_B00)]
+    pub fn QueueAimRelativeOnSpotActions(character: *mut Character) -> bool;
+
     /// The XZ angle (degrees) from `move_dir` to the aim reference direction: the vector from the
     /// character to the player's aim-target position (or the camera forward while planting an
     /// explosive), both rotated into the character's local frame when the relevant state flag is

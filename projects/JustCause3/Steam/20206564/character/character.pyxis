@@ -749,6 +749,12 @@ impl Character {
     #[address(0x140_7F1_FA0)]
     pub fn IsInStuntArea(&self) -> bool;
 
+    /// Whether the on-foot input tasks apply their stunt modification, the stunt turns
+    /// ([`QueueStuntTurns`](input::locomotion::NStateTask_LocoUtil::QueueStuntTurns)): the
+    /// character is attached to a vehicle, or a global override flag is set.
+    #[address(0x140_7F1_A00)]
+    pub fn ShouldApplyStuntModification(&self) -> bool;
+
     /// Whether the character hangs from a helicopter in its stunt position: the vehicle it is
     /// attached to ([`GetVehicle`](Self::GetVehicle)) is a
     /// [`Helicopter`](vehicle::vehicle::Helicopter), and the body rule system is in one of the

@@ -185,6 +185,49 @@ pub type EventIdSymbolTable {
     pub const ACT_TURN_180L: cstr = c"ACT_TURN_180L",
     /// See [`ACT_TURN_90L`](Self::ACT_TURN_90L).
     pub const ACT_TURN_180R: cstr = c"ACT_TURN_180R",
+    /// The forward flick: one of the flick acts that
+    /// [`QueueFlickStick`](input::locomotion::NStateTask_LocoUtil::QueueFlickStick) chooses by the
+    /// angle from the body's forward to the move direction, for a move direction within a sixth of
+    /// a turn of the body's forward. The starts task queues the flicks in place of the stops when a
+    /// stop is called for inside the start clip's `FLICK_STICK_TURN_VALID_SEG` segment. Like the
+    /// starts, the flick writes the residual angle correction that turns the root toward the move
+    /// direction.
+    pub const ACT_FLICK_0: cstr = c"ACT_FLICK_0",
+    /// The flick that turns a third to the right; see [`ACT_FLICK_0`](Self::ACT_FLICK_0).
+    pub const ACT_FLICK_120R: cstr = c"ACT_FLICK_120R",
+    /// The flick that turns a third to the left; see [`ACT_FLICK_0`](Self::ACT_FLICK_0).
+    pub const ACT_FLICK_120L: cstr = c"ACT_FLICK_120L",
+    /// The forward aiming flick: one of the flick acts that
+    /// [`QueueAimFlickStick`](input::locomotion::NStateTask_LocoUtil::QueueAimFlickStick) chooses
+    /// by the angle from the body's forward to the move direction, for a move direction within an
+    /// eighth of a turn of the body's forward. Unlike the running flicks, the aiming flicks write
+    /// no angle correction.
+    pub const ACT_FLICK_0_AIM: cstr = c"ACT_FLICK_0_AIM",
+    /// The aiming flick that turns a quarter to the right; see
+    /// [`ACT_FLICK_0_AIM`](Self::ACT_FLICK_0_AIM).
+    pub const ACT_FLICK_90R_AIM: cstr = c"ACT_FLICK_90R_AIM",
+    /// The aiming flick that turns a quarter to the left; see
+    /// [`ACT_FLICK_0_AIM`](Self::ACT_FLICK_0_AIM).
+    pub const ACT_FLICK_90L_AIM: cstr = c"ACT_FLICK_90L_AIM",
+    /// The aiming flick that turns around; see [`ACT_FLICK_0_AIM`](Self::ACT_FLICK_0_AIM).
+    pub const ACT_FLICK_180_AIM: cstr = c"ACT_FLICK_180_AIM",
+    /// The heavy weapon's standing turn a quarter to the left: one of the on-spot acts
+    /// [`QueueAimRelativeOnSpotActions`](input::locomotion::NStateTask_LocoUtil::QueueAimRelativeOnSpotActions)
+    /// queues for a player wielding a heavy weapon when the aim is more than a sixth of a turn from
+    /// the body's forward.
+    pub const ACT_AIM_FOCUS_ROTATE_90L: cstr = c"ACT_AIM_FOCUS_ROTATE_90L",
+    /// The heavy weapon's standing turn a quarter to the right; see
+    /// [`ACT_AIM_FOCUS_ROTATE_90L`](Self::ACT_AIM_FOCUS_ROTATE_90L).
+    pub const ACT_AIM_FOCUS_ROTATE_90R: cstr = c"ACT_AIM_FOCUS_ROTATE_90R",
+    /// The stunt turn toward a move direction a little off the body's forward: one of the stunt
+    /// turns that [`QueueStuntTurns`](input::locomotion::NStateTask_LocoUtil::QueueStuntTurns)
+    /// chooses by the angle from the body's forward to the move direction, for a character standing
+    /// in a vehicle's stunt area. Each writes the residual angle correction that turns the root.
+    pub const ACT_STUNT_TURN_0: cstr = c"ACT_STUNT_TURN_0",
+    /// The stunt turn a third to the right; see [`ACT_STUNT_TURN_0`](Self::ACT_STUNT_TURN_0).
+    pub const ACT_STUNT_TURN_120R: cstr = c"ACT_STUNT_TURN_120R",
+    /// The stunt turn a third to the left; see [`ACT_STUNT_TURN_0`](Self::ACT_STUNT_TURN_0).
+    pub const ACT_STUNT_TURN_120L: cstr = c"ACT_STUNT_TURN_120L",
     /// The wingsuit's evade, a barrel roll. The air physics
     /// ([`NAirMovement_UpdateAirPhysics`](input::parachute::NAirMovement_UpdateAirPhysics)) queues
     /// it straight on the character's [`AnimatedModel`](character::character::AnimatedModel), not
