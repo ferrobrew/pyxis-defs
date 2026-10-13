@@ -611,7 +611,9 @@ pub type WeaponBase {
         /// [`m_MeasuredWorldVelocity`](WeaponData::m_MeasuredWorldVelocity) and
         /// [`m_MeasuredAngularVelocity`](WeaponData::m_MeasuredAngularVelocity). A non-player
         /// holder's weapon first gets stored ammunition from the holder's dropped-magazine range.
-        /// It clears the holder and enables the weapon's pickup interaction.
+        /// It clears the holder, enables the weapon's pickup interaction, and hides the models of
+        /// every gun past the first, so a dropped weapon of several guns, such as a dual-wield
+        /// weapon, shows its first gun alone, as it is one body ([`AddToWorld`](Self::AddToWorld)).
         #[index(35)]
         pub fn OnDrop(&mut self);
 
