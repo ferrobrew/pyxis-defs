@@ -27,9 +27,44 @@ pub extern coarse_pre_z_models_area_threshold: f32;
 /// camera the render blocks are tested against. Opaque.
 pub type AddToRenderContext;
 
+/// A model instance's status bits (`NModelSystem::CModelInstance::EModelInstanceStatus`), stored
+/// in [`ModelInstance::m_Flags`]. Only the bits the engine's show and hide touch are listed.
+#[copyable]
+pub bitflags ModelInstanceFlags: u32 {
+    /// `FLAG_ENABLED`: set and cleared together with [`VISIBLE`](Self::VISIBLE) by every show and
+    /// hide.
+    FLAG_ENABLED = 0x1,
+    /// `VISIBLE`: whether the instance is drawn. Showing an instance sets it with
+    /// [`FLAG_ENABLED`](Self::FLAG_ENABLED), and hiding clears both; the readers test this bit
+    /// alone.
+    VISIBLE = 0x10,
+}
+
 /// A placed model instance (`NModelSystem::CModelInstance`): a shared model plus its render-block
-/// instance info and world transform. Opaque.
-pub type ModelInstance;
+/// instance info and world transform. Only some members are mapped.
+#[min_size(0x80)]
+pub type ModelInstance {
+    /// The instance's status bits (`m_Flags`). The weapon's visibility virtual
+    /// ([`WeaponBase::SetVisible`](equipment::weapon::WeaponBase::SetVisible)) and the model
+    /// parts' ([`WeaponComponentBase::SetVisible`](equipment::weapon::WeaponComponentBase::SetVisible))
+    /// show an instance by setting [`VISIBLE`](ModelInstanceFlags::VISIBLE) and
+    /// [`FLAG_ENABLED`](ModelInstanceFlags::FLAG_ENABLED) and hide it by clearing both, writing
+    /// only when [`VISIBLE`](ModelInstanceFlags::VISIBLE) differs from the wanted state. Adding the
+    /// instance to the world sets both, and removing it clears both.
+    #[address(0xC)]
+    pub m_Flags: ModelInstanceFlags,
+
+    /// A dirty bit for the instance's render info, set (atomically) whenever
+    /// [`m_FadeAlpha`](Self::m_FadeAlpha) is written.
+    #[address(0x70)]
+    pub m_RenderInfoDirty: u32,
+
+    /// The instance's fade alpha, 255 for fully shown. Showing without a fade sets it to 255 at
+    /// once; showing with a fade sets it to zero and starts the model instance manager's fade.
+    /// Hiding leaves it as it was.
+    #[address(0x7F)]
+    pub m_FadeAlpha: u8,
+}
 impl ModelInstance {
     /// Builds the per-pass draw lists for this instance's render blocks. It fills an
     /// [`AddToRenderContext`] whose test camera is the camera manager's active camera, then
