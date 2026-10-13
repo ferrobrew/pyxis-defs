@@ -185,6 +185,15 @@ pub type EventIdSymbolTable {
     pub const ACT_TURN_180L: cstr = c"ACT_TURN_180L",
     /// See [`ACT_TURN_90L`](Self::ACT_TURN_90L).
     pub const ACT_TURN_180R: cstr = c"ACT_TURN_180R",
+    /// The wingsuit's evade, a barrel roll. The air physics
+    /// ([`NAirMovement_UpdateAirPhysics`](input::parachute::NAirMovement_UpdateAirPhysics)) queues
+    /// it straight on the character's [`AnimatedModel`](character::character::AnimatedModel), not
+    /// through [`Character::QueueAct`](character::character::Character::QueueAct), when the
+    /// `WINGSUIT_EVADE` action fires with the move stick out of its rest. It is the only evade act:
+    /// the roll's directions (`SEG_IN_BARREL_ROLL_EVADE_MOVEMENT` and its `_LEFT`, `_RIGHT`, `_UP`,
+    /// and `_DOWN` variants) and its recovery are segments of the clip it plays, not acts of their
+    /// own.
+    pub const ACT_BOOST_WINGSUIT_BARREL_ROLL: cstr = c"ACT_BOOST_WINGSUIT_BARREL_ROLL",
 }
 impl EventIdSymbolTable {
     /// Resolves an act name to its runtime id. Registers the name with a fresh id when it is not
