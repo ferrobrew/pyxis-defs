@@ -273,6 +273,46 @@ impl NStateTask_MovementWingSuitTask {
     pub fn Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
 }
 
+/// The wingsuit's animation-graph blend state (`CWingsuitBlendState`). Besides blending the
+/// flight samplers, it decides each frame whether the character stalls, and while it does, plays
+/// one of two dedicated clips in place of the flight blend: a plain stall, or a full loop that
+/// recovers from it (the flip). Neither the stall nor the flip moves the physics body: the air
+/// physics clamps the body's pitch and orients it from the steering, so the loop is the clip's own
+/// rotation of the pose. Its layout is unmapped.
+pub type WingsuitBlendState;
+impl WingsuitBlendState {
+    /// Weights the state's samplers for the character owning `instance` over `dt`. The character
+    /// enters the stall when its forward airspeed (its velocity against its forward axis) falls
+    /// below [`WingsuitBlendState_ToStallSpeed`] with its nose raised past
+    /// [`WingsuitBlendState_StallNoseUp`], and leaves it when the airspeed recovers past a higher
+    /// threshold; while a stall clip has weight the nose test is skipped. Stalling sets a local
+    /// flag through the instruction whose immediate is [`WingsuitBlendState_StallFlagSet`], the
+    /// only place the flag is set. While stalling, inside the clip's stall-selection segment, it
+    /// ramps up the flip clip when the nose is raised further, setting the character's
+    /// in-flip flag, and the plain stall clip otherwise, and scales every other sampler down by the
+    /// stall's weight. The stall's progression through its turn segment gates the air brake, the
+    /// wingsuit's close act, and part of the air physics' steering while it runs.
+    #[address(0x140_873_5E0)]
+    pub fn UpdateSamplers(&mut self, instance: *mut void, dt: f32, samplers: *mut void);
+}
+
+/// The forward airspeed below which [`WingsuitBlendState::UpdateSamplers`] enters the stall, metres
+/// per second.
+#[address(0x142_3DB_9DC)]
+pub extern WingsuitBlendState_ToStallSpeed: f32;
+/// The component of the character's forward axis along the world's up axis that
+/// [`WingsuitBlendState::UpdateSamplers`] requires the nose to be raised past to enter the stall;
+/// the character's forward axis is its negative Z, so a raised nose reads below this.
+#[address(0x142_3DB_9D8)]
+pub extern WingsuitBlendState_StallNoseUp: f32;
+/// The immediate operand of the instruction in [`WingsuitBlendState::UpdateSamplers`] that sets
+/// its stalling flag (a byte register move of one). It is the only write of a true value to the
+/// flag, which is cleared on every path that does not stall; with the immediate zero, the blend
+/// state never stalls, its stall clips stay at no weight, the stall progression stays at its
+/// not-stalling value, and the flip never plays.
+#[address(0x140_873_DC7)]
+pub extern WingsuitBlendState_StallFlagSet: u8;
+
 /// `NAirMovement::UpdateAirPhysics`: the air movement core shared by the wingsuit, falling, and
 /// free-falling tasks. It maps the stick vector `input` through the settings'
 /// `m_XInputYawPitchRollAmount` and `m_YInputYawPitchRollAmount` into a yaw, pitch, and roll
