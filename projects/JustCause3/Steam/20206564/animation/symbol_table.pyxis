@@ -228,6 +228,12 @@ pub type EventIdSymbolTable {
     pub const ACT_STUNT_TURN_120R: cstr = c"ACT_STUNT_TURN_120R",
     /// The stunt turn a third to the left; see [`ACT_STUNT_TURN_0`](Self::ACT_STUNT_TURN_0).
     pub const ACT_STUNT_TURN_120L: cstr = c"ACT_STUNT_TURN_120L",
+    /// The return to the idle. The locomotion helpers queue it where no turn is needed:
+    /// [`QueueStuntTurns`](input::locomotion::NStateTask_LocoUtil::QueueStuntTurns) when the move
+    /// direction is close to the body's forward, and
+    /// [`QueueAimRelativeOnSpotActions`](input::locomotion::NStateTask_LocoUtil::QueueAimRelativeOnSpotActions)
+    /// when the aim is. The starts, move, and path-follow input tasks also queue it.
+    pub const ACT_TO_IDLE: cstr = c"ACT_TO_IDLE",
     /// The wingsuit's evade, a barrel roll. The air physics
     /// ([`NAirMovement_UpdateAirPhysics`](input::parachute::NAirMovement_UpdateAirPhysics)) queues
     /// it straight on the character's [`AnimatedModel`](character::character::AnimatedModel), not
