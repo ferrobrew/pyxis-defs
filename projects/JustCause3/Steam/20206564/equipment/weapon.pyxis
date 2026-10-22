@@ -3,7 +3,7 @@ use animation::message::AnimationMessageData;
 use character::character::{AnimatedModel, Character};
 use character::inventory::WeaponSlot;
 use game::{GameObject, GameObjectRenderContext};
-use graphics_engine::model_instance::ModelInstance;
+use graphics_engine::model_instance::{Model, ModelInstance};
 use physics::{PfxRigidBody, RigidObject};
 use types::math::Matrix4;
 use types::math::Vector3;
@@ -1654,6 +1654,19 @@ impl RPGWeapon {
 /// their offsets from the start of the weapon.
 #[min_size(0x7CA)]
 pub type ThrownGrenadeWeapon {
+    /// The compiled-name hash of [`m_PhysicalProjectileModel`](Self::m_PhysicalProjectileModel)
+    /// (`CPhysicalProjectileWeapon::m_PhysicalProjectileModelHash`), or zero when the model did
+    /// not load.
+    #[address(0x600)]
+    pub m_PhysicalProjectileModelHash: u32,
+
+    /// The grenade's model (`CPhysicalProjectileWeapon::m_PhysicalProjectileModel`), loaded by the
+    /// physical-projectile weapon's `SetProperties` from the projectile model path in the
+    /// weapon's properties ([`ModelManager::GetModel`](graphics_engine::model_instance::ModelManager::GetModel)).
+    /// The weapon holds it for its lifetime, so the model stays cached while the weapon exists.
+    #[address(0x628)]
+    pub m_PhysicalProjectileModel: SharedPtr<Model>,
+
     /// The primed grenade: the live [`Grenade`](equipment::explosive::Grenade) spawned by
     /// [`PrimeGrenade`](Self::PrimeGrenade) and not yet thrown, or null. `px` is the grenade's
     /// `CGameObject` subobject
@@ -1723,6 +1736,43 @@ impl ThrownGrenadeWeapon {
 /// are mapped, at their offsets from the start of the weapon.
 #[min_size(0x80D)]
 pub type PlantedExplosiveWeapon {
+    /// The compiled-name hash of [`m_PhysicalProjectileModel`](Self::m_PhysicalProjectileModel)
+    /// (`CPhysicalProjectileWeapon::m_PhysicalProjectileModelHash`), or zero when the model did
+    /// not load.
+    #[address(0x600)]
+    pub m_PhysicalProjectileModelHash: u32,
+
+    /// The live charge's model (`CPhysicalProjectileWeapon::m_PhysicalProjectileModel`), loaded by
+    /// the physical-projectile weapon's `SetProperties` from the projectile model path in the
+    /// weapon's properties ([`ModelManager::GetModel`](graphics_engine::model_instance::ModelManager::GetModel)).
+    /// The weapon holds it for its lifetime.
+    #[address(0x628)]
+    pub m_PhysicalProjectileModel: SharedPtr<Model>,
+
+    /// The placement preview: an instance of the ghost model named in the weapon's properties,
+    /// created by `SetProperties` (casting shadows, outside the world) and shown by
+    /// `SetPropertiesDeferred`
+    /// ([`ModelInstanceManager::ShowModelInstance`](graphics_engine::model_instance::ModelInstanceManager::ShowModelInstance)).
+    /// The weapon's `UpdateRender` moves it to the aimed placement with
+    /// [`ModelInstance::UpdateMatrix`](graphics_engine::model_instance::ModelInstance::UpdateMatrix)
+    /// and pulses its fade alpha while the target is shown; the destructor releases it
+    /// ([`ModelInstanceManager::AddToDeleteQueue`](graphics_engine::model_instance::ModelInstanceManager::AddToDeleteQueue)).
+    #[address(0x6F8)]
+    pub m_GhostModelInstance: *mut ModelInstance,
+
+    /// The in-hand charge's model: despite the name, the model itself rather than an instance of
+    /// it, loaded by `SetProperties` from the inactive model path in the weapon's properties and
+    /// held for the weapon's lifetime, which keeps it in the model manager's cache. A charge's
+    /// in-hand instance
+    /// ([`PlantedExplosive::m_InactiveModelInstance`](equipment::explosive::PlantedExplosive::m_InactiveModelInstance))
+    /// is created from the cache by hash.
+    #[address(0x700)]
+    pub m_InactiveModelInstance: SharedPtr<Model>,
+
+    /// The compiled-name hash of [`m_InactiveModelInstance`](Self::m_InactiveModelInstance).
+    #[address(0x710)]
+    pub m_InactiveModelHash: u32,
+
     /// The primed charge: the live [`PlantedExplosive`](equipment::explosive::PlantedExplosive)
     /// spawned by [`PrimeExplosive`](Self::PrimeExplosive) and not yet placed, or null. `px` is
     /// the charge's `CGameObject` subobject

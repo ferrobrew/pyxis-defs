@@ -1,5 +1,6 @@
 use graphics_engine::render_pass::{RBIInfo, RenderBlock, RenderPass};
 use types::math::{Matrix4, Vector3};
+use types::shared_ptr::SharedPtr;
 
 /// Whether the per-render-block draw-list build frustum-tests each render block's world bounding
 /// box (`g_useBoundingBoxModelRBView`). Together with [`enable_coarse_pre_z_models`] it selects which
@@ -28,21 +29,75 @@ pub extern coarse_pre_z_models_area_threshold: f32;
 pub type AddToRenderContext;
 
 /// A model instance's status bits (`NModelSystem::CModelInstance::EModelInstanceStatus`), stored
-/// in [`ModelInstance::m_Flags`]. Only the bits the engine's show and hide touch are listed.
+/// in [`ModelInstance::m_Flags`]. Only some bits are listed. A newly constructed instance has
+/// [`FLAG_ENABLED`](Self::FLAG_ENABLED), [`FLAG_CLIPONDISTANCE`](Self::FLAG_CLIPONDISTANCE),
+/// [`FLAG_UPDATELOD`](Self::FLAG_UPDATELOD), [`VISIBLE`](Self::VISIBLE),
+/// [`DYNAMIC`](Self::DYNAMIC), and [`SHADOW`](Self::SHADOW) set, among debug bits.
 #[copyable]
 pub bitflags ModelInstanceFlags: u32 {
     /// `FLAG_ENABLED`: set and cleared together with [`VISIBLE`](Self::VISIBLE) by every show and
     /// hide.
     FLAG_ENABLED = 0x1,
+    /// `FLAG_CLIPONDISTANCE`: the dynamic draw-list build
+    /// ([`ModelInstanceManager::ShowUpdate`]) skips the instance once its distance from the LOD
+    /// camera, scaled by its LOD factor, passes the clip distance of its last LOD.
+    FLAG_CLIPONDISTANCE = 0x2,
+    /// `FLAG_UPDATELOD`: the dynamic draw-list build picks the instance's LOD from its distance
+    /// each frame.
+    FLAG_UPDATELOD = 0x4,
+    /// `FLAG_DELETED`: set by [`ModelManager::RemoveModelInstance`] when the instance is queued
+    /// for destruction.
+    FLAG_DELETED = 0x8,
     /// `VISIBLE`: whether the instance is drawn. Showing an instance sets it with
     /// [`FLAG_ENABLED`](Self::FLAG_ENABLED), and hiding clears both; the readers test this bit
     /// alone.
     VISIBLE = 0x10,
+    /// `DYNAMIC`: a moving instance. The dynamic draw-list build lets such an instance write the
+    /// velocity buffer while motion blur is active;
+    /// [`ModelInstanceManager::CreateStaticInstance`] clears it.
+    DYNAMIC = 0x20,
+    /// `SHADOW`: the instance casts shadows. [`ModelInstanceManager::InitModelInstance`] sets or
+    /// clears it from its `casts_shadow` argument.
+    SHADOW = 0x80,
+    /// `REFLECTION`: the instance is drawn into the reflection pass.
+    /// [`ModelInstanceManager::InitModelInstance`] sets or clears it from its `reflect` argument.
+    REFLECTION = 0x100,
+    /// `FADE_OUT_ON_DELETE`: [`ModelInstanceManager::AddToDeleteQueue`] fades the instance out
+    /// before destroying it (when [`FLAG_CLIPONDISTANCE`](Self::FLAG_CLIPONDISTANCE) is also set
+    /// and the manager's fading is on) instead of destroying it at once.
+    FADE_OUT_ON_DELETE = 0x800,
+    /// `NO_SSSIZECULLING`: [`ModelInstance::AddToWorld`] exempts the instance from the cull's
+    /// screen-space-size test.
+    NO_SSSIZECULLING = 0x4000,
+}
+
+/// A shared model resource (`NModelSystem::CModel`): the render blocks of up to five LODs, the
+/// bounding box the instances transform, and the model's id. Instances hold it by
+/// [`SharedPtr`]; the [`ModelManager`]'s cache holds it weakly, so a model lives as long as an
+/// instance, a resource, or another owner keeps a reference. A `.rbm` loads as a single-mesh
+/// model; a `.lod` loads as a LOD model whose levels are `.rbm` meshes. Only some members are
+/// mapped.
+#[min_size(0x8)]
+pub type Model {
+    vftable {
+        /// `GetShowLod`: whether the model defines a mesh for LOD `lod`, that is, whether the
+        /// LOD's entry in the model's LOD list names a mesh. The dynamic draw-list build
+        /// ([`ModelInstanceManager::ShowUpdate`]) adds nothing to the passes for an instance
+        /// whose current LOD this reports false for.
+        #[index(15)]
+        pub fn GetShowLod(&self, lod: u8) -> bool;
+    },
 }
 
 /// A placed model instance (`NModelSystem::CModelInstance`): a shared model plus its render-block
-/// instance info and world transform. Only some members are mapped.
-#[min_size(0x80)]
+/// instance info and world transform. Every creator allocates it at this size and constructs it
+/// from a [`Model`]; the [`ModelInstanceManager`] is the usual factory, and
+/// [`ModelInstanceManager::AddToDeleteQueue`] its release. An instance is drawn while it is in
+/// the world (registered with a BFBC context through [`AddToWorld`](Self::AddToWorld)) and
+/// [`VISIBLE`](ModelInstanceFlags::VISIBLE): the model instance manager's dynamic cull finds it
+/// there each frame and adds its render blocks to the passes, so the owner only keeps its matrix
+/// current with [`UpdateMatrix`](Self::UpdateMatrix). Only some members are mapped.
+#[size(0x120)]
 pub type ModelInstance {
     /// The instance's status bits (`m_Flags`). The weapon's visibility virtual
     /// ([`WeaponBase::SetVisible`](equipment::weapon::WeaponBase::SetVisible)) and the model
@@ -53,6 +108,23 @@ pub type ModelInstance {
     /// instance to the world sets both, and removing it clears both.
     #[address(0xC)]
     pub m_Flags: ModelInstanceFlags,
+
+    /// The instance's entry in its BFBC context ([`m_BFBC`](Self::m_BFBC)), or all bits set while
+    /// the instance is not in the world. [`AddToWorld`](Self::AddToWorld) sets it and
+    /// [`RemoveFromWorld`](Self::RemoveFromWorld) resets it.
+    #[address(0x12)]
+    pub m_BFBC_id: u16,
+
+    /// The BFBC context the instance is registered with while in the world, or null. The model
+    /// instance manager's creators and [`ModelInstanceManager::ShowModelInstance`] assign the
+    /// manager's [`m_BFBC`](ModelInstanceManager::m_BFBC).
+    #[address(0x18)]
+    pub m_BFBC: *mut BFBCContext,
+
+    /// The model the instance draws. The constructor takes a reference to it, so the model lives
+    /// at least as long as the instance.
+    #[address(0x20)]
+    pub m_spModel: SharedPtr<Model>,
 
     /// A dirty bit for the instance's render info, set (atomically) whenever
     /// [`m_FadeAlpha`](Self::m_FadeAlpha) is written.
@@ -75,9 +147,36 @@ impl ModelInstance {
     pub fn AddToRender(&mut self, opaque_pass: *mut RenderPass, transparent_pass: *mut RenderPass, allow_pre_z: bool, allow_velocity_buffer: bool, allow_culling: bool, refract_pass: *mut RenderPass, sq_distance: f32);
 
     /// Sets the instance's world transform and recomputes its world bounding box from the model's
-    /// bounding box (a tail call to `UpdateMatrixAndAABB`).
+    /// bounding box (a tail call to `UpdateMatrixAndAABB`). The transform goes into the render
+    /// info's slot for the current render frame, and while the instance is in the world the new
+    /// box is pushed to its BFBC entry, so the next cull tests the moved box. The engine's owners
+    /// of moving instances (weapons, explosives, the C4 placement preview) call it from their
+    /// render-phase `UpdateRender`.
     #[address(0x140_316_5A0)]
     pub fn UpdateMatrix(&mut self, matrix: *const Matrix4);
+
+    /// Registers the instance with its BFBC context ([`m_BFBC`](Self::m_BFBC), which must be
+    /// set) unless it already is: recomputes its world bounding box from its current transform,
+    /// adds the box to the context, stores the entry in [`m_BFBC_id`](Self::m_BFBC_id), applies
+    /// [`NO_SSSIZECULLING`](ModelInstanceFlags::NO_SSSIZECULLING), and sets
+    /// [`VISIBLE`](ModelInstanceFlags::VISIBLE) and
+    /// [`FLAG_ENABLED`](ModelInstanceFlags::FLAG_ENABLED). The BFBC context is not locked:
+    /// registration is main-thread work, and [`ModelInstanceManager::AddToDeleteQueue`] defers a
+    /// removal requested from any other thread to the main thread.
+    #[address(0x140_319_B60)]
+    pub fn AddToWorld(&mut self);
+
+    /// Removes the instance from its BFBC context when it is in the world, resetting
+    /// [`m_BFBC_id`](Self::m_BFBC_id), and clears [`VISIBLE`](ModelInstanceFlags::VISIBLE) and
+    /// [`FLAG_ENABLED`](ModelInstanceFlags::FLAG_ENABLED) either way. It keeps
+    /// [`m_BFBC`](Self::m_BFBC).
+    #[address(0x140_313_E70)]
+    pub fn RemoveFromWorld(&mut self);
+
+    /// Stores `bfbc` in [`m_BFBC`](Self::m_BFBC) and nothing else; an instance that is in the
+    /// world must be removed first.
+    #[address(0x140_311_620)]
+    pub fn SetBFBC(&mut self, bfbc: *mut BFBCContext);
 
     /// Writes the model's bounding box, in the model's own space, to `min` and `max`. It is the
     /// box the shared model resource carries, and the box [`UpdateMatrix`](Self::UpdateMatrix)
@@ -127,9 +226,103 @@ impl ModelCollection {
     pub fn DoCulling(bfbc: *mut BFBCContext, cull_stat: *mut void);
 }
 
-/// The model instance manager (`CModelInstanceManager`). Opaque.
-pub type ModelInstanceManager;
+/// The model instance manager (`CModelInstanceManager`, a `Base::CSingle` singleton): the factory
+/// and release point for game-object model instances, the owner of the dynamic BFBC context their
+/// instances are culled in, and the per-frame cull and draw-list build over them, with its fade
+/// queue. Only some members are mapped.
+///
+/// An instance it creates with `add_to_world` set, or shows with
+/// [`ShowModelInstance`](Self::ShowModelInstance), is in [`m_BFBC`](Self::m_BFBC) and is drawn
+/// each frame while [`VISIBLE`](ModelInstanceFlags::VISIBLE), from the transform its owner last
+/// pushed with [`ModelInstance::UpdateMatrix`]; the owner never adds it to a pass itself.
+#[singleton(0x142_F16_F18)]
+pub type ModelInstanceManager {
+    /// The dynamic BFBC context: the one [`ShowModelInstance`](Self::ShowModelInstance) and the
+    /// creators register instances with, and whose per-frame cull hands each surviving
+    /// [`VISIBLE`](ModelInstanceFlags::VISIBLE) instance to [`ShowUpdate`](Self::ShowUpdate).
+    #[address(0x220)]
+    pub m_BFBC: *mut BFBCContext,
+}
 impl ModelInstanceManager {
+    /// `CreateInstance(const char*, ...)`: creates an instance of the model at `name` through
+    /// [`ModelManager::GetModelInstanceFromName`] with `load_flags`, so a name that fails to load
+    /// yields an instance of the fail model rather than null. It then initialises it at
+    /// `world_matrix` ([`InitModelInstance`](Self::InitModelInstance)) and, with `add_to_world`,
+    /// assigns [`m_BFBC`](Self::m_BFBC) and adds it to the world
+    /// ([`ModelInstance::AddToWorld`]). `name` may be an intermediate (`.model_xml`) or a compiled
+    /// (`.lod`, `.rbm`) path. Returns null only when no instance could be allocated.
+    #[address(0x140_4E1_790)]
+    pub fn CreateInstanceFromName(&mut self, name: *const u8, world_matrix: *const Matrix4, casts_shadow: bool, reflect: bool, load_flags: ModelLoadFlags, add_to_world: bool) -> *mut ModelInstance;
+
+    /// `CreateInstance(unsigned int, ...)`: as
+    /// [`CreateInstanceFromName`](Self::CreateInstanceFromName) for the model whose compiled-name
+    /// hash is `name_hash`, through [`ModelManager::GetModelInstanceFromHash`]. It loads nothing:
+    /// it returns null unless the model is in the model manager's cache.
+    #[address(0x140_4E1_6E0)]
+    pub fn CreateInstanceFromHash(&mut self, name_hash: u32, world_matrix: *const Matrix4, casts_shadow: bool, reflect: bool, add_to_world: bool) -> *mut ModelInstance;
+
+    /// `CreateInstance(const boost::shared_ptr<CModel>&, ...)`: allocates an instance of `model`
+    /// directly, then initialises it and optionally adds it to the world as
+    /// [`CreateInstanceFromName`](Self::CreateInstanceFromName) does. IDA labels this address
+    /// `CModelManager::GetModelInstance(const char*, int)`; it is this overload.
+    #[address(0x140_4E1_620)]
+    pub fn CreateInstanceFromModel(&mut self, model: *const SharedPtr<Model>, world_matrix: *const Matrix4, casts_shadow: bool, reflect: bool, add_to_world: bool) -> *mut ModelInstance;
+
+    /// The creators' common initialisation: sets the instance's transform (`InitMatrix`), its
+    /// sand or snow tint from the landscape at the transform's position, and
+    /// [`SHADOW`](ModelInstanceFlags::SHADOW) and [`REFLECTION`](ModelInstanceFlags::REFLECTION)
+    /// from `casts_shadow` and `reflect`. Does nothing for a null instance. Static.
+    #[address(0x140_4CF_AA0)]
+    pub fn InitModelInstance(instance: *mut ModelInstance, world_matrix: *const Matrix4, casts_shadow: bool, reflect: bool);
+
+    /// Creates an instance of `model` for the static world: as
+    /// [`CreateInstanceFromModel`](Self::CreateInstanceFromModel) without adding it to the world,
+    /// and with [`DYNAMIC`](ModelInstanceFlags::DYNAMIC) cleared. Static.
+    #[address(0x140_4DB_450)]
+    pub fn CreateStaticInstance(model: *const SharedPtr<Model>, world_matrix: *const Matrix4, casts_shadow: bool, reflect: bool) -> *mut ModelInstance;
+
+    /// Shows an instance: sets [`VISIBLE`](ModelInstanceFlags::VISIBLE) and
+    /// [`FLAG_ENABLED`](ModelInstanceFlags::FLAG_ENABLED), assigns [`m_BFBC`](Self::m_BFBC) when
+    /// the instance has no context, and adds it to the world ([`ModelInstance::AddToWorld`]),
+    /// which does nothing for an instance already there.
+    #[address(0x140_4DB_4E0)]
+    pub fn ShowModelInstance(&mut self, instance: *mut ModelInstance);
+
+    /// Hides an instance: clears [`VISIBLE`](ModelInstanceFlags::VISIBLE) and
+    /// [`FLAG_ENABLED`](ModelInstanceFlags::FLAG_ENABLED) and removes it from the world
+    /// ([`ModelInstance::RemoveFromWorld`]). The instance keeps its context, so
+    /// [`ShowModelInstance`](Self::ShowModelInstance) brings it back.
+    #[address(0x140_4DB_510)]
+    pub fn HideModelInstance(&mut self, instance: *mut ModelInstance);
+
+    /// Releases an instance, the counterpart of the creators. Does nothing for null. On the main
+    /// thread, without `always_defer`, it destroys the instance at once
+    /// ([`DeleteInstance`](Self::DeleteInstance)); from another thread, or with `always_defer`, it
+    /// queues an immediate fade whose completion destroys it on the main thread. An instance with
+    /// [`FADE_OUT_ON_DELETE`](ModelInstanceFlags::FADE_OUT_ON_DELETE) and
+    /// [`FLAG_CLIPONDISTANCE`](ModelInstanceFlags::FLAG_CLIPONDISTANCE), while the manager's
+    /// fading is on, is moved into [`m_BFBC`](Self::m_BFBC) and faded out first. The caller must
+    /// not touch the instance afterwards.
+    #[address(0x140_505_F40)]
+    pub fn AddToDeleteQueue(&mut self, instance: *mut ModelInstance, always_defer: bool) -> bool;
+
+    /// Destroys an instance: clears [`FLAG_ENABLED`](ModelInstanceFlags::FLAG_ENABLED), removes
+    /// it from the world when it is there, clears its context, drops any fade, and hands it to
+    /// [`ModelManager::RemoveModelInstance`], which frees it later.
+    #[address(0x140_4F5_930)]
+    pub fn DeleteInstance(&mut self, instance: *mut ModelInstance);
+
+    /// The dynamic draw-list build for one culled instance (the dynamic cull's per-instance step).
+    /// It sets [`FLAG_ENABLED`](ModelInstanceFlags::FLAG_ENABLED), then returns false, adding
+    /// nothing, when the instance is clipped by distance
+    /// ([`FLAG_CLIPONDISTANCE`](ModelInstanceFlags::FLAG_CLIPONDISTANCE)) or its model reports
+    /// no mesh for the chosen LOD ([`Model::GetShowLod`]). Otherwise it picks the LOD
+    /// ([`FLAG_UPDATELOD`](ModelInstanceFlags::FLAG_UPDATELOD)), updates the instance's constant
+    /// buffer, and adds it to `opaque_pass` and `transparent_pass` (and the effect and
+    /// reflection passes its flags select) through [`ModelInstance::AddToRender`].
+    #[address(0x140_4E1_840)]
+    pub fn ShowUpdate(&mut self, instance: *mut ModelInstance, opaque_pass: *mut RenderPass, transparent_pass: *mut RenderPass, camera_position: *const Vector3, sq_distance: f32, use_velocity: bool, global_lod_factor: f32) -> bool;
+
     /// The per-frame texture-streaming distance task: runs a BFBC squared-distance process over the
     /// model instances from the occluder manager's camera position (feeding
     /// `CModelInstanceManager::BFBCCallbackDistSq`), then kicks the streaming update jobs. Static.
@@ -137,6 +330,77 @@ impl ModelInstanceManager {
     /// `CModelInstanceManager::TextureStreamingTask`.
     #[address(0x140_4F3_010)]
     pub fn TextureStreamingTask(bfbc: *mut BFBCContext) -> i64;
+}
+
+/// The load flags [`ModelManager::GetModel`] takes (`FLAG_LOAD`, `FLAG_HOLD`).
+#[copyable]
+pub bitflags ModelLoadFlags: u32 {
+    /// `FLAG_LOAD`: for a `.lod` model that is not cached and has no in-memory data, read the LOD
+    /// list from the file system and load each LOD mesh. Without it such a request returns null,
+    /// and a LOD model built from an in-memory list takes only meshes already cached. A `.rbm` is
+    /// read from the file system when not cached either way.
+    FLAG_LOAD = 0x1,
+    /// `FLAG_HOLD`: build the LOD model with the policy that holds its meshes by strong
+    /// reference, so they stay loaded while the model lives. The manager forces it on while its
+    /// hold mode is set.
+    FLAG_HOLD = 0x2,
+}
+
+/// The model manager (`NModelSystem::CModelManager`, a `Base::CSingle` singleton): the loader and
+/// cache of [`Model`]s, keyed by the hash of their compiled names, and the deferred destruction
+/// of [`ModelInstance`]s. The cache holds models weakly. The model resource factory
+/// (`CModel::CreateResource`) builds each model of a loading resource bundle from the bundle's
+/// in-memory data through [`GetModel`](Self::GetModel), which caches it, and the resource keeps a
+/// reference; so while a bundle is loaded its models are found in the cache by name or hash. Only
+/// some members are mapped.
+#[singleton(0x142_EEC_EC0)]
+pub type ModelManager {
+    /// The fail model (a pink box): the model
+    /// [`GetModelInstanceFromName`](Self::GetModelInstanceFromName) instances when a name does
+    /// not load, and the mesh a LOD model's top LOD falls back to when its mesh is missing.
+    #[address(0x130)]
+    pub m_FailModel: SharedPtr<Model>,
+}
+impl ModelManager {
+    /// Returns, through `result`, the model at `name`. The name is first transformed to its
+    /// compiled form (`TransformToCompiledName`, so a `.model_xml` becomes a `.lod`) and hashed,
+    /// and a cached model under that hash is returned as is. Otherwise a `.rbm` is read from
+    /// `memory` (`size` bytes) or, without it, synchronously from the virtual file system, built
+    /// (`CMeshModel::ReadLod`), and cached; a `.lod` is built from the LOD list in `memory`, or
+    /// read from the file system under [`FLAG_LOAD`](ModelLoadFlags::FLAG_LOAD), its LOD meshes
+    /// loaded or looked up per `flags`, and cached. Any other extension, an empty name, or a
+    /// failed read yields null.
+    #[address(0x140_321_D70)]
+    pub fn GetModel(&mut self, result: *mut SharedPtr<Model>, name: *const u8, memory: *mut u8, size: u32, flags: ModelLoadFlags) -> *mut SharedPtr<Model>;
+
+    /// Returns, through `result`, the cached model whose compiled-name hash is `name_hash`, or
+    /// null when the cache has none or its last owner has released it. Loads nothing. The cache
+    /// is guarded for concurrent readers.
+    #[address(0x140_31A_100)]
+    pub fn GetCachedModel(&self, result: *mut SharedPtr<Model>, name_hash: u32) -> *mut SharedPtr<Model>;
+
+    /// `GetModelInstance(const char*, int)`: gets the model at `name` with
+    /// [`GetModel`](Self::GetModel) and `flags` and allocates an instance of it, or of
+    /// [`m_FailModel`](Self::m_FailModel) when the model does not load. The instance is not
+    /// initialised or added to the world. IDA labels this address
+    /// `CModelInstanceManager::CreateInstance(const boost::shared_ptr<CModel>&, ...)`; it is this
+    /// function.
+    #[address(0x140_322_F70)]
+    pub fn GetModelInstanceFromName(&mut self, name: *const u8, flags: ModelLoadFlags) -> *mut ModelInstance;
+
+    /// `GetModelInstance(unsigned int)`: allocates an instance of the cached model whose
+    /// compiled-name hash is `name_hash` ([`GetCachedModel`](Self::GetCachedModel)), or returns
+    /// null when it is not cached.
+    #[address(0x140_31F_FC0)]
+    pub fn GetModelInstanceFromHash(&mut self, name_hash: u32) -> *mut ModelInstance;
+
+    /// Queues an instance for destruction: sets
+    /// [`FLAG_DELETED`](ModelInstanceFlags::FLAG_DELETED), calls the instance-deletion callback
+    /// when one is set, and appends the instance, under a lock, to the current half of the
+    /// double-buffered removal list, whose instances are freed on a later frame. The instance
+    /// must be out of the world.
+    #[address(0x140_31E_450)]
+    pub fn RemoveModelInstance(&mut self, instance: *mut ModelInstance);
 }
 
 /// The spline-road shader variant (`CRenderBlockTypeSplineRoad::EShaderType`). Each road visual type

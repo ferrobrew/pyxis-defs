@@ -1,7 +1,9 @@
 use character::character::Character;
 use damage::DamageMsg;
+use graphics_engine::model_instance::{Model, ModelInstance};
 use havok::{hkAabb, hkAabb16, hkIntSpaceUtil, hkReferencedObject, hkSimdFloat32, hkTransformf, hknpBodyCinfo, hknpConstraintCinfo, hknpContactImpulseEvent, hknpMotionCinfo, hknpShape};
 use types::math::{Matrix4, Vector3};
+use types::shared_ptr::SharedPtr;
 use types::vector_math::{AlignedQuat, AlignedVector3};
 
 /// The physics system (`CPhysicsSystem`), a `Base::CSingle` singleton that owns the Havok world and
@@ -624,8 +626,23 @@ pub type PfxInstance {
 
 /// A rigid object (`CRigidObject`): a [`PhysicsGameObject`] with one rigid body, such as a crate,
 /// a barrel, a gas canister, or a piece of debris. Its body may be static, fixed, keyframed, or
-/// dynamic. Characters, vehicles, and weapons are not rigid objects. Only its type id is bound.
-pub type RigidObject;
+/// dynamic. Characters, vehicles, and weapons are not rigid objects. Only some members are
+/// mapped.
+pub type RigidObject {
+    /// The object's model instance, or null while its graphics are not loaded. Created from
+    /// [`m_Model`](Self::m_Model) (`CRigidObject::CreateModelInstance`); `UnloadGraphics` releases
+    /// it with a deferred
+    /// [`ModelInstanceManager::AddToDeleteQueue`](graphics_engine::model_instance::ModelInstanceManager::AddToDeleteQueue).
+    #[address(0x418)]
+    pub m_ModelInstance: *mut ModelInstance,
+
+    /// The object's model, set by `CRigidObject::CacheModel` from a name
+    /// ([`ModelManager::GetModel`](graphics_engine::model_instance::ModelManager::GetModel)) or
+    /// a compiled-name hash (the cache) and released by `UnloadGraphics`. The object holds it
+    /// whether or not it is in the world or has a model instance.
+    #[address(0x420)]
+    pub m_Model: SharedPtr<Model>,
+}
 impl RigidObject {
     /// `CRigidObject::TYPE_ID`: the run-time type id of `CRigidObject`, for
     /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use.

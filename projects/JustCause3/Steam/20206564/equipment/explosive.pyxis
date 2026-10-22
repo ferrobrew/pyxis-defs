@@ -14,7 +14,12 @@ pub type Explosive {
     pub const GAME_OBJECT_BASE_OFFSET: u64 = 0x70,
 
     /// The explosive's model instance, or null. [`UpdateRender`](Self::UpdateRender) pushes the
-    /// interpolated world matrix to it.
+    /// interpolated world matrix to it. The first `UpdatePostSimFromManager` after the explosive
+    /// spawns creates it from [`m_ModelHash`](Self::m_ModelHash)
+    /// ([`ModelInstanceManager::CreateInstanceFromHash`](graphics_engine::model_instance::ModelInstanceManager::CreateInstanceFromHash),
+    /// at [`m_WorldMatrixT1`](Self::m_WorldMatrixT1), casting no shadow, added to the world),
+    /// clears its [`FLAG_CLIPONDISTANCE`](graphics_engine::model_instance::ModelInstanceFlags::FLAG_CLIPONDISTANCE),
+    /// and shows it; the destructor releases it.
     #[address(0x4B0)]
     pub m_ModelInstance: *mut ModelInstance,
 
@@ -63,6 +68,12 @@ pub type Explosive {
     /// [`PropelToward`](Self::PropelToward) from the virtual `VelocityToHitTarget`.
     #[address(0x5EC)]
     pub m_DeferredInitialVelocity: Vector3,
+
+    /// The compiled-name hash of the explosive's model, from which
+    /// [`m_ModelInstance`](Self::m_ModelInstance) is created; no instance is created unless the
+    /// model is in the model manager's cache. Zero for an explosive without a model.
+    #[address(0x5FC)]
+    pub m_ModelHash: u32,
 
     /// Seconds since the explosive was thrown; [`PropelToward`](Self::PropelToward) resets it.
     #[address(0x604)]
@@ -131,6 +142,11 @@ impl Explosive {
 /// ([`DropExplosive`](Self::DropExplosive)) sticks where it lands.
 #[min_size(0x6B5)]
 pub type PlantedExplosive {
+    /// The compiled-name hash of the in-hand model, from which
+    /// [`m_InactiveModelInstance`](Self::m_InactiveModelInstance) is created.
+    #[address(0x624)]
+    pub m_InactiveModelHash: u32,
+
     /// The in-hand model's world matrix as of the previous simulation tick, which
     /// [`UpdateRender`](Self::UpdateRender) interpolates from toward
     /// [`m_InactiveModelWorldMatrixT1`](Self::m_InactiveModelWorldMatrixT1).
@@ -144,7 +160,11 @@ pub type PlantedExplosive {
     #[address(0x668)]
     pub m_InactiveModelWorldMatrixT1: Matrix4,
 
-    /// The in-hand model's instance, or null.
+    /// The in-hand model's instance, or null. The charge's `UpdatePostSimFromManager` creates it
+    /// from [`m_InactiveModelHash`](Self::m_InactiveModelHash) in the same update that creates
+    /// the live model's [`Explosive::m_ModelInstance`], hiding the live one and showing this one
+    /// with [`FLAG_CLIPONDISTANCE`](graphics_engine::model_instance::ModelInstanceFlags::FLAG_CLIPONDISTANCE)
+    /// cleared.
     #[address(0x6A8)]
     pub m_InactiveModelInstance: *mut ModelInstance,
 
