@@ -1484,7 +1484,14 @@ pub enum SafeBoneIndex: u32 {
     STERNUM = 0x9DCAB8BF,
     LEFT_SHOULDER = 0x8735207D,
     RIGHT_SHOULDER = 0x302EEE80,
+    /// `BackAttach`: on Rico's skeleton the right of the back, below the shoulder. A holstered
+    /// two-handed or heavy slot's gun rides it, and a special slot's of any holder but the player
+    /// ([`WeaponBase::UpdatePostFinalizePose`](equipment::weapon::WeaponBase::UpdatePostFinalizePose)).
     BACK_ATTACH = 0xD8BACD9,
+    /// `BackAttach02`: on Rico's skeleton the left of the back, a little higher than
+    /// [`BACK_ATTACH`](Self::BACK_ATTACH); the generic male skeleton lacks it. A holstered special
+    /// slot's gun rides it while the player holds the weapon
+    /// ([`WeaponBase::UpdatePostFinalizePose`](equipment::weapon::WeaponBase::UpdatePostFinalizePose)).
     BACK_ATTACH_2 = 0xB7D0AD64,
     EQUIPPED_EXPLOSIVE = 0xA76A3A31,
     LEFT_HOLSTER = 0x63ABE53F,
