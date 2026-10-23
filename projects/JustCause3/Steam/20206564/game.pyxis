@@ -139,6 +139,33 @@ impl GameStateRun {
     pub fn UpdateRenderPaused(update_contexts: *mut UpdateContexts);
 }
 
+/// The game's load state (`CGameStateLoad`), entered for a load, a continue, a new game, a world
+/// reload, and every teleport with the load state
+/// ([`GameWorld::TeleportPlayer`](game_world::GameWorld::TeleportPlayer)). Its layout is unmapped.
+pub type GameStateLoad;
+impl GameStateLoad {
+    /// The load state's entry. It runs [`ResetSystems`](Self::ResetSystems), so every entry to
+    /// the load state resets the spawn system.
+    #[address(0x140_9FE_C80)]
+    pub fn OnEnter();
+
+    /// The load state's reset step, called only by [`OnEnter`](Self::OnEnter): aborts an active
+    /// challenge unless the no-unload flag is set, resets the dialogue, resets the spawn system
+    /// ([`SpawnSystem::ResetSystem`](spawn_system::SpawnSystem::ResetSystem)), and resets the heat.
+    /// The disassembler mislabels it `IConsole::GetLoadingLock`.
+    #[address(0x140_9BA_BB0)]
+    pub fn ResetSystems();
+}
+
+/// The game's frontend state (`CGameStateFrontend`), the main menu. Its layout is unmapped.
+pub type GameStateFrontend;
+impl GameStateFrontend {
+    /// The frontend's reset of the game systems on the quit to the menu, which resets the spawn
+    /// system ([`SpawnSystem::ResetSystem`](spawn_system::SpawnSystem::ResetSystem)).
+    #[address(0x140_9AC_700)]
+    pub fn ResetSystems();
+}
+
 // Opaque engine context types carried by the per-frame update contexts.
 pub type ResourceCache;
 

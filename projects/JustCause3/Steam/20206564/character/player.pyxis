@@ -1,6 +1,7 @@
 use aim::aim::PlayerAimControl;
 use character::avatar::Avatar;
 use character::character::Character;
+use types::math::Matrix4;
 
 /// The player's aim mode (`CPlayer::EAimModes`), held in [`Player::m_AimMode`].
 pub enum AimMode: i32 {
@@ -33,6 +34,10 @@ pub type Player {
     #[address(0x158)]
     pub m_AimControl: *mut PlayerAimControl,
 
+    /// Whether the player is the local player; the weapons' fire statistics read it.
+    #[address(0x1_3D8)]
+    pub m_LocalPlayer: bool,
+
     /// The damage of the player's melee hit, in health points, from the player's settings. The
     /// melee input task tests it against the target's health to choose a killing act, and the melee
     /// hit message ([`Character::HandleTrackMessage`](character::character::Character::HandleTrackMessage))
@@ -60,7 +65,13 @@ impl Player {
     /// falling without a parachute or when the character has none of the aimable weapon slots
     /// filled. On a change it records [`m_AimModeChangeTime`](Self::m_AimModeChangeTime), adds or
     /// removes the precision-aim camera hint (adding it only when `add_camera_hint` is set), sets
-    /// the aim control's aim state, and forwards the mode to the selected weapon (or draws it).
+    /// the aim control's aim state, and forwards the mode to the selected weapon
+    /// ([`Character::GetSelectedWeapon`](character::character::Character::GetSelectedWeapon)) only,
+    /// and only while the player is that weapon's user
+    /// ([`WeaponBase::IsCharacterUsingWeapon`](equipment::weapon::WeaponBase::IsCharacterUsingWeapon));
+    /// otherwise it draws the selected weapon when that weapon has a precision hint. It skips the
+    /// forward while planting. Any other weapon the player uses keeps the mode it was given at
+    /// [`WeaponBase::StartUsing`](equipment::weapon::WeaponBase::StartUsing).
     ///
     /// Precision aim is entered from three places: the player's weapon handling
     /// (`CInventory::UpdateWeaponHandling`) on the precision-aim input, for a weapon with
@@ -76,6 +87,19 @@ impl Player {
     /// `CPlayer::UpdatePostPhysics`.
     #[address(0x140_C3D_100)]
     pub fn UpdateAimMode(&mut self);
+
+    /// Respawns the player at `transform` (`CPlayer::ReInit`): revives the character (which forces
+    /// its neutral state, [`Character::ForceNeutralState`](character::character::Character::ForceNeutralState)),
+    /// returns to normal aim, teleports with the load state
+    /// ([`GameWorld::TeleportPlayer`](game_world::GameWorld::TeleportPlayer)), fills the slot
+    /// weapons' reserves
+    /// ([`Inventory::GiveMaxAmmoToAllWeaponInInventory`](character::inventory::Inventory::GiveMaxAmmoToAllWeaponInInventory)),
+    /// and writes `inventory_reset_flags` to
+    /// [`Inventory::m_SpawnSystemResetFlags`](character::inventory::Inventory::m_SpawnSystemResetFlags).
+    /// The mission manager's restart ([`MissionManager::GoToRestartPoint`](mission::MissionManager::GoToRestartPoint))
+    /// and the player's post-physics update call it.
+    #[address(0x140_C54_EE0)]
+    pub fn ReInit(&mut self, transform: *mut Matrix4, teleport_flags: u32, inventory_reset_flags: u32);
 }
 
 /// The player's ability table (`CAbilitiesHandler`): the status of each unlockable ability, keyed

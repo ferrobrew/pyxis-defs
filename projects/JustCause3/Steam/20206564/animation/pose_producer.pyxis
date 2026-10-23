@@ -72,6 +72,16 @@ impl Blender {
     /// without them.
     #[address(0x141_E6B_1C0)]
     pub fn HasSamplers(&mut self) -> bool;
+
+    /// Adds `instance` to the blender's samplers: registers its Havok animation control with the
+    /// blender's animated skeleton and keeps a reference to it.
+    #[address(0x141_E6B_930)]
+    pub fn AddSampler(&mut self, instance: *mut SharedPtr<AnimationInstance>);
+
+    /// Removes every sampler's animation control from the animated skeleton and releases the
+    /// samplers.
+    #[address(0x141_E6B_9B0)]
+    pub fn ClearSamplers(&mut self);
 }
 
 /// One animation layer of an animation controller (`CAnimatedBodyPart`): the layer's rule system and
@@ -92,3 +102,36 @@ pub type AnimationDriverTransition {
     #[address(0xD8)]
     pub m_Blender: SharedPtr<Blender>,
 }
+impl AnimationDriverTransition {
+    /// Starts `instance`, a clip chosen by code rather than by the layer's rule system, on the
+    /// layer, blending it in over `blend` seconds.
+    /// [`AnimationController::PlayCustomAnimation`](character::character::AnimationController::PlayCustomAnimation)
+    /// calls it.
+    #[address(0x140_474_AB0)]
+    pub fn PlayCustomAnimation(&mut self, instance: *mut SharedPtr<AnimationInstance>, blend: f32);
+}
+
+/// One playing clip (`CAnimationInstance`): a clip resource bound to a skeleton, with its
+/// playback time, weight, easing, and loop mode. A [`Blender`] samples its instances into a pose.
+/// Only its size is bound.
+#[size(0x120)]
+pub type AnimationInstance;
+impl AnimationInstance {
+    /// Constructs an instance of the clip resource `animation` (a `TResourceCachePtr<CAnimation>`,
+    /// one resource handle) over the skeleton resource `skeleton`, configured by `context` (a
+    /// `CAnimationInstance::SCreationContext`: its easing, start and finish trims, speed, mirror
+    /// flag, and loop mode). A context with the mirror flag set binds the clip mirrored.
+    #[address(0x141_E68_BD0)]
+    pub fn Construct(&mut self, animation: *const *mut void, skeleton: *const *mut void, context: *const void) -> *mut AnimationInstance;
+}
+
+/// `IAnimationManager::AquireAnimation`: the clip resource for the clip path `path` (transformed
+/// to its compiled name and hashed with `HashString`), from the global resource cache. It writes
+/// the resource handle (a `TResourceCachePtr<CAnimation>`) into `result` and returns it.
+#[address(0x140_3EB_FD0)]
+pub fn AquireAnimation(result: *mut *mut void, path: *const u8) -> *mut *mut void;
+
+/// `IAnimationManager::AquireAnimation` with an explicit resource cache: like [`AquireAnimation`]
+/// but from `cache`, and writing a null handle for a null or empty `path`.
+#[address(0x140_482_3D0)]
+pub fn AquireAnimationFromCache(result: *mut *mut void, path: *const u8, cache: *mut void) -> *mut *mut void;

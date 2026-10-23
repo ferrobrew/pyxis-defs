@@ -1,9 +1,12 @@
-use character::character::Character;
+use character::character::{AnimatedModel, Character};
 use equipment::grappling_hook::GrapplingHook;
 use equipment::weapon::{AmmunitionType, WeaponBase};
 use event::{EventImpl, ReceiveEvent};
+use game::GameObject;
+use state::StateContext;
 use types::math::Vector3;
 use types::shared_ptr::SharedPtr;
+use types::std_vector::Vector;
 
 /// An inventory weapon slot (`CInventory::EWeaponSlot`). Mounted guns a character picks up occupy
 /// [`E_SLOT_HEAVY`](Self::E_SLOT_HEAVY): `CCharacter::IsInMountedGunState` tests the weapon in that
@@ -33,6 +36,19 @@ pub enum EquipMode: i32 {
     E_EQUIP_IF_IN_SELECTED_SLOT = 0x2,
 }
 
+/// The flags of [`Inventory::m_SpawnSystemResetFlags`], which shape what the spawn system's
+/// pre-reset event records into the respawn table.
+#[copyable]
+pub bitflags SpawnSystemResetFlags: u32 {
+    /// Respawn the loadout of [`m_WeaponToSpawnReset`](Inventory::m_WeaponToSpawnReset) in place
+    /// of the slots' current weapons.
+    RESPAWN_RESET_LOADOUT = 0b0000_0000_0000_0000_0000_0000_0000_0001,
+    /// Respawn the slots' weapons with full magazines and the extra-ammunition flag.
+    FULL_MAGAZINES = 0b0000_0000_0000_0000_0000_0000_0000_0010,
+    /// Respawn the reset grappling device.
+    RESET_GRAPPLING_DEVICE = 0b0000_0000_0000_0000_0000_0000_0000_0100,
+}
+
 /// The character's equipment inventory (`CInventory`), embedded in `CCharacter`
 /// ([`Character::m_Inventory`](character::character::Character::m_Inventory)). Only some members
 /// are mapped.
@@ -40,7 +56,7 @@ pub enum EquipMode: i32 {
 pub type Inventory {
     /// The weapon in each slot, indexed by [`WeaponSlot`] (up to
     /// [`E_NUM_WEAPON_SLOTS`](WeaponSlot::E_NUM_WEAPON_SLOTS)); a null pointer for an empty slot.
-    /// `CCharacter::GetWeaponInInventory` returns a reference to an entry.
+    /// [`Character::GetWeaponInInventory`](character::character::Character::GetWeaponInInventory) returns a reference to an entry.
     #[address(0x20)]
     pub m_Weapons: [SharedPtr<WeaponBase>; 8],
 
@@ -58,9 +74,40 @@ pub type Inventory {
     /// ([`LoadPlayerSaveData`](save::LoadPlayerSaveData)) writes the saved types here, and the
     /// post-reset event ([`m_SpawnSystemPostReset`](Self::m_SpawnSystemPostReset)) requests a spawn
     /// of each entry; each spawned weapon replaces the slot's occupant through the character's
-    /// pickup.
+    /// pickup. [`GivePlayerWeapon`](Self::GivePlayerWeapon) writes an entry and requests its spawn,
+    /// and [`WeaponSpawned`](Self::WeaponSpawned) clears it once the weapon arrives.
     #[address(0xE8)]
     pub m_WeaponToSpawn: [i32; 8],
+    /// The loadout the pre-reset event copies into [`m_WeaponToSpawn`](Self::m_WeaponToSpawn) in
+    /// place of the slots' current weapons when
+    /// [`RESPAWN_RESET_LOADOUT`](SpawnSystemResetFlags::RESPAWN_RESET_LOADOUT) is set: a spawn tag
+    /// index per slot, or zero.
+    pub m_WeaponToSpawnReset: [i32; 8],
+    /// The magazine each respawn-table entry arrives with.
+    pub m_WeaponToSpawnAmmunition: [i32; 8],
+    /// Per respawn-table entry, whether the arriving weapon's add drops the slot's occupant into
+    /// the world rather than despawning it ([`AddWeapon`](Self::AddWeapon)).
+    pub m_WeaponToSpawnDropOld: [bool; 8],
+    /// The slot whose arriving respawn-table weapon is equipped
+    /// ([`E_EQUIP`](EquipMode::E_EQUIP)), or [`E_NONE`](WeaponSlot::E_NONE), in which case an
+    /// arriving weapon is equipped only into the selected slot
+    /// ([`E_EQUIP_IF_IN_SELECTED_SLOT`](EquipMode::E_EQUIP_IF_IN_SELECTED_SLOT)). The pre-reset
+    /// event records the selected slot here.
+    pub m_WeaponToSpawnEquippedWeapon: WeaponSlot,
+    /// Per respawn-table entry, whether rounds beyond the magazine go to the reserve on arrival.
+    pub m_WeaponToSpawnExtraAmmo: [bool; 8],
+    /// Per slot, whether a spawn of the slot's respawn-table entry is in flight.
+    /// [`RequestWeaponSpawn`](Self::RequestWeaponSpawn) does nothing for a slot already pending.
+    pub m_WeaponPendingSpawn: [bool; 8],
+
+    /// Per slot, whether the slot's occupant is marked for removal. [`ForceRemoveWeapon`](Self::ForceRemoveWeapon),
+    /// [`ForceRemoveAllWeapons`](Self::ForceRemoveAllWeapons), and the post-reset event set the
+    /// marks; [`UpdatePrePhysics`](Self::UpdatePrePhysics) carries them out through
+    /// [`Internal_RemoveWeapon`](Self::Internal_RemoveWeapon);
+    /// [`CancelRemoveWeapon`](Self::CancelRemoveWeapon) and an arriving respawn-table weapon of the
+    /// expected type ([`WeaponSpawned`](Self::WeaponSpawned)) clear one.
+    #[address(0x17C)]
+    pub m_WeaponToRemove: [bool; 8],
 
     /// Whether the current animation permits shooting; one half of
     /// [`GetAnimationAllowsShooting`](Self::GetAnimationAllowsShooting).
@@ -88,7 +135,8 @@ pub type Inventory {
 
     /// Whether the current animation permits switching weapons: recomputed by
     /// [`UpdateInventoryPermissions`](Self::UpdateInventoryPermissions). A deferred switch, a
-    /// committed slot selection (`CCharacter::SwitchWeapon`), and
+    /// committed slot selection
+    /// ([`Character::SwitchWeapon`](character::character::Character::SwitchWeapon)), and
     /// [`TryToSwitchToValidWeapon`](Self::TryToSwitchToValidWeapon) all wait on it.
     #[address(0x189)]
     pub m_DoesAnimationAllowSwitchingWeapons: bool,
@@ -180,13 +228,16 @@ pub type Inventory {
     /// every slot's occupant for removal, clears the character's next selected slot, and requests a
     /// spawn of every slot's respawn entry and of the grappling device.
     pub m_SpawnSystemPostReset: ReceiveEvent,
+    /// How the next spawn reset rebuilds the slots, read and cleared by the pre-reset event.
+    /// [`Player::ReInit`](character::player::Player::ReInit) writes it.
+    pub m_SpawnSystemResetFlags: SpawnSystemResetFlags,
 
     /// The slot the weapon selection commits when every slot-select input is released, or
     /// [`E_NONE`](WeaponSlot::E_NONE). While a slot-select input is held,
     /// [`UpdateWeaponHandling`](Self::UpdateWeaponHandling) rewrites it every frame with the winning
     /// slot, or with [`E_NONE`](WeaponSlot::E_NONE) when the winner is the wielded weapon's slot or
     /// holds no weapon. On a frame with every slot-select input zero and this set, it switches to
-    /// the slot (`CCharacter::SwitchWeapon`) when the animation allows switching, or selects and
+    /// the slot ([`Character::SwitchWeapon`](character::character::Character::SwitchWeapon)) when the animation allows switching, or selects and
     /// draws it with nothing wielded, and resets it to [`E_NONE`](WeaponSlot::E_NONE); otherwise it
     /// stays set and the commit is retried every frame. Entering a vehicle seat other than a
     /// motorcycle's resets it.
@@ -250,7 +301,15 @@ impl Inventory {
     /// weapon, all with `muzzle_target`, and then the selected grenade with `grenade_target`. The
     /// fire inputs passed down come from the owner's
     /// [`m_WeaponInputs`](character::character::Character::m_WeaponInputs), zeroed while shooting
-    /// (or throwing) is not allowed. The disassembler mislabels it `CGrapplingHook::GetFireInputEnabled`.
+    /// (or throwing) is not allowed: the primary input unless
+    /// [`GetAnimationAllowsShooting`](Self::GetAnimationAllowsShooting) holds, and the grenade
+    /// input unless [`m_DoesAnimationAllowGrenades`](Self::m_DoesAnimationAllowGrenades) is set and
+    /// [`SB_DISABLE_USE_GRENADES`](state::StateBitFlag::SB_DISABLE_USE_GRENADES) is clear. The
+    /// secondary input is always zero. For the player, a riding state
+    /// ([`Character::IsInRidingInVehicleState`](character::character::Character::IsInRidingInVehicleState))
+    /// skips the wielding weapon unless the ride is a motorcycle, and skips the grenade in any
+    /// riding state. Nothing inside a weapon reads the shooting permission, so a weapon updated
+    /// directly bypasses it. The disassembler mislabels it `CGrapplingHook::GetFireInputEnabled`.
     #[address(0x140_8C6_9A0)]
     pub fn UpdateWeapons_Parallel(&mut self, dt: f32, muzzle_target: *const Vector3, grenade_target: *const Vector3);
 
@@ -285,7 +344,16 @@ impl Inventory {
     pub fn GetAnimationAllowsTriggeringExplosives(&self) -> bool;
 
     /// Recomputes the inventory's per-frame permissions from the owner's state (it consults the
-    /// grapple reel-in predicates among others).
+    /// grapple reel-in predicates among others). Shooting is cleared while pre-reeling or reeling
+    /// in without the shoot-while-reeling upgrade, every permission while the grappling hook holds
+    /// an object, and the grenade permission and two others while the wielded weapon's
+    /// [`m_PrecisionCameraHash`](equipment::weapon::WeaponBase::m_PrecisionCameraHash) hint is
+    /// active. It then ANDs each permission with the inverse of its disable state bit
+    /// ([`SB_DISABLE_SHOOT`](state::StateBitFlag::SB_DISABLE_SHOOT) and its siblings), writes the
+    /// permission bytes ([`m_DoesAnimationAllowShooting`](Self::m_DoesAnimationAllowShooting)
+    /// onward), and clears the disable bits. The disable bits are therefore per-frame requests:
+    /// the graph's `NSetInventoryPermissions` state tasks set them during the animation update
+    /// ([`NSetInventoryPermissions_SetPermissions`]), and this latches and clears them.
     #[address(0x140_91B_3E0)]
     pub fn UpdateInventoryPermissions(&mut self);
 
@@ -370,7 +438,8 @@ impl Inventory {
     /// [`E_SLOT_TWO_HANDED_SPECIAL`](WeaponSlot::E_SLOT_TWO_HANDED_SPECIAL) weapon. A weapon
     /// qualifies when its magazine is not empty or the inventory holds ammunition of its type; the
     /// order does not depend on the wielded slot, which is skipped only because it is empty. The
-    /// first that qualifies is switched to through `CCharacter::SelectWeapon`, and the function
+    /// first that qualifies is switched to through
+    /// [`Character::SelectWeapon`](character::character::Character::SelectWeapon), and the function
     /// returns true. It does nothing and returns false while
     /// [`m_DoesAnimationAllowSwitchingWeapons`](Self::m_DoesAnimationAllowSwitchingWeapons) is
     /// clear, while the owner's
@@ -380,7 +449,7 @@ impl Inventory {
     /// It has two callers. [`WeaponBase::CheckIfReloadShouldBeTriggeredBase`](equipment::weapon::WeaponBase::CheckIfReloadShouldBeTriggeredBase)
     /// calls it when the player pulls the trigger of a weapon that is empty and cannot reload,
     /// which is the game's automatic switch away from an empty weapon. The `NWeaponEquipTask`
-    /// state task calls it on entry when its character wields nothing and the task is not
+    /// state task ([`NWeaponEquipTask_OnEnter`](equipment::weapon_animation::NWeaponEquipTask_OnEnter)) calls it on entry when its character wields nothing and the task is not
     /// configured to equip a fixed slot.
     #[address(0x140_8D6_1F0)]
     pub fn TryToSwitchToValidWeapon(&mut self) -> bool;
@@ -466,4 +535,163 @@ impl Inventory {
     /// force. The character calls it when its own visibility changes.
     #[address(0x140_8C6_D50)]
     pub fn UpdateWeaponVisibility(&mut self, visible: bool);
+
+    /// Gives the character a weapon of spawn tag index `tag_index` in `slot` through the respawn
+    /// table: writes the slot's entry ([`m_WeaponToSpawn`](Self::m_WeaponToSpawn) and its
+    /// [`m_WeaponToSpawnAmmunition`](Self::m_WeaponToSpawnAmmunition),
+    /// [`m_WeaponToSpawnExtraAmmo`](Self::m_WeaponToSpawnExtraAmmo), and
+    /// [`m_WeaponToSpawnDropOld`](Self::m_WeaponToSpawnDropOld) entries, and with
+    /// `start_equipped` [`m_WeaponToSpawnEquippedWeapon`](Self::m_WeaponToSpawnEquippedWeapon))
+    /// and requests its spawn ([`RequestWeaponSpawn`](Self::RequestWeaponSpawn)). The weapon
+    /// arrives later through [`InventoryWeaponSpawnCallback`] and
+    /// [`WeaponSpawned`](Self::WeaponSpawned). Every game-side give takes this path: missions and
+    /// their checkpoint restores, challenges, the graph script's `SpawnWeapons` node, the
+    /// `equip weapon` event, a rack's infinite pickups
+    /// ([`WeaponBase::m_InfinitePickup`](equipment::weapon::WeaponBase::m_InfinitePickup)), and the
+    /// game-completion reward.
+    #[address(0x140_947_980)]
+    pub fn GivePlayerWeapon(&mut self, tag_index: i32, ammo: i32, slot: WeaponSlot, start_equipped: bool, extra_ammo_to_inventory: bool, drop_old: bool);
+
+    /// Requests the spawn of `slot`'s respawn-table entry from the spawn system, with
+    /// [`InventoryWeaponSpawnCallback`] as the callback, unless one is already pending
+    /// ([`m_WeaponPendingSpawn`](Self::m_WeaponPendingSpawn)). The disassembler swaps its name with
+    /// [`RequestSpawnGrapplingDevice`](Self::RequestSpawnGrapplingDevice): it labels this function
+    /// `CInventory::RequestSpawnGrapplingDevice`.
+    #[address(0x140_942_510)]
+    pub fn RequestWeaponSpawn(&mut self, slot: i32);
+
+    /// Requests the spawn of the character's grappling device. The disassembler labels it
+    /// `CInventory::RequestWeaponSpawn`; see [`RequestWeaponSpawn`](Self::RequestWeaponSpawn).
+    #[address(0x140_91C_470)]
+    pub fn RequestSpawnGrapplingDevice(&mut self);
+
+    /// Hands a weapon spawned for the respawn table to the character. `weapon` is a
+    /// `boost::shared_ptr<CWeaponBase>` passed by value, so it points at the caller's copy, which
+    /// this function releases. When the weapon's spawn tag index is the slot's
+    /// [`m_WeaponToSpawn`](Self::m_WeaponToSpawn) entry (the slot being the weapon's
+    /// [`m_EquipSlot`](equipment::weapon::WeaponBase::m_EquipSlot)), it clears the slot's removal
+    /// mark ([`m_WeaponToRemove`](Self::m_WeaponToRemove)), picks the equip mode
+    /// ([`E_EQUIP`](EquipMode::E_EQUIP) for the
+    /// [`m_WeaponToSpawnEquippedWeapon`](Self::m_WeaponToSpawnEquippedWeapon) slot, after
+    /// unequipping the wielded weapon; [`E_EQUIP_IF_IN_SELECTED_SLOT`](EquipMode::E_EQUIP_IF_IN_SELECTED_SLOT)
+    /// when that is [`E_NONE`](WeaponSlot::E_NONE); [`E_DONT_EQUIP`](EquipMode::E_DONT_EQUIP)
+    /// otherwise), passes the weapon to
+    /// [`Character::PickUpWeapon`](character::character::Character::PickUpWeapon), sets the
+    /// entry's magazine and, with the extra-ammunition flag, moves the overflow into the reserve,
+    /// applies the character's visibility to every slot weapon, and clears the entry. On a tag
+    /// mismatch it removes the slot's occupant ([`Internal_RemoveWeapon`](Self::Internal_RemoveWeapon)),
+    /// or despawns the newcomer when the slot is empty. Ordinary world weapons never pass through
+    /// it: it sees only respawn-table weapons, the gives and the respawns after a spawn reset.
+    #[address(0x140_932_B30)]
+    pub fn WeaponSpawned(&mut self, weapon: *mut SharedPtr<WeaponBase>);
+
+    /// Marks `slot`'s occupant for removal ([`m_WeaponToRemove`](Self::m_WeaponToRemove)), carried
+    /// out by the next [`UpdatePrePhysics`](Self::UpdatePrePhysics). With `reset_ammo` it also
+    /// empties the weapon's magazine and the reserve of its ammunition type, and with
+    /// `clear_spawning` it clears the slot's respawn-table entry.
+    #[address(0x140_8D5_D40)]
+    pub fn ForceRemoveWeapon(&mut self, slot: WeaponSlot, reset_ammo: bool, clear_spawning: bool);
+
+    /// Marks every slot for removal, like [`ForceRemoveWeapon`](Self::ForceRemoveWeapon) on each.
+    #[address(0x140_902_D30)]
+    pub fn ForceRemoveAllWeapons(&mut self, clear_spawning: bool);
+
+    /// Clears `slot`'s removal mark ([`m_WeaponToRemove`](Self::m_WeaponToRemove)).
+    #[address(0x140_8BB_450)]
+    pub fn CancelRemoveWeapon(&mut self, slot: WeaponSlot);
+
+    /// Carries out `slot`'s removal: a mounted gun is stopped and released, any other occupant is
+    /// despawned ([`DespawnWeapon`](Self::DespawnWeapon)), and the mark is cleared.
+    #[address(0x140_91B_280)]
+    pub fn Internal_RemoveWeapon(&mut self, slot: WeaponSlot);
+
+    /// Empties `slot` and despawns its weapon at once
+    /// ([`WeaponBase::Despawn`](equipment::weapon::WeaponBase::Despawn)). The challenges call it
+    /// directly, bypassing the removal marks.
+    #[address(0x140_91A_C10)]
+    pub fn DespawnWeapon(&mut self, slot: WeaponSlot);
+
+    /// The inventory's pre-physics update: carries out every marked removal
+    /// ([`Internal_RemoveWeapon`](Self::Internal_RemoveWeapon)), then updates the secondary attach
+    /// objects.
+    #[address(0x140_932_DA0)]
+    pub fn UpdatePrePhysics(&mut self, dt: f32);
+
+    /// The weapon reference in `slot` ([`m_Weapons`](Self::m_Weapons)). The disassembler mislabels
+    /// it `CPOI::Create`.
+    #[address(0x140_8BB_9C0)]
+    pub fn GetWeapon(&self, slot: WeaponSlot) -> *const SharedPtr<WeaponBase>;
+
+    /// Whether a slot holds a weapon whose
+    /// [`m_AmmunitionType`](equipment::weapon::WeaponBase::m_AmmunitionType) is `ammo_type`. It
+    /// reads only the eight slots. Its one caller is the pickup's automatic ammunition credit
+    /// ([`WeaponBase::ShouldAutoPickup`](equipment::weapon::WeaponBase::ShouldAutoPickup)).
+    #[address(0x140_8C6_EF0)]
+    pub fn HasWeaponWithAmmoType(&self, ammo_type: AmmunitionType) -> bool;
+
+    /// Adds `count` rounds to the reserve of `ammo_type`, up to its cap
+    /// ([`m_MaxAmmunition`](Self::m_MaxAmmunition)), and returns how many were added.
+    #[address(0x140_8D6_190)]
+    pub fn AddAmmo(&mut self, ammo_type: AmmunitionType, count: i32) -> i32;
+
+    /// Re-requests the spawn of every respawn-table entry not already pending, and of the
+    /// grappling device. The player's post-physics update calls it once the save data has loaded.
+    #[address(0x140_947_9D0)]
+    pub fn RespawnPlayerGear(&mut self);
+
+    /// Requests the respawn table's weapons with the two-handed slot as the equipped slot
+    /// ([`m_WeaponToSpawnEquippedWeapon`](Self::m_WeaponToSpawnEquippedWeapon)).
+    #[address(0x140_942_840)]
+    pub fn RespawnPlayerWeapon(&mut self);
+
+    /// Fills the reserve of each slot weapon's ammunition type. The player's respawn
+    /// ([`Player::ReInit`](character::player::Player::ReInit)) calls it.
+    #[address(0x140_8D6_010)]
+    pub fn GiveMaxAmmoToAllWeaponInInventory(&mut self);
+
+    /// Selects a weapon that has ammunition and returns whether it found one. The meanings of the
+    /// two flags are unverified. [`Character::DrawWeapon`](character::character::Character::DrawWeapon),
+    /// [`DropWeapon`](Self::DropWeapon), [`WeaponBase::StopUsing`](equipment::weapon::WeaponBase::StopUsing)
+    /// for a mounted gun, the planted explosive's stop, and the store's close call it.
+    #[address(0x140_91A_D40)]
+    pub fn SelectValidWeapon(&mut self, p1: bool, p2: bool) -> bool;
 }
+
+/// The spawn callback ([`SpawnCallback`](spawn_system::SpawnCallback)) of the respawn table's
+/// requests, with the inventory as its userdata. It despawns a spawned weapon that is not a
+/// profile item, and hands any other to [`Inventory::WeaponSpawned`].
+#[address(0x140_942_180)]
+pub fn InventoryWeaponSpawnCallback(objects: *const Vector<SharedPtr<GameObject>>, inventory: *mut Inventory);
+
+/// Maps a bit of an `NSetInventoryPermissions` state task's `Flags` property to the state bit it
+/// sets: the shoot flag to [`SB_DISABLE_SHOOT`](state::StateBitFlag::SB_DISABLE_SHOOT), the reload
+/// flag to [`SB_DISABLE_RELOAD`](state::StateBitFlag::SB_DISABLE_RELOAD), the grenade flag to
+/// [`SB_DISABLE_USE_GRENADES`](state::StateBitFlag::SB_DISABLE_USE_GRENADES), and so on through
+/// the disable bits that [`Inventory::UpdateInventoryPermissions`] latches.
+#[address(0x140_837_E80)]
+pub fn NSetInventoryPermissions_TranslatePermissionsFlagToStateBit(flag_bit: i32) -> i32;
+
+/// Sets the state bits of the permission `flags` (mapped through
+/// [`NSetInventoryPermissions_TranslatePermissionsFlagToStateBit`]) in `model`'s current state-bit
+/// words. The state task's scopes call it: the whole-state scope on entry and every update, and the
+/// segment scope within a named clip segment.
+#[address(0x140_837_F50)]
+pub fn NSetInventoryPermissions_SetPermissions(model: *mut AnimatedModel, flags: i32);
+
+/// The entry of the whole-state scope of the `NSetInventoryPermissions` state task.
+#[address(0x140_849_3E0)]
+pub fn NSetInventoryPermissions_NStateScope_OnEnter(context: *mut StateContext, properties: *mut void, instance: *mut void);
+
+/// The update of the whole-state scope of the `NSetInventoryPermissions` state task, which sets
+/// the permission bits on every update of its state.
+#[address(0x140_837_FC0)]
+pub fn NSetInventoryPermissions_NStateScope_Update(context: *mut StateContext, properties: *mut void, instance: *mut void);
+
+/// The entry of the segment scope of the `NSetInventoryPermissions` state task.
+#[address(0x140_838_020)]
+pub fn NSetInventoryPermissions_NSegmentScope_OnEnter(context: *mut StateContext, properties: *mut void, instance: *mut void);
+
+/// The update of the segment scope of the `NSetInventoryPermissions` state task, which sets the
+/// permission bits while the state's clip is inside the task's named segment.
+#[address(0x140_847_810)]
+pub fn NSetInventoryPermissions_NSegmentScope_Update(context: *mut StateContext, properties: *mut void, instance: *mut void);

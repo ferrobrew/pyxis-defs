@@ -101,6 +101,13 @@ pub type Vehicle {
     #[address(0x1_830)]
     pub m_StuntAreas: StuntAreas,
 
+    /// Whether the holstered weapons of the characters seated in the vehicle are hidden: the
+    /// seat states' hide task
+    /// ([`NWeaponHideInVehicleTask_OnEnter`](equipment::weapon_animation::NWeaponHideInVehicleTask_OnEnter))
+    /// makes a holstered slot weapon holstered-invisible while it is set.
+    #[address(0x4_C02)]
+    pub m_HideCharacterWeapons: bool,
+
     /// The world-space point the vehicle's weapons aim at, written by
     /// [`SetAimTargetPosition`](Self::SetAimTargetPosition).
     #[address(0x4_C34)]

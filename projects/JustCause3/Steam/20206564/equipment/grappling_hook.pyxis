@@ -12,8 +12,10 @@ use types::shared_ptr::SharedPtr;
 /// [`GHS_REELING_IN`](Self::GHS_REELING_IN) -- during which
 /// `NReeledInController::RotateToGrappleTarget` rotates the character's root toward the target as
 /// the reel pulls them in -- and completes into one of the `GHS_REELED_*` attachment states
-/// depending on the landing surface and pose. `GHS_CUSTOM_ACTIVE_WIRE` is a wire held open outside
-/// the reel flow (tethers).
+/// depending on the landing surface and pose.
+/// [`GHS_CUSTOM_ACTIVE_WIRE`](Self::GHS_CUSTOM_ACTIVE_WIRE) is the state of a scripted wire fired
+/// outside the reel flow (`CGrapplingHook::FireHookCustom`, which the vehicle grapple and the
+/// stunt-position grapple use).
 #[copyable]
 pub enum GrapplingHookState: i32 {
     GHS_INITIALIZING = 0x0,
@@ -23,6 +25,8 @@ pub enum GrapplingHookState: i32 {
     GHS_REELED_HANG = 0x4,
     GHS_REELED_UPSIDEDOWN = 0x5,
     GHS_REELED_STUNT = 0x6,
+    /// A scripted wire is out: `CGrapplingHook::FireHookCustom` sets it when it fires a wire from
+    /// the inactive state, with no fire animation.
     GHS_CUSTOM_ACTIVE_WIRE = 0x7,
 }
 

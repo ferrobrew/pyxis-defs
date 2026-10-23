@@ -382,3 +382,23 @@ impl VehicleAimBlendState {
     #[address(0x140_86F_4F0)]
     pub fn UpdateSamplers(&mut self, instance: *mut void, dt: f32, samplers: *mut void);
 }
+
+/// The on-foot vertical aim blend (`CVerticalAimBlendState`), an animation-graph state that blends
+/// aim samplers by the aim's yaw and pitch and plays the firing recoil. Its layout is unmapped.
+pub type VerticalAimBlendState;
+impl VerticalAimBlendState {
+    /// Weights the state's samplers for the character owning `instance` (a
+    /// `NAnimationSystem::CStateMachineInstance`) over `dt`. The yaw and pitch are measured from
+    /// the left arm when the wielded weapon sits in the left hand
+    /// ([`WeaponBase::IsWieldedInLeftHand`]), from the right arm for a heavy weapon and the grapple
+    /// fire, and from the head otherwise. When the state's recoil flag is set and a weapon is
+    /// wielded, it drives one recoil sampler per gun of the wielded weapon
+    /// ([`WeaponBase::GetNumRecoilAnimationNeeded`]): each sampler's time is that gun's own time
+    /// since its last shot ([`WeaponData::m_TimeSinceLastFire`](equipment::weapon::WeaponData::m_TimeSinceLastFire))
+    /// and its weight the weapon's maximum recoil weight until the clip ends, so the recoil is per
+    /// gun but follows the one wielded weapon. The per-gun time read is inlined here; the two
+    /// functions the disassembler names `CWeaponBase::GetTimeSinceLastFireForSpecificWeaponData`
+    /// are unrelated.
+    #[address(0x140_86F_F10)]
+    pub fn UpdateSamplers(&mut self, instance: *mut void, dt: f32, samplers: *mut void);
+}

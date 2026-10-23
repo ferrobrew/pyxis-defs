@@ -1,0 +1,9 @@
+/// The supply-drop store's screen (`CCommStoreUI`). Its layout is unmapped.
+pub type CommStoreUI;
+impl CommStoreUI {
+    /// The store's close (a virtual override): when the store delivered something while the
+    /// planted explosive is in use, it stops using the planted explosive and selects a valid weapon
+    /// ([`Inventory::SelectValidWeapon`](character::inventory::Inventory::SelectValidWeapon)).
+    #[address(0x140_F03_5E0)]
+    pub fn OnInactive(&mut self);
+}

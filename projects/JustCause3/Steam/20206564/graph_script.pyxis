@@ -1,18 +1,74 @@
-use character::inventory::Inventory;
+use character::inventory::{Inventory, WeaponSlot};
+use types::std_vector::Vector;
+
+/// One slot's record in a weapon cache: the slot, the weapon's spawn tag index
+/// ([`GameObject::GetUniqueSpawnTagIndex`](game::GameObject::GetUniqueSpawnTagIndex), or zero for
+/// an empty slot), the reserve of its ammunition kind, and its magazine. The graph script's
+/// [`NodeWeaponCache`] and the mission manager's checkpoint cache
+/// ([`MissionManager::m_CachedWeapons`](mission::MissionManager::m_CachedWeapons)) keep these.
+#[size(0x10), copyable]
+pub type WeaponCacheEntry {
+    pub m_Slot: WeaponSlot,
+    pub m_SpawnTagIndex: i32,
+    pub m_Ammunition: i32,
+    pub m_MagazineAmmo: i32,
+}
 
 /// A graph script's weapon cache (`NGSONodes::CNodeWeaponCache`): the weapons a mission takes from
-/// a character and later gives back. It keeps one entry per inventory slot (the slot, the weapon's
-/// spawn tag index, the reserve of its ammunition kind, and its magazine). Opaque. No function of
-/// its own gives the weapons back: the cache node's lookup and the mission manager's restore of
-/// cached weapons both call the inventory's weapon gift and its forced removal directly.
-pub type NodeWeaponCache;
+/// a character and later gives back, one [`WeaponCacheEntry`] per inventory slot. The
+/// `SpawnWeapons` node ([`NGSONodes_SpawnWeapons`]) fills it and gives the weapons back through
+/// [`RestoreWeapons`](Self::RestoreWeapons).
+#[min_size(0x20)]
+pub type NodeWeaponCache {
+    /// The cached slots.
+    pub m_Entries: Vector<WeaponCacheEntry>,
+}
 impl NodeWeaponCache {
     /// Records every slot of `inventory` (`CNodeWeaponCache::CacheAllWeaponSlots`): for each of
     /// the eight slots an entry with the slot, the weapon's spawn tag index
     /// ([`GameObject::GetUniqueSpawnTagIndex`](game::GameObject::GetUniqueSpawnTagIndex), or zero
     /// for an empty slot), the reserve of its ammunition kind
     /// ([`Inventory::GetAmmoCount`](character::inventory::Inventory::GetAmmoCount)), and its
-    /// magazine. With `remove` set, each slot's weapon is then forced out of the inventory.
+    /// magazine. With `remove` set, each slot's weapon is then forced out of the inventory. Its one
+    /// caller is [`NGSONodes_SpawnWeapons`], which removes only for its remove-all type.
     #[address(0x140_A4F_0B0)]
     pub fn CacheAllWeaponSlots(&mut self, inventory: *mut Inventory, remove: bool);
+
+    /// Gives the cached slots back to `inventory` (`CNodeWeaponCache::RestoreWeapons`). For each
+    /// entry but the heavy slot's: the slot's current weapon's reserve is zeroed; a weapon of the
+    /// cached type keeps its object and gets the cached reserve and magazine; another type or an
+    /// empty slot gets a give
+    /// ([`Inventory::GivePlayerWeapon`](character::inventory::Inventory::GivePlayerWeapon), with the
+    /// reserve and the magazine as its rounds, not equipped, with extra ammunition to the reserve,
+    /// and despawning the occupant); and a cached empty slot that now holds a weapon is marked for
+    /// removal ([`Inventory::ForceRemoveWeapon`](character::inventory::Inventory::ForceRemoveWeapon)),
+    /// except the planted-explosive slot. The disassembler mislabels it `CNodeWeaponCache::Get`,
+    /// and gives this name to a player-save-data store helper.
+    #[address(0x140_A44_880)]
+    pub fn RestoreWeapons(&mut self, inventory: *mut Inventory);
 }
+
+/// The graph script node `SpawnWeapons` (`NGSONodes::SpawnWeapons`), which strips, gives, caches,
+/// and restores a character's weapons; `processor` is the graph script processor, `node` the node,
+/// and `input_pin` the pin that fired, and it returns the node result. Its fields are a removal
+/// type (only replace, remove where the field is empty, or remove all and replace), a weapon tag
+/// and ammunition for each of the dual-wield, two-handed, special, hand-grenade, and
+/// planted-explosive slots, the equipped weapon, and the cache.
+///
+/// On its main input it clears the cache, records the slots
+/// ([`NodeWeaponCache::CacheAllWeaponSlots`], removing them for the remove-all type), and returns
+/// the player to normal aim; then per field it marks the slot for removal
+/// ([`Inventory::ForceRemoveWeapon`](character::inventory::Inventory::ForceRemoveWeapon)) for an
+/// empty field under remove-where-empty, or under remove-all; keeps a weapon of the same type,
+/// setting its reserve and cancelling its removal
+/// ([`Inventory::CancelRemoveWeapon`](character::inventory::Inventory::CancelRemoveWeapon)); and
+/// otherwise gives the field's weapon
+/// ([`Inventory::GivePlayerWeapon`](character::inventory::Inventory::GivePlayerWeapon), equipped for
+/// the equipped field's slot). With no equipped field it unequips the wielded weapon
+/// ([`WeaponBase::UnequipDeferred`](equipment::weapon::WeaponBase::UnequipDeferred)) and relaxes
+/// the character; with an equipped field and nothing to give it selects it
+/// ([`Character::SelectWeapon`](character::character::Character::SelectWeapon)). A second pin only
+/// caches; a third restores ([`NodeWeaponCache::RestoreWeapons`], after a return to normal aim) and
+/// refreshes the HUD's weapons; the update pin waits until no slot's spawn is pending.
+#[address(0x140_A31_700)]
+pub fn NGSONodes_SpawnWeapons(processor: *mut void, node: *const void, input_pin: u32) -> u32;
