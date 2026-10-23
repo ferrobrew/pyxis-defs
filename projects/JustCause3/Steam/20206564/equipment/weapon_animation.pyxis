@@ -3,9 +3,13 @@ use state::StateContext;
 
 /// The animation-graph condition on the wielded weapon (`CWeaponWieldedCondition`, registered by
 /// the character manager's condition registration), configured with a `WeaponType` slot. Rico's
-/// graphs use it as `C_WEAPON_WIELDED` (any slot) and `C_PLANTED_EXPLOSIVE_WIELDED`. Its layout is
-/// unmapped.
-pub type WeaponWieldedCondition;
+/// graphs use it as `C_WEAPON_WIELDED` (any slot) and `C_PLANTED_EXPLOSIVE_WIELDED`.
+#[min_size(0x18)]
+pub type WeaponWieldedCondition {
+    /// The condition's slot (a `CInventory::EWeaponSlot`), or negative for any slot.
+    #[address(0x10)]
+    pub m_WeaponType: i32,
+}
 impl WeaponWieldedCondition {
     /// Evaluates the condition for the character owning `instance`. For a negative slot it is
     /// whether the character wields anything

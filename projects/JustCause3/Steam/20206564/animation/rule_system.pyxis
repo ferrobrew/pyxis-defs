@@ -1,3 +1,4 @@
+use game::GameObject;
 use hash::HashString;
 use types::shared_ptr::SharedPtr;
 
@@ -18,6 +19,12 @@ pub type StateMachineInstance {
     /// The state the machine is currently in.
     #[address(0x18)]
     pub m_CurrentState: *mut State,
+
+    /// The game object the machine animates (`CStateMachineInstance::GetUserData`): for a
+    /// character's machines, its [`Character::GAME_OBJECT_BASE_OFFSET`](character::character::Character::GAME_OBJECT_BASE_OFFSET)
+    /// subobject. The graph's conditions read their character through it.
+    #[address(0x20)]
+    pub m_UserData: *mut GameObject,
 }
 
 /// An animation rule system (`CAnimationRuleSystem`): drives one afsmb state machine for a character.
