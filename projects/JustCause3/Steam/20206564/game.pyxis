@@ -150,7 +150,10 @@ impl GameStateLoad {
     pub fn OnEnter();
 
     /// The load state's reset step, called only by [`OnEnter`](Self::OnEnter): aborts an active
-    /// challenge unless the no-unload flag is set, resets the dialogue, resets the spawn system
+    /// challenge unless the no-unload flag is set, gives back a challenge's loadout its
+    /// destruction left to the reset
+    /// ([`ROMObject::RestoreWeaponsAndAmmo`](mission::ROMObject::RestoreWeaponsAndAmmo)), resets the
+    /// dialogue, resets the spawn system
     /// ([`SpawnSystem::ResetSystem`](spawn_system::SpawnSystem::ResetSystem)), and resets the heat.
     /// The disassembler mislabels it `IConsole::GetLoadingLock`.
     #[address(0x140_9BA_BB0)]

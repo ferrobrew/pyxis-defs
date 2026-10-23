@@ -81,11 +81,18 @@ impl ROMObject {
     #[address(0x140_ACA_E10)]
     pub fn PostInit(&mut self);
 
-    /// Restores the loadout recorded by [`PostInit`](Self::PostInit), called at the challenge's end
-    /// and on the object's exit: per slot, a recorded empty slot is despawned
-    /// ([`Inventory::DespawnWeapon`](character::inventory::Inventory::DespawnWeapon)) and any other
-    /// gets a give of the recorded type and magazine; then every reserve but the beacons' and
-    /// flares' is restored, and an autosave is requested.
+    /// Restores the loadout recorded by [`PostInit`](Self::PostInit) onto the local player. Every
+    /// slot is emptied first: with `despawn` set its weapon is despawned at once
+    /// ([`Inventory::DespawnWeapon`](character::inventory::Inventory::DespawnWeapon)), and without
+    /// it the weapon is only taken out ([`Inventory::RemoveWeapon`](character::inventory::Inventory::RemoveWeapon)).
+    /// Each slot recorded with a weapon then gets its recorded type and magazine: a give
+    /// ([`Inventory::GivePlayerWeapon`](character::inventory::Inventory::GivePlayerWeapon)) with
+    /// `despawn` set, and without it only the respawn table's entry, which the spawn reset that
+    /// follows spawns. Then every reserve but the beacons' and flares' is restored, and an autosave
+    /// is requested. The challenge object's destruction calls it with `despawn` set; for one kind
+    /// of challenge the destruction instead marks the challenge manager, and the load state's reset
+    /// step ([`GameStateLoad::ResetSystems`](game::GameStateLoad::ResetSystems)) calls it with
+    /// `despawn` clear.
     #[address(0x140_AC8_840)]
-    pub fn RestoreWeaponsAndAmmo();
+    pub fn RestoreWeaponsAndAmmo(despawn: bool);
 }
