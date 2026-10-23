@@ -9,6 +9,13 @@ pub type EventIdSymbolTable {
     pub const ACT_REVERSE: cstr = c"ACT_REVERSE",
     /// The motorbike variant of [`ACT_REVERSE`](Self::ACT_REVERSE).
     pub const ACT_REVERSE_MOTORBIKE: cstr = c"ACT_REVERSE_MOTORBIKE",
+    /// The upper-body actions' abort: every `S_UB_*` state of `rico_partial_global` (the draws,
+    /// holsters, switches, reloads, pumps, bolts, pickups, throws, and explosives' actions) has an
+    /// unconditional transition on it back to the layer's idle, `S_GLOBAL_PARTIAL_NULL`, so a clip
+    /// still playing fires none of its remaining track messages. The parachute arm states, the
+    /// detonations, and the explosive reloads (`S_JC_UB_*`) do not take it. Read in the shipped
+    /// graph data.
+    pub const ACT_ABORT_WEAPON_PARTIAL: cstr = c"ACT_ABORT_WEAPON_PARTIAL",
     /// The one-off idle-variation act: transitions the on-foot idle from `S_IDLE` to
     /// `S_IDLE_ONE_OFF` in `rico_base.afsmb`, playing a single idle-break animation (a weight shift,
     /// a look-around, a fidget) before returning to `S_IDLE`. `NStateTask_InputLocoIdleTask::Update`

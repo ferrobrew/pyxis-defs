@@ -65,6 +65,19 @@ impl GameCameraManager {
     #[address(0x140_7AE_2F0)]
     pub fn AddHint(&mut self, hint: u32, debug_name: *const u8);
 
+    /// Drops a reference to camera hint `hint`, erasing it from the hint table when its count
+    /// reaches zero; an absent hint is left alone. `debug_name` is unused.
+    #[address(0x140_799_BA0)]
+    pub fn RemoveHint(&mut self, hint: u32, debug_name: *const u8);
+
+    /// Whether camera hint `hint` is in the hint table, with any reference count.
+    /// [`WeaponBase::StartUsing`](equipment::weapon::WeaponBase::StartUsing) adds a weapon's use hint
+    /// only when this is false, and [`WeaponBase::StopUsingBase`](equipment::weapon::WeaponBase::StopUsingBase)
+    /// removes it only when this is true, so a hint shared by two weapons in use holds one
+    /// reference and goes with the first weapon to stop.
+    #[address(0x140_799_B30)]
+    pub fn HasHint(&self, hint: u32) -> bool;
+
     /// Resets the camera control context, the camera director, and the camera tree; when
     /// `transform` is non-null, also initializes the camera manager's transform to it and stores it
     /// as the reset transform. Called on player teleports.
