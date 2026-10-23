@@ -628,6 +628,14 @@ impl Character {
     #[address(0x140_75F_630)]
     pub fn IsUsingWingsuit(&self) -> bool;
 
+    /// Whether the character has the boost wingsuit, the wingsuit with guns: the flag on its aim
+    /// control, false without one. While it has it and flies the wingsuit
+    /// ([`IsUsingWingsuit`](Self::IsUsingWingsuit)), the inventory's weapon updates
+    /// ([`Inventory::UpdateWeapons_Parallel`](character::inventory::Inventory::UpdateWeapons_Parallel))
+    /// update the wingsuit's guns in place of the wielded weapon.
+    #[address(0x140_77E_CC0)]
+    pub fn HasBoostWingsuit(&self) -> bool;
+
     /// Whether the parachute is deployed:
     /// [`SB_IS_PARACHUTING`](state::StateBitFlag::SB_IS_PARACHUTING).
     #[address(0x140_75F_550)]
