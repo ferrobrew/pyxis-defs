@@ -1,10 +1,12 @@
 use aim::target::TargetType;
 use character::character::Character;
 use physics::PfxRigidBody;
-use equipment::wire_end::HookTargetInfo;
+use equipment::wire_end::{HookTargetInfo, WireEnd};
 use state::StateContext;
 use types::math::Vector3;
-use types::shared_ptr::SharedPtr;
+use types::shared_ptr::{SharedPtr, WeakPtrGameObject};
+use types::std_vector::Vector;
+use aim::target::Target;
 
 /// The grappling hook's high-level state machine (`CGrapplingHook::m_State`). `SetState` is the
 /// mutator; the reel tasks (`NStateTask_ReelIn`) and the reeled-in controller
@@ -30,10 +32,59 @@ pub enum GrapplingHookState: i32 {
     GHS_CUSTOM_ACTIVE_WIRE = 0x7,
 }
 
-/// A single grapple wire (`CGrapplingHookWire`, a `CGameObject`): two `CWireEnd`s (near/device and
-/// far/hook), the physics constraint, and the wire rendering. Only referenced through
-/// [`GrapplingHook::m_ActiveWire`] here; the layout is unmapped.
-pub type GrapplingHookWire;
+/// A grapple wire's state (`CGrapplingHookWire::EWireState`).
+#[copyable]
+pub enum WireState: i32 {
+    /// Live, without a physics constraint yet: a wire flying or attached at its far end only.
+    GHWS_ACTIVE_VIRTUAL = 0x0,
+    /// Live, with its physics constraint between the two ends.
+    GHWS_ACTIVE_PHYSICAL = 0x1,
+    GHWS_BROKEN = 0x2,
+    /// Dead: [`GrapplingHook::CancelActiveWire`] leaves it here.
+    GHWS_INVALID = 0x3,
+}
+
+/// A single grapple wire (`CGrapplingHookWire`, a `CGameObject`): two [`WireEnd`]s, the physics
+/// constraint, and the wire rendering. [`m_WireEnds[0]`](Self::m_WireEnds) is the hook (far) end
+/// and `m_WireEnds[1]` the device end. Only some members are bound.
+#[min_size(0xC2A), align(16)]
+pub type GrapplingHookWire {
+    /// The wire's state; see [`WireState`].
+    #[address(0x82C)]
+    pub m_WireState: WireState,
+
+    /// The state before the last change.
+    #[address(0x830)]
+    pub m_PreviousWireState: WireState,
+
+    /// The longest the wire may run, metres: the tuning's
+    /// [`m_GrappleDistance`](GrappleTuning::m_GrappleDistance) when the hook fires it. An end
+    /// flying past it retracts.
+    #[address(0x834)]
+    pub m_MaxLength: f32,
+
+    /// The hook (far) end, then the device end.
+    #[address(0x840)]
+    pub m_WireEnds: [WireEnd; 2],
+
+    #[address(0xC20)]
+    pub m_WireId: u32,
+
+    /// Whether the wire is the hook's [`m_ActiveWire`](GrapplingHook::m_ActiveWire).
+    #[address(0xC28)]
+    pub m_IsActiveWire: bool,
+
+    /// Whether the wire is the hook's [`m_AttachmentWire`](GrapplingHook::m_AttachmentWire).
+    #[address(0xC29)]
+    pub m_IsAttachmentWire: bool,
+}
+impl GrapplingHookWire {
+    /// Sets both ends' cast-filter ignore objects
+    /// ([`WireEndCastFilter::m_IgnoreObject1`](equipment::wire_end::WireEndCastFilter::m_IgnoreObject1)
+    /// and [`m_IgnoreObject2`](equipment::wire_end::WireEndCastFilter::m_IgnoreObject2)).
+    #[address(0x140_8CC_5C0)]
+    pub fn SetupHookCastFilters(&mut self, ignore1: *mut void, ignore2: *mut void);
+}
 
 /// The physics proxy a character hangs from under a grapple line (`CGrapplingHangPhysicsProxy`, a
 /// `CGrapplePointProxy`): a rigid body the hang task swings, with the character attached to it.
@@ -54,12 +105,21 @@ pub type GrapplingHangPhysicsProxy {
 }
 
 /// The grappling hook's tuning (`SGrappleTuning`), a resource the hook reads through its tuning
-/// handle. The reel-in fields below are the ones the reel's velocity update
-/// ([`NStateTask_ReelIn::UpdateReelVelocity`]) reads; the rest of the layout (the grapple range,
-/// the hold time, the tether spring and break settings, the wire's look, and the auto-aim, push,
-/// kick, and wire settings) is unmapped.
-#[copyable, min_size(0x4C)]
+/// handle ([`GrapplingHook::GetTuning`]). The reel-in fields below are the ones the reel's
+/// velocity update ([`NStateTask_ReelIn::UpdateReelVelocity`]) reads; the rest of the layout (the
+/// tether spring and break settings, the wire's look, and the auto-aim, push, kick, and wire
+/// settings) is unmapped.
+#[copyable, min_size(0x70)]
 pub type GrappleTuning {
+    /// The grapple's range, metres: the aim's grapple slot range, and the length a fired wire may
+    /// run ([`GrapplingHookWire::m_MaxLength`]).
+    pub m_GrappleDistance: f32,
+
+    /// How long the fire input must be held, seconds, for its release to fire a tether
+    /// ([`GrapplingHook::m_CachedDualTetherFire`]) rather than reel in.
+    #[address(0x4)]
+    pub m_HoldTime: f32,
+
     /// The reel's top speed along the line (metres per second): a reel moving faster is slowed by
     /// [`m_ReelInClampAccel`](Self::m_ReelInClampAccel).
     #[address(0x28)]
@@ -104,12 +164,26 @@ pub type GrappleTuning {
     /// The distance from the target (metres) at which the reel counts as arrived and finishes.
     #[address(0x48)]
     pub m_ReelInArrivedDistance: f32,
+
+    /// The hook's flight speed, metres per second, which every fire gives the far end
+    /// ([`WireEnd::SetExtend`]).
+    #[address(0x6C)]
+    pub m_GrappleFireSpeed: f32,
 }
 
 /// The grappling-hook equipment item (`CGrapplingHook`, a `CGameObject`): owns the wires, the
 /// reel/tether state machine, and the cached fire target. A character's hook is held by its
 /// inventory ([`Inventory::m_GrapplingHook`](character::inventory::Inventory::m_GrapplingHook)).
 pub type GrapplingHook {
+    /// The character holding the hook (a `boost::weak_ptr<CCharacter>`).
+    #[address(0x220)]
+    pub m_Holder: WeakPtrGameObject,
+
+    /// Whether the fire input has been held past [`GrappleTuning::m_HoldTime`] with an attached
+    /// active wire, so that its release fires a tether rather than reel in.
+    #[address(0x232)]
+    pub m_CachedDualTetherFire: bool,
+
     /// The current state-machine state; see [`GrapplingHookState`]. The state records the *last*
     /// reel outcome as much as the current one: leaving a `GHS_REELED_*` attachment does not
     /// reliably return it to [`GHS_INACTIVE`](GrapplingHookState::GHS_INACTIVE) — readers such as
@@ -170,10 +244,19 @@ pub type GrapplingHook {
     #[address(0x394)]
     pub m_TimeHoldingRetract: f32,
 
+    /// The tethers: wires handed off from the active wire once their second end was fired, and
+    /// the wires [`CancelActiveWire`](Self::CancelActiveWire) dropped.
+    #[address(0x3A8)]
+    pub m_Wires: Vector<SharedPtr<GrapplingHookWire>>,
+
     /// The wire currently driving the reel/attach flow, or null when none is live. The state
     /// readers null-check this before interpreting [`m_State`](Self::m_State).
     #[address(0x3C8)]
     pub m_ActiveWire: SharedPtr<GrapplingHookWire>,
+
+    /// The wire the character hangs from or is attached by after a reel, or null.
+    #[address(0x3D8)]
+    pub m_AttachmentWire: SharedPtr<GrapplingHookWire>,
 
     /// The physics proxy the character hangs from while reeled into a hang
     /// ([`GHS_REELED_HANG`](GrapplingHookState::GHS_REELED_HANG)).
@@ -208,7 +291,16 @@ impl GrapplingHook {
     pub fn DoActFire(aim_direction: *const Vector3, holder: *const SharedPtr<Character>, dual_tether_fire: bool, grapple_reel_fire: bool);
 
     /// The pre-simulation hook update: dispatches the grapple input (fire, reel, dual tether,
-    /// retract, release) and advances the reel and tether state.
+    /// retract, release) and advances the reel and tether state. While
+    /// [`GHS_INACTIVE`](GrapplingHookState::GHS_INACTIVE) without an active wire, a press of the fire
+    /// input latches the aim ([`SetUpTarget`](Self::SetUpTarget)) and queues the fire act at once,
+    /// before a tap and a hold are told apart. While inactive with an active wire whose far end is
+    /// attached, a held fire input sets
+    /// [`m_CachedDualTetherFire`](Self::m_CachedDualTetherFire) past the hold time; on its release
+    /// with that set it latches the aim again and fires the tether's second end, and otherwise, the
+    /// input up, it enters [`GHS_REELING_IN`](GrapplingHookState::GHS_REELING_IN) and queues the
+    /// pre-reel act: the reel runs whenever an attached active wire meets a released input, a quick
+    /// tap that let go before the hook arrived included.
     #[address(0x140_949_F70)]
     pub fn OnPreSimUpdate(&mut self, dt: f32);
 
@@ -222,6 +314,65 @@ impl GrapplingHook {
     /// Spawns a new wire at `spawn_pos` and returns it through `result`.
     #[address(0x140_923_BC0)]
     pub fn CreateNewWire(&mut self, result: *mut SharedPtr<GrapplingHookWire>, spawn_pos: *const Vector3) -> *mut SharedPtr<GrapplingHookWire>;
+
+    /// Fires a wire at `target_info` at once, with no fire act or animation, when the hook has no
+    /// [`m_ActiveWire`](Self::m_ActiveWire) and is
+    /// [`GHS_INACTIVE`](GrapplingHookState::GHS_INACTIVE); otherwise it does nothing. It creates the
+    /// wire at the holder's left hand position, makes it the active wire with the tuning's
+    /// [`m_GrappleDistance`](GrappleTuning::m_GrappleDistance) as its
+    /// [`m_MaxLength`](GrapplingHookWire::m_MaxLength), attaches the device end
+    /// ([`AttachLocalWireEndToDevice`](Self::AttachLocalWireEndToDevice)), sets the ends' cast
+    /// filters to ignore `ignore_object` and the holder, starts the far end extending toward the
+    /// target at [`m_GrappleFireSpeed`](GrappleTuning::m_GrappleFireSpeed) as a ghost wire when
+    /// `ghost_wire`, and enters [`GHS_CUSTOM_ACTIVE_WIRE`](GrapplingHookState::GHS_CUSTOM_ACTIVE_WIRE),
+    /// where the fire, reel, and tether input does nothing. It does not test
+    /// [`m_WaitingForGrappleFire`](Self::m_WaitingForGrappleFire) or
+    /// [`m_WaitingForTetherFire`](Self::m_WaitingForTetherFire). The vehicle grapple
+    /// ([`VehicleGrappleHook::PreSimUpdate`]) and the stunt-position grapple fire through it.
+    #[address(0x140_94C_B20)]
+    pub fn FireHookCustom(&mut self, target_info: *mut HookTargetInfo, ignore_object: *mut void, ghost_wire: bool);
+
+    /// Builds a target info on `target` at `local_position` in its space (in range, no bone),
+    /// fires it as [`FireHookCustom`](Self::FireHookCustom), and releases the info.
+    #[address(0x140_94D_D60)]
+    pub fn FireHookCustomAtTarget(&mut self, target: *mut Target, local_position: *const Vector3, ignore_object: *mut void, ghost_wire: bool);
+
+    /// Ends the active wire, when there is one: destroys its constraint, kills both ends, marks it
+    /// [`GHWS_INVALID`](WireState::GHWS_INVALID), moves it to [`m_Wires`](Self::m_Wires), clears
+    /// [`m_ActiveWire`](Self::m_ActiveWire), and notifies the HUD. It leaves
+    /// [`m_State`](Self::m_State): [`OnPreSimUpdate`](Self::OnPreSimUpdate) returns
+    /// [`GHS_CUSTOM_ACTIVE_WIRE`](GrapplingHookState::GHS_CUSTOM_ACTIVE_WIRE) to
+    /// [`GHS_INACTIVE`](GrapplingHookState::GHS_INACTIVE) on its next run once neither an active nor
+    /// an attachment wire is left.
+    #[address(0x140_90B_200)]
+    pub fn CancelActiveWire(&mut self);
+
+    /// The hook's tuning resource, or null. The disassembler swaps the names of this function and
+    /// [`GetActiveWireAttachmentObjectInfo`](Self::GetActiveWireAttachmentObjectInfo).
+    #[address(0x140_839_F30)]
+    pub fn GetTuning(&self) -> *const GrappleTuning;
+
+    /// The attachment-object kind (`CGrapplePointProxy::EAttachmentObjectInfo`) of the active
+    /// wire's far-end proxy, or zero without an attached active wire. The disassembler swaps the
+    /// names of this function and [`GetTuning`](Self::GetTuning).
+    #[address(0x140_8C9_170)]
+    pub fn GetActiveWireAttachmentObjectInfo(&self) -> i32;
+
+    /// Writes the unit direction from `holder`'s chest to the latched target of `target_info` and
+    /// returns whether there is one. The disassembler mislabels it
+    /// `CAIAirplaneSteering::TakeOffInDirection`.
+    #[address(0x140_93A_090)]
+    pub fn GetFireDirection(direction: *mut Vector3, holder: *const SharedPtr<Character>, target_info: *const HookTargetInfo) -> bool;
+
+    /// Whether the fire input may fire a tether: the holder is the player, no control flag blocks
+    /// it, and the player has the tether ability. The disassembler mislabels it
+    /// `CIsParachuteEnabledCondition::Evaluate`.
+    #[address(0x140_923_9E0)]
+    pub fn GetDualTetherFireInputEnabled(&self) -> bool;
+
+    /// Attaches `wire`'s device end (`m_WireEnds[1]`) to `holder`'s grapple device bone.
+    #[address(0x140_94C_3D0)]
+    pub fn AttachLocalWireEndToDevice(wire: *mut SharedPtr<GrapplingHookWire>, holder: *const SharedPtr<Character>);
 
     /// Retracts the active wire: destroys its physics constraint, detaches the near end, and
     /// notifies the HUD.
@@ -388,3 +539,15 @@ pub extern GrapplingHangTask_EnableSmallImpulseSwing: bool;
 /// the stick's magnitude.
 #[address(0x142_D65_A80)]
 pub extern GrapplingHangTask_SmallImpulseSwingMagnitude: f32;
+
+/// The vehicle grapple (`CVehicleGrappleHook`): a vehicle's grapple, which fires the holder's hook
+/// at a stored target and tethers it to the vehicle.
+pub type VehicleGrappleHook;
+impl VehicleGrappleHook {
+    /// The vehicle grapple's state machine: fires through
+    /// [`GrapplingHook::FireHookCustom`], waits for the far end to attach (the active wire not
+    /// [`GHWS_INVALID`](WireState::GHWS_INVALID) and its far end holding a proxy), tethers it to the
+    /// vehicle's centre of mass, and ends the wire with [`GrapplingHook::CancelActiveWire`].
+    #[address(0x140_94D_910)]
+    pub fn PreSimUpdate(&mut self, holder: *const SharedPtr<Character>, player: *mut void, action_map: *mut void, tuning: *const GrappleTuning, p5: bool, dt: f32);
+}

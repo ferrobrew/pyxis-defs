@@ -302,6 +302,14 @@ pub type PhysicsGameObject {
         #[index(1)]
         pub fn GetIPfxInstance(&mut self) -> *mut PfxInstance;
 
+        /// How the grapple treats the object; see [`GrapplingMode`]. The player aim reads it for
+        /// the grapple slot's direct hit
+        /// ([`PlayerAimControl::m_DirectGrapplePosIsGrapplable`](aim::aim::PlayerAimControl::m_DirectGrapplePosIsGrapplable)),
+        /// and a wire end's attach refuses an ungrapplable object
+        /// ([`WireEnd::SetupProxyForAttachment`](equipment::wire_end::WireEnd::SetupProxyForAttachment)).
+        #[index(13)]
+        pub fn GetGrapplingMode(&self) -> GrapplingMode;
+
         /// Takes the damage in `msg` and returns the damage dealt. Each kind of object overrides
         /// it: a character (`CCharacter::OnDamage`) takes the health, sends the hit effects, and
         /// runs its hit reaction from the message's impulse, position, and direction; a rigid
@@ -309,6 +317,18 @@ pub type PhysicsGameObject {
         #[index(20)]
         pub fn OnDamage(&mut self, msg: *mut DamageMsg) -> i16;
     },
+}
+
+/// How the grapple treats a physics game object (`CPhysicsGameObject::EGrapplingMode`), from
+/// [`PhysicsGameObject::GetGrapplingMode`].
+#[copyable]
+pub enum GrapplingMode: i32 {
+    E_GM_Normal = 0x0,
+    /// Grapplable, without attaching at the end of a reel. A weapon's mode
+    /// ([`WeaponBase::GetGrapplingModeWeapon`](equipment::weapon::WeaponBase::GetGrapplingModeWeapon)).
+    E_GM_ReelInNoAttach = 0x1,
+    /// Not grapplable: the aim does not count it, and a wire end does not attach to it.
+    E_GM_UnGrappable = 0x2,
 }
 
 /// The ragdoll's proxy phantom (`CRagdollProxyPhantom`), the shape set that stands in for a

@@ -7,6 +7,7 @@ use types::math::Matrix4;
 use types::math::Vector3;
 use physics::IgnoreMaterialFlagFilter;
 use physics::MaterialPassFlags;
+use physics::CastRayInfo;
 use types::shared_ptr::SharedPtr;
 use types::shared_ptr::WeakPtrGameObject;
 
@@ -268,8 +269,14 @@ impl PlayerAimControl {
     /// [`m_RayTypeSetting`](Self::m_RayTypeSetting) and range. `collector` is the ray's
     /// `CPlayerAimRaycastFilterCacheFirstHoleyHitAndMinDistanceHit` filter and `non_holey_info`
     /// its `CCastRayInfo`.
+    /// For a slot's hit object that is a weapon with a holder, the holder stands in; the slot's
+    /// target comes only from a live character, a vehicle, a vehicle part, a rigid object, or a
+    /// destruction object; and for the grapple slot it sets
+    /// [`m_DirectGrapplePosIsGrapplable`](Self::m_DirectGrapplePosIsGrapplable) from the object's
+    /// [`GetGrapplingMode`](physics::PhysicsGameObject::GetGrapplingMode). Its one caller is
+    /// [`UpdateDirectAim`](Self::UpdateDirectAim).
     #[address(0x140_CE4_BB0)]
-    pub fn CheckDirectTargets(&mut self, collector: *const void, non_holey_info: *mut void, ray_start: *const Vector3, ray_dir: *const Vector3);
+    pub fn CheckDirectTargets(&mut self, collector: *const PlayerAimRaycastCollector, non_holey_info: *mut CastRayInfo, ray_start: *const Vector3, ray_dir: *const Vector3);
 
     /// Updates the per-slot crosshair look (`CPlayerAimControl::ECrosshairLook`: in range with a
     /// neutral, allied, or hostile target, in range with no target, or out of range).
@@ -345,9 +352,52 @@ pub type PlayerAimRaycastFilter {
 impl PlayerAimRaycastFilter {
     /// `CPlayerAimRaycastFilter::CPlayerAimRaycastFilter`: constructs the base
     /// ([`RaycastFilter::Construct`](physics::RaycastFilter::Construct) with the physics system's
-    /// world), clears [`m_IgnoreObject`](Self::m_IgnoreObject), and sets the virtual table.
+    /// world), clears [`m_IgnoreObject`](PlayerAimRaycastFilter::m_IgnoreObject), and sets the virtual table.
     #[address(0x140_C10_380)]
     pub fn ConstructPlayerAim(&mut self, ignore_material_mask: MaterialPassFlags, force_material_mask: MaterialPassFlags, ignore_instance: *mut void) -> *mut PlayerAimRaycastFilter;
+}
+
+/// The player aim's ray collector (`CPlayerAimRaycastFilterCacheFirstHoleyHitAndMinDistanceHit`):
+/// a [`PlayerAimRaycastFilter`] that also records the first hit on holey (see-through) geometry and
+/// the hit nearer than the minimum-distance fraction, beside the closest hit the query writes to
+/// its [`CastRayInfo`]. [`PlayerAimControl::CheckDirectTargets`] picks one of the three per slot by
+/// [`m_RayTypeSetting`](PlayerAimControl::m_RayTypeSetting).
+#[min_size(0x114), align(16)]
+pub type PlayerAimRaycastCollector {
+    /// The address of the collector's virtual table.
+    pub const VFTABLE: u64 = 0x142458F48,
+
+    #[base]
+    pub base: PlayerAimRaycastFilter,
+
+    /// Whether a holey hit was recorded. A slot that stops at holey geometry
+    /// ([`HIT_HOLEY`](RayType::HIT_HOLEY)) takes the query's closest hit without one.
+    #[address(0xD0)]
+    pub m_HasHoleyHit: bool,
+
+    /// The holey hit's object.
+    #[address(0xD8)]
+    pub m_HoleyHitObject: *mut void,
+
+    /// The holey hit's fraction of the ray.
+    #[address(0xE0)]
+    pub m_HoleyHitFraction: f32,
+
+    #[address(0xE4)]
+    pub m_HoleyHitNormal: Vector3,
+
+    /// Whether a hit nearer than the minimum-distance fraction was recorded.
+    #[address(0xF0)]
+    pub m_HasMinDistanceHit: bool,
+
+    #[address(0xF8)]
+    pub m_MinDistanceHitObject: *mut void,
+
+    #[address(0x104)]
+    pub m_MinDistanceHitFraction: f32,
+
+    #[address(0x108)]
+    pub m_MinDistanceHitNormal: Vector3,
 }
 
 /// The animation-graph condition that the evaluating character is the player's current weapon

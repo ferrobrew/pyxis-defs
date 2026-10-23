@@ -4,7 +4,7 @@ use character::character::{AnimatedModel, Character};
 use character::inventory::WeaponSlot;
 use game::{GameObject, GameObjectRenderContext, GameObjectUpdateContext};
 use graphics_engine::model_instance::{Model, ModelInstance};
-use physics::{PfxRigidBody, RigidObject};
+use physics::{GrapplingMode, PfxRigidBody, RigidObject};
 use types::math::Matrix4;
 use types::math::Vector3;
 use types::shared_ptr::{SharedPtr, WeakPtrGameObject};
@@ -1233,6 +1233,15 @@ impl WeaponBase {
     /// body, and a physics query that hits it reports the weapon.
     #[address(0x140_60F_2F0)]
     pub fn TYPE_ID() -> *const u32;
+
+    /// The weapon's override of
+    /// [`PhysicsGameObject::GetGrapplingMode`](physics::PhysicsGameObject::GetGrapplingMode):
+    /// [`E_GM_ReelInNoAttach`](physics::GrapplingMode::E_GM_ReelInNoAttach), so the grapple counts
+    /// a weapon it hits as grapplable. Neither the player's aim ray nor a wire end's casts hit a
+    /// weapon's body, whose [`WEAPONS`](physics::PfxLayer::WEAPONS) layer does not collide with their
+    /// query layer.
+    #[address(0x140_8CE_F90)]
+    pub fn GetGrapplingModeWeapon(&self) -> GrapplingMode;
 
     /// Whether the weapon's rounds come without limit: true when the holder has
     /// [`m_UnlimitedAmmo`](character::character::Character::m_UnlimitedAmmo), the holder is not a

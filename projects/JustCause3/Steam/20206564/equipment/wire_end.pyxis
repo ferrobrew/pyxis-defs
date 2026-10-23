@@ -1,11 +1,13 @@
 use aim::target::Target;
 use character::character::Character;
+use physics::{CastRayInfo, IgnoreMaterialFlagFilter};
 use types::math::Matrix4;
 use types::math::Vector3;
-use types::shared_ptr::SharedPtr;
+use types::shared_ptr::{SharedPtr, WeakPtrGameObject};
 
 /// A latched grapple target (`CWireEnd::SHookTargetInfo`): the target position, plus the target or
-/// game object it is relative to and the position in that object's space. The hook fills it from the aim state when it fires, and the wire end flies to and attaches at it.
+/// game object it is relative to and the position in that object's space. The hook fills it from
+/// the aim state when it fires, and the wire end flies to and attaches at it.
 #[size(0x38)]
 pub type HookTargetInfo {
     /// The target the hook homes on, or null for a target-less (surface) latch.
@@ -16,21 +18,40 @@ pub type HookTargetInfo {
     #[address(0x8)]
     pub m_TargetPosition: Vector3,
 
+    /// The target position in the space of [`m_TargetGameObject`](Self::m_TargetGameObject): in a
+    /// character's, in the space of bone [`m_BoneIndex`](Self::m_BoneIndex); in any other
+    /// object's, as [`SetupTargetFromGameObject`](Self::SetupTargetFromGameObject) was given it.
+    /// [`GetTargetWorldPosition`](Self::GetTargetWorldPosition) carries it into the world, so the
+    /// latched point follows the object.
+    #[address(0x14)]
+    pub m_TargetLocalPosition: Vector3,
+
     /// Whether the aim slot was in range when the target was latched.
     #[address(0x20)]
     pub m_WasInRange: bool,
 
-    /// The target game object (a `boost::weak_ptr<CGameObject>`: object pointer and weak control
-    /// block), or null.
+    /// The bone of a character target that
+    /// [`m_TargetLocalPosition`](Self::m_TargetLocalPosition) is relative to (the bone nearest the
+    /// latched point), or -1 for none.
+    #[address(0x24)]
+    pub m_BoneIndex: i32,
+
+    /// The target game object (its `CGameObject` subobject), or null.
     #[address(0x28)]
-    pub m_TargetGameObject: [*mut void; 2],
+    pub m_TargetGameObject: WeakPtrGameObject,
 }
 impl HookTargetInfo {
     /// Latches `target` with `local_position` in the target's game-object space.
     #[address(0x140_926_C00)]
     pub fn SetupTargetFromTarget(&mut self, target: *mut Target, local_position: *const Vector3);
 
-    /// Latches the game object `game_object` (a `CGameObject`) with `local_position` in its space.
+    /// Latches the game object `game_object` (a `CGameObject` subobject): copies its weak self
+    /// reference into [`m_TargetGameObject`](Self::m_TargetGameObject), and for a character the
+    /// nearest bone to `local_position` (in the character's model space) and the position in that
+    /// bone's space; for any other object `local_position` as it is. It writes neither
+    /// [`m_TargetPosition`](Self::m_TargetPosition), [`m_WasInRange`](Self::m_WasInRange), nor
+    /// [`m_HomingHookTarget`](Self::m_HomingHookTarget), and for an object other than a character
+    /// not [`m_BoneIndex`](Self::m_BoneIndex).
     #[address(0x140_926_E50)]
     pub fn SetupTargetFromGameObject(&mut self, game_object: *mut void, local_position: *const Vector3);
 
@@ -40,20 +61,136 @@ impl HookTargetInfo {
     pub fn GetTargetWorldPosition(&self, result: *mut Vector3);
 }
 
-/// One end of a grapple wire (`CWireEnd`). A `CGrapplingHookWire` holds two: the near end at the
-/// device and the far end at the hook. An end extends toward a latched [`HookTargetInfo`], then
-/// attaches to a proxy (`CGrapplePointProxy`), not to a bare coordinate. The layout is unmapped.
-pub type WireEnd;
+/// A wire end's state (`CWireEnd::EEndState`).
+#[copyable]
+pub enum WireEndState: i32 {
+    /// Flying toward the latched target: [`WireEnd::SetExtend`] enters it.
+    GWES_EXTENDING = 0x0,
+    /// Attached to a proxy: [`WireEnd::Attach`] enters it.
+    GWES_ATTACHED = 0x1,
+    /// Flying back to the other end.
+    GWES_RETRACTING = 0x2,
+    GWES_DETACHED = 0x3,
+    /// Dead: [`WireEnd::Update`] returns at once.
+    GWES_INVALID = 0x4,
+}
+
+/// Which hook model a wire end shows (`CWireEnd::EHookModelState`).
+#[copyable]
+pub enum HookModelState: i32 {
+    GWEHMS_HIDDEN = 0x0,
+    GWEHMS_VISIBLE_OPEN = 0x1,
+    GWEHMS_VISIBLE_CLOSED = 0x2,
+}
+
+/// A wire end's cast filter (`CWireEnd::CGrapplingHookWireEndCastFilter`), an
+/// [`IgnoreMaterialFlagFilter`]. Its hit test ([`OnRayHit`](Self::OnRayHit)) rejects the two
+/// ignored objects and characters with a control flag, and accepts only characters, vehicles, rigid
+/// bodies, heightfields, ragdoll proxy phantoms, and destruction instances. In ghost mode
+/// ([`m_GhostModeTargetInfo`](Self::m_GhostModeTargetInfo) set) it accepts only the latched target
+/// object or its children.
+#[size(0xE0), align(16)]
+pub type WireEndCastFilter {
+    #[base]
+    pub base: IgnoreMaterialFlagFilter,
+
+    /// The first ignored object: the object a scripted fire names
+    /// ([`GrapplingHook::FireHookCustom`](equipment::grappling_hook::GrapplingHook::FireHookCustom)).
+    #[address(0xC0)]
+    pub m_IgnoreObject1: *mut void,
+
+    /// The second ignored object: the hook's holder.
+    #[address(0xC8)]
+    pub m_IgnoreObject2: *mut void,
+
+    /// The end's own [`WireEnd::m_TargetInfo`] while the end flies as a ghost wire, or null.
+    #[address(0xD0)]
+    pub m_GhostModeTargetInfo: *mut HookTargetInfo,
+}
+impl WireEndCastFilter {
+    /// The filter's hit test (slot 7 of its virtual table).
+    #[address(0x140_926_9E0)]
+    pub fn OnRayHit(&mut self, hit: *mut void) -> bool;
+}
+
+/// One end of a grapple wire (`CWireEnd`). A [`GrapplingHookWire`](equipment::grappling_hook::GrapplingHookWire)
+/// holds two: [`m_WireEnds[0]`](equipment::grappling_hook::GrapplingHookWire::m_WireEnds) is the
+/// hook (far) end, which flies to the target, and `m_WireEnds[1]` the device end, attached to the
+/// holder's grapple device bone
+/// ([`GrapplingHook::AttachLocalWireEndToDevice`](equipment::grappling_hook::GrapplingHook::AttachLocalWireEndToDevice)).
+/// An end extends toward a latched [`HookTargetInfo`], then attaches to a proxy
+/// (`CGrapplePointProxy`), not to a bare coordinate.
+#[size(0x1F0), align(16)]
+pub type WireEnd {
+    /// The end's state; see [`WireEndState`].
+    #[address(0x50)]
+    pub m_WireEndState: WireEndState,
+
+    /// The attachment proxy (`CGrapplePointProxy`) while attached, or null.
+    #[address(0x58)]
+    pub m_PointProxy: *mut void,
+
+    /// The wire's other end.
+    #[address(0x60)]
+    pub m_OtherEnd: *mut WireEnd,
+
+    /// The wire that holds the end.
+    #[address(0x68)]
+    pub m_OwnerWire: *mut void,
+
+    /// The material effect table the impact effect is played from
+    /// ([`PlayImpactEffect`](Self::PlayImpactEffect)).
+    #[address(0x70)]
+    pub m_MaterialEffectTable: *mut void,
+
+    /// The hook model shown; see [`HookModelState`].
+    #[address(0x7C)]
+    pub m_HookModelState: HookModelState,
+
+    /// The end's world position this tick.
+    #[address(0xA0)]
+    pub m_WorldPositionT1: Vector3,
+
+    /// The end's world position the tick before.
+    #[address(0xAC)]
+    pub m_WorldPositionT0: Vector3,
+
+    /// The target the end flies to, latched by [`SetExtend`](Self::SetExtend).
+    #[address(0xB8)]
+    pub m_TargetInfo: HookTargetInfo,
+
+    /// The flight speed, metres per second.
+    #[address(0xF0)]
+    pub m_Speed: f32,
+
+    /// Whether the end flies as a ghost wire: it makes no cast in flight, and at its goal it
+    /// attaches to the latched object ([`ForceAttachToTarget`](Self::ForceAttachToTarget)) when its
+    /// last casts find nothing.
+    #[address(0xF4)]
+    pub m_GhostWire: bool,
+
+    /// The direction of flight, unit length.
+    #[address(0xF8)]
+    pub m_HookDirection: Vector3,
+
+    /// The end's cast filter.
+    #[address(0x110)]
+    pub m_HookCastCollisionFilter: WireEndCastFilter,
+}
 impl WireEnd {
-    /// Puts the end into its extending state: it flies from `start_pos` at `speed` toward
-    /// `target_info`, as a ghost wire when `ghost_wire`.
+    /// Puts the end into its extending state: detaches it, sets its position to `start_pos`, its
+    /// speed to `speed`, and its ghost flag to `ghost_wire`, latches `target_info`, shows the open
+    /// hook, and points it at the target's world position. A scripted fire and the fire
+    /// animation's release both start the far end through it, and a tether's second fire starts
+    /// the device end through it.
     #[address(0x140_93D_700)]
     pub fn SetExtend(&mut self, start_pos: *const Vector3, speed: f32, target_info: *mut HookTargetInfo, ghost_wire: bool);
 
-    /// Attaches the end at `hit_pos`: builds the attachment proxy from the ray hit `cast_info` (a
-    /// `CCastRayInfo`) with `SetupProxyForAttachment` and moves the end to its attached state.
+    /// Attaches the end at `hit_pos`: builds the attachment proxy from the ray hit `cast_info`
+    /// with [`SetupProxyForAttachment`](Self::SetupProxyForAttachment) and moves the end to its
+    /// attached state.
     #[address(0x140_94A_FB0)]
-    pub fn Attach(&mut self, hit_pos: *const Vector3, cast_info: *mut void, hook_owner: *const SharedPtr<Character>, reattaching: bool);
+    pub fn Attach(&mut self, hit_pos: *const Vector3, cast_info: *mut CastRayInfo, hook_owner: *const SharedPtr<Character>, reattaching: bool);
 
     /// Attaches the end to an existing attachment proxy (a `CGrapplePointProxy`).
     #[address(0x140_8F4_850)]
@@ -63,4 +200,47 @@ impl WireEnd {
     /// `CCharacterBoneAttachedPointProxy`.
     #[address(0x140_8F9_1F0)]
     pub fn AttachToCharacterBone(&mut self, character: *const SharedPtr<Character>, bone: i32, local_offset: *const Matrix4);
+
+    /// Attaches the end to its latched target object's body without a ray hit: requires a physics
+    /// game object whose physics instance exists and is valid (a vehicle's own instance for a
+    /// vehicle), builds a [`CastRayInfo`] with the normal against
+    /// [`m_HookDirection`](Self::m_HookDirection) and the instance's body, and calls
+    /// [`Attach`](Self::Attach) at the target's world position. It plays no impact effect.
+    #[address(0x140_94B_880)]
+    pub fn ForceAttachToTarget(&mut self, owner: *const SharedPtr<Character>);
+
+    /// Builds the attachment proxy for the hit `cast_info` at `hit_pos`, by the hit object's kind,
+    /// or returns null when the object cannot be attached: an object whose grappling mode is
+    /// [`E_GM_UnGrappable`](physics::GrapplingMode::E_GM_UnGrappable), one flagged dead or without
+    /// a live physics instance, or a character with the grapple-immunity control flag. A weapon's
+    /// dynamic body gets a `CGenericObjectPointProxy` on the weapon, as other loose objects do.
+    /// Nothing here reads [`E_GM_ReelInNoAttach`](physics::GrapplingMode::E_GM_ReelInNoAttach).
+    #[address(0x140_948_F40)]
+    pub fn SetupProxyForAttachment(&mut self, owner: *const SharedPtr<Character>, hit_pos: *const Vector3, cast_info: *mut CastRayInfo, reattaching: bool) -> *mut void;
+
+    /// Casts the end's segment from `from` to `to` on
+    /// [`RAYCAST_EVERYTHING_PHYSICAL`](physics::PfxLayer::RAYCAST_EVERYTHING_PHYSICAL) with its cast
+    /// filter, and at a hit attaches there and plays the impact effect.
+    #[address(0x140_94B_5E0)]
+    pub fn TryCollide(&mut self, from: *const Vector3, to: *const Vector3, owner: *const SharedPtr<Character>, reattaching: bool, p6: bool) -> bool;
+
+    /// Advances the end by its state. Extending, it flies toward the latched target's world
+    /// position, and past the wire's [`m_MaxLength`](equipment::grappling_hook::GrapplingHookWire::m_MaxLength)
+    /// it retracts. A non-ghost end casts each step with [`TryCollide`](Self::TryCollide), and near
+    /// the target sweeps a small sphere ahead (the disassembler names that sphere cast
+    /// `CDebugRenderer::DebugLineTTL`; it is a second `CPhysicsSystem::CastSphere`). A ghost end
+    /// makes no cast in flight; within one step of its goal it casts twice with its ghost filter,
+    /// and when both miss it clears [`m_GhostWire`](Self::m_GhostWire) and attaches to the target
+    /// ([`ForceAttachToTarget`](Self::ForceAttachToTarget)). It returns at once while
+    /// [`GWES_INVALID`](WireEndState::GWES_INVALID).
+    #[address(0x140_94C_D00)]
+    pub fn Update(&mut self, owner: *const SharedPtr<Character>, dt: f32);
+
+    /// Plays the hook's impact effect and sound at `pos` for the hit material of `cast_info` (its
+    /// body's material), through the attached object's effect container for a damageable one.
+    /// Needs [`m_PointProxy`](Self::m_PointProxy) and
+    /// [`m_MaterialEffectTable`](Self::m_MaterialEffectTable), and plays nothing beyond 200 metres
+    /// of the camera.
+    #[address(0x140_926_440)]
+    pub fn PlayImpactEffect(&mut self, pos: *const Vector3, normal: *const Vector3, cast_info: *mut CastRayInfo);
 }
