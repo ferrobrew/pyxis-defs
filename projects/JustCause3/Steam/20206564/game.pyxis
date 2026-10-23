@@ -1,3 +1,5 @@
+use types::shared_ptr::WeakPtrGameObject;
+
 #[singleton(0x142_E22_E68), min_size(0x2C0)]
 pub type Game {
     /// The intra-`Update` site at which the game's per-frame render bookkeeping starts: the
@@ -319,6 +321,14 @@ pub type GameObject {
         #[index(38)]
         pub fn Enable(&mut self, enable: bool);
     },
+
+    /// A weak reference to the object itself (`m_WeakThis`), from which the engine hands out
+    /// references to the object: the player aim's direct hit takes the slot's game object from it
+    /// ([`PlayerAimControl::CheckDirectTargets`](aim::aim::PlayerAimControl::CheckDirectTargets)),
+    /// and a grapple target info its target object
+    /// ([`HookTargetInfo::SetupTargetFromGameObject`](equipment::wire_end::HookTargetInfo::SetupTargetFromGameObject)).
+    #[address(0x60)]
+    pub m_WeakThis: WeakPtrGameObject,
 }
 impl GameObject {
     /// The object's spawn tag index (`CGameObject::GetUniqueSpawnTagIndex`): the index of the
