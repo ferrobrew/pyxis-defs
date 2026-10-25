@@ -196193,7 +196193,7 @@
             "doc": " The part took damage.",
             "source": {
               "file_index": 106,
-              "line": 156
+              "line": 164
             }
           },
           {
@@ -196202,7 +196202,7 @@
             "doc": " The part was worked on purpose, as a door the door controller opens.",
             "source": {
               "file_index": 106,
-              "line": 158
+              "line": 166
             }
           },
           {
@@ -196211,7 +196211,7 @@
             "doc": " The part starts in this state when the body is made.",
             "source": {
               "file_index": 106,
-              "line": 160
+              "line": 168
             }
           }
         ],
@@ -196224,7 +196224,7 @@
       },
       "source": {
         "file_index": 106,
-        "line": 154
+        "line": 162
       }
     },
     "vehicle::parts::PartInstance": {
@@ -196900,7 +196900,7 @@
           {
             "visibility": "public",
             "name": "EnablePart",
-            "doc": " Loosens the merged part `part` into a body of its own (`CPartInstance::EnablePart`): the\n part's owner spawns its physical part (for a vehicle, `CVehicle::SpawnPhysicalPart`, which\n makes a [`VehiclePartGameObject`] and its body), and with `keep_constraint` the part's\n constraint from the physics prototype is cloned to hang it from its parent, such as a door\n on its hinge; otherwise the part breaks off. A part already hanging by its constraint\n ([`PartInstance::IsConstraintActive`]) is left alone with `keep_constraint`, and broken off\n without it. Runs synchronously on the calling thread, outside the physics step.",
+            "doc": " Loosens the merged part `part` into a body of its own (`CPartInstance::EnablePart`): the\n part's owner spawns its physical part (for a vehicle, `CVehicle::SpawnPhysicalPart`, which\n makes a [`VehiclePartGameObject`] and its body), and with `keep_constraint` the part's\n constraint from the physics prototype is cloned to hang it from its parent, such as a door\n on its hinge; otherwise the part breaks off. A part already hanging by its constraint\n ([`PartInstance::IsConstraintActive`]) is left alone with `keep_constraint`, and broken off\n without it. Runs synchronously on the calling thread, outside the physics step.\n On successful vehicle-part creation, `CVehicle::SpawnPhysicalPart` retains the new\n object in the vehicle's part collection and stores a weak reference in the matching\n [`DoorInfo`](vehicle::vehicle::DoorInfo), setting its state to\n [`DOOR_OPEN`](vehicle::vehicle::DoorState::DOOR_OPEN) before returning. This publication\n precedes constraint cloning and the loosened event; it does not depend on that event.\n The part then disables its merged world-collision and raycast shapes in favor of its\n newly created bodies. No door animation starts unless the door controller processes\n a pending opening or closing request.",
             "doc_links": [
               {
                 "text": "VehiclePartGameObject",
@@ -196912,6 +196912,17 @@
                 "target_kind": "item",
                 "path": "vehicle::parts::PartInstance",
                 "anchor": "func-IsConstraintActive"
+              },
+              {
+                "text": "vehicle::vehicle::DoorInfo",
+                "target_kind": "item",
+                "path": "vehicle::vehicle::DoorInfo"
+              },
+              {
+                "text": "vehicle::vehicle::DoorState::DOOR_OPEN",
+                "target_kind": "item",
+                "path": "vehicle::vehicle::DoorState",
+                "anchor": "variant-DOOR_OPEN"
               }
             ],
             "body": {
@@ -196954,7 +196965,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 106,
-              "line": 143
+              "line": 151
             }
           },
           {
@@ -196985,7 +196996,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 106,
-              "line": 148
+              "line": 156
             }
           }
         ],
@@ -197040,7 +197051,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 106,
-              "line": 171
+              "line": 179
             }
           },
           {
@@ -197066,7 +197077,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 106,
-              "line": 176
+              "line": 184
             }
           }
         ],
@@ -197080,7 +197091,7 @@
       },
       "source": {
         "file_index": 106,
-        "line": 166
+        "line": 174
       }
     },
     "vehicle::stunt_areas::StuntArea": {
@@ -197459,7 +197470,15 @@
           {
             "visibility": "public",
             "name": "m_State",
-            "doc": null,
+            "doc": " The current state. Successful `CVehicle::SpawnPhysicalPart` stores the spawned door\n object's weak reference in this entry and sets this to [`DoorState::DOOR_OPEN`]\n before the part's loosened event. The next post-simulation update replaces it with\n an opening or closing state only when a matching pending request starts an animation.",
+            "doc_links": [
+              {
+                "text": "DoorState::DOOR_OPEN",
+                "target_kind": "item",
+                "path": "vehicle::vehicle::DoorState",
+                "anchor": "variant-DOOR_OPEN"
+              }
+            ],
             "type_ref": {
               "type": "raw",
               "path": "vehicle::vehicle::DoorState"
@@ -197470,7 +197489,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 320
+              "line": 324
             }
           },
           {
@@ -197487,7 +197506,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 321
+              "line": 325
             }
           },
           {
@@ -197508,7 +197527,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 325
+              "line": 329
             }
           },
           {
@@ -197528,7 +197547,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 325
+              "line": 329
             }
           },
           {
@@ -197549,7 +197568,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 329
+              "line": 333
             }
           },
           {
@@ -197566,7 +197585,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 329
+              "line": 333
             }
           },
           {
@@ -197583,7 +197602,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 331
+              "line": 335
             }
           },
           {
@@ -197604,7 +197623,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 335
+              "line": 339
             }
           },
           {
@@ -197621,7 +197640,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 335
+              "line": 339
             }
           },
           {
@@ -197638,7 +197657,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 338
+              "line": 342
             }
           },
           {
@@ -197659,7 +197678,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 341
+              "line": 345
             }
           },
           {
@@ -197676,7 +197695,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 341
+              "line": 345
             }
           },
           {
@@ -197825,7 +197844,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 363
+              "line": 367
             }
           },
           {
@@ -197845,7 +197864,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 364
+              "line": 368
             }
           },
           {
@@ -197865,7 +197884,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 365
+              "line": 369
             }
           },
           {
@@ -197882,7 +197901,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 367
+              "line": 371
             }
           },
           {
@@ -197903,7 +197922,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 371
+              "line": 375
             }
           },
           {
@@ -197923,7 +197942,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 371
+              "line": 375
             }
           },
           {
@@ -197943,7 +197962,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 373
+              "line": 377
             }
           },
           {
@@ -197964,7 +197983,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 377
+              "line": 381
             }
           },
           {
@@ -197981,7 +198000,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 377
+              "line": 381
             }
           },
           {
@@ -198009,7 +198028,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 359
+              "line": 363
             }
           }
         ],
@@ -198024,7 +198043,7 @@
       },
       "source": {
         "file_index": 108,
-        "line": 362
+        "line": 366
       }
     },
     "vehicle::vehicle::DoorSlot": {
@@ -199803,7 +199822,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 352
+              "line": 356
             }
           },
           {
@@ -199831,7 +199850,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 352
+              "line": 356
             }
           },
           {
@@ -199852,7 +199871,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 356
+              "line": 360
             }
           },
           {
@@ -199872,7 +199891,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 356
+              "line": 360
             }
           }
         ],
@@ -199887,7 +199906,7 @@
       },
       "source": {
         "file_index": 108,
-        "line": 348
+        "line": 352
       }
     },
     "vehicle::vehicle::VehicleSeat": {
