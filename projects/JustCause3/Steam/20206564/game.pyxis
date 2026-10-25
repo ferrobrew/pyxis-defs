@@ -1,3 +1,4 @@
+use types::math::Matrix4;
 use types::shared_ptr::WeakPtrGameObject;
 
 #[singleton(0x142_E22_E68), min_size(0x2C0)]
@@ -310,6 +311,13 @@ pub type GameObject {
         /// returns it (such as [`Character::TYPE_ID`](character::character::Character::TYPE_ID)).
         #[index(2)]
         pub fn IsType(&self, type_id: *const u32) -> bool;
+
+        /// Copies the object's current world transform into `out` and reports whether a transform
+        /// is available. The skeletal animated object's implementation copies its current world
+        /// matrix without changing the object. The adjacent mutable overload forwards to this
+        /// const overload.
+        #[index(21)]
+        pub fn GetTransform(&self, out: *mut Matrix4) -> bool;
 
         /// Enables or disables the object. A rigid object's override
         /// ([`RigidObject`](physics::RigidObject)) records the state and, when it changes, adds its
