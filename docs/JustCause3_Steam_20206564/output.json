@@ -158261,7 +158261,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 7
+        "line": 8
       }
     },
     "spawn_system::SBFBCProcessParameter": {
@@ -158298,7 +158298,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 14
+        "line": 15
       }
     },
     "spawn_system::SBFBCProcessState": {
@@ -158322,7 +158322,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 18
+        "line": 19
       }
     },
     "spawn_system::SpawnBudgetEntry": {
@@ -158353,7 +158353,7 @@
             "is_base": false,
             "source": {
               "file_index": 87,
-              "line": 29
+              "line": 30
             }
           },
           {
@@ -158370,7 +158370,7 @@
             "is_base": false,
             "source": {
               "file_index": 87,
-              "line": 29
+              "line": 30
             }
           },
           {
@@ -158391,7 +158391,7 @@
             "is_base": false,
             "source": {
               "file_index": 87,
-              "line": 20
+              "line": 21
             }
           }
         ],
@@ -158406,7 +158406,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 24
+        "line": 25
       }
     },
     "spawn_system::SpawnCallback": {
@@ -158417,13 +158417,40 @@
       "category": "defined",
       "kind": {
         "type": "type_alias",
-        "doc": " The completion callback for [`Spawn`](SpawnSystem::Spawn): a code pointer with the signature\n `void (*)(const std::vector<boost::shared_ptr<CGameObject>>* spawned_objects, void* userdata)`,\n invoked with the spawned objects and the caller's userdata once the request has been serviced.\n Modeled as a raw pointer because the definition language does not yet express function-pointer\n types.",
+        "doc": " The completion callback for [`Spawn`](SpawnSystem::Spawn) and\n [`SpawnTagIndex`](SpawnSystem::SpawnTagIndex). Its signature is\n `void (*)(const std::vector<boost::shared_ptr<CGameObject>>* spawned_objects, void* userdata)`.\n The vector uses [`Vector`](types::std_vector::Vector) of\n [`SharedPtr`](types::shared_ptr::SharedPtr) to [`GameObject`](game::GameObject).\n\n [`PreUpdate`](SpawnSystem::PreUpdate) invokes the callback inline on its caller while holding the\n request lock. The vector and its strong references are borrowed until the callback returns.\n PreUpdate then releases those references and the vector storage. Retaining an object beyond the\n callback requires an additional strong reference; copying a borrowed pointer pair does not take\n one. The system copies the userdata value without taking ownership of it. Cancellation and an\n invalid factory do not invoke the callback.",
         "doc_links": [
           {
             "text": "SpawnSystem::Spawn",
             "target_kind": "item",
             "path": "spawn_system::SpawnSystem",
             "anchor": "func-Spawn"
+          },
+          {
+            "text": "SpawnSystem::SpawnTagIndex",
+            "target_kind": "item",
+            "path": "spawn_system::SpawnSystem",
+            "anchor": "func-SpawnTagIndex"
+          },
+          {
+            "text": "types::std_vector::Vector",
+            "target_kind": "item",
+            "path": "types::std_vector::Vector"
+          },
+          {
+            "text": "types::shared_ptr::SharedPtr",
+            "target_kind": "item",
+            "path": "types::shared_ptr::SharedPtr"
+          },
+          {
+            "text": "game::GameObject",
+            "target_kind": "item",
+            "path": "game::GameObject"
+          },
+          {
+            "text": "SpawnSystem::PreUpdate",
+            "target_kind": "item",
+            "path": "spawn_system::SpawnSystem",
+            "anchor": "func-PreUpdate"
           }
         ],
         "target": {
@@ -158436,7 +158463,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 37
+        "line": 45
       }
     },
     "spawn_system::SpawnFactoryImpl": {
@@ -158508,7 +158535,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 87,
-              "line": 231
+              "line": 317
             }
           }
         ],
@@ -158522,7 +158549,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 224
+        "line": 310
       }
     },
     "spawn_system::SpawnResourceDef": {
@@ -158546,7 +158573,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 221
+        "line": 307
       }
     },
     "spawn_system::SpawnSystem": {
@@ -158585,7 +158612,7 @@
             "is_base": false,
             "source": {
               "file_index": 87,
-              "line": 116
+              "line": 128
             }
           },
           {
@@ -158608,12 +158635,114 @@
             "is_base": false,
             "source": {
               "file_index": 87,
-              "line": 116
+              "line": 128
             }
           },
           {
             "visibility": "private",
             "name": "_field_50",
+            "doc": null,
+            "doc_links": [
+              {
+                "text": "Self::Update",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem",
+                "anchor": "func-Update"
+              },
+              {
+                "text": "Self::ResetSystem",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem",
+                "anchor": "func-ResetSystem"
+              },
+              {
+                "text": "cpu_fragment::CpuFragmentWaitUntilSignalIsNonZero",
+                "target_kind": "module",
+                "path": "cpu_fragment",
+                "anchor": "func-CpuFragmentWaitUntilSignalIsNonZero"
+              },
+              {
+                "text": "Self::PreUpdate",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem",
+                "anchor": "func-PreUpdate"
+              },
+              {
+                "text": "Self::DespawnObject",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem",
+                "anchor": "func-DespawnObject"
+              }
+            ],
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 248
+            },
+            "offset": 80,
+            "size": 248,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 87,
+              "line": 137
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_ThreadSignal",
+            "doc": " The completion signal for the resource and despawn-ranking job run by\n [`Update`](Self::Update). `StartUpdate` clears it before scheduling that job.\n [`ResetSystem`](Self::ResetSystem) waits for it with\n [`CpuFragmentWaitUntilSignalIsNonZero`](cpu_fragment::CpuFragmentWaitUntilSignalIsNonZero).\n [`PreUpdate`](Self::PreUpdate) and [`DespawnObject`](Self::DespawnObject) require that job to\n have finished; their internal locks do not establish worker completion.",
+            "doc_links": [
+              {
+                "text": "Self::Update",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem",
+                "anchor": "func-Update"
+              },
+              {
+                "text": "Self::ResetSystem",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem",
+                "anchor": "func-ResetSystem"
+              },
+              {
+                "text": "cpu_fragment::CpuFragmentWaitUntilSignalIsNonZero",
+                "target_kind": "module",
+                "path": "cpu_fragment",
+                "anchor": "func-CpuFragmentWaitUntilSignalIsNonZero"
+              },
+              {
+                "text": "Self::PreUpdate",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem",
+                "anchor": "func-PreUpdate"
+              },
+              {
+                "text": "Self::DespawnObject",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem",
+                "anchor": "func-DespawnObject"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "u32"
+            },
+            "offset": 328,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 87,
+              "line": 137
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_14c",
             "doc": null,
             "type_ref": {
               "type": "array",
@@ -158621,15 +158750,15 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 280
+              "size": 28
             },
-            "offset": 80,
-            "size": 280,
+            "offset": 332,
+            "size": 28,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 87,
-              "line": 120
+              "line": 141
             }
           },
           {
@@ -158649,7 +158778,7 @@
             "is_base": false,
             "source": {
               "file_index": 87,
-              "line": 120
+              "line": 141
             }
           },
           {
@@ -158677,7 +158806,7 @@
             "is_base": false,
             "source": {
               "file_index": 87,
-              "line": 126
+              "line": 147
             }
           },
           {
@@ -158697,7 +158826,7 @@
             "is_base": false,
             "source": {
               "file_index": 87,
-              "line": 130
+              "line": 151
             }
           },
           {
@@ -158726,7 +158855,7 @@
             "is_base": false,
             "source": {
               "file_index": 87,
-              "line": 135
+              "line": 156
             }
           },
           {
@@ -158751,7 +158880,7 @@
             "is_base": false,
             "source": {
               "file_index": 87,
-              "line": 135
+              "line": 156
             }
           },
           {
@@ -158776,7 +158905,7 @@
             "is_base": false,
             "source": {
               "file_index": 87,
-              "line": 140
+              "line": 161
             }
           },
           {
@@ -158801,11 +158930,70 @@
             "is_base": false,
             "source": {
               "file_index": 87,
-              "line": 145
+              "line": 166
             }
           }
         ],
         "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "PreUpdate",
+            "doc": " Services deferred despawns, queued cancellations, and pending spawn requests, in that order.\n The resource and despawn-ranking job must have finished before entry; see\n [`m_ThreadSignal`](Self::m_ThreadSignal). The request and despawn locks do not wait for that\n job.\n\n First releases the strong references queued for despawn. Then removes every pending request\n matching both fields of each [`CancelSpawn`](Self::CancelSpawn) record, destroys its factory,\n and clears the cancellation records without invoking callbacks. Finally services the remaining\n ready factories under the request lock. A successful request invokes its\n [`SpawnCallback`] inline on the caller, destroys the factory, and removes the request.\n An invalid factory is removed without a callback; an unsuccessful spawn attempt can remain\n pending without invoking one.\n\n The run, load, and frontend state updates call this function. [`ResetSystem`](Self::ResetSystem)\n also calls it and can deliver callbacks while resetting. Callback delivery does not run in\n the separate ranking job in [`Update`](Self::Update).",
+            "doc_links": [
+              {
+                "text": "Self::m_ThreadSignal",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem",
+                "anchor": "field-m_ThreadSignal"
+              },
+              {
+                "text": "Self::CancelSpawn",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem",
+                "anchor": "func-CancelSpawn"
+              },
+              {
+                "text": "SpawnCallback",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnCallback"
+              },
+              {
+                "text": "Self::ResetSystem",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem",
+                "anchor": "func-ResetSystem"
+              },
+              {
+                "text": "Self::Update",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem",
+                "anchor": "func-Update"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5384224576
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "dt",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "f32"
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 87,
+              "line": 186
+            }
+          },
           {
             "visibility": "public",
             "name": "Update",
@@ -158855,7 +159043,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 87,
-              "line": 166
+              "line": 206
             }
           },
           {
@@ -158908,18 +159096,29 @@
             "calling_convention": "system",
             "source": {
               "file_index": 87,
-              "line": 172
+              "line": 212
             }
           },
           {
             "visibility": "public",
             "name": "Spawn",
-            "doc": " Queues an asynchronous spawn request for the resource definitions matching the given tag\n string. Tags are separated by spaces, commas, or pipes; a definition matches when it\n carries every requested tag, and the matching set must belong to a single budget pool. The\n request creates a spawn factory, streams the selected definition's exported entity in if\n needed, and is serviced on a later frame by the spawn thread's update; on success the\n callback fires with the spawned objects and the given userdata. The transform is the\n world-space placement for the spawned object. `flags` is a combination of the\n `EFactoryFlags` constants ([`FF_DEFAULT`](Self::FF_DEFAULT) and friends) controlling which\n spawn checks apply. The callback may be null when the caller does not need the spawned\n objects.",
+            "doc": " Queues an asynchronous spawn request for the resource definitions matching the given tag\n string. Tags are separated by spaces, commas, or pipes; a definition matches when it\n carries every requested tag, and the matching set must belong to a single budget pool. The\n request creates a spawn factory and streams the selected definition's exported entity in if\n needed. [`PreUpdate`](Self::PreUpdate) services it later and invokes the callback inline on\n its caller on success, with the borrowed objects and the given userdata. The transform is\n the world-space placement for the spawned object. `flags` is a combination of the\n `EFactoryFlags` constants ([`FF_DEFAULT`](Self::FF_DEFAULT) and friends) controlling the\n spawn checks and ownership. Unless [`FF_NO_SYSTEM_LOCK`](Self::FF_NO_SYSTEM_LOCK) is set,\n the resource definition retains the complete spawned group independently of the callback's\n references. Releasing the callback's references does not remove that persistent ownership.\n The callback may be null when the caller does not need the spawned objects.",
             "doc_links": [
+              {
+                "text": "Self::PreUpdate",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem",
+                "anchor": "func-PreUpdate"
+              },
               {
                 "text": "Self::FF_DEFAULT",
                 "target_kind": "item",
                 "path": "spawn_system::SpawnSystem::FF_DEFAULT"
+              },
+              {
+                "text": "Self::FF_NO_SYSTEM_LOCK",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem::FF_NO_SYSTEM_LOCK"
               }
             ],
             "body": {
@@ -158987,19 +159186,25 @@
             "calling_convention": "system",
             "source": {
               "file_index": 87,
-              "line": 185
+              "line": 227
             }
           },
           {
             "visibility": "public",
             "name": "SpawnTagIndex",
-            "doc": " Queues an asynchronous spawn request for the spawn tag `tag_index`, a type as\n [`GameObject::GetUniqueSpawnTagIndex`](game::GameObject::GetUniqueSpawnTagIndex) names it\n (the tag-index overload of `CSpawnSystem::Spawn`). The request is queued under the system's\n request lock and serviced on a later frame, as for [`Spawn`](Self::Spawn), and `callback`\n then fires with the spawned objects and `userdata`. The inventory's respawn of a slot\n passes [`FF_HIGH_PRIO_SPAWN_CHECKS`](Self::FF_HIGH_PRIO_SPAWN_CHECKS) for the player and\n [`FF_SECONDARY_SPAWN_CHECKS`](Self::FF_SECONDARY_SPAWN_CHECKS) otherwise, the character's\n transform, and `-1` for `p7`.",
+            "doc": " Queues an asynchronous spawn request for the spawn tag `tag_index`, a type as\n [`GameObject::GetUniqueSpawnTagIndex`](game::GameObject::GetUniqueSpawnTagIndex) names it\n (the tag-index overload of `CSpawnSystem::Spawn`). The request is queued under the system's\n request lock and serviced by [`PreUpdate`](Self::PreUpdate), as for [`Spawn`](Self::Spawn).\n The request copies the transform, callback, userdata, and network identifier; it does not\n retain the transform pointer or take ownership of userdata. If factory creation fails, it\n returns without queueing a request or invoking the callback. A queued request can also be\n removed without a callback if its factory becomes invalid.\n\n On success PreUpdate invokes `callback` inline on its caller with the borrowed spawned group\n and `userdata`. The group has the persistent ownership described by [`Spawn`](Self::Spawn).\n The inventory's respawn of a slot passes\n [`FF_HIGH_PRIO_SPAWN_CHECKS`](Self::FF_HIGH_PRIO_SPAWN_CHECKS) for the player and\n [`FF_SECONDARY_SPAWN_CHECKS`](Self::FF_SECONDARY_SPAWN_CHECKS) otherwise, the character's\n transform, and an all-bits-set network identifier.",
             "doc_links": [
               {
                 "text": "game::GameObject::GetUniqueSpawnTagIndex",
                 "target_kind": "item",
                 "path": "game::GameObject",
                 "anchor": "func-GetUniqueSpawnTagIndex"
+              },
+              {
+                "text": "Self::PreUpdate",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem",
+                "anchor": "func-PreUpdate"
               },
               {
                 "text": "Self::Spawn",
@@ -159077,10 +159282,10 @@
               },
               {
                 "type": "field",
-                "name": "p7",
+                "name": "network_id",
                 "type_ref": {
                   "type": "raw",
-                  "path": "i32"
+                  "path": "u32"
                 }
               }
             ],
@@ -159088,7 +159293,118 @@
             "calling_convention": "system",
             "source": {
               "file_index": 87,
-              "line": 196
+              "line": 245
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "CancelSpawn",
+            "doc": " Queues a cancellation record containing `callback` and `userdata` under the request lock.\n It neither invokes the callback nor dereferences or releases userdata. Returning only\n confirms that the cancellation record is queued; it does not wait for request service or\n worker completion.\n\n [`PreUpdate`](Self::PreUpdate) removes all pending requests matching both values before\n servicing remaining requests. It destroys their factories without invoking callbacks.\n Once that PreUpdate has processed the record and returned, no matching request remains,\n provided no new request has reused the pair. A callback delivered before cancellation is\n unaffected, as are the objects it returned.",
+            "doc_links": [
+              {
+                "text": "Self::PreUpdate",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem",
+                "anchor": "func-PreUpdate"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5384058656
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "callback",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "u8"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "userdata",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "u8"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 87,
+              "line": 258
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "DespawnObject",
+            "doc": " Queues the complete spawn group containing `object` for deferred despawn. The caller must\n keep the object alive with a strong reference through the call, and the resource and\n despawn-ranking job must have finished; see [`m_ThreadSignal`](Self::m_ThreadSignal).\n Internal locks do not wait for that job.\n\n This is the raw-object overload of `CSpawnSystem::Despawn`. It takes a temporary weak\n reference and passes it by value to the weak-pointer overload. When the object belongs to\n a persistent spawned group, the system moves the whole group's strong references from the\n resource definition into the deferred despawn list and reduces the spawn and budget counts.\n [`PreUpdate`](Self::PreUpdate) later releases those deferred references. Other strong\n references can keep the objects alive, and final strong-reference disposal can itself queue\n engine deletion.\n\n Returns the number of objects queued, not whether destruction has completed. A zero result\n can mean that the object is protected, has no matching resource, or is no longer in the\n persistent list. `force` bypasses the critical-object check, but does not bypass missing\n membership. Objects spawned with [`FF_NO_SYSTEM_LOCK`](Self::FF_NO_SYSTEM_LOCK) are not in\n that list.",
+            "doc_links": [
+              {
+                "text": "Self::m_ThreadSignal",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem",
+                "anchor": "field-m_ThreadSignal"
+              },
+              {
+                "text": "Self::PreUpdate",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem",
+                "anchor": "func-PreUpdate"
+              },
+              {
+                "text": "Self::FF_NO_SYSTEM_LOCK",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem::FF_NO_SYSTEM_LOCK"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5384437056
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "object",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "game::GameObject"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "force",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "bool"
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 87,
+              "line": 279
             }
           },
           {
@@ -159119,7 +159435,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 87,
-              "line": 200
+              "line": 283
             }
           },
           {
@@ -159150,14 +159466,26 @@
             "calling_convention": "system",
             "source": {
               "file_index": 87,
-              "line": 204
+              "line": 287
             }
           },
           {
             "visibility": "public",
             "name": "ResetSystem",
-            "doc": " Resets the system: waits for its spawn job, sends `spawn.reset_all_spawn_rules` at once,\n destroys every pending spawn request and its factory, releases the system's references to\n every spawned object of every resource definition and every object queued for despawn, and\n posts `spawn.post_reset_all_spawn_rules`, which its receivers handle later. An object that\n something else still holds a strong reference to outlives the reset, outside the system.\n The load state's reset step\n ([`GameStateLoad::ResetSystems`](game::GameStateLoad::ResetSystems)) and the frontend's\n ([`GameStateFrontend::ResetSystems`](game::GameStateFrontend::ResetSystems)) call it, so a\n death, a mission failure or checkpoint restart, a fast travel, a challenge's start, retry,\n restart, or abort, a load, and the quit to the menu all reset.",
+            "doc": " Resets the system: waits for its spawn job through [`m_ThreadSignal`](Self::m_ThreadSignal),\n sends `spawn.reset_all_spawn_rules` at once, and calls [`PreUpdate`](Self::PreUpdate). This\n service call can invoke successful pending spawn callbacks inline while the reset is in\n progress. It then destroys every remaining pending spawn request and its factory, releases\n the system's references to every spawned object of every resource definition and every\n object queued for despawn, and posts `spawn.post_reset_all_spawn_rules`, which its receivers\n handle later. An object that something else still holds a strong reference to outlives the\n reset, outside the system.\n The load state's reset step\n ([`GameStateLoad::ResetSystems`](game::GameStateLoad::ResetSystems)) and the frontend's\n ([`GameStateFrontend::ResetSystems`](game::GameStateFrontend::ResetSystems)) call it, so a\n death, a mission failure or checkpoint restart, a fast travel, a challenge's start, retry,\n restart, or abort, a load, and the quit to the menu all reset.",
             "doc_links": [
+              {
+                "text": "Self::m_ThreadSignal",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem",
+                "anchor": "field-m_ThreadSignal"
+              },
+              {
+                "text": "Self::PreUpdate",
+                "target_kind": "item",
+                "path": "spawn_system::SpawnSystem",
+                "anchor": "func-PreUpdate"
+              },
               {
                 "text": "game::GameStateLoad::ResetSystems",
                 "target_kind": "item",
@@ -159187,7 +159515,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 87,
-              "line": 217
+              "line": 303
             }
           }
         ],
@@ -159227,7 +159555,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 54
+        "line": 62
       }
     },
     "spawn_system::SpawnSystem::FF_AMBIENT_SPAWN": {
@@ -159250,7 +159578,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 82
+        "line": 94
       }
     },
     "spawn_system::SpawnSystem::FF_AUTO_DESPAWN_BLOCK": {
@@ -159273,7 +159601,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 90
+        "line": 102
       }
     },
     "spawn_system::SpawnSystem::FF_DEBUG_CHECK": {
@@ -159296,7 +159624,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 96
+        "line": 108
       }
     },
     "spawn_system::SpawnSystem::FF_DEBUG_SPAWN": {
@@ -159319,7 +159647,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 98
+        "line": 110
       }
     },
     "spawn_system::SpawnSystem::FF_DEBUG_SPAWN_CHECKS": {
@@ -159342,7 +159670,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 104
+        "line": 116
       }
     },
     "spawn_system::SpawnSystem::FF_DEFAULT": {
@@ -159365,7 +159693,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 58
+        "line": 66
       }
     },
     "spawn_system::SpawnSystem::FF_HIGH_PRIORITY_LOAD": {
@@ -159388,7 +159716,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 94
+        "line": 106
       }
     },
     "spawn_system::SpawnSystem::FF_HIGH_PRIO_SPAWN_CHECKS": {
@@ -159418,7 +159746,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 110
+        "line": 122
       }
     },
     "spawn_system::SpawnSystem::FF_MISSION_CRITICAL": {
@@ -159441,7 +159769,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 84
+        "line": 96
       }
     },
     "spawn_system::SpawnSystem::FF_NO_BUDGET_COUNT": {
@@ -159464,7 +159792,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 78
+        "line": 90
       }
     },
     "spawn_system::SpawnSystem::FF_NO_DEBUG_LOOP_CHECK": {
@@ -159487,7 +159815,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 92
+        "line": 104
       }
     },
     "spawn_system::SpawnSystem::FF_NO_DESPAWN_CHECK": {
@@ -159510,7 +159838,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 64
+        "line": 76
       }
     },
     "spawn_system::SpawnSystem::FF_NO_LANDSCAPE_CHECK": {
@@ -159533,7 +159861,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 80
+        "line": 92
       }
     },
     "spawn_system::SpawnSystem::FF_NO_LOS_CHECK": {
@@ -159556,7 +159884,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 66
+        "line": 78
       }
     },
     "spawn_system::SpawnSystem::FF_NO_PHYSICS_CHECK": {
@@ -159579,7 +159907,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 76
+        "line": 88
       }
     },
     "spawn_system::SpawnSystem::FF_NO_PLAYER_PROX_CHECK": {
@@ -159602,7 +159930,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 68
+        "line": 80
       }
     },
     "spawn_system::SpawnSystem::FF_NO_RESOURCE_REQUEST": {
@@ -159625,7 +159953,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 60
+        "line": 68
       }
     },
     "spawn_system::SpawnSystem::FF_NO_SPAWN_BLOCK_CHECK": {
@@ -159648,7 +159976,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 70
+        "line": 82
       }
     },
     "spawn_system::SpawnSystem::FF_NO_SPAWN_POOL_CHECK": {
@@ -159671,7 +159999,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 74
+        "line": 86
       }
     },
     "spawn_system::SpawnSystem::FF_NO_SYSTEM_LOCK": {
@@ -159682,7 +160010,15 @@
       "category": "defined",
       "kind": {
         "type": "constant",
-        "doc": " `EFactoryFlags`: skip taking the system lock.",
+        "doc": " `EFactoryFlags`: skip retaining the spawned group in the resource definition's persistent\n spawned-object list and skip its spawn and budget accounting. The callback output still\n receives the group. [`DespawnObject`](Self::DespawnObject) cannot find objects omitted from\n that persistent list. This flag does not remove the request lock used for queueing and\n callback delivery.",
+        "doc_links": [
+          {
+            "text": "Self::DespawnObject",
+            "target_kind": "item",
+            "path": "spawn_system::SpawnSystem",
+            "anchor": "func-DespawnObject"
+          }
+        ],
         "value_type": {
           "type": "raw",
           "path": "u32"
@@ -159694,7 +160030,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 62
+        "line": 74
       }
     },
     "spawn_system::SpawnSystem::FF_NO_TIME_CHECK": {
@@ -159717,7 +160053,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 72
+        "line": 84
       }
     },
     "spawn_system::SpawnSystem::FF_PREMIUM_SPAWN": {
@@ -159740,7 +160076,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 86
+        "line": 98
       }
     },
     "spawn_system::SpawnSystem::FF_PROTOTYPE_SPAWN": {
@@ -159763,7 +160099,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 88
+        "line": 100
       }
     },
     "spawn_system::SpawnSystem::FF_SECONDARY_SPAWN_CHECKS": {
@@ -159786,7 +160122,7 @@
       },
       "source": {
         "file_index": 87,
-        "line": 101
+        "line": 113
       }
     },
     "state::ContextBitFlag": {
