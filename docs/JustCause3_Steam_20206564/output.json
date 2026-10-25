@@ -9019,7 +9019,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 93
+              "line": 102
             }
           },
           {
@@ -9039,7 +9039,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 93
+              "line": 102
             }
           }
         ],
@@ -9054,7 +9054,7 @@
       },
       "source": {
         "file_index": 8,
-        "line": 90
+        "line": 99
       }
     },
     "animation::pose_producer::AnimationDriverTransition": {
@@ -9092,7 +9092,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 103
+              "line": 112
             }
           },
           {
@@ -9115,7 +9115,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 103
+              "line": 112
             }
           }
         ],
@@ -9170,7 +9170,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 8,
-              "line": 111
+              "line": 120
             }
           }
         ],
@@ -9184,7 +9184,7 @@
       },
       "source": {
         "file_index": 8,
-        "line": 100
+        "line": 109
       }
     },
     "animation::pose_producer::AnimationInstance": {
@@ -9229,7 +9229,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 114
+              "line": 123
             }
           }
         ],
@@ -9296,7 +9296,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 8,
-              "line": 125
+              "line": 134
             }
           }
         ],
@@ -9310,7 +9310,7 @@
       },
       "source": {
         "file_index": 8,
-        "line": 118
+        "line": 127
       }
     },
     "animation::pose_producer::Blender": {
@@ -9419,7 +9419,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 8,
-              "line": 69
+              "line": 78
             }
           },
           {
@@ -9442,7 +9442,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 8,
-              "line": 74
+              "line": 83
             }
           },
           {
@@ -9479,7 +9479,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 8,
-              "line": 79
+              "line": 88
             }
           },
           {
@@ -9499,7 +9499,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 8,
-              "line": 84
+              "line": 93
             }
           }
         ],
@@ -9513,7 +9513,7 @@
       },
       "source": {
         "file_index": 8,
-        "line": 59
+        "line": 68
       }
     },
     "animation::pose_producer::PoseProducer": {
@@ -9564,7 +9564,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 26
+              "line": 27
             }
           },
           {
@@ -9584,7 +9584,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 26
+              "line": 27
             }
           },
           {
@@ -9618,11 +9618,70 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 34
+              "line": 35
             }
           }
         ],
         "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "GetJoint",
+            "doc": " Copies bone `index` from the current [`m_PoseT1`](Self::m_PoseT1) into `result` in model space and returns `result`. A dirty model-space transform is calculated lazily before the complete joint is copied.\n\n The current pose must be live, `index` must be nonnegative and valid for its bone flags and model-space transforms, and `result` must point to writable aligned joint storage. There are no null or range guards. The lazy calculation can modify the pose caches, so the call requires serialized access to the current pose. It does not read [`m_PoseT0`](Self::m_PoseT0).\n\n IDA labels this address `TResourceCachePtr<CSkeleton>::operator->`; the body is the pose producer's joint accessor.",
+            "doc_links": [
+              {
+                "text": "Self::m_PoseT1",
+                "target_kind": "item",
+                "path": "animation::pose_producer::PoseProducer",
+                "anchor": "field-m_PoseT1"
+              },
+              {
+                "text": "Self::m_PoseT0",
+                "target_kind": "item",
+                "path": "animation::pose_producer::PoseProducer",
+                "anchor": "field-m_PoseT0"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5400597456
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "result",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "character::character::Joint"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "index",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "i32"
+                }
+              }
+            ],
+            "return_type": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "character::character::Joint"
+              }
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 8,
+              "line": 44
+            }
+          },
           {
             "visibility": "public",
             "name": "MakeSkinningPalette",
@@ -9667,7 +9726,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 8,
-              "line": 45
+              "line": 54
             }
           }
         ],
@@ -9681,7 +9740,7 @@
       },
       "source": {
         "file_index": 8,
-        "line": 23
+        "line": 24
       }
     },
     "animation::pose_producer::QsTransform": {
@@ -9708,7 +9767,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 52
+              "line": 61
             }
           },
           {
@@ -9725,7 +9784,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 53
+              "line": 62
             }
           },
           {
@@ -9742,7 +9801,7 @@
             "is_base": false,
             "source": {
               "file_index": 8,
-              "line": 54
+              "line": 63
             }
           }
         ],
@@ -9757,7 +9816,7 @@
       },
       "source": {
         "file_index": 8,
-        "line": 51
+        "line": 60
       }
     },
     "animation::rule_system::AnimationModifierType": {
@@ -19016,7 +19075,14 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": null,
+        "doc": " An animated model (`CAnimatedModel`): owns its rule systems, model-instance slots, and separately allocated [`AnimationController`]. Its constructor allocates the controller, and its destructor destroys and frees that allocation. The controller can replace its pose producer and skeleton resource without replacement of the model or controller.",
+        "doc_links": [
+          {
+            "text": "AnimationController",
+            "target_kind": "item",
+            "path": "character::character::AnimationController"
+          }
+        ],
         "fields": [
           {
             "visibility": "private",
@@ -19036,7 +19102,7 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 1340
+              "line": 1332
             }
           },
           {
@@ -19065,7 +19131,7 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 1340
+              "line": 1332
             }
           },
           {
@@ -19086,13 +19152,13 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 1343
+              "line": 1336
             }
           },
           {
             "visibility": "public",
             "name": "m_AnimationController",
-            "doc": null,
+            "doc": " The model's separately allocated controller. The model destroys and frees it during destruction; the field is not a shared reference.",
             "type_ref": {
               "type": "mut_pointer",
               "inner": {
@@ -19106,7 +19172,7 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 1343
+              "line": 1336
             }
           },
           {
@@ -19135,7 +19201,7 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 1349
+              "line": 1342
             }
           },
           {
@@ -19163,7 +19229,7 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 1349
+              "line": 1342
             }
           },
           {
@@ -19191,7 +19257,7 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 1357
+              "line": 1350
             }
           },
           {
@@ -19219,7 +19285,7 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 1357
+              "line": 1350
             }
           }
         ],
@@ -19269,7 +19335,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1365
+              "line": 1358
             }
           },
           {
@@ -19320,7 +19386,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1373
+              "line": 1366
             }
           }
         ],
@@ -19339,7 +19405,7 @@
       },
       "source": {
         "file_index": 24,
-        "line": 1324
+        "line": 1316
       }
     },
     "character::character::AnimatedModel::BODY_MODEL_SLOT": {
@@ -19370,7 +19436,7 @@
       },
       "source": {
         "file_index": 24,
-        "line": 1332
+        "line": 1324
       }
     },
     "character::character::AnimatedModel::MODEL_INSTANCE_RBI_INFO_OFFSET": {
@@ -19393,7 +19459,7 @@
       },
       "source": {
         "file_index": 24,
-        "line": 1337
+        "line": 1329
       }
     },
     "character::character::AnimatedModel::MODEL_INSTANCE_SLOTS": {
@@ -19424,7 +19490,7 @@
       },
       "source": {
         "file_index": 24,
-        "line": 1327
+        "line": 1319
       }
     },
     "character::character::AnimationController": {
@@ -19435,7 +19501,27 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": " A character's animation controller (`NCharacterSystem::CAnimationControl`): the skeleton, the\n pose producer, and one body part per animation layer.",
+        "doc": " A character's animation controller (`NCharacterSystem::CAnimationControl`): owns the skeleton resource handle and pose producer, with a body part per animation layer. [`InitSkeleton`](Self::InitSkeleton), [`InitControl`](Self::InitControl), and [`Reset`](Self::Reset) change that state in place; an unchanged controller address does not imply an unchanged skeleton or producer.",
+        "doc_links": [
+          {
+            "text": "Self::InitSkeleton",
+            "target_kind": "item",
+            "path": "character::character::AnimationController",
+            "anchor": "func-InitSkeleton"
+          },
+          {
+            "text": "Self::InitControl",
+            "target_kind": "item",
+            "path": "character::character::AnimationController",
+            "anchor": "func-InitControl"
+          },
+          {
+            "text": "Self::Reset",
+            "target_kind": "item",
+            "path": "character::character::AnimationController",
+            "anchor": "func-Reset"
+          }
+        ],
         "fields": [
           {
             "visibility": "private",
@@ -19443,10 +19529,10 @@
             "doc": null,
             "doc_links": [
               {
-                "text": "Self::GetBoneIndex",
+                "text": "Self::InitSkeleton",
                 "target_kind": "item",
                 "path": "character::character::AnimationController",
-                "anchor": "func-GetBoneIndex"
+                "anchor": "func-InitSkeleton"
               }
             ],
             "type_ref": {
@@ -19455,27 +19541,61 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 160
+              "size": 152
             },
             "offset": 0,
-            "size": 160,
+            "size": 152,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 1382
+              "line": 1373
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_SkeletonResourceHandle",
+            "doc": " The owned skeleton resource handle (`TResourceCachePtr<CSkeleton>::m_Handle`). [`InitSkeleton`](Self::InitSkeleton) replaces it and releases the previous handle. The handle's resource-retention operations are not mapped.",
+            "doc_links": [
+              {
+                "text": "Self::InitSkeleton",
+                "target_kind": "item",
+                "path": "character::character::AnimationController",
+                "anchor": "func-InitSkeleton"
+              }
+            ],
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "void"
+              }
+            },
+            "offset": 152,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 24,
+              "line": 1373
             }
           },
           {
             "visibility": "public",
             "name": "m_Skeleton",
-            "doc": " The skeleton resource, through which [`GetBoneIndex`](Self::GetBoneIndex) resolves a bone by\n the hash of its name.",
+            "doc": " The cached skeleton pointer, through which [`GetBoneIndex`](Self::GetBoneIndex) resolves a bone by the hash of its name. [`InitSkeleton`](Self::InitSkeleton) refreshes it when the acquired resource handle is non-null, but does not clear it on the empty-handle path. This cache is not an independent owning reference.",
             "doc_links": [
               {
                 "text": "Self::GetBoneIndex",
                 "target_kind": "item",
                 "path": "character::character::AnimationController",
                 "anchor": "func-GetBoneIndex"
+              },
+              {
+                "text": "Self::InitSkeleton",
+                "target_kind": "item",
+                "path": "character::character::AnimationController",
+                "anchor": "func-InitSkeleton"
               }
             ],
             "type_ref": {
@@ -19491,7 +19611,7 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 1382
+              "line": 1377
             }
           },
           {
@@ -19500,22 +19620,28 @@
             "doc": null,
             "doc_links": [
               {
+                "text": "Self::m_PoseProducerControlBlock",
+                "target_kind": "item",
+                "path": "character::character::AnimationController",
+                "anchor": "field-m_PoseProducerControlBlock"
+              },
+              {
                 "text": "animation::pose_producer::PoseProducer::m_PoseT1",
                 "target_kind": "item",
                 "path": "animation::pose_producer::PoseProducer",
                 "anchor": "field-m_PoseT1"
               },
               {
-                "text": "Self::GetJoint",
+                "text": "Self::InitControl",
                 "target_kind": "item",
                 "path": "character::character::AnimationController",
-                "anchor": "func-GetJoint"
+                "anchor": "func-InitControl"
               },
               {
-                "text": "Self::SetJoint",
+                "text": "Self::Reset",
                 "target_kind": "item",
                 "path": "character::character::AnimationController",
-                "anchor": "func-SetJoint"
+                "anchor": "func-Reset"
               }
             ],
             "type_ref": {
@@ -19532,14 +19658,20 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 1388
+              "line": 1381
             }
           },
           {
             "visibility": "public",
             "name": "m_PoseProducer",
-            "doc": " The pose producer, whose [`m_PoseT1`](animation::pose_producer::PoseProducer::m_PoseT1) the\n joint accessors ([`GetJoint`](Self::GetJoint) and [`SetJoint`](Self::SetJoint)) read and\n write.",
+            "doc": " The object pointer (`px`) of the owning `m_Skinner` shared pointer, paired with [`m_PoseProducerControlBlock`](Self::m_PoseProducerControlBlock). The joint accessors read and write its current [`m_PoseT1`](animation::pose_producer::PoseProducer::m_PoseT1). [`InitControl`](Self::InitControl) replaces the owner, and [`Reset`](Self::Reset) clears and releases it. Reading this raw pointer does not retain the producer.",
             "doc_links": [
+              {
+                "text": "Self::m_PoseProducerControlBlock",
+                "target_kind": "item",
+                "path": "character::character::AnimationController",
+                "anchor": "field-m_PoseProducerControlBlock"
+              },
               {
                 "text": "animation::pose_producer::PoseProducer::m_PoseT1",
                 "target_kind": "item",
@@ -19547,16 +19679,16 @@
                 "anchor": "field-m_PoseT1"
               },
               {
-                "text": "Self::GetJoint",
+                "text": "Self::InitControl",
                 "target_kind": "item",
                 "path": "character::character::AnimationController",
-                "anchor": "func-GetJoint"
+                "anchor": "func-InitControl"
               },
               {
-                "text": "Self::SetJoint",
+                "text": "Self::Reset",
                 "target_kind": "item",
                 "path": "character::character::AnimationController",
-                "anchor": "func-SetJoint"
+                "anchor": "func-Reset"
               }
             ],
             "type_ref": {
@@ -19572,41 +19704,40 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 1388
+              "line": 1381
             }
           },
           {
-            "visibility": "private",
-            "name": "_field_c0",
-            "doc": null,
+            "visibility": "public",
+            "name": "m_PoseProducerControlBlock",
+            "doc": " The reference-count control block (`pn`) of `m_Skinner`, paired with [`m_PoseProducer`](Self::m_PoseProducer). These fields together are an owning [`SharedPtr<PoseProducer>`](types::shared_ptr::SharedPtr), not independent pointers. Concurrent owner replacement must be excluded before reading or retaining the pair; an atomic count increment alone does not provide safe acquisition.",
             "doc_links": [
               {
-                "text": "AnimationLayer",
+                "text": "Self::m_PoseProducer",
                 "target_kind": "item",
-                "path": "character::character::AnimationLayer"
+                "path": "character::character::AnimationController",
+                "anchor": "field-m_PoseProducer"
               },
               {
-                "text": "AnimatedModel::m_RuleSystems",
+                "text": "types::shared_ptr::SharedPtr",
                 "target_kind": "item",
-                "path": "character::character::AnimatedModel",
-                "anchor": "field-m_RuleSystems"
+                "path": "types::shared_ptr::SharedPtr"
               }
             ],
             "type_ref": {
-              "type": "array",
+              "type": "mut_pointer",
               "inner": {
                 "type": "raw",
-                "path": "u8"
-              },
-              "size": 8
+                "path": "void"
+              }
             },
             "offset": 192,
             "size": 8,
-            "alignment": 1,
+            "alignment": 8,
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 1394
+              "line": 1385
             }
           },
           {
@@ -19648,11 +19779,157 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 1394
+              "line": 1391
             }
           }
         ],
         "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "InitSkeleton",
+            "doc": " Acquires the skeleton at `skeleton_path`, replaces [`m_SkeletonResourceHandle`](Self::m_SkeletonResourceHandle), and releases the previous handle. When the acquired handle is non-null, resolves it and writes [`m_Skeleton`](Self::m_Skeleton); the empty-handle path leaves that cache unchanged. The controller allocation is unchanged.",
+            "doc_links": [
+              {
+                "text": "Self::m_SkeletonResourceHandle",
+                "target_kind": "item",
+                "path": "character::character::AnimationController",
+                "anchor": "field-m_SkeletonResourceHandle"
+              },
+              {
+                "text": "Self::m_Skeleton",
+                "target_kind": "item",
+                "path": "character::character::AnimationController",
+                "anchor": "field-m_Skeleton"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5373233376
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "skeleton_path",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "u8"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 24,
+              "line": 1396
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "InitControl",
+            "doc": " Creates a pose producer over [`m_SkeletonResourceHandle`](Self::m_SkeletonResourceHandle), adopts it into `m_Skinner`, and releases the previous producer owner. Creates the skinning palette, rebuilds the body parts from `rules` and `animation_sets`, and calculates the producer's model-space pose. The skeleton must be initialized first.\n\n `rules` points to `num_layers` shared rule-system references, and `animation_sets` points to the corresponding `TResourceCachePtr<CAnimationSet>` handles. Initialization replaces the producer without replacing the controller. The adopting shared-pointer reset is not a retaining acquisition operation for an already owned producer.",
+            "doc_links": [
+              {
+                "text": "Self::m_SkeletonResourceHandle",
+                "target_kind": "item",
+                "path": "character::character::AnimationController",
+                "anchor": "field-m_SkeletonResourceHandle"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5373403376
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "num_layers",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "i32"
+                }
+              },
+              {
+                "type": "field",
+                "name": "rules",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "generic",
+                    "base": "types::shared_ptr::SharedPtr",
+                    "args": [
+                      {
+                        "type": "raw",
+                        "path": "animation::rule_system::AnimationRuleSystem"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "animation_sets",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "mut_pointer",
+                    "inner": {
+                      "type": "raw",
+                      "path": "void"
+                    }
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 24,
+              "line": 1402
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "Reset",
+            "doc": " Clears the samplers before clearing [`m_PoseProducer`](Self::m_PoseProducer) and [`m_PoseProducerControlBlock`](Self::m_PoseProducerControlBlock), then releases the previous shared owner. The final strong release disposes the producer synchronously, and the final weak release destroys the control block. Clears the body parts and active scripts afterward. The controller allocation survives this reset.",
+            "doc_links": [
+              {
+                "text": "Self::m_PoseProducer",
+                "target_kind": "item",
+                "path": "character::character::AnimationController",
+                "anchor": "field-m_PoseProducer"
+              },
+              {
+                "text": "Self::m_PoseProducerControlBlock",
+                "target_kind": "item",
+                "path": "character::character::AnimationController",
+                "anchor": "field-m_PoseProducerControlBlock"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5373386912
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 24,
+              "line": 1406
+            }
+          },
           {
             "visibility": "public",
             "name": "GetBoneIndex",
@@ -19681,7 +19958,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1398
+              "line": 1409
             }
           },
           {
@@ -19707,7 +19984,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1405
+              "line": 1416
             }
           },
           {
@@ -19746,13 +20023,27 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1408
+              "line": 1419
             }
           },
           {
             "visibility": "public",
             "name": "GetJoint",
-            "doc": null,
+            "doc": " Copies the current model-space joint at `index` through `joint` by unconditionally forwarding [`m_PoseProducer`](Self::m_PoseProducer) to [`PoseProducer::GetJoint`](animation::pose_producer::PoseProducer::GetJoint). There is no null check, range check, or fallback joint. The producer and its current pose must be live, the index must be valid for that pose, and `joint` must point to writable aligned joint storage. The forwarded accessor can calculate dirty model-space transforms, so this call requires serialized pose access despite its const receiver.",
+            "doc_links": [
+              {
+                "text": "Self::m_PoseProducer",
+                "target_kind": "item",
+                "path": "character::character::AnimationController",
+                "anchor": "field-m_PoseProducer"
+              },
+              {
+                "text": "animation::pose_producer::PoseProducer::GetJoint",
+                "target_kind": "item",
+                "path": "animation::pose_producer::PoseProducer",
+                "anchor": "func-GetJoint"
+              }
+            ],
             "body": {
               "type": "address",
               "address": 5373165456
@@ -19785,7 +20076,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1411
+              "line": 1423
             }
           },
           {
@@ -19824,7 +20115,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1414
+              "line": 1426
             }
           },
           {
@@ -19863,7 +20154,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1421
+              "line": 1433
             }
           },
           {
@@ -19899,7 +20190,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1427
+              "line": 1439
             }
           },
           {
@@ -19935,7 +20226,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1434
+              "line": 1446
             }
           },
           {
@@ -19982,7 +20273,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1443
+              "line": 1455
             }
           },
           {
@@ -20079,7 +20370,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1453
+              "line": 1465
             }
           }
         ],
@@ -20093,7 +20384,7 @@
       },
       "source": {
         "file_index": 24,
-        "line": 1378
+        "line": 1370
       }
     },
     "character::character::AnimationLayer": {
@@ -20116,7 +20407,7 @@
             "doc": " The full-body base graph (the locomotion, the stunts, and the weapon-modifier clip variants\n of both).",
             "source": {
               "file_index": 24,
-              "line": 1311
+              "line": 1302
             }
           },
           {
@@ -20125,7 +20416,7 @@
             "doc": " The upper-body partial graph synchronised to the base graph's locomotion.",
             "source": {
               "file_index": 24,
-              "line": 1313
+              "line": 1304
             }
           },
           {
@@ -20134,7 +20425,7 @@
             "doc": " The upper-body partial graph for one-off actions: draw, holster, switch, reload, pump, bolt,\n pickup, and throws.",
             "source": {
               "file_index": 24,
-              "line": 1316
+              "line": 1307
             }
           },
           {
@@ -20143,7 +20434,7 @@
             "doc": " The additive graph synchronised to the base graph.",
             "source": {
               "file_index": 24,
-              "line": 1318
+              "line": 1309
             }
           },
           {
@@ -20152,7 +20443,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1319
+              "line": 1310
             }
           },
           {
@@ -20161,7 +20452,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1320
+              "line": 1311
             }
           }
         ],
@@ -20174,7 +20465,7 @@
       },
       "source": {
         "file_index": 24,
-        "line": 1308
+        "line": 1299
       }
     },
     "character::character::Character": {
@@ -22583,7 +22874,7 @@
           {
             "visibility": "public",
             "name": "UpdatePassFinalizePose_Parallel",
-            "doc": " The character's SIM-phase pose-finalization pass. After the animation graph has finalized the\n local pose, this first runs the current states' tasks registered in the\n [`FINALIZE_POSE_STATE_TASK_RANGE`](Self::FINALIZE_POSE_STATE_TASK_RANGE) through\n [`UpdateStateTasksInRange`](Self::UpdateStateTasksInRange) (the aim, look-at, grapple-fire\n arm, and weapon off-hand IK tasks among them), then drives the [`HumanIK`](Self::m_HIK) solve\n (the `MAIN` body pass, gated on [`HumanIK::HasTargets`] and run through\n [`UpdateIKForTargets`](Self::UpdateIKForTargets), followed by\n [`UpdateSecondaryHandIKPass`](Self::UpdateSecondaryHandIKPass)), then computes the\n model-space pose (`CalculateModelSpacePose`), and finally calls\n [`UpdatePropEffects`](Self::UpdatePropEffects). Effector targets queued before this runs\n are solved into the pose the same frame; blackboard keys those tasks write are written after\n its entry.",
+            "doc": " The character's SIM-phase pose-finalization pass. Eligibility checks can return before any finalization work. An eligible pass runs the current states' tasks registered in the [`FINALIZE_POSE_STATE_TASK_RANGE`](Self::FINALIZE_POSE_STATE_TASK_RANGE) through [`UpdateStateTasksInRange`](Self::UpdateStateTasksInRange), including the aim, look-at, grapple-fire arm, and weapon off-hand IK tasks.\n\n It then places attachments and drives the [`HumanIK`](Self::m_HIK) solve: the `MAIN` body pass, gated on [`HumanIK::HasTargets`] and run through [`UpdateIKForTargets`](Self::UpdateIKForTargets), followed by [`UpdateSecondaryHandIKPass`](Self::UpdateSecondaryHandIKPass). It then computes the model-space pose (`CalculateModelSpacePose`) and calls [`UpdatePropEffects`](Self::UpdatePropEffects). Blackboard keys written by the finalize state tasks are written after entry. Entry alone does not establish that the animation job has completed or that the pose is newly produced; the caller's job synchronization is not mapped.",
             "doc_links": [
               {
                 "text": "Self::FINALIZE_POSE_STATE_TASK_RANGE",
@@ -22651,7 +22942,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 451
+              "line": 442
             }
           },
           {
@@ -22717,7 +23008,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 462
+              "line": 453
             }
           },
           {
@@ -22776,7 +23067,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 472
+              "line": 463
             }
           },
           {
@@ -22812,7 +23103,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 478
+              "line": 469
             }
           },
           {
@@ -22876,7 +23167,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 490
+              "line": 481
             }
           },
           {
@@ -22932,7 +23223,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 500
+              "line": 491
             }
           },
           {
@@ -22968,7 +23259,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 506
+              "line": 497
             }
           },
           {
@@ -23002,7 +23293,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 515
+              "line": 506
             }
           },
           {
@@ -23030,7 +23321,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 524
+              "line": 515
             }
           },
           {
@@ -23075,7 +23366,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 538
+              "line": 529
             }
           },
           {
@@ -23166,7 +23457,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 565
+              "line": 556
             }
           },
           {
@@ -23334,7 +23625,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 608
+              "line": 599
             }
           },
           {
@@ -23357,7 +23648,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 613
+              "line": 604
             }
           },
           {
@@ -23380,7 +23671,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 618
+              "line": 609
             }
           },
           {
@@ -23411,7 +23702,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 624
+              "line": 615
             }
           },
           {
@@ -23448,7 +23739,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 630
+              "line": 621
             }
           },
           {
@@ -23485,7 +23776,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 638
+              "line": 629
             }
           },
           {
@@ -23516,7 +23807,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 643
+              "line": 634
             }
           },
           {
@@ -23547,7 +23838,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 648
+              "line": 639
             }
           },
           {
@@ -23578,7 +23869,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 653
+              "line": 644
             }
           },
           {
@@ -23609,7 +23900,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 658
+              "line": 649
             }
           },
           {
@@ -23640,7 +23931,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 663
+              "line": 654
             }
           },
           {
@@ -23671,7 +23962,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 668
+              "line": 659
             }
           },
           {
@@ -23702,7 +23993,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 673
+              "line": 664
             }
           },
           {
@@ -23733,7 +24024,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 678
+              "line": 669
             }
           },
           {
@@ -23764,7 +24055,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 683
+              "line": 674
             }
           },
           {
@@ -23795,7 +24086,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 688
+              "line": 679
             }
           },
           {
@@ -23826,7 +24117,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 693
+              "line": 684
             }
           },
           {
@@ -23857,7 +24148,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 700
+              "line": 691
             }
           },
           {
@@ -23888,7 +24179,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 707
+              "line": 698
             }
           },
           {
@@ -23949,7 +24240,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 720
+              "line": 711
             }
           },
           {
@@ -23986,7 +24277,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 728
+              "line": 719
             }
           },
           {
@@ -24023,7 +24314,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 735
+              "line": 726
             }
           },
           {
@@ -24062,7 +24353,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 746
+              "line": 737
             }
           },
           {
@@ -24093,7 +24384,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 751
+              "line": 742
             }
           },
           {
@@ -24116,7 +24407,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 756
+              "line": 747
             }
           },
           {
@@ -24147,7 +24438,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 763
+              "line": 754
             }
           },
           {
@@ -24178,7 +24469,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 769
+              "line": 760
             }
           },
           {
@@ -24209,7 +24500,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 775
+              "line": 766
             }
           },
           {
@@ -24245,7 +24536,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 783
+              "line": 774
             }
           },
           {
@@ -24327,7 +24618,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 803
+              "line": 794
             }
           },
           {
@@ -24358,7 +24649,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 817
+              "line": 808
             }
           },
           {
@@ -24389,7 +24680,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 822
+              "line": 813
             }
           },
           {
@@ -24438,7 +24729,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 828
+              "line": 819
             }
           },
           {
@@ -24472,7 +24763,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 833
+              "line": 824
             }
           },
           {
@@ -24495,7 +24786,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 837
+              "line": 828
             }
           },
           {
@@ -24542,7 +24833,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 843
+              "line": 834
             }
           },
           {
@@ -24578,7 +24869,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 848
+              "line": 839
             }
           },
           {
@@ -24612,7 +24903,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 856
+              "line": 847
             }
           },
           {
@@ -24663,7 +24954,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 862
+              "line": 853
             }
           },
           {
@@ -24700,7 +24991,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 868
+              "line": 859
             }
           },
           {
@@ -24731,7 +25022,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 873
+              "line": 864
             }
           },
           {
@@ -24754,7 +25045,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 877
+              "line": 868
             }
           },
           {
@@ -24777,7 +25068,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 881
+              "line": 872
             }
           },
           {
@@ -24800,7 +25091,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 885
+              "line": 876
             }
           },
           {
@@ -24823,7 +25114,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 889
+              "line": 880
             }
           },
           {
@@ -24854,7 +25145,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 893
+              "line": 884
             }
           },
           {
@@ -24899,7 +25190,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 898
+              "line": 889
             }
           },
           {
@@ -24938,7 +25229,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 902
+              "line": 893
             }
           },
           {
@@ -24980,7 +25271,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 909
+              "line": 900
             }
           },
           {
@@ -25003,7 +25294,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 913
+              "line": 904
             }
           },
           {
@@ -25075,7 +25366,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 929
+              "line": 920
             }
           },
           {
@@ -25111,7 +25402,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 934
+              "line": 925
             }
           },
           {
@@ -25134,7 +25425,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 938
+              "line": 929
             }
           },
           {
@@ -25192,7 +25483,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 960
+              "line": 951
             }
           },
           {
@@ -25239,7 +25530,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 965
+              "line": 956
             }
           },
           {
@@ -25270,7 +25561,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 970
+              "line": 961
             }
           },
           {
@@ -25336,7 +25627,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 982
+              "line": 973
             }
           },
           {
@@ -25359,7 +25650,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 986
+              "line": 977
             }
           },
           {
@@ -25399,7 +25690,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 992
+              "line": 983
             }
           },
           {
@@ -25447,7 +25738,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 998
+              "line": 989
             }
           },
           {
@@ -25470,7 +25761,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1002
+              "line": 993
             }
           },
           {
@@ -25506,7 +25797,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1010
+              "line": 1001
             }
           },
           {
@@ -25572,7 +25863,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1022
+              "line": 1013
             }
           },
           {
@@ -25600,7 +25891,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1026
+              "line": 1017
             }
           },
           {
@@ -25677,7 +25968,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1037
+              "line": 1028
             }
           },
           {
@@ -25742,7 +26033,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1045
+              "line": 1036
             }
           },
           {
@@ -25770,7 +26061,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1051
+              "line": 1042
             }
           },
           {
@@ -25793,7 +26084,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1055
+              "line": 1046
             }
           },
           {
@@ -25824,7 +26115,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1060
+              "line": 1051
             }
           },
           {
@@ -25900,7 +26191,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1067
+              "line": 1058
             }
           },
           {
@@ -25937,7 +26228,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1073
+              "line": 1064
             }
           },
           {
@@ -25968,7 +26259,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1078
+              "line": 1069
             }
           },
           {
@@ -25991,7 +26282,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1084
+              "line": 1075
             }
           },
           {
@@ -26043,7 +26334,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1089
+              "line": 1080
             }
           },
           {
@@ -26111,7 +26402,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1102
+              "line": 1093
             }
           },
           {
@@ -26157,7 +26448,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1112
+              "line": 1103
             }
           },
           {
@@ -26291,7 +26582,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1153
+              "line": 1144
             }
           },
           {
@@ -26331,7 +26622,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1163
+              "line": 1154
             }
           },
           {
@@ -26362,7 +26653,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1169
+              "line": 1160
             }
           },
           {
@@ -26392,7 +26683,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1177
+              "line": 1168
             }
           },
           {
@@ -26444,7 +26735,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1188
+              "line": 1179
             }
           },
           {
@@ -26478,7 +26769,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1196
+              "line": 1187
             }
           },
           {
@@ -26512,7 +26803,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1204
+              "line": 1195
             }
           },
           {
@@ -26651,7 +26942,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1225
+              "line": 1216
             }
           },
           {
@@ -26700,7 +26991,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1232
+              "line": 1223
             }
           },
           {
@@ -26766,7 +27057,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1238
+              "line": 1229
             }
           },
           {
@@ -26797,7 +27088,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1243
+              "line": 1234
             }
           },
           {
@@ -26833,7 +27124,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1247
+              "line": 1238
             }
           },
           {
@@ -26869,7 +27160,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1251
+              "line": 1242
             }
           },
           {
@@ -26905,7 +27196,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1255
+              "line": 1246
             }
           },
           {
@@ -26941,7 +27232,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 24,
-              "line": 1259
+              "line": 1250
             }
           }
         ],
@@ -29466,7 +29757,7 @@
       },
       "source": {
         "file_index": 24,
-        "line": 1480
+        "line": 1492
       }
     },
     "character::character::Character_EnableLocoStrafing": {
@@ -29486,7 +29777,7 @@
       },
       "source": {
         "file_index": 24,
-        "line": 1468
+        "line": 1480
       }
     },
     "character::character::Character_ForceCombat": {
@@ -29506,7 +29797,7 @@
       },
       "source": {
         "file_index": 24,
-        "line": 1472
+        "line": 1484
       }
     },
     "character::character::Character_ForceNonCombat": {
@@ -29533,7 +29824,7 @@
       },
       "source": {
         "file_index": 24,
-        "line": 1476
+        "line": 1488
       }
     },
     "character::character::Character_GoreEnabled": {
@@ -29553,7 +29844,7 @@
       },
       "source": {
         "file_index": 24,
-        "line": 1466
+        "line": 1478
       }
     },
     "character::character::DamageStateFlags": {
@@ -29670,7 +29961,7 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 1458
+              "line": 1470
             }
           },
           {
@@ -29687,7 +29978,7 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 1459
+              "line": 1471
             }
           },
           {
@@ -29704,7 +29995,7 @@
             "is_base": false,
             "source": {
               "file_index": 24,
-              "line": 1460
+              "line": 1472
             }
           }
         ],
@@ -29719,7 +30010,7 @@
       },
       "source": {
         "file_index": 24,
-        "line": 1457
+        "line": 1469
       }
     },
     "character::character::SafeBoneIndex": {
@@ -29742,7 +30033,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1484
+              "line": 1496
             }
           },
           {
@@ -29751,7 +30042,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1485
+              "line": 1497
             }
           },
           {
@@ -29760,7 +30051,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1486
+              "line": 1498
             }
           },
           {
@@ -29769,7 +30060,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1487
+              "line": 1499
             }
           },
           {
@@ -29778,7 +30069,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1488
+              "line": 1500
             }
           },
           {
@@ -29787,7 +30078,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1489
+              "line": 1501
             }
           },
           {
@@ -29796,7 +30087,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1490
+              "line": 1502
             }
           },
           {
@@ -29805,7 +30096,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1491
+              "line": 1503
             }
           },
           {
@@ -29814,7 +30105,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1492
+              "line": 1504
             }
           },
           {
@@ -29823,7 +30114,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1493
+              "line": 1505
             }
           },
           {
@@ -29832,7 +30123,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1494
+              "line": 1506
             }
           },
           {
@@ -29841,7 +30132,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1495
+              "line": 1507
             }
           },
           {
@@ -29850,7 +30141,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1496
+              "line": 1508
             }
           },
           {
@@ -29859,7 +30150,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1497
+              "line": 1509
             }
           },
           {
@@ -29868,7 +30159,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1498
+              "line": 1510
             }
           },
           {
@@ -29877,7 +30168,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1499
+              "line": 1511
             }
           },
           {
@@ -29886,7 +30177,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1500
+              "line": 1512
             }
           },
           {
@@ -29903,7 +30194,7 @@
             ],
             "source": {
               "file_index": 24,
-              "line": 1504
+              "line": 1516
             }
           },
           {
@@ -29926,7 +30217,7 @@
             ],
             "source": {
               "file_index": 24,
-              "line": 1509
+              "line": 1521
             }
           },
           {
@@ -29935,7 +30226,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1510
+              "line": 1522
             }
           },
           {
@@ -29944,7 +30235,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1511
+              "line": 1523
             }
           },
           {
@@ -29953,7 +30244,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1512
+              "line": 1524
             }
           },
           {
@@ -29962,7 +30253,7 @@
             "doc": " The right hand's primary attach point (`AttachHandRight`): the bone whose world matrix a gun\n held in the right hand takes as its own, with no further offset. It is an animated bone of\n the skeleton like any other, so a clip that keys it moves the gun in the hand.",
             "source": {
               "file_index": 24,
-              "line": 1516
+              "line": 1528
             }
           },
           {
@@ -29979,7 +30270,7 @@
             ],
             "source": {
               "file_index": 24,
-              "line": 1519
+              "line": 1531
             }
           },
           {
@@ -29996,7 +30287,7 @@
             ],
             "source": {
               "file_index": 24,
-              "line": 1523
+              "line": 1535
             }
           },
           {
@@ -30013,7 +30304,7 @@
             ],
             "source": {
               "file_index": 24,
-              "line": 1527
+              "line": 1539
             }
           },
           {
@@ -30022,7 +30313,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1528
+              "line": 1540
             }
           },
           {
@@ -30031,7 +30322,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1529
+              "line": 1541
             }
           },
           {
@@ -30040,7 +30331,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1530
+              "line": 1542
             }
           },
           {
@@ -30049,7 +30340,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1531
+              "line": 1543
             }
           },
           {
@@ -30058,7 +30349,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1532
+              "line": 1544
             }
           },
           {
@@ -30067,7 +30358,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1533
+              "line": 1545
             }
           },
           {
@@ -30076,7 +30367,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1534
+              "line": 1546
             }
           },
           {
@@ -30085,7 +30376,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1535
+              "line": 1547
             }
           },
           {
@@ -30094,7 +30385,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1536
+              "line": 1548
             }
           },
           {
@@ -30103,7 +30394,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1537
+              "line": 1549
             }
           },
           {
@@ -30112,7 +30403,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1538
+              "line": 1550
             }
           },
           {
@@ -30121,7 +30412,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1539
+              "line": 1551
             }
           },
           {
@@ -30130,7 +30421,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1540
+              "line": 1552
             }
           },
           {
@@ -30139,7 +30430,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1541
+              "line": 1553
             }
           },
           {
@@ -30148,7 +30439,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1542
+              "line": 1554
             }
           },
           {
@@ -30157,7 +30448,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1543
+              "line": 1555
             }
           },
           {
@@ -30166,7 +30457,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1544
+              "line": 1556
             }
           },
           {
@@ -30175,7 +30466,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1545
+              "line": 1557
             }
           },
           {
@@ -30184,7 +30475,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1546
+              "line": 1558
             }
           },
           {
@@ -30193,7 +30484,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1547
+              "line": 1559
             }
           },
           {
@@ -30202,7 +30493,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1548
+              "line": 1560
             }
           },
           {
@@ -30211,7 +30502,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1549
+              "line": 1561
             }
           },
           {
@@ -30220,7 +30511,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1550
+              "line": 1562
             }
           },
           {
@@ -30229,7 +30520,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1551
+              "line": 1563
             }
           }
         ],
@@ -30242,7 +30533,7 @@
       },
       "source": {
         "file_index": 24,
-        "line": 1483
+        "line": 1495
       }
     },
     "character::character::WeaponInput": {
@@ -30273,7 +30564,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1275
+              "line": 1266
             }
           },
           {
@@ -30282,7 +30573,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1276
+              "line": 1267
             }
           },
           {
@@ -30299,7 +30590,7 @@
             ],
             "source": {
               "file_index": 24,
-              "line": 1281
+              "line": 1272
             }
           },
           {
@@ -30308,7 +30599,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1282
+              "line": 1273
             }
           },
           {
@@ -30317,7 +30608,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1283
+              "line": 1274
             }
           },
           {
@@ -30326,7 +30617,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1284
+              "line": 1275
             }
           },
           {
@@ -30343,7 +30634,7 @@
             ],
             "source": {
               "file_index": 24,
-              "line": 1288
+              "line": 1279
             }
           },
           {
@@ -30352,7 +30643,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1289
+              "line": 1280
             }
           },
           {
@@ -30361,7 +30652,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1290
+              "line": 1281
             }
           },
           {
@@ -30370,7 +30661,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1291
+              "line": 1282
             }
           },
           {
@@ -30379,7 +30670,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1292
+              "line": 1283
             }
           },
           {
@@ -30388,7 +30679,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1293
+              "line": 1284
             }
           },
           {
@@ -30397,7 +30688,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1294
+              "line": 1285
             }
           },
           {
@@ -30406,7 +30697,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1295
+              "line": 1286
             }
           },
           {
@@ -30415,7 +30706,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1296
+              "line": 1287
             }
           },
           {
@@ -30424,7 +30715,7 @@
             "doc": null,
             "source": {
               "file_index": 24,
-              "line": 1297
+              "line": 1288
             }
           },
           {
@@ -30441,7 +30732,7 @@
             ],
             "source": {
               "file_index": 24,
-              "line": 1299
+              "line": 1290
             }
           }
         ],
@@ -30454,7 +30745,7 @@
       },
       "source": {
         "file_index": 24,
-        "line": 1274
+        "line": 1265
       }
     },
     "character::control_parameters::ControlParameters": {
@@ -203058,7 +203349,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 8,
-                "line": 132
+                "line": 141
               }
             },
             {
@@ -203128,7 +203419,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 8,
-                "line": 137
+                "line": 146
               }
             }
           ],
@@ -203566,7 +203857,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 24,
-                "line": 1268
+                "line": 1259
               }
             }
           ],
