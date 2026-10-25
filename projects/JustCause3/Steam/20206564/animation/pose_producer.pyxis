@@ -1,4 +1,5 @@
 use animation::skeleton::HkaPose;
+use character::character::Joint;
 use types::shared_ptr::SharedPtr;
 use types::vector_math::{AlignedQuat, AlignedVector3};
 
@@ -34,6 +35,14 @@ pub type PoseProducer {
     pub m_PoseT1: *mut HkaPose,
 }
 impl PoseProducer {
+    /// Copies bone `index` from the current [`m_PoseT1`](Self::m_PoseT1) into `result` in model space and returns `result`. A dirty model-space transform is calculated lazily before the complete joint is copied.
+    ///
+    /// The current pose must be live, `index` must be nonnegative and valid for its bone flags and model-space transforms, and `result` must point to writable aligned joint storage. There are no null or range guards. The lazy calculation can modify the pose caches, so the call requires serialized access to the current pose. It does not read [`m_PoseT0`](Self::m_PoseT0).
+    ///
+    /// IDA labels this address `TResourceCachePtr<CSkeleton>::operator->`; the body is the pose producer's joint accessor.
+    #[address(0x141_E69_3D0)]
+    pub fn GetJoint(&mut self, result: *mut Joint, index: i32) -> *mut Joint;
+
     /// Queues a skinning-palette job for this producer: advances the time of any time-updatable
     /// blender, then records the skeleton's bone count, `dtf`, and the two poses into the next slot
     /// of the global skinning job table (up to 0x1000 jobs per frame) together with the output

@@ -435,18 +435,9 @@ impl Character {
     #[address(0x140_79A_EB0)]
     pub fn GetWorldMatrixForBone(&self, safe_index: SafeBoneIndex, matrix: *mut Matrix4);
 
-    /// The character's SIM-phase pose-finalization pass. After the animation graph has finalized the
-    /// local pose, this first runs the current states' tasks registered in the
-    /// [`FINALIZE_POSE_STATE_TASK_RANGE`](Self::FINALIZE_POSE_STATE_TASK_RANGE) through
-    /// [`UpdateStateTasksInRange`](Self::UpdateStateTasksInRange) (the aim, look-at, grapple-fire
-    /// arm, and weapon off-hand IK tasks among them), then drives the [`HumanIK`](Self::m_HIK) solve
-    /// (the `MAIN` body pass, gated on [`HumanIK::HasTargets`] and run through
-    /// [`UpdateIKForTargets`](Self::UpdateIKForTargets), followed by
-    /// [`UpdateSecondaryHandIKPass`](Self::UpdateSecondaryHandIKPass)), then computes the
-    /// model-space pose (`CalculateModelSpacePose`), and finally calls
-    /// [`UpdatePropEffects`](Self::UpdatePropEffects). Effector targets queued before this runs
-    /// are solved into the pose the same frame; blackboard keys those tasks write are written after
-    /// its entry.
+    /// The character's SIM-phase pose-finalization pass. Eligibility checks can return before any finalization work. An eligible pass runs the current states' tasks registered in the [`FINALIZE_POSE_STATE_TASK_RANGE`](Self::FINALIZE_POSE_STATE_TASK_RANGE) through [`UpdateStateTasksInRange`](Self::UpdateStateTasksInRange), including the aim, look-at, grapple-fire arm, and weapon off-hand IK tasks.
+    ///
+    /// It then places attachments and drives the [`HumanIK`](Self::m_HIK) solve: the `MAIN` body pass, gated on [`HumanIK::HasTargets`] and run through [`UpdateIKForTargets`](Self::UpdateIKForTargets), followed by [`UpdateSecondaryHandIKPass`](Self::UpdateSecondaryHandIKPass). It then computes the model-space pose (`CalculateModelSpacePose`) and calls [`UpdatePropEffects`](Self::UpdatePropEffects). Blackboard keys written by the finalize state tasks are written after entry. Entry alone does not establish that the animation job has completed or that the pose is newly produced; the caller's job synchronization is not mapped.
     #[address(0x140_7F9_B10)]
     pub fn UpdatePassFinalizePose_Parallel(&mut self, context: *mut void);
 
@@ -1320,6 +1311,7 @@ pub enum AnimationLayer: u32 {
     VOCALS = 5,
 }
 
+/// An animated model (`CAnimatedModel`): owns its rule systems, model-instance slots, and separately allocated [`AnimationController`]. Its constructor allocates the controller, and its destructor destroys and frees that allocation. The controller can replace its pose producer and skeleton resource without replacement of the model or controller.
 #[size(0x240)]
 pub type AnimatedModel {
     /// The number of [`m_ModelInstances`](Self::m_ModelInstances) slots. Keep in sync
@@ -1339,6 +1331,7 @@ pub type AnimatedModel {
     #[address(0x98)]
     pub m_RuleSystems: Vector<SharedPtr<AnimationRuleSystem>>,
 
+    /// The model's separately allocated controller. The model destroys and frees it during destruction; the field is not a shared reference.
     #[address(0x178)]
     pub m_AnimationController: *mut AnimationController,
 
@@ -1373,19 +1366,23 @@ impl AnimatedModel {
     pub fn QueueAct(&mut self, act: *const u32);
 }
 
-/// A character's animation controller (`NCharacterSystem::CAnimationControl`): the skeleton, the
-/// pose producer, and one body part per animation layer.
+/// A character's animation controller (`NCharacterSystem::CAnimationControl`): owns the skeleton resource handle and pose producer, with a body part per animation layer. [`InitSkeleton`](Self::InitSkeleton), [`InitControl`](Self::InitControl), and [`Reset`](Self::Reset) change that state in place; an unchanged controller address does not imply an unchanged skeleton or producer.
 pub type AnimationController {
-    /// The skeleton resource, through which [`GetBoneIndex`](Self::GetBoneIndex) resolves a bone by
-    /// the hash of its name.
+    /// The owned skeleton resource handle (`TResourceCachePtr<CSkeleton>::m_Handle`). [`InitSkeleton`](Self::InitSkeleton) replaces it and releases the previous handle. The handle's resource-retention operations are not mapped.
+    #[address(0x98)]
+    pub m_SkeletonResourceHandle: *mut void,
+
+    /// The cached skeleton pointer, through which [`GetBoneIndex`](Self::GetBoneIndex) resolves a bone by the hash of its name. [`InitSkeleton`](Self::InitSkeleton) refreshes it when the acquired resource handle is non-null, but does not clear it on the empty-handle path. This cache is not an independent owning reference.
     #[address(0xA0)]
     pub m_Skeleton: *mut Skeleton,
 
-    /// The pose producer, whose [`m_PoseT1`](animation::pose_producer::PoseProducer::m_PoseT1) the
-    /// joint accessors ([`GetJoint`](Self::GetJoint) and [`SetJoint`](Self::SetJoint)) read and
-    /// write.
+    /// The object pointer (`px`) of the owning `m_Skinner` shared pointer, paired with [`m_PoseProducerControlBlock`](Self::m_PoseProducerControlBlock). The joint accessors read and write its current [`m_PoseT1`](animation::pose_producer::PoseProducer::m_PoseT1). [`InitControl`](Self::InitControl) replaces the owner, and [`Reset`](Self::Reset) clears and releases it. Reading this raw pointer does not retain the producer.
     #[address(0xB8)]
     pub m_PoseProducer: *mut PoseProducer,
+
+    /// The reference-count control block (`pn`) of `m_Skinner`, paired with [`m_PoseProducer`](Self::m_PoseProducer). These fields together are an owning [`SharedPtr<PoseProducer>`](types::shared_ptr::SharedPtr), not independent pointers. Concurrent owner replacement must be excluded before reading or retaining the pair; an atomic count increment alone does not provide safe acquisition.
+    #[address(0xC0)]
+    pub m_PoseProducerControlBlock: *mut void,
 
     /// The animation layers' body parts, in layer order: index *i* belongs to the layer named by
     /// [`AnimationLayer`] *i*, alongside the rule system at the same index of
@@ -1394,6 +1391,20 @@ pub type AnimationController {
     pub m_BodyParts: Vector<SharedPtr<AnimatedBodyPart>>,
 }
 impl AnimationController {
+    /// Acquires the skeleton at `skeleton_path`, replaces [`m_SkeletonResourceHandle`](Self::m_SkeletonResourceHandle), and releases the previous handle. When the acquired handle is non-null, resolves it and writes [`m_Skeleton`](Self::m_Skeleton); the empty-handle path leaves that cache unchanged. The controller allocation is unchanged.
+    #[address(0x140_450_8E0)]
+    pub fn InitSkeleton(&mut self, skeleton_path: *const u8);
+
+    /// Creates a pose producer over [`m_SkeletonResourceHandle`](Self::m_SkeletonResourceHandle), adopts it into `m_Skinner`, and releases the previous producer owner. Creates the skinning palette, rebuilds the body parts from `rules` and `animation_sets`, and calculates the producer's model-space pose. The skeleton must be initialized first.
+    ///
+    /// `rules` points to `num_layers` shared rule-system references, and `animation_sets` points to the corresponding `TResourceCachePtr<CAnimationSet>` handles. Initialization replaces the producer without replacing the controller. The adopting shared-pointer reset is not a retaining acquisition operation for an already owned producer.
+    #[address(0x140_47A_0F0)]
+    pub fn InitControl(&mut self, num_layers: i32, rules: *mut SharedPtr<AnimationRuleSystem>, animation_sets: *mut *mut void);
+
+    /// Clears the samplers before clearing [`m_PoseProducer`](Self::m_PoseProducer) and [`m_PoseProducerControlBlock`](Self::m_PoseProducerControlBlock), then releases the previous shared owner. The final strong release disposes the producer synchronously, and the final weak release destroys the control block. Clears the body parts and active scripts afterward. The controller allocation survives this reset.
+    #[address(0x140_476_0A0)]
+    pub fn Reset(&mut self);
+
     #[address(0x140_434_E30)]
     pub fn GetBoneIndex(&self, hash: u32) -> u32;
 
@@ -1407,6 +1418,7 @@ impl AnimationController {
     #[address(0x140_43F_E70)]
     pub fn GetBoneMatrix(&self, index: u32, matrix: *mut Matrix4);
 
+    /// Copies the current model-space joint at `index` through `joint` by unconditionally forwarding [`m_PoseProducer`](Self::m_PoseProducer) to [`PoseProducer::GetJoint`](animation::pose_producer::PoseProducer::GetJoint). There is no null check, range check, or fallback joint. The producer and its current pose must be live, the index must be valid for that pose, and `joint` must point to writable aligned joint storage. The forwarded accessor can calculate dirty model-space transforms, so this call requires serialized pose access despite its const receiver.
     #[address(0x140_43F_F90)]
     pub fn GetJoint(&self, index: u32, joint: *mut Joint);
 
