@@ -395,6 +395,10 @@ impl Character {
     #[address(0x140_7FA_DD0)]
     pub fn HandleTrackMessage(&mut self, data: *mut void);
 
+    /// Clears frame-bound animation modifiers on each non-null rule system in [`AnimatedModel::m_RuleSystems`] of [`m_AnimatedModel`](Self::m_AnimatedModel).
+    #[address(0x140_77E_200)]
+    pub fn ClearAnimationModifiers(&mut self);
+
     /// Whether the character is attached to a vehicle (riding, or in the mount/dismount
     /// transitions), read from the animation rule system's current state. The state machine
     /// pointers it walks are game-thread data, so the call is only safe on the game update thread.
@@ -437,7 +441,7 @@ impl Character {
 
     /// The character's SIM-phase pose-finalization pass. Eligibility checks can return before any finalization work. An eligible pass runs the current states' tasks registered in the [`FINALIZE_POSE_STATE_TASK_RANGE`](Self::FINALIZE_POSE_STATE_TASK_RANGE) through [`UpdateStateTasksInRange`](Self::UpdateStateTasksInRange), including the aim, look-at, grapple-fire arm, and weapon off-hand IK tasks.
     ///
-    /// It then places attachments and drives the [`HumanIK`](Self::m_HIK) solve: the `MAIN` body pass, gated on [`HumanIK::HasTargets`] and run through [`UpdateIKForTargets`](Self::UpdateIKForTargets), followed by [`UpdateSecondaryHandIKPass`](Self::UpdateSecondaryHandIKPass). It then computes the model-space pose (`CalculateModelSpacePose`) and calls [`UpdatePropEffects`](Self::UpdatePropEffects). Blackboard keys written by the finalize state tasks are written after entry. Entry alone does not establish that the animation job has completed or that the pose is newly produced; the caller's job synchronization is not mapped.
+    /// It then places attachments and drives the [`HumanIK`](Self::m_HIK) solve: the `MAIN` body pass, gated on [`HumanIK::HasTargets`] and run through [`UpdateIKForTargets`](Self::UpdateIKForTargets), followed by [`UpdateSecondaryHandIKPass`](Self::UpdateSecondaryHandIKPass). It then computes the model-space pose (`CalculateModelSpacePose`) and calls [`UpdatePropEffects`](Self::UpdatePropEffects). Blackboard keys written by the finalize state tasks are written after entry. Entry alone does not establish that an eligible animation update produced a new pose for this invocation.
     #[address(0x140_7F9_B10)]
     pub fn UpdatePassFinalizePose_Parallel(&mut self, context: *mut void);
 
@@ -1432,17 +1436,12 @@ impl AnimationController {
     #[address(0x140_440_000)]
     pub fn GetBindPoseBoneMatrix(&self, index: u32, matrix: *mut Matrix4);
 
-    /// Advances the playback clocks of the controller's time-updatable blenders by `dt` (via
-    /// `CPoseProducer::UpdateBlendersTimeInRange`) without recomputing the pose. Runs each SIM frame
-    /// in the character's animation pass, before [`UpdateAnimations`](Self::UpdateAnimations).
-    #[address(0x140_479_4D0)]
+    /// Advances the producer's blender times by `dt` through `CPoseProducer::UpdateBlendersTimeInRange` without recomputing the pose. Returns without producer work when the controller is not initialized. The character's animation callback uses this as a time-only alternative to [`UpdateAnimations`](Self::UpdateAnimations).
+    #[address(0x140_43F_C50)]
     pub fn UpdateAnimationsTime(&mut self, dt: f32);
 
-    /// Recomputes the controller's pose from its pose producers: advances each blender's clock by
-    /// `dt` (`CPoseProducer::Update` -> `CBlender::UpdateTime`) and samples and blends the active
-    /// clips into the model-space pose over `num_of_bones` bones. Runs each SIM frame in the
-    /// character's animation pass. A `dt` of `0` holds the animation clocks, producing a static pose.
-    #[address(0x140_77E_200)]
+    /// Updates [`m_PoseProducer`](Self::m_PoseProducer) synchronously through [`PoseProducer::Update`](animation::pose_producer::PoseProducer::Update), forwarding `dt` and the selected `num_of_bones`. Returns without producer work when the controller is not initialized. The character's animation callback selects this pose-update path or the time-only [`UpdateAnimationsTime`](Self::UpdateAnimationsTime) path; it can also return without either operation.
+    #[address(0x140_43F_C80)]
     pub fn UpdateAnimations(&mut self, dt: f32, num_of_bones: i32);
 
     /// The render-phase skinning update (`CAnimationControl::UpdateSkinning`): hands the pose
