@@ -12,6 +12,7 @@ use interaction::InteractionUserProxy;
 use equipment::attached_effects::AttachedEffectContainer;
 use equipment::grappling_hook::GrapplingHook;
 use equipment::weapon::WeaponBase;
+use game::GameObjectUpdateContext;
 use physics::{PfxCharacterInstance, ProxyState};
 use types::math::Matrix4;
 use types::math::Vector3;
@@ -743,6 +744,11 @@ impl Character {
     /// pre-simulation callbacks run after this pass.
     #[address(0x140_7F4_710)]
     pub fn UpdatePassPrePhysics_Serial(&mut self, context: *mut void);
+
+    /// The character's registered serial post-physics update. Performs post-physics state work,
+    /// then polls the character's message port to dispatch animation track messages.
+    #[address(0x140_7FC_EB0)]
+    pub fn UpdatePassPostPhysics_Serial(&mut self, context: *mut GameObjectUpdateContext);
 
     /// Whether the body rule system is in one of the four stunt-position traversal states
     /// (`S_STUNT_FWD`, `S_STUNT_RIGHT`, `S_STUNT_LEFT`, `S_STUNT_BWD`).
