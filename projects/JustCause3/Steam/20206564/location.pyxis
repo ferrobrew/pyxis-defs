@@ -1,12 +1,50 @@
 use graphics_engine::model_instance::{AABox, ModelCollection};
+use types::std_vector::Vector;
+
+/// The location streaming system's owned state. Its loaded list is read and changed on the game thread.
+#[singleton(0x142_F17_130)]
+pub type GameLocationSystemContext {
+    /// Locations whose loading has completed. Unloading removes an entry and clears its location pointer.
+    #[address(0x1_068)]
+    pub m_LoadedLocations: Vector<*mut LocationInfo>,
+}
+
+/// A location's streaming metadata. The active location is detached before deferred destruction.
+#[min_size(0x20)]
+pub type LocationInfo {
+    /// The active location, or null while no location is owned by this info.
+    #[address(0x18)]
+    pub m_Location: *mut Location,
+}
+
+/// The detail level loaded by a location.
+#[copyable]
+pub enum LocationType: i32 {
+    Invalid = -1,
+    Global = 0,
+    Near = 1,
+    Far = 2,
+    Close = 3,
+    HighRes = 4,
+    Normal = 5,
+    MaxTypes = 6,
+}
 
 /// A loaded location (`CLocation`), which owns the model collection populated from its model data.
-/// Only the fields used by the location model loader are mapped.
-#[min_size(0x70)]
+/// Only some members are mapped.
+#[min_size(0xD0)]
 pub type Location {
     /// The model instances loaded with this location, or null when loading has not succeeded.
     #[address(0x68)]
     pub m_ModelCollection: *mut ModelCollection,
+
+    /// The location's streaming detail level.
+    #[address(0xA0)]
+    pub m_LocationType: LocationType,
+
+    /// The archive base name passed to the location loader.
+    #[address(0xC8)]
+    pub m_LocationFilename: *const u8,
 }
 impl Location {
     /// Loads the location's model collection from a bounded buffer and resource name. A successful

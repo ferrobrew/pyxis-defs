@@ -1,4 +1,5 @@
 use graphics_engine::render_pass::{RBIInfo, RenderBlock, RenderPass};
+use hash::HashString;
 use types::math::{Matrix4, Vector3};
 use types::shared_ptr::SharedPtr;
 
@@ -77,8 +78,11 @@ pub bitflags ModelInstanceFlags: u32 {
 /// instance, a resource, or another owner keeps a reference. A `.rbm` loads as a single-mesh
 /// model; a `.lod` loads as a LOD model whose levels are `.rbm` meshes. Only some members are
 /// mapped.
-#[min_size(0x8)]
+#[min_size(0x28)]
 pub type Model {
+    /// The hash of the model's compiled resource name.
+    #[address(0x24)]
+    pub m_Id: HashString,
     vftable {
         /// `GetShowLod`: whether the model defines a mesh for LOD `lod`, that is, whether the
         /// LOD's entry in the model's LOD list names a mesh. The dynamic draw-list build
