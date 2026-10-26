@@ -95,6 +95,10 @@ pub type hknpShape {
     /// segment with most of its radius here.
     #[address(0x14)]
     pub m_convexRadius: f32,
+
+    /// Opaque user data carried by the shape.
+    #[address(0x18)]
+    pub m_userData: u64,
 }
 
 /// A shape's kind (`hknpShapeType::Enum`), as [`hknpShape::getType`] returns it. Only the convex
@@ -109,6 +113,46 @@ pub enum hknpShapeType: u32 {
     SPHERE = 0x2,
     /// A capsule ([`hknpCapsuleShape`]).
     CAPSULE = 0x3,
+}
+
+/// A four-lane floating-point vector (`hkVector4f`).
+#[copyable, size(0x10), align(16)]
+pub type hkVector4f {
+    pub data: [f32; 4],
+}
+
+/// A strided array of three-dimensional vertices (`hkStridedVertices`).
+#[copyable, size(0x10), align(8)]
+pub type hkStridedVertices {
+    /// The first vertex, whose coordinates are stored as floats.
+    #[address(0x0)]
+    pub m_vertices: *const f32,
+
+    /// The number of vertices.
+    #[address(0x8)]
+    pub m_numVertices: i32,
+    /// The distance in bytes between consecutive vertices.
+    pub m_striding: i32,
+}
+
+/// The options used to build a convex shape (`hknpConvexShapeBuildConfig`). Only the options read
+/// by the vertex factory are mapped.
+#[size(0x38), align(8)]
+pub type hknpConvexShapeBuildConfig {
+    /// The tolerance used when simplifying the convex shape.
+    #[address(0x0)]
+    pub m_simplificationTolerance: f32,
+
+    /// Whether the input vertices are shrunk by the shape radius during construction.
+    #[address(0x4)]
+    pub m_shrinkByRadius: bool,
+    /// The remainder of the construction options is not mapped.
+    _: unknown<0x33>,
+}
+impl hknpConvexShapeBuildConfig {
+    /// `hknpConvexShapeBuildConfig::hknpConvexShapeBuildConfig`: initializes the build options.
+    #[address(0x141_4DC_F60)]
+    pub fn Construct(&mut self) -> *mut hknpConvexShapeBuildConfig;
 }
 
 /// An axis-aligned box (`hkAabb`): its least and greatest corners.
@@ -166,6 +210,11 @@ pub type hknpConvexShape {
     /// The vertices, body space, as four-lane vectors.
     #[address(0x30)]
     pub m_vertices: hkRelArray,
+}
+impl hknpConvexShape {
+    /// Builds a convex shape from strided vertices, applying `radius` and `config`.
+    #[address(0x141_4E0_B10)]
+    pub fn createFromVertices(vertices: *const hkStridedVertices, radius: f32, config: *const hknpConvexShapeBuildConfig) -> *mut hknpShape;
 }
 
 /// A convex polytope shape (`hknpConvexPolytopeShape`): an [`hknpConvexShape`] with its faces. Each

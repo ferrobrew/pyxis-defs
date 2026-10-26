@@ -725,6 +725,38 @@ pub enum ProxyState: i32 {
     WINGSUITING = 0x9,
 }
 
+/// The character proxy's shared shape settings (`CPfxCharacterSettings`): a shape for each
+/// [`ProxyState`], shared by the character proxies that use these settings. Only the shape table and
+/// its corresponding flags are mapped.
+#[size(0x60), align(8)]
+pub type SharedPfxCharacterSettings {
+    /// The collision shape selected by each [`ProxyState`].
+    #[address(0x0)]
+    pub m_CapsuleShape: [*mut hknpShape; 10],
+
+    /// Per-state fake-contact flags corresponding to [`m_CapsuleShape`](Self::m_CapsuleShape).
+    #[address(0x50)]
+    pub m_FakeContact: [bool; 10],
+}
+impl SharedPfxCharacterSettings {
+    /// `CPfxCharacterSettings::CPfxCharacterSettings`: initializes the shared settings.
+    #[address(0x140_2B0_420)]
+    pub fn Construct(&mut self) -> *mut SharedPfxCharacterSettings;
+
+    /// `CPfxCharacterSettings::~CPfxCharacterSettings`: releases the settings' owned resources.
+    #[address(0x140_24D_300)]
+    pub fn Destruct(&mut self);
+}
+
+/// The character-side interface that exposes shared character settings (`IPfxCharacter`).
+pub type PfxCharacterOwner {
+    vftable {
+        /// Returns the character's shared proxy settings.
+        #[index(2)]
+        pub fn GetSharedPfxCharacterSettings(&mut self) -> *mut SharedPfxCharacterSettings;
+    },
+}
+
 /// `CPfxCharacterInstance`: the character's physics-side body instance (the Havok character proxy),
 /// owned by `CCharacter` through a `boost::shared_ptr`. Only some members are bound.
 #[min_size(0x100), align(16)]
@@ -773,9 +805,9 @@ pub type PfxCharacterInstance {
     /// The character rigid-body listener (`CCustomCharacterRBListener*`).
     #[address(0xE8)]
     pub m_CharacterRBListener: *mut void,
-    /// The owning character (`IPfxCharacter*`). Its `GetSharedPfxCharacterSettings` virtual returns
-    /// the shared settings that hold the per-state shape table.
-    pub m_Owner: *mut void,
+    /// The owning character, whose [`GetSharedPfxCharacterSettings`](PfxCharacterOwner::GetSharedPfxCharacterSettings)
+    /// virtual returns the shared settings that hold the per-state shape table.
+    pub m_Owner: *mut PfxCharacterOwner,
 }
 impl PfxCharacterInstance {
     /// Sets the physics body's rotation from the rotation part of `m` (via a quaternion
