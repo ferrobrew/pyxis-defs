@@ -80,9 +80,6 @@ pub bitflags ModelInstanceFlags: u32 {
 /// mapped.
 #[min_size(0x28)]
 pub type Model {
-    /// The hash of the model's compiled resource name.
-    #[address(0x24)]
-    pub m_Id: HashString,
     vftable {
         /// `GetShowLod`: whether the model defines a mesh for LOD `lod`, that is, whether the
         /// LOD's entry in the model's LOD list names a mesh. The dynamic draw-list build
@@ -91,6 +88,10 @@ pub type Model {
         #[index(15)]
         pub fn GetShowLod(&self, lod: u8) -> bool;
     },
+
+    /// The hash of the model's compiled resource name.
+    #[address(0x24)]
+    pub m_Id: HashString,
 }
 
 /// A placed model instance (`NModelSystem::CModelInstance`): a shared model plus its render-block
