@@ -93592,7 +93592,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 224
+              "line": 229
             }
           },
           {
@@ -93609,7 +93609,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 225
+              "line": 230
             }
           }
         ],
@@ -93624,7 +93624,7 @@
       },
       "source": {
         "file_index": 53,
-        "line": 223
+        "line": 228
       }
     },
     "graphics_engine::model_instance::AddToRenderContext": {
@@ -93648,7 +93648,7 @@
       },
       "source": {
         "file_index": 53,
-        "line": 29
+        "line": 30
       }
     },
     "graphics_engine::model_instance::BFBCContext": {
@@ -93672,13 +93672,13 @@
       },
       "source": {
         "file_index": 53,
-        "line": 219
+        "line": 224
       }
     },
     "graphics_engine::model_instance::Model": {
       "path": "graphics_engine::model_instance::Model",
       "visibility": "public",
-      "size": 8,
+      "size": 40,
       "alignment": 8,
       "category": "defined",
       "kind": {
@@ -93714,7 +93714,45 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 82
+              "line": 83
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_8",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 28
+            },
+            "offset": 8,
+            "size": 28,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 53,
+              "line": 94
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Id",
+            "doc": " The hash of the model's compiled resource name.",
+            "type_ref": {
+              "type": "raw",
+              "path": "hash::HashString"
+            },
+            "offset": 36,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 53,
+              "line": 94
             }
           }
         ],
@@ -93738,7 +93776,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 53,
-                "line": 82
+                "line": 83
               }
             },
             {
@@ -93758,7 +93796,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 53,
-                "line": 82
+                "line": 83
               }
             },
             {
@@ -93778,7 +93816,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 53,
-                "line": 82
+                "line": 83
               }
             },
             {
@@ -93798,7 +93836,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 53,
-                "line": 82
+                "line": 83
               }
             },
             {
@@ -93818,7 +93856,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 53,
-                "line": 82
+                "line": 83
               }
             },
             {
@@ -93838,7 +93876,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 53,
-                "line": 82
+                "line": 83
               }
             },
             {
@@ -93858,7 +93896,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 53,
-                "line": 82
+                "line": 83
               }
             },
             {
@@ -93878,7 +93916,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 53,
-                "line": 82
+                "line": 83
               }
             },
             {
@@ -93898,7 +93936,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 53,
-                "line": 82
+                "line": 83
               }
             },
             {
@@ -93918,7 +93956,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 53,
-                "line": 82
+                "line": 83
               }
             },
             {
@@ -93938,7 +93976,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 53,
-                "line": 82
+                "line": 83
               }
             },
             {
@@ -93958,7 +93996,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 53,
-                "line": 82
+                "line": 83
               }
             },
             {
@@ -93978,7 +94016,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 53,
-                "line": 82
+                "line": 83
               }
             },
             {
@@ -93998,7 +94036,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 53,
-                "line": 82
+                "line": 83
               }
             },
             {
@@ -94018,7 +94056,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 53,
-                "line": 82
+                "line": 83
               }
             },
             {
@@ -94057,7 +94095,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 53,
-                "line": 88
+                "line": 89
               }
             }
           ]
@@ -94071,7 +94109,7 @@
       },
       "source": {
         "file_index": 53,
-        "line": 81
+        "line": 82
       }
     },
     "graphics_engine::model_instance::ModelCollection": {
@@ -94112,7 +94150,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 240
+              "line": 245
             }
           },
           {
@@ -94137,7 +94175,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 244
+              "line": 249
             }
           },
           {
@@ -94158,7 +94196,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 248
+              "line": 253
             }
           },
           {
@@ -94181,7 +94219,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 248
+              "line": 253
             }
           },
           {
@@ -94202,7 +94240,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 252
+              "line": 257
             }
           },
           {
@@ -94222,7 +94260,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 252
+              "line": 257
             }
           },
           {
@@ -94239,7 +94277,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 256
+              "line": 261
             }
           },
           {
@@ -94268,7 +94306,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 228
+              "line": 233
             }
           }
         ],
@@ -94290,7 +94328,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 261
+              "line": 266
             }
           },
           {
@@ -94329,7 +94367,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 270
+              "line": 275
             }
           }
         ],
@@ -94348,7 +94386,7 @@
       },
       "source": {
         "file_index": 53,
-        "line": 232
+        "line": 237
       }
     },
     "graphics_engine::model_instance::ModelCollection::FILE_ALIGNMENT": {
@@ -94371,7 +94409,7 @@
       },
       "source": {
         "file_index": 53,
-        "line": 238
+        "line": 243
       }
     },
     "graphics_engine::model_instance::ModelCollection::FILE_MAGIC": {
@@ -94394,7 +94432,7 @@
       },
       "source": {
         "file_index": 53,
-        "line": 234
+        "line": 239
       }
     },
     "graphics_engine::model_instance::ModelCollection::FILE_VERSION": {
@@ -94417,7 +94455,7 @@
       },
       "source": {
         "file_index": 53,
-        "line": 236
+        "line": 241
       }
     },
     "graphics_engine::model_instance::ModelInstance": {
@@ -94510,7 +94548,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 110
+              "line": 115
             }
           },
           {
@@ -94553,7 +94591,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 110
+              "line": 115
             }
           },
           {
@@ -94594,7 +94632,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 116
+              "line": 121
             }
           },
           {
@@ -94631,7 +94669,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 116
+              "line": 121
             }
           },
           {
@@ -94666,7 +94704,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 122
+              "line": 127
             }
           },
           {
@@ -94700,7 +94738,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 122
+              "line": 127
             }
           },
           {
@@ -94723,7 +94761,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 127
+              "line": 132
             }
           },
           {
@@ -94752,7 +94790,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 132
+              "line": 137
             }
           },
           {
@@ -94777,7 +94815,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 132
+              "line": 137
             }
           },
           {
@@ -94798,7 +94836,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 138
+              "line": 143
             }
           },
           {
@@ -94815,7 +94853,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 138
+              "line": 143
             }
           },
           {
@@ -94872,7 +94910,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 92
+              "line": 97
             }
           }
         ],
@@ -94976,7 +95014,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 147
+              "line": 152
             }
           },
           {
@@ -95007,7 +95045,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 156
+              "line": 161
             }
           },
           {
@@ -95044,7 +95082,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 161
+              "line": 166
             }
           },
           {
@@ -95102,7 +95140,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 172
+              "line": 177
             }
           },
           {
@@ -95148,7 +95186,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 179
+              "line": 184
             }
           },
           {
@@ -95187,7 +95225,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 184
+              "line": 189
             }
           },
           {
@@ -95237,7 +95275,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 190
+              "line": 195
             }
           },
           {
@@ -95326,7 +95364,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 199
+              "line": 204
             }
           },
           {
@@ -95421,7 +95459,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 205
+              "line": 210
             }
           },
           {
@@ -95505,7 +95543,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 210
+              "line": 215
             }
           },
           {
@@ -95582,7 +95620,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 215
+              "line": 220
             }
           }
         ],
@@ -95596,7 +95634,7 @@
       },
       "source": {
         "file_index": 53,
-        "line": 101
+        "line": 106
       }
     },
     "graphics_engine::model_instance::ModelInstanceFlags": {
@@ -95671,7 +95709,7 @@
             ],
             "source": {
               "file_index": 53,
-              "line": 40
+              "line": 41
             }
           },
           {
@@ -95688,7 +95726,7 @@
             ],
             "source": {
               "file_index": 53,
-              "line": 44
+              "line": 45
             }
           },
           {
@@ -95697,7 +95735,7 @@
             "doc": " `FLAG_UPDATELOD`: the dynamic draw-list build picks the instance's LOD from its distance\n each frame.",
             "source": {
               "file_index": 53,
-              "line": 47
+              "line": 48
             }
           },
           {
@@ -95714,7 +95752,7 @@
             ],
             "source": {
               "file_index": 53,
-              "line": 50
+              "line": 51
             }
           },
           {
@@ -95731,7 +95769,7 @@
             ],
             "source": {
               "file_index": 53,
-              "line": 54
+              "line": 55
             }
           },
           {
@@ -95748,7 +95786,7 @@
             ],
             "source": {
               "file_index": 53,
-              "line": 58
+              "line": 59
             }
           },
           {
@@ -95765,7 +95803,7 @@
             ],
             "source": {
               "file_index": 53,
-              "line": 61
+              "line": 62
             }
           },
           {
@@ -95782,7 +95820,7 @@
             ],
             "source": {
               "file_index": 53,
-              "line": 64
+              "line": 65
             }
           },
           {
@@ -95805,7 +95843,7 @@
             ],
             "source": {
               "file_index": 53,
-              "line": 68
+              "line": 69
             }
           },
           {
@@ -95822,7 +95860,7 @@
             ],
             "source": {
               "file_index": 53,
-              "line": 71
+              "line": 72
             }
           }
         ],
@@ -95834,7 +95872,7 @@
       },
       "source": {
         "file_index": 53,
-        "line": 37
+        "line": 38
       }
     },
     "graphics_engine::model_instance::ModelInstanceManager": {
@@ -95911,7 +95949,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 288
+              "line": 293
             }
           },
           {
@@ -95951,7 +95989,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 288
+              "line": 293
             }
           }
         ],
@@ -96059,7 +96097,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 299
+              "line": 304
             }
           },
           {
@@ -96142,7 +96180,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 306
+              "line": 311
             }
           },
           {
@@ -96228,7 +96266,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 313
+              "line": 318
             }
           },
           {
@@ -96297,7 +96335,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 320
+              "line": 325
             }
           },
           {
@@ -96378,7 +96416,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 326
+              "line": 331
             }
           },
           {
@@ -96435,7 +96473,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 333
+              "line": 338
             }
           },
           {
@@ -96492,7 +96530,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 340
+              "line": 345
             }
           },
           {
@@ -96560,7 +96598,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 351
+              "line": 356
             }
           },
           {
@@ -96605,7 +96643,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 357
+              "line": 362
             }
           },
           {
@@ -96728,7 +96766,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 368
+              "line": 373
             }
           },
           {
@@ -96759,7 +96797,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 376
+              "line": 381
             }
           }
         ],
@@ -96773,7 +96811,7 @@
       },
       "source": {
         "file_index": 53,
-        "line": 283
+        "line": 288
       }
     },
     "graphics_engine::model_instance::ModelLoadFlags": {
@@ -96804,7 +96842,7 @@
             "doc": " `FLAG_LOAD`: for a `.lod` model that is not cached and has no in-memory data, read the LOD\n list from the file system and load each LOD mesh. Without it such a request returns null,\n and a LOD model built from an in-memory list takes only meshes already cached. A `.rbm` is\n read from the file system when not cached either way.",
             "source": {
               "file_index": 53,
-              "line": 386
+              "line": 391
             }
           },
           {
@@ -96813,7 +96851,7 @@
             "doc": " `FLAG_HOLD`: build the LOD model with the policy that holds its meshes by strong\n reference, so they stay loaded while the model lives. The manager forces it on while its\n hold mode is set.",
             "source": {
               "file_index": 53,
-              "line": 390
+              "line": 395
             }
           }
         ],
@@ -96825,7 +96863,7 @@
       },
       "source": {
         "file_index": 53,
-        "line": 381
+        "line": 386
       }
     },
     "graphics_engine::model_instance::ModelManager": {
@@ -96882,7 +96920,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 406
+              "line": 411
             }
           },
           {
@@ -96913,7 +96951,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 406
+              "line": 411
             }
           }
         ],
@@ -97010,7 +97048,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 418
+              "line": 423
             }
           },
           {
@@ -97067,7 +97105,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 424
+              "line": 429
             }
           },
           {
@@ -97126,7 +97164,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 433
+              "line": 438
             }
           },
           {
@@ -97168,7 +97206,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 439
+              "line": 444
             }
           },
           {
@@ -97207,7 +97245,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 447
+              "line": 452
             }
           }
         ],
@@ -97221,7 +97259,7 @@
       },
       "source": {
         "file_index": 53,
-        "line": 401
+        "line": 406
       }
     },
     "graphics_engine::model_instance::ModelVftable": {
@@ -97261,7 +97299,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 82
+              "line": 83
             }
           },
           {
@@ -97291,7 +97329,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 82
+              "line": 83
             }
           },
           {
@@ -97321,7 +97359,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 82
+              "line": 83
             }
           },
           {
@@ -97351,7 +97389,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 82
+              "line": 83
             }
           },
           {
@@ -97381,7 +97419,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 82
+              "line": 83
             }
           },
           {
@@ -97411,7 +97449,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 82
+              "line": 83
             }
           },
           {
@@ -97441,7 +97479,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 82
+              "line": 83
             }
           },
           {
@@ -97471,7 +97509,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 82
+              "line": 83
             }
           },
           {
@@ -97501,7 +97539,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 82
+              "line": 83
             }
           },
           {
@@ -97531,7 +97569,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 82
+              "line": 83
             }
           },
           {
@@ -97561,7 +97599,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 82
+              "line": 83
             }
           },
           {
@@ -97591,7 +97629,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 82
+              "line": 83
             }
           },
           {
@@ -97621,7 +97659,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 82
+              "line": 83
             }
           },
           {
@@ -97651,7 +97689,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 82
+              "line": 83
             }
           },
           {
@@ -97681,7 +97719,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 82
+              "line": 83
             }
           },
           {
@@ -97729,7 +97767,7 @@
             "is_base": false,
             "source": {
               "file_index": 53,
-              "line": 88
+              "line": 89
             }
           }
         ],
@@ -97744,7 +97782,7 @@
       },
       "source": {
         "file_index": 53,
-        "line": 82
+        "line": 83
       }
     },
     "graphics_engine::model_instance::RoadMeshManager": {
@@ -97783,7 +97821,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 53,
-              "line": 468
+              "line": 473
             }
           }
         ],
@@ -97797,7 +97835,7 @@
       },
       "source": {
         "file_index": 53,
-        "line": 461
+        "line": 466
       }
     },
     "graphics_engine::model_instance::SplineRoadShaderType": {
@@ -97820,7 +97858,7 @@
             "doc": null,
             "source": {
               "file_index": 53,
-              "line": 455
+              "line": 460
             }
           },
           {
@@ -97829,7 +97867,7 @@
             "doc": null,
             "source": {
               "file_index": 53,
-              "line": 456
+              "line": 461
             }
           },
           {
@@ -97838,7 +97876,7 @@
             "doc": null,
             "source": {
               "file_index": 53,
-              "line": 457
+              "line": 462
             }
           }
         ],
@@ -97851,7 +97889,7 @@
       },
       "source": {
         "file_index": 53,
-        "line": 454
+        "line": 459
       }
     },
     "graphics_engine::model_instance::coarse_pre_z_models_area_threshold": {
@@ -97871,7 +97909,7 @@
       },
       "source": {
         "file_index": 53,
-        "line": 24
+        "line": 25
       }
     },
     "graphics_engine::model_instance::coarse_pre_z_models_distance_threshold": {
@@ -97891,7 +97929,7 @@
       },
       "source": {
         "file_index": 53,
-        "line": 19
+        "line": 20
       }
     },
     "graphics_engine::model_instance::enable_coarse_pre_z_models": {
@@ -97911,7 +97949,7 @@
       },
       "source": {
         "file_index": 53,
-        "line": 14
+        "line": 15
       }
     },
     "graphics_engine::model_instance::use_bounding_box_model_rb_view": {
@@ -97950,7 +97988,7 @@
       },
       "source": {
         "file_index": 53,
-        "line": 10
+        "line": 11
       }
     },
     "graphics_engine::post_effects::AAMode": {
@@ -146383,15 +146421,87 @@
         "line": 8
       }
     },
-    "location::Location": {
-      "path": "location::Location",
+    "location::GameLocationSystemContext": {
+      "path": "location::GameLocationSystemContext",
       "visibility": "public",
-      "size": 112,
+      "size": 4232,
       "alignment": 8,
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": " A loaded location (`CLocation`), which owns the model collection populated from its model data.\n Only the fields used by the location model loader are mapped.",
+        "doc": " The location streaming system's owned state. Its loaded list is read and changed on the game thread.",
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 4200
+            },
+            "offset": 0,
+            "size": 4200,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 77,
+              "line": 9
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_LoadedLocations",
+            "doc": " Locations whose loading has completed. Unloading removes an entry and clears its location pointer.",
+            "type_ref": {
+              "type": "generic",
+              "base": "types::std_vector::Vector",
+              "args": [
+                {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "location::LocationInfo"
+                  }
+                }
+              ]
+            },
+            "offset": 4200,
+            "size": 32,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 77,
+              "line": 9
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": 5418086704,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 77,
+        "line": 6
+      }
+    },
+    "location::Location": {
+      "path": "location::Location",
+      "visibility": "public",
+      "size": 208,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " A loaded location (`CLocation`), which owns the model collection populated from its model data.\n Only some members are mapped.",
         "fields": [
           {
             "visibility": "private",
@@ -146411,7 +146521,7 @@
             "is_base": false,
             "source": {
               "file_index": 77,
-              "line": 9
+              "line": 39
             }
           },
           {
@@ -146431,7 +146541,86 @@
             "is_base": false,
             "source": {
               "file_index": 77,
-              "line": 9
+              "line": 39
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_70",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 48
+            },
+            "offset": 112,
+            "size": 48,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 77,
+              "line": 43
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_LocationType",
+            "doc": " The location's streaming detail level.",
+            "type_ref": {
+              "type": "raw",
+              "path": "location::LocationType"
+            },
+            "offset": 160,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 77,
+              "line": 43
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_a4",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 36
+            },
+            "offset": 164,
+            "size": 36,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 77,
+              "line": 47
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_LocationFilename",
+            "doc": " The archive base name passed to the location loader.",
+            "type_ref": {
+              "type": "const_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              }
+            },
+            "offset": 200,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 77,
+              "line": 47
             }
           }
         ],
@@ -146491,7 +146680,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 77,
-              "line": 15
+              "line": 53
             }
           }
         ],
@@ -146505,7 +146694,172 @@
       },
       "source": {
         "file_index": 77,
-        "line": 6
+        "line": 36
+      }
+    },
+    "location::LocationInfo": {
+      "path": "location::LocationInfo",
+      "visibility": "public",
+      "size": 32,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " A location's streaming metadata. The active location is detached before deferred destruction.",
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 24
+            },
+            "offset": 0,
+            "size": 24,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 77,
+              "line": 17
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Location",
+            "doc": " The active location, or null while no location is owned by this info.",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "location::Location"
+              }
+            },
+            "offset": 24,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 77,
+              "line": 17
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 77,
+        "line": 14
+      }
+    },
+    "location::LocationType": {
+      "path": "location::LocationType",
+      "visibility": "public",
+      "size": 4,
+      "alignment": 4,
+      "category": "defined",
+      "kind": {
+        "type": "enum",
+        "doc": " The detail level loaded by a location.",
+        "underlying_type": {
+          "type": "raw",
+          "path": "i32"
+        },
+        "variants": [
+          {
+            "name": "Invalid",
+            "value": -1,
+            "doc": null,
+            "source": {
+              "file_index": 77,
+              "line": 23
+            }
+          },
+          {
+            "name": "Global",
+            "value": 0,
+            "doc": null,
+            "source": {
+              "file_index": 77,
+              "line": 24
+            }
+          },
+          {
+            "name": "Near",
+            "value": 1,
+            "doc": null,
+            "source": {
+              "file_index": 77,
+              "line": 25
+            }
+          },
+          {
+            "name": "Far",
+            "value": 2,
+            "doc": null,
+            "source": {
+              "file_index": 77,
+              "line": 26
+            }
+          },
+          {
+            "name": "Close",
+            "value": 3,
+            "doc": null,
+            "source": {
+              "file_index": 77,
+              "line": 27
+            }
+          },
+          {
+            "name": "HighRes",
+            "value": 4,
+            "doc": null,
+            "source": {
+              "file_index": 77,
+              "line": 28
+            }
+          },
+          {
+            "name": "Normal",
+            "value": 5,
+            "doc": null,
+            "source": {
+              "file_index": 77,
+              "line": 29
+            }
+          },
+          {
+            "name": "MaxTypes",
+            "value": 6,
+            "doc": null,
+            "source": {
+              "file_index": 77,
+              "line": 30
+            }
+          }
+        ],
+        "associated_functions": [],
+        "singleton": null,
+        "copyable": true,
+        "cloneable": true,
+        "default": null,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 77,
+        "line": 22
       }
     },
     "mission::MissionManager": {
@@ -217465,7 +217819,10 @@
     "location": {
       "doc": null,
       "items": [
-        "location::Location"
+        "location::GameLocationSystemContext",
+        "location::Location",
+        "location::LocationInfo",
+        "location::LocationType"
       ],
       "submodules": {},
       "functions": [],
