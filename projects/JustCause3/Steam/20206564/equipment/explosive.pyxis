@@ -87,6 +87,11 @@ pub type Explosive {
     pub m_StartDetonationTimer: f32,
 }
 impl Explosive {
+    /// Marks the explosive removed and erases it from the ammunition manager's active objects.
+    /// This operation does not return ammunition to an inventory.
+    #[address(0x140_8F2_E50)]
+    pub fn RemoveSelf(&mut self);
+
     /// Queues `transform` for the physics body: when the explosive has a
     /// [`m_PfxInstance`](Self::m_PfxInstance), copies it to
     /// [`m_DeferredPhysicsTransform`](Self::m_DeferredPhysicsTransform) and raises

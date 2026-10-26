@@ -1658,6 +1658,13 @@ impl WeaponBase {
     #[address(0x140_965_CF0)]
     pub fn CheckIfReloadShouldBeTriggeredBase(&mut self, weapon_data: *mut WeaponData, should_try_to_fire: *mut bool, was_trigger_pulled: bool);
 
+    /// The base implementation of [`ConsumeAmmo`](Self::ConsumeAmmo). Deducts the requested
+    /// count from the gun's magazine, updates empty-magazine state, and deducts reserve
+    /// ammunition when the weapon's ammunition policy requires it. Reserve ammunition can
+    /// belong to the weapon or its owning character's inventory.
+    #[address(0x140_966_220)]
+    pub fn ConsumeAmmoBase(&mut self, weapon_data: *mut WeaponData, count: i32);
+
     /// The base implementation of the [`IsWeaponAiming`](Self::IsWeaponAiming) virtual.
     #[address(0x140_950_F90)]
     pub fn IsWeaponAimingBase(&self) -> bool;
