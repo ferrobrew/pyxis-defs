@@ -41122,6 +41122,26 @@
         "associated_functions": [
           {
             "visibility": "public",
+            "name": "RemoveSelf",
+            "doc": " Marks the explosive removed and erases it from the ammunition manager's active objects.\n This operation does not return ammunition to an inventory.",
+            "body": {
+              "type": "address",
+              "address": 5378092624
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 35,
+              "line": 93
+            }
+          },
+          {
+            "visibility": "public",
             "name": "SetPhysicsTransform",
             "doc": " Queues `transform` for the physics body: when the explosive has a\n [`m_PfxInstance`](Self::m_PfxInstance), copies it to\n [`m_DeferredPhysicsTransform`](Self::m_DeferredPhysicsTransform) and raises\n [`m_DeferredSetPhysicsTransform`](Self::m_DeferredSetPhysicsTransform). A later call before\n the body applies it replaces it.",
             "doc_links": [
@@ -41168,7 +41188,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 35,
-              "line": 96
+              "line": 101
             }
           },
           {
@@ -41252,7 +41272,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 35,
-              "line": 106
+              "line": 111
             }
           },
           {
@@ -41343,7 +41363,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 35,
-              "line": 114
+              "line": 119
             }
           },
           {
@@ -41413,7 +41433,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 35,
-              "line": 124
+              "line": 129
             }
           },
           {
@@ -41441,7 +41461,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 35,
-              "line": 129
+              "line": 134
             }
           }
         ],
@@ -41527,7 +41547,7 @@
             "is_base": false,
             "source": {
               "file_index": 35,
-              "line": 216
+              "line": 221
             }
           },
           {
@@ -41544,7 +41564,7 @@
             "is_base": false,
             "source": {
               "file_index": 35,
-              "line": 216
+              "line": 221
             }
           },
           {
@@ -41573,7 +41593,7 @@
             "is_base": false,
             "source": {
               "file_index": 35,
-              "line": 221
+              "line": 226
             }
           },
           {
@@ -41598,7 +41618,7 @@
             "is_base": false,
             "source": {
               "file_index": 35,
-              "line": 221
+              "line": 226
             }
           },
           {
@@ -41627,7 +41647,7 @@
             "is_base": false,
             "source": {
               "file_index": 35,
-              "line": 228
+              "line": 233
             }
           },
           {
@@ -41652,7 +41672,7 @@
             "is_base": false,
             "source": {
               "file_index": 35,
-              "line": 228
+              "line": 233
             }
           },
           {
@@ -41680,7 +41700,7 @@
             "is_base": false,
             "source": {
               "file_index": 35,
-              "line": 210
+              "line": 215
             }
           }
         ],
@@ -41712,7 +41732,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 35,
-              "line": 235
+              "line": 240
             }
           },
           {
@@ -41784,7 +41804,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 35,
-              "line": 241
+              "line": 246
             }
           },
           {
@@ -41875,7 +41895,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 35,
-              "line": 246
+              "line": 251
             }
           }
         ],
@@ -41889,7 +41909,7 @@
       },
       "source": {
         "file_index": 35,
-        "line": 213
+        "line": 218
       }
     },
     "equipment::explosive::PlantedExplosive": {
@@ -41958,7 +41978,7 @@
             "is_base": false,
             "source": {
               "file_index": 35,
-              "line": 148
+              "line": 153
             }
           },
           {
@@ -41983,7 +42003,7 @@
             "is_base": false,
             "source": {
               "file_index": 35,
-              "line": 148
+              "line": 153
             }
           },
           {
@@ -42014,7 +42034,7 @@
             "is_base": false,
             "source": {
               "file_index": 35,
-              "line": 154
+              "line": 159
             }
           },
           {
@@ -42039,7 +42059,7 @@
             "is_base": false,
             "source": {
               "file_index": 35,
-              "line": 161
+              "line": 166
             }
           },
           {
@@ -42079,7 +42099,7 @@
             "is_base": false,
             "source": {
               "file_index": 35,
-              "line": 169
+              "line": 174
             }
           },
           {
@@ -42108,7 +42128,7 @@
             "is_base": false,
             "source": {
               "file_index": 35,
-              "line": 173
+              "line": 178
             }
           },
           {
@@ -42133,7 +42153,7 @@
             "is_base": false,
             "source": {
               "file_index": 35,
-              "line": 173
+              "line": 178
             }
           },
           {
@@ -42184,7 +42204,7 @@
             "is_base": false,
             "source": {
               "file_index": 35,
-              "line": 132
+              "line": 137
             }
           }
         ],
@@ -42214,7 +42234,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 35,
-              "line": 179
+              "line": 184
             }
           },
           {
@@ -42242,7 +42262,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 35,
-              "line": 186
+              "line": 191
             }
           },
           {
@@ -42281,7 +42301,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 35,
-              "line": 192
+              "line": 197
             }
           },
           {
@@ -42351,7 +42371,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 35,
-              "line": 203
+              "line": 208
             }
           },
           {
@@ -42390,7 +42410,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 35,
-              "line": 207
+              "line": 212
             }
           }
         ],
@@ -42404,7 +42424,7 @@
       },
       "source": {
         "file_index": 35,
-        "line": 144
+        "line": 149
       }
     },
     "equipment::grappling_hook::GrappleTuning": {
@@ -46580,7 +46600,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2552
+              "line": 2559
             }
           },
           {
@@ -46605,7 +46625,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2552
+              "line": 2559
             }
           },
           {
@@ -46622,7 +46642,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2554
+              "line": 2561
             }
           },
           {
@@ -46639,7 +46659,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2556
+              "line": 2563
             }
           },
           {
@@ -46656,7 +46676,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2558
+              "line": 2565
             }
           },
           {
@@ -46673,7 +46693,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2561
+              "line": 2568
             }
           },
           {
@@ -46707,7 +46727,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2537
+              "line": 2544
             }
           }
         ],
@@ -46739,7 +46759,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2567
+              "line": 2574
             }
           },
           {
@@ -46827,7 +46847,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2582
+              "line": 2589
             }
           }
         ],
@@ -46844,7 +46864,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2543
+        "line": 2550
       }
     },
     "equipment::weapon::BarrelRecoilWeaponComponent::VFTABLE": {
@@ -46875,7 +46895,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2547
+        "line": 2554
       }
     },
     "equipment::weapon::BarrelSpinWeaponComponent": {
@@ -46929,7 +46949,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2597
+              "line": 2604
             }
           }
         ],
@@ -46946,7 +46966,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2589
+        "line": 2596
       }
     },
     "equipment::weapon::BarrelSpinWeaponComponent::VFTABLE": {
@@ -46969,7 +46989,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2591
+        "line": 2598
       }
     },
     "equipment::weapon::BulletWeaponBase": {
@@ -47073,7 +47093,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1849
+              "line": 1856
             }
           },
           {
@@ -47099,7 +47119,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1854
+              "line": 1861
             }
           }
         ],
@@ -47113,7 +47133,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 1834
+        "line": 1841
       }
     },
     "equipment::weapon::DoActWeaponComponent": {
@@ -47164,7 +47184,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2615
+              "line": 2622
             }
           },
           {
@@ -47184,7 +47204,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2615
+              "line": 2622
             }
           },
           {
@@ -47205,7 +47225,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2620
+              "line": 2627
             }
           },
           {
@@ -47222,7 +47242,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2620
+              "line": 2627
             }
           },
           {
@@ -47243,7 +47263,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2624
+              "line": 2631
             }
           },
           {
@@ -47260,7 +47280,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2624
+              "line": 2631
             }
           },
           {
@@ -47277,7 +47297,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2626
+              "line": 2633
             }
           },
           {
@@ -47294,7 +47314,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2628
+              "line": 2635
             }
           },
           {
@@ -47318,7 +47338,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2631
+              "line": 2638
             }
           },
           {
@@ -47343,7 +47363,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2634
+              "line": 2641
             }
           },
           {
@@ -47360,7 +47380,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2636
+              "line": 2643
             }
           },
           {
@@ -47377,7 +47397,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2638
+              "line": 2645
             }
           },
           {
@@ -47394,7 +47414,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2641
+              "line": 2648
             }
           },
           {
@@ -47435,7 +47455,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2600
+              "line": 2607
             }
           }
         ],
@@ -47467,7 +47487,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2647
+              "line": 2654
             }
           },
           {
@@ -47518,7 +47538,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2653
+              "line": 2660
             }
           },
           {
@@ -47563,7 +47583,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2659
+              "line": 2666
             }
           },
           {
@@ -47602,7 +47622,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2663
+              "line": 2670
             }
           },
           {
@@ -47650,7 +47670,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2670
+              "line": 2677
             }
           },
           {
@@ -47692,7 +47712,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2675
+              "line": 2682
             }
           }
         ],
@@ -47709,7 +47729,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2609
+        "line": 2616
       }
     },
     "equipment::weapon::DoActWeaponComponent::ANY_WEAPON_DATA_INDEX": {
@@ -47740,7 +47760,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2611
+        "line": 2618
       }
     },
     "equipment::weapon::InternalFireInformation": {
@@ -47896,7 +47916,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -47917,7 +47937,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2419
+              "line": 2426
             }
           },
           {
@@ -47937,7 +47957,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2419
+              "line": 2426
             }
           },
           {
@@ -47962,7 +47982,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2425
+              "line": 2432
             }
           },
           {
@@ -47991,7 +48011,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2430
+              "line": 2437
             }
           },
           {
@@ -48016,7 +48036,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2430
+              "line": 2437
             }
           },
           {
@@ -48045,7 +48065,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2435
+              "line": 2442
             }
           },
           {
@@ -48070,7 +48090,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2435
+              "line": 2442
             }
           },
           {
@@ -48094,7 +48114,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2441
+              "line": 2448
             }
           },
           {
@@ -48143,7 +48163,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2450
+              "line": 2457
             }
           },
           {
@@ -48164,7 +48184,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2455
+              "line": 2462
             }
           },
           {
@@ -48181,7 +48201,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2455
+              "line": 2462
             }
           },
           {
@@ -48198,7 +48218,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2458
+              "line": 2465
             }
           },
           {
@@ -48234,7 +48254,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2468
+              "line": 2475
             }
           },
           {
@@ -48251,7 +48271,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2472
+              "line": 2479
             }
           },
           {
@@ -48288,7 +48308,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2479
+              "line": 2486
             }
           },
           {
@@ -48313,7 +48333,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2484
+              "line": 2491
             }
           },
           {
@@ -48333,7 +48353,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2488
+              "line": 2495
             }
           }
         ],
@@ -48365,7 +48385,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2494
+              "line": 2501
             }
           },
           {
@@ -48441,7 +48461,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2508
+              "line": 2515
             }
           },
           {
@@ -48515,7 +48535,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2522
+              "line": 2529
             }
           },
           {
@@ -48551,7 +48571,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2527
+              "line": 2534
             }
           },
           {
@@ -48596,7 +48616,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2534
+              "line": 2541
             }
           }
         ],
@@ -48619,7 +48639,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -48639,7 +48659,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -48681,7 +48701,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2397
+                "line": 2404
               }
             },
             {
@@ -48701,7 +48721,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -48721,7 +48741,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -48741,7 +48761,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -48761,7 +48781,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -48781,7 +48801,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -48801,7 +48821,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -48821,7 +48841,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -48841,7 +48861,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -48861,7 +48881,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -48881,7 +48901,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -48901,7 +48921,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -48921,7 +48941,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -48941,7 +48961,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -48961,7 +48981,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -48981,7 +49001,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49001,7 +49021,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49021,7 +49041,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49041,7 +49061,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49061,7 +49081,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49081,7 +49101,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49101,7 +49121,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49121,7 +49141,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49141,7 +49161,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49161,7 +49181,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49181,7 +49201,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49201,7 +49221,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49221,7 +49241,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49241,7 +49261,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49261,7 +49281,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49281,7 +49301,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49301,7 +49321,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49321,7 +49341,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49341,7 +49361,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49361,7 +49381,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49381,7 +49401,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49434,7 +49454,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2406
+                "line": 2413
               }
             },
             {
@@ -49454,7 +49474,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49474,7 +49494,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49494,7 +49514,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49514,7 +49534,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49534,7 +49554,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49554,7 +49574,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49574,7 +49594,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49594,7 +49614,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49614,7 +49634,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49634,7 +49654,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49654,7 +49674,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49674,7 +49694,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49694,7 +49714,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49714,7 +49734,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49734,7 +49754,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49754,7 +49774,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2394
+                "line": 2401
               }
             },
             {
@@ -49804,7 +49824,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2414
+                "line": 2421
               }
             }
           ]
@@ -49827,7 +49847,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2369
+        "line": 2376
       }
     },
     "equipment::weapon::ModelAttachementWeaponComponent::CARTRIDGE_EMPTY_NAME_HASH": {
@@ -49858,7 +49878,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2388
+        "line": 2395
       }
     },
     "equipment::weapon::ModelAttachementWeaponComponent::CARTRIDGE_FULL_NAME_HASH": {
@@ -49889,7 +49909,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2385
+        "line": 2392
       }
     },
     "equipment::weapon::ModelAttachementWeaponComponent::MAGAZINE_NAME_HASH": {
@@ -49920,7 +49940,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2376
+        "line": 2383
       }
     },
     "equipment::weapon::ModelAttachementWeaponComponent::NO_CHARACTER_BONE": {
@@ -49951,7 +49971,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2372
+        "line": 2379
       }
     },
     "equipment::weapon::ModelAttachementWeaponComponent::ROCKET_POD_NAME_HASH": {
@@ -49982,7 +50002,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2382
+        "line": 2389
       }
     },
     "equipment::weapon::ModelAttachementWeaponComponent::RPG_NAME_HASH": {
@@ -50013,7 +50033,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2379
+        "line": 2386
       }
     },
     "equipment::weapon::ModelAttachementWeaponComponent::VFTABLE": {
@@ -50048,7 +50068,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2392
+        "line": 2399
       }
     },
     "equipment::weapon::ModelAttachementWeaponComponentVftable": {
@@ -50088,7 +50108,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50118,7 +50138,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50169,7 +50189,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2397
+              "line": 2404
             }
           },
           {
@@ -50199,7 +50219,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50229,7 +50249,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50259,7 +50279,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50289,7 +50309,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50319,7 +50339,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50349,7 +50369,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50379,7 +50399,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50409,7 +50429,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50439,7 +50459,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50469,7 +50489,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50499,7 +50519,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50529,7 +50549,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50559,7 +50579,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50589,7 +50609,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50619,7 +50639,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50649,7 +50669,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50679,7 +50699,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50709,7 +50729,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50739,7 +50759,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50769,7 +50789,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50799,7 +50819,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50829,7 +50849,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50859,7 +50879,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50889,7 +50909,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50919,7 +50939,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50949,7 +50969,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -50979,7 +50999,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51009,7 +51029,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51039,7 +51059,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51069,7 +51089,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51099,7 +51119,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51129,7 +51149,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51159,7 +51179,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51189,7 +51209,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51219,7 +51239,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51281,7 +51301,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2406
+              "line": 2413
             }
           },
           {
@@ -51311,7 +51331,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51341,7 +51361,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51371,7 +51391,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51401,7 +51421,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51431,7 +51451,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51461,7 +51481,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51491,7 +51511,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51521,7 +51541,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51551,7 +51571,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51581,7 +51601,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51611,7 +51631,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51641,7 +51661,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51671,7 +51691,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51701,7 +51721,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51731,7 +51751,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51761,7 +51781,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2394
+              "line": 2401
             }
           },
           {
@@ -51819,7 +51839,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2414
+              "line": 2421
             }
           }
         ],
@@ -51834,7 +51854,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2394
+        "line": 2401
       }
     },
     "equipment::weapon::NWeaponUtil": {
@@ -51925,7 +51945,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2261
+              "line": 2268
             }
           },
           {
@@ -51997,7 +52017,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2266
+              "line": 2273
             }
           }
         ],
@@ -52011,7 +52031,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2255
+        "line": 2262
       }
     },
     "equipment::weapon::PlantedExplosiveWeapon": {
@@ -52105,7 +52125,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2105
+              "line": 2112
             }
           },
           {
@@ -52130,7 +52150,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2105
+              "line": 2112
             }
           },
           {
@@ -52159,7 +52179,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2112
+              "line": 2119
             }
           },
           {
@@ -52190,7 +52210,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2112
+              "line": 2119
             }
           },
           {
@@ -52231,7 +52251,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2123
+              "line": 2130
             }
           },
           {
@@ -52271,7 +52291,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2123
+              "line": 2130
             }
           },
           {
@@ -52302,7 +52322,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2132
+              "line": 2139
             }
           },
           {
@@ -52327,7 +52347,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2136
+              "line": 2143
             }
           },
           {
@@ -52384,7 +52404,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2146
+              "line": 2153
             }
           },
           {
@@ -52437,7 +52457,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2146
+              "line": 2153
             }
           },
           {
@@ -52462,7 +52482,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2150
+              "line": 2157
             }
           },
           {
@@ -52491,7 +52511,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2156
+              "line": 2163
             }
           },
           {
@@ -52512,7 +52532,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2161
+              "line": 2168
             }
           },
           {
@@ -52529,7 +52549,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2161
+              "line": 2168
             }
           },
           {
@@ -52564,7 +52584,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2168
+              "line": 2175
             }
           },
           {
@@ -52595,7 +52615,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2168
+              "line": 2175
             }
           },
           {
@@ -52671,7 +52691,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2080
+              "line": 2087
             }
           }
         ],
@@ -52767,7 +52787,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2191
+              "line": 2198
             }
           },
           {
@@ -52823,7 +52843,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2202
+              "line": 2209
             }
           },
           {
@@ -52928,7 +52948,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2221
+              "line": 2228
             }
           },
           {
@@ -52956,7 +52976,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2226
+              "line": 2233
             }
           },
           {
@@ -53014,7 +53034,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2235
+              "line": 2242
             }
           },
           {
@@ -53037,7 +53057,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2239
+              "line": 2246
             }
           },
           {
@@ -53068,7 +53088,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2245
+              "line": 2252
             }
           },
           {
@@ -53105,7 +53125,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2251
+              "line": 2258
             }
           }
         ],
@@ -53119,7 +53139,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2100
+        "line": 2107
       }
     },
     "equipment::weapon::ProjectileFireDirectionMode": {
@@ -53238,7 +53258,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 1967
+              "line": 1974
             }
           },
           {
@@ -53258,7 +53278,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 1967
+              "line": 1974
             }
           },
           {
@@ -53279,7 +53299,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 1972
+              "line": 1979
             }
           },
           {
@@ -53296,7 +53316,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 1972
+              "line": 1979
             }
           },
           {
@@ -53317,7 +53337,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 1976
+              "line": 1983
             }
           },
           {
@@ -53334,7 +53354,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 1976
+              "line": 1983
             }
           },
           {
@@ -53369,7 +53389,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 1959
+              "line": 1966
             }
           }
         ],
@@ -53420,7 +53440,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1985
+              "line": 1992
             }
           },
           {
@@ -53465,7 +53485,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1991
+              "line": 1998
             }
           },
           {
@@ -53529,7 +53549,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1998
+              "line": 2005
             }
           },
           {
@@ -53593,7 +53613,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2007
+              "line": 2014
             }
           }
         ],
@@ -53607,7 +53627,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 1964
+        "line": 1971
       }
     },
     "equipment::weapon::ReloadType": {
@@ -53759,7 +53779,7 @@
             "doc": " Nowhere: the launcher is empty and the rocket model hidden.",
             "source": {
               "file_index": 37,
-              "line": 1952
+              "line": 1959
             }
           },
           {
@@ -53768,7 +53788,7 @@
             "doc": " In the holder's hand, during a reload.",
             "source": {
               "file_index": 37,
-              "line": 1954
+              "line": 1961
             }
           },
           {
@@ -53777,7 +53797,7 @@
             "doc": " Loaded in the launcher. The launcher fires only in this state.",
             "source": {
               "file_index": 37,
-              "line": 1956
+              "line": 1963
             }
           }
         ],
@@ -53790,7 +53810,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 1950
+        "line": 1957
       }
     },
     "equipment::weapon::SniperWeapon": {
@@ -53847,7 +53867,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 1869
+              "line": 1876
             }
           },
           {
@@ -53864,7 +53884,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 1869
+              "line": 1876
             }
           },
           {
@@ -53881,7 +53901,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 1872
+              "line": 1879
             }
           },
           {
@@ -53936,7 +53956,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 1880
+              "line": 1887
             }
           },
           {
@@ -53953,7 +53973,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 1883
+              "line": 1890
             }
           },
           {
@@ -53978,7 +53998,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 1887
+              "line": 1894
             }
           }
         ],
@@ -54037,7 +54057,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1895
+              "line": 1902
             }
           },
           {
@@ -54082,7 +54102,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1901
+              "line": 1908
             }
           },
           {
@@ -54152,7 +54172,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1907
+              "line": 1914
             }
           },
           {
@@ -54186,7 +54206,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1913
+              "line": 1920
             }
           },
           {
@@ -54280,7 +54300,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1931
+              "line": 1938
             }
           },
           {
@@ -54337,7 +54357,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1938
+              "line": 1945
             }
           },
           {
@@ -54385,7 +54405,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1944
+              "line": 1951
             }
           }
         ],
@@ -54399,7 +54419,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 1866
+        "line": 1873
       }
     },
     "equipment::weapon::ThrownGrenadeWeapon": {
@@ -54469,7 +54489,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2023
+              "line": 2030
             }
           },
           {
@@ -54494,7 +54514,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2023
+              "line": 2030
             }
           },
           {
@@ -54523,7 +54543,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2030
+              "line": 2037
             }
           },
           {
@@ -54554,7 +54574,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2030
+              "line": 2037
             }
           },
           {
@@ -54599,7 +54619,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2038
+              "line": 2045
             }
           },
           {
@@ -54640,7 +54660,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2038
+              "line": 2045
             }
           },
           {
@@ -54675,7 +54695,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2044
+              "line": 2051
             }
           },
           {
@@ -54706,7 +54726,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2044
+              "line": 2051
             }
           },
           {
@@ -54758,7 +54778,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2010
+              "line": 2017
             }
           }
         ],
@@ -54836,7 +54856,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2054
+              "line": 2061
             }
           },
           {
@@ -54892,7 +54912,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2064
+              "line": 2071
             }
           },
           {
@@ -54920,7 +54940,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2071
+              "line": 2078
             }
           },
           {
@@ -54964,7 +54984,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2077
+              "line": 2084
             }
           }
         ],
@@ -54978,7 +54998,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2018
+        "line": 2025
       }
     },
     "equipment::weapon::TurretWeaponComponent": {
@@ -55017,7 +55037,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2687
+              "line": 2694
             }
           }
         ],
@@ -55031,7 +55051,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2680
+        "line": 2687
       }
     },
     "equipment::weapon::WallPenetrationWeaponComponent": {
@@ -55062,7 +55082,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2289
+              "line": 2296
             }
           },
           {
@@ -55082,7 +55102,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2289
+              "line": 2296
             }
           }
         ],
@@ -55175,7 +55195,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2309
+              "line": 2316
             }
           }
         ],
@@ -55189,7 +55209,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2286
+        "line": 2293
       }
     },
     "equipment::weapon::WeapoIsTryingToFireCondition": {
@@ -55234,7 +55254,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 2280
+              "line": 2287
             }
           }
         ],
@@ -55248,7 +55268,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2271
+        "line": 2278
       }
     },
     "equipment::weapon::WeaponBase": {
@@ -60397,6 +60417,53 @@
           },
           {
             "visibility": "public",
+            "name": "ConsumeAmmoBase",
+            "doc": " The base implementation of [`ConsumeAmmo`](Self::ConsumeAmmo). Deducts the requested\n count from the gun's magazine, updates empty-magazine state, and deducts reserve\n ammunition when the weapon's ammunition policy requires it. Reserve ammunition can\n belong to the weapon or its owning character's inventory.",
+            "doc_links": [
+              {
+                "text": "Self::ConsumeAmmo",
+                "target_kind": "item",
+                "path": "equipment::weapon::WeaponBase",
+                "anchor": "vfunc-ConsumeAmmo"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5378564640
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "weapon_data",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "equipment::weapon::WeaponData"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "count",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "i32"
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 37,
+              "line": 1666
+            }
+          },
+          {
+            "visibility": "public",
             "name": "IsWeaponAimingBase",
             "doc": " The base implementation of the [`IsWeaponAiming`](Self::IsWeaponAiming) virtual.",
             "doc_links": [
@@ -60423,7 +60490,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1663
+              "line": 1670
             }
           },
           {
@@ -60499,7 +60566,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1675
+              "line": 1682
             }
           },
           {
@@ -60644,7 +60711,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1699
+              "line": 1706
             }
           },
           {
@@ -60713,7 +60780,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1710
+              "line": 1717
             }
           },
           {
@@ -60758,7 +60825,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1716
+              "line": 1723
             }
           },
           {
@@ -60828,7 +60895,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1724
+              "line": 1731
             }
           },
           {
@@ -60878,7 +60945,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1730
+              "line": 1737
             }
           },
           {
@@ -60952,7 +61019,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1741
+              "line": 1748
             }
           },
           {
@@ -60989,7 +61056,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1749
+              "line": 1756
             }
           },
           {
@@ -61020,7 +61087,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1754
+              "line": 1761
             }
           },
           {
@@ -61063,7 +61130,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1761
+              "line": 1768
             }
           },
           {
@@ -61099,7 +61166,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1766
+              "line": 1773
             }
           },
           {
@@ -61141,7 +61208,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1776
+              "line": 1783
             }
           },
           {
@@ -61259,7 +61326,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1808
+              "line": 1815
             }
           },
           {
@@ -61298,7 +61365,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1813
+              "line": 1820
             }
           },
           {
@@ -61348,7 +61415,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1819
+              "line": 1826
             }
           },
           {
@@ -61413,7 +61480,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 1830
+              "line": 1837
             }
           }
         ],
@@ -66607,7 +66674,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -66628,7 +66695,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2344
+              "line": 2351
             }
           },
           {
@@ -66648,7 +66715,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2344
+              "line": 2351
             }
           },
           {
@@ -66665,7 +66732,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2348
+              "line": 2355
             }
           },
           {
@@ -66694,7 +66761,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2353
+              "line": 2360
             }
           },
           {
@@ -66719,7 +66786,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2353
+              "line": 2360
             }
           },
           {
@@ -66748,7 +66815,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2312
+              "line": 2319
             }
           }
         ],
@@ -66772,7 +66839,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -66792,7 +66859,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -66840,7 +66907,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2324
+                "line": 2331
               }
             },
             {
@@ -66860,7 +66927,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -66880,7 +66947,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -66900,7 +66967,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -66920,7 +66987,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -66940,7 +67007,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -66960,7 +67027,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -66980,7 +67047,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67000,7 +67067,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67020,7 +67087,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67040,7 +67107,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67060,7 +67127,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67080,7 +67147,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67100,7 +67167,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67120,7 +67187,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67140,7 +67207,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67160,7 +67227,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67180,7 +67247,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67200,7 +67267,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67220,7 +67287,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67240,7 +67307,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67260,7 +67327,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67280,7 +67347,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67300,7 +67367,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67320,7 +67387,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67340,7 +67407,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67360,7 +67427,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67380,7 +67447,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67400,7 +67467,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67420,7 +67487,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67440,7 +67507,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67460,7 +67527,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67480,7 +67547,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67500,7 +67567,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67520,7 +67587,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67540,7 +67607,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67582,7 +67649,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2331
+                "line": 2338
               }
             },
             {
@@ -67602,7 +67669,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67622,7 +67689,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67642,7 +67709,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67662,7 +67729,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67682,7 +67749,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67702,7 +67769,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67722,7 +67789,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67742,7 +67809,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67762,7 +67829,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67782,7 +67849,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67802,7 +67869,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67822,7 +67889,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67842,7 +67909,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67862,7 +67929,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67882,7 +67949,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67902,7 +67969,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2318
+                "line": 2325
               }
             },
             {
@@ -67952,7 +68019,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 37,
-                "line": 2339
+                "line": 2346
               }
             }
           ]
@@ -67966,7 +68033,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2317
+        "line": 2324
       }
     },
     "equipment::weapon::WeaponComponentBaseVftable": {
@@ -68006,7 +68073,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68036,7 +68103,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68093,7 +68160,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2324
+              "line": 2331
             }
           },
           {
@@ -68123,7 +68190,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68153,7 +68220,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68183,7 +68250,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68213,7 +68280,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68243,7 +68310,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68273,7 +68340,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68303,7 +68370,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68333,7 +68400,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68363,7 +68430,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68393,7 +68460,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68423,7 +68490,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68453,7 +68520,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68483,7 +68550,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68513,7 +68580,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68543,7 +68610,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68573,7 +68640,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68603,7 +68670,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68633,7 +68700,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68663,7 +68730,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68693,7 +68760,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68723,7 +68790,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68753,7 +68820,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68783,7 +68850,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68813,7 +68880,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68843,7 +68910,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68873,7 +68940,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68903,7 +68970,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68933,7 +69000,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68963,7 +69030,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -68993,7 +69060,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69023,7 +69090,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69053,7 +69120,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69083,7 +69150,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69113,7 +69180,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69143,7 +69210,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69194,7 +69261,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2331
+              "line": 2338
             }
           },
           {
@@ -69224,7 +69291,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69254,7 +69321,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69284,7 +69351,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69314,7 +69381,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69344,7 +69411,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69374,7 +69441,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69404,7 +69471,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69434,7 +69501,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69464,7 +69531,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69494,7 +69561,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69524,7 +69591,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69554,7 +69621,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69584,7 +69651,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69614,7 +69681,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69644,7 +69711,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69674,7 +69741,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2318
+              "line": 2325
             }
           },
           {
@@ -69732,7 +69799,7 @@
             "is_base": false,
             "source": {
               "file_index": 37,
-              "line": 2339
+              "line": 2346
             }
           }
         ],
@@ -69747,7 +69814,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 2318
+        "line": 2325
       }
     },
     "equipment::weapon::WeaponComponentType": {
