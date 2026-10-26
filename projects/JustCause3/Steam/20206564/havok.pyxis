@@ -69,8 +69,12 @@ pub type hknpShape {
     pub const IS_CONVEX_SHAPE: u16 = 0x1,
     /// The [`m_flags`](Self::m_flags) bit of a shape that is an [`hknpConvexPolytopeShape`].
     pub const IS_CONVEX_POLYTOPE_SHAPE: u16 = 0x2,
+    /// The invalid shape key returned when shape-key enumeration has no further key.
+    pub const INVALID_SHAPE_KEY: u32 = 0xFFFFFFFF,
+    /// The collector flag indicating that a leaf contains stored triangles.
+    pub const COLLECTOR_STORES_TRIANGLES: u32 = 0x10,
 
-    #[size(5)]
+    #[size(22)]
     vftable {
         /// As [`hkReferencedObject::deleteThisReferencedObject`].
         #[index(3)]
@@ -80,6 +84,18 @@ pub type hknpShape {
         /// constant.
         #[index(4)]
         pub fn getType(&self) -> u32;
+
+        /// Computes the world-space axis-aligned bounds of the shape.
+        #[index(6)]
+        pub fn calcAabb(&self, transform: *const hkTransformf, out: *mut hkAabb);
+
+        /// Returns shape keys following `previous`, up to the provided capacity.
+        #[index(20)]
+        pub fn getShapeKeys(&self, keys: *mut u32, capacity: i32, previous: u32, config: *const hknpGetShapeKeysConfig) -> i32;
+
+        /// Collects the leaf shapes identified by the provided keys.
+        #[index(21)]
+        pub fn getLeafShapes(&self, keys: *const u32, count: i32, collector: *mut hknpShapeCollector) -> i32;
     },
 
     #[base]
@@ -101,8 +117,8 @@ pub type hknpShape {
     pub m_userData: u64,
 }
 
-/// A shape's kind (`hknpShapeType::Enum`), as [`hknpShape::getType`] returns it. Only the convex
-/// kinds are bound; the compound, mesh, and height-field kinds have other values.
+/// A shape's kind (`hknpShapeType::Enum`), as [`hknpShape::getType`] returns it. The bound kinds
+/// include convex shapes and the compressed mesh and height-field shapes.
 pub enum hknpShapeType: u32 {
     /// A convex hull given by its vertices alone ([`hknpConvexShape`]).
     CONVEX = 0x0,
@@ -113,6 +129,10 @@ pub enum hknpShapeType: u32 {
     SPHERE = 0x2,
     /// A capsule ([`hknpCapsuleShape`]).
     CAPSULE = 0x3,
+    /// A mesh whose geometry is stored in compressed form.
+    COMPRESSED_MESH = 0x5,
+    /// A height field whose data is stored in compressed form.
+    COMPRESSED_HEIGHT_FIELD = 0xA,
 }
 
 /// A four-lane floating-point vector (`hkVector4f`).
@@ -435,3 +455,105 @@ impl hknpContactJacobianUtil {
     #[address(0x141_48C_090)]
     pub fn getNumContactPoints(solver_type: u32, jacobian: *const void) -> i32;
 }
+
+/// The configuration for paged shape-key enumeration. The parent path starts empty, with no mask
+/// and the most detailed geometry.
+#[size(0x18), align(8)]
+pub type hknpGetShapeKeysConfig {
+    /// Selects the most detailed geometry.
+    pub const MOST_DETAILED: i32 = 0,
+
+    pub m_parentKey: u32,
+    pub m_parentSize: i32,
+    pub m_mask: *const void,
+    pub m_levelOfDetail: i32,
+}
+
+/// Storage used to collect leaf shapes. The triangle prototype is externally supplied. A reset
+/// installs the root transform and clears the prior result; leaf extraction can modify the
+/// transform, scale, and shape. Triangle batches are materialized by [`getSubshape`].
+#[size(0xC50), align(16)]
+pub type hknpShapeCollector {
+    pub m_transformOut: hkTransformf,
+
+    #[address(0x40)]
+    pub m_scaleOut: hkVector4f,
+    pub m_flags: u32,
+
+    #[address(0x58)]
+    pub m_shapeOut: *const hknpShape,
+
+    #[address(0x68)]
+    pub m_triangleShapePrototype: *mut hknpShape,
+}
+impl hknpShapeCollector {
+    /// Resets the collector with a root transform and room for shape tags.
+    #[address(0x140_1D9_400)]
+    pub fn reset(&mut self, transform: *const hkTransformf, num_shapes: i32);
+}
+
+/// An in-place triangle, including its relative vertex, plane, face, and index arrays.
+#[size(0xF0), align(16)]
+pub type hknpInplaceTriangleShape;
+impl hknpInplaceTriangleShape {
+    /// Builds the in-place triangle with its native default radius. The object's storage remains
+    /// owned by its caller.
+    #[address(0x141_4DC_020)]
+    pub fn Construct(&mut self, finish_loaded: bool) -> *mut hknpInplaceTriangleShape;
+}
+
+/// Extracts one leaf, materializes any triangle batch into the supplied prototype, and returns
+/// the resulting shape pointer from the collector. The collector must have been reset.
+#[address(0x140_F88_3B0)]
+pub fn getSubshape(shape: *const hknpShape, key: u32, collector: *mut hknpShapeCollector) -> *const hknpShape;
+
+/// Input for the ordinary vertex-array GSK distance query. The transform maps B into A.
+#[size(0x70), align(16)]
+pub type hkcdGskGetClosestPointInput {
+    /// Enables the penetration-depth query.
+    pub const HANDLE_PENETRATION: u32 = 1,
+    /// The ordinary-distance termination growth rate used by native callers.
+    pub const DEFAULT_TERMINATION_GROWTH_RATE: f32 = 1.4,
+
+    pub m_aTb: hkTransformf,
+    pub m_handlePenetration: u32,
+
+    #[address(0x50)]
+    pub m_coreCollisionTolerance: hkVector4f,
+    pub m_terminationGrowthRate: f32,
+}
+
+/// GSK's simplex cache.
+#[size(0x5), align(1)]
+pub type hkcdGskCache {
+    pub const INITIAL_DIMENSION: u8 = 0x41,
+
+    pub m_vertexIds: [u8; 4],
+    pub m_dimAb: u8,
+}
+
+/// Distance between the core shapes, normal in A, and a closest point in A. Shape convex radii
+/// are not subtracted from the distance.
+#[size(0x30), align(16)]
+pub type hkcdGskGetClosestPointOutput {
+    pub m_distance: hkVector4f,
+    pub m_normalInA: hkVector4f,
+    pub m_pointAinA: hkVector4f,
+}
+
+/// Status returned by an ordinary GSK closest-point query.
+pub enum hkcdGskGetClosestPointStatus: i32 {
+    STATUS_OK_NOT_PENTRATING = 0,
+    STATUS_OK_PENETRATING = 1,
+    STATUS_PD_HEURISTIC_SAMPLING = 2,
+    STATUS_PD_OUT_OF_MEMORY = 3,
+    STATUS_OK_FLAG = 4,
+    STATUS_PD_DISTANCE_TOO_BIG = 5,
+    STATUS_PENETRATING = 6,
+    STATUS_PD_UNSOLVABLE = 7,
+}
+
+/// Computes the closest core points of the two vertex arrays, updating the simplex cache and
+/// returning a status independently of the output. The arrays contain aligned Havok vertices.
+#[address(0x141_2FC_430)]
+pub fn hkcdGskGetClosestPoint(vertices_a: *const hkVector4f, count_a: i32, vertices_b: *const hkVector4f, count_b: i32, input: *const hkcdGskGetClosestPointInput, cache: *mut hkcdGskCache, output: *mut hkcdGskGetClosestPointOutput) -> i32;

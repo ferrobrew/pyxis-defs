@@ -155,6 +155,11 @@ impl ModelInstance {
     #[address(0x140_316_5A0)]
     pub fn UpdateMatrix(&mut self, matrix: *const Matrix4);
 
+    /// Returns the world transform for the current update frame through `result`, and returns the
+    /// same pointer. The transform comes from the instance's render information.
+    #[address(0x140_315_D60)]
+    pub fn GetMatrix(&self, result: *mut Matrix4) -> *mut Matrix4;
+
     /// Registers the instance with its BFBC context ([`m_BFBC`](Self::m_BFBC), which must be
     /// set) unless it already is: recomputes its world bounding box from its current transform,
     /// adds the box to the context, stores the entry in [`m_BFBC_id`](Self::m_BFBC_id), applies
@@ -213,9 +218,48 @@ impl ModelInstance {
 /// The BFBC result context the model collection cull runs in. Opaque.
 pub type BFBCContext;
 
-/// A model collection (`CModelCollection`). Opaque.
-pub type ModelCollection;
+/// An axis-aligned box (`CAABox`), stored as its least and greatest corners.
+#[size(0x18), copyable]
+pub type AABox {
+    pub min: Vector3,
+    pub max: Vector3,
+}
+
+/// A collection of model instances loaded together from a location resource. Its instance pointers
+/// are owned by the collection and are retired by [`Destruct`](Self::Destruct); they must not outlive
+/// their entry in this collection.
+#[size(0x48)]
+pub type ModelCollection {
+    /// The four-byte identifier at the start of the model-collection stream.
+    pub const FILE_MAGIC: u32 = 0x49444D,
+    /// The stream format version accepted by the collection loader.
+    pub const FILE_VERSION: u32 = 12,
+    /// The stream boundary used when advancing between aligned data sections.
+    pub const FILE_ALIGNMENT: u32 = 16,
+
+    pub m_Vftable: *mut *mut void,
+
+    /// The number of model instances in [`m_ModelInstances`](Self::m_ModelInstances).
+    #[address(0x8)]
+    pub m_NumInstances: u32,
+
+    /// The model instances in file order.
+    #[address(0x10)]
+    pub m_ModelInstances: *mut *mut ModelInstance,
+
+    /// The broad-phase culling context shared by this collection's instances.
+    #[address(0x20)]
+    pub m_Bfbc: *mut BFBCContext,
+
+    /// The collection's axis-aligned bounds.
+    #[address(0x28)]
+    pub m_AABB: AABox,
+}
 impl ModelCollection {
+    /// Releases the instances and resources owned by the collection, and clears its instance array.
+    #[address(0x140_508_A00)]
+    pub fn Destruct(&mut self);
+
     /// The instance-level broad-phase cull: runs a BFBC frustum and distance process over the model
     /// collections against the occluder manager's main cull camera (its cached parameters from
     /// `GetBFBCFrustumParamsForCameraAndTime`), passing each survivor on through

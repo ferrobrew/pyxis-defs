@@ -1,0 +1,16 @@
+use graphics_engine::model_instance::{AABox, ModelCollection};
+
+/// A loaded location (`CLocation`), which owns the model collection populated from its model data.
+/// Only the fields used by the location model loader are mapped.
+#[min_size(0x70)]
+pub type Location {
+    /// The model instances loaded with this location, or null when loading has not succeeded.
+    #[address(0x68)]
+    pub m_ModelCollection: *mut ModelCollection,
+}
+impl Location {
+    /// Loads the location's model collection from a bounded buffer and resource name. A successful
+    /// load assigns [`m_ModelCollection`](Self::m_ModelCollection); a failed load clears it.
+    #[address(0x140_508_670)]
+    pub fn LoadModelCollection(&mut self, buffer: *const u8, size: u32, name: *const u8);
+}

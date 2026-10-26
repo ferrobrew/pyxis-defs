@@ -1,6 +1,8 @@
-use animation::skeleton::HkaPose;
+use animation::rule_system::AnimationRuleSystem;
+use animation::skeleton::{HkArray, HkaPose};
 use character::character::Joint;
 use types::shared_ptr::SharedPtr;
+use types::std_vector::Vector;
 use types::vector_math::{AlignedQuat, AlignedVector3};
 
 /// A pose producer (`CPoseProducer`): owns an animated model's blenders and the `T0`/`T1` poses the skinning palette is built from.
@@ -57,7 +59,12 @@ pub type QsTransform {
 
 /// One animation layer's sampler set (`CBlender`): wraps a Havok animated skeleton whose animation
 /// controls are the layer driver's playing clips.
-pub type Blender;
+#[min_size(0x18)]
+pub type Blender {
+    /// Animation instances whose controls are registered with the blender's animated skeleton.
+    #[address(0x8)]
+    pub m_Samplers: HkArray<SharedPtr<AnimationInstance>>,
+}
 impl Blender {
     /// Samples the blender's clips and blends them over `reference_pose` into `pose_out`, both `num_bones` local-space transforms, and likewise the float slots from `reference_floats` into `float_slots_out` (`num_float_slots` each). Where the clips' total weight on a bone is below the skeleton's reference-pose threshold, the reference fills in. `normal_blend_pose_out` is non-null only for the first layer, which also copies its result there (the pose producer's pre-additive pose). It writes nothing but its outputs. [`PoseProducer::UpdateBlendersPoseInRange`] calls it during synchronous updates and pose-job execution.
     #[address(0x141_E6B_E10)]
@@ -92,6 +99,14 @@ pub type AnimatedBodyPart {
 /// plays send the layer's track messages and answer its segment queries whether or not the blender's
 /// pose reaches the skeleton.
 pub type AnimationDriverTransition {
+    /// The layer's animation rule system, which supplies the current state and transition choices.
+    #[address(0x30)]
+    pub m_RuleSystem: SharedPtr<AnimationRuleSystem>,
+
+    /// Animation instances selected by the driver for playback.
+    #[address(0x40)]
+    pub m_PlayingAnimInstances: Vector<SharedPtr<AnimationInstance>>,
+
     /// The layer's blender, added to the pose producer when the body part is created.
     #[address(0xD8)]
     pub m_Blender: SharedPtr<Blender>,
@@ -107,9 +122,32 @@ impl AnimationDriverTransition {
 
 /// One playing clip (`CAnimationInstance`): a clip resource bound to a skeleton, with its
 /// playback time, weight, easing, and loop mode. A [`Blender`] samples its instances into a pose.
-/// Only its size is bound.
 #[size(0x120)]
-pub type AnimationInstance;
+pub type AnimationInstance {
+    /// The animation resource handle retained by this instance.
+    #[address(0x10)]
+    pub m_Animation: *mut void,
+
+    /// The playback mode selected when this instance is constructed.
+    #[address(0x20)]
+    pub m_LoopMode: AnimLoopMode,
+
+    /// Per-transform-track weights used when the control contributes to a blended pose.
+    #[address(0x48)]
+    pub m_TransformTrackWeights: HkArray<u8>,
+
+    /// The mapping from this animation's transform tracks to skeleton bones.
+    #[address(0x68)]
+    pub m_Binding: *mut AnimationBinding,
+
+    /// The number of positive playback-time wraps recorded by the embedded animation control.
+    #[address(0x90)]
+    pub m_OverflowCount: u32,
+
+    /// The number of negative playback-time wraps recorded by the embedded animation control.
+    #[address(0x94)]
+    pub m_UnderflowCount: u32,
+}
 impl AnimationInstance {
     /// Constructs an instance of the clip resource `animation` (a `TResourceCachePtr<CAnimation>`,
     /// one resource handle) over the skeleton resource `skeleton`, configured by `context` (a
@@ -117,6 +155,35 @@ impl AnimationInstance {
     /// flag, and loop mode). A context with the mirror flag set binds the clip mirrored.
     #[address(0x141_E68_BD0)]
     pub fn Construct(&mut self, animation: *const *mut void, skeleton: *const *mut void, context: *const void) -> *mut AnimationInstance;
+
+    /// Returns the embedded animation control's current local playback time.
+    #[address(0x141_E66_EA0)]
+    pub fn GetTime(&self) -> f32;
+
+    /// Returns the embedded animation control's total playback weight.
+    #[address(0x141_E66_F00)]
+    pub fn GetTotalWeight(&self) -> f32;
+
+    /// Returns the duration of the animation resource retained by this instance.
+    #[address(0x141_E67_B10)]
+    pub fn GetDuration(&self) -> f32;
+}
+
+/// How an animation instance treats playback at the end of its duration.
+#[copyable]
+pub enum AnimLoopMode: u32 {
+    /// Playback repeats when it reaches the end.
+    Loop = 0,
+    /// Playback stops when it reaches the end.
+    PlayOnce = 1,
+}
+
+/// The binding between an animation's transform tracks and the skeleton's bones.
+#[min_size(0x30)]
+pub type AnimationBinding {
+    /// Maps each animation transform track to its corresponding skeleton bone index.
+    #[address(0x20)]
+    pub m_TransformTrackToBoneIndices: HkArray<i16>,
 }
 
 /// `IAnimationManager::AquireAnimation`: the clip resource for the clip path `path` (transformed
