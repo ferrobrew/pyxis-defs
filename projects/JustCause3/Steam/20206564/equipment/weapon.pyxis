@@ -2062,8 +2062,11 @@ impl ThrownGrenadeWeapon {
 
     /// Primes a grenade (`CreatePrimed<CGrenade>`): consumes one grenade, allocates a
     /// [`Grenade`](equipment::explosive::Grenade) from the ammunition pool at the weapon's world
-    /// matrix (returning null when the pool is full), plays the priming effect, stores it in
-    /// [`m_PrimedGrenade`](Self::m_PrimedGrenade), and adds it to the update. The grenade's
+    /// matrix, plays the priming effect, stores it in
+    /// [`m_PrimedGrenade`](Self::m_PrimedGrenade), and adds it to the update. Player holder
+    /// information enables reclamation in [`AllocateGrenade`](equipment::explosive::AllocateGrenade),
+    /// so a full pool can erase an existing entry before allocating. Failure returns null.
+    /// The grenade's
     /// detonation timer runs from this point
     /// ([`Explosive::m_DetonationTimer`](equipment::explosive::Explosive::m_DetonationTimer)), so a
     /// grenade held for longer than its fuse explodes before it is thrown.

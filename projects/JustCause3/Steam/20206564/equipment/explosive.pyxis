@@ -1,8 +1,15 @@
 use game::GameObjectRenderContext;
+use game::GameObjectUpdateContext;
 use graphics_engine::model_instance::ModelInstance;
 use physics::PfxRigidBody;
 use types::math::Matrix4;
 use types::math::Vector3;
+
+/// Reserves a grenade slot under the ammunition manager's critical section. When no slot remains,
+/// `reclaim` permits `FreePoolSoPlayerCanFire` to erase an existing entry before retrying.
+/// With `reclaim` false, exhaustion returns null without removing another object.
+#[address(0x140_963_0C0)]
+pub fn AllocateGrenade(manager: *mut void, allocation_type: u32, position: *const Vector3, reclaim: bool) -> *mut void;
 
 /// A thrown or placed explosive object (`CExplosive`, a `CGameObjectAmmunition<CDamageable>`): its
 /// physics body, trail effect, detonation timers, and the deferred launch that
@@ -78,12 +85,17 @@ pub type Explosive {
     /// Seconds since the explosive was thrown; [`PropelToward`](Self::PropelToward) resets it.
     #[address(0x604)]
     pub m_TimeSinceThrow: f32,
+
     /// Seconds until the explosive detonates. The constructor sets it to the grenade weapon's
-    /// detonation time; the post-simulation update counts it down by the tick delta while the
-    /// virtual `ShouldTickDetonationTimer` holds (a hand grenade's does from the moment it spawns,
-    /// primed or thrown) and calls the virtual `Detonate` once it reaches zero.
+    /// detonation time; [`UpdatePostSim`](Self::UpdatePostSim) counts it down by the tick delta
+    /// while the virtual `ShouldTickDetonationTimer` holds (a hand grenade's does from the moment it
+    /// spawns, primed or thrown) and calls the virtual `Detonate` once it is at or below zero, a
+    /// dispatch that does not consult that virtual again.
+    #[address(0x608)]
     pub m_DetonationTimer: f32,
+
     /// The detonation time [`m_DetonationTimer`](Self::m_DetonationTimer) started from.
+    #[address(0x60C)]
     pub m_StartDetonationTimer: f32,
 }
 impl Explosive {
@@ -132,6 +144,18 @@ impl Explosive {
     /// has one.
     #[address(0x140_8D6_E20)]
     pub fn PlayTrailEffect(&mut self);
+
+    /// The explosive's post-simulation update (its override of the `CGameObject` virtual). It is
+    /// where the fuse runs: it counts [`m_DetonationTimer`](Self::m_DetonationTimer) down by the
+    /// context's tick delta while the virtual `ShouldTickDetonationTimer` returns true, and calls the
+    /// virtual `Detonate` once the timer is at or below zero, without consulting that virtual again.
+    /// The rest of the update places a body attached to a parent object at the parent's transform,
+    /// follows the body with the sound instance, re-enables collisions that were disabled against the
+    /// thrower once the explosive has been loose for a moment, and drops the explosive from the update
+    /// when it has no physics body. `game_object` is the explosive's `CGameObject` subobject
+    /// ([`GAME_OBJECT_BASE_OFFSET`](Self::GAME_OBJECT_BASE_OFFSET)), not the start of the explosive.
+    #[address(0x140_91D_B90)]
+    pub fn UpdatePostSim(game_object: *mut void, context: *mut GameObjectUpdateContext);
 }
 
 /// A C4 charge (`CPlantedExplosive`, a [`Explosive`]), spawned and owned by the
@@ -216,7 +240,10 @@ impl PlantedExplosive {
 /// targets, extra trail effects, and the landing position.
 #[min_size(0x730)]
 pub type Grenade {
-    /// Whether the grenade applies the thrower's grenade upgrades (homing and similar).
+    /// Whether the grenade applies the thrower's grenade upgrades. The collision handler gates
+    /// the contact, hostile-contact, and character-or-vehicle contact upgrades on this field.
+    /// Those upgrades can zero [`Explosive::m_DetonationTimer`] without consulting
+    /// [`m_ShouldTickDetonationTimer`](Self::m_ShouldTickDetonationTimer).
     #[address(0x620)]
     pub m_CanUseUpgrades: bool,
 
