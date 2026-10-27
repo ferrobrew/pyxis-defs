@@ -79,6 +79,37 @@ pub type GrapplingHookWire {
     pub m_IsAttachmentWire: bool,
 }
 impl GrapplingHookWire {
+    /// Advances both ends, creates or updates a physical constraint when
+    /// [`ShouldUseConstraint`](Self::ShouldUseConstraint) permits it, and updates the wire effects.
+    #[address(0x140_94D_E00)]
+    pub fn Update(&mut self, owner: *const SharedPtr<Character>, tuning: *const GrappleTuning, dt: f32);
+
+    /// Whether both ends have live proxies, neither end is invalid, both proxies permit a
+    /// constraint, and at least one requests a physical constraint. The disassembler mislabels
+    /// this function as `CWireEnd::GetAttachmentObjectInfo`.
+    #[address(0x140_8CC_640)]
+    pub fn ShouldUseConstraint(&self) -> bool;
+
+    /// Creates the spring and linear-motor constraint between distinct valid proxy bodies. A new
+    /// attachment snapshots the current length into [`m_MaxLength`](Self::m_MaxLength); a wire
+    /// that is neither active nor an attachment wire also receives a safety buffer. The spring's
+    /// length is the maximum length less `tether_shorten_length`, bounded away from zero. The
+    /// disassembler mislabels this function as `NPfxVehicle::SStaticWheelFrictionData::addFrictionConstraint`.
+    #[address(0x140_8F3_DE0)]
+    pub fn CreateConstraint(&mut self, tether_shorten_length: f32, reattaching: bool);
+
+    /// Removes the wire's physics constraint and releases its data.
+    #[address(0x140_8CC_6D0)]
+    pub fn DestroyConstraint(&mut self);
+
+    /// Updates the existing spring and motor, including their pivots and tension response.
+    #[address(0x140_8F4_250)]
+    pub fn UpdateConstraint(&mut self, tuning: *const GrappleTuning, dt: f32);
+
+    /// Computes the wire tension and break state and sends tension to both attachment proxies.
+    #[address(0x140_944_CB0)]
+    pub fn UpdateWireTension(&mut self, tuning: *const GrappleTuning, dt: f32);
+
     /// Sets both ends' cast-filter ignore objects
     /// ([`WireEndCastFilter::m_IgnoreObject1`](equipment::wire_end::WireEndCastFilter::m_IgnoreObject1)
     /// and [`m_IgnoreObject2`](equipment::wire_end::WireEndCastFilter::m_IgnoreObject2)).

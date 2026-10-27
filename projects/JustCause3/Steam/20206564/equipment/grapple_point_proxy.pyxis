@@ -1,0 +1,24 @@
+use types::math::{Matrix4, Vector3};
+
+/// A grapple attachment fixed to a character bone (`CCharacterBoneAttachedPointProxy`). Its
+/// visual getters multiply the local attachment transform by the bone and character transforms.
+pub type CharacterBoneAttachedPointProxy;
+impl CharacterBoneAttachedPointProxy {
+    /// Writes the attachment's world position and normal, or returns false without a character.
+    #[address(0x140_8D8_180)]
+    pub fn GetVisualPositionAndNormalWS(&self, position: *mut Vector3, normal: *mut Vector3) -> bool;
+
+    /// Writes the attachment's world transform, or returns false without a character.
+    #[address(0x140_8D8_280)]
+    pub fn GetVisualTransformWS(&self, transform: *mut Matrix4) -> bool;
+}
+
+/// A grapple attachment on a physics game object (`CGenericObjectPointProxy`).
+pub type GenericObjectPointProxy;
+impl GenericObjectPointProxy {
+    /// Returns no constraint for an invalid proxy or a weapon whose grappling mode reels without
+    /// attaching. Rigid objects request a virtual or physical constraint according to their motion
+    /// type; other valid objects request a physical constraint.
+    #[address(0x140_924_7D0)]
+    pub fn GetConstraintHint(&self) -> i32;
+}
