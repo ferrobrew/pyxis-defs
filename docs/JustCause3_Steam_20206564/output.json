@@ -202277,10 +202277,103 @@
         "line": 9
       }
     },
+    "vehicle::parts::ConstraintInfo": {
+      "path": "vehicle::parts::ConstraintInfo",
+      "visibility": "public",
+      "size": 76,
+      "alignment": 4,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " The authored limited hinge's local frame, axis, and signed angular limits.",
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_TransformLocal",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "types::math::Matrix4"
+            },
+            "offset": 0,
+            "size": 64,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 187
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_AxisIndex",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 64,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 188
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_MinAngle",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 68,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 189
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_MaxAngle",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 72,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 190
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 108,
+        "line": 186
+      }
+    },
     "vehicle::parts::Part": {
       "path": "vehicle::parts::Part",
       "visibility": "public",
-      "size": 152,
+      "size": 184,
       "alignment": 8,
       "category": "defined",
       "kind": {
@@ -202456,6 +202549,158 @@
             "visibility": "private",
             "name": "_field_94",
             "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 21
+            },
+            "offset": 148,
+            "size": 21,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 54
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_should_break",
+            "doc": " Whether the part may break off. Root parts cannot break off regardless of this property.",
+            "type_ref": {
+              "type": "raw",
+              "path": "u8"
+            },
+            "offset": 169,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 54
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_aa",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 2
+            },
+            "offset": 170,
+            "size": 2,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 58
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_prevent_breaking_while_alive",
+            "doc": " Whether ordinary damage keeps the part attached until its body or an ancestor breaks.",
+            "type_ref": {
+              "type": "raw",
+              "path": "u8"
+            },
+            "offset": 172,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 58
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_ad",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 3
+            },
+            "offset": 173,
+            "size": 3,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 62
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_disappears_when_broken",
+            "doc": " Whether breaking destroys the visual part instead of retaining its physical body.",
+            "type_ref": {
+              "type": "raw",
+              "path": "u8"
+            },
+            "offset": 176,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 62
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_b1",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 5
+            },
+            "offset": 177,
+            "size": 5,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 66
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_has_world_collision_shape",
+            "doc": " Whether the part has an authored world-collision shape.",
+            "type_ref": {
+              "type": "raw",
+              "path": "u8"
+            },
+            "offset": 182,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 66
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_b7",
+            "doc": null,
             "doc_links": [
               {
                 "text": "Self::m_parent_space_offset",
@@ -202470,10 +202715,10 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 4
+              "size": 1
             },
-            "offset": 148,
-            "size": 4,
+            "offset": 183,
+            "size": 1,
             "alignment": 1,
             "is_base": false,
             "source": {
@@ -202524,7 +202769,7 @@
             "doc": " The part took damage.",
             "source": {
               "file_index": 108,
-              "line": 164
+              "line": 232
             }
           },
           {
@@ -202533,7 +202778,7 @@
             "doc": " The part was worked on purpose, as a door the door controller opens.",
             "source": {
               "file_index": 108,
-              "line": 166
+              "line": 234
             }
           },
           {
@@ -202542,7 +202787,7 @@
             "doc": " The part starts in this state when the body is made.",
             "source": {
               "file_index": 108,
-              "line": 168
+              "line": 236
             }
           }
         ],
@@ -202555,7 +202800,7 @@
       },
       "source": {
         "file_index": 108,
-        "line": 162
+        "line": 230
       }
     },
     "vehicle::parts::PartInstance": {
@@ -202597,36 +202842,48 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 59
+              "line": 75
             }
           },
           {
             "visibility": "private",
             "name": "_field_8",
             "doc": null,
-            "doc_links": [
-              {
-                "text": "Part::m_part_index",
-                "target_kind": "item",
-                "path": "vehicle::parts::Part",
-                "anchor": "field-m_part_index"
-              }
-            ],
             "type_ref": {
               "type": "array",
               "inner": {
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 24
+              "size": 16
             },
             "offset": 8,
-            "size": 24,
+            "size": 16,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 63
+              "line": 79
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Breakable",
+            "doc": " The breakable body whose resource and phase govern this part.",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "vehicle::parts::PfxBreakable"
+              }
+            },
+            "offset": 24,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 79
             }
           },
           {
@@ -202651,7 +202908,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 63
+              "line": 83
             }
           },
           {
@@ -202664,15 +202921,70 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 12
+              "size": 8
             },
             "offset": 36,
-            "size": 12,
+            "size": 8,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 69
+              "line": 87
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Deleted",
+            "doc": " Whether the part has been deleted from its owner's active parts.",
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 44,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 87
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_IsValid",
+            "doc": " Whether the resource entry supplies a valid part instance, checked by restoration.",
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 45,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 89
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_2e",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 2
+            },
+            "offset": 46,
+            "size": 2,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 95
             }
           },
           {
@@ -202692,36 +203004,78 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 69
+              "line": 95
             }
           },
           {
-            "visibility": "private",
-            "name": "_field_38",
-            "doc": null,
-            "doc_links": [
-              {
-                "text": "Self::BrokeOffOrAncestorBrokeOff",
-                "target_kind": "item",
-                "path": "vehicle::parts::PartInstance",
-                "anchor": "func-BrokeOffOrAncestorBrokeOff"
-              }
-            ],
+            "visibility": "public",
+            "name": "m_PartDamageType",
+            "doc": " The resolved damage-type tuning used for damaged, loosened, and broken health transitions.",
             "type_ref": {
-              "type": "array",
+              "type": "const_pointer",
               "inner": {
                 "type": "raw",
-                "path": "u8"
-              },
-              "size": 14
+                "path": "void"
+              }
             },
             "offset": 56,
-            "size": 14,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 97
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Health",
+            "doc": " Remaining part health. Negative health is not processed by the break-off damage helper.",
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 64,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 101
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Invulnerable",
+            "doc": " Blocks ordinary damage admission and the final instant break operation, including forced\n break damage.",
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 68,
+            "size": 1,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 74
+              "line": 104
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_IsOnlyVulnerableToPlayerDamage",
+            "doc": " Ordinary damage must be attributed to the player while set.",
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 69,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 106
             }
           },
           {
@@ -202746,7 +203100,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 74
+              "line": 111
             }
           },
           {
@@ -202775,7 +203129,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 84
+              "line": 121
             }
           },
           {
@@ -202800,7 +203154,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 84
+              "line": 121
             }
           },
           {
@@ -202821,7 +203175,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 88
+              "line": 125
             }
           },
           {
@@ -202841,7 +203195,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 88
+              "line": 125
             }
           },
           {
@@ -202869,7 +203223,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 92
+              "line": 129
             }
           },
           {
@@ -202896,7 +203250,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 92
+              "line": 129
             }
           },
           {
@@ -202929,11 +203283,78 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 53
+              "line": 69
             }
           }
         ],
         "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "DamagePart_ToBreakOff",
+            "doc": " Applies enough player-attributed or unattributed damage to pass below zero health. Uses\n neutral damage flags. Forced damage bypasses ordinary invulnerability admission and the\n prevent-breaking-while-alive property, but still requires an authored breakable non-root\n part. The final break operation independently refuses an invulnerable part and defers while\n its breakable is in a parallel update phase.",
+            "body": {
+              "type": "address",
+              "address": 5371001584
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "is_player_doing_damage",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "bool"
+                }
+              },
+              {
+                "type": "field",
+                "name": "force_damage",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "bool"
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 108,
+              "line": 138
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "IsAllowedToBreakOffNow",
+            "doc": " Whether authored breakability and the body's current life state permit breaking off.\n Forced damage ignores the prevent-breaking-while-alive property, not authored breakability.",
+            "body": {
+              "type": "address",
+              "address": 5370611520
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "force_damage",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "bool"
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 108,
+              "line": 143
+            }
+          },
           {
             "visibility": "public",
             "name": "BrokeOffOrAncestorBrokeOff",
@@ -202968,7 +203389,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 108,
-              "line": 98
+              "line": 148
             }
           },
           {
@@ -202991,7 +203412,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 108,
-              "line": 104
+              "line": 154
             }
           },
           {
@@ -203024,7 +203445,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 108,
-              "line": 111
+              "line": 161
             }
           }
         ],
@@ -203038,7 +203459,7 @@
       },
       "source": {
         "file_index": 108,
-        "line": 57
+        "line": 73
       }
     },
     "vehicle::parts::PfxBreakable": {
@@ -203074,15 +203495,53 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 288
+              "size": 204
             },
             "offset": 0,
-            "size": 288,
+            "size": 204,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 122
+              "line": 172
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_InParallelUpdatePhaseCounter",
+            "doc": " Positive while part transitions must defer their non-thread-safe work.",
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 204,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 172
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_d0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 80
+            },
+            "offset": 208,
+            "size": 80,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 108,
+              "line": 176
             }
           },
           {
@@ -203102,7 +203561,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 122
+              "line": 176
             }
           },
           {
@@ -203130,7 +203589,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 125
+              "line": 179
             }
           },
           {
@@ -203155,7 +203614,7 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 127
+              "line": 181
             }
           },
           {
@@ -203189,11 +203648,53 @@
             "is_base": false,
             "source": {
               "file_index": 108,
-              "line": 114
+              "line": 164
             }
           }
         ],
         "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "GetConstraintInfoFromPrototype",
+            "doc": " Reads a part's limited hinge from the physics prototype, found by its part-name hash.\n Returns false for an absent part, an absent constraint, or a constraint other than a limited hinge.",
+            "body": {
+              "type": "address",
+              "address": 5371117568
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "part_name_hash",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              },
+              {
+                "type": "field",
+                "name": "info",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "vehicle::parts::ConstraintInfo"
+                  }
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 108,
+              "line": 196
+            }
+          },
           {
             "visibility": "public",
             "name": "GetPartByIndex",
@@ -203225,7 +203726,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 108,
-              "line": 133
+              "line": 201
             }
           },
           {
@@ -203296,7 +203797,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 108,
-              "line": 151
+              "line": 219
             }
           },
           {
@@ -203327,7 +203828,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 108,
-              "line": 156
+              "line": 224
             }
           }
         ],
@@ -203341,7 +203842,7 @@
       },
       "source": {
         "file_index": 108,
-        "line": 119
+        "line": 169
       }
     },
     "vehicle::parts::VehiclePartGameObject": {
@@ -203382,7 +203883,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 108,
-              "line": 179
+              "line": 247
             }
           },
           {
@@ -203408,7 +203909,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 108,
-              "line": 184
+              "line": 252
             }
           }
         ],
@@ -203422,7 +203923,7 @@
       },
       "source": {
         "file_index": 108,
-        "line": 174
+        "line": 242
       }
     },
     "vehicle::stunt_areas::StuntArea": {
@@ -203612,7 +204113,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 236
+              "line": 245
             }
           }
         ],
@@ -203670,7 +204171,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 110,
-              "line": 249
+              "line": 258
             }
           }
         ],
@@ -203687,7 +204188,7 @@
       },
       "source": {
         "file_index": 110,
-        "line": 229
+        "line": 238
       }
     },
     "vehicle::vehicle::AirPlane::NITROUS_THRUST_THRESHOLD": {
@@ -203718,7 +204219,7 @@
       },
       "source": {
         "file_index": 110,
-        "line": 233
+        "line": 242
       }
     },
     "vehicle::vehicle::DoorInfo": {
@@ -203795,7 +204296,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 319
+              "line": 328
             }
           },
           {
@@ -203820,7 +204321,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 324
+              "line": 333
             }
           },
           {
@@ -203837,7 +204338,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 325
+              "line": 334
             }
           },
           {
@@ -203858,7 +204359,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 329
+              "line": 338
             }
           },
           {
@@ -203878,7 +204379,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 329
+              "line": 338
             }
           },
           {
@@ -203899,7 +204400,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 333
+              "line": 342
             }
           },
           {
@@ -203916,7 +204417,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 333
+              "line": 342
             }
           },
           {
@@ -203933,7 +204434,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 335
+              "line": 344
             }
           },
           {
@@ -203954,7 +204455,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 339
+              "line": 348
             }
           },
           {
@@ -203971,7 +204472,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 339
+              "line": 348
             }
           },
           {
@@ -203988,7 +204489,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 342
+              "line": 351
             }
           },
           {
@@ -204009,7 +204510,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 345
+              "line": 354
             }
           },
           {
@@ -204026,7 +204527,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 345
+              "line": 354
             }
           },
           {
@@ -204089,7 +204590,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 295
+              "line": 304
             }
           }
         ],
@@ -204107,7 +204608,7 @@
       },
       "source": {
         "file_index": 110,
-        "line": 313
+        "line": 322
       }
     },
     "vehicle::vehicle::DoorInfo::FLAG_KEEP_OPEN": {
@@ -204138,7 +204639,7 @@
       },
       "source": {
         "file_index": 110,
-        "line": 315
+        "line": 324
       }
     },
     "vehicle::vehicle::DoorMapNode": {
@@ -204175,7 +204676,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 367
+              "line": 376
             }
           },
           {
@@ -204195,7 +204696,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 368
+              "line": 377
             }
           },
           {
@@ -204215,7 +204716,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 369
+              "line": 378
             }
           },
           {
@@ -204232,7 +204733,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 371
+              "line": 380
             }
           },
           {
@@ -204253,7 +204754,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 375
+              "line": 384
             }
           },
           {
@@ -204273,7 +204774,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 375
+              "line": 384
             }
           },
           {
@@ -204293,7 +204794,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 377
+              "line": 386
             }
           },
           {
@@ -204314,7 +204815,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 381
+              "line": 390
             }
           },
           {
@@ -204331,7 +204832,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 381
+              "line": 390
             }
           },
           {
@@ -204359,7 +204860,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 363
+              "line": 372
             }
           }
         ],
@@ -204374,7 +204875,7 @@
       },
       "source": {
         "file_index": 110,
-        "line": 366
+        "line": 375
       }
     },
     "vehicle::vehicle::DoorSlot": {
@@ -204404,7 +204905,7 @@
             "doc": null,
             "source": {
               "file_index": 110,
-              "line": 263
+              "line": 272
             }
           },
           {
@@ -204413,7 +204914,7 @@
             "doc": null,
             "source": {
               "file_index": 110,
-              "line": 264
+              "line": 273
             }
           },
           {
@@ -204422,7 +204923,7 @@
             "doc": null,
             "source": {
               "file_index": 110,
-              "line": 265
+              "line": 274
             }
           },
           {
@@ -204431,7 +204932,7 @@
             "doc": null,
             "source": {
               "file_index": 110,
-              "line": 266
+              "line": 275
             }
           },
           {
@@ -204440,7 +204941,7 @@
             "doc": null,
             "source": {
               "file_index": 110,
-              "line": 267
+              "line": 276
             }
           },
           {
@@ -204449,7 +204950,7 @@
             "doc": null,
             "source": {
               "file_index": 110,
-              "line": 268
+              "line": 277
             }
           },
           {
@@ -204458,7 +204959,7 @@
             "doc": null,
             "source": {
               "file_index": 110,
-              "line": 269
+              "line": 278
             }
           },
           {
@@ -204467,7 +204968,7 @@
             "doc": null,
             "source": {
               "file_index": 110,
-              "line": 270
+              "line": 279
             }
           },
           {
@@ -204476,7 +204977,7 @@
             "doc": null,
             "source": {
               "file_index": 110,
-              "line": 271
+              "line": 280
             }
           },
           {
@@ -204485,7 +204986,7 @@
             "doc": null,
             "source": {
               "file_index": 110,
-              "line": 272
+              "line": 281
             }
           },
           {
@@ -204494,7 +204995,7 @@
             "doc": null,
             "source": {
               "file_index": 110,
-              "line": 273
+              "line": 282
             }
           },
           {
@@ -204503,7 +205004,7 @@
             "doc": null,
             "source": {
               "file_index": 110,
-              "line": 274
+              "line": 283
             }
           },
           {
@@ -204512,7 +205013,7 @@
             "doc": null,
             "source": {
               "file_index": 110,
-              "line": 275
+              "line": 284
             }
           }
         ],
@@ -204525,7 +205026,7 @@
       },
       "source": {
         "file_index": 110,
-        "line": 262
+        "line": 271
       }
     },
     "vehicle::vehicle::DoorState": {
@@ -204562,7 +205063,7 @@
             "doc": " Open: the part is loose on its hinge, swinging freely or held open by the hinge's motor.",
             "source": {
               "file_index": 110,
-              "line": 283
+              "line": 292
             }
           },
           {
@@ -204571,7 +205072,7 @@
             "doc": " Being turned open by the hinge's motor.",
             "source": {
               "file_index": 110,
-              "line": 285
+              "line": 294
             }
           },
           {
@@ -204580,7 +205081,7 @@
             "doc": " Being turned shut by the hinge's motor.",
             "source": {
               "file_index": 110,
-              "line": 287
+              "line": 296
             }
           },
           {
@@ -204589,7 +205090,7 @@
             "doc": " The part broke off.",
             "source": {
               "file_index": 110,
-              "line": 289
+              "line": 298
             }
           },
           {
@@ -204598,7 +205099,7 @@
             "doc": " Closed: the part is merged into the vehicle's body. As a pending state, it means that no\n request is pending.",
             "source": {
               "file_index": 110,
-              "line": 292
+              "line": 301
             }
           }
         ],
@@ -204611,7 +205112,7 @@
       },
       "source": {
         "file_index": 110,
-        "line": 281
+        "line": 290
       }
     },
     "vehicle::vehicle::Helicopter": {
@@ -204659,7 +205160,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 110,
-              "line": 224
+              "line": 233
             }
           }
         ],
@@ -204673,7 +205174,7 @@
       },
       "source": {
         "file_index": 110,
-        "line": 219
+        "line": 228
       }
     },
     "vehicle::vehicle::Seat": {
@@ -204794,6 +205295,44 @@
             "visibility": "private",
             "name": "_field_0",
             "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 559
+            },
+            "offset": 0,
+            "size": 559,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 110,
+              "line": 54
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Invulnerable",
+            "doc": " The damageable object's general invulnerability. Vehicle damage admission refuses part\n damage while set, independently of each part's own protection.",
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 559,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 110,
+              "line": 54
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_230",
+            "doc": null,
             "doc_links": [
               {
                 "text": "AirPlane::UpdateVehicleInputsFromActionMap",
@@ -204814,15 +205353,15 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 1088
+              "size": 528
             },
-            "offset": 0,
-            "size": 1088,
+            "offset": 560,
+            "size": 528,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 56
+              "line": 61
             }
           },
           {
@@ -204853,7 +205392,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 56
+              "line": 61
             }
           },
           {
@@ -204870,7 +205409,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 59
+              "line": 64
             }
           },
           {
@@ -204891,7 +205430,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 65
+              "line": 70
             }
           },
           {
@@ -204908,7 +205447,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 65
+              "line": 70
             }
           },
           {
@@ -204929,7 +205468,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 70
+              "line": 75
             }
           },
           {
@@ -204946,7 +205485,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 70
+              "line": 75
             }
           },
           {
@@ -204963,7 +205502,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 72
+              "line": 77
             }
           },
           {
@@ -205000,7 +205539,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 77
+              "line": 82
             }
           },
           {
@@ -205028,7 +205567,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 81
+              "line": 86
             }
           },
           {
@@ -205056,7 +205595,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 81
+              "line": 86
             }
           },
           {
@@ -205091,7 +205630,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 86
+              "line": 91
             }
           },
           {
@@ -205122,7 +205661,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 86
+              "line": 91
             }
           },
           {
@@ -205143,7 +205682,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 90
+              "line": 95
             }
           },
           {
@@ -205160,7 +205699,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 90
+              "line": 95
             }
           },
           {
@@ -205189,7 +205728,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 96
+              "line": 101
             }
           },
           {
@@ -205214,7 +205753,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 96
+              "line": 101
             }
           },
           {
@@ -205235,7 +205774,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 102
+              "line": 107
             }
           },
           {
@@ -205252,12 +205791,50 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 102
+              "line": 107
             }
           },
           {
             "visibility": "private",
             "name": "_field_4938",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 552
+            },
+            "offset": 18744,
+            "size": 552,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 110,
+              "line": 111
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_InJesusMode",
+            "doc": " The vehicle's damage-immune mode. Vehicle damage admission suppresses part damage while set.",
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 19296,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 110,
+              "line": 111
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_4b61",
             "doc": null,
             "doc_links": [
               {
@@ -205273,15 +205850,15 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 714
+              "size": 161
             },
-            "offset": 18744,
-            "size": 714,
+            "offset": 19297,
+            "size": 161,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 109
+              "line": 118
             }
           },
           {
@@ -205306,7 +205883,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 109
+              "line": 118
             }
           },
           {
@@ -205335,7 +205912,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 114
+              "line": 123
             }
           },
           {
@@ -205360,7 +205937,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 114
+              "line": 123
             }
           },
           {
@@ -205388,7 +205965,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 119
+              "line": 128
             }
           },
           {
@@ -205412,7 +205989,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 119
+              "line": 128
             }
           },
           {
@@ -205441,7 +206018,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 125
+              "line": 134
             }
           },
           {
@@ -205466,7 +206043,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 125
+              "line": 134
             }
           },
           {
@@ -205495,7 +206072,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 131
+              "line": 140
             }
           },
           {
@@ -205523,7 +206100,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 131
+              "line": 140
             }
           },
           {
@@ -205552,7 +206129,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 136
+              "line": 145
             }
           },
           {
@@ -205577,7 +206154,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 136
+              "line": 145
             }
           },
           {
@@ -205637,7 +206214,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 110,
-              "line": 142
+              "line": 151
             }
           },
           {
@@ -205717,7 +206294,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 110,
-              "line": 154
+              "line": 163
             }
           },
           {
@@ -205753,7 +206330,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 110,
-              "line": 160
+              "line": 169
             }
           },
           {
@@ -205798,7 +206375,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 110,
-              "line": 165
+              "line": 174
             }
           },
           {
@@ -205840,7 +206417,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 110,
-              "line": 170
+              "line": 179
             }
           },
           {
@@ -205863,7 +206440,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 110,
-              "line": 174
+              "line": 183
             }
           },
           {
@@ -205902,7 +206479,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 110,
-              "line": 180
+              "line": 189
             }
           },
           {
@@ -205925,7 +206502,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 110,
-              "line": 185
+              "line": 194
             }
           },
           {
@@ -205978,7 +206555,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 110,
-              "line": 197
+              "line": 206
             }
           },
           {
@@ -206009,7 +206586,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 110,
-              "line": 205
+              "line": 214
             }
           },
           {
@@ -206054,7 +206631,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 110,
-              "line": 215
+              "line": 224
             }
           }
         ],
@@ -206153,7 +206730,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 356
+              "line": 365
             }
           },
           {
@@ -206181,7 +206758,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 356
+              "line": 365
             }
           },
           {
@@ -206202,7 +206779,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 360
+              "line": 369
             }
           },
           {
@@ -206222,7 +206799,7 @@
             "is_base": false,
             "source": {
               "file_index": 110,
-              "line": 360
+              "line": 369
             }
           }
         ],
@@ -206237,7 +206814,7 @@
       },
       "source": {
         "file_index": 110,
-        "line": 352
+        "line": 361
       }
     },
     "vehicle::vehicle::VehicleSeat": {
@@ -220750,6 +221327,7 @@
           "doc": null,
           "items": [
             "vehicle::parts::AdfHashString",
+            "vehicle::parts::ConstraintInfo",
             "vehicle::parts::Part",
             "vehicle::parts::PartEventReason",
             "vehicle::parts::PartInstance",
@@ -220932,7 +221510,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 110,
-                "line": 257
+                "line": 266
               }
             }
           ],
