@@ -22,7 +22,7 @@ pub type AdfHashString {
 /// parts, the steering wheel among them, have an identity offset under the body, so their mesh is
 /// authored in the vehicle's own space (+X right, +Y up, -Z forward). A hinged part, such as a
 /// motorcycle's or jetski's steering fork, has its hinge pivot as its offset.
-#[min_size(0x94)]
+#[min_size(0xB8)]
 pub type Part {
     /// The part's name, `<model>_<piece>`, such as `modernsuv_steeringwheel`,
     /// `atv_upper_steering`, or `modernmini_mirror_l`.
@@ -48,6 +48,22 @@ pub type Part {
     /// The part's pivot in its parent part's space, as the engine's row-major matrix.
     #[address(0x54)]
     pub m_parent_space_offset: Matrix4,
+
+    /// Whether the part may break off. Root parts cannot break off regardless of this property.
+    #[address(0xA9)]
+    pub m_should_break: u8,
+
+    /// Whether ordinary damage keeps the part attached until its body or an ancestor breaks.
+    #[address(0xAC)]
+    pub m_prevent_breaking_while_alive: u8,
+
+    /// Whether breaking destroys the visual part instead of retaining its physical body.
+    #[address(0xB0)]
+    pub m_disappears_when_broken: u8,
+
+    /// Whether the part has an authored world-collision shape.
+    #[address(0xB6)]
+    pub m_has_world_collision_shape: u8,
 }
 
 /// `CPartInstance`: the live state of one [`Part`] of a breakable physics body
@@ -58,15 +74,36 @@ pub type PartInstance {
     /// The part this one hangs from, or null for the root part.
     pub m_ParentPart: *mut PartInstance,
 
+    /// The breakable body whose resource and phase govern this part.
+    #[address(0x18)]
+    pub m_Breakable: *mut PfxBreakable,
+
     /// The part's index in its body's part instances, the same as its [`Part::m_part_index`].
     #[address(0x20)]
     pub m_PartInstanceIndex: u32,
+
+    /// Whether the part has been deleted from its owner's active parts.
+    #[address(0x2C)]
+    pub m_Deleted: bool,
+    /// Whether the resource entry supplies a valid part instance, checked by restoration.
+    pub m_IsValid: bool,
 
     /// The owner the part reports damage to (`IDamagePartOwner*`). For a vehicle's part this is
     /// the vehicle's damage-part-owner interface; the vehicle's render update only draws parts
     /// whose owner it is.
     #[address(0x30)]
     pub m_DamagePartOwner: *mut void,
+    /// The resolved damage-type tuning used for damaged, loosened, and broken health transitions.
+    pub m_PartDamageType: *const void,
+
+    /// Remaining part health. Negative health is not processed by the break-off damage helper.
+    #[address(0x40)]
+    pub m_Health: i32,
+    /// Blocks ordinary damage admission and the final instant break operation, including forced
+    /// break damage.
+    pub m_Invulnerable: bool,
+    /// Ordinary damage must be attributed to the player while set.
+    pub m_IsOnlyVulnerableToPlayerDamage: bool,
 
     /// Whether the part has broken off the body. A part also counts as broken off when any ancestor
     /// has ([`BrokeOffOrAncestorBrokeOff`](Self::BrokeOffOrAncestorBrokeOff)).
@@ -92,6 +129,19 @@ pub type PartInstance {
     pub m_PartProperties: *const Part,
 }
 impl PartInstance {
+    /// Applies enough player-attributed or unattributed damage to pass below zero health. Uses
+    /// neutral damage flags. Forced damage bypasses ordinary invulnerability admission and the
+    /// prevent-breaking-while-alive property, but still requires an authored breakable non-root
+    /// part. The final break operation independently refuses an invulnerable part and defers while
+    /// its breakable is in a parallel update phase.
+    #[address(0x140_22F_AF0)]
+    pub fn DamagePart_ToBreakOff(&mut self, is_player_doing_damage: bool, force_damage: bool);
+
+    /// Whether authored breakability and the body's current life state permit breaking off.
+    /// Forced damage ignores the prevent-breaking-while-alive property, not authored breakability.
+    #[address(0x140_1D0_740)]
+    pub fn IsAllowedToBreakOffNow(&self, force_damage: bool) -> bool;
+
     /// Whether the part or any of its ancestors has broken off ([`m_BrokeOff`](Self::m_BrokeOff)),
     /// walking [`m_ParentPart`](Self::m_ParentPart) to the root.
     #[address(0x140_1D0_670)]
@@ -117,6 +167,10 @@ impl PartInstance {
 /// are bound.
 #[min_size(0x134)]
 pub type PfxBreakable {
+    /// Positive while part transitions must defer their non-thread-safe work.
+    #[address(0xCC)]
+    pub m_InParallelUpdatePhaseCounter: i32,
+
     /// The part instances, one per entry of the parts resource, indexed by part index.
     #[address(0x120)]
     pub m_PartInstances: *mut PartInstance,
@@ -126,7 +180,21 @@ pub type PfxBreakable {
     /// The number of entries in [`m_ValidPartIndices`](Self::m_ValidPartIndices).
     pub m_NumberOfValidParts: u32,
 }
+
+/// The authored limited hinge's local frame, axis, and signed angular limits.
+#[size(0x4C), align(4)]
+pub type ConstraintInfo {
+    pub m_TransformLocal: Matrix4,
+    pub m_AxisIndex: i32,
+    pub m_MinAngle: f32,
+    pub m_MaxAngle: f32,
+}
 impl PfxBreakable {
+    /// Reads a part's limited hinge from the physics prototype, found by its part-name hash.
+    /// Returns false for an absent part, an absent constraint, or a constraint other than a limited hinge.
+    #[address(0x140_24C_000)]
+    pub fn GetConstraintInfoFromPrototype(&mut self, part_name_hash: u32, info: *mut ConstraintInfo) -> bool;
+
     /// The part instance at `index`, or null when `index` is not below the parts resource's part
     /// count.
     #[address(0x140_237_A60)]

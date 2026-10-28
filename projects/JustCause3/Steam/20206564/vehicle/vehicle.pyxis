@@ -48,6 +48,11 @@ pub type Vehicle {
     /// The number of entries in [`m_Seats`](Self::m_Seats).
     pub const MAX_SEATS: u64 = 42,
 
+    /// The damageable object's general invulnerability. Vehicle damage admission refuses part
+    /// damage while set, independently of each part's own protection.
+    #[address(0x22F)]
+    pub m_Invulnerable: bool,
+
     /// The signed throttle the vehicle's input reader last applied (`m_SteeringValues.Acceleration`).
     /// A plane's reader ([`AirPlane::UpdateVehicleInputsFromActionMap`]) sets it to the
     /// `PLANE_INC_TRUST` value less the `PLANE_DEC_TRUST` value, so it is negative while braking.
@@ -100,6 +105,10 @@ pub type Vehicle {
     /// vehicle's interaction context rather than an area.
     #[address(0x1_830)]
     pub m_StuntAreas: StuntAreas,
+
+    /// The vehicle's damage-immune mode. Vehicle damage admission suppresses part damage while set.
+    #[address(0x4_B60)]
+    pub m_InJesusMode: bool,
 
     /// Whether the holstered weapons of the characters seated in the vehicle are hidden: the
     /// seat states' hide task
