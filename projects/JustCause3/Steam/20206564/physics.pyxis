@@ -403,6 +403,12 @@ pub type hknpWorld {
     pub m_intSpaceUtil: hkIntSpaceUtil,
 }
 impl hknpWorld {
+    /// Removes the bodies from the simulation, notifies the world's body-destroyed listeners,
+    /// detaches their motions, releases their shape references, and schedules their slots for
+    /// deletion. `activation_mode` is forwarded to the removal of the bodies.
+    #[address(0x141_4EA_080)]
+    pub fn destroyBodies(&mut self, ids: *const u32, count: i32, activation_mode: i32);
+
     /// Creates a constraint from `cinfo`, writes its id to `out`, and returns `out`. A constraint
     /// whose two bodies are the same, or whose data is of a type the world does not support, is
     /// created disabled; otherwise it is enabled at once. The constraint takes a reference of its

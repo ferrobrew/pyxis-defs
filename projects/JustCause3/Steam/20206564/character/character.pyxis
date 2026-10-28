@@ -811,6 +811,11 @@ impl Character {
     #[address(0x140_7F1_A30)]
     pub fn AutoAttachToStuntAreaOnVehicleBelow(&mut self) -> bool;
 
+    /// Whether the ground-information vehicle flag is set and its weak ground object resolves
+    /// to exactly `vehicle`. A missing, expired, or different vehicle returns false.
+    #[address(0x140_7D5_C80)]
+    pub fn IsThisVehicleBelow(&self, vehicle: *const Vehicle) -> bool;
+
     /// Whether the character mans a mounted gun: the weapon in the
     /// [`E_SLOT_HEAVY`](WeaponSlot::E_SLOT_HEAVY) slot is in its mounted weapon state.
     #[address(0x140_7B0_F60)]
