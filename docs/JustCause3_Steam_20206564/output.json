@@ -126376,7 +126376,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 531
+              "line": 550
             }
           },
           {
@@ -126393,7 +126393,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 532
+              "line": 551
             }
           }
         ],
@@ -126411,7 +126411,7 @@
       },
       "source": {
         "file_index": 66,
-        "line": 528
+        "line": 547
       }
     },
     "havok::hkcdGskCache::INITIAL_DIMENSION": {
@@ -126434,7 +126434,7 @@
       },
       "source": {
         "file_index": 66,
-        "line": 529
+        "line": 548
       }
     },
     "havok::hkcdGskGetClosestPointInput": {
@@ -126461,7 +126461,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 518
+              "line": 537
             }
           },
           {
@@ -126478,7 +126478,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 519
+              "line": 538
             }
           },
           {
@@ -126499,7 +126499,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 522
+              "line": 541
             }
           },
           {
@@ -126516,7 +126516,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 522
+              "line": 541
             }
           },
           {
@@ -126533,7 +126533,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 523
+              "line": 542
             }
           },
           {
@@ -126554,7 +126554,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 510
+              "line": 529
             }
           }
         ],
@@ -126573,7 +126573,7 @@
       },
       "source": {
         "file_index": 66,
-        "line": 512
+        "line": 531
       }
     },
     "havok::hkcdGskGetClosestPointInput::DEFAULT_TERMINATION_GROWTH_RATE": {
@@ -126596,7 +126596,7 @@
       },
       "source": {
         "file_index": 66,
-        "line": 516
+        "line": 535
       }
     },
     "havok::hkcdGskGetClosestPointInput::HANDLE_PENETRATION": {
@@ -126619,7 +126619,7 @@
       },
       "source": {
         "file_index": 66,
-        "line": 514
+        "line": 533
       }
     },
     "havok::hkcdGskGetClosestPointOutput": {
@@ -126646,7 +126646,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 539
+              "line": 558
             }
           },
           {
@@ -126663,7 +126663,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 540
+              "line": 559
             }
           },
           {
@@ -126680,7 +126680,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 541
+              "line": 560
             }
           }
         ],
@@ -126695,7 +126695,7 @@
       },
       "source": {
         "file_index": 66,
-        "line": 538
+        "line": 557
       }
     },
     "havok::hkcdGskGetClosestPointStatus": {
@@ -126718,7 +126718,7 @@
             "doc": null,
             "source": {
               "file_index": 66,
-              "line": 546
+              "line": 565
             }
           },
           {
@@ -126727,7 +126727,7 @@
             "doc": null,
             "source": {
               "file_index": 66,
-              "line": 547
+              "line": 566
             }
           },
           {
@@ -126736,7 +126736,7 @@
             "doc": null,
             "source": {
               "file_index": 66,
-              "line": 548
+              "line": 567
             }
           },
           {
@@ -126745,7 +126745,7 @@
             "doc": null,
             "source": {
               "file_index": 66,
-              "line": 549
+              "line": 568
             }
           },
           {
@@ -126754,7 +126754,7 @@
             "doc": null,
             "source": {
               "file_index": 66,
-              "line": 550
+              "line": 569
             }
           },
           {
@@ -126763,7 +126763,7 @@
             "doc": null,
             "source": {
               "file_index": 66,
-              "line": 551
+              "line": 570
             }
           },
           {
@@ -126772,7 +126772,7 @@
             "doc": null,
             "source": {
               "file_index": 66,
-              "line": 552
+              "line": 571
             }
           },
           {
@@ -126781,7 +126781,7 @@
             "doc": null,
             "source": {
               "file_index": 66,
-              "line": 553
+              "line": 572
             }
           }
         ],
@@ -126794,7 +126794,163 @@
       },
       "source": {
         "file_index": 66,
-        "line": 545
+        "line": 564
+      }
+    },
+    "havok::hkcdManifold4": {
+      "path": "havok::hkcdManifold4",
+      "visibility": "public",
+      "size": 128,
+      "alignment": 16,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " A contact manifold (`hkcdManifold4`) with the normal and world-space contact positions.",
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_numPoints",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "offset": 0,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 66,
+              "line": 452
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_minimumDistance",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 4,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 66,
+              "line": 453
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_8",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 8
+            },
+            "offset": 8,
+            "size": 8,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 66,
+              "line": 456
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_normal",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "havok::hkVector4f"
+            },
+            "offset": 16,
+            "size": 16,
+            "alignment": 16,
+            "is_base": false,
+            "source": {
+              "file_index": 66,
+              "line": 456
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_weldNormal",
+            "doc": null,
+            "type_ref": {
+              "type": "raw",
+              "path": "havok::hkVector4f"
+            },
+            "offset": 32,
+            "size": 16,
+            "alignment": 16,
+            "is_base": false,
+            "source": {
+              "file_index": 66,
+              "line": 457
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_distances",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "f32"
+              },
+              "size": 4
+            },
+            "offset": 48,
+            "size": 16,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 66,
+              "line": 458
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_positions",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "havok::hkVector4f"
+              },
+              "size": 4
+            },
+            "offset": 64,
+            "size": 64,
+            "alignment": 16,
+            "is_base": false,
+            "source": {
+              "file_index": 66,
+              "line": 459
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 66,
+        "line": 451
       }
     },
     "havok::hknpBodyCinfo": {
@@ -128146,7 +128302,50 @@
             }
           }
         ],
-        "associated_functions": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "calculateContactPointPositions",
+            "doc": " Reconstructs the contact positions from the Jacobian and the world's body motions.\n The disassembler labels this function `hknpBodyTracker_getBodyIdsFromInput`.",
+            "body": {
+              "type": "address",
+              "address": 5390832320
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "world",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "physics::hknpWorld"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "manifold",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "havok::hkcdManifold4"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 66,
+              "line": 465
+            }
+          }
+        ],
         "vftable": null,
         "singleton": null,
         "copyable": false,
@@ -128337,7 +128536,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 66,
-              "line": 456
+              "line": 475
             }
           }
         ],
@@ -128351,7 +128550,7 @@
       },
       "source": {
         "file_index": 66,
-        "line": 450
+        "line": 469
       }
     },
     "havok::hknpConvexPolytopeFace": {
@@ -129997,7 +130196,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 466
+              "line": 485
             }
           },
           {
@@ -130014,7 +130213,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 467
+              "line": 486
             }
           },
           {
@@ -130034,7 +130233,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 468
+              "line": 487
             }
           },
           {
@@ -130051,7 +130250,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 469
+              "line": 488
             }
           },
           {
@@ -130072,7 +130271,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 459
+              "line": 478
             }
           }
         ],
@@ -130090,7 +130289,7 @@
       },
       "source": {
         "file_index": 66,
-        "line": 462
+        "line": 481
       }
     },
     "havok::hknpGetShapeKeysConfig::MOST_DETAILED": {
@@ -130113,7 +130312,7 @@
       },
       "source": {
         "file_index": 66,
-        "line": 464
+        "line": 483
       }
     },
     "havok::hknpInplaceTriangleShape": {
@@ -130144,7 +130343,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 495
+              "line": 514
             }
           }
         ],
@@ -130180,7 +130379,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 66,
-              "line": 502
+              "line": 521
             }
           }
         ],
@@ -130194,7 +130393,7 @@
       },
       "source": {
         "file_index": 66,
-        "line": 497
+        "line": 516
       }
     },
     "havok::hknpMotionCinfo": {
@@ -131279,7 +131478,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 477
+              "line": 496
             }
           },
           {
@@ -131296,7 +131495,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 480
+              "line": 499
             }
           },
           {
@@ -131313,7 +131512,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 481
+              "line": 500
             }
           },
           {
@@ -131334,7 +131533,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 484
+              "line": 503
             }
           },
           {
@@ -131354,7 +131553,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 484
+              "line": 503
             }
           },
           {
@@ -131375,7 +131574,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 487
+              "line": 506
             }
           },
           {
@@ -131395,7 +131594,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 487
+              "line": 506
             }
           },
           {
@@ -131424,7 +131623,7 @@
             "is_base": false,
             "source": {
               "file_index": 66,
-              "line": 472
+              "line": 491
             }
           }
         ],
@@ -131465,7 +131664,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 66,
-              "line": 492
+              "line": 511
             }
           }
         ],
@@ -131479,7 +131678,7 @@
       },
       "source": {
         "file_index": 66,
-        "line": 476
+        "line": 495
       }
     },
     "havok::hknpShapeType": {
@@ -149579,7 +149778,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 691
+              "line": 714
             }
           },
           {
@@ -149610,7 +149809,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 698
+              "line": 721
             }
           },
           {
@@ -149645,7 +149844,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 708
+              "line": 731
             }
           },
           {
@@ -149676,7 +149875,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 708
+              "line": 731
             }
           }
         ],
@@ -149691,7 +149890,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 690
+        "line": 713
       }
     },
     "physics::Constraint": {
@@ -149732,7 +149931,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 684
+              "line": 707
             }
           }
         ],
@@ -149746,7 +149945,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 679
+        "line": 702
       }
     },
     "physics::CustomGroupCollisionFilter": {
@@ -149815,7 +150014,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 1088
+        "line": 1111
       }
     },
     "physics::CustomGroupCollisionFilter::FIELD_MASK": {
@@ -149838,7 +150037,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 1092
+        "line": 1115
       }
     },
     "physics::CustomGroupCollisionFilter::LAYER_MASK": {
@@ -149861,7 +150060,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 1090
+        "line": 1113
       }
     },
     "physics::CustomGroupCollisionFilter::NO_COLLIDE_SHIFT": {
@@ -149884,7 +150083,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 1096
+        "line": 1119
       }
     },
     "physics::CustomGroupCollisionFilter::SUBSYSTEM_SHIFT": {
@@ -149907,7 +150106,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 1094
+        "line": 1117
       }
     },
     "physics::CustomGroupCollisionFilter::SYSTEM_GROUP_SHIFT": {
@@ -149930,7 +150129,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 1098
+        "line": 1121
       }
     },
     "physics::GameMaterialId": {
@@ -150006,7 +150205,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 326
+              "line": 347
             }
           },
           {
@@ -150023,7 +150222,7 @@
             ],
             "source": {
               "file_index": 82,
-              "line": 329
+              "line": 350
             }
           },
           {
@@ -150032,7 +150231,7 @@
             "doc": " Not grapplable: the aim does not count it, and a wire end does not attach to it.",
             "source": {
               "file_index": 82,
-              "line": 331
+              "line": 352
             }
           }
         ],
@@ -150045,7 +150244,74 @@
       },
       "source": {
         "file_index": 82,
-        "line": 325
+        "line": 346
+      }
+    },
+    "physics::HavokCollisionListener": {
+      "path": "physics::HavokCollisionListener",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " The physics system's global collision listener. Contact impulse dispatch resolves both body\n instances and calls each instance's event virtual when its subscription flag is active.",
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "onContactImpulseEvent",
+            "doc": " Dispatches a contact impulse event without modifying the contact's solver impulses.",
+            "body": {
+              "type": "address",
+              "address": 5370602752
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "input",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "void"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "event",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "havok::hknpContactImpulseEvent"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 82,
+              "line": 294
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 82,
+        "line": 290
       }
     },
     "physics::IgnoreMaterialFlagFilter": {
@@ -150398,7 +150664,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 770
+              "line": 793
             }
           },
           {
@@ -150422,7 +150688,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 770
+              "line": 793
             }
           },
           {
@@ -150463,7 +150729,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 778
+              "line": 801
             }
           },
           {
@@ -150500,7 +150766,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 778
+              "line": 801
             }
           },
           {
@@ -150517,7 +150783,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 781
+              "line": 804
             }
           },
           {
@@ -150547,7 +150813,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 786
+              "line": 809
             }
           },
           {
@@ -150572,7 +150838,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 788
+              "line": 811
             }
           },
           {
@@ -150593,7 +150859,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 793
+              "line": 816
             }
           },
           {
@@ -150610,7 +150876,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 793
+              "line": 816
             }
           },
           {
@@ -150644,7 +150910,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 798
+              "line": 821
             }
           },
           {
@@ -150674,7 +150940,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 798
+              "line": 821
             }
           },
           {
@@ -150703,7 +150969,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 803
+              "line": 826
             }
           },
           {
@@ -150731,7 +150997,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 803
+              "line": 826
             }
           },
           {
@@ -150752,7 +151018,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 807
+              "line": 830
             }
           },
           {
@@ -150772,7 +151038,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 807
+              "line": 830
             }
           },
           {
@@ -150800,7 +151066,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 810
+              "line": 833
             }
           },
           {
@@ -150821,7 +151087,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 760
+              "line": 783
             }
           }
         ],
@@ -150868,7 +151134,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 819
+              "line": 842
             }
           },
           {
@@ -150899,7 +151165,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 824
+              "line": 847
             }
           },
           {
@@ -150953,7 +151219,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 833
+              "line": 856
             }
           },
           {
@@ -151003,7 +151269,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 838
+              "line": 861
             }
           },
           {
@@ -151023,7 +151289,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 843
+              "line": 866
             }
           },
           {
@@ -151065,7 +151331,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 852
+              "line": 875
             }
           },
           {
@@ -151096,7 +151362,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 858
+              "line": 881
             }
           },
           {
@@ -151149,7 +151415,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 866
+              "line": 889
             }
           },
           {
@@ -151208,7 +151474,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 875
+              "line": 898
             }
           }
         ],
@@ -151225,7 +151491,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 763
+        "line": 786
       }
     },
     "physics::PfxCharacterInstance::INVALID_BODY_ID": {
@@ -151256,7 +151522,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 766
+        "line": 789
       }
     },
     "physics::PfxCharacterOwner": {
@@ -151286,7 +151552,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 753
+              "line": 776
             }
           }
         ],
@@ -151310,7 +151576,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 753
+                "line": 776
               }
             },
             {
@@ -151330,7 +151596,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 753
+                "line": 776
               }
             },
             {
@@ -151356,7 +151622,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 756
+                "line": 779
               }
             }
           ]
@@ -151370,7 +151636,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 752
+        "line": 775
       }
     },
     "physics::PfxCharacterOwnerVftable": {
@@ -151410,7 +151676,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 753
+              "line": 776
             }
           },
           {
@@ -151440,7 +151706,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 753
+              "line": 776
             }
           },
           {
@@ -151476,7 +151742,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 756
+              "line": 779
             }
           }
         ],
@@ -151491,7 +151757,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 753
+        "line": 776
       }
     },
     "physics::PfxInstance": {
@@ -151528,7 +151794,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -151562,7 +151828,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 638
+              "line": 661
             }
           },
           {
@@ -151595,7 +151861,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 638
+              "line": 661
             }
           },
           {
@@ -151620,7 +151886,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 641
+              "line": 664
             }
           },
           {
@@ -151645,7 +151911,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 644
+              "line": 667
             }
           },
           {
@@ -151673,7 +151939,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 610
+              "line": 633
             }
           }
         ],
@@ -151697,7 +151963,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 619
+                "line": 642
               }
             },
             {
@@ -151717,7 +151983,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 619
+                "line": 642
               }
             },
             {
@@ -151737,7 +152003,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 619
+                "line": 642
               }
             },
             {
@@ -151757,7 +152023,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 619
+                "line": 642
               }
             },
             {
@@ -151777,7 +152043,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 619
+                "line": 642
               }
             },
             {
@@ -151797,7 +152063,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 619
+                "line": 642
               }
             },
             {
@@ -151817,7 +152083,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 619
+                "line": 642
               }
             },
             {
@@ -151837,7 +152103,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 619
+                "line": 642
               }
             },
             {
@@ -151857,7 +152123,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 619
+                "line": 642
               }
             },
             {
@@ -151877,7 +152143,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 619
+                "line": 642
               }
             },
             {
@@ -151897,7 +152163,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 619
+                "line": 642
               }
             },
             {
@@ -151917,7 +152183,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 619
+                "line": 642
               }
             },
             {
@@ -151937,7 +152203,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 619
+                "line": 642
               }
             },
             {
@@ -151957,7 +152223,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 619
+                "line": 642
               }
             },
             {
@@ -151977,7 +152243,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 619
+                "line": 642
               }
             },
             {
@@ -151997,7 +152263,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 619
+                "line": 642
               }
             },
             {
@@ -152017,7 +152283,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 619
+                "line": 642
               }
             },
             {
@@ -152037,7 +152303,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 619
+                "line": 642
               }
             },
             {
@@ -152057,7 +152323,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 619
+                "line": 642
               }
             },
             {
@@ -152077,7 +152343,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 619
+                "line": 642
               }
             },
             {
@@ -152146,7 +152412,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 625
+                "line": 648
               }
             },
             {
@@ -152221,7 +152487,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 632
+                "line": 655
               }
             }
           ]
@@ -152235,7 +152501,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 618
+        "line": 641
       }
     },
     "physics::PfxInstanceVftable": {
@@ -152275,7 +152541,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -152305,7 +152571,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -152335,7 +152601,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -152365,7 +152631,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -152395,7 +152661,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -152425,7 +152691,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -152455,7 +152721,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -152485,7 +152751,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -152515,7 +152781,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -152545,7 +152811,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -152575,7 +152841,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -152605,7 +152871,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -152635,7 +152901,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -152665,7 +152931,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -152695,7 +152961,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -152725,7 +152991,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -152755,7 +153021,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -152785,7 +153051,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -152815,7 +153081,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -152845,7 +153111,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 619
+              "line": 642
             }
           },
           {
@@ -152920,7 +153186,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 625
+              "line": 648
             }
           },
           {
@@ -153001,7 +153267,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 632
+              "line": 655
             }
           }
         ],
@@ -153016,7 +153282,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 619
+        "line": 642
       }
     },
     "physics::PfxLayer": {
@@ -153046,7 +153312,7 @@
             "doc": " Collides with everything.",
             "source": {
               "file_index": 82,
-              "line": 1038
+              "line": 1061
             }
           },
           {
@@ -153063,7 +153329,7 @@
             ],
             "source": {
               "file_index": 82,
-              "line": 1040
+              "line": 1063
             }
           },
           {
@@ -153072,7 +153338,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1041
+              "line": 1064
             }
           },
           {
@@ -153081,7 +153347,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1042
+              "line": 1065
             }
           },
           {
@@ -153090,7 +153356,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1043
+              "line": 1066
             }
           },
           {
@@ -153099,7 +153365,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1044
+              "line": 1067
             }
           },
           {
@@ -153108,7 +153374,7 @@
             "doc": " The character proxies, the player's included.",
             "source": {
               "file_index": 82,
-              "line": 1046
+              "line": 1069
             }
           },
           {
@@ -153117,7 +153383,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1047
+              "line": 1070
             }
           },
           {
@@ -153126,7 +153392,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1048
+              "line": 1071
             }
           },
           {
@@ -153135,7 +153401,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1049
+              "line": 1072
             }
           },
           {
@@ -153144,7 +153410,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1050
+              "line": 1073
             }
           },
           {
@@ -153153,7 +153419,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1051
+              "line": 1074
             }
           },
           {
@@ -153162,7 +153428,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1052
+              "line": 1075
             }
           },
           {
@@ -153171,7 +153437,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1053
+              "line": 1076
             }
           },
           {
@@ -153180,7 +153446,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1054
+              "line": 1077
             }
           },
           {
@@ -153189,7 +153455,7 @@
             "doc": " Weapons. It collides with the static, terrain, dynamic, destruction, character collision,\n character ragdoll, and character-attached dynamic layers, the vehicle collision layers, the\n vehicle raycast layer, and the listener-effects layer, and with nothing else: not with\n itself, and not with the raycast or shape-query layers.",
             "source": {
               "file_index": 82,
-              "line": 1059
+              "line": 1082
             }
           },
           {
@@ -153198,7 +153464,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1060
+              "line": 1083
             }
           },
           {
@@ -153207,7 +153473,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1061
+              "line": 1084
             }
           },
           {
@@ -153216,7 +153482,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1062
+              "line": 1085
             }
           },
           {
@@ -153225,7 +153491,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1063
+              "line": 1086
             }
           },
           {
@@ -153234,7 +153500,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1064
+              "line": 1087
             }
           },
           {
@@ -153250,7 +153516,7 @@
             ],
             "source": {
               "file_index": 82,
-              "line": 1066
+              "line": 1089
             }
           },
           {
@@ -153259,7 +153525,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1067
+              "line": 1090
             }
           },
           {
@@ -153268,7 +153534,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1068
+              "line": 1091
             }
           },
           {
@@ -153277,7 +153543,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1069
+              "line": 1092
             }
           },
           {
@@ -153286,7 +153552,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1070
+              "line": 1093
             }
           },
           {
@@ -153295,7 +153561,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1071
+              "line": 1094
             }
           },
           {
@@ -153304,7 +153570,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1072
+              "line": 1095
             }
           },
           {
@@ -153313,7 +153579,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1073
+              "line": 1096
             }
           },
           {
@@ -153322,7 +153588,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 1074
+              "line": 1097
             }
           }
         ],
@@ -153335,7 +153601,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 1036
+        "line": 1059
       }
     },
     "physics::PfxPreSimulationCallback": {
@@ -153379,7 +153645,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 1116
+              "line": 1139
             }
           }
         ],
@@ -153411,7 +153677,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 1116
+                "line": 1139
               }
             },
             {
@@ -153463,7 +153729,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 1124
+                "line": 1147
               }
             },
             {
@@ -153494,7 +153760,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 1130
+                "line": 1153
               }
             }
           ]
@@ -153508,7 +153774,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 1112
+        "line": 1135
       }
     },
     "physics::PfxPreSimulationCallbackVftable": {
@@ -153555,7 +153821,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 1116
+              "line": 1139
             }
           },
           {
@@ -153615,7 +153881,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 1124
+              "line": 1147
             }
           },
           {
@@ -153655,7 +153921,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 1130
+              "line": 1153
             }
           }
         ],
@@ -153670,7 +153936,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 1116
+        "line": 1139
       }
     },
     "physics::PfxRigidBody": {
@@ -153726,7 +153992,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 951
+              "line": 974
             }
           },
           {
@@ -153747,7 +154013,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 994
+              "line": 1017
             }
           },
           {
@@ -153764,7 +154030,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 994
+              "line": 1017
             }
           },
           {
@@ -153804,7 +154070,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 931
+              "line": 954
             }
           }
         ],
@@ -153885,7 +154151,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 1006
+              "line": 1029
             }
           },
           {
@@ -153920,7 +154186,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 1012
+              "line": 1035
             }
           },
           {
@@ -153955,7 +154221,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 1017
+              "line": 1040
             }
           },
           {
@@ -153983,7 +154249,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 1023
+              "line": 1046
             }
           },
           {
@@ -154033,7 +154299,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 1029
+              "line": 1052
             }
           }
         ],
@@ -154077,7 +154343,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 951
+                "line": 974
               }
             },
             {
@@ -154097,7 +154363,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154117,7 +154383,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154137,7 +154403,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154157,7 +154423,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154177,7 +154443,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154197,7 +154463,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154217,7 +154483,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154237,7 +154503,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154260,7 +154526,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 955
+                "line": 978
               }
             },
             {
@@ -154280,7 +154546,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 961
+                "line": 984
               }
             },
             {
@@ -154300,7 +154566,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154328,7 +154594,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 967
+                "line": 990
               }
             },
             {
@@ -154348,7 +154614,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154387,7 +154653,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 972
+                "line": 995
               }
             },
             {
@@ -154418,7 +154684,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 977
+                "line": 1000
               }
             },
             {
@@ -154438,7 +154704,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154458,7 +154724,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154478,7 +154744,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154498,7 +154764,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154518,7 +154784,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154587,7 +154853,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 981
+                "line": 1004
               }
             },
             {
@@ -154607,7 +154873,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154627,7 +154893,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154668,7 +154934,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 989
+                "line": 1012
               }
             },
             {
@@ -154688,7 +154954,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154708,7 +154974,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154728,7 +154994,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154748,7 +155014,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154768,7 +155034,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154788,7 +155054,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154808,7 +155074,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154828,7 +155094,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154848,7 +155114,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154868,7 +155134,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154888,7 +155154,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154908,7 +155174,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154928,7 +155194,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154948,7 +155214,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154968,7 +155234,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -154988,7 +155254,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -155008,7 +155274,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -155028,7 +155294,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             },
             {
@@ -155048,7 +155314,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 945
+                "line": 968
               }
             }
           ]
@@ -155066,7 +155332,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 937
+        "line": 960
       }
     },
     "physics::PfxRigidBody::DESTRUCT_FREE": {
@@ -155097,7 +155363,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 939
+        "line": 962
       }
     },
     "physics::PfxRigidBody::VFTABLE": {
@@ -155128,7 +155394,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 942
+        "line": 965
       }
     },
     "physics::PfxRigidBodyVftable": {
@@ -155195,7 +155461,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 951
+              "line": 974
             }
           },
           {
@@ -155225,7 +155491,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -155255,7 +155521,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -155285,7 +155551,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -155315,7 +155581,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -155345,7 +155611,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -155375,7 +155641,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -155405,7 +155671,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -155435,7 +155701,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -155468,7 +155734,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 955
+              "line": 978
             }
           },
           {
@@ -155498,7 +155764,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 961
+              "line": 984
             }
           },
           {
@@ -155528,7 +155794,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -155565,7 +155831,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 967
+              "line": 990
             }
           },
           {
@@ -155595,7 +155861,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -155643,7 +155909,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 972
+              "line": 995
             }
           },
           {
@@ -155683,7 +155949,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 977
+              "line": 1000
             }
           },
           {
@@ -155713,7 +155979,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -155743,7 +156009,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -155773,7 +156039,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -155803,7 +156069,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -155833,7 +156099,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -155908,7 +156174,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 981
+              "line": 1004
             }
           },
           {
@@ -155938,7 +156204,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -155968,7 +156234,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -156018,7 +156284,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 989
+              "line": 1012
             }
           },
           {
@@ -156048,7 +156314,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -156078,7 +156344,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -156108,7 +156374,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -156138,7 +156404,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -156168,7 +156434,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -156198,7 +156464,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -156228,7 +156494,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -156258,7 +156524,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -156288,7 +156554,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -156318,7 +156584,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -156348,7 +156614,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -156378,7 +156644,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -156408,7 +156674,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -156438,7 +156704,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -156468,7 +156734,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -156498,7 +156764,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -156528,7 +156794,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -156558,7 +156824,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           },
           {
@@ -156588,7 +156854,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 945
+              "line": 968
             }
           }
         ],
@@ -156603,7 +156869,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 951
+        "line": 974
       }
     },
     "physics::PhysicsGameObject": {
@@ -156652,7 +156918,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 298
+              "line": 319
             }
           }
         ],
@@ -156676,7 +156942,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 298
+                "line": 319
               }
             },
             {
@@ -156720,7 +156986,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 303
+                "line": 324
               }
             },
             {
@@ -156740,7 +157006,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 298
+                "line": 319
               }
             },
             {
@@ -156760,7 +157026,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 298
+                "line": 319
               }
             },
             {
@@ -156780,7 +157046,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 298
+                "line": 319
               }
             },
             {
@@ -156800,7 +157066,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 298
+                "line": 319
               }
             },
             {
@@ -156820,7 +157086,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 298
+                "line": 319
               }
             },
             {
@@ -156840,7 +157106,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 298
+                "line": 319
               }
             },
             {
@@ -156860,7 +157126,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 298
+                "line": 319
               }
             },
             {
@@ -156880,7 +157146,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 298
+                "line": 319
               }
             },
             {
@@ -156900,7 +157166,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 298
+                "line": 319
               }
             },
             {
@@ -156920,7 +157186,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 298
+                "line": 319
               }
             },
             {
@@ -156940,7 +157206,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 298
+                "line": 319
               }
             },
             {
@@ -156982,7 +157248,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 311
+                "line": 332
               }
             },
             {
@@ -157002,7 +157268,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 298
+                "line": 319
               }
             },
             {
@@ -157022,7 +157288,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 298
+                "line": 319
               }
             },
             {
@@ -157042,7 +157308,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 298
+                "line": 319
               }
             },
             {
@@ -157062,7 +157328,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 298
+                "line": 319
               }
             },
             {
@@ -157082,7 +157348,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 298
+                "line": 319
               }
             },
             {
@@ -157102,7 +157368,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 298
+                "line": 319
               }
             },
             {
@@ -157136,7 +157402,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 82,
-                "line": 318
+                "line": 339
               }
             }
           ]
@@ -157153,7 +157419,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 294
+        "line": 315
       }
     },
     "physics::PhysicsGameObject::GAME_OBJECT_BASE_OFFSET": {
@@ -157176,7 +157442,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 296
+        "line": 317
       }
     },
     "physics::PhysicsGameObjectVftable": {
@@ -157216,7 +157482,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 298
+              "line": 319
             }
           },
           {
@@ -157270,7 +157536,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 303
+              "line": 324
             }
           },
           {
@@ -157300,7 +157566,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 298
+              "line": 319
             }
           },
           {
@@ -157330,7 +157596,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 298
+              "line": 319
             }
           },
           {
@@ -157360,7 +157626,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 298
+              "line": 319
             }
           },
           {
@@ -157390,7 +157656,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 298
+              "line": 319
             }
           },
           {
@@ -157420,7 +157686,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 298
+              "line": 319
             }
           },
           {
@@ -157450,7 +157716,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 298
+              "line": 319
             }
           },
           {
@@ -157480,7 +157746,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 298
+              "line": 319
             }
           },
           {
@@ -157510,7 +157776,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 298
+              "line": 319
             }
           },
           {
@@ -157540,7 +157806,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 298
+              "line": 319
             }
           },
           {
@@ -157570,7 +157836,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 298
+              "line": 319
             }
           },
           {
@@ -157600,7 +157866,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 298
+              "line": 319
             }
           },
           {
@@ -157652,7 +157918,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 311
+              "line": 332
             }
           },
           {
@@ -157682,7 +157948,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 298
+              "line": 319
             }
           },
           {
@@ -157712,7 +157978,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 298
+              "line": 319
             }
           },
           {
@@ -157742,7 +158008,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 298
+              "line": 319
             }
           },
           {
@@ -157772,7 +158038,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 298
+              "line": 319
             }
           },
           {
@@ -157802,7 +158068,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 298
+              "line": 319
             }
           },
           {
@@ -157832,7 +158098,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 298
+              "line": 319
             }
           },
           {
@@ -157875,7 +158141,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 318
+              "line": 339
             }
           }
         ],
@@ -157890,7 +158156,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 298
+        "line": 319
       }
     },
     "physics::PhysicsSystem": {
@@ -158960,7 +159226,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 716
+              "line": 739
             }
           },
           {
@@ -158969,7 +159235,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 717
+              "line": 740
             }
           },
           {
@@ -158978,7 +159244,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 718
+              "line": 741
             }
           },
           {
@@ -158987,7 +159253,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 719
+              "line": 742
             }
           },
           {
@@ -158996,7 +159262,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 720
+              "line": 743
             }
           },
           {
@@ -159005,7 +159271,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 721
+              "line": 744
             }
           },
           {
@@ -159014,7 +159280,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 722
+              "line": 745
             }
           },
           {
@@ -159023,7 +159289,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 723
+              "line": 746
             }
           },
           {
@@ -159032,7 +159298,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 724
+              "line": 747
             }
           },
           {
@@ -159041,7 +159307,7 @@
             "doc": null,
             "source": {
               "file_index": 82,
-              "line": 725
+              "line": 748
             }
           }
         ],
@@ -159054,7 +159320,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 715
+        "line": 738
       }
     },
     "physics::RagdollProxyPhantom": {
@@ -159099,7 +159365,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 342
+              "line": 363
             }
           }
         ],
@@ -159113,7 +159379,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 336
+        "line": 357
       }
     },
     "physics::Ray3": {
@@ -159467,7 +159733,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 657
+              "line": 680
             }
           },
           {
@@ -159501,7 +159767,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 657
+              "line": 680
             }
           },
           {
@@ -159532,7 +159798,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 664
+              "line": 687
             }
           }
         ],
@@ -159564,7 +159830,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 670
+              "line": 693
             }
           }
         ],
@@ -159578,7 +159844,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 651
+        "line": 674
       }
     },
     "physics::SharedPfxCharacterSettings": {
@@ -159626,7 +159892,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 735
+              "line": 758
             }
           },
           {
@@ -159655,7 +159921,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 739
+              "line": 762
             }
           },
           {
@@ -159683,7 +159949,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 728
+              "line": 751
             }
           }
         ],
@@ -159711,7 +159977,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 744
+              "line": 767
             }
           },
           {
@@ -159731,7 +159997,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 748
+              "line": 771
             }
           }
         ],
@@ -159745,7 +160011,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 732
+        "line": 755
       }
     },
     "physics::WaterProxy": {
@@ -159952,7 +160218,7 @@
             ],
             "source": {
               "file_index": 82,
-              "line": 1106
+              "line": 1129
             }
           }
         ],
@@ -159965,7 +160231,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 1103
+        "line": 1126
       }
     },
     "physics::hknpBody": {
@@ -160000,7 +160266,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 492
+              "line": 515
             }
           },
           {
@@ -160024,7 +160290,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 496
+              "line": 519
             }
           },
           {
@@ -160048,7 +160314,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 499
+              "line": 522
             }
           },
           {
@@ -160076,7 +160342,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 504
+              "line": 527
             }
           },
           {
@@ -160107,7 +160373,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 507
+              "line": 530
             }
           },
           {
@@ -160136,7 +160402,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 511
+              "line": 534
             }
           },
           {
@@ -160161,7 +160427,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 511
+              "line": 534
             }
           },
           {
@@ -160191,7 +160457,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 516
+              "line": 539
             }
           },
           {
@@ -160212,7 +160478,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 464
+              "line": 487
             }
           }
         ],
@@ -160235,7 +160501,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 467
+        "line": 490
       }
     },
     "physics::hknpBody::INVALID_BROAD_PHASE_ID": {
@@ -160266,7 +160532,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 487
+        "line": 510
       }
     },
     "physics::hknpBody::INVALID_MOTION_ID": {
@@ -160297,7 +160563,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 484
+        "line": 507
       }
     },
     "physics::hknpBody::IS_DYNAMIC": {
@@ -160340,7 +160606,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 474
+        "line": 497
       }
     },
     "physics::hknpBody::IS_KEYFRAMED": {
@@ -160376,7 +160642,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 482
+        "line": 505
       }
     },
     "physics::hknpBody::IS_STATIC": {
@@ -160418,7 +160684,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 471
+        "line": 494
       }
     },
     "physics::hknpBody::RAISE_CONTACT_IMPULSE_EVENTS": {
@@ -160460,7 +160726,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 478
+        "line": 501
       }
     },
     "physics::hknpBodyPropertyBuffer": {
@@ -160505,7 +160771,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 599
+              "line": 622
             }
           },
           {
@@ -160525,7 +160791,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 599
+              "line": 622
             }
           },
           {
@@ -160546,7 +160812,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 603
+              "line": 626
             }
           },
           {
@@ -160563,7 +160829,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 603
+              "line": 626
             }
           },
           {
@@ -160584,7 +160850,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 607
+              "line": 630
             }
           },
           {
@@ -160604,7 +160870,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 607
+              "line": 630
             }
           }
         ],
@@ -160619,7 +160885,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 596
+        "line": 619
       }
     },
     "physics::hknpBodyPropertyMap": {
@@ -160664,7 +160930,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 581
+              "line": 604
             }
           }
         ],
@@ -160711,7 +160977,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 589
+              "line": 612
             }
           }
         ],
@@ -160725,7 +160991,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 585
+        "line": 608
       }
     },
     "physics::hknpCharacterRigidBody": {
@@ -160772,7 +161038,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 913
+              "line": 936
             }
           },
           {
@@ -160797,7 +161063,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 913
+              "line": 936
             }
           },
           {
@@ -160818,7 +161084,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 917
+              "line": 940
             }
           },
           {
@@ -160838,7 +161104,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 917
+              "line": 940
             }
           },
           {
@@ -160867,7 +161133,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 906
+              "line": 929
             }
           }
         ],
@@ -160933,7 +161199,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 928
+              "line": 951
             }
           }
         ],
@@ -160947,7 +161213,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 910
+        "line": 933
       }
     },
     "physics::hknpCharacterSurfaceInfo": {
@@ -160974,7 +161240,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 889
+              "line": 912
             }
           },
           {
@@ -161008,7 +161274,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 892
+              "line": 915
             }
           },
           {
@@ -161029,7 +161295,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 896
+              "line": 919
             }
           },
           {
@@ -161046,7 +161312,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 896
+              "line": 919
             }
           },
           {
@@ -161067,7 +161333,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 900
+              "line": 923
             }
           },
           {
@@ -161084,7 +161350,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 900
+              "line": 923
             }
           },
           {
@@ -161101,7 +161367,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 903
+              "line": 926
             }
           }
         ],
@@ -161121,7 +161387,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 880
+        "line": 903
       }
     },
     "physics::hknpCharacterSurfaceInfo::SLIDING": {
@@ -161152,7 +161418,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 884
+        "line": 907
       }
     },
     "physics::hknpCharacterSurfaceInfo::SUPPORTED": {
@@ -161183,7 +161449,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 886
+        "line": 909
       }
     },
     "physics::hknpCharacterSurfaceInfo::UNSUPPORTED": {
@@ -161214,7 +161480,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 882
+        "line": 905
       }
     },
     "physics::hknpConstraint": {
@@ -161253,7 +161519,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 544
+              "line": 567
             }
           },
           {
@@ -161270,7 +161536,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 546
+              "line": 569
             }
           },
           {
@@ -161290,7 +161556,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 549
+              "line": 572
             }
           },
           {
@@ -161307,7 +161573,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 551
+              "line": 574
             }
           },
           {
@@ -161335,7 +161601,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 555
+              "line": 578
             }
           },
           {
@@ -161359,7 +161625,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 555
+              "line": 578
             }
           },
           {
@@ -161392,7 +161658,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 533
+              "line": 556
             }
           }
         ],
@@ -161411,7 +161677,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 537
+        "line": 560
       }
     },
     "physics::hknpConstraint::INVALID_BODY_ID": {
@@ -161442,7 +161708,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 539
+        "line": 562
       }
     },
     "physics::hknpConstraint::IS_DISABLED": {
@@ -161473,7 +161739,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 541
+        "line": 564
       }
     },
     "physics::hknpConstraintManager": {
@@ -161512,7 +161778,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 528
+              "line": 551
             }
           },
           {
@@ -161540,7 +161806,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 528
+              "line": 551
             }
           },
           {
@@ -161557,7 +161823,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 530
+              "line": 553
             }
           },
           {
@@ -161578,7 +161844,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 519
+              "line": 542
             }
           }
         ],
@@ -161596,7 +161862,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 522
+        "line": 545
       }
     },
     "physics::hknpConstraintManager::INVALID_CONSTRAINT_ID": {
@@ -161627,7 +161893,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 524
+        "line": 547
       }
     },
     "physics::hknpMotion": {
@@ -161662,7 +161928,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 564
+              "line": 587
             }
           },
           {
@@ -161679,7 +161945,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 566
+              "line": 589
             }
           },
           {
@@ -161708,7 +161974,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 572
+              "line": 595
             }
           },
           {
@@ -161729,7 +161995,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 576
+              "line": 599
             }
           },
           {
@@ -161746,7 +162012,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 576
+              "line": 599
             }
           },
           {
@@ -161763,7 +162029,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 578
+              "line": 601
             }
           },
           {
@@ -161792,7 +162058,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 558
+              "line": 581
             }
           }
         ],
@@ -161807,7 +162073,7 @@
       },
       "source": {
         "file_index": 82,
-        "line": 562
+        "line": 585
       }
     },
     "physics::hknpWorld": {
@@ -161857,7 +162123,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 358
+              "line": 381
             }
           },
           {
@@ -161896,7 +162162,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 358
+              "line": 381
             }
           },
           {
@@ -161925,7 +162191,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 363
+              "line": 386
             }
           },
           {
@@ -161950,7 +162216,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 363
+              "line": 386
             }
           },
           {
@@ -161971,7 +162237,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 367
+              "line": 390
             }
           },
           {
@@ -161988,7 +162254,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 367
+              "line": 390
             }
           },
           {
@@ -162017,7 +162283,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 371
+              "line": 394
             }
           },
           {
@@ -162045,7 +162311,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 371
+              "line": 394
             }
           },
           {
@@ -162066,7 +162332,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 375
+              "line": 398
             }
           },
           {
@@ -162083,7 +162349,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 375
+              "line": 398
             }
           },
           {
@@ -162112,7 +162378,7 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 380
+              "line": 403
             }
           },
           {
@@ -162137,11 +162403,99 @@
             "is_base": false,
             "source": {
               "file_index": 82,
-              "line": 380
+              "line": 403
             }
           }
         ],
         "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "enableBodyFlags",
+            "doc": " Adds collision flags and rebuilds collision caches when `rebuild_mode` selects rebuilding.\n The disassembler labels this function as a rigid-body constructor.",
+            "body": {
+              "type": "address",
+              "address": 5390525632
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "body",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              },
+              {
+                "type": "field",
+                "name": "flags",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              },
+              {
+                "type": "field",
+                "name": "rebuild_mode",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "i32"
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 82,
+              "line": 301
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "disableBodyFlags",
+            "doc": " Removes collision flags and rebuilds collision caches when `rebuild_mode` selects rebuilding.\n The disassembler labels this function as a signal subscription.",
+            "body": {
+              "type": "address",
+              "address": 5390525776
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "body",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              },
+              {
+                "type": "field",
+                "name": "flags",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              },
+              {
+                "type": "field",
+                "name": "rebuild_mode",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "i32"
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 82,
+              "line": 306
+            }
+          },
           {
             "visibility": "public",
             "name": "createConstraint",
@@ -162187,7 +162541,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 393
+              "line": 416
             }
           },
           {
@@ -162233,7 +162587,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 402
+              "line": 425
             }
           },
           {
@@ -162286,7 +162640,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 411
+              "line": 434
             }
           },
           {
@@ -162369,7 +162723,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 419
+              "line": 442
             }
           },
           {
@@ -162411,7 +162765,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 424
+              "line": 447
             }
           },
           {
@@ -162475,7 +162829,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 434
+              "line": 457
             }
           },
           {
@@ -162525,7 +162879,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 441
+              "line": 464
             }
           },
           {
@@ -162572,7 +162926,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 446
+              "line": 469
             }
           },
           {
@@ -162619,7 +162973,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 451
+              "line": 474
             }
           },
           {
@@ -162658,7 +163012,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 455
+              "line": 478
             }
           },
           {
@@ -162711,7 +163065,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 82,
-              "line": 461
+              "line": 484
             }
           }
         ],
@@ -162723,12 +163077,13 @@
         "packed": false,
         "pinned": false,
         "nested_items": [
+          "physics::hknpWorld::REBUILD_COLLISION_CACHES",
           "physics::hknpWorld::BODY_PROPERTY_PFX_INSTANCE"
         ]
       },
       "source": {
         "file_index": 82,
-        "line": 349
+        "line": 370
       }
     },
     "physics::hknpWorld::BODY_PROPERTY_PFX_INSTANCE": {
@@ -162758,7 +163113,30 @@
       },
       "source": {
         "file_index": 82,
-        "line": 352
+        "line": 375
+      }
+    },
+    "physics::hknpWorld::REBUILD_COLLISION_CACHES": {
+      "path": "physics::hknpWorld::REBUILD_COLLISION_CACHES",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " Rebuild the body's collision caches after changing flags.",
+        "value_type": {
+          "type": "raw",
+          "path": "i32"
+        },
+        "value": {
+          "kind": "int",
+          "value": 0
+        }
+      },
+      "source": {
+        "file_index": 82,
+        "line": 372
       }
     },
     "profile_manager::ProfileManager": {
@@ -216877,6 +217255,7 @@
         "havok::hkcdGskGetClosestPointInput",
         "havok::hkcdGskGetClosestPointOutput",
         "havok::hkcdGskGetClosestPointStatus",
+        "havok::hkcdManifold4",
         "havok::hknpBodyCinfo",
         "havok::hknpCapsuleShape",
         "havok::hknpConstraintCinfo",
@@ -216947,7 +217326,7 @@
           "calling_convention": "system",
           "source": {
             "file_index": 66,
-            "line": 508
+            "line": 527
           }
         },
         {
@@ -217038,7 +217417,7 @@
           "calling_convention": "system",
           "source": {
             "file_index": 66,
-            "line": 559
+            "line": 578
           }
         }
       ],
@@ -218841,6 +219220,7 @@
         "physics::CustomGroupCollisionFilter",
         "physics::GameMaterialId",
         "physics::GrapplingMode",
+        "physics::HavokCollisionListener",
         "physics::IgnoreMaterialFlagFilter",
         "physics::MaterialPassFlags",
         "physics::PfxCharacterInstance",
@@ -218989,7 +219369,7 @@
           "calling_convention": "system",
           "source": {
             "file_index": 82,
-            "line": 1137
+            "line": 1160
           }
         },
         {
@@ -219047,7 +219427,7 @@
           "calling_convention": "system",
           "source": {
             "file_index": 82,
-            "line": 1143
+            "line": 1166
           }
         },
         {
@@ -219131,7 +219511,7 @@
           "calling_convention": "system",
           "source": {
             "file_index": 82,
-            "line": 1164
+            "line": 1187
           }
         },
         {
@@ -219224,7 +219604,7 @@
           "calling_convention": "system",
           "source": {
             "file_index": 82,
-            "line": 1174
+            "line": 1197
           }
         }
       ],
