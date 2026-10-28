@@ -69,6 +69,11 @@ pub type Game {
     /// [`INTERPOLATION_OVERRIDE_NONE`](Self::INTERPOLATION_OVERRIDE_NONE) when unset.
     pub m_InterpolationOverride: i32,
 
+    /// The simulation dispatch counter, incremented by [`UpdateGame`](Self::UpdateGame) before
+    /// the active state's update. Render-only updates do not advance it.
+    #[address(0x1D0)]
+    pub m_FrameCounter: u64,
+
     #[address(0x260)]
     pub m_DecoupleEnabled: bool,
 

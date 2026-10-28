@@ -1398,6 +1398,12 @@ impl AnimatedModel {
 
 /// A character's animation controller (`NCharacterSystem::CAnimationControl`): owns the skeleton resource handle and pose producer, with a body part per animation layer. [`InitSkeleton`](Self::InitSkeleton), [`InitControl`](Self::InitControl), and [`Reset`](Self::Reset) change that state in place; an unchanged controller address does not imply an unchanged skeleton or producer.
 pub type AnimationController {
+    /// Whether control initialization has completed. [`UpdateAnimations`](Self::UpdateAnimations)
+    /// and [`UpdateAnimationsTime`](Self::UpdateAnimationsTime) return without updating the producer
+    /// while this is clear.
+    #[address(0x91)]
+    pub m_Initialized: bool,
+
     /// The owned skeleton resource handle (`TResourceCachePtr<CSkeleton>::m_Handle`). [`InitSkeleton`](Self::InitSkeleton) replaces it and releases the previous handle. The handle's resource-retention operations are not mapped.
     #[address(0x98)]
     pub m_SkeletonResourceHandle: *mut void,

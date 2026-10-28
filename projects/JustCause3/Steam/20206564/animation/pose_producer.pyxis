@@ -12,6 +12,10 @@ use types::vector_math::{AlignedQuat, AlignedVector3};
 /// The poses are reused buffers. [`Update`](Self::Update) exchanges their pointers before synchronously evaluating [`m_PoseT1`](Self::m_PoseT1). The asynchronous pose-job path (`CPoseProducer::KickUpdateJob`) also exchanges them before queuing `PoseUpdate_fragment` on a CPU fragment worker. [`m_PoseT0`](Self::m_PoseT0) receives the previously current pose, including changes made before the exchange, such as HumanIK results and joint writes. The skinning job blends `T0` to `T1`.
 #[min_size(0x30)]
 pub type PoseProducer {
+    /// The ordered animation layers evaluated by [`Update`](Self::Update). The first layer samples over the skeleton's reference pose.
+    #[address(0x8)]
+    pub m_Blenders: HkArray<SharedPtr<Blender>>,
+
     /// The previously current pose after the latest buffer exchange. [`Update`](Self::Update) exchanges this pointer with [`m_PoseT1`](Self::m_PoseT1) before evaluating the new current output.
     #[address(0x20)]
     pub m_PoseT0: *mut HkaPose,
@@ -21,6 +25,10 @@ pub type PoseProducer {
     pub m_PoseT1: *mut HkaPose,
 }
 impl PoseProducer {
+    /// Exchanges the pose buffers and queues `PoseUpdate_fragment` with the selected layer and bone counts. The worker evaluates the pose after this call returns; returning from dispatch does not establish completed pose output.
+    #[address(0x141_E69_2C0)]
+    pub fn KickUpdateJob(&mut self, dt: f32, num_animation_layers: i32, num_bones: i32);
+
     /// Exchanges [`m_PoseT0`](Self::m_PoseT0) and [`m_PoseT1`](Self::m_PoseT1), advances each blender's time by `dt`, and synchronously evaluates all blenders through [`UpdateBlendersPoseInRange`](Self::UpdateBlendersPoseInRange) for `num_bones`. The selected local transforms and float slots are copied into the current pose before this call returns. The blender range is captured before the time updates.
     #[address(0x141_E6A_9A0)]
     pub fn Update(&mut self, dt: f32, num_bones: i32);
