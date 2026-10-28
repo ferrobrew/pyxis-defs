@@ -54,8 +54,7 @@ pub bitflags AimState: u8 {
 }
 
 /// A byte of `CCharacter` bitfields holding the visibility, invulnerability, and weapons-enabled
-/// flags. Not every bit is mapped: three of the remaining bits are, in ascending order, `Enabled`,
-/// `m_GhostMode`, and `m_PermanentGhostMode`, and these names are unconfirmed.
+/// flags. The ghost-mode fields remain unmapped.
 #[copyable]
 pub bitflags DamageStateFlags: u8 {
     /// `Visible`: whether the character's models are shown. Read by `CCharacter::IsVisible`.
@@ -67,12 +66,26 @@ pub bitflags DamageStateFlags: u8 {
     /// `m_JesusMode`: the damage-immune variant written by `CCharacter::SetJesusMode`, which, when
     /// enabling it on a living character, also restores health and forces the neutral state.
     JESUS_MODE = 0b0000_0100,
+    /// Whether the character is enabled. Required by the character update passes.
+    ENABLED = 0b0000_1000,
     /// `m_WeaponsEnabled`: whether the character may use its weapons. Written by
     /// [`SetWeaponsEnabled`](Character::SetWeaponsEnabled); both aim-input updates
     /// ([`HandleAimingInputPlayer`](Character::HandleAimingInputPlayer) and
     /// [`HandleAimingInputNPC`](Character::HandleAimingInputNPC)) only let an aiming weapon
     /// refresh the aim timer while it is set.
     WEAPONS_ENABLED = 0b0100_0000,
+}
+
+/// Initialization state tested by the character update passes.
+#[copyable]
+pub bitflags CharacterInitializationFlags: u8 {
+    INITIALIZED = 0b0000_0001,
+}
+
+/// Pause state tested by the character update passes.
+#[copyable]
+pub bitflags CharacterPauseFlags: u8 {
+    PAUSED = 0b0000_0001,
 }
 
 /// Per-character LOD/update-gating flags. Checked before the SIM-phase animation and IK work:
@@ -229,6 +242,10 @@ pub type Character {
     #[address(0x2_0E9)]
     pub m_DamageFlags: DamageStateFlags,
 
+    /// Initialization state required by the character update passes.
+    #[address(0x2_0EC)]
+    pub m_InitializationFlags: CharacterInitializationFlags,
+
     /// Whether the character's weapons draw ammunition without consuming it. Read by
     /// `CWeaponBase::HasUnlimitedAmmo` together with the non-player and challenge-island rules.
     /// Set through [`SetUnlimitedAmmo`](Self::SetUnlimitedAmmo), which also refreshes the HUD's
@@ -286,6 +303,10 @@ pub type Character {
     /// predicate on this type reads through this pointer.
     #[address(0x2_718)]
     pub m_ControlParameters: *mut ControlParameters,
+
+    /// Pause state that excludes the character from update passes.
+    #[address(0x2_788)]
+    pub m_PauseFlags: CharacterPauseFlags,
 
     /// Per-character LOD/update-gating flags; see [`CharacterLodFlags`].
     #[address(0x2_78C)]
