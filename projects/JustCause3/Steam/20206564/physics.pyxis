@@ -285,6 +285,27 @@ pub enum GameMaterialId: u32 {
     EGameMaterialId_Default = 0x1F,
 }
 
+/// The physics system's global collision listener. Contact impulse dispatch resolves both body
+/// instances and calls each instance's event virtual when its subscription flag is active.
+pub type HavokCollisionListener;
+impl HavokCollisionListener {
+    /// Dispatches a contact impulse event without modifying the contact's solver impulses.
+    #[address(0x140_1CE_500)]
+    pub fn onContactImpulseEvent(&mut self, input: *const void, event: *const hknpContactImpulseEvent);
+}
+
+impl hknpWorld {
+    /// Adds collision flags and rebuilds collision caches when `rebuild_mode` selects rebuilding.
+    /// The disassembler labels this function as a rigid-body constructor.
+    #[address(0x141_4CE_4C0)]
+    pub fn enableBodyFlags(&mut self, body: u32, flags: u32, rebuild_mode: i32);
+
+    /// Removes collision flags and rebuilds collision caches when `rebuild_mode` selects rebuilding.
+    /// The disassembler labels this function as a signal subscription.
+    #[address(0x141_4CE_550)]
+    pub fn disableBodyFlags(&mut self, body: u32, flags: u32, rebuild_mode: i32);
+}
+
 /// A physics game object (`CPhysicsGameObject`): a game object with a physics instance, the owner a
 /// physics query reports for a hit body ([`CastRayInfo::m_GameObject`]). Characters, vehicles,
 /// and rigid props are physics game objects. Its `CGameObject` subobject sits at
@@ -347,6 +368,8 @@ impl RagdollProxyPhantom {
 /// are bound.
 #[min_size(0x1C0), align(16)]
 pub type hknpWorld {
+    /// Rebuild the body's collision caches after changing flags.
+    pub const REBUILD_COLLISION_CACHES: i32 = 0,
     /// The body property that holds a body's engine instance ([`PfxInstance`]), as the physics
     /// queries read it to report the body's owner.
     pub const BODY_PROPERTY_PFX_INSTANCE: u16 = 1,

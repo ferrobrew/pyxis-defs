@@ -446,6 +446,25 @@ pub type hknpContactImpulseEvent {
     pub m_contactImpulses: [f32; 4],
 }
 
+/// A contact manifold (`hkcdManifold4`) with the normal and world-space contact positions.
+#[size(0x80), align(16)]
+pub type hkcdManifold4 {
+    pub m_numPoints: i32,
+    pub m_minimumDistance: f32,
+
+    #[address(0x10)]
+    pub m_normal: hkVector4f,
+    pub m_weldNormal: hkVector4f,
+    pub m_distances: [f32; 4],
+    pub m_positions: [hkVector4f; 4],
+}
+impl hknpContactImpulseEvent {
+    /// Reconstructs the contact positions from the Jacobian and the world's body motions.
+    /// The disassembler labels this function `hknpBodyTracker_getBodyIdsFromInput`.
+    #[address(0x141_519_2C0)]
+    pub fn calculateContactPointPositions(&self, world: *const physics::hknpWorld, manifold: *mut hkcdManifold4);
+}
+
 /// Helpers that read a contact's solver Jacobian (`hknpContactJacobianUtil`).
 pub type hknpContactJacobianUtil;
 impl hknpContactJacobianUtil {
