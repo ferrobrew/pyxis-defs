@@ -140,6 +140,36 @@ pub bitflags GameUpdateFlags: u32 {
 /// `CGameStateRun`: the in-game state's static update functions.
 pub type GameStateRun;
 impl GameStateRun {
+    /// `CGameStateRun::Update`: the run state's sim tick, called by [`Game::UpdateGame`] once per
+    /// tick in play and by [`GameStateFrontend::Update`] once its sub-state reaches the main menu
+    /// with the world loaded behind it. It queues the frame's raycast fragments, then the input
+    /// job ([`RunInputThread`]), and runs the network, traffic and ambient-spawn starts, the task
+    /// pool's continuations, the road decorations, the water, the effects' pre-simulation update,
+    /// the world time, the render cameras' transform history, the character manager's
+    /// pre-simulation step, the settings, the AI's queued messages and path requests, and the
+    /// effects' physics-model spawn while the input job runs. It then spins on the input job's
+    /// completion signal (yielding, without running queued fragments), and runs the dialogue,
+    /// the sound post-simulation update, the vehicles' pre-update, the operations, login, rebel
+    /// support, ammunition, and mission updates, the traffic and ambient-spawn sync halves, the
+    /// posted-event dispatch, the challenge (ROM), encounter, heat, and spawn-system updates, and
+    /// the video's pre-simulation update before the game world's pre-simulation queue
+    /// ([`GameWorld::UpdatePreSim`](game_world::GameWorld::UpdatePreSim)), the physics phase
+    /// ([`GameState::UpdatePhysics`]), and the post-simulation queue. Nothing between the
+    /// completion spin and the pre-simulation queue returns early. The challenge update reads the
+    /// player action map there: an active race reads how long
+    /// [`CHALLENGE_RESET_VEHICLE`](input::input_action_map::Action::CHALLENGE_RESET_VEHICLE) has
+    /// been held.
+    ///
+    /// The disassembler mislabels several callees: the effects' pre-simulation update as
+    /// `CCharacterManager::UpdateVDB`, the ambient-spawn sync as
+    /// `CGameCameraManager::UpdateBeforeGameWorld`, the posted-event dispatch as
+    /// `CPropertyUtil::RegisterEvent`, the continuation pump as `CGameStateInit::UpdateDone`, the
+    /// network pre-simulation update as `CNetworkManager::Update_PostSim`, the pathfinder's message
+    /// processing as `CAiPathfinder2::UpdatePathRequest`, and [`GameState::UpdatePhysics`] as
+    /// `IsStillAlive`.
+    #[address(0x140_9F0_EE0)]
+    pub fn Update(update_contexts: *mut UpdateContexts);
+
     /// The render-side update the run state performs while the game is paused: drives the
     /// landscape, UI prerender, video, water simulation, and resource streaming, and waits for the
     /// CPU draw, without running the camera update.
@@ -152,6 +182,11 @@ impl GameStateRun {
 /// ([`GameWorld::TeleportPlayer`](game_world::GameWorld::TeleportPlayer)). Its layout is unmapped.
 pub type GameStateLoad;
 impl GameStateLoad {
+    /// `CGameStateLoad::Update`: the load state's tick. It calls [`GameState::PreUpdate`] inline on
+    /// the game thread.
+    #[address(0x140_A11_CC0)]
+    pub fn Update(update_contexts: *mut UpdateContexts);
+
     /// The load state's entry. It runs [`ResetSystems`](Self::ResetSystems), so every entry to
     /// the load state resets the spawn system.
     #[address(0x140_9FE_C80)]
@@ -171,6 +206,15 @@ impl GameStateLoad {
 /// The game's frontend state (`CGameStateFrontend`), the main menu. Its layout is unmapped.
 pub type GameStateFrontend;
 impl GameStateFrontend {
+    /// `CGameStateFrontend::Update`: the frontend's tick, stepping its sub-state machine (waiting
+    /// for IO, the title, login, language, loading the global data, the spawn, landscape, and
+    /// location loads, and the main menu). Before the main menu's sub-states it calls
+    /// [`GameState::PreUpdate`] inline on the game thread with its own reduced update. Once the
+    /// world is loaded behind the main menu it calls [`GameStateRun::Update`] instead, so the input
+    /// job runs as it does in play.
+    #[address(0x140_A15_A40)]
+    pub fn Update(update_contexts: *mut UpdateContexts);
+
     /// The frontend's reset of the game systems on the quit to the menu, which resets the spawn
     /// system ([`SpawnSystem::ResetSystem`](spawn_system::SpawnSystem::ResetSystem)).
     #[address(0x140_9AC_700)]
@@ -236,6 +280,24 @@ pub enum GameState: u32 {
     NOF_GAME_STATES = 0x6,
 }
 impl GameState {
+    /// `CGameState::PreUpdate`: the input update. In order, it sets the UI manager's capture thread
+    /// to the calling thread, starts the sound library's pre-simulation job, updates the message
+    /// boxes and the account manager, restores the steering objects' action maps when the device
+    /// manager has marked them dirty, runs the device poll
+    /// ([`InputDeviceManager::Update`](input::input_device_manager::InputDeviceManager::Update))
+    /// and [`UpdateForceClicks`](input::input_device_manager::InputDeviceManager::UpdateForceClicks)
+    /// unless the out-of-focus input setting is on and the window is out of focus, runs the UI's
+    /// input update (`CUIManager::PreUpdate`, which reads the pause and commlink actions from the
+    /// player action map and dispatches the screens' input handlers), waits for the sound job, and
+    /// reverts the capture thread. It touches input devices, the action maps, the UI, the message
+    /// boxes, the accounts, and the sound job, and nothing of the world.
+    ///
+    /// Callers: the input job ([`RunInputThread_Proxy`]), [`GameStateLoad::Update`], and
+    /// [`GameStateFrontend::Update`] before its main-menu sub-states. The disassembler mislabels
+    /// the capture thread's revert as `ProfilerInitThread`.
+    #[address(0x140_9AC_0E0)]
+    pub fn PreUpdate(update_contexts: *mut UpdateContexts);
+
     #[address(0x140_A00_E90)]
     pub fn PostUpdateRender(update_contexts: *const UpdateContexts);
 
@@ -277,6 +339,22 @@ pub fn GameLocationSystemUpdate(budget_us: u32);
 /// it once per tick after the effects' post-simulation update.
 #[address(0x140_9AE_070)]
 pub fn RunLightThread(dt: f32);
+
+/// `RunInputThread`: clears the input job's completion signal and queues [`RunInputThread_Proxy`]
+/// as a `CallProxy` CPU fragment, with `update_contexts` as its argument and the signal attached.
+/// [`GameStateRun::Update`] calls it once per tick and spins on the signal before the world's
+/// pre-simulation queue.
+#[address(0x140_9AE_130)]
+pub fn RunInputThread(update_contexts: *mut UpdateContexts);
+
+/// The input job's body: calls [`GameState::PreUpdate`] with `update_contexts` and returns 1. It
+/// runs on whichever CPU fragment worker takes the fragment, or on the game thread when that
+/// thread runs queued fragments while it waits on the previous frame's signals
+/// (`CGameStateRun::WaitForLocksFromPreviousFrame`), concurrently with the rest of
+/// [`GameStateRun::Update`] up to the completion spin. The engine keeps the two apart by partition:
+/// the job touches only input, the UI, the message boxes, the accounts, and the sound job.
+#[address(0x140_9AE_110)]
+pub fn RunInputThread_Proxy(update_contexts: *mut UpdateContexts) -> i32;
 
 /// `RunAIThread1`: queues [`RunAIThread1_Proxy`] on a CPU fragment with `dt` the tick's step, and
 /// clears its completion signal. The run state's update calls it once per tick after the awareness
