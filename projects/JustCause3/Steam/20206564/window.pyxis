@@ -1,3 +1,67 @@
-/// The game's Win32 window procedure.
+/// The game's Win32 window procedure. It does not handle `WM_ACTIVATEAPP`, `WM_ACTIVATE`,
+/// `WM_SETFOCUS`, or `WM_KILLFOCUS`: those fall through to `DefWindowProcA`, and the game tracks
+/// window focus by polling the foreground window in [`AVAMainLoop`] instead. It sets
+/// [`AltTab`] on `WM_CANCELMODE`.
 #[address(0x140_006_F40)]
 fn WndProc(hwnd: *mut void, msg: u32, wparam: u64, lparam: i64) -> i64;
+
+/// `AVAMainLoop`: the application's main loop. Each iteration drains the thread's message queue
+/// with `PeekMessageA` (dispatching to [`WndProc`] and quitting on `WM_QUIT`), then polls
+/// `GetForegroundWindow`. When the foreground window differs from the one the previous iteration
+/// saw, or [`AltTab`] is set, it calls [`GainFocus`] if the new foreground window is
+/// [`WindowHandle`] (and [`AltTab`] is clear), and [`LoseFocus`] otherwise, then refreshes the
+/// cursor clip ([`GraphicsEngine::UpdateCursor`](graphics_engine::graphics_engine::GraphicsEngine::UpdateCursor))
+/// and clears [`AltTab`]. Only a change of foreground window triggers either call, so a window
+/// that never changes the foreground keeps the state it last set.
+///
+/// While [`SuspendGame`] is set and the game state is
+/// [`E_GAME_RUN`](game::GameState::E_GAME_RUN), the iteration skips
+/// [`Game::Update`](game::Game::Update) and the `SleepEx` yield after it, so the loop spins on
+/// the message queue and the foreground poll: no simulation, rendering, input, or present runs
+/// until [`GainFocus`] clears the flag. In any other game state (the frontend, loading, and so on)
+/// the game keeps updating while suspended.
+#[address(0x140_00B_1A0)]
+pub fn AVAMainLoop(instance: *mut void, prev_instance: *mut void, cmd_line: *mut u8) -> i32;
+
+/// `LoseFocus`: suspends the game because its window lost the foreground. Called by
+/// [`AVAMainLoop`] with the main window handle and whether any window holds the foreground. When
+/// [`SuspendGame`] is clear it sets it, tells the sound library the window lost focus
+/// ([`SetWindowFocused`](audio::sound_library::SetWindowFocused), which mutes the master bus),
+/// broadcasts the `pause_game_checked` event, and clears the input device manager's
+/// [`m_IsInFocus`](input::input_device_manager::InputDeviceManager::m_IsInFocus). When
+/// `allow_mode_change` is set and the graphics engine exists, it also saves the current
+/// fullscreen mode in [`WasFullscreen`] and switches to windowed mode (through the settings
+/// manager when one exists). It always refreshes the cursor. A call while already suspended only
+/// refreshes the cursor.
+#[address(0x140_001_B70)]
+pub fn LoseFocus(hwnd: *mut void, allow_mode_change: bool);
+
+/// `GainFocus`: resumes the game because its window regained the foreground. Called by
+/// [`AVAMainLoop`] with the main window handle. When [`SuspendGame`] is set it clears it, tells
+/// the sound library the window has focus
+/// ([`SetWindowFocused`](audio::sound_library::SetWindowFocused)), sets the input device
+/// manager's [`m_IsInFocus`](input::input_device_manager::InputDeviceManager::m_IsInFocus),
+/// restores the fullscreen mode saved in [`WasFullscreen`], clears [`WasFullscreen`], and
+/// broadcasts the `pause_game_clear` event. When the game is not suspended it only applies the
+/// fullscreen mode in [`WasFullscreen`], without clearing it. It always refreshes the cursor.
+#[address(0x140_001_AB0)]
+pub fn GainFocus(hwnd: *mut void);
+
+/// `g_SuspendGame`: whether the game is suspended because its window lost the foreground.
+/// [`LoseFocus`] sets it, [`GainFocus`] clears it, and `WM_DESTROY` in [`WndProc`] clears it.
+/// [`AVAMainLoop`] skips [`Game::Update`](game::Game::Update) while it is set during gameplay.
+#[address(0x142_E22_A11)]
+pub extern SuspendGame: bool;
+/// `g_WasFullscreen`: the fullscreen mode [`LoseFocus`] saved when it switched the window to
+/// windowed mode, which [`GainFocus`] restores. Initialized to the configured fullscreen mode at
+/// startup.
+#[address(0x142_E22_A12)]
+pub extern WasFullscreen: bool;
+/// `g_AltTab`: set by [`WndProc`] on `WM_CANCELMODE`. It forces [`AVAMainLoop`] to treat the next
+/// iteration as a focus loss even when the foreground window did not change, and the loop clears
+/// it after handling the change.
+#[address(0x142_E22_A14)]
+pub extern AltTab: bool;
+/// `gHWND`: the game's main window, which [`AVAMainLoop`] compares against the foreground window.
+#[address(0x142_E22_A18)]
+pub extern WindowHandle: *mut void;

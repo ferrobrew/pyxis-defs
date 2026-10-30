@@ -73,6 +73,16 @@ pub type InputDeviceManager {
     /// `IsEnabled` (virtual) write and read it.
     #[address(0xC)]
     pub m_Enabled: bool,
+
+    /// Whether the game window holds the foreground, as the input devices see it.
+    /// [`Update`](Self::Update) passes it to every device's object-state update next to
+    /// [`m_Enabled`](Self::m_Enabled); the keyboard and mouse read their DirectInput state only
+    /// while both are set, and zero it otherwise. Gamepads ignore it. The mouse is acquired with a
+    /// background cooperative level, so this flag, not DirectInput, is what stops it reading motion
+    /// while another window has the foreground. [`LoseFocus`](window::LoseFocus) clears it and
+    /// [`GainFocus`](window::GainFocus) sets it.
+    #[address(0x70)]
+    pub m_IsInFocus: bool,
 }
 impl InputDeviceManager {
     /// Finds a device of `device_type`. With [`DeviceOrder::Appearance`], `index` selects the
