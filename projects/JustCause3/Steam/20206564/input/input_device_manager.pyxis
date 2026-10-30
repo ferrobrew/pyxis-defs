@@ -96,9 +96,17 @@ impl InputDeviceManager {
 
     /// The per-frame device poll: reads all devices and refreshes their effector states (see
     /// [`InputDeviceEffector`](input::input_action_map::InputDeviceEffector)). `CGameState::PreUpdate`
-    /// calls it, then [`UpdateForceClicks`](Self::UpdateForceClicks), before the frame's world
-    /// update. The poll overwrites effector values written before it runs, and skips the devices when
-    /// the clock's real time is unchanged since the previous poll.
+    /// calls it through the manager's virtual table, then
+    /// [`UpdateForceClicks`](Self::UpdateForceClicks), before the frame's world update. The poll
+    /// overwrites effector values written before it runs, and skips the devices when the clock's real
+    /// time is unchanged since the previous poll.
+    ///
+    /// The thread depends on the game state. The frontend and loading states call `PreUpdate`
+    /// inline on the game thread. The run state (`CGameStateRun::Update`) queues it as a CPU fragment
+    /// (`RunInputThread`), so it runs on whichever fragment worker takes it, or on the game thread
+    /// if that thread steals it while it waits on another signal, concurrently with the game
+    /// thread's update until the game thread spins on the fragment's completion signal, before the
+    /// world update. `UIManager::PreUpdate` runs inside the same call.
     #[address(0x140_2F2_0C0)]
     pub fn Update(&mut self, dt: f32);
 
