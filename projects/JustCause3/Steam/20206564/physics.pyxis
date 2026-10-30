@@ -509,7 +509,12 @@ pub type hknpBody {
     /// collisions do not push. `CPfxCharacterInstance::IsGroundBodyStaticOrKeyFramed` tests it with
     /// [`IS_STATIC`](Self::IS_STATIC).
     pub const IS_KEYFRAMED: u32 = 0x4,
-    /// The [`m_motionId`](Self::m_motionId) of a freed body slot.
+    /// The [`m_motionId`](Self::m_motionId) of a freed body slot. `hknpWorld::destroyBodies`
+    /// clears the slot's [`IS_STATIC`](Self::IS_STATIC) and [`IS_DYNAMIC`](Self::IS_DYNAMIC) bits
+    /// and releases its shape reference at once, but frees the slot later
+    /// (`hknpBodyManager::freeDestroyedBodyIds`), which writes this id and links the slot into the
+    /// free list. Neither step clears [`m_shape`](Self::m_shape), so a destroyed or freed slot keeps
+    /// pointing at the shape it last had until the slot is reused.
     pub const INVALID_MOTION_ID: u32 = 0x7FFFFFFF,
     /// The [`m_broadPhaseId`](Self::m_broadPhaseId) of a body that is not in the broad phase: one
     /// created but not added to the simulation, or removed from it.
