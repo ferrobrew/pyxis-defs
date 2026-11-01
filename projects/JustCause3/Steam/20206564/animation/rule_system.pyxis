@@ -31,6 +31,21 @@ pub type StateMachineInstance {
 /// A character's [`AnimatedModel`](character::character::AnimatedModel) holds one per animated model,
 /// the first being the body's.
 pub type AnimationRuleSystem {
+    /// The character's height over the ground or the water surface, whichever is nearer, metres.
+    /// Written for the character's first rule system by
+    /// [`CalculateHeightOverGround`](character::character::Character::CalculateHeightOverGround),
+    /// and zeroed by [`DoGroundInfoRaycasts`](character::character::Character::DoGroundInfoRaycasts)
+    /// while the proxy is supported or sliding with no ray cast. The graph's
+    /// `CHeightOverGroundCondition` reads it or
+    /// [`m_HeightOverGroundExcludingWater`](Self::m_HeightOverGroundExcludingWater) by its flag
+    /// (unverified).
+    #[address(0x34)]
+    pub m_HeightOverGround: f32,
+    /// The character's height over the ground alone, ignoring water, metres. Written and zeroed
+    /// alongside [`m_HeightOverGround`](Self::m_HeightOverGround); a cast that hits nothing within
+    /// its 200 metres leaves the full length less the cast's lift.
+    pub m_HeightOverGroundExcludingWater: f32,
+
     /// The running state machine instance this rule system drives.
     #[address(0x48)]
     pub m_StateMachineInstance: SharedPtr<StateMachineInstance>,
