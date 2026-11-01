@@ -1106,6 +1106,12 @@ pub type WeaponBase {
     #[address(0x414)]
     pub m_AimMode: AimMode,
 
+    /// The weapon's kind: two weapons of the same kind share it. The pickup condition
+    /// [`InteractionGraphParentWeaponNotInInventory`](interaction::InteractionGraphParentWeaponNotInInventory)
+    /// compares it with the weapon in the character's slot.
+    #[address(0x41C)]
+    pub m_WeaponId: i16,
+
     /// The inventory slot the weapon is equipped in.
     #[address(0x420)]
     pub m_EquipSlot: WeaponSlot,

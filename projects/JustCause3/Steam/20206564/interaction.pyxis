@@ -1,17 +1,69 @@
+use character::character::Character;
 use types::shared_ptr::WeakPtrGameObject;
 
 /// A character's user side of the interaction system (`CInteractionUserProxy`), embedded in the
 /// character ([`Character::m_InteractionUserProxy`](character::character::Character::m_InteractionUserProxy)).
 /// It tracks the interaction graphs near the character and which of their entries the character
 /// could take. Only some members are mapped.
-#[min_size(0x228)]
+#[min_size(0x240)]
 pub type InteractionUserProxy {
-    /// The entries of nearby interaction graphs that the character could enter now. The player's
-    /// weapon readout and a swimming character's weapon pickup
+    /// The character the proxy belongs to.
+    #[address(0x8)]
+    pub m_Character: *mut Character,
+
+    /// The entries being validated on this update, which
+    /// [`ProcessPotentialEntries`](Self::ProcessPotentialEntries) works through and empties. An
+    /// entry whose graph's conditions pass becomes one of
+    /// [`m_ValidEntries`](Self::m_ValidEntries).
+    #[address(0x198)]
+    pub m_PotentialEntries: InteractionGraphEntryArray,
+
+    /// The entries of nearby interaction graphs that the character could enter now: those whose
+    /// conditions passed, such as
+    /// [`InteractionGraphParentWeaponNotInInventory`](InteractionGraphParentWeaponNotInInventory)
+    /// on a weapon pickup. The player's weapon readout and a swimming character's weapon pickup
     /// ([`Inventory::UpdateWeaponHandling`](character::inventory::Inventory::UpdateWeaponHandling))
     /// walk it for the weapon the first entry offers.
     #[address(0x218)]
     pub m_ValidEntries: InteractionGraphEntryArray,
+
+    /// Set while [`ProcessPotentialEntries`](Self::ProcessPotentialEntries) runs, so that a
+    /// condition evaluated meanwhile reads [`m_PotentialEntries`](Self::m_PotentialEntries) rather
+    /// than [`m_ValidEntries`](Self::m_ValidEntries).
+    #[address(0x23C)]
+    pub m_IsValidatingEntry: bool,
+}
+impl InteractionUserProxy {
+    /// Works through [`m_PotentialEntries`](Self::m_PotentialEntries) with
+    /// [`m_IsValidatingEntry`](Self::m_IsValidatingEntry) set, and empties it: an entry whose
+    /// interaction's act the character's animated model can take moves to
+    /// [`m_ValidEntries`](Self::m_ValidEntries), and any other has its interaction's components
+    /// deactivated. Returns whether an entry was moved.
+    #[address(0x140_A67_1F0)]
+    pub fn ProcessPotentialEntries(&mut self) -> bool;
+}
+
+/// The interaction graph entry condition `CInteractionGraphParentWeaponNotInInventory`, one of the
+/// pickup conditions: a pickup graph that uses it is not offered to a character that already
+/// carries a weapon of the same kind in the offered weapon's slot. Only its evaluation is mapped.
+#[min_size(0x8)]
+pub type InteractionGraphParentWeaponNotInInventory {
+}
+impl InteractionGraphParentWeaponNotInInventory {
+    /// Evaluates the condition for `user`. It reads the user's entries
+    /// ([`InteractionUserProxy::m_PotentialEntries`] while
+    /// [`InteractionUserProxy::m_IsValidatingEntry`] is set, otherwise
+    /// [`InteractionUserProxy::m_ValidEntries`]) and takes the weapon the first entry offers, found
+    /// as the weapon readout finds it: the entry's graph's context's parent when that is a weapon,
+    /// or the weapon spawned by the weapon placement rule the entry's node stands for. It fails
+    /// only when the user's character
+    /// ([`InteractionUserProxy::m_Character`]) holds a weapon in that weapon's slot
+    /// ([`WeaponBase::m_EquipSlot`](equipment::weapon::WeaponBase::m_EquipSlot)) with the same
+    /// [`WeaponBase::m_WeaponId`](equipment::weapon::WeaponBase::m_WeaponId); with no entries, no
+    /// weapon found, or an empty slot, it passes. A non-zero `evaluation_type` logs a warning that
+    /// the condition is meant for entries alone.
+    #[address(0x140_A5B_6C0)]
+    pub fn Evaluate(&mut self, user: *mut InteractionUserProxy, evaluation_type: u32) -> bool;
 }
 
 /// A `TArray<CInteractionGraphEntry *>`: the start and the end of its element array.
