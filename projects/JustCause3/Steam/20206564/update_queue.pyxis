@@ -1,0 +1,30 @@
+/// `CUpdateQueue`: the game world's queue of per-object update functions, kept sorted by
+/// priority. The pre-simulation, post-simulation, post-camera, and render updates are four
+/// priority bands of the one queue, each run by [`Execute`](Self::Execute) with its own range.
+///
+/// Registering an update (`CGameObject::AddToUpdate`, which registers the object's
+/// pre-simulation, post-simulation, and render updates as its `GetRequiredUpdates` asks) only
+/// appends a pending entry and marks the queue dirty; the entry joins the queue, and starts being
+/// run, at the next [`CommitAddRemove`](Self::CommitAddRemove). Unregistering clears the entry at
+/// once, so a removed object is skipped from then on. The world commits at the top of its
+/// pre-simulation update
+/// ([`GameWorld::UpdatePreSimImpl`](game_world::GameWorld::UpdatePreSimImpl)), before that band
+/// runs, and at the end of its render update. An object registered before the pre-simulation
+/// commit is therefore run by the same tick's pre-simulation and post-simulation bands, and one
+/// registered after it, from inside the pre-simulation band onward, is first run in the next
+/// tick. Its layout is unmapped.
+pub type UpdateQueue;
+impl UpdateQueue {
+    /// Runs the registered updates whose priority lies in `prio_min..=prio_max`, in priority
+    /// order, with `dt` and `context` (a `SGameObjectUpdateContext` or `SGameObjectRenderContext`,
+    /// as the band expects). An update function that returns false is unregistered. It does not
+    /// commit pending registrations.
+    #[address(0x140_552_700)]
+    pub fn Execute(&mut self, dt: f32, prio_min: i32, prio_max: i32, context: *mut void);
+
+    /// Under the queue's registration lock, when the queue is dirty, drops the cleared entries,
+    /// merges the pending registrations into the queue in priority order, and rebuilds the handle
+    /// lookup. The disassembler mislabels it `CUpdateQueue::ValidateEmpty`.
+    #[address(0x140_552_A90)]
+    pub fn CommitAddRemove(&mut self);
+}
