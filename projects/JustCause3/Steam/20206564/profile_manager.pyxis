@@ -31,4 +31,12 @@ impl ProfileManager {
     /// never null, so the purchased and enabled tests read false.
     #[address(0x140_C7E_6C0)]
     pub fn GetUpgradeInfo(&self, id: *const HashString) -> *const UpgradeInfo;
+
+    /// `CProfileManager::Update` (virtual): fires the profile's real-time deadlines. A purchasable
+    /// or rewardable item whose expiry time has passed the clock's real time has the expiry cleared
+    /// and the profile observers notified; an upgrade whose research completion time has passed is
+    /// marked researched and the observers notified. [`GameStateRun::Update`](game::GameStateRun::Update)
+    /// calls it through the manager's virtual table once per tick among the online managers.
+    #[address(0x140_CA8_CD0)]
+    pub fn Update(&mut self, dt: f32);
 }

@@ -1,0 +1,75 @@
+/// `CStatisticManager`: the player statistics, kept in buckets that persist locally and refresh
+/// from the online collections. Its layout is unmapped.
+pub type StatisticManager;
+impl StatisticManager {
+    /// `CStatisticManager::Update`: while the login manager is logged in, persists or refreshes the
+    /// buckets waiting for the online state (an offline login persists them through the local data
+    /// store's asynchronous persist, an online login drops the other players from them), then
+    /// triggers the queued statistic increments. [`GameStateRun::Update`](game::GameStateRun::Update)
+    /// calls it once per tick after the AI threads are kicked, first of the online managers. The
+    /// disassembler mislabels it `CAccountManager::OnLoginStateChange`.
+    #[address(0x140_C07_A00)]
+    pub fn Update(&mut self, dt: f32);
+}
+
+/// `CAsynchronousBragManager`: the asynchronous brags, challenge scores compared against friends'
+/// statistics. Its layout is unmapped.
+pub type AsynchronousBragManager;
+impl AsynchronousBragManager {
+    /// `CAsynchronousBragManager::Update`: advances the statistic timers, activates the brag buckets
+    /// whose accumulated time passes their threshold, refreshes the collections of newly seen
+    /// players, updates the brag tracker, and refreshes the friends' collections when its own
+    /// accumulated time passes ten minutes. [`GameStateRun::Update`](game::GameStateRun::Update)
+    /// calls it once per tick among the online managers.
+    #[address(0x140_756_A90)]
+    pub fn Update(&mut self, dt: f32);
+}
+
+/// `COnlineSuiteManager`: the owner of the online suite (`OSuite::ZOnlineSuite`), the publisher's
+/// HTTP-based online services. Its layout is unmapped.
+pub type OnlineSuiteManager;
+impl OnlineSuiteManager {
+    /// `COnlineSuiteManager::Update`: updates the online suite, starts a queued online login, and,
+    /// while logged in without the suite, retries the suite's platform initialization as an
+    /// operation at most once every five minutes of the clock's real time.
+    /// [`GameStateRun::Update`](game::GameStateRun::Update) calls it once per tick among the online
+    /// managers.
+    #[address(0x140_B3F_BC0)]
+    pub fn Update(&mut self, dt: f32);
+}
+
+/// `COnlinePlatformSystem_Steam`: the Steam implementation of the online platform system. Its
+/// layout is unmapped.
+pub type OnlinePlatformSystemSteam;
+impl OnlinePlatformSystemSteam {
+    /// `COnlinePlatformSystem_Steam::Update` (virtual): runs the Steam API's callbacks
+    /// (`SteamAPI_RunCallbacks`), then, when the current matchmaking session's host is not the
+    /// local player but the Steam lobby names the local player its owner, takes the host role.
+    /// [`GameStateRun::Update`](game::GameStateRun::Update) calls it through the platform system's
+    /// virtual table once per tick among the online managers, so every Steam callback the game
+    /// registered runs here, on the game thread.
+    #[address(0x141_0A3_270)]
+    pub fn Update(&mut self, dt: f32);
+}
+
+/// `COperationManager`: the queue of asynchronous online operations. Its layout is unmapped.
+pub type OperationManager;
+impl OperationManager {
+    /// `COperationManager::Update`: advances the queued online operations.
+    /// [`GameStateRun::Update`](game::GameStateRun::Update) calls it once per tick after the input
+    /// job's completion spin, before the game world's pre-simulation queue.
+    #[address(0x140_BDA_8C0)]
+    pub fn Update(&mut self, dt: f32);
+}
+
+/// `CLoginManager`: the login state machine for the platform and the online services. Its layout
+/// is unmapped.
+pub type LoginManager;
+impl LoginManager {
+    /// `CLoginManager::Update`: steps the login state machine (the system, online-suite, and
+    /// platform logins and logouts and their waits).
+    /// [`GameStateRun::Update`](game::GameStateRun::Update) calls it once per tick after the
+    /// operations, before the game world's pre-simulation queue.
+    #[address(0x140_B7B_150)]
+    pub fn Update(&mut self, dt: f32);
+}
