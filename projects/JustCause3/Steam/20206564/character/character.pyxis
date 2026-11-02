@@ -434,6 +434,14 @@ impl Character {
     #[address(0x140_7B1_4B0)]
     pub fn SetUnlimitedAmmo(&mut self, unlimited: bool);
 
+    /// Whether the character's rounds come without limit: true when
+    /// [`m_UnlimitedAmmo`](Self::m_UnlimitedAmmo) is set, when the character is not the local
+    /// player ([`IsPlayer`](Self::IsPlayer)), or while the challenge-island game mode runs. It is the
+    /// holder half of [`WeaponBase::HasUnlimitedAmmo`](equipment::weapon::WeaponBase::HasUnlimitedAmmo),
+    /// read without a weapon; the weapon's automatic-pickup check asks it of the character.
+    #[address(0x140_94F_F20)]
+    pub fn HasUnlimitedAmmo(&self) -> bool;
+
     /// Sets the [`GOD_MODE`](DamageStateFlags::GOD_MODE) damage flag and the damageable's
     /// invulnerability. Enabling it on a living character also restores full health, forces the
     /// neutral animation state, and notifies the network component.
