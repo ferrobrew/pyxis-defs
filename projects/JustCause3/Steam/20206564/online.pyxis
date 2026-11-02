@@ -29,7 +29,8 @@ impl AsynchronousBragManager {
 /// HTTP-based online services. Its layout is unmapped.
 pub type OnlineSuiteManager;
 impl OnlineSuiteManager {
-    /// `COnlineSuiteManager::Update`: updates the online suite, starts a queued online login, and,
+    /// `COnlineSuiteManager::Update`: updates the online suite
+    /// ([`OnlineSuite::Update`](osuite::OnlineSuite::Update)), starts a queued online login, and,
     /// while logged in without the suite, retries the suite's platform initialization as an
     /// operation at most once every five minutes of the clock's real time.
     /// [`GameStateRun::Update`](game::GameStateRun::Update) calls it once per tick among the online
