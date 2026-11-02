@@ -109,6 +109,44 @@ impl AttachedInstance {
     pub fn UpdateTransform(&mut self, container: *mut AttachedEffectContainer);
 }
 
+/// How a particle effect instance stops (`CEffectInstance::EStopMode`).
+#[copyable]
+pub enum EffectStopMode: i32 {
+    /// The effect stops emitting and its live particles play out.
+    E_STOP_SOFTLY = 0x0,
+    /// The effect is removed at once.
+    E_STOP_IMMEDIATE = 0x1,
+}
+
+/// How a sound instance stops (`CSoundInstance::EStopMode`).
+#[copyable]
+pub enum SoundStopMode: i32 {
+    /// The sound is cut at once.
+    EStopMode_Immediately = 0x0,
+    /// The sound plays its release.
+    EStopMode_Softly = 0x1,
+}
+
+/// One attached effect usage of a container (`NAttachedEffectContainer::SAttachedEffectBase`): a
+/// named slot that resolves to an effect and a sound per material.
+pub type AttachedEffectUsage;
+
+/// One entry of an [`AttachedEffectContainer`]'s usage table.
+#[size(0x10)]
+pub type AttachedEffectUsageEntry {
+    /// The usage's hash (`hashlittle` of its name).
+    #[address(0x0)]
+    pub m_Hash: u32,
+
+    /// The index of the next entry in the bucket's chain, `0xFFFF` at its end.
+    #[address(0x4)]
+    pub m_Next: u16,
+
+    /// The usage.
+    #[address(0x8)]
+    pub m_Usage: *mut AttachedEffectUsage,
+}
+
 /// A game object's set of attached effects and sounds (`CAttachedEffectContainer`, a base of weapons,
 /// the grappling hook, and other game objects), with the effect parameter sources that feed them.
 #[min_size(0x90)]
@@ -132,6 +170,24 @@ pub type AttachedEffectContainer {
     #[address(0x30)]
     pub m_PlayingInstances: *mut AttachedInstance,
 
+    /// The usage table's buckets: one entry index per bucket into
+    /// [`m_UsageEntries`](Self::m_UsageEntries), `0xFFFF` for an empty bucket. A usage hash's
+    /// bucket is the hash modulo [`m_UsageBucketCount`](Self::m_UsageBucketCount).
+    #[address(0x38)]
+    pub m_UsageBuckets: *mut u16,
+
+    /// The usage table's entries, chained per bucket; see [`AttachedEffectUsageEntry`].
+    #[address(0x40)]
+    pub m_UsageEntries: *mut AttachedEffectUsageEntry,
+
+    /// The number of buckets in [`m_UsageBuckets`](Self::m_UsageBuckets).
+    #[address(0x48)]
+    pub m_UsageBucketCount: u16,
+
+    /// The number of usages in the table; zero for a container that loaded none.
+    #[address(0x50)]
+    pub m_UsageCount: u16,
+
     /// The container's accumulated time, advanced by [`UpdateAttachedEffects`](Self::UpdateAttachedEffects).
     #[address(0x88)]
     pub m_CurrentTime: f32,
@@ -152,6 +208,31 @@ impl AttachedEffectContainer {
     /// not loaded returns a shared empty pair, both of whose pointers are null.
     #[address(0x140_453_900)]
     pub fn GetDynamicAttachedEffects(&mut self, usage_hash: u32, source_material: GameMaterialId, target_material: u32, retrigger_time: *mut f32) -> *const EffectAndSoundPair;
+
+    /// The container's attached effect usage whose hash is `usage_hash`
+    /// (`hashlittle` of the usage's name), or null when the container did not load one. Owners
+    /// resolve their usages once, when their properties are set, and play them through
+    /// [`ActivateAttachedEffect`](Self::ActivateAttachedEffect).
+    #[address(0x140_44B_B30)]
+    pub fn FindAttachedEffectUsage(&mut self, usage_hash: u32) -> *mut AttachedEffectUsage;
+
+    /// Starts `usage`'s effect and sound for `material` (an `EGameMaterialId`, usually
+    /// [`EGameMaterialId_Default`](GameMaterialId::EGameMaterialId_Default)), attached to the
+    /// container's owner. With `restart_if_playing`, an instance of the usage that is still
+    /// playing is stopped and started again; without it, a playing instance for the same material
+    /// is left to play. A null `usage` does nothing. Returns whether an instance plays.
+    #[address(0x140_469_340)]
+    pub fn ActivateAttachedEffect(&mut self, usage: *mut AttachedEffectUsage, restart_if_playing: bool, material: GameMaterialId) -> bool;
+
+    /// Stops `usage`'s playing instances: its effects with `effect_stop_mode` and its sounds with
+    /// `sound_stop_mode`.
+    #[address(0x140_465_D60)]
+    pub fn DeactivateAttachedEffect(&mut self, usage: *mut AttachedEffectUsage, effect_stop_mode: EffectStopMode, sound_stop_mode: SoundStopMode);
+
+    /// Whether `usage` loops for `material`: whether any of its variants resolves to an effect or a
+    /// sound that loops. A looping usage plays until it is deactivated.
+    #[address(0x140_441_CE0)]
+    pub fn IsAttachedEffectLooping(&self, usage: *mut AttachedEffectUsage, material: GameMaterialId) -> bool;
 }
 
 /// A one-off effect and sound (`SEffectAndSoundPair`): a particle effect resource and an FMOD
