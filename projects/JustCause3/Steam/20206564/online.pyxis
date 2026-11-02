@@ -26,17 +26,79 @@ impl AsynchronousBragManager {
 }
 
 /// `COnlineSuiteManager`: the owner of the online suite (`OSuite::ZOnlineSuite`), the publisher's
-/// HTTP-based online services. Its layout is unmapped.
-pub type OnlineSuiteManager;
+/// HTTP-based online services. Only some members are bound.
+#[min_size(0xC0)]
+pub type OnlineSuiteManager {
+    /// Set while a platform initialization of the suite (`COnlineSuitePlatformInitOperation`) that
+    /// the manager started is running, which holds back both the queued login and the retry in
+    /// [`Update`](Self::Update).
+    #[address(0xB8)]
+    pub m_ProbingConnectivity: bool,
+
+    /// Set when an online login is queued; [`Update`](Self::Update) starts it and clears the flag
+    /// once no platform initialization is running.
+    #[address(0xB9)]
+    pub m_ShouldStartLogin: bool,
+
+    /// Whether the suite is known to be reachable outside an online login. The logout and the
+    /// offline login clear it, and `COnlineSuiteManager::HasConnectivity` reports connectivity when
+    /// it is set or the suite's web-service client exists.
+    #[address(0xBA)]
+    pub m_HasConnectivity: bool,
+}
 impl OnlineSuiteManager {
     /// `COnlineSuiteManager::Update`: updates the online suite
-    /// ([`OnlineSuite::Update`](osuite::OnlineSuite::Update)), starts a queued online login, and,
-    /// while logged in without the suite, retries the suite's platform initialization as an
-    /// operation at most once every five minutes of the clock's real time.
-    /// [`GameStateRun::Update`](game::GameStateRun::Update) calls it once per tick among the online
-    /// managers.
+    /// ([`OnlineSuite::Update`](osuite::OnlineSuite::Update)), starts a queued online login
+    /// ([`m_ShouldStartLogin`](Self::m_ShouldStartLogin)), and then checks whether to retry the
+    /// suite. While the login manager is [`LoggedIn`](LoginState::LoggedIn) in the
+    /// [`Offline`](LoginMode::Offline) mode, with neither a platform initialization running
+    /// ([`m_ProbingConnectivity`](Self::m_ProbingConnectivity)) nor the suite reached
+    /// ([`m_HasConnectivity`](Self::m_HasConnectivity)), it asks the account manager whether the
+    /// first-party service is reachable
+    /// ([`AccountManager::IsConnectedToFirstPartyService`]) on every call; when it is, and more
+    /// than five minutes of the clock's real time have passed since the last attempt, it starts the
+    /// suite's platform initialization as an operation, whose success registers the account with
+    /// the suite. [`GameStateRun::Update`](game::GameStateRun::Update) calls it once per tick among
+    /// the online managers.
     #[address(0x140_B3F_BC0)]
     pub fn Update(&mut self, dt: f32);
+}
+
+/// `CAccountManager`: the player's account on the platform, which reacts to the login manager's
+/// state changes with the login, connection-lost, and offline message boxes, and decides when an
+/// offline session logs back in online (`CAccountManager::TryReconnectOnline`). One instance
+/// exists, of the platform's subclass ([`AccountManagerSteam`]). Only some virtual functions are
+/// bound.
+#[singleton(0x142_F36_968)]
+pub type AccountManager {
+    vftable {
+        /// `CAccountManager::IsConnectedToFirstPartyService`: whether the platform's own online
+        /// service is reachable (for Steam, [`AccountManagerSteam::IsConnectedToFirstPartyService`]).
+        /// Its callers are [`OnlineSuiteManager::Update`], every tick while logged in offline
+        /// without the suite; the frontend's title screen, which logs in online when this and
+        /// the internet check pass and offline otherwise; the login-state change out of
+        /// [`LoggedOut`](LoginState::LoggedOut), which records it in the login attempt;
+        /// `TryReconnectOnline`, before logging an offline session back in online; the Steam
+        /// account's login completion, which explains the offline mode on the title screen when it
+        /// fails; the Steam achievements' bucket activation, which requests the Steam statistics
+        /// only when it passes; and the pause menu's update, which enables the DLC store items
+        /// with it.
+        #[index(11)]
+        pub fn IsConnectedToFirstPartyService(&mut self) -> bool;
+    },
+}
+
+/// `CAccountManager_Steam`: the Steam implementation of [`AccountManager`]. Its layout is
+/// unmapped.
+pub type AccountManagerSteam;
+impl AccountManagerSteam {
+    /// `CAccountManager_Steam::IsConnectedToFirstPartyService`, the Steam override of
+    /// [`AccountManager::IsConnectedToFirstPartyService`]: returns `ISteamUser::BLoggedOn`,
+    /// whether the Steam client is logged on to the Steam servers, or false when `SteamUser()`
+    /// returns no interface. Each call is two calls into the Steam client library and one into the
+    /// Steam client.
+    #[address(0x140_F28_780)]
+    pub fn IsConnectedToFirstPartyService(&mut self) -> bool;
 }
 
 /// `COnlinePlatformSystem_Steam`: the Steam implementation of the online platform system. Its
@@ -63,9 +125,57 @@ impl OperationManager {
     pub fn Update(&mut self, dt: f32);
 }
 
-/// `CLoginManager`: the login state machine for the platform and the online services. Its layout
-/// is unmapped.
-pub type LoginManager;
+/// A step of the login state machine (`NOnline::ELoginState`), [`LoginManager::m_State`]. A login
+/// runs from [`LoggedOut`](Self::LoggedOut) through the system, online-suite, and platform steps to
+/// [`LoggedIn`](Self::LoggedIn), and a logout runs the other way.
+#[copyable]
+pub enum LoginState: i32 {
+    LoggedOut = 0x0,
+    LoginInitialize = 0x1,
+    LoginSystem = 0x2,
+    LoginSystemWait = 0x3,
+    LoginOnlineSuite = 0x4,
+    LoginOnlineSuiteWait = 0x5,
+    LoginReadyWait = 0x6,
+    Login = 0x7,
+    LoginWait = 0x8,
+    LoggedIn = 0x9,
+    LogoutReadyWait = 0xA,
+    Logout = 0xB,
+    LogoutWait = 0xC,
+    LogoutOnlineSuite = 0xD,
+    LogoutOnlineSuiteWait = 0xE,
+    LogoutSystem = 0xF,
+    LogoutSystemWait = 0x10,
+}
+
+/// A login mode (`NOnline::ELoginMode`): whether a login uses the online services.
+#[copyable]
+pub enum LoginMode: i32 {
+    None = -1,
+    Online = 0x0,
+    /// Logged in without the online services; the online managers keep their data locally.
+    Offline = 0x1,
+}
+
+/// `CLoginManager`: the login state machine for the platform and the online services. Only some
+/// members are bound.
+#[singleton(0x142_F36_BB0)]
+pub type LoginManager {
+    /// The state machine's current step.
+    #[address(0x0)]
+    pub m_State: LoginState,
+
+    /// The mode of the completed login, which `CLoginManager::GetLoginMode` returns while
+    /// [`m_State`](Self::m_State) is [`LoggedIn`](LoginState::LoggedIn).
+    #[address(0xA8)]
+    pub m_LoginMode: LoginMode,
+
+    /// The mode of the login in progress, which `CLoginManager::GetLoginMode` returns in every
+    /// other state.
+    #[address(0xAC)]
+    pub m_LoggingInMode: LoginMode,
+}
 impl LoginManager {
     /// `CLoginManager::Update`: steps the login state machine (the system, online-suite, and
     /// platform logins and logouts and their waits).
