@@ -216,6 +216,18 @@ pub type GrapplingHook {
     /// The hash of the release-from-attached one-off usage (`hashlittle("ReleaseFromAttached")`),
     /// resolved into [`m_ReleaseFromAttachedEffectUsage`](Self::m_ReleaseFromAttachedEffectUsage).
     pub const RELEASE_FROM_ATTACHED_USAGE: u32 = 0x2F29EBC3,
+    /// The hash of the failed fire's one-off usage (`hashlittle("GrappleFail")`), resolved into
+    /// [`m_GrappleFireFailEffectUsage`](Self::m_GrappleFireFailEffectUsage).
+    pub const GRAPPLE_FAIL_USAGE: u32 = 0xBD920663,
+    /// The hash of the fire's one-off usage (`hashlittle("GrappleFire")`): the device's fire sound
+    /// and its muzzle effect. No code names it: it plays only from a track message to the hook
+    /// (`CGrapplingHook::PlayEffectOnMessage`), which finds it in
+    /// [`m_AttachedEffects`](Self::m_AttachedEffects) by this hash.
+    pub const GRAPPLE_FIRE_USAGE: u32 = 0xC0862DF,
+    /// The hash of the pre-fire's one-off usage (`hashlittle("GrapplePreFire")`): a sound with no
+    /// effect, which also plays only from a track message to the hook. Which animation sends it,
+    /// and when, is unverified.
+    pub const GRAPPLE_PRE_FIRE_USAGE: u32 = 0x5338704,
 
     /// The hook's attached effects and sounds (its `CAttachedEffectContainer` base), loaded from
     /// the grapple device's effect container when the hook's properties are set. The fire
@@ -242,7 +254,8 @@ pub type GrapplingHook {
     #[address(0x1C8)]
     pub m_RetractingActiveWireEffectUsage: *mut AttachedEffectUsage,
 
-    /// The one-off effect and sound of a fire that finds no target.
+    /// The one-off effect and sound of a fire that finds no target
+    /// ([`GRAPPLE_FAIL_USAGE`](Self::GRAPPLE_FAIL_USAGE)).
     #[address(0x1D0)]
     pub m_GrappleFireFailEffectUsage: *mut AttachedEffectUsage,
 
