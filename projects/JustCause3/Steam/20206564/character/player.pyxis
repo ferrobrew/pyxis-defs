@@ -16,7 +16,7 @@ pub enum AimMode: i32 {
 /// `CAvatar`, so the [`Avatar`] base sits at [`AVATAR_BASE_OFFSET`](Self::AVATAR_BASE_OFFSET) and a
 /// character's [`m_Avatar`](character::character::Character::m_Avatar) points there rather than at
 /// the start of the player. Only some members are bound.
-#[min_size(0x1414)]
+#[min_size(0x14B8)]
 pub type Player {
     /// The offset of the [`Avatar`] base within the player.
     pub const AVATAR_BASE_OFFSET: u64 = 0x10,
@@ -58,6 +58,18 @@ pub type Player {
     /// The game time ([`Clock`](clock::Clock) game-time milliseconds) at which
     /// [`m_AimMode`](Self::m_AimMode) last changed.
     pub m_AimModeChangeTime: u32,
+
+    /// The weapon id ([`WeaponBase::m_WeaponId`](equipment::weapon::WeaponBase::m_WeaponId)) of
+    /// the weapon the HUD's pickup panel last offered, or -1 when the panel is cleared.
+    /// [`UpdateWeaponHUD`](Self::UpdateWeaponHUD) compares it with this frame's offer to decide
+    /// whether to tell the HUD, and writes this frame's offer back.
+    #[address(0x1_4B0)]
+    pub m_CurrentWeaponPickupId: i16,
+
+    /// The ammunition the HUD's pickup panel last showed for
+    /// [`m_CurrentWeaponPickupId`](Self::m_CurrentWeaponPickupId), or -1.
+    #[address(0x1_4B4)]
+    pub m_CurrentWeaponPickupAmmo: i32,
 }
 impl Player {
     /// Switches the player's aim mode. Entering precision aim
@@ -100,6 +112,25 @@ impl Player {
     /// and the player's post-physics update call it.
     #[address(0x140_C54_EE0)]
     pub fn ReInit(&mut self, transform: *mut Matrix4, teleport_flags: u32, inventory_reset_flags: u32);
+
+    /// Drives the HUD's weapon pickup panel, which names the weapon on offer, the ammunition it
+    /// would bring, and the weapon it would replace in its slot, beside the use-item glyph. It
+    /// takes the weapon the first of the character's interaction entries offers
+    /// ([`InteractionUserProxy::m_ValidEntries`](interaction::InteractionUserProxy::m_ValidEntries)):
+    /// the entry's graph's context's parent when that is a weapon, or the weapon a weapon placement
+    /// rule among them spawned. There is no offer while the
+    /// [`USE_ITEM`](input::input_action_map::Action::USE_ITEM) action is disabled in the player's
+    /// action map or the animation forbids a pickup
+    /// ([`Inventory::GetAnimationAllowsPickup`](character::inventory::Inventory::GetAnimationAllowsPickup)).
+    /// With no offer it clears the panel
+    /// ([`HUDUI::ClearValidWeaponPickup`](ui::hud_ui::HUDUI::ClearValidWeaponPickup)) when one was
+    /// shown; a changed weapon or ammunition shows it again
+    /// ([`HUDUI::OnNewValidWeaponPickup`](ui::hud_ui::HUDUI::OnNewValidWeaponPickup)). Either way
+    /// it stores the offer in [`m_CurrentWeaponPickupId`](Self::m_CurrentWeaponPickupId) and
+    /// [`m_CurrentWeaponPickupAmmo`](Self::m_CurrentWeaponPickupAmmo). `CPlayer::UpdatePostPhysics`
+    /// calls it each frame.
+    #[address(0x140_CE0_4C0)]
+    pub fn UpdateWeaponHUD(&mut self);
 }
 
 /// The player's ability table (`CAbilitiesHandler`): the status of each unlockable ability, keyed
