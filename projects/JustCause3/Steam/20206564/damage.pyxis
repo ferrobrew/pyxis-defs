@@ -59,7 +59,10 @@ pub type DamageMsg {
     #[address(0x64)]
     pub m_DamageFlags: DamageFlags,
     /// The damager's faction, as [`Character::GetFaction`](character::character::Character::GetFaction)
-    /// reports it; [`Clear`](Self::Clear) sets `-1`. The struck character compares it with its own.
+    /// reports it; [`Clear`](Self::Clear) sets `-1`. The struck character (`CCharacter::OnDamage`)
+    /// compares it with its own and takes no damage from its own faction, except from a locally
+    /// controlled player character (resolved from [`m_Damager`](Self::m_Damager)), including
+    /// itself, and from explosive damage.
     pub m_Faction: i32,
     /// What the damager was doing (in a stunt, under the parachute, aiming down the sights, and so
     /// on), as [`Character::GetCurrentDamageSourceStateInfo`](character::character::Character::GetCurrentDamageSourceStateInfo)
