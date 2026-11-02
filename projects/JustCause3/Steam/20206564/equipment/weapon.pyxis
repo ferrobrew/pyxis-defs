@@ -1519,6 +1519,14 @@ impl WeaponBase {
     #[address(0x140_991_580)]
     pub fn OnEquipBase(&mut self, character: *mut Character);
 
+    /// The base implementation of the [`OnDrop`](Self::OnDrop) virtual, which a weapon without an
+    /// override of its own, such as a thrown grenade weapon, runs. The inventory's drop
+    /// ([`Inventory::DropWeapon`](character::inventory::Inventory::DropWeapon)) reaches it through
+    /// the deferred drop on the weapon's next pre-simulation update. It leaves the weapon in
+    /// [`E_WS_DROPPED`](WeaponState::E_WS_DROPPED) with its holder cleared.
+    #[address(0x140_9A4_870)]
+    pub fn OnDropBase(&mut self);
+
     /// The base implementation of the [`OnUnequip`](Self::OnUnequip) virtual.
     #[address(0x140_982_040)]
     pub fn OnUnequipBase(&mut self);
