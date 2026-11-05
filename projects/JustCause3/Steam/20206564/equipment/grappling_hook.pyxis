@@ -389,9 +389,26 @@ impl GrapplingHook {
     /// with that set it latches the aim again and fires the tether's second end, and otherwise, the
     /// input up, it enters [`GHS_REELING_IN`](GrapplingHookState::GHS_REELING_IN) and queues the
     /// pre-reel act: the reel runs whenever an attached active wire meets a released input, a quick
-    /// tap that let go before the hook arrived included.
+    /// tap that let go before the hook arrived included. While
+    /// [`GHS_REELING_IN`](GrapplingHookState::GHS_REELING_IN) with an attached far end, a press of
+    /// the fire input (its press edge, or a press still queued within its window) fires again from
+    /// the reel ([`FireHookFromReelingIn`](Self::FireHookFromReelingIn)) when the hook is ready to
+    /// fire, the re-reel upgrade is bought and enabled, and the grapple slot is in range; from the
+    /// parachute or the wingsuit it ends the line and fires a fresh one instead. Without such a
+    /// press, a cancel click retracts the active wire, rights the character (unless it uses the
+    /// parachute or the wingsuit), and queues the grapple cancel act.
     #[address(0x140_949_F70)]
     pub fn OnPreSimUpdate(&mut self, dt: f32);
+
+    /// Fires again while the hook is [`GHS_REELING_IN`](GrapplingHookState::GHS_REELING_IN): latches
+    /// the player's grapple slot into [`m_HookFireInfo`](Self::m_HookFireInfo)
+    /// ([`SetUpTarget`](Self::SetUpTarget)), queues the fire act toward it as a reel fire
+    /// ([`DoActFire`](Self::DoActFire)), and arms the wait for the fire animation
+    /// ([`m_WaitForFireSignalTimeout`](Self::m_WaitForFireSignalTimeout),
+    /// [`m_WaitingForGrappleFire`](Self::m_WaitingForGrappleFire)). It does nothing in any other
+    /// state.
+    #[address(0x140_943_FA0)]
+    pub fn FireHookFromReelingIn(&mut self, player: *mut void, holder: *const SharedPtr<Character>);
 
     /// The post-camera hook update. On the fire animation's release frame it creates the wire
     /// ([`CreateNewWire`](Self::CreateNewWire)), pins the near end to the device, and starts the
@@ -472,8 +489,12 @@ impl GrapplingHook {
     #[address(0x140_94C_3D0)]
     pub fn AttachLocalWireEndToDevice(wire: *mut SharedPtr<GrapplingHookWire>, holder: *const SharedPtr<Character>);
 
-    /// Retracts the active wire: destroys its physics constraint, detaches the near end, and
-    /// notifies the HUD.
+    /// Retracts the active wire: destroys its physics constraint, detaches its hook (far) end
+    /// ([`m_WireEnds[0]`](GrapplingHookWire::m_WireEnds)), returns it to
+    /// [`GHWS_ACTIVE_VIRTUAL`](WireState::GHWS_ACTIVE_VIRTUAL), notifies the HUD, and plays the
+    /// retracting usage ([`m_RetractingActiveWireEffectUsage`](Self::m_RetractingActiveWireEffectUsage)).
+    /// A reel under way then cancels itself on its next update
+    /// ([`NStateTask_ReelIn::Update`]), its far end no longer attached.
     #[address(0x140_8F7_A10)]
     pub fn RetractActiveWire(&mut self);
 
@@ -540,6 +561,16 @@ impl GrapplingHook {
     /// [`m_IsSqueezingDualTethers`](Self::m_IsSqueezingDualTethers).
     #[address(0x140_923_E00)]
     pub fn SqueezeDualTethers(&mut self, player: *mut void, tuning: *const GrappleTuning, squeeze_value: f32, dt: f32);
+
+    /// The reel's stuck check, run by the hook's post-simulation update while the hook is
+    /// [`GHS_REELING_IN`](GrapplingHookState::GHS_REELING_IN) and the character is in the reel. Past
+    /// the reel's opening jump, it measures how fast the hips close on the reel target, smoothed
+    /// over ticks; while the character's proxy touches something and that speed is under 1 metre
+    /// per second, a timer runs, and past a fifth of a second the reel is resolved: dropped
+    /// (retract, cancel act) for a custom attachment or on walkable ground, otherwise reattached to
+    /// a nearby foot support or floor, or dropped when none is found.
+    #[address(0x140_948_280)]
+    pub fn CheckReelCollisions(&mut self, holder: *const SharedPtr<Character>, dt: f32);
 }
 
 /// The reel-in state task (`NStateTask_ReelIn`): the character state task that carries the
@@ -547,6 +578,54 @@ impl GrapplingHook {
 /// [`GHS_REELING_IN`](GrapplingHookState::GHS_REELING_IN).
 pub type NStateTask_ReelIn;
 impl NStateTask_ReelIn {
+    /// The per-tick update. It cancels the reel (queues the grapple cancel act, rights the
+    /// character, and retracts the active wire with [`GrapplingHook::RetractActiveWire`]) when the
+    /// context's time step is not positive, when the active wire's far end is not attached or the
+    /// hook has left [`GHS_REELING_IN`](GrapplingHookState::GHS_REELING_IN), or when the hook gives
+    /// no reel target or direction. Otherwise it reads the character's velocity, advances it with
+    /// [`UpdateReelVelocity`](Self::UpdateReelVelocity), hands it to the character with
+    /// [`UpdateMotion`](Self::UpdateMotion), and finishes the reel with
+    /// [`FinishReel`](Self::FinishReel) on arrival, tested by what the far end is attached to
+    /// ([`AttachmentObjectInfo`](equipment::grapple_point_proxy::AttachmentObjectInfo)):
+    ///
+    /// - a character: once the distance left after this tick's travel along the line is within the
+    ///   tuning's kick distance;
+    /// - a vehicle: [`CheckReelToVehicleRelease`](Self::CheckReelToVehicleRelease);
+    /// - anything else: when the character faces along the line within
+    ///   [`GrappleTuning::m_ReelInArrivedDistance`] of the target, or when the distance less this
+    ///   tick's travel (the speed, at least 1 metre per second, times the step) is under 0.4 metres.
+    ///
+    /// No test times the reel out or watches its progress: a velocity that does not close the
+    /// distance keeps the task running. The hook's post-simulation update watches for a reel stuck
+    /// against geometry ([`GrapplingHook::CheckReelCollisions`]).
+    #[address(0x140_841_470)]
+    pub fn Update(ctx: *mut StateContext, properties: *mut void, instance: *mut void);
+
+    /// Hands the reel's velocity to the character: turns the character toward `target_dir` (over
+    /// the act's rotation segment, or at a fixed rate), sets its motion state to
+    /// [`MOTION_STATE_TASK_DEFINED`](character::character::Character::MOTION_STATE_TASK_DEFINED),
+    /// flags the proxy's input velocity as game controlled
+    /// ([`CharacterInput::gameControledVelocity`](physics::CharacterInput::gameControledVelocity)),
+    /// and sets `wanted_velocity` as the character's wanted world velocity. The velocity is the
+    /// whole of the character's motion for the step.
+    #[address(0x140_838_690)]
+    pub fn UpdateMotion(character: *mut Character, target_dir: *const Vector3, wanted_velocity: *const Vector3, instance: *mut void, properties: *mut void, layer: i32, dt: f32);
+
+    /// Ends the reel at `target_position` into the reeled state its attachment setup chose: a
+    /// perch, a hang, upside down, a vehicle's stunt position, or a fall. [`Update`](Self::Update)
+    /// is its only caller.
+    #[address(0x140_841_100)]
+    pub fn FinishReel(character: *mut Character, hook: *const SharedPtr<GrapplingHook>, tuning: *const GrappleTuning, target_position: *const Vector3);
+
+    /// The arrival test of a reel onto a vehicle: within a fixed distance of the vehicle's entry
+    /// point (`target_position`), overshooting it along the reel's direction
+    /// (`to_target_next` is the offset to it after this tick's travel), or a sphere around it
+    /// predicted to be met within this tick's travel. It also sets the character's collision
+    /// group to the vehicle's while the vehicle's entry is chosen. The disassembler mislabels it
+    /// `CJumpToFallTransitionState::UpdateSamplers`.
+    #[address(0x140_83B_060)]
+    pub fn CheckReelToVehicleRelease(character: *mut Character, hook: *const SharedPtr<GrapplingHook>, dt: f32, target_position: *const Vector3, target_velocity: *const Vector3, to_target_next: *const Vector3, distance_to_target: f32) -> bool;
+
     /// Advances the reel's velocity by `dt`. It accelerates `velocity` (in and out: the
     /// character's world velocity less the velocity it inherited) along `wanted_reel_direction` by
     /// [`GrappleTuning::m_ReelInAccel`], or [`GrappleTuning::m_RetractReelInAccel`] while the
@@ -556,7 +635,13 @@ impl NStateTask_ReelIn {
     /// between [`GrappleTuning::m_ReelInSpeedMin`] and the top speed
     /// ([`GrappleTuning::m_ReelInSpeedMax`], or [`GrappleTuning::m_RetractReelInSpeedMax`] while the
     /// reel boost applies), stops at the target within [`GrappleTuning::m_ReelInDragMaxDistance`],
-    /// and adds back the blended inherited velocity. `current_position` is the character's
+    /// and adds back the blended inherited velocity. The inherited velocity blends, with a
+    /// smoothstep over the reel's running time, from the velocity the character carried into the
+    /// reel toward the far end's attach point velocity
+    /// ([`GrapplePointProxy::GetObjectAttachPointVelocity`](equipment::grapple_point_proxy::GrapplePointProxy::GetObjectAttachPointVelocity)),
+    /// so a reel onto a moving body chases it; it is zero without an attached far end. It applies
+    /// no gravity: [`UpdateMotion`](Self::UpdateMotion) hands the result to the character as its
+    /// whole velocity. `current_position` is the character's
     /// position and `distance_to_target` its distance from the target. The reel task's update
     /// calls it once per tick, and the trajectory prediction (`SimulateImmediateTrajectory`) calls
     /// it per predicted step with `is_simulating` set, which only suppresses its debug drawing. The

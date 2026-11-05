@@ -1,5 +1,6 @@
 use aim::target::Target;
 use character::character::Character;
+use equipment::grapple_point_proxy::GrapplePointProxy;
 use physics::{CastRayInfo, IgnoreMaterialFlagFilter};
 use types::math::Matrix4;
 use types::math::Vector3;
@@ -126,9 +127,9 @@ pub type WireEnd {
     #[address(0x50)]
     pub m_WireEndState: WireEndState,
 
-    /// The attachment proxy (`CGrapplePointProxy`) while attached, or null.
+    /// The attachment proxy while attached, or null.
     #[address(0x58)]
-    pub m_PointProxy: *mut void,
+    pub m_PointProxy: *mut GrapplePointProxy,
 
     /// The wire's other end.
     #[address(0x60)]

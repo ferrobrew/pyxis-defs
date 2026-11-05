@@ -1,7 +1,76 @@
+use game::GameObject;
 use types::math::{Matrix4, Vector3};
 
-/// A grapple attachment fixed to a character bone (`CCharacterBoneAttachedPointProxy`). Its
-/// visual getters multiply the local attachment transform by the bone and character transforms.
+/// What a grapple attachment proxy is attached to (`CGrapplePointProxy::EAttachmentObjectInfo`),
+/// stored in [`GrapplePointProxy::m_AttachmentObjectInfo`]. The reel task picks its arrival test by
+/// it ([`NStateTask_ReelIn::Update`](equipment::grappling_hook::NStateTask_ReelIn::Update)).
+#[copyable]
+pub enum AttachmentObjectInfo: i32 {
+    AOI_Invalid = 0x0,
+    /// A character's bone ([`CharacterBoneAttachedPointProxy`]).
+    AOI_Character = 0x1,
+    /// A vehicle or one of its parts (`CVehicleGrapplePointProxy`).
+    AOI_Vehicle = 0x2,
+    /// Static world geometry.
+    AOI_Static = 0x3,
+    /// Any other physics object ([`GenericObjectPointProxy`]).
+    AOI_Generic = 0x4,
+}
+
+/// The base of every grapple attachment (`CGrapplePointProxy`): what a wire end
+/// ([`WireEnd::m_PointProxy`](equipment::wire_end::WireEnd::m_PointProxy)) is attached to. Its
+/// virtual interface answers for the attached thing whatever its kind: where the attach point is,
+/// how it moves, the body behind it, and its mass. Only some members are bound.
+pub type GrapplePointProxy {
+    vftable {
+        /// Writes the attach point's world position and normal, or returns false when the
+        /// attached thing is gone.
+        #[index(1)]
+        pub fn GetVisualPositionAndNormalWS(&self, position: *mut Vector3, normal: *mut Vector3) -> bool;
+
+        /// Whether the proxy and the thing it is attached to are live.
+        #[index(3)]
+        pub fn IsOk(&self) -> bool;
+
+        /// The attached object's mass, kilograms: its physics instance's mass for a dynamic
+        /// object, a vehicle's own mass for a vehicle, and a very large mass for an object that is
+        /// not dynamic.
+        #[index(4)]
+        pub fn GetObjectMass(&self) -> f32;
+
+        /// Writes the attach point's world velocity: for a physics object, its body's velocity at
+        /// the point (the linear velocity plus the angular velocity's part at the point), and zero
+        /// when the object is gone. The reel blends the character's carried velocity toward it
+        /// ([`NStateTask_ReelIn::UpdateReelVelocity`](equipment::grappling_hook::NStateTask_ReelIn::UpdateReelVelocity)).
+        #[index(5)]
+        pub fn GetObjectAttachPointVelocity(&self, velocity: *mut Vector3);
+
+        /// Writes the id of the body a wire constraint at this end would join, or the invalid id
+        /// ([`PfxCharacterInstance::INVALID_BODY_ID`](physics::PfxCharacterInstance::INVALID_BODY_ID))
+        /// without one: a physics object's own body while it is dynamic, a
+        /// character's proxy body or the ragdoll bone it is attached to.
+        /// [`GrapplingHookWire::CreateConstraint`](equipment::grappling_hook::GrapplingHookWire::CreateConstraint)
+        /// reads both ends' bodies through it.
+        #[index(16)]
+        pub fn GetRigidBodyForConstraint(&self, result: *mut u32) -> *mut u32;
+
+        /// The attached game object (its `CGameObject` subobject), or null.
+        #[index(22)]
+        pub fn GetGameObject(&self) -> *mut GameObject;
+    },
+
+    /// What the proxy is attached to; see [`AttachmentObjectInfo`].
+    #[address(0xC)]
+    pub m_AttachmentObjectInfo: AttachmentObjectInfo,
+}
+
+/// A grapple attachment fixed to a character bone (`CCharacterBoneAttachedPointProxy`), a
+/// [`GrapplePointProxy`]. Its visual getters multiply the local attachment transform by the bone
+/// and character transforms. A proxy built for a bone is virtual only: its constraint hint
+/// ([`GetConstraintHint`](Self::GetConstraintHint)) permits no wire constraint until the
+/// attachment is physicalized, and the device end of every wire
+/// ([`GrapplingHook::AttachLocalWireEndToDevice`](equipment::grappling_hook::GrapplingHook::AttachLocalWireEndToDevice))
+/// is such a proxy, so the active wire never holds a physics constraint.
 pub type CharacterBoneAttachedPointProxy;
 impl CharacterBoneAttachedPointProxy {
     /// Writes the attachment's world position and normal, or returns false without a character.
@@ -11,9 +80,15 @@ impl CharacterBoneAttachedPointProxy {
     /// Writes the attachment's world transform, or returns false without a character.
     #[address(0x140_8D8_280)]
     pub fn GetVisualTransformWS(&self, transform: *mut Matrix4) -> bool;
+
+    /// No constraint for a proxy that is not live, has no character, or is virtual only; an active
+    /// (physical) constraint otherwise.
+    #[address(0x140_8CA_4D0)]
+    pub fn GetConstraintHint(&self) -> i32;
 }
 
-/// A grapple attachment on a physics game object (`CGenericObjectPointProxy`).
+/// A grapple attachment on a physics game object (`CGenericObjectPointProxy`), a
+/// [`GrapplePointProxy`].
 pub type GenericObjectPointProxy;
 impl GenericObjectPointProxy {
     /// Returns no constraint for an invalid proxy or a weapon whose grappling mode reels without
