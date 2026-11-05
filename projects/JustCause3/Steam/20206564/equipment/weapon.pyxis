@@ -1070,6 +1070,15 @@ pub type WeaponBase {
     #[address(0x278)]
     pub m_RecoilPitch: f32,
 
+    /// The placement rule that spawned the weapon (a
+    /// [`WeaponPlacementRule`](weapon_placement_rule::WeaponPlacementRule)), as a weak reference
+    /// to the rule's `CGameObject` subobject; empty for a weapon no rule placed. The rule writes it
+    /// once its weapon has spawned (`CWeaponPlacementRule::OnPostSpawn`), with the weapon's
+    /// infinite-pickup setting and its picked-up events, before it puts a rack's weapon in the
+    /// rack state. It is not cleared when the weapon leaves the rule's spot.
+    #[address(0x288)]
+    pub m_SpawnedFromRule: WeakPtrGameObject,
+
     /// Whether the weapon overheats.
     #[address(0x38C)]
     pub m_CanBeOverheated: bool,
