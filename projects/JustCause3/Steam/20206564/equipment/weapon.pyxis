@@ -2227,6 +2227,13 @@ pub type PlantedExplosiveWeapon {
     pub m_AlreadyDetonatedOnThisInput: bool,
 }
 impl PlantedExplosiveWeapon {
+    /// `CPlantedExplosiveWeapon::TYPE_ID`: the run-time type id of the class, for
+    /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use. The game tests
+    /// the weapon in the [`E_SLOT_PLANTED_EXPLOSIVE`](character::inventory::WeaponSlot::E_SLOT_PLANTED_EXPLOSIVE)
+    /// slot against it before treating it as the C4 weapon.
+    #[address(0x140_7C8_2C0)]
+    pub fn TYPE_ID() -> *const u32;
+
     /// The weapon's serial per-frame update from its user (its override of
     /// [`WeaponBase::UpdateFromUserPostSim_Serial`]). The inventory runs it for the planted
     /// explosive slot's weapon every frame, wielded or not
@@ -2283,6 +2290,20 @@ impl PlantedExplosiveWeapon {
     /// [`m_PrimedExplosive`](Self::m_PrimedExplosive).
     #[address(0x140_980_EA0)]
     pub fn DespawnPrimedExplosive(&mut self);
+
+    /// Removes every placed charge without detonating it: for each live charge it unregisters the
+    /// HUD's charge hint, removes the charge
+    /// ([`Explosive::RemoveSelf`](equipment::explosive::Explosive::RemoveSelf)), turns off the
+    /// charge's light component, and drops it from the live list, then refreshes the HUD's charge
+    /// count. It then queues a stop-using for the next pre-simulation update
+    /// ([`m_DeferredStopUsing`](WeaponBase::m_DeferredStopUsing), registering the weapon through
+    /// [`m_RequiresPreSimUpdates`](WeaponBase::m_RequiresPreSimUpdates)); the weapon's
+    /// `StopUsing` acts only in the planting mode, which it leaves, despawning a primed charge.
+    /// Outside the planting mode a primed charge is left alone. The game calls it when a character
+    /// is disabled, when a mission activates or resets, when a ROM starts, and from the player's
+    /// event handler.
+    #[address(0x140_990_6B0)]
+    pub fn RemoveAllExplosives(&mut self);
 
     /// Places the weapon's attachments (its override of the `UpdateAttachmentTransforms` virtual):
     /// after the base placement, while the weapon has a user, it puts the primed charge's
