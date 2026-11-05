@@ -1,0 +1,17 @@
+use physics::{hknpRagdoll, hknpWorld};
+
+/// A character's ragdoll instance (`NAnimationSystem::CRagdollInstanceImpl`): the Havok ragdoll
+/// built from the character's ragdoll resource, its bodies in the physics world, and the
+/// controllers that drive them toward the animated pose. While its owner controls its displacement
+/// the bodies follow the animation; otherwise they simulate freely and the character follows them.
+/// Only some members are bound.
+#[min_size(0x18)]
+pub type RagdollInstance {
+    /// The physics world the ragdoll's bodies live in.
+    #[address(0x8)]
+    pub m_World: *mut hknpWorld,
+
+    /// The Havok ragdoll: the ragdoll's bodies and constraints, and its skeleton.
+    #[address(0x10)]
+    pub m_Ragdoll: *mut hknpRagdoll,
+}

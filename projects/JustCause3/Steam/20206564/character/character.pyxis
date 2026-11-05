@@ -1,5 +1,6 @@
 use animation::ik::HumanIK;
 use animation::pose_producer::{AnimatedBodyPart, AnimationInstance, PoseProducer};
+use animation::ragdoll::RagdollInstance;
 use animation::skeleton::Skeleton;
 use animation::rule_system::{AnimationModifierType, AnimationRuleSystem};
 use blackboard::ObjectBlackboard;
@@ -201,6 +202,19 @@ pub type Character {
     /// the character alone counts as staggering.
     pub m_HitReaction_AccumalatedImpulseStumbleThreshold: f32,
 
+    /// The character's melee invulnerability, which `CCharacter::IsInvulnerableToMelee` returns.
+    /// Per-character tuning read from data.
+    #[address(0x4CC)]
+    pub m_InvulnerableToMelee: bool,
+    /// The character's invulnerability to other non-player characters, toggled at run time by the
+    /// character's enable and disable events for it.
+    pub m_InvulnerableToOtherAI: bool,
+    /// Whether a mission marks the character as critical to it. The character rule that spawns the
+    /// character copies it from the rule's data. The interaction graph's node-occupied condition
+    /// can be set to treat a node a non-player character occupies as free for a mission-critical
+    /// character, and the AI's vehicle entry checks it when the seat it wants is occupied.
+    pub m_IsMissionCriticalCharacter: bool,
+
     /// The chance, from zero to one, that the character drops its hand grenade when it dies
     /// ([`OnDestroyed`](Self::OnDestroyed)). Per-character tuning read from data; the constructor
     /// sets a quarter.
@@ -281,6 +295,13 @@ pub type Character {
     /// part of its per-frame update. Left as a raw integer because only a few of its ~25 values have
     /// been confirmed: `MOTION_STATE_SWIMMING`, `MOTION_STATE_RAGDOLL`, and
     /// `MOTION_STATE_TASK_DEFINED` on this type.
+    /// The character's ragdoll (`boost::shared_ptr<NAnimationSystem::CRagdollInstanceImpl>`), or
+    /// null for a character without one. While the animation drives the character the ragdoll's
+    /// displacement is controlled by its owner; the character ragdolls
+    /// ([`IsRagdolling`](Self::IsRagdolling)) while the ragdoll's own simulation moves it.
+    #[address(0x2_428)]
+    pub m_Ragdoll: SharedPtr<RagdollInstance>,
+
     #[address(0x2_494)]
     pub m_CurrentMotionState: u32,
 
@@ -870,6 +891,13 @@ impl Character {
     /// Whether the character is attached to any vehicle through the interaction graph.
     #[address(0x140_7D5_EA0)]
     pub fn IsAttachedToVehicle(&self) -> bool;
+
+    /// Whether the character is ragdolling: it has a ragdoll ([`m_Ragdoll`](Self::m_Ragdoll)) whose
+    /// displacement is not controlled by its owner, so the ragdoll's bodies simulate freely and
+    /// move the character. A knocked-down, thrown, or dead character ragdolls until the animation
+    /// graph's get-up takes it back.
+    #[address(0x140_77E_270)]
+    pub fn IsRagdolling(&self) -> bool;
 
     /// Requests proxy state `state` (a [`ProxyState`] value) by writing
     /// [`m_PendingProxyState`](Self::m_PendingProxyState); the physics proxy changes shape when

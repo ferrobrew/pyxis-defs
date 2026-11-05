@@ -1,3 +1,4 @@
+use animation::skeleton::HkArray;
 use character::character::Character;
 use damage::DamageMsg;
 use graphics_engine::model_instance::{Model, ModelInstance};
@@ -361,6 +362,18 @@ impl RagdollProxyPhantom {
     /// find the body part a hit struck.
     #[address(0x140_3E4_8E0)]
     pub fn GetHitNameHash(&mut self, info: *const CastRayInfoBase) -> u32;
+}
+
+/// A Havok ragdoll (`hknpRagdoll`, an `hknpPhysicsSystem`): the bodies and constraints of one
+/// ragdoll in the world, and the skeleton they map to. Only some members are bound.
+#[min_size(0x48)]
+pub type hknpRagdoll {
+    /// An invalid entry of [`m_bodyIds`](Self::m_bodyIds).
+    pub const INVALID_BODY_ID: u32 = 0x7FFFFFFF,
+
+    /// The ragdoll's bodies, one per ragdoll bone in the order of the ragdoll's skeleton.
+    #[address(0x20)]
+    pub m_bodyIds: HkArray<u32>,
 }
 
 /// The Havok physics world (`hknpWorld`, Havok Physics 2014.1). Its body manager is embedded at
