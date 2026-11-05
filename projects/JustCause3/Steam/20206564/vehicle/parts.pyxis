@@ -153,6 +153,14 @@ impl PartInstance {
     #[address(0x140_1DF_050)]
     pub fn IsConstraintActive(&self) -> bool;
 
+    /// Merges a loosened part back into its parent's body: it re-enables the part's merged
+    /// world-collision shapes, hands the part's physical body back to its owner to destroy,
+    /// reattaches its children, and destroys the part's constraint. The door controller merges a
+    /// door this way when its latch catches it or its motor closes it
+    /// ([`DoorInfo`](vehicle::vehicle::DoorInfo)).
+    #[address(0x140_221_E10)]
+    pub fn MergePart(&mut self);
+
     /// The part's own body, a `CPfxVehiclePart` (a [`PfxRigidBody`](physics::PfxRigidBody)), when
     /// the part has been loosened or broken off into one; null while the part is merged into its
     /// body's own rigid body. It reads the part's world-collision rigid body and keeps it only when

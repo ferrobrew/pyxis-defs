@@ -168,6 +168,13 @@ impl Vehicle {
     #[address(0x140_FC7_2B0)]
     pub fn CloseDoor(&mut self, slot: DoorSlot);
 
+    /// Notes that the doors of `slot` finished closing: queues the slot's door-closed effect usage
+    /// (the folding wing, the cargo bay door, and the missile hatch have their own), and for the
+    /// folding wing refreshes the stunt area edges. The door controller calls it after merging a
+    /// door, from its latch and at the end of a motor close.
+    #[address(0x141_01A_020)]
+    pub fn OnFinishedClosingDoor(&mut self, slot: DoorSlot);
+
     /// Sets [`m_AimingTargetPosition`](Self::m_AimingTargetPosition) and refreshes
     /// [`m_AIVehicleWeaponAimTimeout`](Self::m_AIVehicleWeaponAimTimeout).
     #[address(0x140_F24_B00)]
@@ -315,13 +322,33 @@ pub enum DoorState: i32 {
 /// closed angle. A door that has opened stops its motor, unless it is kept open, and then swings
 /// freely on its hinge. A freely swinging door whose hinge angle above its minimum
 /// ([`PfxBreakable::GetHingeAngleAboveMin`](vehicle::parts::PfxBreakable::GetHingeAngleAboveMin))
-/// falls below a small angle while it swings shut faster than a threshold speed is merged back into
-/// the body (`CPartInstance::MergePart`): a door swung shut hard latches. A door the motor closes
-/// is merged once it reaches its smallest angle. Only some members are bound.
+/// falls below [`LATCH_ANGLE_DEG`](Self::LATCH_ANGLE_DEG) while it swings shut faster than
+/// [`LATCH_SPEED_DEG_S`](Self::LATCH_SPEED_DEG_S) is merged back into the body
+/// ([`PartInstance::MergePart`](vehicle::parts::PartInstance::MergePart), then
+/// [`Vehicle::OnFinishedClosingDoor`]): a door swung shut hard latches. The speed is the change of
+/// the angle since [`m_PreviousAngle_Deg`](Self::m_PreviousAngle_Deg) over the update's step. A door
+/// the motor closes is merged once it reaches its smallest angle.
+///
+/// The latch is skipped for a door with [`FLAG_KEEP_OPEN`](Self::FLAG_KEEP_OPEN). Such a door that
+/// is [`DoorState::DOOR_OPEN`] and touching nothing is asked to open again (a pending
+/// [`DoorState::DOOR_OPENING`], so the motor turns it back) once the hinge's largest angle exceeds
+/// its angle above the smallest plus [`m_KeepOpenMinAngle_Rad`](Self::m_KeepOpenMinAngle_Rad) by
+/// more than [`KEEP_OPEN_REOPEN_RAD`](Self::KEEP_OPEN_REOPEN_RAD). With the kept angle at the
+/// hinge's largest, that never holds, so the door swings freely and never latches. Only some
+/// members are bound.
 #[size(0x50)]
 pub type DoorInfo {
     /// The flag of [`m_Flags`](Self::m_Flags) an opening request that keeps the door open sets.
     pub const FLAG_KEEP_OPEN: u32 = 0x2,
+    /// The angle above the hinge's smallest below which a free door swinging shut latches, degrees.
+    /// A static of the controller's update.
+    pub const LATCH_ANGLE_DEG: f32 = 2.0,
+    /// The closing speed above which a free door within [`LATCH_ANGLE_DEG`](Self::LATCH_ANGLE_DEG)
+    /// latches, degrees per second. A static of the controller's update.
+    pub const LATCH_SPEED_DEG_S: f32 = 10.0,
+    /// How far a kept-open door must fall short of its kept angle before it is asked to open again,
+    /// radians. A static of the controller's update.
+    pub const KEEP_OPEN_REOPEN_RAD: f32 = 0.0017453292,
 
     /// The state the controller moves the door to on its next update, or
     /// [`DoorState::DOOR_CLOSED`] when nothing is pending.
@@ -343,7 +370,9 @@ pub type DoorInfo {
     /// The hinge's largest angle, radians.
     pub m_HingeMaxAngle_Rad: f32,
 
-    /// The smallest angle a door kept open is held at, radians.
+    /// The smallest angle a door kept open is held at, radians. An opening request sets it a given
+    /// angle below the hinge's largest (no lower than the smallest) when it keeps the door open, and
+    /// to the hinge's smallest otherwise.
     #[address(0x28)]
     pub m_KeepOpenMinAngle_Rad: f32,
     /// A freely swinging door's hinge angle above its minimum on the controller's last update,
