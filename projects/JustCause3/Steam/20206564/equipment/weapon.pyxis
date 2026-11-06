@@ -336,6 +336,18 @@ pub type WeaponData {
     #[address(0x198)]
     pub m_WorldMatrixT1: Matrix4,
 
+    /// The gun's attach offset. [`UpdateAttachmentTransforms`](Self::UpdateAttachmentTransforms)
+    /// places a gun on a holster or back bone
+    /// ([`RIGHT_HOLSTER`](character::character::SafeBoneIndex::RIGHT_HOLSTER),
+    /// [`LEFT_HOLSTER`](character::character::SafeBoneIndex::LEFT_HOLSTER),
+    /// [`BACK_ATTACH`](character::character::SafeBoneIndex::BACK_ATTACH), or
+    /// [`BACK_ATTACH_2`](character::character::SafeBoneIndex::BACK_ATTACH_2)), when the weapon's
+    /// attach tuning asks for it, at this offset composed with the bone's model-space pose and the
+    /// holder's world matrix, rather than at the bone's world matrix as it is. Each gun carries
+    /// its own, so the offset follows the gun, not the bone it rides.
+    #[address(0x218)]
+    pub m_AttachOffset: Matrix4,
+
     /// The gun's measured world velocity, metres per second.
     /// [`ThrowAwayMagazineObject`](Self::ThrowAwayMagazineObject) gives it to the dropped magazine.
     #[address(0x270)]
@@ -446,7 +458,8 @@ impl WeaponData {
     /// `state`
     /// ([`Character::GetWorldMatrixForBone`](character::character::Character::GetWorldMatrixForBone)):
     /// a hand attach bone's matrix as it is, and a holster or back bone's composed with the gun's
-    /// attach offset when the weapon's attach tuning asks for it. So a hand-held gun's pose in the
+    /// attach offset ([`m_AttachOffset`](Self::m_AttachOffset)) when the weapon's attach tuning
+    /// asks for it. So a hand-held gun's pose in the
     /// hand is the attach bone's pose relative to the wrist, which the animation sets. While
     /// [`m_SkipRenderInterpolation`](Self::m_SkipRenderInterpolation) or
     /// `skip_render_interpolation` is set, and for the initial placement (`update_type` 0), it
