@@ -214,6 +214,11 @@ impl IgnoreMaterialFlagFilter {
 /// fraction to one and clears the object. Engine callers construct it on the stack: the
 /// [`VFTABLE`](Self::VFTABLE) pointer, a null [`m_HitObjectId`](Self::m_HitObjectId), then
 /// [`Reset`](Self::Reset).
+///
+/// The class is abstract: its virtual hit-object setter is the runtime's pure-call stub, and
+/// [`PhysicsSystem::CastRay`] calls that setter with null on a miss, so a query given an info
+/// that still carries the base table aborts the process on its first miss. Callers pass a derived
+/// info such as [`CastRayInfo`], switching the table after [`Reset`](Self::Reset).
 #[size(0x38), align(8)]
 pub type CastRayInfoBase {
     /// The address of the `CCastRayInfoBase` virtual table.
@@ -240,8 +245,8 @@ pub type CastRayInfoBase {
 }
 impl CastRayInfoBase {
     /// Clears the result for reuse: a unit normal and fraction, a null object, an invalid body,
-    /// then the virtual hit-object setter with null. It calls through the virtual table, which must
-    /// already be set.
+    /// then a second virtual setter with null, which is empty in the base class and which
+    /// [`CastRayInfo`] overrides. It calls through the virtual table, which must already be set.
     #[address(0x140_255_8C0)]
     pub fn Reset(&mut self);
 
