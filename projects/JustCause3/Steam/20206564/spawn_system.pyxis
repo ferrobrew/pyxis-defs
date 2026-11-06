@@ -286,6 +286,23 @@ impl SpawnSystem {
     #[address(0x140_E5D_5A0)]
     pub fn GetTagIndexFromTagHash(&self, tag_hash: u32) -> i32;
 
+    /// The unique spawn tag of the first resource definition matching the tag string `tags`
+    /// (parsed and matched as [`Spawn`](Self::Spawn) does, with premium and prototype definitions
+    /// included and no shuffle), or zero when the string has no valid tag or nothing matches. A
+    /// definition's unique tag is the first of its tags, the one only it carries. The game's
+    /// completion reward looks up its weapon's definition by name this way and hands the tag to the
+    /// inventory's weapon give.
+    #[address(0x140_E83_A90)]
+    pub fn GetUniqueTag(&mut self, tags: *const u8) -> i32;
+
+    /// The first resource definition carrying the spawn tag whose hash is `tag_hash` (a unique
+    /// tag's hash names exactly one), or null when no loaded tag has that hash or no definition
+    /// carries it. [`GetTagHashFromTagIndex`](Self::GetTagHashFromTagIndex) turns a tag index such
+    /// as [`GetUniqueTag`](Self::GetUniqueTag)'s into the hash. The definitions are built once when
+    /// the system initializes, so the pointer stays valid until the system is released.
+    #[address(0x140_E5D_750)]
+    pub fn GetResourceDefFromTagHash(&self, tag_hash: u32) -> *mut SpawnResourceDef;
+
     /// Resets the system: waits for its spawn job through [`m_ThreadSignal`](Self::m_ThreadSignal),
     /// sends `spawn.reset_all_spawn_rules` at once, and calls [`PreUpdate`](Self::PreUpdate). This
     /// service call can invoke successful pending spawn callbacks inline while the reset is in
@@ -303,8 +320,57 @@ impl SpawnSystem {
     pub fn ResetSystem(&mut self) -> i32;
 }
 
-/// An opaque `CSpawnSystem::SResourceDef`: one spawnable resource's definition.
-pub type SpawnResourceDef;
+/// The load state of a [`SpawnResourceDef`]'s exported entity (`SResourceDef::EStatus`).
+#[copyable]
+pub enum SpawnResourceDefStatus: i32 {
+    /// Not loaded. The update starts loading a definition that a pending request needs when its
+    /// budget pool has room under its definition limit, or at once for a high-priority request.
+    UNLOADED = 0x0,
+    /// The exported entity is streaming in.
+    LOADING = 0x1,
+    /// Loaded and spawnable.
+    LOADED = 0x2,
+    /// Unloading, after its last request and spawned object went. A request that needs it again
+    /// takes it straight back to [`LOADED`](Self::LOADED).
+    UNLOADING = 0x3,
+    /// The exported entity's load hit a file error. The definition is never loaded again, and the
+    /// update drops it from every factory that matched it; a factory left with no definition is
+    /// invalid, and [`PreUpdate`](SpawnSystem::PreUpdate) removes its request without a callback.
+    LOAD_ERROR = 0x4,
+}
+
+/// `CSpawnSystem::SResourceDef`: one spawnable resource's definition, built at initialization from
+/// an entry of a budget pool's definition file (its exported entity, its tags, and its selection
+/// weight). Partial: only the members below are mapped.
+#[size(0x2B8)]
+pub type SpawnResourceDef {
+    /// Whether the definition came from its pool's prototype definition file. Only a request with
+    /// [`FF_PROTOTYPE_SPAWN`](SpawnSystem::FF_PROTOTYPE_SPAWN) matches it, unless the system's
+    /// debug switch for prototypes is on.
+    #[address(0x94)]
+    pub m_PrototypeContent: bool,
+
+    /// Whether the definition came from its pool's premium definition file. Only a request with
+    /// [`FF_PREMIUM_SPAWN`](SpawnSystem::FF_PREMIUM_SPAWN) matches it, and such a request that
+    /// matches any premium definition takes only the premium ones.
+    #[address(0x95)]
+    pub m_PremiumContent: bool,
+
+    /// The load state of the definition's exported entity.
+    #[address(0x120)]
+    pub m_Status: SpawnResourceDefStatus,
+
+    /// How many live factories want the definition loaded: each factory that matched it counts
+    /// once, unless it was created with
+    /// [`FF_NO_RESOURCE_REQUEST`](SpawnSystem::FF_NO_RESOURCE_REQUEST).
+    #[address(0x124)]
+    pub m_RequestCount: u32,
+
+    /// How many objects one spawn of the definition creates, counted from the exported entity when
+    /// its load completes.
+    #[address(0x164)]
+    pub m_ObjectsPerSpawn: i32,
+}
 
 /// `CSpawnSystem::CSpawnFactoryImpl`: the factory that vets and performs individual spawns.
 pub type SpawnFactoryImpl;
