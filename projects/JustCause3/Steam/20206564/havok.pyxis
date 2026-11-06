@@ -56,7 +56,24 @@ pub type hkMemoryAllocator {
         /// Frees the block `p` of `num_bytes` bytes.
         #[index(2)]
         pub fn blockFree(&mut self, p: *mut void, num_bytes: i32);
+
+        /// Frees the buffer `p` of `num_bytes` bytes, as a growable container returns its storage.
+        #[index(4)]
+        pub fn bufFree(&mut self, p: *mut void, num_bytes: i32);
     },
+}
+
+/// The allocator behind Havok containers declared with `hkContainerHeapAllocator`, such as the
+/// body-id array [`hknpWorld::queryAabb`](physics::hknpWorld::queryAabb) fills. A container grows
+/// its storage from [`s_alloc`](Self::s_alloc) and its owner frees it there with
+/// [`bufFree`](hkMemoryAllocator::bufFree), giving the capacity in bytes, unless the array's flags
+/// say it does not own the storage
+/// ([`HK_ARRAY_DONT_DEALLOCATE_FLAG`](animation::skeleton::HK_ARRAY_DONT_DEALLOCATE_FLAG)).
+pub type hkContainerHeapAllocator {
+    /// The process-wide allocator object (`hkContainerHeapAllocator::s_alloc`), constructed at
+    /// static initialization; callers pass its address as `this`.
+    #[address(0x142_DAD_020)]
+    pub extern s_alloc: hkMemoryAllocator,
 }
 
 /// A Havok collision shape (`hknpShape`), a [`hkReferencedObject`] allocated from the Havok heap of

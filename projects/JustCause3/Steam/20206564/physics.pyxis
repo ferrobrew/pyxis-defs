@@ -2,7 +2,7 @@ use animation::skeleton::HkArray;
 use character::character::Character;
 use damage::DamageMsg;
 use graphics_engine::model_instance::{Model, ModelInstance};
-use havok::{hkAabb, hkAabb16, hkIntSpaceUtil, hkReferencedObject, hkSimdFloat32, hkTransformf, hknpBodyCinfo, hknpConstraintCinfo, hknpContactImpulseEvent, hknpMotionCinfo, hknpShape};
+use havok::{hkAabb, hkAabb16, hkContainerHeapAllocator, hkIntSpaceUtil, hkReferencedObject, hkSimdFloat32, hkTransformf, hknpBodyCinfo, hknpConstraintCinfo, hknpContactImpulseEvent, hknpMotionCinfo, hknpShape};
 use types::math::{Matrix4, Vector3};
 use types::shared_ptr::SharedPtr;
 use types::vector_math::{AlignedQuat, AlignedVector3};
@@ -511,11 +511,52 @@ impl hknpWorld {
     #[address(0x141_4CF_370)]
     pub fn setBodyShape(&mut self, body_id: u32, shape: *const void);
 
+    /// Appends to `hits` the id of every body in the broad phase whose box overlaps the query's
+    /// box ([`hknpAabbQuery::m_aabb`], Havok space), on every broad-phase layer. The query box is
+    /// quantized outwards into [`m_intSpaceUtil`](Self::m_intSpaceUtil) and compared with each
+    /// body's [`hknpBody::m_aabb`], so the hits can include bodies whose real boxes only come close;
+    /// a body is never tested against its shape. A query with a [`m_filter`](hknpAabbQuery::m_filter)
+    /// asks it per layer and per body; a null filter keeps every hit. A body not in the broad phase
+    /// is never a hit. `hits` grows from [`hkContainerHeapAllocator::s_alloc`], and the caller frees
+    /// what it grew.
+    #[address(0x141_501_2D0)]
+    pub fn queryAabb(&self, query: *const hknpAabbQuery, hits: *mut HkArray<u32>);
+
     /// Writes the body `body_id`'s box as the broad phase holds it to `aabb`, Havok space: its
     /// [`hknpBody::m_aabb`] restored through [`m_intSpaceUtil`](Self::m_intSpaceUtil), each corner
     /// as the integer corner times the inverse scale less the low offset.
     #[address(0x141_4CC_220)]
     pub fn getBodyAabb(&self, body_id: u32, aabb: *mut hkAabb);
+}
+
+/// A box query against a world's bodies (`hknpAabbQuery`), as
+/// [`hknpWorld::queryAabb`] takes it. The engine's callers zero it, with the material
+/// `0xFFFF`, and fill in the box.
+#[size(0x40), align(16)]
+pub type hknpAabbQuery {
+    /// The collision filter that decides which layers and bodies the query sees
+    /// (`hknpCollisionFilter*`), or null for all of them.
+    pub m_filter: *mut void,
+
+    /// The query's material (`hknpQueryFilterData::m_materialId`), for the filter.
+    #[address(0x8)]
+    pub m_materialId: u16,
+
+    /// The query's collision filter info, for the filter.
+    #[address(0xC)]
+    pub m_collisionFilterInfo: u32,
+
+    /// The query's user data, for the filter.
+    #[address(0x10)]
+    pub m_userData: u64,
+
+    /// The shape level of detail the query asks for.
+    #[address(0x18)]
+    pub m_levelOfDetail: u8,
+
+    /// The box, Havok space.
+    #[address(0x20)]
+    pub m_aabb: hkAabb,
 }
 
 /// A Havok body (`hknpBody`): its transform, collision data, and the motion that moves it. Only
