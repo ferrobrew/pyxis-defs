@@ -2,6 +2,7 @@ use aim::aim::AimMode;
 use animation::message::AnimationMessageData;
 use character::character::{AnimatedModel, Character};
 use character::inventory::WeaponSlot;
+use equipment::explosive::PlantedExplosive;
 use game::{GameObject, GameObjectRenderContext, GameObjectUpdateContext};
 use graphics_engine::model_instance::{Model, ModelInstance};
 use physics::{GrapplingMode, PfxRigidBody, RigidObject};
@@ -2136,6 +2137,17 @@ impl ThrownGrenadeWeapon {
     pub fn UpdateAttachmentTransforms(&mut self, p2: f32, p3: f32, transform_type: u32);
 }
 
+/// One placed charge on a [`PlantedExplosiveWeapon`]'s live list
+/// ([`m_ActiveExplosives`](PlantedExplosiveWeapon::m_ActiveExplosives)): the charge and the index of
+/// the weapon light component that lights it, or -1 for none.
+#[size(0x10), copyable]
+pub type ActiveExplosiveEntry {
+    /// The placed charge, at the start of the object (not its `CGameObject` subobject).
+    pub m_Explosive: *mut PlantedExplosive,
+    /// The index of the charge's light among the weapon's light components, or -1.
+    pub m_LightIndex: i32,
+}
+
 /// `CPlantedExplosiveWeapon`: the C4 weapon, a [`WeaponBase`] held in the
 /// [`E_SLOT_PLANTED_EXPLOSIVE`](character::inventory::WeaponSlot::E_SLOT_PLANTED_EXPLOSIVE) slot.
 /// It owns the charges the character has placed and their remote detonation.
@@ -2193,6 +2205,15 @@ pub type PlantedExplosiveWeapon {
     /// The compiled-name hash of [`m_InactiveModelInstance`](Self::m_InactiveModelInstance).
     #[address(0x710)]
     pub m_InactiveModelHash: u32,
+
+    /// The placed charges, in the order they were made live: the live list that
+    /// [`Fire_Projectile`](Self::Fire_Projectile) appends to (up to
+    /// [`MaxActiveExplosives`](Self::MaxActiveExplosives)),
+    /// [`NumActiveExplosives`](Self::NumActiveExplosives) counts, the detonation walks, and
+    /// [`RemoveFromActiveList`](Self::RemoveFromActiveList) and
+    /// [`RemoveAllExplosives`](Self::RemoveAllExplosives) erase from.
+    #[address(0x718)]
+    pub m_ActiveExplosives: Vector<ActiveExplosiveEntry>,
 
     /// The primed charge: the live [`PlantedExplosive`](equipment::explosive::PlantedExplosive)
     /// spawned by [`PrimeExplosive`](Self::PrimeExplosive) and not yet placed, or null. `px` is
@@ -2304,6 +2325,16 @@ impl PlantedExplosiveWeapon {
     /// event handler.
     #[address(0x140_990_6B0)]
     pub fn RemoveAllExplosives(&mut self);
+
+    /// Takes one placed charge off the live list without detonating or removing it: unregisters
+    /// the HUD's charge hint for `explosive` (when it is not null), and when the charge is on
+    /// [`m_ActiveExplosives`](Self::m_ActiveExplosives), turns off its light component, erases its
+    /// entry, and refreshes the HUD's charge count. A charge not on the list changes nothing else.
+    /// The charge's destructor calls it unless the charge was removed with
+    /// [`Explosive::RemoveSelf`](equipment::explosive::Explosive::RemoveSelf) first, and so does a
+    /// charge's detonation.
+    #[address(0x140_990_590)]
+    pub fn RemoveFromActiveList(&mut self, explosive: *mut PlantedExplosive);
 
     /// Places the weapon's attachments (its override of the `UpdateAttachmentTransforms` virtual):
     /// after the base placement, while the weapon has a user, it puts the primed charge's
