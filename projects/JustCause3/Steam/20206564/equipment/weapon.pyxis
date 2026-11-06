@@ -10,6 +10,7 @@ use types::math::Matrix4;
 use types::math::Vector3;
 use types::shared_ptr::{SharedPtr, WeakPtrGameObject};
 use types::std_vector::Vector;
+use equipment::attached_effects::AttachedEffectContainer;
 
 /// The hand a weapon grip-table entry is for (`EWeaponGripHand`), as
 /// [`WeaponBase::GetGripPosition`] takes it.
@@ -276,6 +277,25 @@ pub type WeaponData {
     /// skeleton, the CS111 Archangel's and the Final Argument's: the skeleton's one bone besides its
     /// `Reference` root, which carries the bolt and which the rifle's bolt-action clip moves.
     pub const SLIDER_BONE_HASH: u32 = 0x7B1541DB,
+    /// The hash of the usage a gun's effect file names `ReloadInsertAmmo` (`hashlittle` of the
+    /// name): the sound of one shell or grenade going in, which only the shell-fed shotgun's and the
+    /// Bildt Negotiator's effect files carry. No code names it; a reload clip's track message
+    /// plays it.
+    pub const RELOAD_INSERT_AMMO_USAGE: u32 = 0x08FABB82,
+    /// The hash of the usage `ReloadEnd` (`hashlittle` of the name): the sound of a reload
+    /// finishing. [`WeaponBase::CheckIfReloadShouldBeTriggeredBase`] plays it on every gun of a
+    /// weapon whose timed reload with no animation has run out.
+    pub const RELOAD_END_USAGE: u32 = 0xB32F5BFA,
+    /// The hash of the usage `OutOfAmmoFire` (`hashlittle` of the name): the click of a trigger
+    /// pulled on an empty gun, which [`WeaponBase::CheckIfReloadShouldBeTriggeredBase`] plays on the
+    /// firing gun of a player with nothing left to reload.
+    pub const OUT_OF_AMMO_FIRE_USAGE: u32 = 0x53A64A14,
+
+    /// The gun's attached effects and sounds (its `CAttachedEffectContainer` base), loaded from the
+    /// weapon's effect file. The weapon plays its one-off sounds on each gun's container: the reload
+    /// start and end, the dry-fire click, and the usages its clips' track messages name.
+    #[base]
+    pub m_AttachedEffects: AttachedEffectContainer,
 
     /// The weapon this gun belongs to.
     #[address(0xC0)]
