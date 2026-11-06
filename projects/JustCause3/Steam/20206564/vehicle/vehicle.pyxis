@@ -1,5 +1,7 @@
 use character::character::Character;
 use game::GameObjectUpdateContext;
+use input::input_action_map::Action;
+use state::StateContext;
 use types::math::{Matrix4, Vector3};
 use vehicle::parts::{PartInstance, PfxBreakable};
 use vehicle::stunt_areas::StuntAreas;
@@ -271,6 +273,71 @@ impl AirPlane {
 /// the physics proxy (the placement itself is inferred from the call shape).
 #[address(0x140_81A_3C0)]
 pub fn NStateTask_InputVehicleExitTask_TeleportUpwards(character: *mut Character);
+
+/// The per-instance loaded properties of [`NStateTask_InputVehicleExitTask`]
+/// (`NStateTask_InputVehicleExitTask::SProperties`).
+#[size(0xC), align(4)]
+pub type InputVehicleExitTaskProperties {
+    /// The act the task queues to leave the seat (the runtime `idstring` value of an `ACT_*` id).
+    pub m_Act: u32,
+    /// The action whose release leaves the seat.
+    pub m_Button: Action,
+    /// The longest the action may have been pressed before its release for the release to leave
+    /// the seat, seconds.
+    pub m_Time: f32,
+}
+
+/// The input state task of a seated player that leaves the vehicle
+/// (`NStateTask_InputVehicleExitTask`). The exit is a tap: the task reads the release of
+/// [`InputVehicleExitTaskProperties::m_Button`], and a press held longer than
+/// [`InputVehicleExitTaskProperties::m_Time`] before its release leaves nothing behind.
+pub type NStateTask_InputVehicleExitTask;
+impl NStateTask_InputVehicleExitTask {
+    /// The per-frame update, skipped while the `CROMManager` shows either of its availability
+    /// notices. For the local player, when another occupant of the interaction graph is on the
+    /// player's node, it queues [`InputVehicleExitTaskProperties::m_Act`]. For a character with an
+    /// avatar, it queues the act on the frame the avatar's action map reports
+    /// [`InputVehicleExitTaskProperties::m_Button`] released with its time pressed before the
+    /// release at most [`InputVehicleExitTaskProperties::m_Time`]. Both queue the act with a
+    /// callback that runs [`NStateTask_InputVehicleExitTask_TeleportUpwards`] when the queued
+    /// action reports that it did not exit.
+    #[address(0x140_824_990)]
+    pub fn Update(ctx: *mut StateContext, properties: *const InputVehicleExitTaskProperties, instance: *mut void);
+}
+
+/// The per-instance loaded properties of [`NStateTask_InputVehicleEnterTask`]
+/// (`NStateTask_InputVehicleEnterTask::SProperties`).
+#[size(0xC), align(4)]
+pub type InputVehicleEnterTaskProperties {
+    /// The action read.
+    pub m_Button: Action,
+    /// How long the action must be held to move to another seat rather than enter, seconds.
+    pub m_Holdtime: f32,
+    /// How long an entry requested through the character's blackboard stays honoured, seconds.
+    pub m_Buffertime: f32,
+}
+
+/// The input state task that enters a vehicle and changes seat in it
+/// (`NStateTask_InputVehicleEnterTask`), for the local player outside cinematic mode.
+pub type NStateTask_InputVehicleEnterTask;
+impl NStateTask_InputVehicleEnterTask {
+    /// The per-frame update. With no seat change available, a press of
+    /// [`InputVehicleEnterTaskProperties::m_Button`] queues `ACT_ENTER_VEHICLE` on every pressed
+    /// frame. A seat change is available when the player's interaction node has a transition to a
+    /// gunner seat ([`HasAvailableGunnerDestination`](Self::HasAvailableGunnerDestination)), when
+    /// the player is in a gunner seat (the change is back to the driver's seat), or when the player
+    /// is in the driver's seat of a vehicle with a reachable cargo bay. Then a press held for
+    /// [`InputVehicleEnterTaskProperties::m_Holdtime`] targets that seat and queues
+    /// `ACT_ENTER_VEHICLE_MOUNTED_WEAPON` (or `ACT_ENTER_VEHICLE_CARGO_BAY` for the cargo bay),
+    /// once per press, and a release sooner than that queues `ACT_ENTER_VEHICLE`.
+    #[address(0x140_824_690)]
+    pub fn Update(ctx: *mut StateContext, properties: *const InputVehicleEnterTaskProperties, instance: *mut void);
+
+    /// Whether the user's current interaction node has a transition to a gunner seat node, or, off
+    /// a node, whether any available graph entry leads to one.
+    #[address(0x140_81A_200)]
+    pub fn HasAvailableGunnerDestination(user: *const void) -> bool;
+}
 
 /// The door slots of a vehicle (`NVehicle::EDoorSlot`): which opening a [`DoorInfo`] is. A slot
 /// may hold several door parts that open together.
