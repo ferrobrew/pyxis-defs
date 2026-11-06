@@ -222,6 +222,17 @@ impl Vehicle {
     #[address(0x140_F6F_8F0)]
     pub fn IsRocketBoat(&self) -> bool;
 
+    /// The vehicle's effective nitrous upgrade level (`NVehicle::EVehicleModUpgradeLevel`): `-1`
+    /// when it has no nitrous, `0` for the base nitrous, and `1` for the improved one. A vehicle
+    /// that can use mods and whose physics body has the nitrous physical action takes its level
+    /// from the player profile's upgrades for its class (land for cars, motorcycles, and trains;
+    /// sea for boats and submarines; air for helicopters and planes): the unlock upgrade gives the
+    /// base level and the better upgrade the improved one. The vehicle's own minimum nitrous
+    /// upgrade raises the result. The HUD shows the nitrous meter only above `-1`, and the
+    /// vehicle's nitrous update burns nitrous only then.
+    #[address(0x140_F25_AA0)]
+    pub fn GetCurrentEffectiveNitrousUpgradeLevel(&self) -> i32;
+
     /// Moves the landing gear and its hatches toward
     /// [`m_DesiredLandingGearState`](Self::m_DesiredLandingGearState), and plays the gear's attached
     /// effects as they open, close, and lock. While the local player drives, it first chooses the
