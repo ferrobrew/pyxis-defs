@@ -870,6 +870,15 @@ impl PfxCharacterInstance {
     #[address(0x140_239_100)]
     pub fn SetOrientation(&mut self, m: *const Matrix4);
 
+    /// Writes the physics body's transform to `out`, read from the world's body array: the body's
+    /// rotation in the rows and its Havok-space position plus
+    /// [`PhysicsSystem::m_AccumulatedShift`] in the translation. A rotation set through
+    /// [`SetOrientation`](Self::SetOrientation) reads back at once.
+    /// [`Character::SetWantedWorldVelocity`](character::character::Character::SetWantedWorldVelocity)
+    /// converts a world velocity into the proxy's local frame with this rotation's transpose.
+    #[address(0x140_24D_6A0)]
+    pub fn GetTransform(&self, out: *mut Matrix4);
+
     /// Returns the physics body's current linear velocity (world space, 3 floats) via the body's
     /// Havok transform/velocity chain.
     #[address(0x140_24D_820)]
