@@ -394,7 +394,9 @@ pub type hknpWorld {
 
     /// The body manager's body array, indexed by body id. A body id below or at
     /// [`m_peakBodyIndex`](Self::m_peakBodyIndex) has a slot; a freed slot's
-    /// [`hknpBody::m_motionId`] is [`hknpBody::INVALID_MOTION_ID`].
+    /// [`hknpBody::m_motionId`] is [`hknpBody::INVALID_MOTION_ID`]. Body 0 is the world's fixed
+    /// body, which the body manager's constructor sets up as static and with no shape, so a live
+    /// body without a shape is not by itself a sign of a body still being built.
     #[address(0x20)]
     pub m_bodies: *mut hknpBody,
 
