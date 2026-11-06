@@ -429,6 +429,14 @@ impl hknpWorld {
     #[address(0x141_4EA_080)]
     pub fn destroyBodies(&mut self, ids: *const u32, count: i32, activation_mode: i32);
 
+    /// Wakes the body `body_id` and the bodies around it through the world's deactivation
+    /// manager, when the body is in the broad phase. It changes no body's motion type, so a static
+    /// or keyframed body stays as it is. [`PfxRigidBody::ForceActivate`] and
+    /// [`WireEnd::SetupProxyForAttachment`](equipment::wire_end::WireEnd::SetupProxyForAttachment)
+    /// call it. The disassembler mislabels it `hknpWorld::activateBodiesInAabb`.
+    #[address(0x141_4E4_650)]
+    pub fn activateBody(&mut self, body_id: u32);
+
     /// Creates a constraint from `cinfo`, writes its id to `out`, and returns `out`. A constraint
     /// whose two bodies are the same, or whose data is of a type the world does not support, is
     /// created disabled; otherwise it is enabled at once. The constraint takes a reference of its
@@ -699,10 +707,34 @@ pub type PfxInstance {
 }
 
 /// A rigid object (`CRigidObject`): a [`PhysicsGameObject`] with one rigid body, such as a crate,
-/// a barrel, a gas canister, or a piece of debris. Its body may be static, fixed, keyframed, or
-/// dynamic. Characters, vehicles, and weapons are not rigid objects. Only some members are
-/// mapped.
+/// a barrel, a gas canister, or a piece of debris. Its type ([`RigidObjectType`], in
+/// [`m_Flags`](Self::m_Flags)) says whether its body is static, fixed, keyframed, or dynamic.
+/// Characters, vehicles, and weapons are not rigid objects. Only some members are mapped.
+///
+/// The body is created from the object's collision resource with the mass that resource gives it,
+/// and `CRigidObject::CreatePhysics` then sets its motion by the type: a static or fixed object's
+/// body is made static and a keyframed object's keyframed
+/// ([`PfxRigidBody::SetMotionType`]), which keeps the mass in the wrapper's saved motion
+/// ([`PfxRigidBody::m_SavedMotionId`]); a dynamic object's body is left as created. A fixed or
+/// keyframed object becomes dynamic through [`MakeDynamic`](Self::MakeDynamic). Damage does not do
+/// it: `CRigidObject::OnDamage` applies the hit's impulse only to a dynamic object, and the force
+/// pulse of an explosion skips static and fixed objects. What makes one dynamic is its events (its
+/// own make-dynamic and stop-keyframe receive events, wired in its data to other objects' send
+/// events, such as its damage controller's), a script call (`CRigidObjectModule::MakeDynamic`), or
+/// the code that drops a held or attached object.
+#[min_size(0x4F8)]
 pub type RigidObject {
+    /// The mask of the object's [`RigidObjectType`] in [`m_Flags`](Self::m_Flags).
+    pub const TYPE_MASK: u16 = 0x3,
+    /// The bit of [`m_Flags`](Self::m_Flags) that has the object inherit its parent's transform,
+    /// and on [`MakeDynamic`](Self::MakeDynamic) its parent's velocity at its centre of mass.
+    pub const INHERIT_PARENT_TRANSFORM: u16 = 0x80,
+
+    /// The object's body wrapper, or null while its physics is not created. It is what
+    /// [`PhysicsGameObject::GetIPfxInstance`] returns for a rigid object.
+    #[address(0x360)]
+    pub m_PfxInstance: SharedPtr<PfxRigidBody>,
+
     /// The object's model instance, or null while its graphics are not loaded. Created from
     /// [`m_Model`](Self::m_Model) (`CRigidObject::CreateModelInstance`); `UnloadGraphics` releases
     /// it with a deferred
@@ -716,12 +748,59 @@ pub type RigidObject {
     /// whether or not it is in the world or has a model instance.
     #[address(0x420)]
     pub m_Model: SharedPtr<Model>,
+
+    /// The body's collision layer as the object last set it (a [`PfxLayer`]): the static layer for
+    /// a static or fixed object at setup, and the dynamic layer once it is dynamic.
+    #[address(0x4F0)]
+    pub m_CollisionLayer: u32,
+    /// The object's packed settings: its [`RigidObjectType`] under
+    /// [`TYPE_MASK`](Self::TYPE_MASK), then its enabled, cast-shadow, daytime-emissive,
+    /// clip-on-distance, and reflect-in-water switches,
+    /// [`INHERIT_PARENT_TRANSFORM`](Self::INHERIT_PARENT_TRANSFORM), and its grappling mode in the
+    /// next two bits.
+    pub m_Flags: u16,
 }
 impl RigidObject {
+    /// `CRigidObject::MakeDynamic`: makes the object dynamic as the game does when it is shaken
+    /// loose. With a body wrapper, it sets the object's type to
+    /// [`DYNAMIC_RIGIDOBJECT`](RigidObjectType::DYNAMIC_RIGIDOBJECT), and when the body is not yet
+    /// dynamic it moves the body to the [`DYNAMIC`](PfxLayer::DYNAMIC) collision layer, with
+    /// `new_system_group` also into a new collision system group of its own, and changes its motion
+    /// to dynamic ([`PfxRigidBody::SetMotionType`]), which restores the mass and inertia kept in the
+    /// wrapper's saved motion. With
+    /// [`INHERIT_PARENT_TRANSFORM`](Self::INHERIT_PARENT_TRANSFORM) and a parent whose physics
+    /// instance is a rigid body, the body takes the parent's velocity at the body's centre of mass
+    /// and the parent's angular velocity. It then wakes the body
+    /// ([`PfxRigidBody::ForceActivate`]) and runs the object's activation handler, which turns off
+    /// its model's static shadow. The body keeps its id. The changes are made at once, on the world,
+    /// so the call belongs on the game thread outside the simulation step, as the object's event
+    /// handler and the script call make it. The disassembler mislabels it
+    /// `CPhysicsSystem::CreateMaterialFromTemplate`, and gives the name `CRigidObject::MakeDynamic`
+    /// to the magnet weapon's gravity-field body creation
+    /// (`CMagnetWeaponComponent::CreateGravityFieldBody`).
+    #[address(0x140_CDD_5B0)]
+    pub fn MakeDynamic(&mut self, new_system_group: bool);
+
     /// `CRigidObject::TYPE_ID`: the run-time type id of `CRigidObject`, for
     /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use.
     #[address(0x140_60F_1F0)]
     pub fn TYPE_ID() -> *const u32;
+}
+
+/// A rigid object's type (`CRigidObject::RigidObject_Type`), the low bits of
+/// [`RigidObject::m_Flags`].
+#[copyable]
+pub enum RigidObjectType: u16 {
+    /// Part of the static world: a static body that nothing makes dynamic. The grappling hook
+    /// treats a hit on it as a hit on the world.
+    STATIC_RIGIDOBJECT = 0x0,
+    /// A placed object at rest: a static body that keeps its mass in its wrapper's saved motion
+    /// until [`RigidObject::MakeDynamic`]. The grappling hook attaches to it as a loose object.
+    FIXED_RIGIDOBJECT = 0x1,
+    /// A keyframed body, with its mass kept the same way.
+    KEYFRAMED_RIGIDOBJECT = 0x2,
+    /// A dynamic body.
+    DYNAMIC_RIGIDOBJECT = 0x3,
 }
 
 /// A physics constraint placed in the world (`CConstraint`): a game object that joins two objects'
@@ -1050,13 +1129,58 @@ pub type PfxRigidBody {
         /// a `hkSignal2::subscribe`), which rebuild the body's collision caches.
         #[index(24)]
         pub fn SetContactImpulseEventActive(&mut self, active: bool);
+
+        /// Wakes the body ([`hknpWorld::activateBody`]) when it is valid, in the broad phase, and a
+        /// virtual of the wrapper's own does not veto it, then notifies the wrapper's activation
+        /// listener, if it has one.
+        #[index(34)]
+        pub fn ForceActivate(&mut self);
     },
 
     /// The body's id in the physics system's world.
     #[address(0x40)]
     pub m_BodyId: u32,
+    /// The motion the body had before [`SetMotionType`](Self::SetMotionType) made it static or
+    /// keyframed, or [`hknpBody::INVALID_MOTION_ID`] when there is none. It is a motion of its own
+    /// in [`hknpWorld::m_motions`] that no body uses, made from the body's motion at the change, so
+    /// it keeps the body's mass and inertia while the body itself has the world's static motion or
+    /// an infinite-mass keyframed one. [`SetMotionType`](Self::SetMotionType) rebuilds the dynamic
+    /// motion from it and destroys it.
+    pub m_SavedMotionId: u32,
 }
 impl PfxRigidBody {
+    /// `CPfxRigidBody::GetMotionType`: the body's [`PfxMotionType`], from its flags:
+    /// [`KEYFRAMED`](PfxMotionType::KEYFRAMED) when it has
+    /// [`IS_KEYFRAMED`](hknpBody::IS_KEYFRAMED), [`STATIC`](PfxMotionType::STATIC) when it has
+    /// [`IS_STATIC`](hknpBody::IS_STATIC), and [`DYNAMIC`](PfxMotionType::DYNAMIC) otherwise. It
+    /// does not check the body id. The disassembler mislabels it `CSoundInstance::IsActive`.
+    #[address(0x140_24E_FB0)]
+    pub fn GetMotionType(&self) -> PfxMotionType;
+
+    /// `CPfxRigidBody::SetMotionType`: changes the body's motion type to `motion_type` (a
+    /// [`PfxMotionType`]) and returns the type it had; it does nothing for a type out of range or
+    /// equal to the current one. The body keeps its id throughout; only its motion is replaced
+    /// ([`hknpBody::m_motionId`]), at once, through `hknpWorld::setBodyMotion`, so it needs the world
+    /// open for writing, outside the simulation step.
+    ///
+    /// To static, it saves a copy of the body's motion in
+    /// [`m_SavedMotionId`](Self::m_SavedMotionId) and gives the body the world's static motion. To
+    /// keyframed, it saves a copy the same way, gives the body a second copy, and sets that one's
+    /// mass to infinite. To dynamic, it reads the mass from the saved motion's inverse mass
+    /// ([`hknpMotion::m_inverseInertia`]): a positive mass initializes a new motion with that mass,
+    /// a negative one with its magnitude as a density, and zero as keyframed; the new motion then
+    /// takes the saved motion's inverse inertia, so the body gets back the mass properties it had.
+    /// It gives the body the new motion, destroys the saved one, clears
+    /// [`m_SavedMotionId`](Self::m_SavedMotionId), and pushes the wrapper's motion properties to the
+    /// new motion.
+    ///
+    /// A body with the static motion and no saved motion (a body created without mass) cannot leave
+    /// the static type, and the call does nothing. A keyframed body without a saved motion is not
+    /// guarded: the change to dynamic reads the saved motion at the invalid id. `activate` is passed
+    /// by every caller as `true`; the function does not read it.
+    #[address(0x140_294_D90)]
+    pub fn SetMotionType(&mut self, motion_type: PfxMotionType, activate: bool) -> PfxMotionType;
+
     /// `CPfxRigidBody::CPfxRigidBody`: wraps the existing body `*body_id` of the physics system's
     /// world. It sets the body's instance property
     /// ([`BODY_PROPERTY_PFX_INSTANCE`](hknpWorld::BODY_PROPERTY_PFX_INSTANCE)) to the wrapper, sets
@@ -1090,6 +1214,19 @@ impl PfxRigidBody {
     /// impulse virtual. The last argument only scales the debug display of the impulse.
     #[address(0x140_24E_D80)]
     pub fn ApplyImpulse(&mut self, impulse: *const Vector3, position: *const Vector3, debug_scale: f32);
+}
+
+/// A body's motion type as the engine wrapper sees it (`CPfxRigidBody::GetMotionType` and
+/// [`SetMotionType`](PfxRigidBody::SetMotionType)).
+#[copyable]
+pub enum PfxMotionType: u32 {
+    /// The body has the world's static motion and [`IS_STATIC`](hknpBody::IS_STATIC).
+    STATIC = 0x0,
+    /// The body has a motion of its own with finite mass.
+    DYNAMIC = 0x1,
+    /// The body has a motion of its own with infinite mass, moved along a set path;
+    /// [`IS_KEYFRAMED`](hknpBody::IS_KEYFRAMED).
+    KEYFRAMED = 0x2,
 }
 
 /// The engine's collision layers (`EPfxLayer`), the low field of a body's collision-filter word
