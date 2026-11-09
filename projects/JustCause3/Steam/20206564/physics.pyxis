@@ -374,6 +374,14 @@ pub type PhysicsGameObject {
     },
 }
 
+/// Native collision-hit reaction data (`SHitReactInfo`).
+pub type HitReactInfo;
+impl PhysicsGameObject {
+    /// Converts collision-hit data into an impact damage message and dispatches it to the object.
+    #[address(0x140_4F2_040)]
+    pub fn DoReactToHit(&mut self, info: *const HitReactInfo);
+}
+
 /// How the grapple treats a physics game object (`CPhysicsGameObject::EGrapplingMode`), from
 /// [`PhysicsGameObject::GetGrapplingMode`].
 #[copyable]
