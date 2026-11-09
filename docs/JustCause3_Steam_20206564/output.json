@@ -2651,7 +2651,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 189
+              "line": 210
             }
           },
           {
@@ -2688,7 +2688,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 201
+              "line": 222
             }
           },
           {
@@ -2725,7 +2725,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 205
+              "line": 226
             }
           },
           {
@@ -2762,7 +2762,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 209
+              "line": 230
             }
           },
           {
@@ -3003,7 +3003,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 189
+              "line": 210
             }
           },
           {
@@ -3040,7 +3040,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 201
+              "line": 222
             }
           },
           {
@@ -3077,7 +3077,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 205
+              "line": 226
             }
           },
           {
@@ -3114,7 +3114,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 209
+              "line": 230
             }
           },
           {
@@ -50963,6 +50963,97 @@
               "file_index": 38,
               "line": 119
             }
+          },
+          {
+            "visibility": "public",
+            "name": "PushGrapplingHookWire",
+            "doc": " Appends a retained wire reference to a grapple wire list. Reallocation preserves the shared\n references held by the existing list entries.",
+            "body": {
+              "type": "address",
+              "address": 5378185824
+            },
+            "arguments": [
+              {
+                "type": "field",
+                "name": "wires",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "generic",
+                    "base": "types::std_vector::Vector",
+                    "args": [
+                      {
+                        "type": "generic",
+                        "base": "types::shared_ptr::SharedPtr",
+                        "args": [
+                          {
+                            "type": "raw",
+                            "path": "equipment::grappling_hook::GrapplingHookWire"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "wire",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "generic",
+                    "base": "types::shared_ptr::SharedPtr",
+                    "args": [
+                      {
+                        "type": "raw",
+                        "path": "equipment::grappling_hook::GrapplingHookWire"
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 38,
+              "line": 774
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "ResetGrapplingHookWire",
+            "doc": " Releases and clears one shared wire reference.",
+            "body": {
+              "type": "address",
+              "address": 5378058352
+            },
+            "arguments": [
+              {
+                "type": "field",
+                "name": "wire",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "generic",
+                    "base": "types::shared_ptr::SharedPtr",
+                    "args": [
+                      {
+                        "type": "raw",
+                        "path": "equipment::grappling_hook::GrapplingHookWire"
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 38,
+              "line": 778
+            }
           }
         ],
         "vftable": null,
@@ -52034,7 +52125,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 38,
-              "line": 789
+              "line": 799
             }
           }
         ],
@@ -52048,7 +52139,7 @@
       },
       "source": {
         "file_index": 38,
-        "line": 777
+        "line": 787
       }
     },
     "equipment::grappling_hook::WireState": {
@@ -80566,6 +80657,26 @@
         "associated_functions": [
           {
             "visibility": "public",
+            "name": "Detach",
+            "doc": " Detaches the attachment proxy, removes the proxy's reference to this end, and releases\n its attachment state before a new endpoint is installed.",
+            "body": {
+              "type": "address",
+              "address": 5378076800
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 41,
+              "line": 185
+            }
+          },
+          {
+            "visibility": "public",
             "name": "SetExtend",
             "doc": " Puts the end into its extending state: detaches it, sets its position to `start_pos`, its\n speed to `speed`, and its ghost flag to `ghost_wire`, latches `target_info`, shows the open\n hook, and points it at the target's world position. A scripted fire and the fire\n animation's release both start the far end through it, and a tether's second fire starts\n the device end through it.",
             "body": {
@@ -80619,7 +80730,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 41,
-              "line": 188
+              "line": 193
             }
           },
           {
@@ -80694,7 +80805,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 41,
-              "line": 194
+              "line": 199
             }
           },
           {
@@ -80725,7 +80836,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 41,
-              "line": 198
+              "line": 203
             }
           },
           {
@@ -80781,7 +80892,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 41,
-              "line": 203
+              "line": 208
             }
           },
           {
@@ -80837,7 +80948,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 41,
-              "line": 211
+              "line": 216
             }
           },
           {
@@ -80924,7 +81035,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 41,
-              "line": 220
+              "line": 225
             }
           },
           {
@@ -81010,7 +81121,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 41,
-              "line": 226
+              "line": 231
             }
           },
           {
@@ -81087,7 +81198,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 41,
-              "line": 238
+              "line": 243
             }
           },
           {
@@ -81154,7 +81265,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 41,
-              "line": 246
+              "line": 251
             }
           }
         ],
@@ -81405,7 +81516,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 189
+              "line": 210
             }
           },
           {
@@ -81442,7 +81553,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 201
+              "line": 222
             }
           },
           {
@@ -81479,7 +81590,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 205
+              "line": 226
             }
           },
           {
@@ -81516,7 +81627,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 209
+              "line": 230
             }
           },
           {
@@ -158402,7 +158513,7 @@
             "is_base": true,
             "source": {
               "file_index": 85,
-              "line": 268
+              "line": 289
             }
           },
           {
@@ -158435,7 +158546,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 274
+              "line": 295
             }
           },
           {
@@ -158474,7 +158585,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 259
+              "line": 280
             }
           }
         ],
@@ -158504,7 +158615,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 251
+              "line": 272
             }
           },
           {
@@ -158536,7 +158647,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 256
+              "line": 277
             }
           },
           {
@@ -158559,7 +158670,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 280
+              "line": 301
             }
           }
         ],
@@ -158576,7 +158687,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 263
+        "line": 284
       }
     },
     "physics::CastRayInfo::VFTABLE": {
@@ -158599,7 +158710,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 265
+        "line": 286
       }
     },
     "physics::CastRayInfoBase": {
@@ -158656,7 +158767,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 227
+              "line": 248
             }
           },
           {
@@ -158673,7 +158784,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 231
+              "line": 252
             }
           },
           {
@@ -158690,7 +158801,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 236
+              "line": 257
             }
           },
           {
@@ -158707,7 +158818,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 240
+              "line": 261
             }
           },
           {
@@ -158728,7 +158839,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 244
+              "line": 265
             }
           },
           {
@@ -158745,7 +158856,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 244
+              "line": 265
             }
           },
           {
@@ -158796,7 +158907,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 212
+              "line": 233
             }
           }
         ],
@@ -158825,7 +158936,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 251
+              "line": 272
             }
           },
           {
@@ -158856,7 +158967,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 256
+              "line": 277
             }
           }
         ],
@@ -158873,7 +158984,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 223
+        "line": 244
       }
     },
     "physics::CastRayInfoBase::VFTABLE": {
@@ -158896,7 +159007,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 225
+        "line": 246
       }
     },
     "physics::CharacterInput": {
@@ -158923,7 +159034,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 872
+              "line": 893
             }
           },
           {
@@ -158954,7 +159065,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 879
+              "line": 900
             }
           },
           {
@@ -158989,7 +159100,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 889
+              "line": 910
             }
           },
           {
@@ -159020,7 +159131,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 889
+              "line": 910
             }
           }
         ],
@@ -159035,7 +159146,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 871
+        "line": 892
       }
     },
     "physics::Constraint": {
@@ -159076,7 +159187,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 865
+              "line": 886
             }
           }
         ],
@@ -159090,7 +159201,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 860
+        "line": 881
       }
     },
     "physics::CustomGroupCollisionFilter": {
@@ -159159,7 +159270,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 1336
+        "line": 1357
       }
     },
     "physics::CustomGroupCollisionFilter::FIELD_MASK": {
@@ -159182,7 +159293,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 1340
+        "line": 1361
       }
     },
     "physics::CustomGroupCollisionFilter::LAYER_MASK": {
@@ -159205,7 +159316,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 1338
+        "line": 1359
       }
     },
     "physics::CustomGroupCollisionFilter::NO_COLLIDE_SHIFT": {
@@ -159228,7 +159339,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 1344
+        "line": 1365
       }
     },
     "physics::CustomGroupCollisionFilter::SUBSYSTEM_SHIFT": {
@@ -159251,7 +159362,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 1342
+        "line": 1363
       }
     },
     "physics::CustomGroupCollisionFilter::SYSTEM_GROUP_SHIFT": {
@@ -159274,7 +159385,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 1346
+        "line": 1367
       }
     },
     "physics::GameMaterialId": {
@@ -159297,7 +159408,7 @@
             "doc": " A character's body, the material a melee hit on a character plays its impact against.",
             "source": {
               "file_index": 85,
-              "line": 289
+              "line": 310
             }
           },
           {
@@ -159306,7 +159417,7 @@
             "doc": " The fallback material: a lookup with no entry for a material uses this one's.",
             "source": {
               "file_index": 85,
-              "line": 291
+              "line": 312
             }
           }
         ],
@@ -159319,7 +159430,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 287
+        "line": 308
       }
     },
     "physics::GrapplingMode": {
@@ -159350,7 +159461,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 360
+              "line": 381
             }
           },
           {
@@ -159367,7 +159478,7 @@
             ],
             "source": {
               "file_index": 85,
-              "line": 363
+              "line": 384
             }
           },
           {
@@ -159376,7 +159487,7 @@
             "doc": " Not grapplable: the aim does not count it, and a wire end does not attach to it.",
             "source": {
               "file_index": 85,
-              "line": 365
+              "line": 386
             }
           }
         ],
@@ -159389,7 +159500,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 359
+        "line": 380
       }
     },
     "physics::HavokCollisionListener": {
@@ -159442,7 +159553,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 300
+              "line": 321
             }
           }
         ],
@@ -159456,7 +159567,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 296
+        "line": 317
       }
     },
     "physics::IgnoreMaterialFlagFilter": {
@@ -159490,7 +159601,7 @@
             "is_base": true,
             "source": {
               "file_index": 85,
-              "line": 196
+              "line": 217
             }
           }
         ],
@@ -159565,7 +159676,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 189
+              "line": 210
             }
           },
           {
@@ -159601,7 +159712,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 201
+              "line": 222
             }
           },
           {
@@ -159637,7 +159748,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 205
+              "line": 226
             }
           },
           {
@@ -159673,7 +159784,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 209
+              "line": 230
             }
           }
         ],
@@ -159687,7 +159798,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 194
+        "line": 215
       }
     },
     "physics::MaterialPassFlags": {
@@ -159725,7 +159836,7 @@
             ],
             "source": {
               "file_index": 85,
-              "line": 159
+              "line": 180
             }
           },
           {
@@ -159742,7 +159853,7 @@
             ],
             "source": {
               "file_index": 85,
-              "line": 162
+              "line": 183
             }
           },
           {
@@ -159759,7 +159870,7 @@
             ],
             "source": {
               "file_index": 85,
-              "line": 164
+              "line": 185
             }
           }
         ],
@@ -159771,7 +159882,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 156
+        "line": 177
       }
     },
     "physics::PfxCharacterInstance": {
@@ -159809,7 +159920,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 951
+              "line": 972
             }
           },
           {
@@ -159833,7 +159944,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 951
+              "line": 972
             }
           },
           {
@@ -159874,7 +159985,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 959
+              "line": 980
             }
           },
           {
@@ -159911,7 +160022,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 959
+              "line": 980
             }
           },
           {
@@ -159928,7 +160039,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 962
+              "line": 983
             }
           },
           {
@@ -159958,7 +160069,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 967
+              "line": 988
             }
           },
           {
@@ -159983,7 +160094,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 969
+              "line": 990
             }
           },
           {
@@ -160004,7 +160115,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 974
+              "line": 995
             }
           },
           {
@@ -160021,7 +160132,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 974
+              "line": 995
             }
           },
           {
@@ -160055,7 +160166,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 979
+              "line": 1000
             }
           },
           {
@@ -160085,7 +160196,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 979
+              "line": 1000
             }
           },
           {
@@ -160114,7 +160225,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 984
+              "line": 1005
             }
           },
           {
@@ -160142,7 +160253,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 984
+              "line": 1005
             }
           },
           {
@@ -160163,7 +160274,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 988
+              "line": 1009
             }
           },
           {
@@ -160183,7 +160294,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 988
+              "line": 1009
             }
           },
           {
@@ -160211,7 +160322,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 991
+              "line": 1012
             }
           },
           {
@@ -160232,7 +160343,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 941
+              "line": 962
             }
           }
         ],
@@ -160279,7 +160390,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 1000
+              "line": 1021
             }
           },
           {
@@ -160330,7 +160441,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 1009
+              "line": 1030
             }
           },
           {
@@ -160361,7 +160472,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 1014
+              "line": 1035
             }
           },
           {
@@ -160415,7 +160526,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 1023
+              "line": 1044
             }
           },
           {
@@ -160465,7 +160576,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 1028
+              "line": 1049
             }
           },
           {
@@ -160485,7 +160596,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 1033
+              "line": 1054
             }
           },
           {
@@ -160527,7 +160638,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 1042
+              "line": 1063
             }
           },
           {
@@ -160558,7 +160669,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 1048
+              "line": 1069
             }
           },
           {
@@ -160611,7 +160722,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 1056
+              "line": 1077
             }
           },
           {
@@ -160670,7 +160781,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 1065
+              "line": 1086
             }
           }
         ],
@@ -160687,7 +160798,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 944
+        "line": 965
       }
     },
     "physics::PfxCharacterInstance::INVALID_BODY_ID": {
@@ -160718,7 +160829,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 947
+        "line": 968
       }
     },
     "physics::PfxCharacterOwner": {
@@ -160748,7 +160859,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 934
+              "line": 955
             }
           }
         ],
@@ -160772,7 +160883,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 934
+                "line": 955
               }
             },
             {
@@ -160792,7 +160903,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 934
+                "line": 955
               }
             },
             {
@@ -160818,7 +160929,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 937
+                "line": 958
               }
             }
           ]
@@ -160832,7 +160943,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 933
+        "line": 954
       }
     },
     "physics::PfxCharacterOwnerVftable": {
@@ -160872,7 +160983,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 934
+              "line": 955
             }
           },
           {
@@ -160902,7 +161013,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 934
+              "line": 955
             }
           },
           {
@@ -160938,7 +161049,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 937
+              "line": 958
             }
           }
         ],
@@ -160953,7 +161064,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 934
+        "line": 955
       }
     },
     "physics::PfxInstance": {
@@ -160990,7 +161101,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -161024,7 +161135,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 748
+              "line": 769
             }
           },
           {
@@ -161057,7 +161168,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 748
+              "line": 769
             }
           },
           {
@@ -161082,7 +161193,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 751
+              "line": 772
             }
           },
           {
@@ -161107,7 +161218,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 754
+              "line": 775
             }
           },
           {
@@ -161135,7 +161246,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 720
+              "line": 741
             }
           }
         ],
@@ -161159,7 +161270,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 729
+                "line": 750
               }
             },
             {
@@ -161179,7 +161290,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 729
+                "line": 750
               }
             },
             {
@@ -161199,7 +161310,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 729
+                "line": 750
               }
             },
             {
@@ -161219,7 +161330,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 729
+                "line": 750
               }
             },
             {
@@ -161239,7 +161350,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 729
+                "line": 750
               }
             },
             {
@@ -161259,7 +161370,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 729
+                "line": 750
               }
             },
             {
@@ -161279,7 +161390,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 729
+                "line": 750
               }
             },
             {
@@ -161299,7 +161410,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 729
+                "line": 750
               }
             },
             {
@@ -161319,7 +161430,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 729
+                "line": 750
               }
             },
             {
@@ -161339,7 +161450,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 729
+                "line": 750
               }
             },
             {
@@ -161359,7 +161470,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 729
+                "line": 750
               }
             },
             {
@@ -161379,7 +161490,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 729
+                "line": 750
               }
             },
             {
@@ -161399,7 +161510,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 729
+                "line": 750
               }
             },
             {
@@ -161419,7 +161530,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 729
+                "line": 750
               }
             },
             {
@@ -161439,7 +161550,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 729
+                "line": 750
               }
             },
             {
@@ -161459,7 +161570,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 729
+                "line": 750
               }
             },
             {
@@ -161479,7 +161590,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 729
+                "line": 750
               }
             },
             {
@@ -161499,7 +161610,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 729
+                "line": 750
               }
             },
             {
@@ -161519,7 +161630,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 729
+                "line": 750
               }
             },
             {
@@ -161539,7 +161650,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 729
+                "line": 750
               }
             },
             {
@@ -161608,7 +161719,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 735
+                "line": 756
               }
             },
             {
@@ -161683,7 +161794,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 742
+                "line": 763
               }
             }
           ]
@@ -161697,7 +161808,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 728
+        "line": 749
       }
     },
     "physics::PfxInstanceVftable": {
@@ -161737,7 +161848,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -161767,7 +161878,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -161797,7 +161908,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -161827,7 +161938,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -161857,7 +161968,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -161887,7 +161998,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -161917,7 +162028,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -161947,7 +162058,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -161977,7 +162088,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -162007,7 +162118,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -162037,7 +162148,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -162067,7 +162178,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -162097,7 +162208,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -162127,7 +162238,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -162157,7 +162268,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -162187,7 +162298,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -162217,7 +162328,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -162247,7 +162358,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -162277,7 +162388,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -162307,7 +162418,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 729
+              "line": 750
             }
           },
           {
@@ -162382,7 +162493,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 735
+              "line": 756
             }
           },
           {
@@ -162463,7 +162574,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 742
+              "line": 763
             }
           }
         ],
@@ -162478,7 +162589,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 729
+        "line": 750
       }
     },
     "physics::PfxLayer": {
@@ -162508,7 +162619,7 @@
             "doc": " Collides with everything.",
             "source": {
               "file_index": 85,
-              "line": 1286
+              "line": 1307
             }
           },
           {
@@ -162525,7 +162636,7 @@
             ],
             "source": {
               "file_index": 85,
-              "line": 1288
+              "line": 1309
             }
           },
           {
@@ -162534,7 +162645,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1289
+              "line": 1310
             }
           },
           {
@@ -162543,7 +162654,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1290
+              "line": 1311
             }
           },
           {
@@ -162552,7 +162663,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1291
+              "line": 1312
             }
           },
           {
@@ -162561,7 +162672,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1292
+              "line": 1313
             }
           },
           {
@@ -162570,7 +162681,7 @@
             "doc": " The character proxies, the player's included.",
             "source": {
               "file_index": 85,
-              "line": 1294
+              "line": 1315
             }
           },
           {
@@ -162579,7 +162690,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1295
+              "line": 1316
             }
           },
           {
@@ -162588,7 +162699,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1296
+              "line": 1317
             }
           },
           {
@@ -162597,7 +162708,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1297
+              "line": 1318
             }
           },
           {
@@ -162606,7 +162717,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1298
+              "line": 1319
             }
           },
           {
@@ -162615,7 +162726,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1299
+              "line": 1320
             }
           },
           {
@@ -162624,7 +162735,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1300
+              "line": 1321
             }
           },
           {
@@ -162633,7 +162744,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1301
+              "line": 1322
             }
           },
           {
@@ -162642,7 +162753,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1302
+              "line": 1323
             }
           },
           {
@@ -162651,7 +162762,7 @@
             "doc": " Weapons. It collides with the static, terrain, dynamic, destruction, character collision,\n character ragdoll, and character-attached dynamic layers, the vehicle collision layers, the\n vehicle raycast layer, and the listener-effects layer, and with nothing else: not with\n itself, and not with the raycast or shape-query layers.",
             "source": {
               "file_index": 85,
-              "line": 1307
+              "line": 1328
             }
           },
           {
@@ -162660,7 +162771,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1308
+              "line": 1329
             }
           },
           {
@@ -162669,7 +162780,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1309
+              "line": 1330
             }
           },
           {
@@ -162678,7 +162789,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1310
+              "line": 1331
             }
           },
           {
@@ -162687,7 +162798,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1311
+              "line": 1332
             }
           },
           {
@@ -162696,7 +162807,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1312
+              "line": 1333
             }
           },
           {
@@ -162712,7 +162823,7 @@
             ],
             "source": {
               "file_index": 85,
-              "line": 1314
+              "line": 1335
             }
           },
           {
@@ -162721,7 +162832,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1315
+              "line": 1336
             }
           },
           {
@@ -162730,7 +162841,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1316
+              "line": 1337
             }
           },
           {
@@ -162739,7 +162850,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1317
+              "line": 1338
             }
           },
           {
@@ -162748,7 +162859,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1318
+              "line": 1339
             }
           },
           {
@@ -162757,7 +162868,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1319
+              "line": 1340
             }
           },
           {
@@ -162766,7 +162877,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1320
+              "line": 1341
             }
           },
           {
@@ -162775,7 +162886,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1321
+              "line": 1342
             }
           },
           {
@@ -162784,7 +162895,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 1322
+              "line": 1343
             }
           }
         ],
@@ -162797,7 +162908,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 1284
+        "line": 1305
       }
     },
     "physics::PfxMotionType": {
@@ -162835,7 +162946,7 @@
             ],
             "source": {
               "file_index": 85,
-              "line": 1272
+              "line": 1293
             }
           },
           {
@@ -162844,7 +162955,7 @@
             "doc": " The body has a motion of its own with finite mass.",
             "source": {
               "file_index": 85,
-              "line": 1274
+              "line": 1295
             }
           },
           {
@@ -162860,7 +162971,7 @@
             ],
             "source": {
               "file_index": 85,
-              "line": 1277
+              "line": 1298
             }
           }
         ],
@@ -162873,7 +162984,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 1270
+        "line": 1291
       }
     },
     "physics::PfxPreSimulationCallback": {
@@ -162917,7 +163028,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1364
+              "line": 1385
             }
           }
         ],
@@ -162949,7 +163060,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1364
+                "line": 1385
               }
             },
             {
@@ -163001,7 +163112,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1372
+                "line": 1393
               }
             },
             {
@@ -163032,7 +163143,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1378
+                "line": 1399
               }
             }
           ]
@@ -163046,7 +163157,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 1360
+        "line": 1381
       }
     },
     "physics::PfxPreSimulationCallbackVftable": {
@@ -163093,7 +163204,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1364
+              "line": 1385
             }
           },
           {
@@ -163153,7 +163264,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1372
+              "line": 1393
             }
           },
           {
@@ -163193,7 +163304,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1378
+              "line": 1399
             }
           }
         ],
@@ -163208,7 +163319,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 1364
+        "line": 1385
       }
     },
     "physics::PfxRigidBody": {
@@ -163264,7 +163375,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1141
+              "line": 1162
             }
           },
           {
@@ -163285,7 +163396,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1190
+              "line": 1211
             }
           },
           {
@@ -163302,7 +163413,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1190
+              "line": 1211
             }
           },
           {
@@ -163338,7 +163449,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1197
+              "line": 1218
             }
           },
           {
@@ -163378,7 +163489,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1121
+              "line": 1142
             }
           }
         ],
@@ -163438,7 +163549,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 1206
+              "line": 1227
             }
           },
           {
@@ -163502,7 +163613,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 1230
+              "line": 1251
             }
           },
           {
@@ -163581,7 +163692,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 1241
+              "line": 1262
             }
           },
           {
@@ -163616,7 +163727,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 1247
+              "line": 1268
             }
           },
           {
@@ -163651,7 +163762,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 1252
+              "line": 1273
             }
           },
           {
@@ -163679,7 +163790,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 1258
+              "line": 1279
             }
           },
           {
@@ -163729,7 +163840,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 1264
+              "line": 1285
             }
           }
         ],
@@ -163773,7 +163884,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1141
+                "line": 1162
               }
             },
             {
@@ -163793,7 +163904,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -163813,7 +163924,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -163833,7 +163944,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -163853,7 +163964,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -163873,7 +163984,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -163893,7 +164004,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -163913,7 +164024,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -163933,7 +164044,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -163956,7 +164067,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1145
+                "line": 1166
               }
             },
             {
@@ -163976,7 +164087,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1151
+                "line": 1172
               }
             },
             {
@@ -163996,7 +164107,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164024,7 +164135,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1157
+                "line": 1178
               }
             },
             {
@@ -164044,7 +164155,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164083,7 +164194,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1162
+                "line": 1183
               }
             },
             {
@@ -164114,7 +164225,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1167
+                "line": 1188
               }
             },
             {
@@ -164134,7 +164245,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164154,7 +164265,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164174,7 +164285,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164194,7 +164305,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164214,7 +164325,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164283,7 +164394,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1171
+                "line": 1192
               }
             },
             {
@@ -164303,7 +164414,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164323,7 +164434,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164364,7 +164475,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1179
+                "line": 1200
               }
             },
             {
@@ -164384,7 +164495,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164404,7 +164515,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164424,7 +164535,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164444,7 +164555,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164464,7 +164575,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164484,7 +164595,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164504,7 +164615,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164524,7 +164635,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164544,7 +164655,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164572,7 +164683,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1185
+                "line": 1206
               }
             },
             {
@@ -164592,7 +164703,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164612,7 +164723,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164632,7 +164743,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164652,7 +164763,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164672,7 +164783,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164692,7 +164803,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164712,7 +164823,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164732,7 +164843,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             },
             {
@@ -164752,7 +164863,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 1135
+                "line": 1156
               }
             }
           ]
@@ -164770,7 +164881,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 1127
+        "line": 1148
       }
     },
     "physics::PfxRigidBody::DESTRUCT_FREE": {
@@ -164801,7 +164912,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 1129
+        "line": 1150
       }
     },
     "physics::PfxRigidBody::VFTABLE": {
@@ -164832,7 +164943,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 1132
+        "line": 1153
       }
     },
     "physics::PfxRigidBodyVftable": {
@@ -164899,7 +165010,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1141
+              "line": 1162
             }
           },
           {
@@ -164929,7 +165040,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -164959,7 +165070,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -164989,7 +165100,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165019,7 +165130,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165049,7 +165160,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165079,7 +165190,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165109,7 +165220,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165139,7 +165250,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165172,7 +165283,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1145
+              "line": 1166
             }
           },
           {
@@ -165202,7 +165313,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1151
+              "line": 1172
             }
           },
           {
@@ -165232,7 +165343,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165269,7 +165380,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1157
+              "line": 1178
             }
           },
           {
@@ -165299,7 +165410,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165347,7 +165458,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1162
+              "line": 1183
             }
           },
           {
@@ -165387,7 +165498,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1167
+              "line": 1188
             }
           },
           {
@@ -165417,7 +165528,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165447,7 +165558,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165477,7 +165588,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165507,7 +165618,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165537,7 +165648,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165612,7 +165723,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1171
+              "line": 1192
             }
           },
           {
@@ -165642,7 +165753,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165672,7 +165783,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165722,7 +165833,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1179
+              "line": 1200
             }
           },
           {
@@ -165752,7 +165863,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165782,7 +165893,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165812,7 +165923,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165842,7 +165953,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165872,7 +165983,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165902,7 +166013,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165932,7 +166043,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165962,7 +166073,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -165992,7 +166103,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -166030,7 +166141,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1185
+              "line": 1206
             }
           },
           {
@@ -166060,7 +166171,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -166090,7 +166201,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -166120,7 +166231,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -166150,7 +166261,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -166180,7 +166291,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -166210,7 +166321,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -166240,7 +166351,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -166270,7 +166381,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           },
           {
@@ -166300,7 +166411,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1135
+              "line": 1156
             }
           }
         ],
@@ -166315,7 +166426,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 1141
+        "line": 1162
       }
     },
     "physics::PhysicsGameObject": {
@@ -166364,7 +166475,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 332
+              "line": 353
             }
           }
         ],
@@ -166388,7 +166499,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 332
+                "line": 353
               }
             },
             {
@@ -166432,7 +166543,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 337
+                "line": 358
               }
             },
             {
@@ -166452,7 +166563,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 332
+                "line": 353
               }
             },
             {
@@ -166472,7 +166583,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 332
+                "line": 353
               }
             },
             {
@@ -166492,7 +166603,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 332
+                "line": 353
               }
             },
             {
@@ -166512,7 +166623,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 332
+                "line": 353
               }
             },
             {
@@ -166532,7 +166643,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 332
+                "line": 353
               }
             },
             {
@@ -166552,7 +166663,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 332
+                "line": 353
               }
             },
             {
@@ -166572,7 +166683,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 332
+                "line": 353
               }
             },
             {
@@ -166592,7 +166703,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 332
+                "line": 353
               }
             },
             {
@@ -166612,7 +166723,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 332
+                "line": 353
               }
             },
             {
@@ -166632,7 +166743,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 332
+                "line": 353
               }
             },
             {
@@ -166652,7 +166763,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 332
+                "line": 353
               }
             },
             {
@@ -166694,7 +166805,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 345
+                "line": 366
               }
             },
             {
@@ -166714,7 +166825,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 332
+                "line": 353
               }
             },
             {
@@ -166734,7 +166845,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 332
+                "line": 353
               }
             },
             {
@@ -166754,7 +166865,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 332
+                "line": 353
               }
             },
             {
@@ -166774,7 +166885,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 332
+                "line": 353
               }
             },
             {
@@ -166794,7 +166905,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 332
+                "line": 353
               }
             },
             {
@@ -166814,7 +166925,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 332
+                "line": 353
               }
             },
             {
@@ -166848,7 +166959,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 352
+                "line": 373
               }
             }
           ]
@@ -166865,7 +166976,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 328
+        "line": 349
       }
     },
     "physics::PhysicsGameObject::GAME_OBJECT_BASE_OFFSET": {
@@ -166888,7 +166999,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 330
+        "line": 351
       }
     },
     "physics::PhysicsGameObjectVftable": {
@@ -166928,7 +167039,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 332
+              "line": 353
             }
           },
           {
@@ -166982,7 +167093,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 337
+              "line": 358
             }
           },
           {
@@ -167012,7 +167123,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 332
+              "line": 353
             }
           },
           {
@@ -167042,7 +167153,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 332
+              "line": 353
             }
           },
           {
@@ -167072,7 +167183,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 332
+              "line": 353
             }
           },
           {
@@ -167102,7 +167213,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 332
+              "line": 353
             }
           },
           {
@@ -167132,7 +167243,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 332
+              "line": 353
             }
           },
           {
@@ -167162,7 +167273,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 332
+              "line": 353
             }
           },
           {
@@ -167192,7 +167303,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 332
+              "line": 353
             }
           },
           {
@@ -167222,7 +167333,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 332
+              "line": 353
             }
           },
           {
@@ -167252,7 +167363,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 332
+              "line": 353
             }
           },
           {
@@ -167282,7 +167393,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 332
+              "line": 353
             }
           },
           {
@@ -167312,7 +167423,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 332
+              "line": 353
             }
           },
           {
@@ -167364,7 +167475,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 345
+              "line": 366
             }
           },
           {
@@ -167394,7 +167505,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 332
+              "line": 353
             }
           },
           {
@@ -167424,7 +167535,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 332
+              "line": 353
             }
           },
           {
@@ -167454,7 +167565,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 332
+              "line": 353
             }
           },
           {
@@ -167484,7 +167595,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 332
+              "line": 353
             }
           },
           {
@@ -167514,7 +167625,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 332
+              "line": 353
             }
           },
           {
@@ -167544,7 +167655,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 332
+              "line": 353
             }
           },
           {
@@ -167587,7 +167698,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 352
+              "line": 373
             }
           }
         ],
@@ -167602,13 +167713,13 @@
       },
       "source": {
         "file_index": 85,
-        "line": 332
+        "line": 353
       }
     },
     "physics::PhysicsSystem": {
       "path": "physics::PhysicsSystem",
       "visibility": "public",
-      "size": 1278416,
+      "size": 1278488,
       "alignment": 8,
       "category": "defined",
       "kind": {
@@ -167721,6 +167832,47 @@
               "file_index": 85,
               "line": 41
             }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_1381d0",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 64
+            },
+            "offset": 1278416,
+            "size": 64,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 85,
+              "line": 45
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_PairCollisionFilter",
+            "doc": " The reference-counted body-pair exclusion filter shared with the constraint filter.",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "physics::hknpPairCollisionFilter"
+              }
+            },
+            "offset": 1278480,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 85,
+              "line": 45
+            }
           }
         ],
         "associated_functions": [
@@ -167773,7 +167925,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 57
+              "line": 78
             }
           },
           {
@@ -167837,7 +167989,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 66
+              "line": 87
             }
           },
           {
@@ -167876,7 +168028,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 73
+              "line": 94
             }
           },
           {
@@ -167907,7 +168059,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 80
+              "line": 101
             }
           },
           {
@@ -168003,7 +168155,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 88
+              "line": 109
             }
           },
           {
@@ -168069,7 +168221,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 94
+              "line": 115
             }
           },
           {
@@ -168138,7 +168290,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 98
+              "line": 119
             }
           },
           {
@@ -168194,7 +168346,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 103
+              "line": 124
             }
           },
           {
@@ -168274,7 +168426,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 114
+              "line": 135
             }
           },
           {
@@ -168362,7 +168514,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 119
+              "line": 140
             }
           },
           {
@@ -168464,7 +168616,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 124
+              "line": 145
             }
           }
         ],
@@ -168641,7 +168793,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 141
+        "line": 162
       }
     },
     "physics::ProxyState": {
@@ -168672,7 +168824,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 897
+              "line": 918
             }
           },
           {
@@ -168681,7 +168833,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 898
+              "line": 919
             }
           },
           {
@@ -168690,7 +168842,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 899
+              "line": 920
             }
           },
           {
@@ -168699,7 +168851,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 900
+              "line": 921
             }
           },
           {
@@ -168708,7 +168860,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 901
+              "line": 922
             }
           },
           {
@@ -168717,7 +168869,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 902
+              "line": 923
             }
           },
           {
@@ -168726,7 +168878,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 903
+              "line": 924
             }
           },
           {
@@ -168735,7 +168887,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 904
+              "line": 925
             }
           },
           {
@@ -168744,7 +168896,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 905
+              "line": 926
             }
           },
           {
@@ -168753,7 +168905,7 @@
             "doc": null,
             "source": {
               "file_index": 85,
-              "line": 906
+              "line": 927
             }
           }
         ],
@@ -168766,7 +168918,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 896
+        "line": 917
       }
     },
     "physics::RagdollProxyPhantom": {
@@ -168811,7 +168963,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 376
+              "line": 397
             }
           }
         ],
@@ -168825,7 +168977,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 370
+        "line": 391
       }
     },
     "physics::Ray3": {
@@ -168860,7 +169012,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 147
+              "line": 168
             }
           },
           {
@@ -168877,7 +169029,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 149
+              "line": 170
             }
           }
         ],
@@ -168892,7 +169044,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 146
+        "line": 167
       }
     },
     "physics::RaycastFilter": {
@@ -168923,7 +169075,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 174
+              "line": 195
             }
           },
           {
@@ -168940,7 +169092,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 174
+              "line": 195
             }
           },
           {
@@ -168957,7 +169109,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 176
+              "line": 197
             }
           },
           {
@@ -168977,7 +169129,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 178
+              "line": 199
             }
           },
           {
@@ -168998,7 +169150,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 183
+              "line": 204
             }
           },
           {
@@ -169018,7 +169170,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 183
+              "line": 204
             }
           },
           {
@@ -169039,7 +169191,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 167
+              "line": 188
             }
           }
         ],
@@ -169113,7 +169265,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 189
+              "line": 210
             }
           }
         ],
@@ -169127,7 +169279,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 171
+        "line": 192
       }
     },
     "physics::RigidObject": {
@@ -169202,7 +169354,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 784
+              "line": 805
             }
           },
           {
@@ -169233,7 +169385,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 784
+              "line": 805
             }
           },
           {
@@ -169268,7 +169420,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 791
+              "line": 812
             }
           },
           {
@@ -169302,7 +169454,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 791
+              "line": 812
             }
           },
           {
@@ -169333,7 +169485,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 798
+              "line": 819
             }
           },
           {
@@ -169361,7 +169513,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 803
+              "line": 824
             }
           },
           {
@@ -169385,7 +169537,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 803
+              "line": 824
             }
           },
           {
@@ -169419,7 +169571,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 809
+              "line": 830
             }
           },
           {
@@ -169476,7 +169628,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 757
+              "line": 778
             }
           }
         ],
@@ -169537,7 +169689,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 830
+              "line": 851
             }
           },
           {
@@ -169567,7 +169719,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 835
+              "line": 856
             }
           }
         ],
@@ -169585,7 +169737,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 774
+        "line": 795
       }
     },
     "physics::RigidObject::INHERIT_PARENT_TRANSFORM": {
@@ -169622,7 +169774,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 779
+        "line": 800
       }
     },
     "physics::RigidObject::TYPE_MASK": {
@@ -169658,7 +169810,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 776
+        "line": 797
       }
     },
     "physics::RigidObjectType": {
@@ -169689,7 +169841,7 @@
             "doc": " Part of the static world: a static body that nothing makes dynamic. The grappling hook\n treats a hit on it as a hit on the world.",
             "source": {
               "file_index": 85,
-              "line": 844
+              "line": 865
             }
           },
           {
@@ -169706,7 +169858,7 @@
             ],
             "source": {
               "file_index": 85,
-              "line": 847
+              "line": 868
             }
           },
           {
@@ -169715,7 +169867,7 @@
             "doc": " A keyframed body, with its mass kept the same way.",
             "source": {
               "file_index": 85,
-              "line": 849
+              "line": 870
             }
           },
           {
@@ -169724,7 +169876,7 @@
             "doc": " A dynamic body.",
             "source": {
               "file_index": 85,
-              "line": 851
+              "line": 872
             }
           }
         ],
@@ -169737,7 +169889,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 841
+        "line": 862
       }
     },
     "physics::SharedPfxCharacterSettings": {
@@ -169785,7 +169937,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 916
+              "line": 937
             }
           },
           {
@@ -169814,7 +169966,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 920
+              "line": 941
             }
           },
           {
@@ -169842,7 +169994,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 909
+              "line": 930
             }
           }
         ],
@@ -169870,7 +170022,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 925
+              "line": 946
             }
           },
           {
@@ -169890,7 +170042,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 929
+              "line": 950
             }
           }
         ],
@@ -169904,7 +170056,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 913
+        "line": 934
       }
     },
     "physics::WaterProxy": {
@@ -169949,7 +170101,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 134
+              "line": 155
             }
           }
         ],
@@ -169984,7 +170136,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 85,
-                "line": 134
+                "line": 155
               }
             }
           ]
@@ -169998,7 +170150,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 129
+        "line": 150
       }
     },
     "physics::WaterProxyVftable": {
@@ -170057,7 +170209,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 134
+              "line": 155
             }
           }
         ],
@@ -170072,7 +170224,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 134
+        "line": 155
       }
     },
     "physics::hknpAabbQuery": {
@@ -170110,7 +170262,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 546
+              "line": 567
             }
           },
           {
@@ -170127,7 +170279,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 550
+              "line": 571
             }
           },
           {
@@ -170148,7 +170300,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 554
+              "line": 575
             }
           },
           {
@@ -170165,7 +170317,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 554
+              "line": 575
             }
           },
           {
@@ -170182,7 +170334,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 558
+              "line": 579
             }
           },
           {
@@ -170199,7 +170351,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 562
+              "line": 583
             }
           },
           {
@@ -170220,7 +170372,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 566
+              "line": 587
             }
           },
           {
@@ -170237,7 +170389,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 566
+              "line": 587
             }
           }
         ],
@@ -170252,7 +170404,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 543
+        "line": 564
       }
     },
     "physics::hknpAdditionMode": {
@@ -170291,7 +170443,7 @@
             ],
             "source": {
               "file_index": 85,
-              "line": 1354
+              "line": 1375
             }
           }
         ],
@@ -170304,7 +170456,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 1351
+        "line": 1372
       }
     },
     "physics::hknpBody": {
@@ -170339,7 +170491,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 602
+              "line": 623
             }
           },
           {
@@ -170363,7 +170515,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 606
+              "line": 627
             }
           },
           {
@@ -170387,7 +170539,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 609
+              "line": 630
             }
           },
           {
@@ -170415,7 +170567,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 614
+              "line": 635
             }
           },
           {
@@ -170446,7 +170598,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 617
+              "line": 638
             }
           },
           {
@@ -170475,7 +170627,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 621
+              "line": 642
             }
           },
           {
@@ -170500,7 +170652,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 621
+              "line": 642
             }
           },
           {
@@ -170530,7 +170682,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 626
+              "line": 647
             }
           },
           {
@@ -170551,7 +170703,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 569
+              "line": 590
             }
           }
         ],
@@ -170574,7 +170726,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 572
+        "line": 593
       }
     },
     "physics::hknpBody::INVALID_BROAD_PHASE_ID": {
@@ -170605,7 +170757,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 597
+        "line": 618
       }
     },
     "physics::hknpBody::INVALID_MOTION_ID": {
@@ -170652,7 +170804,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 594
+        "line": 615
       }
     },
     "physics::hknpBody::IS_DYNAMIC": {
@@ -170695,7 +170847,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 579
+        "line": 600
       }
     },
     "physics::hknpBody::IS_KEYFRAMED": {
@@ -170731,7 +170883,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 587
+        "line": 608
       }
     },
     "physics::hknpBody::IS_STATIC": {
@@ -170773,7 +170925,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 576
+        "line": 597
       }
     },
     "physics::hknpBody::RAISE_CONTACT_IMPULSE_EVENTS": {
@@ -170815,7 +170967,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 583
+        "line": 604
       }
     },
     "physics::hknpBodyPropertyBuffer": {
@@ -170860,7 +171012,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 709
+              "line": 730
             }
           },
           {
@@ -170880,7 +171032,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 709
+              "line": 730
             }
           },
           {
@@ -170901,7 +171053,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 713
+              "line": 734
             }
           },
           {
@@ -170918,7 +171070,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 713
+              "line": 734
             }
           },
           {
@@ -170939,7 +171091,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 717
+              "line": 738
             }
           },
           {
@@ -170959,7 +171111,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 717
+              "line": 738
             }
           }
         ],
@@ -170974,7 +171126,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 706
+        "line": 727
       }
     },
     "physics::hknpBodyPropertyMap": {
@@ -171019,7 +171171,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 691
+              "line": 712
             }
           }
         ],
@@ -171066,7 +171218,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 699
+              "line": 720
             }
           }
         ],
@@ -171080,7 +171232,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 695
+        "line": 716
       }
     },
     "physics::hknpCharacterRigidBody": {
@@ -171127,7 +171279,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1103
+              "line": 1124
             }
           },
           {
@@ -171152,7 +171304,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1103
+              "line": 1124
             }
           },
           {
@@ -171173,7 +171325,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1107
+              "line": 1128
             }
           },
           {
@@ -171193,7 +171345,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1107
+              "line": 1128
             }
           },
           {
@@ -171222,7 +171374,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1096
+              "line": 1117
             }
           }
         ],
@@ -171288,7 +171440,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 1118
+              "line": 1139
             }
           }
         ],
@@ -171302,7 +171454,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 1100
+        "line": 1121
       }
     },
     "physics::hknpCharacterSurfaceInfo": {
@@ -171329,7 +171481,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1079
+              "line": 1100
             }
           },
           {
@@ -171363,7 +171515,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1082
+              "line": 1103
             }
           },
           {
@@ -171384,7 +171536,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1086
+              "line": 1107
             }
           },
           {
@@ -171401,7 +171553,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1086
+              "line": 1107
             }
           },
           {
@@ -171422,7 +171574,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1090
+              "line": 1111
             }
           },
           {
@@ -171439,7 +171591,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1090
+              "line": 1111
             }
           },
           {
@@ -171456,7 +171608,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 1093
+              "line": 1114
             }
           }
         ],
@@ -171476,7 +171628,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 1070
+        "line": 1091
       }
     },
     "physics::hknpCharacterSurfaceInfo::SLIDING": {
@@ -171507,7 +171659,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 1074
+        "line": 1095
       }
     },
     "physics::hknpCharacterSurfaceInfo::SUPPORTED": {
@@ -171538,7 +171690,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 1076
+        "line": 1097
       }
     },
     "physics::hknpCharacterSurfaceInfo::UNSUPPORTED": {
@@ -171569,7 +171721,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 1072
+        "line": 1093
       }
     },
     "physics::hknpConstraint": {
@@ -171608,7 +171760,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 654
+              "line": 675
             }
           },
           {
@@ -171625,7 +171777,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 656
+              "line": 677
             }
           },
           {
@@ -171645,7 +171797,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 659
+              "line": 680
             }
           },
           {
@@ -171662,7 +171814,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 661
+              "line": 682
             }
           },
           {
@@ -171690,7 +171842,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 665
+              "line": 686
             }
           },
           {
@@ -171714,7 +171866,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 665
+              "line": 686
             }
           },
           {
@@ -171747,7 +171899,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 643
+              "line": 664
             }
           }
         ],
@@ -171766,7 +171918,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 647
+        "line": 668
       }
     },
     "physics::hknpConstraint::INVALID_BODY_ID": {
@@ -171797,7 +171949,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 649
+        "line": 670
       }
     },
     "physics::hknpConstraint::IS_DISABLED": {
@@ -171828,7 +171980,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 651
+        "line": 672
       }
     },
     "physics::hknpConstraintManager": {
@@ -171867,7 +172019,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 638
+              "line": 659
             }
           },
           {
@@ -171895,7 +172047,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 638
+              "line": 659
             }
           },
           {
@@ -171912,7 +172064,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 640
+              "line": 661
             }
           },
           {
@@ -171933,7 +172085,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 629
+              "line": 650
             }
           }
         ],
@@ -171951,7 +172103,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 632
+        "line": 653
       }
     },
     "physics::hknpConstraintManager::INVALID_CONSTRAINT_ID": {
@@ -171982,7 +172134,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 634
+        "line": 655
       }
     },
     "physics::hknpMotion": {
@@ -172017,7 +172169,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 674
+              "line": 695
             }
           },
           {
@@ -172034,7 +172186,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 676
+              "line": 697
             }
           },
           {
@@ -172063,7 +172215,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 682
+              "line": 703
             }
           },
           {
@@ -172084,7 +172236,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 686
+              "line": 707
             }
           },
           {
@@ -172101,7 +172253,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 686
+              "line": 707
             }
           },
           {
@@ -172118,7 +172270,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 688
+              "line": 709
             }
           },
           {
@@ -172147,7 +172299,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 668
+              "line": 689
             }
           }
         ],
@@ -172162,7 +172314,132 @@
       },
       "source": {
         "file_index": 85,
-        "line": 672
+        "line": 693
+      }
+    },
+    "physics::hknpPairCollisionFilter": {
+      "path": "physics::hknpPairCollisionFilter",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " The body's pair-exclusion filter. Each unordered body pair has a reference count, so\n independent callers can disable the same pair without releasing another caller's exclusion.",
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "disableCollisionsBetween",
+            "doc": " Adds one exclusion reference for the unordered body pair, rebuilds the affected collision\n caches, and returns the new reference count. The disassembler mislabels this function\n `NHavokCollisionFilter::SetSystemGroup`.",
+            "body": {
+              "type": "address",
+              "address": 5390883568
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "world",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "physics::hknpWorld"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "body_a",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              },
+              {
+                "type": "field",
+                "name": "body_b",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 85,
+              "line": 56
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "enableCollisionsBetween",
+            "doc": " Removes one exclusion reference and returns the remaining count. Removing the final\n reference requests collision regeneration when both body slots are valid.",
+            "body": {
+              "type": "address",
+              "address": 5390883760
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "world",
+                "type_ref": {
+                  "type": "mut_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "physics::hknpWorld"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "body_a",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              },
+              {
+                "type": "field",
+                "name": "body_b",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "u32"
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "i32"
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 85,
+              "line": 61
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 85,
+        "line": 50
       }
     },
     "physics::hknpRagdoll": {
@@ -172193,7 +172470,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 388
+              "line": 409
             }
           },
           {
@@ -172216,7 +172493,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 388
+              "line": 409
             }
           },
           {
@@ -172237,7 +172514,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 379
+              "line": 400
             }
           }
         ],
@@ -172255,7 +172532,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 382
+        "line": 403
       }
     },
     "physics::hknpRagdoll::INVALID_BODY_ID": {
@@ -172286,7 +172563,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 384
+        "line": 405
       }
     },
     "physics::hknpWorld": {
@@ -172336,7 +172613,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 408
+              "line": 429
             }
           },
           {
@@ -172375,7 +172652,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 408
+              "line": 429
             }
           },
           {
@@ -172404,7 +172681,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 413
+              "line": 434
             }
           },
           {
@@ -172429,7 +172706,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 413
+              "line": 434
             }
           },
           {
@@ -172450,7 +172727,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 417
+              "line": 438
             }
           },
           {
@@ -172467,7 +172744,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 417
+              "line": 438
             }
           },
           {
@@ -172496,7 +172773,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 421
+              "line": 442
             }
           },
           {
@@ -172524,7 +172801,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 421
+              "line": 442
             }
           },
           {
@@ -172545,7 +172822,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 425
+              "line": 446
             }
           },
           {
@@ -172562,7 +172839,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 425
+              "line": 446
             }
           },
           {
@@ -172591,7 +172868,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 430
+              "line": 451
             }
           },
           {
@@ -172616,7 +172893,7 @@
             "is_base": false,
             "source": {
               "file_index": 85,
-              "line": 430
+              "line": 451
             }
           }
         ],
@@ -172669,7 +172946,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 309
+              "line": 330
             }
           },
           {
@@ -172713,7 +172990,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 314
+              "line": 335
             }
           },
           {
@@ -172757,7 +173034,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 319
+              "line": 340
             }
           },
           {
@@ -172804,7 +173081,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 437
+              "line": 458
             }
           },
           {
@@ -172846,7 +173123,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 445
+              "line": 466
             }
           },
           {
@@ -172894,7 +173171,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 457
+              "line": 478
             }
           },
           {
@@ -172940,7 +173217,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 466
+              "line": 487
             }
           },
           {
@@ -172993,7 +173270,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 475
+              "line": 496
             }
           },
           {
@@ -173076,7 +173353,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 483
+              "line": 504
             }
           },
           {
@@ -173118,7 +173395,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 488
+              "line": 509
             }
           },
           {
@@ -173182,7 +173459,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 498
+              "line": 519
             }
           },
           {
@@ -173232,7 +173509,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 505
+              "line": 526
             }
           },
           {
@@ -173279,7 +173556,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 510
+              "line": 531
             }
           },
           {
@@ -173326,7 +173603,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 515
+              "line": 536
             }
           },
           {
@@ -173365,7 +173642,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 519
+              "line": 540
             }
           },
           {
@@ -173444,7 +173721,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 530
+              "line": 551
             }
           },
           {
@@ -173497,7 +173774,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 85,
-              "line": 536
+              "line": 557
             }
           }
         ],
@@ -173515,7 +173792,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 395
+        "line": 416
       }
     },
     "physics::hknpWorld::BODY_PROPERTY_PFX_INSTANCE": {
@@ -173545,7 +173822,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 400
+        "line": 421
       }
     },
     "physics::hknpWorld::REBUILD_COLLISION_CACHES": {
@@ -173568,7 +173845,7 @@
       },
       "source": {
         "file_index": 85,
-        "line": 397
+        "line": 418
       }
     },
     "profile_manager::ProfileManager": {
@@ -232210,6 +232487,7 @@
         "physics::hknpConstraint",
         "physics::hknpConstraintManager",
         "physics::hknpMotion",
+        "physics::hknpPairCollisionFilter",
         "physics::hknpRagdoll",
         "physics::hknpWorld"
       ],
@@ -232326,7 +232604,7 @@
           "calling_convention": "system",
           "source": {
             "file_index": 85,
-            "line": 1385
+            "line": 1406
           }
         },
         {
@@ -232384,7 +232662,7 @@
           "calling_convention": "system",
           "source": {
             "file_index": 85,
-            "line": 1391
+            "line": 1412
           }
         },
         {
@@ -232468,7 +232746,7 @@
           "calling_convention": "system",
           "source": {
             "file_index": 85,
-            "line": 1412
+            "line": 1433
           }
         },
         {
@@ -232561,7 +232839,7 @@
           "calling_convention": "system",
           "source": {
             "file_index": 85,
-            "line": 1422
+            "line": 1443
           }
         }
       ],
