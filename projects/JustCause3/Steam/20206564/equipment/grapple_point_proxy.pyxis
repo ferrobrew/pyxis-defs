@@ -87,6 +87,15 @@ impl CharacterBoneAttachedPointProxy {
     pub fn GetConstraintHint(&self) -> i32;
 }
 
+/// A grapple attachment to a vehicle or one of its physics parts (`CVehicleGrapplePointProxy`).
+pub type VehicleGrapplePointProxy;
+impl VehicleGrapplePointProxy {
+    /// Moves the attachment to a new world-space position and normal, updating both its visual
+    /// local transform and its physics-local attachment while retaining the vehicle.
+    #[address(0x140_944_290)]
+    pub fn ReattachToNewPos(&mut self, position: *const Vector3, normal: *const Vector3);
+}
+
 /// A grapple attachment on a physics game object (`CGenericObjectPointProxy`), a
 /// [`GrapplePointProxy`].
 pub type GenericObjectPointProxy;
