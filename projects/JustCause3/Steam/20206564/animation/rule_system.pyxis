@@ -1,4 +1,4 @@
-use game::GameObject;
+use game::{GameObject, ResourceHandle};
 use hash::HashString;
 use types::shared_ptr::SharedPtr;
 
@@ -16,6 +16,10 @@ pub type State {
 /// A running animation state machine (`NAnimationSystem::CStateMachineInstance`): tracks the current
 /// [`State`] for one [`AnimationRuleSystem`].
 pub type StateMachineInstance {
+    /// The resource handle for the state machine definition that supplies the states and global transitions.
+    #[address(0x10)]
+    pub m_StateMachine: *mut ResourceHandle,
+
     /// The state the machine is currently in.
     #[address(0x18)]
     pub m_CurrentState: *mut State,
@@ -25,6 +29,11 @@ pub type StateMachineInstance {
     /// subobject. The graph's conditions read their character through it.
     #[address(0x20)]
     pub m_UserData: *mut GameObject,
+}
+impl StateMachineInstance {
+    /// Tests whether an event has an eligible transition, evaluating the current state's transitions before the global transitions. Evaluates transition conditions, but does not enqueue the event, change the current state, or execute state tasks.
+    #[address(0x140_3DD_5E0)]
+    pub fn TryEvent(&self, event: *const u32) -> bool;
 }
 
 /// An animation rule system (`CAnimationRuleSystem`): drives one afsmb state machine for a character.

@@ -224,9 +224,35 @@ impl GameStateFrontend {
     pub fn ResetSystems();
 }
 
-// Opaque engine context types carried by the per-frame update contexts.
-pub type ResourceCache;
+/// The resource cache shared by resource handles and game-object initialization contexts.
+#[min_size(0x60)]
+pub type ResourceCache {
+    /// The resource records indexed by [`ResourceHandle::m_Index`].
+    #[address(0x58)]
+    pub m_Resources: *mut ResourceInfo,
+}
 
+/// A handle identifying a resource record in its owning cache.
+#[min_size(0x10)]
+pub type ResourceHandle {
+    /// The index into the owning cache's [`m_Resources`](ResourceCache::m_Resources) array.
+    #[address(0x0)]
+    pub m_Index: u16,
+
+    /// The cache that owns the indexed resource record.
+    #[address(0x8)]
+    pub m_ResourceCache: *mut ResourceCache,
+}
+
+/// A resource cache record containing the loaded resource pointer and bookkeeping.
+#[size(0x28)]
+pub type ResourceInfo {
+    /// The loaded resource pointer.
+    #[address(0x0)]
+    pub m_Resource: *mut void,
+}
+
+/// The project context carried by game-object update contexts. Its layout is unmapped.
 pub type ProjectContext;
 
 #[size(0x20), copyable]
