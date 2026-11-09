@@ -8,6 +8,9 @@ use types::shared_ptr::WeakPtrGameObject;
 pub bitflags DamageFlags: u32 {
     /// The type [`DamageMsg::Clear`] resets a message to.
     DMG_TYPE_UNKNOWN = 0x1,
+    /// Collision impact damage. Rigid objects suppress this damage when its damager resolves to a
+    /// character, while impacts attributed to another physics object reach their damage controllers.
+    DMG_TYPE_IMPACT = 0x10,
     /// Melee damage: the type the player's melee hit message
     /// ([`Character::HandleTrackMessage`](character::character::Character::HandleTrackMessage))
     /// sends, to the struck character and to the objects its box query finds.

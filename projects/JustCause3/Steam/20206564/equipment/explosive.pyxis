@@ -31,6 +31,13 @@ pub type Explosive {
     /// point there rather than at the start of the explosive.
     pub const GAME_OBJECT_BASE_OFFSET: u64 = 0x70,
 
+    /// The ammunition-pool slot. Awareness events pair it with
+    /// [`m_InstanceUniqueId`](Self::m_InstanceUniqueId) to reject recycled instances.
+    #[address(0x24)]
+    pub m_PoolIndex: u32,
+    /// The current allocation's identity within the ammunition pool.
+    pub m_InstanceUniqueId: u32,
+
     /// The explosive's model instance, or null. [`UpdateRender`](Self::UpdateRender) pushes the
     /// interpolated world matrix to it. The first
     /// [`UpdatePostSimFromManager`](Self::UpdatePostSimFromManager) after the explosive spawns

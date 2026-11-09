@@ -1394,6 +1394,11 @@ impl WeaponBase {
     #[address(0x140_991_8B0)]
     pub fn HandleTrackMessage(&mut self, data: *mut AnimationMessageData, character: *mut Character);
 
+    /// Detaches the mounted weapon from its rigid holder: disables the holder's child interaction
+    /// contexts, stops using the weapon, and drops it. It does not equip the detached weapon.
+    #[address(0x140_982_3E0)]
+    pub fn DetachMountedGun(&mut self);
+
     /// Starts picking the weapon up for `activator` (a character's `CGameObject` subobject; any
     /// other object is ignored). A hand grenade is taken at once, whatever its
     /// [`m_InfinitePickup`](Self::m_InfinitePickup): its stored ammunition
