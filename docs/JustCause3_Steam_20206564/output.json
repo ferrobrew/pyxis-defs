@@ -12098,7 +12098,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 12,
-              "line": 259
+              "line": 265
             }
           }
         ],
@@ -12126,6 +12126,8 @@
           "animation::symbol_table::EventIdSymbolTable::ACT_HITREACT_STUMBLE_BULLET",
           "animation::symbol_table::EventIdSymbolTable::ACT_HITREACT_STUMBLE_MELEE",
           "animation::symbol_table::EventIdSymbolTable::ACT_HITREACT_FLY",
+          "animation::symbol_table::EventIdSymbolTable::ACT_FULL_RAGDOLL",
+          "animation::symbol_table::EventIdSymbolTable::ACT_HITREACT_RAGDOLL",
           "animation::symbol_table::EventIdSymbolTable::ACT_IDLE_TO_START_0",
           "animation::symbol_table::EventIdSymbolTable::ACT_IDLE_TO_START_90R",
           "animation::symbol_table::EventIdSymbolTable::ACT_IDLE_TO_START_90L",
@@ -12241,7 +12243,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 225
+        "line": 231
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_AIM_FOCUS_ROTATE_90R": {
@@ -12271,7 +12273,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 228
+        "line": 234
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_BOOST_WINGSUIT_BARREL_ROLL": {
@@ -12313,7 +12315,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 252
+        "line": 258
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_FLICK_0": {
@@ -12344,7 +12346,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 202
+        "line": 208
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_FLICK_0_AIM": {
@@ -12375,7 +12377,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 212
+        "line": 218
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_FLICK_120L": {
@@ -12405,7 +12407,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 206
+        "line": 212
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_FLICK_120R": {
@@ -12435,7 +12437,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 204
+        "line": 210
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_FLICK_180_AIM": {
@@ -12465,7 +12467,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 220
+        "line": 226
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_FLICK_90L_AIM": {
@@ -12495,7 +12497,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 218
+        "line": 224
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_FLICK_90R_AIM": {
@@ -12525,7 +12527,30 @@
       },
       "source": {
         "file_index": 12,
-        "line": 215
+        "line": 221
+      }
+    },
+    "animation::symbol_table::EventIdSymbolTable::ACT_FULL_RAGDOLL": {
+      "path": "animation::symbol_table::EventIdSymbolTable::ACT_FULL_RAGDOLL",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " The full-ragdoll act accepted by guarded global transitions, including the civilian and\n soldier motorcycle states. Leaving a seat runs the native seat task's exit cleanup.",
+        "value_type": {
+          "type": "raw",
+          "path": "cstr"
+        },
+        "value": {
+          "kind": "c_string",
+          "value": "ACT_FULL_RAGDOLL"
+        }
+      },
+      "source": {
+        "file_index": 12,
+        "line": 86
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_HITREACT_FLY": {
@@ -12686,6 +12711,29 @@
         "line": 66
       }
     },
+    "animation::symbol_table::EventIdSymbolTable::ACT_HITREACT_RAGDOLL": {
+      "path": "animation::symbol_table::EventIdSymbolTable::ACT_HITREACT_RAGDOLL",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "constant",
+        "doc": " The ragdoll reaction requested by heavy NPC melee hits. The civilian and soldier motorcycle\n states do not provide this transition.",
+        "value_type": {
+          "type": "raw",
+          "path": "cstr"
+        },
+        "value": {
+          "kind": "c_string",
+          "value": "ACT_HITREACT_RAGDOLL"
+        }
+      },
+      "source": {
+        "file_index": 12,
+        "line": 89
+      }
+    },
     "animation::symbol_table::EventIdSymbolTable::ACT_HITREACT_STUMBLE": {
       "path": "animation::symbol_table::EventIdSymbolTable::ACT_HITREACT_STUMBLE",
       "visibility": "public",
@@ -12820,7 +12868,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 87
+        "line": 93
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_IDLE_TO_START_120L": {
@@ -12850,7 +12898,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 99
+        "line": 105
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_IDLE_TO_START_120R": {
@@ -12880,7 +12928,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 96
+        "line": 102
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_IDLE_TO_START_180L": {
@@ -12910,7 +12958,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 105
+        "line": 111
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_IDLE_TO_START_180R": {
@@ -12940,7 +12988,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 102
+        "line": 108
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_IDLE_TO_START_90L": {
@@ -12970,7 +13018,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 93
+        "line": 99
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_IDLE_TO_START_90R": {
@@ -13000,7 +13048,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 90
+        "line": 96
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_IDLE_TO_WALK_START_0": {
@@ -13036,7 +13084,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 110
+        "line": 116
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_IDLE_TO_WALK_START_120L": {
@@ -13066,7 +13114,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 122
+        "line": 128
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_IDLE_TO_WALK_START_120R": {
@@ -13096,7 +13144,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 119
+        "line": 125
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_IDLE_TO_WALK_START_180L": {
@@ -13126,7 +13174,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 128
+        "line": 134
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_IDLE_TO_WALK_START_180R": {
@@ -13156,7 +13204,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 125
+        "line": 131
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_IDLE_TO_WALK_START_90L": {
@@ -13186,7 +13234,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 116
+        "line": 122
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_IDLE_TO_WALK_START_90R": {
@@ -13216,7 +13264,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 113
+        "line": 119
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_ON_UNEQUIP_WEAPON_SLOW": {
@@ -13335,7 +13383,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 168
+        "line": 174
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_ROTATE_180L_WARP": {
@@ -13365,7 +13413,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 176
+        "line": 182
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_ROTATE_180R": {
@@ -13395,7 +13443,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 170
+        "line": 176
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_ROTATE_180R_WARP": {
@@ -13425,7 +13473,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 178
+        "line": 184
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_ROTATE_45L": {
@@ -13448,7 +13496,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 160
+        "line": 166
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_ROTATE_45R": {
@@ -13478,7 +13526,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 162
+        "line": 168
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_ROTATE_90L": {
@@ -13508,7 +13556,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 164
+        "line": 170
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_ROTATE_90L_WARP": {
@@ -13538,7 +13586,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 172
+        "line": 178
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_ROTATE_90R": {
@@ -13568,7 +13616,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 166
+        "line": 172
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_ROTATE_90R_WARP": {
@@ -13598,7 +13646,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 174
+        "line": 180
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_ROTATE_END": {
@@ -13633,7 +13681,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 185
+        "line": 191
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_ROTATE_LEFT_START": {
@@ -13663,7 +13711,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 180
+        "line": 186
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_ROTATE_RIGHT_START": {
@@ -13693,7 +13741,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 182
+        "line": 188
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_SHOTGUN_PUMP": {
@@ -13791,7 +13839,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 132
+        "line": 138
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_STOP_TURN_0_WARP": {
@@ -13814,7 +13862,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 148
+        "line": 154
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_STOP_TURN_120L": {
@@ -13844,7 +13892,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 141
+        "line": 147
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_STOP_TURN_120R": {
@@ -13874,7 +13922,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 139
+        "line": 145
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_STOP_TURN_180L": {
@@ -13904,7 +13952,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 145
+        "line": 151
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_STOP_TURN_180L_WARP": {
@@ -13934,7 +13982,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 156
+        "line": 162
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_STOP_TURN_180R": {
@@ -13964,7 +14012,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 143
+        "line": 149
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_STOP_TURN_180R_WARP": {
@@ -13994,7 +14042,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 154
+        "line": 160
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_STOP_TURN_90L": {
@@ -14024,7 +14072,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 137
+        "line": 143
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_STOP_TURN_90L_WARP": {
@@ -14054,7 +14102,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 152
+        "line": 158
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_STOP_TURN_90R": {
@@ -14084,7 +14132,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 135
+        "line": 141
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_STOP_TURN_90R_WARP": {
@@ -14114,7 +14162,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 150
+        "line": 156
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_STUNT_TURN_0": {
@@ -14145,7 +14193,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 233
+        "line": 239
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_STUNT_TURN_120L": {
@@ -14175,7 +14223,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 237
+        "line": 243
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_STUNT_TURN_120R": {
@@ -14205,7 +14253,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 235
+        "line": 241
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_TO_IDLE": {
@@ -14242,7 +14290,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 243
+        "line": 249
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_TO_IDLE_ONE_OFF": {
@@ -14303,7 +14351,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 192
+        "line": 198
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_TURN_180R": {
@@ -14333,7 +14381,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 194
+        "line": 200
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_TURN_90L": {
@@ -14356,7 +14404,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 188
+        "line": 194
       }
     },
     "animation::symbol_table::EventIdSymbolTable::ACT_TURN_90R": {
@@ -14386,7 +14434,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 190
+        "line": 196
       }
     },
     "animation::symbol_table::EventIdSymbolTable::UB_ACT_HOLSTER": {
@@ -14458,7 +14506,7 @@
             "is_base": false,
             "source": {
               "file_index": 12,
-              "line": 275
+              "line": 281
             }
           }
         ],
@@ -14480,7 +14528,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 12,
-              "line": 280
+              "line": 286
             }
           }
         ],
@@ -14497,7 +14545,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 269
+        "line": 275
       }
     },
     "animation::symbol_table::RagdollRBGroupId::NONE": {
@@ -14520,7 +14568,7 @@
       },
       "source": {
         "file_index": 12,
-        "line": 272
+        "line": 278
       }
     },
     "audio::sound_library::WindowFocused": {
