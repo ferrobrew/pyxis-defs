@@ -45268,7 +45268,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 37,
-              "line": 98
+              "line": 107
             }
           }
         ],
@@ -45282,7 +45282,7 @@
       },
       "source": {
         "file_index": 37,
-        "line": 92
+        "line": 101
       }
     },
     "equipment::grapple_point_proxy::GrapplePointProxy": {
@@ -46734,6 +46734,73 @@
       "source": {
         "file_index": 37,
         "line": 25
+      }
+    },
+    "equipment::grapple_point_proxy::VehicleGrapplePointProxy": {
+      "path": "equipment::grapple_point_proxy::VehicleGrapplePointProxy",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " A grapple attachment to a vehicle or one of its physics parts (`CVehicleGrapplePointProxy`).",
+        "fields": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "ReattachToNewPos",
+            "doc": " Moves the attachment to a new world-space position and normal, updating both its visual\n local transform and its physics-local attachment while retaining the vehicle.",
+            "body": {
+              "type": "address",
+              "address": 5378425488
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "position",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "types::math::Vector3"
+                  }
+                }
+              },
+              {
+                "type": "field",
+                "name": "normal",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "types::math::Vector3"
+                  }
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 37,
+              "line": 96
+            }
+          }
+        ],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 37,
+        "line": 91
       }
     },
     "equipment::grappling_hook::GrappleTuning": {
@@ -224697,7 +224764,8 @@
             "equipment::grapple_point_proxy::CharacterBoneAttachedPointProxy",
             "equipment::grapple_point_proxy::GenericObjectPointProxy",
             "equipment::grapple_point_proxy::GrapplePointProxy",
-            "equipment::grapple_point_proxy::GrapplePointProxyVftable"
+            "equipment::grapple_point_proxy::GrapplePointProxyVftable",
+            "equipment::grapple_point_proxy::VehicleGrapplePointProxy"
           ],
           "submodules": {},
           "functions": [],
