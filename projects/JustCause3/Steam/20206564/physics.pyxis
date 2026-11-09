@@ -10,7 +10,7 @@ use types::vector_math::{AlignedQuat, AlignedVector3};
 /// The physics system (`CPhysicsSystem`), a `Base::CSingle` singleton that owns the Havok world and
 /// serves the engine's scene queries. The queries are sim-phase calls against the live Havok world.
 /// Only some members are bound.
-#[singleton(0x142_EDC_120), min_size(0x1381D0)]
+#[singleton(0x142_EDC_120), min_size(0x138218)]
 pub type PhysicsSystem {
     /// The collision layer [`CastRaySimple`](Self::CastRaySimple) hardcodes, and the one the
     /// player's direct-aim query passes to [`CastRay`](Self::CastRay).
@@ -39,7 +39,28 @@ pub type PhysicsSystem {
     /// a query reports. [`hknpWorld::applyBodyImpulseAt`] takes a Havok-space position.
     #[address(0x138_1C4)]
     pub m_AccumulatedShift: Vector3,
+
+    /// The reference-counted body-pair exclusion filter shared with the constraint filter.
+    #[address(0x138_210)]
+    pub m_PairCollisionFilter: *mut hknpPairCollisionFilter,
 }
+
+/// The body's pair-exclusion filter. Each unordered body pair has a reference count, so
+/// independent callers can disable the same pair without releasing another caller's exclusion.
+pub type hknpPairCollisionFilter;
+impl hknpPairCollisionFilter {
+    /// Adds one exclusion reference for the unordered body pair, rebuilds the affected collision
+    /// caches, and returns the new reference count. The disassembler mislabels this function
+    /// `NHavokCollisionFilter::SetSystemGroup`.
+    #[address(0x141_525_AF0)]
+    pub fn disableCollisionsBetween(&mut self, world: *mut hknpWorld, body_a: u32, body_b: u32) -> i32;
+
+    /// Removes one exclusion reference and returns the remaining count. Removing the final
+    /// reference requests collision regeneration when both body slots are valid.
+    #[address(0x141_525_BB0)]
+    pub fn enableCollisionsBetween(&mut self, world: *mut hknpWorld, body_a: u32, body_b: u32) -> i32;
+}
+
 impl PhysicsSystem {
     /// Advances the physics by one step. It fires the pre-update signal, clears the collision
     /// array, and updates the bodies that do not simulate; then, unless one of its two suspend

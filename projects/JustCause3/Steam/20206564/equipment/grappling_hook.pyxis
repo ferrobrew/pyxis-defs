@@ -767,6 +767,16 @@ pub extern GrapplingHangTask_EnableSmallImpulseSwing: bool;
 /// the stick's magnitude.
 #[address(0x142_D65_A80)]
 pub extern GrapplingHangTask_SmallImpulseSwingMagnitude: f32;
+impl GrapplingHookWire {
+    /// Appends a retained wire reference to a grapple wire list. Reallocation preserves the shared
+    /// references held by the existing list entries.
+    #[address(0x140_909_A60)]
+    pub fn PushGrapplingHookWire(wires: *mut Vector<SharedPtr<GrapplingHookWire>>, wire: *const SharedPtr<GrapplingHookWire>);
+
+    /// Releases and clears one shared wire reference.
+    #[address(0x140_8EA_870)]
+    pub fn ResetGrapplingHookWire(wire: *mut SharedPtr<GrapplingHookWire>);
+}
 
 /// The vehicle grapple (`CVehicleGrappleHook`): a grapple fired from a vehicle seat, which fires
 /// the holder's hook at the player aim's target and tethers what it hits to the vehicle. The hook

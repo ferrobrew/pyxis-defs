@@ -179,6 +179,11 @@ pub type WireEnd {
     pub m_HookCastCollisionFilter: WireEndCastFilter,
 }
 impl WireEnd {
+    /// Detaches the attachment proxy, removes the proxy's reference to this end, and releases
+    /// its attachment state before a new endpoint is installed.
+    #[address(0x140_8EF_080)]
+    pub fn Detach(&mut self);
+
     /// Puts the end into its extending state: detaches it, sets its position to `start_pos`, its
     /// speed to `speed`, and its ghost flag to `ghost_wire`, latches `target_info`, shows the open
     /// hook, and points it at the target's world position. A scripted fire and the fire
