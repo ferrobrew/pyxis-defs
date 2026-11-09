@@ -81,6 +81,12 @@ pub type EventIdSymbolTable {
     /// the state machine accepts it, and the full ragdoll otherwise. In `rico_base.afsmb` it leads
     /// to the `S_JC_HITREACT_FLY_*` states.
     pub const ACT_HITREACT_FLY: cstr = c"ACT_HITREACT_FLY",
+    /// The full-ragdoll act accepted by guarded global transitions, including the civilian and
+    /// soldier motorcycle states. Leaving a seat runs the native seat task's exit cleanup.
+    pub const ACT_FULL_RAGDOLL: cstr = c"ACT_FULL_RAGDOLL",
+    /// The ragdoll reaction requested by heavy NPC melee hits. The civilian and soldier motorcycle
+    /// states do not provide this transition.
+    pub const ACT_HITREACT_RAGDOLL: cstr = c"ACT_HITREACT_RAGDOLL",
     /// The forward run start, out of the idle: one of the directional run-start (wind-up) acts that
     /// [`QueueStarts`](input::locomotion::NStateTask_LocoUtil::QueueStarts) chooses by the angle from
     /// the body's forward to the move direction. Its clip starts straight ahead.
