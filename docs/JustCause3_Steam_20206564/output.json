@@ -10962,7 +10962,7 @@
             ],
             "source": {
               "file_index": 10,
-              "line": 71
+              "line": 80
             }
           },
           {
@@ -10971,7 +10971,7 @@
             "doc": " Active for the current state; the ragdoll get-up task's entry sets a modifier from its\n properties with this type.",
             "source": {
               "file_index": 10,
-              "line": 74
+              "line": 83
             }
           }
         ],
@@ -10984,7 +10984,7 @@
       },
       "source": {
         "file_index": 10,
-        "line": 68
+        "line": 77
       }
     },
     "animation::rule_system::AnimationRuleSystem": {
@@ -11042,7 +11042,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 43
+              "line": 52
             }
           },
           {
@@ -11079,7 +11079,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 43
+              "line": 52
             }
           },
           {
@@ -11104,7 +11104,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 47
+              "line": 56
             }
           },
           {
@@ -11125,7 +11125,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 51
+              "line": 60
             }
           },
           {
@@ -11148,7 +11148,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 51
+              "line": 60
             }
           }
         ],
@@ -11197,7 +11197,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 10,
-              "line": 61
+              "line": 70
             }
           }
         ],
@@ -11211,7 +11211,7 @@
       },
       "source": {
         "file_index": 10,
-        "line": 33
+        "line": 42
       }
     },
     "animation::rule_system::State": {
@@ -11330,11 +11330,31 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 24
+              "size": 16
             },
             "offset": 0,
-            "size": 24,
+            "size": 16,
             "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 10,
+              "line": 21
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_StateMachine",
+            "doc": " The resource handle for the state machine definition that supplies the states and global transitions.",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "game::ResourceHandle"
+              }
+            },
+            "offset": 16,
+            "size": 8,
+            "alignment": 8,
             "is_base": false,
             "source": {
               "file_index": 10,
@@ -11358,7 +11378,7 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 21
+              "line": 25
             }
           },
           {
@@ -11385,11 +11405,46 @@
             "is_base": false,
             "source": {
               "file_index": 10,
-              "line": 27
+              "line": 31
             }
           }
         ],
-        "associated_functions": [],
+        "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "TryEvent",
+            "doc": " Tests whether an event has an eligible transition, evaluating the current state's transitions before the global transitions. Evaluates transition conditions, but does not enqueue the event, change the current state, or execute state tasks.",
+            "body": {
+              "type": "address",
+              "address": 5372761568
+            },
+            "arguments": [
+              {
+                "type": "const_self"
+              },
+              {
+                "type": "field",
+                "name": "event",
+                "type_ref": {
+                  "type": "const_pointer",
+                  "inner": {
+                    "type": "raw",
+                    "path": "u32"
+                  }
+                }
+              }
+            ],
+            "return_type": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "calling_convention": "system",
+            "source": {
+              "file_index": 10,
+              "line": 36
+            }
+          }
+        ],
         "vftable": null,
         "singleton": null,
         "copyable": false,
@@ -83248,7 +83303,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -83283,7 +83338,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 425
+              "line": 451
             }
           },
           {
@@ -83314,7 +83369,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 425
+              "line": 451
             }
           }
         ],
@@ -83353,7 +83408,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 435
+              "line": 461
             }
           }
         ],
@@ -83376,7 +83431,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83396,7 +83451,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83438,7 +83493,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 399
+                "line": 425
               }
             },
             {
@@ -83458,7 +83513,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83478,7 +83533,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83498,7 +83553,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83518,7 +83573,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83538,7 +83593,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83558,7 +83613,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83578,7 +83633,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83598,7 +83653,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83618,7 +83673,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83638,7 +83693,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83658,7 +83713,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83678,7 +83733,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83698,7 +83753,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83718,7 +83773,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83738,7 +83793,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83758,7 +83813,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83778,7 +83833,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83798,7 +83853,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83832,7 +83887,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 406
+                "line": 432
               }
             },
             {
@@ -83852,7 +83907,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83872,7 +83927,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83892,7 +83947,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83912,7 +83967,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83932,7 +83987,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83952,7 +84007,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83972,7 +84027,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -83992,7 +84047,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -84012,7 +84067,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -84032,7 +84087,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -84052,7 +84107,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -84072,7 +84127,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -84092,7 +84147,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -84112,7 +84167,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -84132,7 +84187,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -84152,7 +84207,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 394
+                "line": 420
               }
             },
             {
@@ -84199,7 +84254,7 @@
               "calling_convention": "system",
               "source": {
                 "file_index": 44,
-                "line": 416
+                "line": 442
               }
             }
           ]
@@ -84213,7 +84268,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 393
+        "line": 419
       }
     },
     "game::GameObjectInitContext": {
@@ -84240,7 +84295,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 234
+              "line": 260
             }
           },
           {
@@ -84257,7 +84312,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 235
+              "line": 261
             }
           },
           {
@@ -84274,7 +84329,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 236
+              "line": 262
             }
           },
           {
@@ -84295,7 +84350,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 239
+              "line": 265
             }
           },
           {
@@ -84315,7 +84370,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 239
+              "line": 265
             }
           },
           {
@@ -84335,7 +84390,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 240
+              "line": 266
             }
           }
         ],
@@ -84350,7 +84405,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 233
+        "line": 259
       }
     },
     "game::GameObjectRenderContext": {
@@ -84377,7 +84432,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 258
+              "line": 284
             }
           },
           {
@@ -84394,7 +84449,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 259
+              "line": 285
             }
           },
           {
@@ -84411,7 +84466,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 260
+              "line": 286
             }
           },
           {
@@ -84428,7 +84483,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 261
+              "line": 287
             }
           },
           {
@@ -84445,7 +84500,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 262
+              "line": 288
             }
           },
           {
@@ -84466,7 +84521,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 265
+              "line": 291
             }
           },
           {
@@ -84486,7 +84541,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 265
+              "line": 291
             }
           }
         ],
@@ -84501,7 +84556,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 257
+        "line": 283
       }
     },
     "game::GameObjectUpdateContext": {
@@ -84528,7 +84583,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 245
+              "line": 271
             }
           },
           {
@@ -84545,7 +84600,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 246
+              "line": 272
             }
           },
           {
@@ -84562,7 +84617,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 247
+              "line": 273
             }
           },
           {
@@ -84579,7 +84634,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 248
+              "line": 274
             }
           },
           {
@@ -84596,7 +84651,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 249
+              "line": 275
             }
           },
           {
@@ -84613,7 +84668,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 250
+              "line": 276
             }
           },
           {
@@ -84634,7 +84689,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 253
+              "line": 279
             }
           },
           {
@@ -84654,7 +84709,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 253
+              "line": 279
             }
           }
         ],
@@ -84669,7 +84724,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 244
+        "line": 270
       }
     },
     "game::GameObjectVftable": {
@@ -84709,7 +84764,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -84739,7 +84794,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -84790,7 +84845,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 399
+              "line": 425
             }
           },
           {
@@ -84820,7 +84875,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -84850,7 +84905,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -84880,7 +84935,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -84910,7 +84965,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -84940,7 +84995,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -84970,7 +85025,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85000,7 +85055,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85030,7 +85085,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85060,7 +85115,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85090,7 +85145,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85120,7 +85175,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85150,7 +85205,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85180,7 +85235,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85210,7 +85265,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85240,7 +85295,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85270,7 +85325,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85300,7 +85355,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85330,7 +85385,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85373,7 +85428,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 406
+              "line": 432
             }
           },
           {
@@ -85403,7 +85458,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85433,7 +85488,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85463,7 +85518,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85493,7 +85548,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85523,7 +85578,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85553,7 +85608,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85583,7 +85638,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85613,7 +85668,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85643,7 +85698,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85673,7 +85728,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85703,7 +85758,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85733,7 +85788,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85763,7 +85818,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85793,7 +85848,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85823,7 +85878,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85853,7 +85908,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 394
+              "line": 420
             }
           },
           {
@@ -85909,7 +85964,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 416
+              "line": 442
             }
           }
         ],
@@ -85924,7 +85979,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 394
+        "line": 420
       }
     },
     "game::GameState": {
@@ -85947,7 +86002,7 @@
             "doc": null,
             "source": {
               "file_index": 44,
-              "line": 277
+              "line": 303
             }
           },
           {
@@ -85956,7 +86011,7 @@
             "doc": null,
             "source": {
               "file_index": 44,
-              "line": 278
+              "line": 304
             }
           },
           {
@@ -85965,7 +86020,7 @@
             "doc": null,
             "source": {
               "file_index": 44,
-              "line": 279
+              "line": 305
             }
           },
           {
@@ -85974,7 +86029,7 @@
             "doc": null,
             "source": {
               "file_index": 44,
-              "line": 280
+              "line": 306
             }
           },
           {
@@ -85983,7 +86038,7 @@
             "doc": null,
             "source": {
               "file_index": 44,
-              "line": 281
+              "line": 307
             }
           },
           {
@@ -85992,7 +86047,7 @@
             "doc": null,
             "source": {
               "file_index": 44,
-              "line": 282
+              "line": 308
             }
           },
           {
@@ -86001,7 +86056,7 @@
             "doc": null,
             "source": {
               "file_index": 44,
-              "line": 283
+              "line": 309
             }
           }
         ],
@@ -86063,7 +86118,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 302
+              "line": 328
             }
           },
           {
@@ -86091,7 +86146,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 305
+              "line": 331
             }
           },
           {
@@ -86136,7 +86191,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 316
+              "line": 342
             }
           },
           {
@@ -86175,7 +86230,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 44,
-              "line": 323
+              "line": 349
             }
           }
         ],
@@ -86187,7 +86242,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 276
+        "line": 302
       }
     },
     "game::GameStateFrontend": {
@@ -86670,7 +86725,7 @@
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": null,
+        "doc": " The project context carried by game-object update contexts. Its layout is unmapped.",
         "fields": [],
         "associated_functions": [],
         "vftable": null,
@@ -86683,19 +86738,77 @@
       },
       "source": {
         "file_index": 44,
-        "line": 230
+        "line": 256
       }
     },
     "game::ResourceCache": {
       "path": "game::ResourceCache",
       "visibility": "public",
-      "size": 0,
+      "size": 96,
       "alignment": 8,
       "category": "defined",
       "kind": {
         "type": "type",
-        "doc": null,
-        "fields": [],
+        "doc": " The resource cache shared by resource handles and game-object initialization contexts.",
+        "fields": [
+          {
+            "visibility": "private",
+            "name": "_field_0",
+            "doc": null,
+            "doc_links": [
+              {
+                "text": "ResourceHandle::m_Index",
+                "target_kind": "item",
+                "path": "game::ResourceHandle",
+                "anchor": "field-m_Index"
+              }
+            ],
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 88
+            },
+            "offset": 0,
+            "size": 88,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 44,
+              "line": 232
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Resources",
+            "doc": " The resource records indexed by [`ResourceHandle::m_Index`].",
+            "doc_links": [
+              {
+                "text": "ResourceHandle::m_Index",
+                "target_kind": "item",
+                "path": "game::ResourceHandle",
+                "anchor": "field-m_Index"
+              }
+            ],
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "game::ResourceInfo"
+              }
+            },
+            "offset": 88,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 44,
+              "line": 232
+            }
+          }
+        ],
         "associated_functions": [],
         "vftable": null,
         "singleton": null,
@@ -86707,7 +86820,164 @@
       },
       "source": {
         "file_index": 44,
-        "line": 228
+        "line": 229
+      }
+    },
+    "game::ResourceHandle": {
+      "path": "game::ResourceHandle",
+      "visibility": "public",
+      "size": 16,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " A handle identifying a resource record in its owning cache.",
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_Index",
+            "doc": " The index into the owning cache's [`m_Resources`](ResourceCache::m_Resources) array.",
+            "doc_links": [
+              {
+                "text": "ResourceCache::m_Resources",
+                "target_kind": "item",
+                "path": "game::ResourceCache",
+                "anchor": "field-m_Resources"
+              }
+            ],
+            "type_ref": {
+              "type": "raw",
+              "path": "u16"
+            },
+            "offset": 0,
+            "size": 2,
+            "alignment": 2,
+            "is_base": false,
+            "source": {
+              "file_index": 44,
+              "line": 240
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_2",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 6
+            },
+            "offset": 2,
+            "size": 6,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 44,
+              "line": 244
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_ResourceCache",
+            "doc": " The cache that owns the indexed resource record.",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "game::ResourceCache"
+              }
+            },
+            "offset": 8,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 44,
+              "line": 244
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 44,
+        "line": 237
+      }
+    },
+    "game::ResourceInfo": {
+      "path": "game::ResourceInfo",
+      "visibility": "public",
+      "size": 40,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " A resource cache record containing the loaded resource pointer and bookkeeping.",
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_Resource",
+            "doc": " The loaded resource pointer.",
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "void"
+              }
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 44,
+              "line": 252
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_8",
+            "doc": null,
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 32
+            },
+            "offset": 8,
+            "size": 32,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 44,
+              "line": 247
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 44,
+        "line": 249
       }
     },
     "game::UpdateContexts": {
@@ -86734,7 +87004,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 270
+              "line": 296
             }
           },
           {
@@ -86751,7 +87021,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 271
+              "line": 297
             }
           },
           {
@@ -86768,7 +87038,7 @@
             "is_base": false,
             "source": {
               "file_index": 44,
-              "line": 272
+              "line": 298
             }
           }
         ],
@@ -86783,7 +87053,7 @@
       },
       "source": {
         "file_index": 44,
-        "line": 269
+        "line": 295
       }
     },
     "game_world::GameWorld": {
@@ -225930,6 +226200,8 @@
         "game::Game_MaxGameUpdatesPerRender",
         "game::ProjectContext",
         "game::ResourceCache",
+        "game::ResourceHandle",
+        "game::ResourceInfo",
         "game::UpdateContexts"
       ],
       "submodules": {},
@@ -225959,7 +226231,7 @@
           "calling_convention": "system",
           "source": {
             "file_index": 44,
-            "line": 332
+            "line": 358
           }
         },
         {
@@ -225992,7 +226264,7 @@
           "calling_convention": "system",
           "source": {
             "file_index": 44,
-            "line": 338
+            "line": 364
           }
         },
         {
@@ -226017,7 +226289,7 @@
           "calling_convention": "system",
           "source": {
             "file_index": 44,
-            "line": 344
+            "line": 370
           }
         },
         {
@@ -226059,7 +226331,7 @@
           "calling_convention": "system",
           "source": {
             "file_index": 44,
-            "line": 351
+            "line": 377
           }
         },
         {
@@ -226104,7 +226376,7 @@
           "calling_convention": "system",
           "source": {
             "file_index": 44,
-            "line": 360
+            "line": 386
           }
         },
         {
@@ -226137,7 +226409,7 @@
           "calling_convention": "system",
           "source": {
             "file_index": 44,
-            "line": 366
+            "line": 392
           }
         },
         {
@@ -226168,7 +226440,7 @@
           "calling_convention": "system",
           "source": {
             "file_index": 44,
-            "line": 373
+            "line": 399
           }
         },
         {
@@ -226201,7 +226473,7 @@
           "calling_convention": "system",
           "source": {
             "file_index": 44,
-            "line": 381
+            "line": 407
           }
         },
         {
@@ -226232,7 +226504,7 @@
           "calling_convention": "system",
           "source": {
             "file_index": 44,
-            "line": 387
+            "line": 413
           }
         }
       ],
