@@ -589,6 +589,13 @@ impl GrapplingHook {
     #[address(0x140_93A_290)]
     pub fn UpdateDualTetherHandling(&mut self, holder: *const SharedPtr<Character>, player: *mut void, tuning: *const GrappleTuning, action_map: *mut void, dt: f32);
 
+    /// Releases every non-invalid wire in [`m_Wires`](Self::m_Wires): plays its detached
+    /// effect, destroys its constraint, detaches both ends, and returns it to
+    /// [`GHWS_ACTIVE_VIRTUAL`](WireState::GHWS_ACTIVE_VIRTUAL).
+    /// The disassembler mislabels this function `CGrapplingHook::OnSuccessfulGrappleFromReelIn`.
+    #[address(0x140_8F7_A80)]
+    pub fn ReleaseAllDualTethers(&mut self);
+
     /// Squeezes every wire of the tether list by `squeeze_value` (`0..=1`): each wire rebuilds its
     /// constraint toward a shorter length and smooths its squeeze factor toward the value. It sets
     /// [`m_IsSqueezingDualTethers`](Self::m_IsSqueezingDualTethers).

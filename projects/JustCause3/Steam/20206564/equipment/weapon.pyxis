@@ -281,7 +281,7 @@ pub type WeaponData {
     /// name): the sound of one shell or grenade going in, which only the shell-fed shotgun's and the
     /// Bildt Negotiator's effect files carry. No code names it; a reload clip's track message
     /// plays it.
-    pub const RELOAD_INSERT_AMMO_USAGE: u32 = 0x08FABB82,
+    pub const RELOAD_INSERT_AMMO_USAGE: u32 = 0x8FABB82,
     /// The hash of the usage `ReloadEnd` (`hashlittle` of the name): the sound of a reload
     /// finishing. [`WeaponBase::CheckIfReloadShouldBeTriggeredBase`] plays it on every gun of a
     /// weapon whose timed reload with no animation has run out.
@@ -2171,6 +2171,16 @@ impl ThrownGrenadeWeapon {
     /// matrix, so a held grenade rides the weapon's attach bone.
     #[address(0x140_99E_B70)]
     pub fn UpdateAttachmentTransforms(&mut self, p2: f32, p3: f32, transform_type: u32);
+}
+
+/// `CBeaconWeapon`: the rebel-support beacon weapon, sharing the primed explosive slot and
+/// attachment placement of [`ThrownGrenadeWeapon`].
+pub type BeaconWeapon;
+impl BeaconWeapon {
+    /// Fires the primed beacon through the common thrown-projectile path, re-equips the hand
+    /// grenade, and requests the deferred rebel-support beacon event.
+    #[address(0x140_997_EA0)]
+    pub fn Fire_Projectile(&mut self, weapon_data: *mut WeaponData);
 }
 
 /// One placed charge on a [`PlantedExplosiveWeapon`]'s live list
