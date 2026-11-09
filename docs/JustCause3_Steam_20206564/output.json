@@ -90058,8 +90058,59 @@
         ],
         "fields": [
           {
+            "visibility": "public",
+            "name": "m_RemoveQueueLock",
+            "doc": " The recursive critical section that guards [`m_RemoveQueue`](Self::m_RemoveQueue).",
+            "doc_links": [
+              {
+                "text": "Self::m_RemoveQueue",
+                "target_kind": "item",
+                "path": "game_world_object_manager::GameWorldObjectManager",
+                "anchor": "field-m_RemoveQueue"
+              }
+            ],
+            "type_ref": {
+              "type": "mut_pointer",
+              "inner": {
+                "type": "raw",
+                "path": "void"
+              }
+            },
+            "offset": 0,
+            "size": 8,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 46,
+              "line": 20
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_RemoveQueue",
+            "doc": " Objects waiting for delayed removal, each with its countdown.",
+            "type_ref": {
+              "type": "generic",
+              "base": "types::std_vector::Vector",
+              "args": [
+                {
+                  "type": "raw",
+                  "path": "game_world_object_manager::PendingRemove"
+                }
+              ]
+            },
+            "offset": 8,
+            "size": 32,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 46,
+              "line": 24
+            }
+          },
+          {
             "visibility": "private",
-            "name": "_field_0",
+            "name": "_field_28",
             "doc": null,
             "doc_links": [
               {
@@ -90081,15 +90132,15 @@
                 "type": "raw",
                 "path": "u8"
               },
-              "size": 2552
+              "size": 2512
             },
-            "offset": 0,
-            "size": 2552,
+            "offset": 40,
+            "size": 2512,
             "alignment": 1,
             "is_base": false,
             "source": {
               "file_index": 46,
-              "line": 19
+              "line": 30
             }
           },
           {
@@ -90123,7 +90174,7 @@
             "is_base": false,
             "source": {
               "file_index": 46,
-              "line": 19
+              "line": 30
             }
           },
           {
@@ -90144,7 +90195,7 @@
             "is_base": false,
             "source": {
               "file_index": 46,
-              "line": 23
+              "line": 34
             }
           },
           {
@@ -90164,11 +90215,47 @@
             "is_base": false,
             "source": {
               "file_index": 46,
-              "line": 23
+              "line": 34
             }
           }
         ],
         "associated_functions": [
+          {
+            "visibility": "public",
+            "name": "UpdateRemoveQueue",
+            "doc": " Decrements every pending object's countdown by `dt`, fades an object through its last\n second, and compacts out the entries whose countdown reached zero. The caller holds\n [`m_RemoveQueueLock`](Self::m_RemoveQueueLock).",
+            "doc_links": [
+              {
+                "text": "Self::m_RemoveQueueLock",
+                "target_kind": "item",
+                "path": "game_world_object_manager::GameWorldObjectManager",
+                "anchor": "field-m_RemoveQueueLock"
+              }
+            ],
+            "body": {
+              "type": "address",
+              "address": 5379182832
+            },
+            "arguments": [
+              {
+                "type": "mut_self"
+              },
+              {
+                "type": "field",
+                "name": "dt",
+                "type_ref": {
+                  "type": "raw",
+                  "path": "f32"
+                }
+              }
+            ],
+            "return_type": null,
+            "calling_convention": "system",
+            "source": {
+              "file_index": 46,
+              "line": 58
+            }
+          },
           {
             "visibility": "public",
             "name": "StartCommitAddRemove",
@@ -90200,7 +90287,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 46,
-              "line": 32
+              "line": 66
             }
           },
           {
@@ -90243,7 +90330,7 @@
             "calling_convention": "system",
             "source": {
               "file_index": 46,
-              "line": 40
+              "line": 74
             }
           }
         ],
@@ -90257,7 +90344,126 @@
       },
       "source": {
         "file_index": 46,
-        "line": 14
+        "line": 17
+      }
+    },
+    "game_world_object_manager::PendingRemove": {
+      "path": "game_world_object_manager::PendingRemove",
+      "visibility": "public",
+      "size": 24,
+      "alignment": 8,
+      "category": "defined",
+      "kind": {
+        "type": "type",
+        "doc": " One object in [`GameWorldObjectManager::m_RemoveQueue`]: the object, its remaining countdown,\n and whether it fades out over its last second.",
+        "doc_links": [
+          {
+            "text": "GameWorldObjectManager::m_RemoveQueue",
+            "target_kind": "item",
+            "path": "game_world_object_manager::GameWorldObjectManager",
+            "anchor": "field-m_RemoveQueue"
+          }
+        ],
+        "fields": [
+          {
+            "visibility": "public",
+            "name": "m_Object",
+            "doc": " The object scheduled for removal.",
+            "type_ref": {
+              "type": "generic",
+              "base": "types::shared_ptr::SharedPtr",
+              "args": [
+                {
+                  "type": "raw",
+                  "path": "game::GameObject"
+                }
+              ]
+            },
+            "offset": 0,
+            "size": 16,
+            "alignment": 8,
+            "is_base": false,
+            "source": {
+              "file_index": 46,
+              "line": 43
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_TimeLeft",
+            "doc": " Seconds left before the entry is compacted out of the queue, seconds.",
+            "type_ref": {
+              "type": "raw",
+              "path": "f32"
+            },
+            "offset": 16,
+            "size": 4,
+            "alignment": 4,
+            "is_base": false,
+            "source": {
+              "file_index": 46,
+              "line": 47
+            }
+          },
+          {
+            "visibility": "public",
+            "name": "m_Fade",
+            "doc": " Whether the object fades out while its countdown is at most one second.",
+            "type_ref": {
+              "type": "raw",
+              "path": "bool"
+            },
+            "offset": 20,
+            "size": 1,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 46,
+              "line": 51
+            }
+          },
+          {
+            "visibility": "private",
+            "name": "_field_15",
+            "doc": null,
+            "doc_links": [
+              {
+                "text": "GameWorldObjectManager::m_RemoveQueue",
+                "target_kind": "item",
+                "path": "game_world_object_manager::GameWorldObjectManager",
+                "anchor": "field-m_RemoveQueue"
+              }
+            ],
+            "type_ref": {
+              "type": "array",
+              "inner": {
+                "type": "raw",
+                "path": "u8"
+              },
+              "size": 3
+            },
+            "offset": 21,
+            "size": 3,
+            "alignment": 1,
+            "is_base": false,
+            "source": {
+              "file_index": 46,
+              "line": 37
+            }
+          }
+        ],
+        "associated_functions": [],
+        "vftable": null,
+        "singleton": null,
+        "copyable": false,
+        "cloneable": false,
+        "defaultable": false,
+        "packed": false,
+        "pinned": false
+      },
+      "source": {
+        "file_index": 46,
+        "line": 40
       }
     },
     "graph_script::NodeWeaponCache": {
@@ -227495,7 +227701,8 @@
     "game_world_object_manager": {
       "doc": null,
       "items": [
-        "game_world_object_manager::GameWorldObjectManager"
+        "game_world_object_manager::GameWorldObjectManager",
+        "game_world_object_manager::PendingRemove"
       ],
       "submodules": {},
       "functions": [],
