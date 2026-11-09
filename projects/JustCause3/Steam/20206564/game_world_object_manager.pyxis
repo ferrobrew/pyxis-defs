@@ -1,5 +1,8 @@
 use camera::camera::Camera;
+use game::GameObject;
 use spawn_system::SBFBCContext;
+use types::shared_ptr::SharedPtr;
+use types::std_vector::Vector;
 
 /// The game world object manager: owns the character occlusion BFBC state and drives the per-frame
 /// character occlusion cull. Each frame, [`StartCommitAddRemove`](Self::StartCommitAddRemove)
@@ -12,6 +15,14 @@ use spawn_system::SBFBCContext;
 /// projection.
 #[singleton(0x142_F17_128)]
 pub type GameWorldObjectManager {
+    /// The recursive critical section that guards [`m_RemoveQueue`](Self::m_RemoveQueue).
+    #[address(0x0)]
+    pub m_RemoveQueueLock: *mut void,
+
+    /// Objects waiting for delayed removal, each with its countdown.
+    #[address(0x8)]
+    pub m_RemoveQueue: Vector<PendingRemove>,
+
     /// The camera the character occlusion cull builds its BFBC frustum against. Set each frame by
     /// [`StartCommitAddRemove`](Self::StartCommitAddRemove) from
     /// [`CameraManager::m_ActiveCamera`](camera::camera_manager::CameraManager::m_ActiveCamera).
@@ -22,7 +33,30 @@ pub type GameWorldObjectManager {
     #[address(0x10_A90)]
     pub m_CharacterBFBCContext: *mut SBFBCContext,
 }
+
+/// One object in [`GameWorldObjectManager::m_RemoveQueue`]: the object, its remaining countdown,
+/// and whether it fades out over its last second.
+#[size(0x18), align(8)]
+pub type PendingRemove {
+    /// The object scheduled for removal.
+    #[address(0x0)]
+    pub m_Object: SharedPtr<GameObject>,
+
+    /// Seconds left before the entry is compacted out of the queue, seconds.
+    #[address(0x10)]
+    pub m_TimeLeft: f32,
+
+    /// Whether the object fades out while its countdown is at most one second.
+    #[address(0x14)]
+    pub m_Fade: bool,
+}
 impl GameWorldObjectManager {
+    /// Decrements every pending object's countdown by `dt`, fades an object through its last
+    /// second, and compacts out the entries whose countdown reached zero. The caller holds
+    /// [`m_RemoveQueueLock`](Self::m_RemoveQueueLock).
+    #[address(0x140_9FD_0F0)]
+    pub fn UpdateRemoveQueue(&mut self, dt: f32);
+
     /// Copies the camera manager's active camera into
     /// [`m_OcclusionCamera`](Self::m_OcclusionCamera), along with its frustum planes
     /// and transform, then dispatches
