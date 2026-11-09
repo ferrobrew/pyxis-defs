@@ -102,11 +102,25 @@ impl InteractionGraph {
 
 /// The game object that holds a set of interaction graphs (`CInteractionContext`). Only some
 /// members are mapped.
+#[min_size(0x388)]
 pub type InteractionContext {
     /// The game object the context belongs to (`CGameObject::m_Parent`), such as the weapon whose
     /// pickup interaction the context carries.
     #[address(0x70)]
     pub m_Parent: WeakPtrGameObject,
+
+    /// The context's state bits, including the `m_Enabled` bit its
+    /// [`GameObject::Enable`](game::GameObject::Enable) override reads and writes.
+    #[address(0x380)]
+    pub m_Flags: InteractionContextFlags,
+}
+
+/// The state bits of an interaction context (`CInteractionContext::m_Enabled` and its neighbours).
+#[copyable]
+pub bitflags InteractionContextFlags: u8 {
+    /// The context is enabled: its interactions are offered, and its `Enable` override tells the
+    /// user proxies when the bit changes.
+    ENABLED = 0x1,
 }
 
 /// One node of an interaction graph (`CInteractionGraphNode`). Only some members are mapped.

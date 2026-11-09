@@ -440,6 +440,14 @@ pub type GameObject {
         /// enables it.
         #[index(38)]
         pub fn Enable(&mut self, enable: bool);
+
+        /// Registers the object for the updates its update-type virtual asks for
+        /// (`CGameObject::AddToUpdate`). The base implementation queries the object's required
+        /// update types and registers its pre-simulation, post-simulation, and render updates
+        /// accordingly, then adds its children. A weapon's post-simulation update calls it when
+        /// its post-simulation flag rises from clear.
+        #[index(42)]
+        pub fn AddToUpdate(&mut self);
     },
 
     /// A weak reference to the object itself (`m_WeakThis`), from which the engine hands out

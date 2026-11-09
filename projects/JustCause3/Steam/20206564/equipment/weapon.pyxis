@@ -5,6 +5,7 @@ use character::inventory::WeaponSlot;
 use equipment::explosive::PlantedExplosive;
 use game::{GameObject, GameObjectRenderContext, GameObjectUpdateContext};
 use graphics_engine::model_instance::{Model, ModelInstance};
+use interaction::InteractionContext;
 use physics::{GrapplingMode, PfxRigidBody, RigidObject};
 use types::math::Matrix4;
 use types::math::Vector3;
@@ -1113,6 +1114,26 @@ pub type WeaponBase {
     #[address(0x288)]
     pub m_SpawnedFromRule: WeakPtrGameObject,
 
+    /// The horizontal mount constraint (a `boost::weak_ptr<CConstraint>`): the hinge that limits a
+    /// mounted weapon's yaw. The mounted aim drives its motor, and
+    /// [`GetMountedHorizontalAngularLimits`](Self::GetMountedHorizontalAngularLimits) reads its
+    /// angular limits.
+    #[address(0x2C8)]
+    pub m_ConstraintHorizontal: WeakPtrGameObject,
+
+    /// The two vertical mount constraints (a `boost::weak_ptr<CConstraint>[2]`): the hinges that
+    /// limit a mounted weapon's pitch. The mounted aim drives their motors, and
+    /// [`GetMountedVerticalAngularLimits`](Self::GetMountedVerticalAngularLimits) reads the first
+    /// one's angular limits.
+    #[address(0x2D8)]
+    pub m_ConstraintVertical: [WeakPtrGameObject; 2],
+
+    /// Whether the mounted weapon may be torn off its mount.
+    /// [`Inventory::UpdateInventoryPermissions`](character::inventory::Inventory::UpdateInventoryPermissions)
+    /// reads it to decide whether the player may detach the mounted gun they are using.
+    #[address(0x330)]
+    pub m_MountedCanBeDetached: bool,
+
     /// Whether the weapon overheats.
     #[address(0x38C)]
     pub m_CanBeOverheated: bool,
@@ -1207,6 +1228,13 @@ pub type WeaponBase {
     /// request set it and register the weapon when it was clear.
     #[address(0x47C)]
     pub m_RequiresPreSimUpdates: bool,
+
+    /// Whether the weapon is registered for post-simulation updates
+    /// ([`UpdatePostSim`](Self::UpdatePostSim)). Its post-simulation update sets it while its guns
+    /// or components still have attached-effect work and registers the weapon through
+    /// [`GameObject::AddToUpdate`](game::GameObject::AddToUpdate) when the flag rises from clear.
+    #[address(0x47D)]
+    pub m_RequiresPostSimUpdates: bool,
 
     /// The weapon type's tuning, or null.
     #[address(0x490)]
@@ -1573,6 +1601,33 @@ impl WeaponBase {
     /// - a stop-using alone, for a weapon with a user: [`StopUsing`](Self::StopUsing).
     #[address(0x140_993_2C0)]
     pub fn UpdatePreSim(game_object: *mut void, context: *mut GameObjectUpdateContext);
+
+    /// The weapon's post-simulation update, the `CGameObject::UpdatePostSim` override, run while
+    /// the weapon is registered ([`m_RequiresPostSimUpdates`](Self::m_RequiresPostSimUpdates)).
+    /// `game_object` is the weapon's `CGameObject` subobject, not the start of the weapon. It runs
+    /// each gun's component update and attached-effect update, and clears the post-simulation flag
+    /// when nothing remains to update.
+    #[address(0x140_995_CB0)]
+    pub fn UpdatePostSim(game_object: *mut void, context: *mut GameObjectUpdateContext);
+
+    /// The weapon's pickup interaction context: the first [`InteractionContext`] child of the
+    /// weapon's game object, cached on the weapon. The mounted weapon's "use" prompt is this
+    /// context's.
+    #[address(0x140_983_750)]
+    pub fn GetPickupContext(&mut self) -> *mut InteractionContext;
+
+    /// Reads the horizontal mount constraint's angular limits, from the vehicle part's powered
+    /// hinge controller when the holder is a vehicle, or from
+    /// [`m_ConstraintHorizontal`](Self::m_ConstraintHorizontal). Returns whether the limits were
+    /// found.
+    #[address(0x140_986_730)]
+    pub fn GetMountedHorizontalAngularLimits(&self, min: *mut f32, max: *mut f32) -> bool;
+
+    /// Reads the first vertical mount constraint's angular limits, from the vehicle part's powered
+    /// hinge controller when the holder is a vehicle, or from
+    /// [`m_ConstraintVertical`](Self::m_ConstraintVertical). Returns whether the limits were found.
+    #[address(0x140_986_2C0)]
+    pub fn GetMountedVerticalAngularLimits(&self, min: *mut f32, max: *mut f32) -> bool;
 
     /// The base implementation of the [`OnEquip`](Self::OnEquip) virtual.
     #[address(0x140_991_580)]

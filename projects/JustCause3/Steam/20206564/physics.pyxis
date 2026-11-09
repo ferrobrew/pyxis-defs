@@ -885,13 +885,41 @@ pub enum RigidObjectType: u16 {
 /// socket, stiff spring, hinge, limited hinge, ragdoll, wheel, or prismatic), optionally motored
 /// (position, spring-damper, or velocity motors) and breakable. It names the two objects by object
 /// id and connects them once both exist; the physics step then resolves the constraint with the
-/// bodies' other contacts. Only its type id is bound.
-pub type Constraint;
+/// bodies' other contacts. Only some members are mapped.
+#[min_size(0x190)]
+pub type Constraint {
+    /// The constraint's state bits (`CConstraint::m_Flags`). The engine clears and sets
+    /// [`MOTOR_ENABLED`](ConstraintFlags::MOTOR_ENABLED) through
+    /// [`DisableMotor`](Self::DisableMotor) and [`EnableMotor`](Self::EnableMotor).
+    #[address(0x188)]
+    pub m_Flags: ConstraintFlags,
+}
 impl Constraint {
     /// `CConstraint::TYPE_ID`: the run-time type id of `CConstraint`, for
     /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use.
     #[address(0x140_977_BC0)]
     pub fn TYPE_ID() -> *const u32;
+
+    /// `CConstraint::DisableMotor`: clears [`MOTOR_ENABLED`](ConstraintFlags::MOTOR_ENABLED) and,
+    /// when the constraint is in the physics world, tells its Havok constraint to stop driving its
+    /// motor, then reactivates its members.
+    #[address(0x140_BA2_CD0)]
+    pub fn DisableMotor(&mut self);
+
+    /// `CConstraint::EnableMotor`: sets [`MOTOR_ENABLED`](ConstraintFlags::MOTOR_ENABLED) and,
+    /// when the constraint is in the physics world, tells its Havok constraint to drive its motor
+    /// again, then reactivates its members.
+    #[address(0x140_BA2_C60)]
+    pub fn EnableMotor(&mut self);
+}
+
+/// The state bits of a constraint (`CConstraint::m_Flags`).
+#[copyable]
+pub bitflags ConstraintFlags: u8 {
+    /// The constraint is enabled.
+    ENABLED = 0x1,
+    /// The constraint's motor is enabled.
+    MOTOR_ENABLED = 0x2,
 }
 
 /// The Havok-facing input of a character proxy (`CPfxCharacterInstance::CCharacterInput`), read by
