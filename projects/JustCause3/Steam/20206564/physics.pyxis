@@ -52,7 +52,7 @@ impl hknpPairCollisionFilter {
     /// Adds one exclusion reference for the unordered body pair, rebuilds the affected collision
     /// caches, and returns the new reference count. The disassembler mislabels this function
     /// `NHavokCollisionFilter::SetSystemGroup`.
-    #[address(0x141_525_AF0)]
+    #[address(0x141_525_AE0)]
     pub fn disableCollisionsBetween(&mut self, world: *mut hknpWorld, body_a: u32, body_b: u32) -> i32;
 
     /// Removes one exclusion reference and returns the remaining count. Removing the final
