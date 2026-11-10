@@ -377,6 +377,13 @@ pub type PhysicsGameObject {
 /// Native collision-hit reaction data (`SHitReactInfo`).
 pub type HitReactInfo;
 impl PhysicsGameObject {
+    /// `CPhysicsGameObject::TYPE_ID`: the run-time type id of `CPhysicsGameObject`, for
+    /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use. Characters,
+    /// vehicles, their parts, rigid objects, and weapons derive from it, so a test against it
+    /// tells whether a game object owns a physics instance.
+    #[address(0x140_4C9_880)]
+    pub fn TYPE_ID() -> *const u32;
+
     /// Converts collision-hit data into an impact damage message and dispatches it to the object.
     #[address(0x140_4F2_040)]
     pub fn DoReactToHit(&mut self, info: *const HitReactInfo);
