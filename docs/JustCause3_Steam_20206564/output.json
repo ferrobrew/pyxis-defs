@@ -31870,6 +31870,67 @@
         "line": 1567
       }
     },
+    "character::character::Character_StuntCombatModifier": {
+      "path": "character::character::Character_StuntCombatModifier",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": " `STUNT_COMBAT_MODIFIER`: the animation modifier whose idstring selects the armed stunt idle,\n movement, turn, and stop clip variants. [`Character::SetCharacterModifiers`] sets it on every\n rule system of an attached character, or while the stunt mode is forced, once per frame; the\n animation set's ordered-modifier variants then replace the on-foot clips while it is active.\n The symbol table assigns the id at load, so the static holds a run-time value and\n [`AnimationRuleSystem::SetModifier`](animation::rule_system::AnimationRuleSystem::SetModifier)\n takes its address rather than the value.",
+        "doc_links": [
+          {
+            "text": "Character::SetCharacterModifiers",
+            "target_kind": "item",
+            "path": "character::character::Character",
+            "anchor": "func-SetCharacterModifiers"
+          },
+          {
+            "text": "animation::rule_system::AnimationRuleSystem::SetModifier",
+            "target_kind": "item",
+            "path": "animation::rule_system::AnimationRuleSystem",
+            "anchor": "func-SetModifier"
+          }
+        ],
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "address": 5418185496
+      },
+      "source": {
+        "file_index": 25,
+        "line": 1590
+      }
+    },
+    "character::character::Character_StuntNoncombatModifier": {
+      "path": "character::character::Character_StuntNoncombatModifier",
+      "visibility": "public",
+      "size": 0,
+      "alignment": 1,
+      "category": "defined",
+      "kind": {
+        "type": "extern_value",
+        "doc": " `STUNT_NONCOMBAT_MODIFIER`: the unarmed counterpart of\n [`Character_StuntCombatModifier`], selecting the non-combat stunt clip variants under the same\n conditions.",
+        "doc_links": [
+          {
+            "text": "Character_StuntCombatModifier",
+            "target_kind": "item",
+            "path": "character::character::Character_StuntCombatModifier"
+          }
+        ],
+        "value_type": {
+          "type": "raw",
+          "path": "u32"
+        },
+        "address": 5418185620
+      },
+      "source": {
+        "file_index": 25,
+        "line": 1595
+      }
+    },
     "character::character::DamageStateFlags": {
       "path": "character::character::DamageStateFlags",
       "visibility": "public",
@@ -32065,7 +32126,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1585
+              "line": 1599
             }
           },
           {
@@ -32074,7 +32135,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1586
+              "line": 1600
             }
           },
           {
@@ -32083,7 +32144,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1587
+              "line": 1601
             }
           },
           {
@@ -32092,7 +32153,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1588
+              "line": 1602
             }
           },
           {
@@ -32101,7 +32162,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1589
+              "line": 1603
             }
           },
           {
@@ -32110,7 +32171,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1590
+              "line": 1604
             }
           },
           {
@@ -32119,7 +32180,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1591
+              "line": 1605
             }
           },
           {
@@ -32128,7 +32189,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1592
+              "line": 1606
             }
           },
           {
@@ -32137,7 +32198,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1593
+              "line": 1607
             }
           },
           {
@@ -32146,7 +32207,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1594
+              "line": 1608
             }
           },
           {
@@ -32155,7 +32216,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1595
+              "line": 1609
             }
           },
           {
@@ -32164,7 +32225,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1596
+              "line": 1610
             }
           },
           {
@@ -32173,7 +32234,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1597
+              "line": 1611
             }
           },
           {
@@ -32182,7 +32243,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1598
+              "line": 1612
             }
           },
           {
@@ -32191,7 +32252,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1599
+              "line": 1613
             }
           },
           {
@@ -32200,7 +32261,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1600
+              "line": 1614
             }
           },
           {
@@ -32209,7 +32270,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1601
+              "line": 1615
             }
           },
           {
@@ -32226,7 +32287,7 @@
             ],
             "source": {
               "file_index": 25,
-              "line": 1605
+              "line": 1619
             }
           },
           {
@@ -32249,7 +32310,7 @@
             ],
             "source": {
               "file_index": 25,
-              "line": 1610
+              "line": 1624
             }
           },
           {
@@ -32258,7 +32319,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1611
+              "line": 1625
             }
           },
           {
@@ -32267,7 +32328,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1612
+              "line": 1626
             }
           },
           {
@@ -32276,7 +32337,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1613
+              "line": 1627
             }
           },
           {
@@ -32285,7 +32346,7 @@
             "doc": " The right hand's primary attach point (`AttachHandRight`): the bone whose world matrix a gun\n held in the right hand takes as its own, with no further offset. It is an animated bone of\n the skeleton like any other, so a clip that keys it moves the gun in the hand.",
             "source": {
               "file_index": 25,
-              "line": 1617
+              "line": 1631
             }
           },
           {
@@ -32302,7 +32363,7 @@
             ],
             "source": {
               "file_index": 25,
-              "line": 1620
+              "line": 1634
             }
           },
           {
@@ -32319,7 +32380,7 @@
             ],
             "source": {
               "file_index": 25,
-              "line": 1624
+              "line": 1638
             }
           },
           {
@@ -32336,7 +32397,7 @@
             ],
             "source": {
               "file_index": 25,
-              "line": 1628
+              "line": 1642
             }
           },
           {
@@ -32345,7 +32406,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1629
+              "line": 1643
             }
           },
           {
@@ -32354,7 +32415,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1630
+              "line": 1644
             }
           },
           {
@@ -32363,7 +32424,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1631
+              "line": 1645
             }
           },
           {
@@ -32372,7 +32433,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1632
+              "line": 1646
             }
           },
           {
@@ -32381,7 +32442,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1633
+              "line": 1647
             }
           },
           {
@@ -32390,7 +32451,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1634
+              "line": 1648
             }
           },
           {
@@ -32399,7 +32460,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1635
+              "line": 1649
             }
           },
           {
@@ -32408,7 +32469,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1636
+              "line": 1650
             }
           },
           {
@@ -32417,7 +32478,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1637
+              "line": 1651
             }
           },
           {
@@ -32426,7 +32487,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1638
+              "line": 1652
             }
           },
           {
@@ -32435,7 +32496,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1639
+              "line": 1653
             }
           },
           {
@@ -32444,7 +32505,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1640
+              "line": 1654
             }
           },
           {
@@ -32453,7 +32514,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1641
+              "line": 1655
             }
           },
           {
@@ -32462,7 +32523,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1642
+              "line": 1656
             }
           },
           {
@@ -32471,7 +32532,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1643
+              "line": 1657
             }
           },
           {
@@ -32480,7 +32541,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1644
+              "line": 1658
             }
           },
           {
@@ -32489,7 +32550,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1645
+              "line": 1659
             }
           },
           {
@@ -32498,7 +32559,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1646
+              "line": 1660
             }
           },
           {
@@ -32507,7 +32568,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1647
+              "line": 1661
             }
           },
           {
@@ -32516,7 +32577,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1648
+              "line": 1662
             }
           },
           {
@@ -32525,7 +32586,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1649
+              "line": 1663
             }
           },
           {
@@ -32534,7 +32595,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1650
+              "line": 1664
             }
           },
           {
@@ -32543,7 +32604,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1651
+              "line": 1665
             }
           },
           {
@@ -32552,7 +32613,7 @@
             "doc": null,
             "source": {
               "file_index": 25,
-              "line": 1652
+              "line": 1666
             }
           }
         ],
@@ -32565,7 +32626,7 @@
       },
       "source": {
         "file_index": 25,
-        "line": 1584
+        "line": 1598
       }
     },
     "character::character::WeaponInput": {
@@ -225569,6 +225630,8 @@
             "character::character::Character_ForceCombat",
             "character::character::Character_ForceNonCombat",
             "character::character::Character_GoreEnabled",
+            "character::character::Character_StuntCombatModifier",
+            "character::character::Character_StuntNoncombatModifier",
             "character::character::DamageStateFlags",
             "character::character::Joint",
             "character::character::SafeBoneIndex",
