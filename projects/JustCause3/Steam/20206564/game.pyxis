@@ -457,8 +457,18 @@ pub type GameObject {
     /// ([`HookTargetInfo::SetupTargetFromGameObject`](equipment::wire_end::HookTargetInfo::SetupTargetFromGameObject)).
     #[address(0x60)]
     pub m_WeakThis: WeakPtrGameObject,
+    /// A weak reference to the object's parent in its entity hierarchy (`m_Parent`), empty for a
+    /// root. [`GetParentTransform`](Self::GetParentTransform) locks it for the parent's world
+    /// transform: a child object such as the grappling hook's mesh takes its world transform from
+    /// its parent's.
+    pub m_Parent: WeakPtrGameObject,
 }
 impl GameObject {
+    /// Locks [`m_Parent`](Self::m_Parent) and copies the parent's world transform into `out`
+    /// through the parent's [`GetTransform`](Self::GetTransform); returns false without a parent.
+    #[address(0x140_4E6_760)]
+    pub fn GetParentTransform(&self, out: *mut Matrix4) -> bool;
+
     /// The object's spawn tag index (`CGameObject::GetUniqueSpawnTagIndex`): the index of the
     /// spawn tag the spawn system spawned it from, which identifies its type. The spawn system
     /// converts it to the tag's hash, the persistent form, with

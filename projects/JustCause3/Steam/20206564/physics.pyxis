@@ -1,6 +1,7 @@
 use animation::skeleton::HkArray;
 use character::character::Character;
 use damage::DamageMsg;
+use game::GameObjectRenderContext;
 use graphics_engine::model_instance::{Model, ModelInstance};
 use havok::{hkAabb, hkAabb16, hkContainerHeapAllocator, hkIntSpaceUtil, hkReferencedObject, hkSimdFloat32, hkTransformf, hknpBodyCinfo, hknpConstraintCinfo, hknpContactImpulseEvent, hknpMotionCinfo, hknpShape};
 use types::math::{Matrix4, Vector3};
@@ -869,6 +870,19 @@ impl RigidObject {
     /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use.
     #[address(0x140_60F_1F0)]
     pub fn TYPE_ID() -> *const u32;
+
+    /// The render-phase `CGameObject::UpdateRender` override. While the object is enabled and has
+    /// a model instance, it marks the instance's dynamic bit by whether the body is active (a
+    /// keyframed or dynamic object without a body counts by its type) and pushes the object's
+    /// transform to the instance ([`ModelInstance::UpdateMatrix`]):
+    /// its render transform at the context's interpolation fraction, or its current world matrix
+    /// for the first few renders after it is placed. An object that rides a parent (the grappling
+    /// hook's mesh, under the hook's world transform) is drawn from the transforms its simulation
+    /// updates left. `game_object` is the object's `CGameObject` subobject, 8 bytes into the
+    /// object. The disassembler names it `CHavokDestructionObject::UpdateRender`, and gives
+    /// `CRigidObject::UpdateRender` to the destruction object's.
+    #[address(0x140_C26_AC0)]
+    pub fn UpdateRender(game_object: *mut void, context: *const GameObjectRenderContext);
 }
 
 /// A rigid object's type (`CRigidObject::RigidObject_Type`), the low bits of
