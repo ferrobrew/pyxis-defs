@@ -313,6 +313,41 @@ pub enum GameMaterialId: u32 {
     EGameMaterialId_Default = 0x1F,
 }
 
+/// A contact report (`SCollision`), passed to a physics game object's collision handler (such as
+/// [`Grenade::OnCollision`](equipment::explosive::Grenade::OnCollision)). The handler's owner is
+/// the report's first object, and [`m_GB`](Self::m_GB) is the one it touched.
+#[min_size(0x58)]
+pub type Collision {
+    /// The object the handler's owner touched, or null for the static world.
+    #[address(0x8)]
+    pub m_GB: *mut PhysicsGameObject,
+
+    /// The touched surface's game material (`EGameMaterialId`; see [`GameMaterialId`]).
+    #[address(0x14)]
+    pub m_MatB: u32,
+
+    /// The contact point, world space.
+    #[address(0x18)]
+    pub m_Position: Vector3,
+
+    /// The contact normal, world space.
+    #[address(0x24)]
+    pub m_Normal: Vector3,
+
+    /// The contact's impulse. A grenade's handler compares it against its bounce count to decide
+    /// whether a contact plays an impact.
+    #[address(0x30)]
+    pub m_Impulse: f32,
+
+    /// The two bodies' separation velocity at the contact, along the normal.
+    #[address(0x40)]
+    pub m_SeparationVelocity: f32,
+
+    /// The touched body. An explosive's handler attaches to the touched object at this body.
+    #[address(0x54)]
+    pub m_bodyIdB: u32,
+}
+
 /// The physics system's global collision listener. Contact impulse dispatch resolves both body
 /// instances and calls each instance's event virtual when its subscription flag is active.
 pub type HavokCollisionListener;

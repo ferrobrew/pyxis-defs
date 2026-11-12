@@ -2,6 +2,7 @@ use game::GameObjectRenderContext;
 use game::GameObjectUpdateContext;
 use game::UpdateContexts;
 use graphics_engine::model_instance::ModelInstance;
+use physics::Collision;
 use physics::PfxRigidBody;
 use types::math::Matrix4;
 use types::math::Vector3;
@@ -30,6 +31,9 @@ pub type Explosive {
     /// as [`ThrownGrenadeWeapon::m_PrimedGrenade`](equipment::weapon::ThrownGrenadeWeapon::m_PrimedGrenade))
     /// point there rather than at the start of the explosive.
     pub const GAME_OBJECT_BASE_OFFSET: u64 = 0x70,
+    /// The offset of the embedded `CPfxBodyListener` subobject, the `this` of the explosive's
+    /// collision handler ([`Grenade::OnCollision`]).
+    pub const PFX_BODY_LISTENER_OFFSET: u64 = 0x68,
 
     /// The ammunition-pool slot. Awareness events pair it with
     /// [`m_InstanceUniqueId`](Self::m_InstanceUniqueId) to reject recycled instances.
@@ -359,6 +363,29 @@ impl Grenade {
     /// grenade weapon checks its primed object against it before treating it as a grenade.
     #[address(0x140_60F_D60)]
     pub fn TYPE_ID() -> *const u32;
+
+    /// The grenade's collision handler (`CGrenade::OnCollision`, its override of the
+    /// `CPfxBodyListener` virtual). It reads the profile's contact upgrades, gated on
+    /// [`m_CanUseUpgrades`](Self::m_CanUseUpgrades) and on a flag of the grenade's ammunition
+    /// entry, as every upgrade check of the grenade is: explode on contact, explode on hostile
+    /// contact, and explode on characters and vehicles only. For a contact with an object it
+    /// classifies the object by its physics instance's type and sets
+    /// [`Explosive::m_DetonationTimer`] to zero when the enabled upgrade accepts it; a contact with
+    /// the static world ([`Collision::m_GB`] null) zeroes the timer only under explode on contact
+    /// alone. The zeroed timer makes the next [`Explosive::UpdatePostSim`] detonate the grenade.
+    /// The handler also plays the impact effects and the first-bounce sound, counts bounces,
+    /// redirects the first bounce's velocity under the upgrades, and records the contact normal.
+    /// `listener` is the grenade's `CPfxBodyListener` subobject
+    /// ([`Explosive::PFX_BODY_LISTENER_OFFSET`]), not the start of the grenade.
+    #[address(0x140_937_4B0)]
+    pub fn OnCollision(listener: *mut void, collision: *const Collision);
+
+    /// The grenade's override of the virtual `Detonate`: runs the explosive's detonation (the
+    /// blast and the explosive's removal), then tells a thrown grenade weapon that owns the grenade
+    /// that the grenade is gone. [`Explosive::UpdatePostSim`] calls the virtual once
+    /// [`Explosive::m_DetonationTimer`] is at or below zero; `dt` is the tick's delta.
+    #[address(0x140_91F_560)]
+    pub fn Detonate(&mut self, dt: f32);
 
     /// The [`Explosive::PropelToward`] override: calls it, records `target_position` in
     /// [`m_InitialLandingPos`](Self::m_InitialLandingPos), plays the extra trail effects, and, with
