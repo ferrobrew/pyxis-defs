@@ -34,6 +34,15 @@ impl StateMachineInstance {
     /// Tests whether an event has an eligible transition, evaluating the current state's transitions before the global transitions. Evaluates transition conditions, but does not enqueue the event, change the current state, or execute state tasks.
     #[address(0x140_3DD_5E0)]
     pub fn TryEvent(&self, event: *const u32) -> bool;
+
+    /// Moves the machine to `new_state`: leaves the current state (its state tasks' exits run),
+    /// makes `new_state` current, enters it (its state tasks' entries run), and calls the
+    /// instance's transition callback with the old and new states, which for a character's rule
+    /// system starts the new state's animation. Every state change goes through it: an event's
+    /// transition, an external event's, and a state set by id
+    /// ([`AnimationRuleSystem::SetStateById`]).
+    #[address(0x140_3C7_F00)]
+    pub fn SetStateInternal(&mut self, new_state: *mut State);
 }
 
 /// An animation rule system (`CAnimationRuleSystem`): drives one afsmb state machine for a character.
@@ -68,6 +77,14 @@ impl AnimationRuleSystem {
     /// forwards to this for every rule system of the character's animated model.
     #[address(0x140_479_A10)]
     pub fn SetModifier(&mut self, modifier: *const u32, modifier_type: AnimationModifierType);
+
+    /// Looks the state named by `state_id` up in the running machine's definition and, when it
+    /// exists, moves the machine to it through
+    /// [`StateMachineInstance::SetStateInternal`] whatever the current state's transitions allow.
+    /// Returns whether the state was found. The character's own forced and layered state sets
+    /// reach the machines through it.
+    #[address(0x140_44A_D50)]
+    pub fn SetStateById(&mut self, state_id: *const HashString) -> bool;
 }
 
 /// How long a modifier set through [`AnimationRuleSystem::SetModifier`] stays active

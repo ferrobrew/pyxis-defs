@@ -518,6 +518,15 @@ impl GrapplingHook {
     #[address(0x140_8F7_A10)]
     pub fn RetractActiveWire(&mut self);
 
+    /// Writes the unit direction from the holder's position to the point the hook reels toward
+    /// into `direction`, and returns whether it could: false while the holder is gone, there is no
+    /// active wire, the active wire has no attached far end, or the direction is degenerate. The
+    /// parachute's slingshot ([`UpdateParachutePhysics`](input::parachute::UpdateParachutePhysics))
+    /// reads it each update while the hook is
+    /// [`GHS_REELING_IN`](GrapplingHookState::GHS_REELING_IN).
+    #[address(0x140_943_940)]
+    pub fn GetReelingInDirection(&self, direction: *mut Vector3) -> bool;
+
     /// Turns the active wire into a tether between its far end and `vehicle`. While the far end is
     /// attached and the near end is still on the holder's bone
     /// ([`AOI_Character`](equipment::grapple_point_proxy::AttachmentObjectInfo::AOI_Character)), it
