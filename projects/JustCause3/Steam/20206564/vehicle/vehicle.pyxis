@@ -1,6 +1,7 @@
 use character::character::Character;
 use game::GameObjectUpdateContext;
 use input::input_action_map::Action;
+use interaction::InteractionUserProxy;
 use state::StateContext;
 use types::math::{Matrix4, Vector3};
 use vehicle::parts::{PartInstance, PfxBreakable};
@@ -357,9 +358,11 @@ impl NStateTask_InputVehicleEnterTask {
     pub fn Update(ctx: *mut StateContext, properties: *const InputVehicleEnterTaskProperties, instance: *mut void);
 
     /// Whether the user's current interaction node has a transition to a gunner seat node, or, off
-    /// a node, whether any available graph entry leads to one.
+    /// a node, whether any available graph entry leads to one. [`Update`](Self::Update) passes the
+    /// local player's own proxy
+    /// ([`Character::m_InteractionUserProxy`](character::character::Character::m_InteractionUserProxy)).
     #[address(0x140_81A_200)]
-    pub fn HasAvailableGunnerDestination(user: *const void) -> bool;
+    pub fn HasAvailableGunnerDestination(user: *const InteractionUserProxy) -> bool;
 }
 
 /// The door slots of a vehicle (`NVehicle::EDoorSlot`): which opening a [`DoorInfo`] is. A slot

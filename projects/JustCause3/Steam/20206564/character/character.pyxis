@@ -1299,7 +1299,11 @@ impl Character {
     /// and [`m_HitReaction_ImpulseStumbleThreshold`](Self::m_HitReaction_ImpulseStumbleThreshold);
     /// a ragdoll takes the impulse, along `direction` and capped by
     /// [`m_HitReaction_DamageImpulseMax`](Self::m_HitReaction_DamageImpulseMax). The character's
-    /// damage virtual runs it at the end of every damage message; it takes no health itself.
+    /// damage virtual runs it at the end of every damage message; it takes no health itself. A
+    /// character attached to a vehicle ([`IsAttachedToVehicle`](Self::IsAttachedToVehicle)) is
+    /// never put into its ragdoll here, unless its state has
+    /// [`SB_IS_GRAPPLE_UPSIDEDOWN`](state::StateBitFlag::SB_IS_GRAPPLE_UPSIDEDOWN): the ragdoll
+    /// branch returns before queueing anything.
     #[address(0x140_7D7_980)]
     pub fn HitReaction(&mut self, hit_position: *const Vector3, direction: *const Vector3, impulse: f32, killing_blow: bool, zone: *mut u32, damage_flags: u32, damaged_by_vehicle: bool);
 
