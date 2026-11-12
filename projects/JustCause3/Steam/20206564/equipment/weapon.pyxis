@@ -1423,7 +1423,10 @@ impl WeaponBase {
     pub fn HandleTrackMessage(&mut self, data: *mut AnimationMessageData, character: *mut Character);
 
     /// Detaches the mounted weapon from its rigid holder: disables the holder's child interaction
-    /// contexts, stops using the weapon, and drops it. It does not equip the detached weapon.
+    /// contexts, stops using the weapon ([`StopUsing`](Self::StopUsing)), and drops it
+    /// ([`OnDrop`](Self::OnDrop)). It does not equip the detached weapon. A holder that is not a
+    /// rigid object, such as a vehicle, has no contexts disabled, and nothing is done to the user's
+    /// vehicle seat: a user in a gunner seat is left in it.
     #[address(0x140_982_3E0)]
     pub fn DetachMountedGun(&mut self);
 
