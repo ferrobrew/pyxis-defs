@@ -1,9 +1,12 @@
 use character::character::Character;
+use equipment::weapon::WeaponBase;
 use game::GameObjectUpdateContext;
 use input::input_action_map::Action;
 use interaction::InteractionUserProxy;
 use state::StateContext;
 use types::math::{Matrix4, Vector3};
+use types::shared_ptr::SharedPtr;
+use types::std_vector::Vector;
 use vehicle::parts::{PartInstance, PfxBreakable};
 use vehicle::stunt_areas::StuntAreas;
 
@@ -46,7 +49,7 @@ pub type VehicleSeat {
 /// offset as a character does
 /// ([`Character::GAME_OBJECT_BASE_OFFSET`](character::character::Character::GAME_OBJECT_BASE_OFFSET)),
 /// and the vtable there serves RTTI and the transform virtuals. Only some members are bound.
-#[min_size(0x53A4)]
+#[min_size(0x54EC)]
 pub type Vehicle {
     /// The number of entries in [`m_Seats`](Self::m_Seats).
     pub const MAX_SEATS: u64 = 42,
@@ -125,6 +128,23 @@ pub type Vehicle {
     #[address(0x4_C34)]
     pub m_AimingTargetPosition: Vector3,
 
+    /// The vehicle's built-in weapons, which aim from
+    /// [`m_AimingTargetPosition`](Self::m_AimingTargetPosition).
+    /// [`UpdatePostParts_WeaponsAttachment_Parallel`](Self::UpdatePostParts_WeaponsAttachment_Parallel)
+    /// places each on the vehicle every update.
+    #[address(0x4_C50)]
+    pub m_BuiltInWeapons: Vector<SharedPtr<WeaponBase>>,
+
+    /// The mounted weapons the vehicle carries, such as a turret's machine gun, each a strong
+    /// reference whose weapon has the vehicle as its holder. A gunner seat's user mans one of them.
+    /// [`UpdatePostParts_WeaponsAttachment_Parallel`](Self::UpdatePostParts_WeaponsAttachment_Parallel)
+    /// places every non-null entry on its mount part each update. When the vehicle explodes, it
+    /// drops each through the weapon's drop virtual
+    /// ([`WeaponBase::OnDrop`](equipment::weapon::WeaponBase::OnDrop)) and then clears the entry,
+    /// releasing its reference, so the weapon is no longer placed and falls free.
+    #[address(0x4_C70)]
+    pub m_MountedWeapon: Vector<SharedPtr<WeaponBase>>,
+
     /// The nitrous input, `0..=1`: a plane's input reader raises it to the thrust input while that
     /// is above [`AirPlane::NITROUS_THRUST_THRESHOLD`].
     #[address(0x4_CCC)]
@@ -146,6 +166,12 @@ pub type Vehicle {
     /// `v1706_boat_na_rocketboat`), compared by [`IsRocketBoat`](Self::IsRocketBoat).
     #[address(0x5_3A0)]
     pub m_VehicleTypeNameHash: u32,
+
+    /// Positive while the vehicle runs a parallel update phase. Calls that change the vehicle's
+    /// state, such as the explosion, run at once only while it is zero or below, and are queued
+    /// for later otherwise.
+    #[address(0x5_4E8)]
+    pub m_InParallelUpdatePhaseCounter: i32,
 }
 impl Vehicle {
     /// `CVehicle::TYPE_ID`: the run-time type id of `CVehicle`, for
@@ -209,6 +235,12 @@ impl Vehicle {
     /// Seated characters follow through their attachment.
     #[address(0x140_F4F_C60)]
     pub fn TeleportVehicle(&mut self, transform: *const Matrix4, p2: f32);
+
+    /// Places each of the vehicle's weapons on it: calls each built-in weapon's
+    /// attachment-transform virtual, and each non-null entry of
+    /// [`m_MountedWeapon`](Self::m_MountedWeapon)'s, every update after the parts move.
+    #[address(0x140_F92_FD0)]
+    pub fn UpdatePostParts_WeaponsAttachment_Parallel(&mut self, context: *mut GameObjectUpdateContext);
 
     /// The current yaw angle of the vehicle's weapon turret, read from the powered hinge controller
     /// of the turret part; `0` when the vehicle has no turret.
