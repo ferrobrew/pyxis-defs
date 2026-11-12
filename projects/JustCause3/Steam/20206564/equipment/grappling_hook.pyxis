@@ -419,6 +419,15 @@ impl GrapplingHook {
     #[address(0x140_943_FA0)]
     pub fn FireHookFromReelingIn(&mut self, player: *mut void, holder: *const SharedPtr<Character>);
 
+    /// Starts the reel's upside-down ending, the ceiling attach: clears the holder's velocities,
+    /// queues the grapple upside-down act, and resets the reel's blocked timer. The arrival
+    /// ([`NStateTask_ReelIn::FinishReel`]) calls it when the attachment setup it made for the far end
+    /// chose the upside-down attachment; the act's states then hold the character inverted against
+    /// the surface ([`GHS_REELED_UPSIDEDOWN`](GrapplingHookState::GHS_REELED_UPSIDEDOWN)). The
+    /// disassembler mislabels it `boost::shared_ptr<CGrapplingHookWire>::operator->`.
+    #[address(0x140_8C9_2B0)]
+    pub fn StartReelUpsideDown(&mut self, holder: *const SharedPtr<Character>);
+
     /// The post-camera hook update. On the fire animation's release frame it creates the wire
     /// ([`CreateNewWire`](Self::CreateNewWire)), pins the near end to the device, and starts the
     /// far end extending toward the latched target
