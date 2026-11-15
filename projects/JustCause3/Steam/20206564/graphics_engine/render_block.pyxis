@@ -644,6 +644,27 @@ impl RenderBlockTypeWindow {
     pub fn Setup(&self, render_context: *mut RenderContext);
 }
 
+/// The window render block (`NGraphicsEngine::CRenderBlockWindow`): alpha-blended glass, the
+/// vehicles' windows and the world's panes, drawn with the window shader, and with its damage when
+/// the instance carries window metadata
+/// ([`MetaWindow`](graphics_engine::window_damage::MetaWindow)).
+pub type RenderBlockWindow {
+    /// The address of the `CRenderBlockWindow` virtual table, by which a render block is told to be
+    /// a window.
+    pub const VFTABLE: u64 = 0x1423352D8,
+}
+impl RenderBlockWindow {
+    /// Draws the block for the current pass. Nothing is drawn while the instance's colour alpha
+    /// (the byte [`ModelInstance::m_FadeAlpha`](graphics_engine::model_instance::ModelInstance::m_FadeAlpha)
+    /// holds) is zero, nor in the two outline-effect passes. Otherwise it sets the world and
+    /// world-view-projection constants and the damage weights and the alpha for the window shader,
+    /// binds the damage points of the instance's window metadata, when it has some, through the
+    /// list's constant buffer, and draws the glass: back faces then front faces, or front faces only
+    /// for a single-sided block.
+    #[address(0x140_1A2_C70)]
+    pub fn Draw(&self, render_context: *mut RenderContext, info: *const RBIInfo);
+}
+
 /// The grass/foliage render block (`NGraphicsEngine::CRenderBlockFoliage`, registered name
 /// `"VegetationFoliage"`): forward-lit ground cover and small plants, drawn in `RP_VEGETATION_OPAQUE`.
 /// The bulk is grass drawn GPU-indirect.

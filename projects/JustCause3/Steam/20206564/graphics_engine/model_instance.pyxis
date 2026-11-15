@@ -1,6 +1,6 @@
 use graphics_engine::render_pass::{RBIInfo, RenderBlock, RenderPass};
 use hash::HashString;
-use types::math::{Matrix4, Vector3};
+use types::math::{Matrix4, Vector3, Vector4};
 use types::shared_ptr::SharedPtr;
 
 /// Whether the per-render-block draw-list build frustum-tests each render block's world bounding
@@ -81,6 +81,17 @@ pub bitflags ModelInstanceFlags: u32 {
 #[min_size(0x28)]
 pub type Model {
     vftable {
+        /// `CountLods`: how many LOD slots the model has; a single-mesh model has one, a LOD model
+        /// five (none while it has no LOD list).
+        #[index(3)]
+        pub fn CountLods(&self) -> u32;
+
+        /// `GetRenderBlocks`: points `out` at the render blocks of LOD `lod` and returns how many
+        /// there are. A LOD model whose slot `lod` has no mesh answers with the next LOD that has
+        /// one, and with none past the last.
+        #[index(6)]
+        pub fn GetRenderBlocks(&self, lod: i32, out: *mut *mut *mut RenderBlock) -> u64;
+
         /// `GetShowLod`: whether the model defines a mesh for LOD `lod`, that is, whether the
         /// LOD's entry in the model's LOD list names a mesh. The dynamic draw-list build
         /// ([`ModelInstanceManager::ShowUpdate`]) adds nothing to the passes for an instance
@@ -104,6 +115,13 @@ pub type Model {
 /// current with [`UpdateMatrix`](Self::UpdateMatrix). Only some members are mapped.
 #[size(0x120)]
 pub type ModelInstance {
+    /// The tag bits of [`m_MetaFlags`](Self::m_MetaFlags).
+    pub const META_TAG_MASK: u64 = 0x3,
+    /// The tag bit of [`m_MetaFlags`](Self::m_MetaFlags) that marks an indirect metadata address.
+    pub const META_INDIRECT: u64 = 0x1,
+    /// Where an indirect record holds the metadata block's address.
+    pub const META_INDIRECT_OFFSET: u64 = 0x28,
+
     /// The instance's status bits (`m_Flags`). The weapon's visibility virtual
     /// ([`WeaponBase::SetVisible`](equipment::weapon::WeaponBase::SetVisible)) and the model
     /// parts' ([`WeaponComponentBase::SetVisible`](equipment::weapon::WeaponComponentBase::SetVisible))
@@ -130,6 +148,16 @@ pub type ModelInstance {
     /// at least as long as the instance.
     #[address(0x20)]
     pub m_spModel: SharedPtr<Model>,
+
+    /// The render info's tagged metadata word (`m_RBIInfo.m_MetaFlags`, the first word of the
+    /// instance's render info): the address of the instance's [`MetaData`](graphics_engine::window_damage::MetaData)
+    /// block, or zero for none, in the bits outside [`META_TAG_MASK`](Self::META_TAG_MASK). With
+    /// [`META_INDIRECT`](Self::META_INDIRECT) set the address is of a shared record instead, which
+    /// holds the block's address at [`META_INDIRECT_OFFSET`](Self::META_INDIRECT_OFFSET). The
+    /// window render block, the bullets' window damage, and the vehicle parts' window damage all
+    /// resolve the block this way.
+    #[address(0x50)]
+    pub m_MetaFlags: u64,
 
     /// A dirty bit for the instance's render info, set (atomically) whenever
     /// [`m_FadeAlpha`](Self::m_FadeAlpha) is written.
@@ -223,6 +251,21 @@ impl ModelInstance {
 /// The BFBC result context the model collection cull runs in. Opaque.
 pub type BFBCContext;
 
+/// A `TArray<CModelInstance *>`: begin, end, and capacity-end pointers, then flags. An engine caller
+/// often points it at a stack buffer and sets [`USER_ALLOCATED`](Self::USER_ALLOCATED), so that the
+/// array never frees it; the functions that fill one append only while the end is short of the
+/// capacity end.
+#[size(0x20)]
+pub type ModelInstanceArray {
+    /// The [`m_Flags`](Self::m_Flags) bit that marks storage the array does not own.
+    pub const USER_ALLOCATED: u16 = 0x1,
+
+    pub m_Begin: *mut *mut ModelInstance,
+    pub m_End: *mut *mut ModelInstance,
+    pub m_Last: *mut *mut ModelInstance,
+    pub m_Flags: u16,
+}
+
 /// An axis-aligned box (`CAABox`), stored as its least and greatest corners.
 #[size(0x18), copyable]
 pub type AABox {
@@ -261,6 +304,15 @@ pub type ModelCollection {
     pub m_AABB: AABox,
 }
 impl ModelCollection {
+    /// `CModelCollection::GetIntersectingDecalModels`: collects into `out`, up to `capacity`
+    /// entries, the static-world model instances whose bounds meet the box of half extents
+    /// `half_extents` (its first three components) placed by `transform`, and writes their number
+    /// to `out_count`. Static. A bullet that hits glass but finds no model instance through the hit
+    /// object ([`GetModelInstancesHit`](physics::GetModelInstancesHit)) looks up the world's panes
+    /// this way, with a box of one centimetre at the bullet's position.
+    #[address(0x140_4D9_F30)]
+    pub fn GetIntersectingDecalModels(transform: *const Matrix4, half_extents: *const Vector4, out: *mut *mut ModelInstance, out_count: *mut u32, capacity: u32);
+
     /// Releases the instances and resources owned by the collection, and clears its instance array.
     #[address(0x140_508_A00)]
     pub fn Destruct(&mut self);

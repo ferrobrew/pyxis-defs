@@ -1,8 +1,8 @@
 use animation::skeleton::HkArray;
 use character::character::Character;
 use damage::DamageMsg;
-use game::GameObjectRenderContext;
-use graphics_engine::model_instance::{Model, ModelInstance};
+use game::{GameObject, GameObjectRenderContext};
+use graphics_engine::model_instance::{Model, ModelInstance, ModelInstanceArray};
 use havok::{hkAabb, hkAabb16, hkContainerHeapAllocator, hkIntSpaceUtil, hkReferencedObject, hkSimdFloat32, hkTransformf, hknpBodyCinfo, hknpConstraintCinfo, hknpContactImpulseEvent, hknpMotionCinfo, hknpShape};
 use types::math::{Matrix4, Vector3};
 use types::shared_ptr::SharedPtr;
@@ -261,6 +261,10 @@ pub type CastRayInfoBase {
     #[address(0x18)]
     pub m_HitObjectId: u64,
 
+    /// The hit shape's key within the hit body's shape.
+    #[address(0x28)]
+    pub m_ShapeKey: u32,
+
     /// The Havok body id of the hit body.
     #[address(0x30)]
     pub m_BodyId: u32,
@@ -302,11 +306,26 @@ impl CastRayInfo {
     pub fn GetHitMaterial(&self) -> i32;
 }
 
+/// `NRayCastUtility::GetModelInstancesHit`: appends to `out` the model instance a ray query's hit
+/// names, when `out` has room and the instance is not queued for deletion. The hit object is
+/// `hit_object` (a `CGameObject` subobject), or, when that is null, the object
+/// [`m_HitObjectId`](CastRayInfoBase::m_HitObjectId) names. A breakable tree patch gives the
+/// instance of the hit shape key; any physics game object is asked for the instance of the hit
+/// shape, [`m_ShapeKey`](CastRayInfoBase::m_ShapeKey), and [`m_BodyId`](CastRayInfoBase::m_BodyId)
+/// through its virtual function. `info` must be a complete cast info, since
+/// the call reads the hit shape through its virtual table.
+#[address(0x140_BFA_C40)]
+pub fn GetModelInstancesHit(info: *mut CastRayInfoBase, out: *mut ModelInstanceArray, hit_object: *mut GameObject);
+
 /// A game material (`EGameMaterialId`): the surface kind a physics shape is tagged with, which
 /// picks the impact effects and sounds played against it. Only the values the melee hit's impact
 /// lookup uses are bound.
 #[copyable]
 pub enum GameMaterialId: u32 {
+    /// Glass. A bullet whose ray hits a shape of this material damages the windows the hit names
+    /// ([`Bullet::OnBulletHitGlass`](equipment::weapon::Bullet::OnBulletHitGlass)). Vehicle window
+    /// shapes carry it.
+    EGameMaterialId_Glass = 0x10,
     /// A character's body, the material a melee hit on a character plays its impact against.
     EGameMaterialId_Flesh = 0x19,
     /// The fallback material: a lookup with no entry for a material uses this one's.

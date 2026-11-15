@@ -6,7 +6,7 @@ use equipment::explosive::PlantedExplosive;
 use game::{GameObject, GameObjectRenderContext, GameObjectUpdateContext};
 use graphics_engine::model_instance::{Model, ModelInstance};
 use interaction::InteractionContext;
-use physics::{GrapplingMode, PfxRigidBody, RigidObject};
+use physics::{CastRayInfoBase, GrapplingMode, PfxRigidBody, RigidObject};
 use types::math::Matrix4;
 use types::math::Vector3;
 use types::shared_ptr::{SharedPtr, WeakPtrGameObject};
@@ -2051,6 +2051,25 @@ impl WeaponBase {
     /// the weapon.
     #[address(0x140_966_380)]
     pub fn UpdateRender(game_object: *mut void, context: *const GameObjectRenderContext);
+}
+
+/// A fired bullet (`CBullet`): a pooled ammunition object that sweeps a ray from its last position
+/// to its new one each update and handles what the ray hit. Its layout is unmapped.
+pub type Bullet;
+impl Bullet {
+    /// `CBullet::OnBulletHitGlass`: the bullet's handling of a hit on a shape of the glass material
+    /// ([`EGameMaterialId_Glass`](physics::GameMaterialId::EGameMaterialId_Glass)), which its hit
+    /// handler calls before handling the hit object. It collects the model instances the hit names
+    /// ([`GetModelInstancesHit`](physics::GetModelInstancesHit)), or, finding none, the world's
+    /// panes around the bullet ([`ModelCollection::GetIntersectingDecalModels`](graphics_engine::model_instance::ModelCollection::GetIntersectingDecalModels)).
+    /// For each one with window metadata it maps the bullet's position into the instance's own
+    /// space through the instance's matrix and queues, on the ammunition manager's deferred
+    /// render-update list ([`AmmunitionManagerHandleDeferredQueue`](equipment::explosive::AmmunitionManagerHandleDeferredQueue)),
+    /// a call that adds a damage point there of one fifth
+    /// ([`MetaWindow::AddWindowDamagePoint`](graphics_engine::window_damage::MetaWindow::AddWindowDamagePoint)).
+    /// It plays no effect or sound of its own.
+    #[address(0x140_90E_470)]
+    pub fn OnBulletHitGlass(&mut self, info: *mut CastRayInfoBase, dt: f32);
 }
 
 /// `CBulletWeaponBase`: the base of the fast-projectile weapons. Its layout is unmapped.

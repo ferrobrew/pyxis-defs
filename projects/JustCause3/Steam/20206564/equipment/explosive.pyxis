@@ -24,6 +24,15 @@ pub fn AllocateGrenade(manager: *mut void, allocation_type: u32, position: *cons
 #[address(0x140_8F2_8F0)]
 pub fn AmmunitionManagerUpdatePostSim(manager: *mut void, update_contexts: *const UpdateContexts);
 
+/// `CAmmunitionManager::HandleDeferredQueue`: runs, in order, the calls queued on the manager's
+/// deferred render-update list (`std::function<void ()>` entries that the bullets, which update on
+/// worker threads, queue for main-thread work such as their window damage,
+/// [`Bullet::OnBulletHitGlass`](equipment::weapon::Bullet::OnBulletHitGlass)), then empties the
+/// list. `CAmmunitionManager::UpdateRender` calls it first, on the main thread in the game's render
+/// update, and the loading state's update calls it too.
+#[address(0x140_90B_DC0)]
+pub fn AmmunitionManagerHandleDeferredQueue(manager: *mut void);
+
 /// A thrown or placed explosive object (`CExplosive`, a `CGameObjectAmmunition<CDamageable>`): its
 /// physics body, trail effect, detonation timers, and the deferred launch that
 /// [`PropelToward`](Self::PropelToward) sets up for the physics body to apply later.
