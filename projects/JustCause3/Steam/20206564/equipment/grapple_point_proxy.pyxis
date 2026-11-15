@@ -87,9 +87,36 @@ impl CharacterBoneAttachedPointProxy {
     pub fn GetConstraintHint(&self) -> i32;
 }
 
+/// What kind of vehicle a vehicle grapple attachment is on
+/// (`CVehicleGrapplePointProxy::EVehicleType`), from
+/// [`VehicleGrapplePointProxy::GetVehicleType`].
+#[copyable]
+pub enum VehicleGrappleType: i32 {
+    Car = 0x0,
+    Helicopter = 0x1,
+    Boat = 0x2,
+    MotorBike = 0x3,
+    AirPlane = 0x4,
+    /// No live vehicle, or another kind.
+    None = 0x5,
+}
+
 /// A grapple attachment to a vehicle or one of its physics parts (`CVehicleGrapplePointProxy`).
+/// While the character reels toward a vehicle it also holds the vehicle interaction-graph entry
+/// the reel will end in: the reel prefers any valid entry on the vehicle's door side and falls back
+/// to a hang entry, so a reel onto a helicopter ends at its door side when one validates.
 pub type VehicleGrapplePointProxy;
 impl VehicleGrapplePointProxy {
+    /// The kind of vehicle the attachment is on: [`VehicleGrappleType::None`] when the proxy is
+    /// not live or has no vehicle.
+    #[address(0x140_93C_B50)]
+    pub fn GetVehicleType(&self) -> VehicleGrappleType;
+
+    /// Whether the reel's chosen vehicle entry has the `reel_in_hang` use tag: the reel ends in the
+    /// vehicle's stunt hang rather than at its door side.
+    #[address(0x140_93B_050)]
+    pub fn IsCurrentEntryHangNode(&self) -> bool;
+
     /// Moves the attachment to a new world-space position and normal, updating both its visual
     /// local transform and its physics-local attachment while retaining the vehicle.
     #[address(0x140_944_290)]
