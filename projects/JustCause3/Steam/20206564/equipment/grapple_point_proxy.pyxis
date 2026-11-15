@@ -1,5 +1,7 @@
+use character::character::Character;
 use game::GameObject;
 use types::math::{Matrix4, Vector3};
+use vehicle::vehicle::Vehicle;
 
 /// What a grapple attachment proxy is attached to (`CGrapplePointProxy::EAttachmentObjectInfo`),
 /// stored in [`GrapplePointProxy::m_AttachmentObjectInfo`]. The reel task picks its arrival test by
@@ -131,6 +133,20 @@ impl VehicleGrapplePointProxy {
     /// vehicle's stunt hang rather than at its door side.
     #[address(0x140_93B_050)]
     pub fn IsCurrentEntryHangNode(&self) -> bool;
+
+    /// The vehicle the attachment is on, or null when it is gone.
+    #[address(0x140_925_6F0)]
+    pub fn GetVehiclePtr(&self) -> *mut Vehicle;
+
+    /// The reel's update of its chosen entry for `character`, reeling toward
+    /// `extension_position` along `direction`. With an entry chosen
+    /// ([`VehicleGrapplePointProxy::m_ReelInEntryIndex`]), the entry is offered to the character's
+    /// interaction user, its act checked from the character's state, and its side revalidated; a
+    /// valid entry has its start and goal recalculated. With none chosen, or the chosen one no
+    /// longer valid, an entry is selected afresh. Returns whether an entry stands chosen. Returns
+    /// false without choosing for a vehicle that is upside down or refuses reel entries.
+    #[address(0x140_944_120)]
+    pub fn UpdateVehicleReelInEntrySelection(&mut self, character: *mut Character, extension_position: *const Vector3, direction: *const Vector3) -> bool;
 
     /// Moves the attachment to a new world-space position and normal, updating both its visual
     /// local transform and its physics-local attachment while retaining the vehicle.

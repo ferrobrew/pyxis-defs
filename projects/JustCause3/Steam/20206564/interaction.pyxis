@@ -1,5 +1,6 @@
 use character::character::Character;
-use types::shared_ptr::WeakPtrGameObject;
+use types::math::Matrix4;
+use types::shared_ptr::{SharedPtr, WeakPtrGameObject};
 
 /// A character's user side of the interaction system (`CInteractionUserProxy`), embedded in the
 /// character ([`Character::m_InteractionUserProxy`](character::character::Character::m_InteractionUserProxy)).
@@ -94,16 +95,41 @@ pub type InteractionGraphEntryArray {
 }
 
 /// One way into an interaction graph (`CInteractionGraphEntry`). Only some members are mapped.
+#[size(0x70), align(16)]
 pub type InteractionGraphEntry {
     /// The index of the graph node the entry leads to, for
     /// [`InteractionGraph::GetNodeByIndex`].
     #[address(0x8)]
     pub m_EntryNodeIndex: u64,
 
+    /// The act the entry queues on the character to take it.
+    #[address(0x20)]
+    pub m_EventId: i32,
+    /// The animation state the entry's act leads to.
+    pub m_StateId: u32,
+
+    /// The hash of the entry's use tag, which says what the entry is for: among others
+    /// [`INTERACTION_USE_TAG_REEL_IN_DOOR_SIDE`] and [`INTERACTION_USE_TAG_REEL_IN_HANG`], the
+    /// two a grapple reel onto a vehicle chooses between.
+    #[address(0x38)]
+    pub m_UseTagHash: u32,
+
+    /// Whether the entry is offered.
+    #[address(0x50)]
+    pub m_Enabled: bool,
+
     /// The graph the entry belongs to.
     #[address(0x60)]
     pub m_Graph: *mut InteractionGraph,
 }
+
+/// The use tag of a vehicle entry a grapple reel ends at beside the vehicle, at its door side
+/// ([`InteractionGraphEntry::m_UseTagHash`]). The tag's source name is not known.
+pub const INTERACTION_USE_TAG_REEL_IN_DOOR_SIDE: u32 = 0xCBC5_E511;
+
+/// The use tag of a vehicle entry a grapple reel ends at in the vehicle's stunt hang
+/// ([`InteractionGraphEntry::m_UseTagHash`]): the hash of `reel_in_hang`.
+pub const INTERACTION_USE_TAG_REEL_IN_HANG: u32 = 0x69A6_6317;
 
 /// A graph of interaction nodes (`CInteractionGraph`), owned by an interaction context. Only some
 /// members are mapped.
@@ -111,6 +137,14 @@ pub type InteractionGraph {
     /// The context that owns the graph.
     #[address(0x60)]
     pub m_Context: *mut InteractionContext,
+
+    /// How many entries the graph has.
+    #[address(0x80)]
+    pub m_NofEntries: u32,
+
+    /// The graph's entries, [`InteractionGraph::m_NofEntries`] of them.
+    #[address(0xB0)]
+    pub m_Entries: *mut InteractionGraphEntry,
 }
 impl InteractionGraph {
     /// Removes `user` from the graph: the character stops being attached to the graph's object.
@@ -124,6 +158,15 @@ impl InteractionGraph {
     /// The graph's node at `index`, or null when the index is past the graph's last node.
     #[address(0x140_A37_D60)]
     pub fn GetNodeByIndex(&mut self, index: u64) -> *mut InteractionGraphNode;
+
+    /// The graph's entry at `index`, or null when the index is past the graph's last entry.
+    #[address(0x140_A37_E20)]
+    pub fn GetEntryByIndex(&mut self, index: i32) -> *mut InteractionGraphEntry;
+
+    /// Writes the graph's world transform into `result` and returns it: the graph's local
+    /// transform composed with its context's world transform.
+    #[address(0x140_A42_220)]
+    pub fn GetWorldTransform(&self, result: *mut Matrix4) -> *mut Matrix4;
 }
 
 /// The game object that holds a set of interaction graphs (`CInteractionContext`). Only some
@@ -134,6 +177,10 @@ pub type InteractionContext {
     /// pickup interaction the context carries.
     #[address(0x70)]
     pub m_Parent: WeakPtrGameObject,
+
+    /// The context's interaction graphs; a vehicle's graph of seats and entries is the first.
+    #[address(0x108)]
+    pub m_InteractionGraphs: [SharedPtr<InteractionGraph>; 16],
 
     /// The context's state bits, including the `m_Enabled` bit its
     /// [`GameObject::Enable`](game::GameObject::Enable) override reads and writes.

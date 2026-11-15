@@ -2,7 +2,7 @@ use character::character::Character;
 use equipment::weapon::WeaponBase;
 use game::GameObjectUpdateContext;
 use input::input_action_map::Action;
-use interaction::InteractionUserProxy;
+use interaction::{InteractionContext, InteractionUserProxy};
 use state::StateContext;
 use types::math::{Matrix4, Vector3};
 use types::shared_ptr::SharedPtr;
@@ -95,6 +95,11 @@ pub type Vehicle {
     /// contexts test it against [`Seat::EDriverSeat`] to decide whether driver controls apply.
     #[address(0x1_5DC)]
     pub m_LocalPlayerSeat: Seat,
+
+    /// The interaction context that holds the vehicle's graph of seats and entries
+    /// ([`InteractionContext::m_InteractionGraphs`]), or null.
+    #[address(0x1_5F0)]
+    pub m_InteractionContext: *mut InteractionContext,
 
     /// The vehicle's doors, hood, trunk, hatches, and other opening parts, and their state.
     #[address(0x1_668)]
