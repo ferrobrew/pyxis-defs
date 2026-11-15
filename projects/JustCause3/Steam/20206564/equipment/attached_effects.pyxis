@@ -127,6 +127,20 @@ pub enum SoundStopMode: i32 {
     EStopMode_Softly = 0x1,
 }
 
+/// `CEffectInstance::Stop`: stops the effect instance whose handle is at `instance` (an 8-byte
+/// instance handle such as
+/// [`Explosive::m_TrailEffectInstance`](equipment::explosive::Explosive::m_TrailEffectInstance)). An
+/// instance that has not started is released at once and the handle cleared; a playing one is put
+/// into its stopping state, softly or at once by `mode`. A null handle is left alone.
+#[address(0x140_47B_CB0)]
+pub fn EffectInstanceStop(instance: *mut *mut void, mode: EffectStopMode);
+
+/// `CSoundInstance::Stop`: stops the sound instance whose handle is at `instance` (such as
+/// [`Explosive::m_TrailSoundInstance`](equipment::explosive::Explosive::m_TrailSoundInstance)), with
+/// the same pattern as [`EffectInstanceStop`]. A null handle is left alone.
+#[address(0x140_2FF_C70)]
+pub fn SoundInstanceStop(instance: *mut *mut void, mode: SoundStopMode);
+
 /// One attached effect usage of a container (`NAttachedEffectContainer::SAttachedEffectBase`): a
 /// named slot that resolves to an effect and a sound per material.
 pub type AttachedEffectUsage;

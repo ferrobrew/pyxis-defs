@@ -6,6 +6,7 @@ use physics::Collision;
 use physics::PfxRigidBody;
 use types::math::Matrix4;
 use types::math::Vector3;
+use types::shared_ptr::SharedPtr;
 
 /// Reserves a grenade slot under the ammunition manager's critical section. When no slot remains,
 /// `reclaim` permits `FreePoolSoPlayerCanFire` to erase an existing entry before retrying.
@@ -168,6 +169,17 @@ pub type Explosive {
     pub m_StartDetonationTimer: f32,
 }
 impl Explosive {
+    /// Sets the explosive's trail resources by shared-pointer assignment: `trail_effect` into
+    /// [`m_TrailEffect`](Self::m_TrailEffect) and `trail_sound` into
+    /// [`m_TrailSound`](Self::m_TrailSound). It plays nothing; [`PlayTrailEffect`](Self::PlayTrailEffect)
+    /// does. The weapons that spawn an explosive call it with their own trail resources
+    /// ([`ThrownGrenadeWeapon::m_TrailEffectPlayer`](equipment::weapon::ThrownGrenadeWeapon::m_TrailEffectPlayer)
+    /// and its siblings): the hand grenade's launch, the planted explosive's prime, and the balloon
+    /// and Namaste launches. The hand grenade's prime does not, so a primed grenade has no trail
+    /// resources until its launch.
+    #[address(0x140_8ED_7B0)]
+    pub fn SetupEffects(&mut self, trail_effect: *const SharedPtr<void>, trail_sound: *const SharedPtr<void>);
+
     /// Marks the explosive removed and erases it from the ammunition manager's active objects.
     /// This operation does not return ammunition to an inventory.
     #[address(0x140_8F2_E50)]
