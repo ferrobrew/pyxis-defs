@@ -1158,6 +1158,19 @@ pub type WeaponBase {
     #[address(0x330)]
     pub m_MountedCanBeDetached: bool,
 
+    /// Whether the mounted aim leaves the mount's motors alone: set while the motors blend out.
+    /// [`UpdateMountedInput`](Self::UpdateMountedInput) reports the input as handled without
+    /// reading it while it is set.
+    #[address(0x333)]
+    pub m_BlendOutMotors: bool,
+
+    /// Whether a player user turns a vehicle mount with the look input rather than by aiming at
+    /// [`m_AimTargetPosition`](Self::m_AimTargetPosition) ([`UpdateMountedInput`](Self::UpdateMountedInput)),
+    /// read from the weapon's properties. The vehicle camera follows the turret while a manned gun
+    /// sets it.
+    #[address(0x384)]
+    pub m_MountedInputIsControlledByWeapon: bool,
+
     /// Whether the weapon overheats.
     #[address(0x38C)]
     pub m_CanBeOverheated: bool,
@@ -1648,6 +1661,20 @@ impl WeaponBase {
     /// context's.
     #[address(0x140_983_750)]
     pub fn GetPickupContext(&mut self) -> *mut InteractionContext;
+
+    /// The look-input half of a vehicle-mounted weapon's aim, called by the pre-simulation update
+    /// for each mounted gun with the yaw and pitch hinges' current targets. Returns true without
+    /// changing anything while [`m_BlendOutMotors`](Self::m_BlendOutMotors) is set. Returns false,
+    /// and the caller then aims the mount at [`m_AimTargetPosition`](Self::m_AimTargetPosition) seen
+    /// from the gun's mount point, unless
+    /// [`m_MountedInputIsControlledByWeapon`](Self::m_MountedInputIsControlledByWeapon) and
+    /// [`m_IsUserPlayer`](Self::m_IsUserPlayer) are both set. Otherwise it adds the look input's
+    /// rate, from the first gamepad or the mouse, whichever is larger per axis, times `dt` to
+    /// `horizontal_angle` and `vertical_angle`, and returns true. The caller aims nothing while the
+    /// aim target is within about a third of a metre of the mount point, and turns the hinges
+    /// toward the desired angles at the weapon's mounted turn speeds, within their limits.
+    #[address(0x140_984_760)]
+    pub fn UpdateMountedInput(&mut self, dt: f32, horizontal_angle: *mut f32, vertical_angle: *mut f32) -> bool;
 
     /// Enables the weapon's pickup interaction context ([`GetPickupContext`](Self::GetPickupContext))
     /// and registers its HUD pickup hint. The drop ([`OnDrop`](Self::OnDrop)) calls it for every

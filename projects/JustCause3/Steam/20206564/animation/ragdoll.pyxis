@@ -14,4 +14,11 @@ pub type RagdollInstance {
     /// The Havok ragdoll: the ragdoll's bodies and constraints, and its skeleton.
     #[address(0x10)]
     pub m_Ragdoll: *mut hknpRagdoll,
+
+    /// How much of the simulated pose the post-physics update writes into the animated pose, 0 to
+    /// 1, over the animation's own pose from the hips out. A new instance starts at 0 and nothing in
+    /// the preset's sync raises it: the canopy's ragdoll update, the get-up, and the animation
+    /// graph's ragdoll blending tasks do.
+    #[address(0xB4)]
+    pub m_BlendWeight: f32,
 }

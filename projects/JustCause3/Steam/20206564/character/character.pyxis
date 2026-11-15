@@ -295,12 +295,38 @@ pub type Character {
     /// part of its per-frame update. Left as a raw integer because only a few of its ~25 values have
     /// been confirmed: `MOTION_STATE_SWIMMING`, `MOTION_STATE_RAGDOLL`, and
     /// `MOTION_STATE_TASK_DEFINED` on this type.
+    /// The ragdoll preset the character wants (a ragdoll-preset id from
+    /// [`RagdollParamIdSymbolTable`](animation::symbol_table::RagdollParamIdSymbolTable); zero for
+    /// none). The animation graph's `SetRagdoll` state task sets it on entering a state and clears
+    /// it on leaving. The pre-physics pass's ragdoll sync, when
+    /// [`m_SyncRagdollState`](Self::m_SyncRagdollState) is set, makes the ragdoll for a non-zero id,
+    /// re-params it, or destroys it for zero. A preset that keeps any bone keyframed leaves the
+    /// ragdoll under the owner's control, so the character does not ragdoll
+    /// ([`IsRagdolling`](Self::IsRagdolling)) and the graph never sees it.
+    #[address(0x2_420)]
+    pub m_CurrentRagdollParamsID: u32,
+
     /// The character's ragdoll (`boost::shared_ptr<NAnimationSystem::CRagdollInstanceImpl>`), or
-    /// null for a character without one. While the animation drives the character the ragdoll's
+    /// null while [`m_CurrentRagdollParamsID`](Self::m_CurrentRagdollParamsID) is zero, which for the
+    /// player is most of the time: the ragdoll and its bodies exist only while a preset is wanted.
+    /// While the animation drives the character the ragdoll's
     /// displacement is controlled by its owner; the character ragdolls
     /// ([`IsRagdolling`](Self::IsRagdolling)) while the ragdoll's own simulation moves it.
     #[address(0x2_428)]
     pub m_Ragdoll: SharedPtr<RagdollInstance>,
+
+    /// Set when [`m_CurrentRagdollParamsID`](Self::m_CurrentRagdollParamsID) changes; the next
+    /// pre-physics pass applies the preset and clears it.
+    #[address(0x2_438)]
+    pub m_SyncRagdollState: bool,
+
+    /// How long the ragdoll blends from its old preset's gains to the new one's, seconds.
+    #[address(0x2_43C)]
+    pub m_RagdollParameterBlendTime: f32,
+
+    /// Whether the new preset's gains apply at once rather than blending.
+    #[address(0x2_440)]
+    pub m_RagdollParameterReset: bool,
 
     #[address(0x2_494)]
     pub m_CurrentMotionState: u32,
@@ -898,6 +924,13 @@ impl Character {
     /// graph's get-up takes it back.
     #[address(0x140_77E_270)]
     pub fn IsRagdolling(&self) -> bool;
+
+    /// The post-physics pass's ragdoll update: writes the ragdoll's simulated pose into the
+    /// animated pose by the ragdoll's [`m_BlendWeight`](animation::ragdoll::RagdollInstance::m_BlendWeight),
+    /// before the finalize pass's HumanIK solve, so the solve's effectors still override the
+    /// chains they drive. Does nothing without a ragdoll.
+    #[address(0x140_77F_FC0)]
+    pub fn PostPhysicsUpdateRagdoll(&mut self, dt: f32);
 
     /// Requests proxy state `state` (a [`ProxyState`] value) by writing
     /// [`m_PendingProxyState`](Self::m_PendingProxyState); the physics proxy changes shape when

@@ -413,6 +413,38 @@ impl hkpFixedConstraintData {
     pub fn setInBodySpace(&mut self, pivot_a: *const hkTransformf, pivot_b: *const hkTransformf);
 }
 
+/// The data of a ball-and-socket constraint (`hkpBallAndSocketConstraintData`), which holds a point
+/// of one body on a point of the other and leaves the rotation free. The data-driven constraint
+/// system allocates one of this type's size from the calling thread's Havok heap, constructs it,
+/// places its pivot with [`setInWorldSpace`](Self::setInWorldSpace), and creates a constraint from
+/// it. Only some members are bound.
+#[size(0x70), align(16)]
+pub type hkpBallAndSocketConstraintData {
+    #[base]
+    pub base: hkReferencedObject,
+    /// The pivot in the first body's space.
+    #[address(0x30)]
+    pub m_translationA: AlignedVector3,
+    /// The pivot in the second body's space.
+    pub m_translationB: AlignedVector3,
+    /// Whether the stabilisation atom is enabled: on for the stabilized solving method.
+    #[address(0x52)]
+    pub m_setupStabilizationEnabled: bool,
+    /// The ball-socket atom's solving method: 0 stabilized, 1 the older method, which the
+    /// constructor sets.
+    #[address(0x62)]
+    pub m_ballSocketSolvingMethod: u8,
+}
+impl hkpBallAndSocketConstraintData {
+    /// Constructs the data with one reference, zero pivots, and the older solving method.
+    #[address(0x141_356_AF0)]
+    pub fn Construct(&mut self) -> *mut hkpBallAndSocketConstraintData;
+
+    /// Places the pivot from a Havok-space point and the two bodies' transforms.
+    #[address(0x141_356_B50)]
+    pub fn setInWorldSpace(&mut self, body_a: *const hkTransformf, body_b: *const hkTransformf, pivot: *const AlignedVector3);
+}
+
 /// A contact-impulse event (`hknpContactImpulseEvent`), raised by the solver for a contact between
 /// two bodies at least one of which carries
 /// [`RAISE_CONTACT_IMPULSE_EVENTS`](physics::hknpBody::RAISE_CONTACT_IMPULSE_EVENTS). The contact
