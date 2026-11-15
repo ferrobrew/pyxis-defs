@@ -3,7 +3,7 @@ use types::math::Vector3;
 /// The character's animation control parameters (`CControlParameters`), reached through
 /// [`Character::m_ControlParameters`](character::character::Character::m_ControlParameters). Only some
 /// members are bound.
-#[min_size(0x140)]
+#[min_size(0x290)]
 pub type ControlParameters {
     /// The weapon aim point (world space), copied here from the player's aim control each frame by
     /// `CPlayer::UpdatePostCamera` alongside
@@ -14,6 +14,30 @@ pub type ControlParameters {
     /// The animation user VM state, holding the character state-bitflag words.
     #[address(0xD8)]
     pub m_UserVM: UserVM,
+
+    /// The ragdolling timers the animation graph's get-up conditions read.
+    #[address(0x284)]
+    pub m_RagdollingControllerParameters: RagdollingControllerParams,
+}
+
+/// The ragdolling timers (`SRagdollingControllerParams`) in
+/// [`ControlParameters::m_RagdollingControllerParameters`]. The ragdolling state task
+/// (`NRagdolling`) runs the total and the limb speed; the graph's `CRagdollingTimerCondition` and
+/// `CRagdollIsSettledCondition` read them for the get-up.
+#[size(0xC), copyable, align(4)]
+pub type RagdollingControllerParams {
+    /// The time spent ragdolling, seconds. Below zero while the ragdoll's displacement is its
+    /// owner's; `CRagdollingTimerCondition` holds nothing then, and otherwise compares it with its
+    /// threshold.
+    pub m_TotalRagdollingTime: f32,
+    /// How long the ragdoll has counted as settled, seconds. `CRagdollIsSettledCondition` adds each
+    /// update's time while
+    /// [`RagdollingControllerParams::m_AverageRagdollLimbSpeed`] is under its speed threshold and
+    /// the character is near the ground and pose-matched, zeroes it otherwise, and holds once it
+    /// passes its time threshold.
+    pub m_SettledRagdollingTime: f32,
+    /// The ragdoll's average speed of its bodies relative to each other, metres per second.
+    pub m_AverageRagdollLimbSpeed: f32,
 }
 
 /// The animation state machine's per-instance data (`SUserVM`, derived from
