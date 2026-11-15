@@ -68,7 +68,7 @@ pub type HkaSkeleton {
 /// flags. A read of a bone's model-space transform whose flag marks it dirty first recomputes it
 /// from its ancestors' local transforms, and a model-space write recomputes the descendants it
 /// propagates to.
-#[min_size(0x38), align(8)]
+#[min_size(0x40), align(8)]
 pub type HkaPose {
     /// The skeleton the pose is of.
     pub m_Skeleton: *const HkaSkeleton,
@@ -81,10 +81,26 @@ pub type HkaPose {
     #[address(0x18)]
     pub m_ModelPose: HkArray<QsTransform>,
 
-    /// Each bone's sync flags, among them the flag that marks its model-space transform as stale.
+    /// Each bone's sync flags: [`HKA_POSE_F_BONE_LOCAL_DIRTY`] marks its local-space transform
+    /// stale, and [`HKA_POSE_F_BONE_MODEL_DIRTY`] its model-space transform.
     #[address(0x28)]
     pub m_BoneFlags: HkArray<u32>,
+
+    /// Whether every model-space transform is current. While it is clear, a synced model-space
+    /// read first recomputes each bone flagged stale from its parent's model-space transform and
+    /// its own local one, then sets it.
+    #[address(0x38)]
+    pub m_ModelInSync: bool,
+    /// Whether every local-space transform is current, as [`HkaPose::m_ModelInSync`] is for model
+    /// space.
+    pub m_LocalInSync: bool,
 }
+
+/// The [`HkaPose::m_BoneFlags`] flag of a bone whose local-space transform is stale.
+pub const HKA_POSE_F_BONE_LOCAL_DIRTY: u32 = 0x1;
+
+/// The [`HkaPose::m_BoneFlags`] flag of a bone whose model-space transform is stale.
+pub const HKA_POSE_F_BONE_MODEL_DIRTY: u32 = 0x2;
 
 /// The engine's skeleton resource (`CSkeleton`): the Havok skeleton and a table of its bones'
 /// hashed names, which `GetBoneIndexByHashedName` searches to resolve a bone by the hash of its
