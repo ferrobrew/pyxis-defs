@@ -277,6 +277,18 @@ pub type Character {
     #[address(0x2_0F1)]
     pub m_AimFlags: AimState,
 
+    /// Whether the character's opacity fade runs toward opaque. Set by
+    /// [`FadeCharacterInOut`](Self::FadeCharacterInOut). While it is clear, the post-camera pass
+    /// writes the faded-out opacity every frame, so the character stays transparent until a fade
+    /// in. A weapon entering use in the mounted state clears it for a local player user, so a
+    /// gunner is held transparent for as long as they man the gun.
+    #[address(0x2_0F3)]
+    pub m_FadingIn: bool,
+    /// Seconds into the current opacity fade.
+    pub m_FadeCurrentTimer: f32,
+    /// The length of the current opacity fade, seconds.
+    pub m_FadeTargetTime: f32,
+
     /// The proxy state requested for the character, a [`ProxyState`] value.
     /// [`SetProxyState`](Self::SetProxyState) writes it, and
     /// [`UpdateProxyState`](Self::UpdateProxyState) applies it to the physics proxy on the
@@ -924,6 +936,15 @@ impl Character {
     /// graph's get-up takes it back.
     #[address(0x140_77E_270)]
     pub fn IsRagdolling(&self) -> bool;
+
+    /// Starts an opacity fade of the character's models, carried props, and weapons: toward opaque
+    /// when `visible`, else toward transparent, over `time` seconds. It only resets the fade's
+    /// timer; the post-camera pass applies it. A fade out holds the character transparent until the
+    /// next fade in; a fade in ends at opaque, and one with a zero `time` never runs. A weapon
+    /// entering use in the mounted state fades a local player user out, and its stop fades them
+    /// back in.
+    #[address(0x140_75F_AC0)]
+    pub fn FadeCharacterInOut(&mut self, visible: bool, time: f32);
 
     /// The post-physics pass's ragdoll update: writes the ragdoll's simulated pose into the
     /// animated pose by the ragdoll's [`m_BlendWeight`](animation::ragdoll::RagdollInstance::m_BlendWeight),

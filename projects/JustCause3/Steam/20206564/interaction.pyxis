@@ -11,6 +11,15 @@ pub type InteractionUserProxy {
     #[address(0x8)]
     pub m_Character: *mut Character,
 
+    /// The interaction graph the character is a user of, or null.
+    #[address(0x10)]
+    pub m_Graph: *mut InteractionGraph,
+
+    /// Whether the character's own motion state runs, rather than the graph's: an attached
+    /// character's is off, and stepping off a vehicle's stunt area turns it back on.
+    #[address(0x44)]
+    pub m_MotionStateEnabled: bool,
+
     /// The entries being validated on this update, which
     /// [`ProcessPotentialEntries`](Self::ProcessPotentialEntries) works through and empties. An
     /// entry whose graph's conditions pass becomes one of
@@ -30,10 +39,19 @@ pub type InteractionUserProxy {
     /// Set while [`ProcessPotentialEntries`](Self::ProcessPotentialEntries) runs, so that a
     /// condition evaluated meanwhile reads [`m_PotentialEntries`](Self::m_PotentialEntries) rather
     /// than [`m_ValidEntries`](Self::m_ValidEntries).
+    /// The user's state in its graph (`EInteractionGraphUserState`): zero is inactive.
+    /// [`SetGraphUserState`](Self::SetGraphUserState) writes it.
+    #[address(0x238)]
+    pub m_GraphUserState: i32,
+
     #[address(0x23C)]
     pub m_IsValidatingEntry: bool,
 }
 impl InteractionUserProxy {
+    /// Sets the user's state in its graph ([`m_GraphUserState`](Self::m_GraphUserState)).
+    #[address(0x140_A38_400)]
+    pub fn SetGraphUserState(&mut self, state: i32);
+
     /// Works through [`m_PotentialEntries`](Self::m_PotentialEntries) with
     /// [`m_IsValidatingEntry`](Self::m_IsValidatingEntry) set, and empties it: an entry whose
     /// interaction's act the character's animated model can take moves to
@@ -95,6 +113,14 @@ pub type InteractionGraph {
     pub m_Context: *mut InteractionContext,
 }
 impl InteractionGraph {
+    /// Removes `user` from the graph: the character stops being attached to the graph's object.
+    /// With the user's motion state turned back on, its graph state set inactive, and the physics
+    /// input's game-controlled velocity cleared, it is what the stunting movement task does when a
+    /// character walks off a vehicle's stunt area. The disassembler mislabels it
+    /// `ClearVelocities`.
+    #[address(0x140_A49_660)]
+    pub fn RemoveUser(&mut self, user: *mut InteractionUserProxy) -> bool;
+
     /// The graph's node at `index`, or null when the index is past the graph's last node.
     #[address(0x140_A37_D60)]
     pub fn GetNodeByIndex(&mut self, index: u64) -> *mut InteractionGraphNode;

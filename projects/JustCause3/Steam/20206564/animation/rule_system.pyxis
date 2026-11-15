@@ -99,3 +99,26 @@ pub enum AnimationModifierType: i32 {
     /// properties with this type.
     STATE_BOUND = 0x1,
 }
+
+/// A state-machine transition (`NAnimationSystem::CTransition`). Only its destination is mapped.
+pub type Transition;
+impl Transition {
+    /// The state the transition leads to.
+    #[address(0x140_3BC_310)]
+    pub fn GetDestination(&self) -> *const State;
+}
+
+/// The state-machine condition `CValidateStuntPositionCondition`: whether the character can take
+/// the stunt position of a vehicle graph node with a given identifier. A helicopter's door-side
+/// arrival drops into the helicopter's stunt hang through it once its clip ends; without that
+/// transition the door-side state has no way out at the clip's end, and the character stays
+/// attached on the skid by the door. Only its evaluation is mapped.
+pub type ValidateStuntPositionCondition;
+impl ValidateStuntPositionCondition {
+    /// Finds the node with the condition's identifier in the graph the character uses or, failing
+    /// that, through the available entry whose state is `transition`'s destination; needs the
+    /// character's grappling hook, and an attached active wire on the node's graph object; true
+    /// when the node's best point is not blocked.
+    #[address(0x140_7D0_D80)]
+    pub fn Evaluate(&self, machine: *const StateMachineInstance, transition: *const Transition) -> bool;
+}
