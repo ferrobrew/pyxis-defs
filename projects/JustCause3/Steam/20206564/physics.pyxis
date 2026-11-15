@@ -42,6 +42,10 @@ pub type PhysicsSystem {
     pub m_AccumulatedShift: Vector3,
 
     /// The reference-counted body-pair exclusion filter shared with the constraint filter.
+    /// The game materials' descriptions ([`MaterialSystem::GetMaterialDesc`]).
+    #[address(0x138_1E0)]
+    pub m_MaterialManager: *mut MaterialSystem,
+
     #[address(0x138_210)]
     pub m_PairCollisionFilter: *mut hknpPairCollisionFilter,
 }
@@ -316,6 +320,26 @@ impl CastRayInfo {
 /// the call reads the hit shape through its virtual table.
 #[address(0x140_BFA_C40)]
 pub fn GetModelInstancesHit(info: *mut CastRayInfoBase, out: *mut ModelInstanceArray, hit_object: *mut GameObject);
+
+/// The game materials' table (`CMaterialSystem`), held by
+/// [`PhysicsSystem::m_MaterialManager`]. Only some members are bound.
+pub type MaterialSystem;
+impl MaterialSystem {
+    /// The description of the game material `id`.
+    #[address(0x140_9AF_350)]
+    pub fn GetMaterialDesc(&self, id: GameMaterialId) -> *const GameMaterialDesc;
+}
+
+/// One game material's description (`CMaterialSystem::SGameMaterialDesc`), loaded from the game's
+/// material data. Only some members are bound.
+#[min_size(0x80)]
+pub type GameMaterialDesc {
+    /// The chance, from zero to one, that a bullet hitting a game object of this material stops
+    /// there rather than passing through it ([`Bullet::m_HasPenetratedOneObject`](equipment::weapon::Bullet::m_HasPenetratedOneObject)):
+    /// the bullet passes when a uniform random roll exceeds it. One unless the data sets it.
+    #[address(0x78)]
+    pub m_BulletCollideFactor: f32,
+}
 
 /// A game material (`EGameMaterialId`): the surface kind a physics shape is tagged with, which
 /// picks the impact effects and sounds played against it. Only the values the melee hit's impact

@@ -7,7 +7,7 @@ use game::{GameObject, GameObjectRenderContext, GameObjectUpdateContext};
 use graphics_engine::model_instance::{Model, ModelInstance};
 use interaction::InteractionContext;
 use physics::{CastRayInfoBase, GrapplingMode, PfxRigidBody, RigidObject};
-use types::math::Matrix4;
+use types::math::{Matrix4, Vector3};
 use types::math::Vector3;
 use types::shared_ptr::{SharedPtr, WeakPtrGameObject};
 use types::std_vector::Vector;
@@ -2054,9 +2054,65 @@ impl WeaponBase {
 }
 
 /// A fired bullet (`CBullet`): a pooled ammunition object that sweeps a ray from its last position
-/// to its new one each update and handles what the ray hit. Its layout is unmapped.
-pub type Bullet;
+/// to its new one each update and handles what the ray hit ([`Bullet::HandleHit`]). Only some
+/// members are bound.
+#[min_size(0x260), align(8)]
+pub type Bullet {
+    /// Where the bullet's pending ray starts, the start of the segment its hit fraction
+    /// ([`CastRayInfoBase::m_HitDistance`](physics::CastRayInfoBase::m_HitDistance)) measures.
+    #[address(0xC0)]
+    pub m_RaySource: Vector3,
+    /// Where the bullet's pending ray ends.
+    pub m_RayTarget: Vector3,
+
+    /// The objects the bullet's ray filter ignores, the hit physics game objects
+    /// (`CPhysicsGameObject`): the shooter's own while the bullet has penetrated nothing, and the
+    /// object it last passed through after it has
+    /// ([`Bullet::m_HasPenetratedOneObject`]). The second entry is null after a penetration.
+    #[address(0x1B0)]
+    pub m_RayIgnoreList: [*mut void; 2],
+
+    /// The bullet's position: where its last ray ended, or where it hit.
+    #[address(0x1EC)]
+    pub m_Position: Vector3,
+    /// The bullet's direction of travel, unit length.
+    pub m_Direction: Vector3,
+    /// Where the bullet's next ray starts.
+    pub m_PreviousPosition: Vector3,
+
+    /// Whether the bullet still flies. A hit that neither penetrates nor ricochets clears it.
+    #[address(0x224)]
+    pub m_IsAlive: bool,
+
+    /// Whether the bullet has passed through an object. A hit on a game object passes through it
+    /// when a random roll exceeds the hit material's
+    /// [`GameMaterialDesc::m_BulletCollideFactor`](physics::GameMaterialDesc::m_BulletCollideFactor)
+    /// (or, with [`Bullet::m_OverridePenetrationBehaviour`], when the hit physics instance is of
+    /// certain kinds): the bullet's next ray starts at the hit, the object becomes the ray filter's
+    /// one ignored object ([`Bullet::m_RayIgnoreList`]), and this flag keeps the filter from taking
+    /// back the shooter's ignore list. The damage the bullet deals is not reduced by it.
+    #[address(0x259)]
+    pub m_HasPenetratedOneObject: bool,
+    /// Whether the bullet passes through physics instances of certain kinds whatever their
+    /// material.
+    pub m_OverridePenetrationBehaviour: bool,
+
+    /// Whether the bullet has hit anything.
+    #[address(0x25C)]
+    pub m_HasHit: bool,
+}
 impl Bullet {
+    /// `CBullet::HandleHit`: handles the hit `info` of the bullet's ray, when the hit fraction is
+    /// under one. It moves the bullet to the hit, calls
+    /// [`Bullet::OnBulletHitGlass`] for a hit on the glass material, then handles the hit as a hit
+    /// on a game object or on static geometry, which decides whether the bullet passes through
+    /// ([`Bullet::m_HasPenetratedOneObject`]) or stops ([`Bullet::m_IsAlive`]), and marks the
+    /// bullet as having hit ([`Bullet::m_HasHit`]). Whether or not it hit, it then checks the
+    /// bullet's segment against creatures and the water surface, and moves a fully controlled
+    /// trail to the bullet. Bullets update on worker threads, so it runs on one.
+    #[address(0x140_942_C10)]
+    pub fn HandleHit(&mut self, info: *mut CastRayInfoBase, dt: f32);
+
     /// `CBullet::OnBulletHitGlass`: the bullet's handling of a hit on a shape of the glass material
     /// ([`EGameMaterialId_Glass`](physics::GameMaterialId::EGameMaterialId_Glass)), which its hit
     /// handler calls before handling the hit object. It collects the model instances the hit names

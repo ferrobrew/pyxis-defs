@@ -1,5 +1,5 @@
 use types::math::Matrix4;
-use types::shared_ptr::WeakPtrGameObject;
+use types::shared_ptr::{SharedPtr, WeakPtrGameObject};
 
 #[singleton(0x142_E22_E68), min_size(0x2C0)]
 pub type Game {
@@ -348,6 +348,15 @@ impl GameState {
     #[address(0x140_9BA_410)]
     pub fn UpdateDeletionOfObjects(budget_us: u32);
 }
+
+/// `CGameObject::FindOptionalInternal`: looks up the game object with the object id `id`
+/// (`SObjectID`, passed by value) and writes a strong reference to it into `result`, the
+/// `CGameObject` subobject, or a null reference when none exists; returns whether it found one.
+/// The reference keeps the object alive until it is released with
+/// [`ReleaseSharedPtrGameObject`](types::shared_ptr::ReleaseSharedPtrGameObject). The bullets'
+/// hit handling calls it on their worker threads.
+#[address(0x140_4F5_310)]
+pub fn FindOptionalInternal(id: u64, result: *mut SharedPtr<GameObject>) -> bool;
 
 /// The resource streamer's update: polls the file system and the decompressors, creates the
 /// loaded resources, and starts the pending requests, within `budget_us` microseconds. The run
