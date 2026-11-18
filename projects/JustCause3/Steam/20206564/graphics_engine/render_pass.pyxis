@@ -271,10 +271,20 @@ pub type RenderPass {
     #[address(0x9E)]
     pub m_Index: i16,
 
+    /// The camera supplied to the pass. [`SaveRenderFrameData`](Self::SaveRenderFrameData) copies
+    /// it into [`ExternalRenderCamera`](Self::ExternalRenderCamera) before drawing.
+    #[address(0x840)]
+    pub ExternalCamera: *mut Camera,
+
     /// The spinlock serializing [`SortList`](Self::SortList) against concurrent callers
     /// (the render-engine sort task and the lazy sort in [`DoDraw`](Self::DoDraw)).
     #[address(0x858)]
     pub m_SortLock: *mut void,
+
+    /// The pass-owned snapshot that [`Draw`](Self::Draw) converts to a render camera and uses to
+    /// populate the render context.
+    #[address(0x870)]
+    pub ExternalRenderCamera: *mut Camera,
 
     /// How [`SortList`](Self::SortList) orders the draw list. Most passes leave the
     /// constructor default (`Auto`); passes that opt out set `None`.

@@ -1116,6 +1116,19 @@ impl WaterHighEndRenderBlock {
     pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
 }
 
+/// The water-plane proxy that supplies depth to the screen-space reflection pass.
+#[min_size(0x58)]
+pub type RenderBlockWaterReflectionPlane {
+    /// The world transform of the proxy quad.
+    #[address(0x18)]
+    pub m_WorldTransform: Matrix4,
+}
+impl RenderBlockWaterReflectionPlane {
+    /// Uploads the offset world-view-projection matrix to the WaterMask vertex program and draws the quad against the downsampled scene depth.
+    #[address(0x140_184_540)]
+    pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
+}
+
 /// The water-box render block *type*
 /// (`NGraphicsEngine::CWaterBoxRenderBlock::CWaterBoxRenderBlockType`): the per-pass setup for the
 /// `waterbox`, `waterboxbelow`, `waterboxsurface`, and `waterboxclear` permutations that render the

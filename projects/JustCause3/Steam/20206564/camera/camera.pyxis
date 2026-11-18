@@ -77,6 +77,14 @@ pub type Camera {
     pub m_Height: i32,
 }
 impl Camera {
+    /// Stores the dimensions and marks the projection dirty.
+    #[address(0x140_09B_DF0)]
+    pub fn SetWidthHeight(&mut self, width: i32, height: i32);
+
+    /// Stores the aspect ratio and marks the projection dirty.
+    #[address(0x140_09B_D80)]
+    pub fn SetAspectRatio(&mut self, aspect: f32);
+
     /// The per-frame camera update: snapshots the previous view-projection, lerps the transform from
     /// `m_TransformT0` to `m_TransformT1` by `dtf`, and recalculates the projection and frustum.
     #[address(0x140_0C3_020)]
