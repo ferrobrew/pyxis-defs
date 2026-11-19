@@ -157,9 +157,13 @@ pub enum RenderPassId: i32 {
     RP_APPLY_CLOUDS = 0x73,
     RP_VEGETATION_TRANSPARENT_AOIT = 0x74,
     /// Fog-volume generation. The first of `CFogManager`'s two `CRenderBlockFogVolume` passes; the
-    /// block draws viewport-covering geometry, not a world-space volume.
+    /// block draws viewport-covering geometry, not a world-space volume, reconstructing world
+    /// positions from depth into its half-resolution fog target (see
+    /// [`RenderBlockFogVolume::Draw`](graphics_engine::render_block::RenderBlockFogVolume::Draw)).
     RP_FOG_VOLUME_GENERATE = 0x75,
-    /// Fog-volume upsampling. The second `CRenderBlockFogVolume` pass; likewise viewport-covering.
+    /// Fog-volume upsampling. The second `CRenderBlockFogVolume` pass; likewise viewport-covering. It
+    /// bilaterally upsamples the generated fog against the full-resolution depth (see
+    /// [`RenderBlockFogVolume::Draw`](graphics_engine::render_block::RenderBlockFogVolume::Draw)).
     RP_FOG_VOLUME_UPSAMPLE = 0x76,
     /// The fog-volume composite. `CFogManager::m_RenderPassAddFogVolume`, drawing one
     /// `CRenderBlockAddFogVolume` over the viewport.
