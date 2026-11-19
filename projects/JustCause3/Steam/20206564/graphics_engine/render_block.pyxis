@@ -593,6 +593,24 @@ impl RenderBlockBark {
     /// kind.
     #[address(0x140_136_A90)]
     pub fn DrawZ(&self, render_context: *mut RenderContext, info: *const RBIInfo);
+
+    /// The per-block setup (`IRenderBlock::Setup`) for the passes [`Draw`](Self::Draw) issues. The
+    /// draw kind is in `sort_id`: plain, GPU-indirect, or CPU-instanced. When `change` says the kind
+    /// changed since the previous block, it binds the type's vertex program for that kind and the
+    /// matching vertex declaration (the instanced declaration for the CPU-instanced kind), selecting
+    /// the shadow programs and declarations under the
+    /// [`RENDERSTATUS_SHADOWMAP`](graphics_engine::render_pass::RenderStatus::RENDERSTATUS_SHADOWMAP)
+    /// bits. It then binds the block's fragment program, textures, samplers, vertex streams, and
+    /// index buffer. `Draw` binds no vertex program of its own except on the billboard path.
+    #[address(0x140_103_130)]
+    pub fn Setup(&self, render_context: *mut RenderContext, sort_id: u64, change: u64);
+
+    /// The per-block setup for the passes [`DrawZ`](Self::DrawZ) issues: binds the depth or the
+    /// depth-and-velocity vertex program for the draw kind in `sort_id`, with the depth vertex
+    /// declaration, when `change` says the kind changed, then the block's vertex streams (the
+    /// per-instance stream too for the CPU-instanced kind) and index buffer.
+    #[address(0x140_103_020)]
+    pub fn SetupZ(&self, render_context: *mut RenderContext, sort_id: u64, change: u64);
 }
 
 /// The bark render block *type* (`NGraphicsEngine::CRenderBlockBark::CRenderBlockBarkType`).
@@ -700,6 +718,12 @@ impl RenderBlockFoliage {
     /// [`DrawIndexedNoMutex`](graphics_engine::draw::DrawIndexedNoMutex), on the same instance-data flags [`Draw`](Self::Draw) routes on.
     #[address(0x140_12D_9B0)]
     pub fn DrawZ(&self, render_context: *mut RenderContext, info: *const RBIInfo);
+
+    /// The per-block setup for the passes [`DrawZ`](Self::DrawZ) issues: binds the depth or the
+    /// depth-and-velocity vertex program for the draw kind in `sort_id`, with the depth vertex
+    /// declaration, on every call, then the block's stream, texture, and index buffer.
+    #[address(0x140_10D_450)]
+    pub fn SetupZ(&self, render_context: *mut RenderContext, sort_id: u64, change: u64);
 }
 
 /// The tree-impostor render block (`CTreeImpostorRB`): far-distance flat billboard cards that replace
