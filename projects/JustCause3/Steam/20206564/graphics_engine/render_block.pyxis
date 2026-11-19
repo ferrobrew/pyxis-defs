@@ -1,4 +1,4 @@
-use graphics_engine::graphics_engine::{HContext_t, HTexture_t, HVertexDeclaration_t, RenderContext};
+use graphics_engine::graphics_engine::{HContext_t, HDevice_t, HTexture_t, HVertexDeclaration_t, RenderContext};
 use graphics_engine::render_engine::{RenderBlockTypeBase, ResourceContext};
 use graphics_engine::texture::Texture;
 use types::math::{Matrix4, Vector3};
@@ -1622,9 +1622,56 @@ impl RenderBlockTypeLayered {
     pub fn Setup(&self, render_context: *mut RenderContext);
 }
 
-/// The `RenderBlockGeneralMkIII` render block *type* (`NGraphicsEngine::CRenderBlockGeneralMkIII::CRenderBlockTypeGeneralMkIII`).
-pub type RenderBlockTypeGeneralMkIII;
+/// The `RenderBlockGeneralMkIII` render block *type* (`NGraphicsEngine::CRenderBlockGeneralMkIII::CRenderBlockTypeGeneralMkIII`,
+/// type name `GeneralMkIII`): the static and dynamic model block of most buildings and props.
+/// `CRenderBlockGeneralMkIII::InitType` allocates it, stores it in the singleton, calls its
+/// [`Create`](Self::Create), and registers it. It derives from
+/// [`RenderBlockTypeBase`](graphics_engine::render_engine::RenderBlockTypeBase), whose vtable slots it
+/// overrides with the functions bound here; the base is not mapped as a region so that those can be
+/// called directly.
+///
+/// The vertex declarations are indexed by vertex permutation (the `HW_INSTANCED` permutations among
+/// them take theirs from [`CreateVertexDeclarationInstanced`](graphics_engine::graphics_engine::CreateVertexDeclarationInstanced));
+/// several entries alias another entry's handle rather than owning one.
+#[singleton(0x142_ED7_4C8), size(0x18F8)]
+pub type RenderBlockTypeGeneralMkIII {
+    /// The colour passes' declarations.
+    #[address(0x1_6A0)]
+    pub m_VertexDeclaration: [*mut HVertexDeclaration_t; 6],
+    /// The hardware-instanced declarations of the depth-and-velocity pass.
+    pub m_VertexDeclarationHWInstancingVelocity: [[*mut HVertexDeclaration_t; 2]; 2],
+    /// The depth-only passes' declarations.
+    pub m_VertexDeclarationDepth: [*mut HVertexDeclaration_t; 6],
+    /// The alpha-tested depth-only passes' declarations.
+    pub m_VertexDeclarationDepthAlphaTest: [*mut HVertexDeclaration_t; 6],
+}
 impl RenderBlockTypeGeneralMkIII {
+    /// Creates the type's GPU resources ([`RenderBlockTypeBase::Create`](graphics_engine::render_engine::RenderBlockTypeBase::Create)),
+    /// in this order and with no other side effects: binds the wind noise texture through
+    /// [`TextureCacheGetTexture`](graphics_engine::render_engine::TextureCacheGetTexture), resets the
+    /// tuning fields, reads the video card info, acquires the shader holders through
+    /// [`LoadShaders`](Self::LoadShaders), builds every vertex declaration from element arrays it
+    /// assembles on its stack (reading each declaration's vertex program from the holders) through
+    /// [`CreateVertexDeclaration`](graphics_engine::graphics_engine::CreateVertexDeclaration) and
+    /// [`CreateVertexDeclarationInstanced`](graphics_engine::graphics_engine::CreateVertexDeclarationInstanced),
+    /// creates the sampler states through [`CreateSamplerStates`](Self::CreateSamplerStates), and
+    /// creates the identity skinning palette through
+    /// [`CreateConstantBuffer`](graphics_engine::graphics_engine::CreateConstantBuffer). Every result is
+    /// stored in `self`.
+    #[address(0x140_158_C40)]
+    pub fn Create(&mut self, resource_context: *const ResourceContext);
+
+    /// Acquires every vertex and fragment program holder of the type from the resource context's
+    /// shader cache.
+    #[address(0x140_156_AD0)]
+    pub fn LoadShaders(&mut self, resource_context: *const ResourceContext);
+
+    /// Creates the type's sampler states (the regular and normal-map samplers, with and without the
+    /// type's anisotropy, and the wind noise sampler). `Recreate` destroys and re-creates them; it is
+    /// the only thing `Recreate` rebuilds.
+    #[address(0x140_110_9B0)]
+    pub fn CreateSamplerStates(&mut self, device: *mut HDevice_t);
+
     /// The type-level per-pass setup (the `IRenderBlockType::Setup` override). Binds the forward lighting
     /// resources through
     /// [`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources).
