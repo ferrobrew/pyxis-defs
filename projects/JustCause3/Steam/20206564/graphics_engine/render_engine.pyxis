@@ -514,7 +514,11 @@ impl RenderEngine {
 
     /// Uploads the global per-view constant buffer for the frame: lighting, fog, wetness, and the
     /// render camera's full (translation-bearing) view-projection and world position. This drives
-    /// screen-space and non-geometry work, not opaque-geometry vertex placement.
+    /// screen-space and non-geometry work, not opaque-geometry vertex placement. It first rebuilds the
+    /// lighting frame constant buffer relative to the render camera position
+    /// ([`LightManager::ApplyDynamicLights`](graphics_engine::light_manager::LightManager::ApplyDynamicLights))
+    /// and copies the light manager's per-frame resources into `ctx`
+    /// ([`LightManager::UpdateRenderContext`](graphics_engine::light_manager::LightManager::UpdateRenderContext)).
     #[address(0x140_185_740)]
     pub fn SetGlobalShaderConstants(&mut self, ctx: *mut RenderContext);
 

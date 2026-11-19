@@ -108,6 +108,31 @@ impl LightManager {
     #[address(0x140_0B9_910)]
     pub fn SetupLightingTextures(&self, ctx: *const RenderContext);
 
+    /// Fills the clustered-lighting frame constant buffer (`LightingFrameConsts`, the buffer
+    /// [`RenderContext::m_LightBuffer`](graphics_engine::graphics_engine::RenderContext::m_LightBuffer)
+    /// carries) for `ctx` from the frame's point and spot light records. Each point light takes
+    /// three rows of `PointLights` and each spot light four rows of `SpotLights`; the first row's
+    /// `.xyz` is the light's world position minus `ctx`'s
+    /// [`m_RenderCameraPosition`](graphics_engine::graphics_engine::RenderContext::m_RenderCameraPosition),
+    /// so every light position in the buffer is relative to the render camera. Each spot light that
+    /// casts a projected texture also gets a `Projections` matrix: the offset world-view-projection
+    /// of the light's frustum built with a world transform translated to the same render camera
+    /// position, so it maps a camera-relative position rather than a world position. The pixel
+    /// shaders that read the buffer subtract a camera-relative pixel position from the light
+    /// positions and apply the projections to that same position.
+    #[address(0x140_0C6_0D0)]
+    pub fn SetupLightingData(&mut self, ctx: *const RenderContext, point_lights: *const void, point_light_count: u32, spot_lights: *const void, spot_light_count: u32);
+
+    /// Rebuilds the lighting frame constant buffer for `ctx` through
+    /// [`SetupLightingData`](Self::SetupLightingData), from the light records of the current
+    /// render-context frame's slot in the light manager's three-deep ring, then refreshes the light
+    /// lists. Called by
+    /// [`RenderEngine::SetGlobalShaderConstants`](graphics_engine::render_engine::RenderEngine::SetGlobalShaderConstants)
+    /// before it copies the buffer into the context, so the buffer is rebuilt from the render camera
+    /// position each time the global constants are staged.
+    #[address(0x140_0D0_270)]
+    pub fn ApplyDynamicLights(&mut self, ctx: *const RenderContext);
+
     /// Adds the far lights to `render_pass`, culled against the active camera.
     #[address(0x140_0B9_C10)]
     pub fn AddFarLightsToPass(&mut self, render_pass: *mut RenderPass);
