@@ -108,6 +108,36 @@ pub fn Dispatch(ctx: *mut HContext_t, x: u32, y: u32, z: u32);
 #[address(0x141_962_B60)]
 pub fn DispatchIndirect(a1: *mut void, a2: *mut void, a3: *mut void, a4: *mut void, a5: *mut void, a6: *mut void);
 
+// The context lock, and the per-draw state binds the render blocks issue through it.
+
+/// Enters the context's critical section, if it has one. The wrappers without `NoMutex` in their
+/// name take and leave it around their one call into Direct3D; a render block that issues several
+/// calls in a row takes it once here and uses the `NoMutex` variants.
+#[address(0x141_954_CD0)]
+pub fn AcquireThreadOwnership(ctx: *mut HContext_t);
+
+/// Leaves the context's critical section that [`AcquireThreadOwnership`] entered.
+#[address(0x141_954_CF0)]
+pub fn ReleaseThreadOwnership(ctx: *mut HContext_t);
+
+/// Binds a constant buffer to a vertex-program slot without the context mutex: issues
+/// `ID3D11DeviceContext::VSSetConstantBuffers` (vtable slot 7) for the one slot, and for the first
+/// four slots clears the context's record of the staged constants for that slot.
+#[address(0x141_963_DF0)]
+pub fn SetVertexProgramConstantBufferNoMutex(ctx: *mut HContext_t, slot: i32, buffer: *mut void);
+
+/// Binds a vertex buffer to a stream without the context mutex: issues
+/// `ID3D11DeviceContext::IASetVertexBuffers` (vtable slot 18) for the one stream, with the buffer's
+/// current Direct3D buffer and the given offset and stride.
+#[address(0x141_963_260)]
+pub fn SetVertexStreamNoMutex(ctx: *mut HContext_t, buffer: *mut void, stream: i32, offset: i32, stride: i32);
+
+/// Maps a constant buffer for writing without the context mutex: issues `ID3D11DeviceContext::Map`
+/// (vtable slot 14) on the buffer's resource with `D3D11_MAP_WRITE_DISCARD`, whatever `lock_type`
+/// asks, and returns the mapped pointer.
+#[address(0x141_963_C00)]
+pub fn LockConstantBufferNoMutex(ctx: *mut HContext_t, buffer: *mut void, lock_type: i32) -> *mut void;
+
 // Render-target binding, clearing, copying, and MSAA-resolve wrappers.
 
 /// Binds a render setup, the render-target configuration a pass draws into.
