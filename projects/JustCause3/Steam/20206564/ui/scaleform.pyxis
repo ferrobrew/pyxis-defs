@@ -23,6 +23,37 @@ impl RefCountImpl {
     pub fn Release(&self);
 }
 
+/// A Scaleform `Render::TextureImage`: an image over a texture that already exists, rather than
+/// image data Scaleform uploads. Images are reference counted through their own virtuals, on the
+/// count at the same place as [`RefCountImpl::ref_count`].
+#[size(0x40)]
+pub type TextureImage {
+    vftable {
+        /// Virtual destructor. Called by [`Release`](Self::Release) when the count reaches zero.
+        pub fn destructor(&mut self, flags: u32);
+        /// Increments the reference count atomically.
+        pub fn AddRef(&mut self);
+        /// Decrements the reference count atomically, destroying the image at zero.
+        pub fn Release(&mut self);
+    },
+
+    #[address(0x8)]
+    pub RefCount: u32,
+
+    /// The texture the image draws, a reference-counted Scaleform texture holding one reference.
+    #[address(0x10)]
+    pub pTexture: *mut RefCountImpl,
+
+    /// The image format, taken from the texture.
+    #[address(0x28)]
+    pub Format: u32,
+    /// The image's width and height in pixels.
+    pub Width: u32,
+    pub Height: u32,
+    pub Use: u32,
+    pub ImageId: u32,
+}
+
 /// The Scaleform AS3 `MovieRoot` (the `ASMovieRootBase` interface), which `CUIManager::m_Movie`
 /// points at. The engine drives the movie through this interface's virtuals; the bound
 /// [`SetVariable`](Self::SetVariable) / [`GetVariable`](Self::GetVariable) /

@@ -2,7 +2,7 @@ use graphics_engine::device::CRITICAL_SECTION;
 use graphics_engine::graphics_engine::HContext_t;
 use input::steering::Steering;
 use types::math::{Vector2, Vector3, Matrix4};
-use ui::scaleform::{MovieImpl, RenderHAL};
+use ui::scaleform::{MovieImpl, RenderHAL, TextureImage};
 
 /// The `CUiThreadCommandQueue`: commands queued for execution on the UI render worker.
 #[min_size(0xA0)]
@@ -208,6 +208,14 @@ pub type UIManager {
     #[address(0xD4)]
     pub m_GrabScreenTimer: f32,
 
+    /// The Scaleform image over the UI background texture, which
+    /// [`InitBackGroundTexture`](Self::InitBackGroundTexture) creates anew around each new texture,
+    /// releasing the previous one. Movies that load a `.backg` image get an image delegate
+    /// (`CScaleformImageCreator`) holding the image this field holds at that moment, and keep it,
+    /// with its texture, for as long as the movie lives.
+    #[address(0xD8)]
+    pub m_SFBackGroundTexture: *mut TextureImage,
+
     /// Whether the render system is initialized. One of the three gates `Render` checks before
     /// drawing.
     #[address(0x212)]
@@ -354,6 +362,17 @@ impl UIManager {
     /// internal reset counter: it does nothing unless the counter is at 1.
     #[address(0x140_FA9_C70)]
     pub fn RestoreAfterResetImpl(&mut self);
+
+    /// Recreates the UI background: destroys the previous background texture, its render setup and
+    /// sampler, and releases [`m_SFBackGroundTexture`](Self::m_SFBackGroundTexture) (an internal
+    /// `ResetBackGroundTexture`), then creates an RGBA8 render target named `UI BACKGROUND` at the
+    /// UI view size, its render setup and sampler, wraps the target's Direct3D texture in a
+    /// Scaleform texture through the UI texture manager (which takes its own reference to the
+    /// Direct3D texture), and stores a new [`TextureImage`] over it in
+    /// [`m_SFBackGroundTexture`](Self::m_SFBackGroundTexture). Called from
+    /// [`RestoreAfterResetImpl`](Self::RestoreAfterResetImpl), so on every resize.
+    #[address(0x140_FA9_8D0)]
+    pub fn InitBackGroundTexture(&mut self);
 
     /// Recomputes the movie render rectangle ([`m_MovieScaleWidth`](Self::m_MovieScaleWidth) /
     /// [`m_MovieScaleHeight`](Self::m_MovieScaleHeight)). It first refreshes the cached stage and
