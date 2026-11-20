@@ -88,6 +88,11 @@ impl Game {
     #[address(0x140_967_600)]
     pub fn Destructor(&mut self);
 
+    /// Waits for the previous frame's draw task
+    /// ([`GraphicsEngine::WaitForCPUDrawToFinish`](graphics_engine::graphics_engine::GraphicsEngine::WaitForCPUDrawToFinish)),
+    /// decides from the game state, the UI's static background, and a full-screen video whether
+    /// the frame draws the scene, and runs
+    /// [`GraphicsEngine::Draw`](graphics_engine::graphics_engine::GraphicsEngine::Draw).
     #[address(0x140_952_390)]
     pub fn Draw(&self, dt: f32);
 
@@ -107,7 +112,19 @@ impl Game {
     #[address(0x140_960_4E0)]
     pub fn Update(&mut self) -> bool;
 
-    /// Builds the per-frame update contexts and drives rendering.
+    /// Builds the per-frame update contexts and drives rendering: the game state's pre-render
+    /// update, the memory garbage collection, then the active state's render update (the run
+    /// state's, or its paused variant while the main draw is off, or the frontend's; in any other
+    /// state the load state's when loading, then the UI's pre-render and the video manager's render
+    /// update).
+    ///
+    /// It does not wait for the previous frame's draw task: the wait at its top
+    /// ([`GraphicsEngine::WaitForCPUDrawToFinish`](graphics_engine::graphics_engine::GraphicsEngine::WaitForCPUDrawToFinish))
+    /// runs only while [`Game_EnableOldSyncPoint`] is set, and nothing sets it. The render update
+    /// therefore runs alongside the previous frame's draw task, and the fence between them is the
+    /// wait at the top of [`Draw`](Self::Draw). The render update's own work on the immediate
+    /// context, such as the tone mapping's histogram readback (`Graphics::GetOcclusionQueryResult`),
+    /// takes the context's mutex call by call, as the draw task's draw wrappers do.
     #[address(0x140_95A_4E0)]
     pub fn UpdateRender(&mut self, update_contexts: *mut UpdateContexts);
 
@@ -124,6 +141,11 @@ impl Game {
 /// initializes it to 2.
 #[address(0x142_D6E_A50)]
 pub extern Game_MaxGameUpdatesPerRender: u32;
+/// `s_EnableSyncpoint`, the developer menu's `Dev|EnableOldSyncPoint`: while set,
+/// [`Game::UpdateRender`] waits for the previous frame's draw task before the render update. The
+/// image initializes it to false, and its only reference is that read.
+#[address(0x142_F33_B8B)]
+pub extern Game_EnableOldSyncPoint: bool;
 
 /// `CGame::EGameUpdateFlags`: the phases of [`Game::Update`] enabled by
 /// [`Game::m_UpdateFlags`].
