@@ -42,7 +42,14 @@ pub type EffectInfo {
     /// [`FRAME_INDEX_FREE`](Self::FRAME_INDEX_FREE).
     pub const FRAME_INDEX_PICKED: u8 = 3,
 
-    /// The reflection-proxy depth texture.
+    /// The reflection-proxy depth texture: the destination of the `CopyEffectTextures` stage's
+    /// [`CopySurfaceToTexture`](graphics_engine::draw::CopySurfaceToTexture) of the
+    /// reflection-proxy depth surface, a whole-surface copy at the render size.
+    ///
+    /// Nothing reads it. Its two accessors, `GetEffectDepthTexture` and `GetEffectTransformRef`, have
+    /// no callers and no references in the image, and the passes that use the reflection-proxy depth
+    /// sample the live surface rather than a history slot. Skipping the copy leaves the rendered frame
+    /// unchanged.
     pub m_DepthTexture: *mut HTexture_t,
     pub m_Transform: Matrix4,
     /// The lifecycle counter, one of the `FRAME_INDEX_*` constants on this type. Any other non-free
