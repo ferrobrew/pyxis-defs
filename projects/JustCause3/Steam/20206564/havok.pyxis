@@ -1,0 +1,627 @@
+use types::vector_math::{AlignedQuat, AlignedVector3};
+
+/// A Havok reference-counted object (`hkReferencedObject`), the base of Havok shapes, constraint
+/// data, and most Havok heap objects. Only its reference count is bound.
+#[size(0x10), align(8)]
+pub type hkReferencedObject {
+    /// The reference-count half of [`m_memSizeAndRefCount`](Self::m_memSizeAndRefCount).
+    pub const REFERENCE_COUNT_MASK: u32 = 0xFFFF,
+    /// Where the allocation-size half of [`m_memSizeAndRefCount`](Self::m_memSizeAndRefCount) begins.
+    pub const MEMORY_SIZE_SHIFT: u32 = 16,
+
+    vftable {
+        /// Destroys the object and returns its memory to the Havok heap it came from. The engine
+        /// calls it when a release drops the last reference.
+        #[index(3)]
+        pub fn deleteThisReferencedObject(&mut self);
+    },
+
+    /// The allocation size and the reference count in one word: the low half
+    /// ([`REFERENCE_COUNT_MASK`](Self::REFERENCE_COUNT_MASK)) counts the references, and the high
+    /// half (from [`MEMORY_SIZE_SHIFT`](Self::MEMORY_SIZE_SHIFT)) is the size of the object's Havok
+    /// heap allocation. An object whose size half is zero is not counted: it was not allocated from
+    /// the heap, and a release leaves it alone. A release atomically decrements the low half
+    /// without touching the high half, and an object whose count was one is destroyed through
+    /// [`deleteThisReferencedObject`](Self::deleteThisReferencedObject). A new heap object starts
+    /// with a count of one.
+    #[address(0x8)]
+    pub m_memSizeAndRefCount: u32,
+}
+
+/// A thread's Havok memory router (`hkMemoryRouter`), held in the thread-local storage slot
+/// [`s_memoryRouterSlot`](Self::s_memoryRouterSlot). The game thread and the physics workers have
+/// one; Havok objects are allocated from and freed to the router of the thread that makes or
+/// deletes them. Only some members are bound.
+pub type hkMemoryRouter {
+    /// The thread-local storage slot (`hkMemoryRouter::s_memoryRouter`) that holds each thread's
+    /// router, read with `TlsGetValue`.
+    #[address(0x142_F45_0C8)]
+    pub extern s_memoryRouterSlot: u32,
+
+    /// The heap allocator, which Havok objects and their buffers come from.
+    #[address(0x58)]
+    pub m_heap: *mut hkMemoryAllocator,
+}
+
+/// A Havok memory allocator (`hkMemoryAllocator`). The engine's Havok heap objects come from a
+/// router's [`m_heap`](hkMemoryRouter::m_heap) through [`blockAlloc`](Self::blockAlloc) with the
+/// object's size, and go back through [`blockFree`](Self::blockFree) with the same size, as a
+/// [`hkReferencedObject`]'s deletion does. Only some members are bound.
+pub type hkMemoryAllocator {
+    vftable {
+        /// Allocates `num_bytes` bytes, or returns null.
+        #[index(1)]
+        pub fn blockAlloc(&mut self, num_bytes: i32) -> *mut void;
+
+        /// Frees the block `p` of `num_bytes` bytes.
+        #[index(2)]
+        pub fn blockFree(&mut self, p: *mut void, num_bytes: i32);
+
+        /// Frees the buffer `p` of `num_bytes` bytes, as a growable container returns its storage.
+        #[index(4)]
+        pub fn bufFree(&mut self, p: *mut void, num_bytes: i32);
+    },
+}
+
+/// The allocator behind Havok containers declared with `hkContainerHeapAllocator`, such as the
+/// body-id array [`hknpWorld::queryAabb`](physics::hknpWorld::queryAabb) fills. A container grows
+/// its storage from [`s_alloc`](Self::s_alloc) and its owner frees it there with
+/// [`bufFree`](hkMemoryAllocator::bufFree), giving the capacity in bytes, unless the array's flags
+/// say it does not own the storage
+/// ([`HK_ARRAY_DONT_DEALLOCATE_FLAG`](animation::skeleton::HK_ARRAY_DONT_DEALLOCATE_FLAG)).
+pub type hkContainerHeapAllocator {
+    /// The process-wide allocator object (`hkContainerHeapAllocator::s_alloc`), constructed at
+    /// static initialization; callers pass its address as `this`.
+    #[address(0x142_DAD_020)]
+    pub extern s_alloc: hkMemoryAllocator,
+}
+
+/// A Havok collision shape (`hknpShape`), a [`hkReferencedObject`] allocated from the Havok heap of
+/// the thread that creates it. A body holds its own reference to its shape. Its kind is what
+/// [`getType`](Self::getType) returns; the convex kinds are [`hknpConvexShape`] and the types
+/// built on it. Only some members are bound.
+#[min_size(0x30), align(16)]
+pub type hknpShape {
+    /// The [`m_flags`](Self::m_flags) bit of a shape that is an [`hknpConvexShape`].
+    pub const IS_CONVEX_SHAPE: u16 = 0x1,
+    /// The [`m_flags`](Self::m_flags) bit of a shape that is an [`hknpConvexPolytopeShape`].
+    pub const IS_CONVEX_POLYTOPE_SHAPE: u16 = 0x2,
+    /// The invalid shape key returned when shape-key enumeration has no further key.
+    pub const INVALID_SHAPE_KEY: u32 = 0xFFFFFFFF,
+    /// The collector flag indicating that a leaf contains stored triangles.
+    pub const COLLECTOR_STORES_TRIANGLES: u32 = 0x10,
+
+    #[size(22)]
+    vftable {
+        /// As [`hkReferencedObject::deleteThisReferencedObject`].
+        #[index(3)]
+        pub fn deleteThisReferencedObject(&mut self);
+
+        /// The shape's kind, an [`hknpShapeType`] value; each concrete shape class returns its own
+        /// constant.
+        #[index(4)]
+        pub fn getType(&self) -> u32;
+
+        /// Computes the world-space axis-aligned bounds of the shape.
+        #[index(6)]
+        pub fn calcAabb(&self, transform: *const hkTransformf, out: *mut hkAabb);
+
+        /// Returns shape keys following `previous`, up to the provided capacity.
+        #[index(20)]
+        pub fn getShapeKeys(&self, keys: *mut u32, capacity: i32, previous: u32, config: *const hknpGetShapeKeysConfig) -> i32;
+
+        /// Collects the leaf shapes identified by the provided keys.
+        #[index(21)]
+        pub fn getLeafShapes(&self, keys: *const u32, count: i32, collector: *mut hknpShapeCollector) -> i32;
+    },
+
+    #[base]
+    pub base: hkReferencedObject,
+
+    /// The shape's flags (`hknpShape::FlagsEnum`): [`IS_CONVEX_SHAPE`](Self::IS_CONVEX_SHAPE) and
+    /// [`IS_CONVEX_POLYTOPE_SHAPE`](Self::IS_CONVEX_POLYTOPE_SHAPE) mark the convex classes.
+    #[address(0x10)]
+    pub m_flags: u16,
+
+    /// The radius the shape's core is rounded by: every point within it of the core is inside the
+    /// shape. A sphere is a point with its radius here, and a capsule's core is a box around its
+    /// segment with most of its radius here.
+    #[address(0x14)]
+    pub m_convexRadius: f32,
+
+    /// Opaque user data carried by the shape.
+    #[address(0x18)]
+    pub m_userData: u64,
+}
+
+/// A shape's kind (`hknpShapeType::Enum`), as [`hknpShape::getType`] returns it. The bound kinds
+/// include convex shapes and the compressed mesh and height-field shapes.
+pub enum hknpShapeType: u32 {
+    /// A convex hull given by its vertices alone ([`hknpConvexShape`]).
+    CONVEX = 0x0,
+    /// A convex hull with its faces ([`hknpConvexPolytopeShape`]).
+    CONVEX_POLYTOPE = 0x1,
+    /// A sphere: an [`hknpConvexShape`] whose vertices are all its centre and whose convex radius
+    /// is its radius.
+    SPHERE = 0x2,
+    /// A capsule ([`hknpCapsuleShape`]).
+    CAPSULE = 0x3,
+    /// A mesh whose geometry is stored in compressed form.
+    COMPRESSED_MESH = 0x5,
+    /// A height field whose data is stored in compressed form.
+    COMPRESSED_HEIGHT_FIELD = 0xA,
+}
+
+/// A four-lane floating-point vector (`hkVector4f`).
+#[copyable, size(0x10), align(16)]
+pub type hkVector4f {
+    pub data: [f32; 4],
+}
+
+/// A strided array of three-dimensional vertices (`hkStridedVertices`).
+#[copyable, size(0x10), align(8)]
+pub type hkStridedVertices {
+    /// The first vertex, whose coordinates are stored as floats.
+    #[address(0x0)]
+    pub m_vertices: *const f32,
+
+    /// The number of vertices.
+    #[address(0x8)]
+    pub m_numVertices: i32,
+    /// The distance in bytes between consecutive vertices.
+    pub m_striding: i32,
+}
+
+/// The options used to build a convex shape (`hknpConvexShapeBuildConfig`). Only the options read
+/// by the vertex factory are mapped.
+#[size(0x38), align(8)]
+pub type hknpConvexShapeBuildConfig {
+    /// The tolerance used when simplifying the convex shape.
+    #[address(0x0)]
+    pub m_simplificationTolerance: f32,
+
+    /// Whether the input vertices are shrunk by the shape radius during construction.
+    #[address(0x4)]
+    pub m_shrinkByRadius: bool,
+    /// The remainder of the construction options is not mapped.
+    _: unknown<0x33>,
+}
+impl hknpConvexShapeBuildConfig {
+    /// `hknpConvexShapeBuildConfig::hknpConvexShapeBuildConfig`: initializes the build options.
+    #[address(0x141_4DC_F60)]
+    pub fn Construct(&mut self) -> *mut hknpConvexShapeBuildConfig;
+}
+
+/// An axis-aligned box (`hkAabb`): its least and greatest corners.
+#[copyable, defaultable, size(0x20), align(16)]
+pub type hkAabb {
+    pub m_min: AlignedVector3,
+    pub m_max: AlignedVector3,
+}
+
+/// A box quantized into a world's integer space (`hkAabb16`): each corner's coordinates as 16-bit
+/// integers, which the world's [`hkIntSpaceUtil`] turns back into Havok-space positions. The two
+/// key halves are not coordinates.
+#[copyable, size(0x10), align(16)]
+pub type hkAabb16 {
+    pub m_min: [u16; 3],
+    pub m_key: u16,
+    pub m_max: [u16; 3],
+    pub m_key1: u16,
+}
+
+/// The mapping between Havok space and a world's integer space (`hkIntSpaceUtil`), in which the
+/// broad phase keeps every body's box ([`hknpBody::m_aabb`](physics::hknpBody::m_aabb)). A
+/// position is quantized as `(position + offset) * scale`, clamped to the 16-bit range, with
+/// [`m_bitOffsetLow`](Self::m_bitOffsetLow) for a box's least corner and
+/// [`m_bitOffsetHigh`](Self::m_bitOffsetHigh) for its greatest, and restored as
+/// `integer * scale_inv - low_offset` for both corners
+/// ([`hknpWorld::getBodyAabb`](physics::hknpWorld::getBodyAabb)). Only the mapping is bound.
+#[min_size(0x40), align(16)]
+pub type hkIntSpaceUtil {
+    pub m_bitOffsetLow: AlignedVector3,
+    pub m_bitOffsetHigh: AlignedVector3,
+    pub m_bitScale: AlignedVector3,
+    pub m_bitScaleInv: AlignedVector3,
+}
+
+/// An array stored inside its owner at a relative position (`hkRelArray`): its elements start
+/// [`m_offset`](Self::m_offset) bytes after the array's own address. The convex shapes keep their
+/// vertices, planes, faces, and indices in such arrays after their fixed members.
+#[copyable, size(0x4), align(2)]
+pub type hkRelArray {
+    /// The number of elements.
+    pub m_size: u16,
+    /// Where the elements start, in bytes from the array's own address.
+    pub m_offset: u16,
+}
+
+/// A convex shape (`hknpConvexShape`): the hull of its vertices, rounded by its convex radius
+/// ([`hknpShape::m_convexRadius`]). Each vertex is a four-lane vector (`hkcdVertex`) whose last
+/// lane holds the vertex's id bits, not a coordinate. Only the vertices are bound.
+#[min_size(0x40), align(16)]
+pub type hknpConvexShape {
+    #[base]
+    pub base: hknpShape,
+
+    /// The vertices, body space, as four-lane vectors.
+    #[address(0x30)]
+    pub m_vertices: hkRelArray,
+}
+impl hknpConvexShape {
+    /// Builds a convex shape from strided vertices, applying `radius` and `config`.
+    #[address(0x141_4E0_B10)]
+    pub fn createFromVertices(vertices: *const hkStridedVertices, radius: f32, config: *const hknpConvexShapeBuildConfig) -> *mut hknpShape;
+}
+
+/// A convex polytope shape (`hknpConvexPolytopeShape`): an [`hknpConvexShape`] with its faces. Each
+/// face ([`hknpConvexPolytopeFace`]) names a run of [`m_indices`](Self::m_indices), each a vertex
+/// index, which go round the face in order, so consecutive indices and the last and first are the
+/// face's edges. The plane array may hold more planes than there are faces.
+#[min_size(0x50), align(16)]
+pub type hknpConvexPolytopeShape {
+    #[base]
+    pub base: hknpConvexShape,
+
+    /// The face planes, as four-lane vectors.
+    #[address(0x40)]
+    pub m_planes: hkRelArray,
+    /// The faces, [`hknpConvexPolytopeFace`]s.
+    pub m_faces: hkRelArray,
+    /// The faces' vertex indices, one byte each.
+    pub m_indices: hkRelArray,
+}
+
+/// One face of an [`hknpConvexPolytopeShape`] (`hknpConvexPolytopeShape::Face`).
+#[copyable, size(0x4), align(2)]
+pub type hknpConvexPolytopeFace {
+    /// The face's first index in [`hknpConvexPolytopeShape::m_indices`].
+    pub m_firstIndex: u16,
+    /// How many indices the face has.
+    pub m_numIndices: u8,
+    /// The face's minimum half-angle as the collision detection keeps it, one byte; its encoding
+    /// is not established.
+    pub m_minHalfAngle: u8,
+}
+
+/// A capsule shape (`hknpCapsuleShape`): the points within a radius of a segment, built as an
+/// [`hknpConvexPolytopeShape`]: a box of eight vertices along the segment, reaching
+/// [`RADIUS_IN_CORE`](Self::RADIUS_IN_CORE) of the radius past it on every side, rounded by the
+/// convex radius ([`hknpShape::m_convexRadius`]), the rest of the radius.
+#[min_size(0x70), align(16)]
+pub type hknpCapsuleShape {
+    /// The share of the capsule's radius its core box reaches past the segment;
+    /// [`hknpShape::m_convexRadius`] is the capsule's radius less that share.
+    pub const RADIUS_IN_CORE: f32 = 0.01,
+
+    #[base]
+    pub base: hknpConvexPolytopeShape,
+
+    /// The segment's first end, body space.
+    #[address(0x50)]
+    pub m_a: AlignedVector3,
+    /// The segment's second end, body space.
+    pub m_b: AlignedVector3,
+}
+impl hknpCapsuleShape {
+    /// Allocates a capsule from the calling thread's Havok heap, with the segment from `a` to `b`
+    /// (body space) and `radius`, and returns it with one reference, the caller's. The grappling
+    /// hook's hang proxy (`CGrapplingHangPhysicsProxy::Init`) builds its body's capsule with it and
+    /// releases its own reference once the body is created.
+    #[address(0x141_537_F70)]
+    pub fn createCapsuleShape(a: *const AlignedVector3, b: *const AlignedVector3, radius: f32) -> *mut hknpShape;
+}
+
+/// The construction info of a Havok body (`hknpBodyCinfo`), read by
+/// [`hknpWorld::createDynamicBody`](physics::hknpWorld::createDynamicBody). Positions are Havok
+/// space: the game-space position less
+/// [`PhysicsSystem::m_AccumulatedShift`](physics::PhysicsSystem::m_AccumulatedShift). Only some
+/// members are bound; [`Construct`](Self::Construct) sets the others to their defaults: no reserved
+/// body id, no motion, the default quality and material, a zero collision-filter word, no name, no
+/// local frame, and the identity orientation.
+#[size(0x60), align(16)]
+pub type hknpBodyCinfo {
+    /// The body's shape. Creating the body takes a reference of its own.
+    pub m_shape: *mut hknpShape,
+
+    /// The body's position.
+    #[address(0x30)]
+    pub m_position: AlignedVector3,
+    /// The body's orientation, a unit quaternion `(x, y, z, w)`.
+    pub m_orientation: AlignedQuat,
+}
+impl hknpBodyCinfo {
+    /// `hknpBodyCinfo::hknpBodyCinfo`: constructs the info with its defaults.
+    #[address(0x141_500_080)]
+    pub fn Construct(&mut self) -> *mut hknpBodyCinfo;
+}
+
+/// The construction info of a Havok motion (`hknpMotionCinfo`), the mass properties and velocities
+/// of a dynamic body, read by
+/// [`hknpWorld::createDynamicBody`](physics::hknpWorld::createDynamicBody). Only some members are
+/// bound; [`Construct`](Self::Construct) sets the default motion properties, unit mass, the
+/// identity orientation, and zero velocities, with deactivation enabled.
+#[size(0x70), align(16)]
+pub type hknpMotionCinfo {
+    /// Whether the motion may be deactivated: a body at rest for a while is put to sleep, and is
+    /// not simulated until something wakes it.
+    #[address(0x2)]
+    pub m_enableDeactivation: bool,
+}
+impl hknpMotionCinfo {
+    /// `hknpMotionCinfo::hknpMotionCinfo`: constructs the info with its defaults.
+    #[address(0x141_505_D20)]
+    pub fn Construct(&mut self) -> *mut hknpMotionCinfo;
+
+    /// Fills the mass properties for the `num_bodies` bodies at `bodies` sharing one motion, with a
+    /// total of `mass` kilograms: the inverse mass, the inverse inertia from the bodies' shapes, and
+    /// the centre of mass and orientation from the bodies' poses. The bodies' shapes, positions,
+    /// and orientations must already be set.
+    #[address(0x141_506_480)]
+    pub fn initializeWithMass(&mut self, bodies: *const hknpBodyCinfo, num_bodies: i32, mass: f32);
+}
+
+/// A Havok transform (`hkTransformf`): a rotation as three column vectors, the images of the local
+/// axes, and a translation.
+#[copyable, size(0x40), align(16)]
+pub type hkTransformf {
+    pub m_rotation: [AlignedVector3; 3],
+    pub m_translation: AlignedVector3,
+}
+
+/// A Havok SIMD scalar (`hkSimdFloat32`): one value held in all four lanes of a vector register.
+#[copyable, size(0x10), align(16)]
+pub type hkSimdFloat32 {
+    pub m_real: [f32; 4],
+}
+
+/// The construction info of a constraint (`hknpConstraintCinfo`), read by
+/// [`hknpWorld::createConstraint`](physics::hknpWorld::createConstraint).
+#[size(0x18), align(8)]
+pub type hknpConstraintCinfo {
+    /// The constraint's data, such as a [`hkpFixedConstraintData`] (`hkRefPtr<hkpConstraintData>`).
+    pub m_constraintData: *mut hkReferencedObject,
+    /// The constraint's first body.
+    pub m_bodyA: u32,
+    /// The constraint's second body.
+    pub m_bodyB: u32,
+    /// The constraint's flags; the engine's callers pass zero.
+    pub m_flags: u8,
+}
+
+/// The data of a fixed constraint (`hkpFixedConstraintData`), which holds two bodies in a fixed
+/// pose relative to each other. The magnet weapon
+/// (`CMagnetWeaponComponent::ConstrainBodiesToGravityField`) allocates one of this type's size from
+/// the calling thread's Havok heap ([`hkMemoryAllocator::blockAlloc`]), constructs it, sets its
+/// frames and the stabilized solving method, which the constructor already sets, and creates a
+/// constraint from it. The disassembler names that function
+/// `CPartInstance::AttachPartWithConstraint`. Only some members are bound.
+#[size(0xE0), align(16)]
+pub type hkpFixedConstraintData {
+    #[base]
+    pub base: hkReferencedObject,
+}
+impl hkpFixedConstraintData {
+    /// `hkpFixedConstraintData::hkpFixedConstraintData`: constructs the data with one reference
+    /// and the identity frames.
+    #[address(0x141_354_DB0)]
+    pub fn Construct(&mut self) -> *mut hkpFixedConstraintData;
+
+    /// Sets the constraint's frame in each body's space: `pivot_a` in the first body's, `pivot_b`
+    /// in the second's. The constraint holds the two frames together.
+    #[address(0x141_355_090)]
+    pub fn setInBodySpace(&mut self, pivot_a: *const hkTransformf, pivot_b: *const hkTransformf);
+}
+
+/// The data of a ball-and-socket constraint (`hkpBallAndSocketConstraintData`), which holds a point
+/// of one body on a point of the other and leaves the rotation free. The data-driven constraint
+/// system allocates one of this type's size from the calling thread's Havok heap, constructs it,
+/// places its pivot with [`setInWorldSpace`](Self::setInWorldSpace), and creates a constraint from
+/// it. Only some members are bound.
+#[size(0x70), align(16)]
+pub type hkpBallAndSocketConstraintData {
+    #[base]
+    pub base: hkReferencedObject,
+    /// The pivot in the first body's space.
+    #[address(0x30)]
+    pub m_translationA: AlignedVector3,
+    /// The pivot in the second body's space.
+    pub m_translationB: AlignedVector3,
+    /// Whether the stabilisation atom is enabled: on for the stabilized solving method.
+    #[address(0x52)]
+    pub m_setupStabilizationEnabled: bool,
+    /// The ball-socket atom's solving method: 0 stabilized, 1 the older method, which the
+    /// constructor sets.
+    #[address(0x62)]
+    pub m_ballSocketSolvingMethod: u8,
+}
+impl hkpBallAndSocketConstraintData {
+    /// Constructs the data with one reference, zero pivots, and the older solving method.
+    #[address(0x141_356_AF0)]
+    pub fn Construct(&mut self) -> *mut hkpBallAndSocketConstraintData;
+
+    /// Places the pivot from a Havok-space point and the two bodies' transforms.
+    #[address(0x141_356_B50)]
+    pub fn setInWorldSpace(&mut self, body_a: *const hkTransformf, body_b: *const hkTransformf, pivot: *const AlignedVector3);
+}
+
+/// A contact-impulse event (`hknpContactImpulseEvent`), raised by the solver for a contact between
+/// two bodies at least one of which carries
+/// [`RAISE_CONTACT_IMPULSE_EVENTS`](physics::hknpBody::RAISE_CONTACT_IMPULSE_EVENTS). The contact
+/// impulse event creator (`hknpContactImpulseEventCreator::postContactSolve`) writes one into the
+/// solving thread's command stream after it solves the contact, and the world dispatches the
+/// streams in its post-solve phase (`hknpWorldEx::postSolve`), the last task
+/// [`hknpWorld::stepSolve`](physics::hknpWorld::stepSolve) generates, which it runs alone on its
+/// calling thread. For a contact that keeps a collision cache, the creator raises
+/// [`STATUS_STARTED`](Self::STATUS_STARTED) on the first step the contact's impulse is positive,
+/// and raises [`STATUS_CONTINUED`](Self::STATUS_CONTINUED) and
+/// [`STATUS_FINISHED`](Self::STATUS_FINISHED) only for a contact a listener asked them of; a
+/// contact without a cache raises [`STATUS_IMMEDIATE`](Self::STATUS_IMMEDIATE) each step its
+/// impulse is positive.
+#[size(0x40), align(16)]
+pub type hknpContactImpulseEvent {
+    /// [`m_status`](Self::m_status): the contact's impulse became positive this step.
+    pub const STATUS_STARTED: u8 = 1,
+    /// [`m_status`](Self::m_status): the contact's impulse fell to zero this step.
+    pub const STATUS_FINISHED: u8 = 2,
+    /// [`m_status`](Self::m_status): the contact's impulse stayed positive this step.
+    pub const STATUS_CONTINUED: u8 = 3,
+    /// [`m_status`](Self::m_status): a positive impulse on a contact without a collision cache.
+    pub const STATUS_IMMEDIATE: u8 = 4,
+
+    /// The two bodies, the first and the second.
+    #[address(0x8)]
+    pub m_bodyIds: [u32; 2],
+    /// The contact's solver Jacobian (`hknpContactJacobian`), null for a finished contact whose
+    /// manifold is gone; see [`hknpContactJacobianUtil::getNumContactPoints`].
+    pub m_contactJacobian: *const void,
+    /// The index of the contact's manifold in its Jacobian.
+    pub m_manifoldIndex: u8,
+    /// The world's contact solver type (`hknpContactSolverType`), which the Jacobian's layout
+    /// depends on.
+    pub m_contactSolverType: u8,
+
+    /// The event's status, one of the `STATUS_` constants.
+    #[address(0x20)]
+    pub m_status: u8,
+
+    /// The contact's friction factor.
+    #[address(0x24)]
+    pub m_frictionFactor: f32,
+
+    /// The impulse the solver applied at each of the contact's points over the step, newton
+    /// seconds; only the first [`hknpContactJacobianUtil::getNumContactPoints`] are the contact's.
+    #[address(0x30)]
+    pub m_contactImpulses: [f32; 4],
+}
+
+/// A contact manifold (`hkcdManifold4`) with the normal and world-space contact positions.
+#[size(0x80), align(16)]
+pub type hkcdManifold4 {
+    pub m_numPoints: i32,
+    pub m_minimumDistance: f32,
+
+    #[address(0x10)]
+    pub m_normal: hkVector4f,
+    pub m_weldNormal: hkVector4f,
+    pub m_distances: [f32; 4],
+    pub m_positions: [hkVector4f; 4],
+}
+impl hknpContactImpulseEvent {
+    /// Reconstructs the contact positions from the Jacobian and the world's body motions.
+    /// The disassembler labels this function `hknpBodyTracker_getBodyIdsFromInput`.
+    #[address(0x141_519_2C0)]
+    pub fn calculateContactPointPositions(&self, world: *const physics::hknpWorld, manifold: *mut hkcdManifold4);
+}
+
+/// Helpers that read a contact's solver Jacobian (`hknpContactJacobianUtil`).
+pub type hknpContactJacobianUtil;
+impl hknpContactJacobianUtil {
+    /// The number of contact points, at most four, of the contact whose Jacobian is `jacobian`
+    /// under the world's contact solver type `solver_type`. The contact impulse event creator
+    /// counts a contact's impulses with it.
+    #[address(0x141_48C_090)]
+    pub fn getNumContactPoints(solver_type: u32, jacobian: *const void) -> i32;
+}
+
+/// The configuration for paged shape-key enumeration. The parent path starts empty, with no mask
+/// and the most detailed geometry.
+#[size(0x18), align(8)]
+pub type hknpGetShapeKeysConfig {
+    /// Selects the most detailed geometry.
+    pub const MOST_DETAILED: i32 = 0,
+
+    pub m_parentKey: u32,
+    pub m_parentSize: i32,
+    pub m_mask: *const void,
+    pub m_levelOfDetail: i32,
+}
+
+/// Storage used to collect leaf shapes. The triangle prototype is externally supplied. A reset
+/// installs the root transform and clears the prior result; leaf extraction can modify the
+/// transform, scale, and shape. Triangle batches are materialized by [`getSubshape`].
+#[size(0xC50), align(16)]
+pub type hknpShapeCollector {
+    pub m_transformOut: hkTransformf,
+
+    #[address(0x40)]
+    pub m_scaleOut: hkVector4f,
+    pub m_flags: u32,
+
+    #[address(0x58)]
+    pub m_shapeOut: *const hknpShape,
+
+    #[address(0x68)]
+    pub m_triangleShapePrototype: *mut hknpShape,
+}
+impl hknpShapeCollector {
+    /// Resets the collector with a root transform and room for shape tags.
+    #[address(0x140_1D9_400)]
+    pub fn reset(&mut self, transform: *const hkTransformf, num_shapes: i32);
+}
+
+/// An in-place triangle, including its relative vertex, plane, face, and index arrays.
+#[size(0xF0), align(16)]
+pub type hknpInplaceTriangleShape;
+impl hknpInplaceTriangleShape {
+    /// Builds the in-place triangle with its native default radius. The object's storage remains
+    /// owned by its caller.
+    #[address(0x141_4DC_020)]
+    pub fn Construct(&mut self, finish_loaded: bool) -> *mut hknpInplaceTriangleShape;
+}
+
+/// Extracts one leaf, materializes any triangle batch into the supplied prototype, and returns
+/// the resulting shape pointer from the collector. The collector must have been reset.
+#[address(0x140_F88_3B0)]
+pub fn getSubshape(shape: *const hknpShape, key: u32, collector: *mut hknpShapeCollector) -> *const hknpShape;
+
+/// Input for the ordinary vertex-array GSK distance query. The transform maps B into A.
+#[size(0x70), align(16)]
+pub type hkcdGskGetClosestPointInput {
+    /// Enables the penetration-depth query.
+    pub const HANDLE_PENETRATION: u32 = 1,
+    /// The ordinary-distance termination growth rate used by native callers.
+    pub const DEFAULT_TERMINATION_GROWTH_RATE: f32 = 1.4,
+
+    pub m_aTb: hkTransformf,
+    pub m_handlePenetration: u32,
+
+    #[address(0x50)]
+    pub m_coreCollisionTolerance: hkVector4f,
+    pub m_terminationGrowthRate: f32,
+}
+
+/// GSK's simplex cache.
+#[size(0x5), align(1)]
+pub type hkcdGskCache {
+    pub const INITIAL_DIMENSION: u8 = 0x41,
+
+    pub m_vertexIds: [u8; 4],
+    pub m_dimAb: u8,
+}
+
+/// Distance between the core shapes, normal in A, and a closest point in A. Shape convex radii
+/// are not subtracted from the distance.
+#[size(0x30), align(16)]
+pub type hkcdGskGetClosestPointOutput {
+    pub m_distance: hkVector4f,
+    pub m_normalInA: hkVector4f,
+    pub m_pointAinA: hkVector4f,
+}
+
+/// Status returned by an ordinary GSK closest-point query.
+pub enum hkcdGskGetClosestPointStatus: i32 {
+    STATUS_OK_NOT_PENTRATING = 0,
+    STATUS_OK_PENETRATING = 1,
+    STATUS_PD_HEURISTIC_SAMPLING = 2,
+    STATUS_PD_OUT_OF_MEMORY = 3,
+    STATUS_OK_FLAG = 4,
+    STATUS_PD_DISTANCE_TOO_BIG = 5,
+    STATUS_PENETRATING = 6,
+    STATUS_PD_UNSOLVABLE = 7,
+}
+
+/// Computes the closest core points of the two vertex arrays, updating the simplex cache and
+/// returning a status independently of the output. The arrays contain aligned Havok vertices.
+#[address(0x141_2FC_430)]
+pub fn hkcdGskGetClosestPoint(vertices_a: *const hkVector4f, count_a: i32, vertices_b: *const hkVector4f, count_b: i32, input: *const hkcdGskGetClosestPointInput, cache: *mut hkcdGskCache, output: *mut hkcdGskGetClosestPointOutput) -> i32;

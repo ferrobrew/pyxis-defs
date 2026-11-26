@@ -1,3 +1,6 @@
+use types::math::Matrix4;
+use types::shared_ptr::{SharedPtr, WeakPtrGameObject};
+
 #[singleton(0x142_E22_E68), min_size(0x2C0)]
 pub type Game {
     /// The intra-`Update` site at which the game's per-frame render bookkeeping starts: the
@@ -21,7 +24,10 @@ pub type Game {
     pub const INTERPOLATION_METHOD_SINGLE_STEP: u32 = 1,
     /// The [`m_InterpolationMethod`](Self::m_InterpolationMethod) chosen while a cutscene plays:
     /// the same accumulator, but [`UpdateGame`](Self::UpdateGame) runs once per whole step
-    /// accumulated (capped), subtracting one per update.
+    /// accumulated, subtracting one per update, up to [`Game_MaxGameUpdatesPerRender`] a frame;
+    /// the frame's contribution to the accumulator is capped at the same count, so a frame that
+    /// would need more ticks loses the time. A filtered-timer guard drops the frame to one tick
+    /// when the recent ticks took longer than a step.
     pub const INTERPOLATION_METHOD_ACCUMULATED: u32 = 2,
     /// The [`m_InterpolationMethod`](Self::m_InterpolationMethod) that derives the number of sim
     /// steps from `QueryPerformanceCounter` wall-clock time since the method was entered, running
@@ -31,7 +37,15 @@ pub type Game {
 
     #[address(0x10)]
     pub m_CountAccumulator: u64,
+    /// The sim tick rate, ticks per second. The constructor writes 30 here and into
+    /// [`m_DefaultUpdateFrequency`](Self::m_DefaultUpdateFrequency). [`Update`](Self::Update)
+    /// reads it every frame (raising it to 1 when it is not positive): the step it derives,
+    /// one over this rate, is each tick's `m_Dt` and `m_OriginalDt` in the update context, and the
+    /// rate the clock is forced to for the duration of the sim. Writing it changes the tick from
+    /// the next frame on. [`PhysicsSystem::Update`](physics::PhysicsSystem::Update) does not
+    /// follow it: it steps the world by its own fixed step.
     pub m_UpdateFrequency: u32,
+    /// The tick rate the constructor sets, kept beside [`m_UpdateFrequency`](Self::m_UpdateFrequency).
     pub m_DefaultUpdateFrequency: u32,
 
     #[address(0x34)]
@@ -55,6 +69,11 @@ pub type Game {
     /// [`INTERPOLATION_OVERRIDE_NONE`](Self::INTERPOLATION_OVERRIDE_NONE) when unset.
     pub m_InterpolationOverride: i32,
 
+    /// The simulation dispatch counter, incremented by [`UpdateGame`](Self::UpdateGame) before
+    /// the active state's update. Render-only updates do not advance it.
+    #[address(0x1D0)]
+    pub m_FrameCounter: u64,
+
     #[address(0x260)]
     pub m_DecoupleEnabled: bool,
 
@@ -69,14 +88,43 @@ impl Game {
     #[address(0x140_967_600)]
     pub fn Destructor(&mut self);
 
+    /// Waits for the previous frame's draw task
+    /// ([`GraphicsEngine::WaitForCPUDrawToFinish`](graphics_engine::graphics_engine::GraphicsEngine::WaitForCPUDrawToFinish)),
+    /// decides from the game state, the UI's static background, and a full-screen video whether
+    /// the frame draws the scene, and runs
+    /// [`GraphicsEngine::Draw`](graphics_engine::graphics_engine::GraphicsEngine::Draw).
     #[address(0x140_952_390)]
     pub fn Draw(&self, dt: f32);
 
     /// The top-level per-frame update: advances the sim and drives rendering. Returns false on exit.
+    ///
+    /// Each frame it derives the sim step as one over [`m_UpdateFrequency`](Self::m_UpdateFrequency),
+    /// builds the update contexts with that step as their `m_Dt`, and, while
+    /// [`E_GUF_UPDATE`](GameUpdateFlags::E_GUF_UPDATE) is set, forces the clock to that rate
+    /// (`CClock::EnableForceToFPS`), so that [`Clock::GetSPF`](clock::Clock::GetSPF) returns the
+    /// step during the sim; it undoes the forcing before [`UpdateRender`](Self::UpdateRender).
+    /// The frame's seconds per frame, capped at half a second, are converted into ticks by
+    /// the chosen [`m_InterpolationMethod`](Self::m_InterpolationMethod), each tick one
+    /// [`UpdateGame`](Self::UpdateGame) call, and the fraction left over is the render context's
+    /// `m_Dtf`. While the clock is paused, or [`m_DecoupleEnabled`](Self::m_DecoupleEnabled) is
+    /// clear, it instead runs one [`UpdateGame`](Self::UpdateGame) with the frame's time as the
+    /// step.
     #[address(0x140_960_4E0)]
     pub fn Update(&mut self) -> bool;
 
-    /// Builds the per-frame update contexts and drives rendering.
+    /// Builds the per-frame update contexts and drives rendering: the game state's pre-render
+    /// update, the memory garbage collection, then the active state's render update (the run
+    /// state's, or its paused variant while the main draw is off, or the frontend's; in any other
+    /// state the load state's when loading, then the UI's pre-render and the video manager's render
+    /// update).
+    ///
+    /// It does not wait for the previous frame's draw task: the wait at its top
+    /// ([`GraphicsEngine::WaitForCPUDrawToFinish`](graphics_engine::graphics_engine::GraphicsEngine::WaitForCPUDrawToFinish))
+    /// runs only while [`Game_EnableOldSyncPoint`] is set, and nothing sets it. The render update
+    /// therefore runs alongside the previous frame's draw task, and the fence between them is the
+    /// wait at the top of [`Draw`](Self::Draw). The render update's own work on the immediate
+    /// context, such as the tone mapping's histogram readback (`Graphics::GetOcclusionQueryResult`),
+    /// takes the context's mutex call by call, as the draw task's draw wrappers do.
     #[address(0x140_95A_4E0)]
     pub fn UpdateRender(&mut self, update_contexts: *mut UpdateContexts);
 
@@ -86,6 +134,18 @@ impl Game {
     #[address(0x140_952_1F0)]
     pub fn UpdateGame(&mut self, update_contexts: *mut UpdateContexts);
 }
+
+/// `g_MaxGameUpdatesPerRender`: the most [`Game::UpdateGame`] calls one [`Game::Update`] makes
+/// under [`INTERPOLATION_METHOD_ACCUMULATED`](Game::INTERPOLATION_METHOD_ACCUMULATED) and
+/// [`INTERPOLATION_METHOD_TIME_BASED`](Game::INTERPOLATION_METHOD_TIME_BASED). The image
+/// initializes it to 2.
+#[address(0x142_D6E_A50)]
+pub extern Game_MaxGameUpdatesPerRender: u32;
+/// `s_EnableSyncpoint`, the developer menu's `Dev|EnableOldSyncPoint`: while set,
+/// [`Game::UpdateRender`] waits for the previous frame's draw task before the render update. The
+/// image initializes it to false, and its only reference is that read.
+#[address(0x142_F33_B8B)]
+pub extern Game_EnableOldSyncPoint: bool;
 
 /// `CGame::EGameUpdateFlags`: the phases of [`Game::Update`] enabled by
 /// [`Game::m_UpdateFlags`].
@@ -102,6 +162,39 @@ pub bitflags GameUpdateFlags: u32 {
 /// `CGameStateRun`: the in-game state's static update functions.
 pub type GameStateRun;
 impl GameStateRun {
+    /// `CGameStateRun::Update`: the run state's sim tick, called by [`Game::UpdateGame`] once per
+    /// tick in play and by [`GameStateFrontend::Update`] once its sub-state reaches the main menu
+    /// with the world loaded behind it. It queues the frame's raycast fragments, then the input
+    /// job ([`RunInputThread`]), and runs the network, traffic and ambient-spawn starts, the task
+    /// pool's continuations, the road decorations, the water, the effects' pre-simulation update,
+    /// the world time, the render cameras' transform history, the character manager's
+    /// pre-simulation step, the settings, the AI's queued messages and path requests, and the
+    /// effects' physics-model spawn while the input job runs. It then spins on the input job's
+    /// completion signal (yielding, without running queued fragments), and runs the dialogue,
+    /// the sound post-simulation update, the vehicles' pre-update, the operations, login, rebel
+    /// support, ammunition, and mission updates, the traffic and ambient-spawn sync halves, the
+    /// posted-event dispatch, the challenge (ROM), encounter, heat, and spawn-system updates, and
+    /// the video's pre-simulation update before the game world's pre-simulation queue
+    /// ([`GameWorld::UpdatePreSim`](game_world::GameWorld::UpdatePreSim)), the physics phase
+    /// ([`GameState::UpdatePhysics`]), and the post-simulation queue. Nothing between the
+    /// completion spin and the pre-simulation queue returns early. The tick ends with the game
+    /// world's post-camera queue and then the ammunition manager's post-simulation pass
+    /// ([`AmmunitionManagerUpdatePostSim`](equipment::explosive::AmmunitionManagerUpdatePostSim)),
+    /// which gives the explosives spawned since the previous pass their physics bodies. The challenge update reads the
+    /// player action map there: an active race reads how long
+    /// [`CHALLENGE_RESET_VEHICLE`](input::input_action_map::Action::CHALLENGE_RESET_VEHICLE) has
+    /// been held.
+    ///
+    /// The disassembler mislabels several callees: the effects' pre-simulation update as
+    /// `CCharacterManager::UpdateVDB`, the ambient-spawn sync as
+    /// `CGameCameraManager::UpdateBeforeGameWorld`, the posted-event dispatch as
+    /// `CPropertyUtil::RegisterEvent`, the continuation pump as `CGameStateInit::UpdateDone`, the
+    /// network pre-simulation update as `CNetworkManager::Update_PostSim`, the pathfinder's message
+    /// processing as `CAiPathfinder2::UpdatePathRequest`, and [`GameState::UpdatePhysics`] as
+    /// `IsStillAlive`.
+    #[address(0x140_9F0_EE0)]
+    pub fn Update(update_contexts: *mut UpdateContexts);
+
     /// The render-side update the run state performs while the game is paused: drives the
     /// landscape, UI prerender, video, water simulation, and resource streaming, and waits for the
     /// CPU draw, without running the camera update.
@@ -109,9 +202,79 @@ impl GameStateRun {
     pub fn UpdateRenderPaused(update_contexts: *mut UpdateContexts);
 }
 
-// Opaque engine context types carried by the per-frame update contexts.
-pub type ResourceCache;
+/// The game's load state (`CGameStateLoad`), entered for a load, a continue, a new game, a world
+/// reload, and every teleport with the load state
+/// ([`GameWorld::TeleportPlayer`](game_world::GameWorld::TeleportPlayer)). Its layout is unmapped.
+pub type GameStateLoad;
+impl GameStateLoad {
+    /// `CGameStateLoad::Update`: the load state's tick. It calls [`GameState::PreUpdate`] inline on
+    /// the game thread.
+    #[address(0x140_A11_CC0)]
+    pub fn Update(update_contexts: *mut UpdateContexts);
 
+    /// The load state's entry. It runs [`ResetSystems`](Self::ResetSystems), so every entry to
+    /// the load state resets the spawn system.
+    #[address(0x140_9FE_C80)]
+    pub fn OnEnter();
+
+    /// The load state's reset step, called only by [`OnEnter`](Self::OnEnter): aborts an active
+    /// challenge unless the no-unload flag is set, gives back a challenge's loadout its
+    /// destruction left to the reset
+    /// ([`ROMObject::RestoreWeaponsAndAmmo`](mission::ROMObject::RestoreWeaponsAndAmmo)), resets the
+    /// dialogue, resets the spawn system
+    /// ([`SpawnSystem::ResetSystem`](spawn_system::SpawnSystem::ResetSystem)), and resets the heat.
+    /// The disassembler mislabels it `IConsole::GetLoadingLock`.
+    #[address(0x140_9BA_BB0)]
+    pub fn ResetSystems();
+}
+
+/// The game's frontend state (`CGameStateFrontend`), the main menu. Its layout is unmapped.
+pub type GameStateFrontend;
+impl GameStateFrontend {
+    /// `CGameStateFrontend::Update`: the frontend's tick, stepping its sub-state machine (waiting
+    /// for IO, the title, login, language, loading the global data, the spawn, landscape, and
+    /// location loads, and the main menu). Before the main menu's sub-states it calls
+    /// [`GameState::PreUpdate`] inline on the game thread with its own reduced update. Once the
+    /// world is loaded behind the main menu it calls [`GameStateRun::Update`] instead, so the input
+    /// job runs as it does in play.
+    #[address(0x140_A15_A40)]
+    pub fn Update(update_contexts: *mut UpdateContexts);
+
+    /// The frontend's reset of the game systems on the quit to the menu, which resets the spawn
+    /// system ([`SpawnSystem::ResetSystem`](spawn_system::SpawnSystem::ResetSystem)).
+    #[address(0x140_9AC_700)]
+    pub fn ResetSystems();
+}
+
+/// The resource cache shared by resource handles and game-object initialization contexts.
+#[min_size(0x60)]
+pub type ResourceCache {
+    /// The resource records indexed by [`ResourceHandle::m_Index`].
+    #[address(0x58)]
+    pub m_Resources: *mut ResourceInfo,
+}
+
+/// A handle identifying a resource record in its owning cache.
+#[min_size(0x10)]
+pub type ResourceHandle {
+    /// The index into the owning cache's [`m_Resources`](ResourceCache::m_Resources) array.
+    #[address(0x0)]
+    pub m_Index: u16,
+
+    /// The cache that owns the indexed resource record.
+    #[address(0x8)]
+    pub m_ResourceCache: *mut ResourceCache,
+}
+
+/// A resource cache record containing the loaded resource pointer and bookkeeping.
+#[size(0x28)]
+pub type ResourceInfo {
+    /// The loaded resource pointer.
+    #[address(0x0)]
+    pub m_Resource: *mut void,
+}
+
+/// The project context carried by game-object update contexts. Its layout is unmapped.
 pub type ProjectContext;
 
 #[size(0x20), copyable]
@@ -168,6 +331,181 @@ pub enum GameState: u32 {
     NOF_GAME_STATES = 0x6,
 }
 impl GameState {
+    /// `CGameState::PreUpdate`: the input update. In order, it sets the UI manager's capture thread
+    /// to the calling thread, starts the sound library's pre-simulation job, updates the message
+    /// boxes and the account manager, restores the steering objects' action maps when the device
+    /// manager has marked them dirty, runs the device poll
+    /// ([`InputDeviceManager::Update`](input::input_device_manager::InputDeviceManager::Update))
+    /// and [`UpdateForceClicks`](input::input_device_manager::InputDeviceManager::UpdateForceClicks)
+    /// unless the out-of-focus input setting is on and the window is out of focus, runs the UI's
+    /// input update (`CUIManager::PreUpdate`, which reads the pause and commlink actions from the
+    /// player action map and dispatches the screens' input handlers), waits for the sound job, and
+    /// reverts the capture thread. It touches input devices, the action maps, the UI, the message
+    /// boxes, the accounts, and the sound job, and nothing of the world.
+    ///
+    /// Callers: the input job ([`RunInputThread_Proxy`]), [`GameStateLoad::Update`], and
+    /// [`GameStateFrontend::Update`] before its main-menu sub-states. The disassembler mislabels
+    /// the capture thread's revert as `ProfilerInitThread`.
+    #[address(0x140_9AC_0E0)]
+    pub fn PreUpdate(update_contexts: *mut UpdateContexts);
+
     #[address(0x140_A00_E90)]
     pub fn PostUpdateRender(update_contexts: *const UpdateContexts);
+
+    /// `CGameState::UpdatePhysics`: the run state's physics phase, between the game world's
+    /// pre-simulation and post-simulation queues ([`GameWorld::UpdatePreSim`](game_world::GameWorld::UpdatePreSim)
+    /// and [`GameWorld::UpdatePostSim`](game_world::GameWorld::UpdatePostSim)). Unless the clock's
+    /// update speed is below a tenth (deep slow motion, which skips the step), it calls
+    /// [`PhysicsSystem::Update`](physics::PhysicsSystem::Update) with `dt`, the update context's
+    /// `m_Dt`. It then dispatches the queued collisions, clears the collision array, runs the
+    /// vehicles' post-collision update, processes the damage listeners' events, and updates the
+    /// shape sensors.
+    #[address(0x140_9AC_2A0)]
+    pub fn UpdatePhysics(dt: f32);
+
+    /// `CGameState::UpdateDeletionOfObjects`: deletes the queued background objects and the
+    /// locator's queued resources within `budget_us` microseconds. The run state's update calls
+    /// it once per tick, after [`StreamerUpdate`] and [`GameLocationSystemUpdate`], with what is
+    /// left of the tick's streaming budget.
+    #[address(0x140_9BA_410)]
+    pub fn UpdateDeletionOfObjects(budget_us: u32);
+}
+
+/// `CGameObject::FindOptionalInternal`: looks up the game object with the object id `id`
+/// (`SObjectID`, passed by value) and writes a strong reference to it into `result`, the
+/// `CGameObject` subobject, or a null reference when none exists; returns whether it found one.
+/// The reference keeps the object alive until it is released with
+/// [`ReleaseSharedPtrGameObject`](types::shared_ptr::ReleaseSharedPtrGameObject). The bullets'
+/// hit handling calls it on their worker threads.
+#[address(0x140_4F5_310)]
+pub fn FindOptionalInternal(id: u64, result: *mut SharedPtr<GameObject>) -> bool;
+
+/// The resource streamer's update: polls the file system and the decompressors, creates the
+/// loaded resources, and starts the pending requests, within `budget_us` microseconds. The run
+/// state's update calls it once per tick after the physics phase, with a budget of at least
+/// a fixed minimum taken from a reservoir it refills every tick, so the streaming time per second
+/// grows with the tick rate when there is work. Returns the streamer's result code.
+#[address(0x141_18A_180)]
+pub fn StreamerUpdate(budget_us: u32) -> u32;
+
+/// The game location system's update: checks which locations to load and advances their loading
+/// and the landmarks' visibility, within `budget_us` microseconds. The run state's update calls it
+/// once per tick, after [`StreamerUpdate`].
+#[address(0x140_4BC_110)]
+pub fn GameLocationSystemUpdate(budget_us: u32);
+
+/// `RunLightThread`: queues the light manager's update on a CPU fragment, with `dt` the tick's
+/// step, and clears the signal the run state's update later waits on. The run state's update calls
+/// it once per tick after the effects' post-simulation update.
+#[address(0x140_9AE_070)]
+pub fn RunLightThread(dt: f32);
+
+/// `RunInputThread`: clears the input job's completion signal and queues [`RunInputThread_Proxy`]
+/// as a `CallProxy` CPU fragment, with `update_contexts` as its argument and the signal attached.
+/// [`GameStateRun::Update`] calls it once per tick and spins on the signal before the world's
+/// pre-simulation queue.
+#[address(0x140_9AE_130)]
+pub fn RunInputThread(update_contexts: *mut UpdateContexts);
+
+/// The input job's body: calls [`GameState::PreUpdate`] with `update_contexts` and returns 1. It
+/// runs on whichever CPU fragment worker takes the fragment, or on the game thread when that
+/// thread runs queued fragments while it waits on the previous frame's signals
+/// (`CGameStateRun::WaitForLocksFromPreviousFrame`), concurrently with the rest of
+/// [`GameStateRun::Update`] up to the completion spin. The engine keeps the two apart by partition:
+/// the job touches only input, the UI, the message boxes, the accounts, and the sound job.
+#[address(0x140_9AE_110)]
+pub fn RunInputThread_Proxy(update_contexts: *mut UpdateContexts) -> i32;
+
+/// `RunAIThread1`: queues [`RunAIThread1_Proxy`] on a CPU fragment with `dt` the tick's step, and
+/// clears its completion signal. The run state's update calls it once per tick after the awareness
+/// events' dispatch, and waits for the signal near the end of the same tick.
+#[address(0x140_9F0_D40)]
+pub fn RunAIThread1(dt: f32);
+
+/// The first AI thread's body, run on a CPU fragment worker (or by a thread that runs queued
+/// fragments while it waits): the per-character AI update, the road graph, traffic, and action
+/// token managers, and the pathfinder's instant-rotation switch. `dt` points at the tick's step.
+/// Returns 1.
+#[address(0x140_9F0_B30)]
+pub fn RunAIThread1_Proxy(dt: *mut f32) -> i32;
+
+/// `RunAIThread2`: caches the game camera's position for the AI pathfinder, then queues
+/// [`RunAIThread2_Proxy`] on a CPU fragment with `dt` the tick's step, and clears its completion
+/// signal. The run state's update calls it last in the tick, so the thread runs alongside the rest
+/// of the frame: the run state's render update waits for the signal before its raycast threads,
+/// and the next tick's update waits for it before its input.
+#[address(0x140_9F0_DE0)]
+pub fn RunAIThread2(dt: f32);
+
+/// The second AI thread's body, run on a CPU fragment worker: the pathfinders' work, the navmesh
+/// pathfinder, the behavior trees, the AI system's update, and the terrain pathfinder; it queues a
+/// further fragment of its own. `dt` points at the tick's step. Returns 1.
+#[address(0x140_9F0_BC0)]
+pub fn RunAIThread2_Proxy(dt: *mut f32) -> i32;
+
+/// A game object's `CGameObject` subobject, through which the engine's run-time type tests go. A
+/// [`PhysicsGameObject`](physics::PhysicsGameObject) carries it at
+/// [`GAME_OBJECT_BASE_OFFSET`](physics::PhysicsGameObject::GAME_OBJECT_BASE_OFFSET). Only some
+/// virtuals are bound.
+pub type GameObject {
+    vftable {
+        /// `CRtti::IsType`: whether the object is of the class `type_id` names or derives from it.
+        /// `type_id` points at the class's run-time type id, as a class's `TYPE_ID` function
+        /// returns it (such as [`Character::TYPE_ID`](character::character::Character::TYPE_ID)).
+        #[index(2)]
+        pub fn IsType(&self, type_id: *const u32) -> bool;
+
+        /// Copies the object's current world transform into `out` and reports whether a transform
+        /// is available. The skeletal animated object's implementation copies its current world
+        /// matrix without changing the object. The adjacent mutable overload forwards to this
+        /// const overload.
+        #[index(21)]
+        pub fn GetTransform(&self, out: *mut Matrix4) -> bool;
+
+        /// Enables or disables the object. A rigid object's override
+        /// ([`RigidObject`](physics::RigidObject)) records the state and, when it changes, adds its
+        /// body to the physics world on enabling and removes it on disabling. A gun's spare
+        /// magazine prop ([`WeaponData::m_MagazineObject`](equipment::weapon::WeaponData::m_MagazineObject))
+        /// is disabled from its spawn until
+        /// [`ThrowAwayMagazineObject`](equipment::weapon::WeaponData::ThrowAwayMagazineObject)
+        /// enables it.
+        #[index(38)]
+        pub fn Enable(&mut self, enable: bool);
+
+        /// Registers the object for the updates its update-type virtual asks for
+        /// (`CGameObject::AddToUpdate`). The base implementation queries the object's required
+        /// update types and registers its pre-simulation, post-simulation, and render updates
+        /// accordingly, then adds its children. A weapon's post-simulation update calls it when
+        /// its post-simulation flag rises from clear.
+        #[index(42)]
+        pub fn AddToUpdate(&mut self);
+    },
+
+    /// A weak reference to the object itself (`m_WeakThis`), from which the engine hands out
+    /// references to the object: the player aim's direct hit takes the slot's game object from it
+    /// ([`PlayerAimControl::CheckDirectTargets`](aim::aim::PlayerAimControl::CheckDirectTargets)),
+    /// and a grapple target info its target object
+    /// ([`HookTargetInfo::SetupTargetFromGameObject`](equipment::wire_end::HookTargetInfo::SetupTargetFromGameObject)).
+    #[address(0x60)]
+    pub m_WeakThis: WeakPtrGameObject,
+    /// A weak reference to the object's parent in its entity hierarchy (`m_Parent`), empty for a
+    /// root. [`GetParentTransform`](Self::GetParentTransform) locks it for the parent's world
+    /// transform: a child object such as the grappling hook's mesh takes its world transform from
+    /// its parent's.
+    pub m_Parent: WeakPtrGameObject,
+}
+impl GameObject {
+    /// Locks [`m_Parent`](Self::m_Parent) and copies the parent's world transform into `out`
+    /// through the parent's [`GetTransform`](Self::GetTransform); returns false without a parent.
+    #[address(0x140_4E6_760)]
+    pub fn GetParentTransform(&self, out: *mut Matrix4) -> bool;
+
+    /// The object's spawn tag index (`CGameObject::GetUniqueSpawnTagIndex`): the index of the
+    /// spawn tag the spawn system spawned it from, which identifies its type. The spawn system
+    /// converts it to the tag's hash, the persistent form, with
+    /// [`GetTagHashFromTagIndex`](spawn_system::SpawnSystem::GetTagHashFromTagIndex). The player
+    /// save data stores each inventory weapon's type this way, and the inventory's respawn table
+    /// ([`Inventory::m_WeaponToSpawn`](character::inventory::Inventory::m_WeaponToSpawn)) holds it.
+    #[address(0x140_4CC_F60)]
+    pub fn GetUniqueSpawnTagIndex(&self) -> i32;
 }

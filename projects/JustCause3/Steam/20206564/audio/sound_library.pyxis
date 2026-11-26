@@ -4,3 +4,16 @@ use types::math::Vector3;
 /// Sets the 3D audio listener pose and velocity. Free function.
 #[address(0x140_D2A_FF0)]
 fn SetListenerTransform(mat: *const Matrix4, velocity: *const Vector3, enable: bool);
+
+/// `NGameSoundLibrary::SetWindowFocused`: records whether the game window holds the foreground in
+/// [`WindowFocused`] and, when the value changes, runs one sound-library fixed update so the
+/// change takes effect at once. Called by [`LoseFocus`](window::LoseFocus) and
+/// [`GainFocus`](window::GainFocus).
+#[address(0x140_DE6_880)]
+pub fn SetWindowFocused(focused: bool);
+
+/// `NGameSoundLibrary::g_WindowFocused`: whether the game window holds the foreground, as the
+/// sound library sees it. While it is clear the sound library's post-sim update silences the master
+/// bus, as it does for the pause reasons that mute all audio.
+#[address(0x142_D93_109)]
+pub extern WindowFocused: bool;

@@ -1,9 +1,25 @@
 use aim::aim::AimMode;
-use character::character::AnimatedModel;
+use animation::message::AnimationMessageData;
+use character::character::{AnimatedModel, Character};
 use character::inventory::WeaponSlot;
-use types::math::Matrix4;
+use equipment::explosive::PlantedExplosive;
+use game::{GameObject, GameObjectRenderContext, GameObjectUpdateContext};
+use graphics_engine::model_instance::{Model, ModelInstance};
+use interaction::InteractionContext;
+use physics::{CastRayInfoBase, GrapplingMode, PfxRigidBody, RigidObject};
+use types::math::{Matrix4, Vector3};
 use types::math::Vector3;
+use types::shared_ptr::{SharedPtr, WeakPtrGameObject};
 use types::std_vector::Vector;
+use equipment::attached_effects::AttachedEffectContainer;
+
+/// The hand a weapon grip-table entry is for (`EWeaponGripHand`), as
+/// [`WeaponBase::GetGripPosition`] takes it.
+#[copyable]
+pub enum WeaponGripHand: i32 {
+    E_WEAPON_GRIP_HAND_LEFT = 0x0,
+    E_WEAPON_GRIP_HAND_RIGHT = 0x1,
+}
 
 /// The situation a weapon is in (`CWeaponData::EWeaponState`), stored on the weapon as
 /// [`WeaponBase::m_State`]. It selects the weapon's attach bone
@@ -29,6 +45,28 @@ pub enum WeaponState: i32 {
     E_WS_NUM = 0xB,
 }
 
+/// A weapon's class (`CWeaponBase::EWeaponClass`), stored on the weapon as [`WeaponBase::m_Class`].
+/// Type-specific code compares it, for example the character's level-of-detail update, which keeps
+/// full detail for a character wielding a rocket launcher or a sniper rifle.
+#[copyable]
+pub enum WeaponClass: i32 {
+    E_WEAPON_CLASS_NONE = 0x3E8,
+    E_WEAPON_CLASS_PISTOL = 0x3E9,
+    E_WEAPON_CLASS_SMG = 0x3EA,
+    E_WEAPON_CLASS_ASSAULT_RIFLE = 0x3EB,
+    E_WEAPON_CLASS_SHOTGUN = 0x3EC,
+    /// A scoped rifle ([`SniperWeapon`]).
+    E_WEAPON_CLASS_SNIPER = 0x3ED,
+    E_WEAPON_CLASS_GRENADE_LAUNCHER = 0x3EE,
+    E_WEAPON_CLASS_RPG = 0x3EF,
+    E_WEAPON_CLASS_MINIGUN = 0x3F0,
+    E_WEAPON_CLASS_AA_GUN = 0x3F1,
+    E_WEAPON_CLASS_MORTAR = 0x3F2,
+    E_WEAPON_CLASS_50CAL = 0x3F3,
+    E_WEAPON_CLASS_SPECIAL = 0x3F4,
+    E_WEAPON_CLASS_REVOLVER = 0x3F5,
+}
+
 /// How a weapon orients its projectiles (`CWeaponBase::EProjectileFireDirectionMode`), read by
 /// [`WeaponBase::GetShotMatrix`] from [`WeaponBase::m_ProjectileTempFireDirection`], falling back to
 /// [`WeaponBase::m_ProjectileFireDirection`] while the temporary mode is unset.
@@ -42,12 +80,105 @@ pub enum ProjectileFireDirectionMode: i32 {
     E_PROJECTILE_FIRE_DIRECTION_BARREL = 0x1,
 }
 
+/// A kind of ammunition (`CAmmunition::EAmmunitionType`). A weapon's kind is
+/// [`WeaponBase::m_AmmunitionType`], set from the weapon's properties, and the holder's reserve of
+/// each kind is an entry of
+/// [`Inventory::m_Ammunition`](character::inventory::Inventory::m_Ammunition), so every weapon of
+/// a kind draws on the same reserve.
+#[copyable]
+pub enum AmmunitionType: i32 {
+    AMMO_PISTOL = 0x0,
+    AMMO_SHOTGUN = 0x1,
+    AMMO_SMG = 0x2,
+    AMMO_ASSAULT_RIFLE = 0x3,
+    AMMO_SNIPER = 0x4,
+    AMMO_ROCKETS = 0x5,
+    AMMO_EXPLOSIVES = 0x6,
+    /// Hand grenades. A refill of this kind from empty also reloads the hand grenade weapon
+    /// ([`Inventory::SetAmmoCount`](character::inventory::Inventory::SetAmmoCount)).
+    AMMO_HAND_GRENADE = 0x7,
+    AMMO_GRENADE_LAUNCHER = 0x8,
+    AMMO_SUNGUN = 0x9,
+    AMMO_MISSILE_STRIKE = 0xA,
+    /// Unlimited ammunition: a weapon of this kind never reloads.
+    /// [`WeaponBase::Reload`] and [`WeaponBase::CanReload`] refuse it, and the ammunition check
+    /// ([`WeaponBase::CheckIfReloadShouldBeTriggeredBase`]) never counts its magazine as empty.
+    AMMO_UNLIMITED = 0xB,
+    AMMO_BEACON = 0xC,
+    AMMO_NO_AMMO = 0xD,
+    AMMO_FLARE = 0xE,
+    AMMO_EMP = 0xF,
+    AMMO_POWERCORE = 0x10,
+    /// The number of ammunition kinds, and so the length of the inventory's per-kind arrays.
+    NOF_AMMO_TYPES = 0x11,
+    AMMO_INVALID = 0x12,
+}
+
+/// How a weapon reloads (`CWeaponBase::EReloadType`), stored on the weapon as
+/// [`WeaponBase::m_ReloadType`] and set from the weapon's `reload_type` property.
+#[copyable]
+pub enum ReloadType: i32 {
+    /// A whole magazine per reload: the reload act plays the weapon's reload clip, whose reload
+    /// track message ([`TRACK_MESSAGE_RELOAD`](WeaponBase::TRACK_MESSAGE_RELOAD)) calls
+    /// [`WeaponBase::Reload`] once and refills the magazine as far as the reserve allows. Nearly
+    /// every weapon uses it.
+    E_RELOAD_MAGAZINE = 0x0,
+    /// One round per refill: each [`WeaponBase::Reload`] adds a single round and, while the
+    /// magazine is still short of full, sets [`WeaponBase::m_KeepReloading`], which keeps the
+    /// reload going for the next round. The ammunition check cancels the reload act
+    /// ([`Character::CancelReload`](character::character::Character::CancelReload)) once the
+    /// flag is clear. The pump shotgun (the U-Rys 96) uses it.
+    E_RELOAD_BULLET = 0x1,
+    /// A timed reload with no act: the ammunition check sets [`WeaponBase::m_IsReloading`] and
+    /// [`WeaponBase::m_ReloadTimeLeft`] (from [`WeaponTuning::m_reload_time_scale`]), blocks the
+    /// shot while the timer runs, and calls [`WeaponBase::Reload`] when it runs out. Among the
+    /// hand-held weapons, the guitar-case launcher, the missile strike, and the EMP use it.
+    E_RELOAD_NO_ANIMATION = 0x2,
+}
+
+/// The kind of a weapon component (`CWeaponBase::EWeaponComponentType`), stored on the component
+/// as [`WeaponComponentBase::m_Type`]. A component of a derived class carries the derived kind:
+/// the barrel recoil and barrel spin components derive from the model-attachment component but
+/// carry their own kinds.
+#[copyable]
+pub enum WeaponComponentType: i32 {
+    E_WEAPON_COMPONENT_LASER_BEAM = 0x0,
+    E_WEAPON_COMPONENT_TURRET = 0x1,
+    E_WEAPON_COMPONENT_BARREL_SPIN = 0x2,
+    E_WEAPON_COMPONENT_BARREL_RECOIL = 0x3,
+    E_WEAPON_COMPONENT_DO_ACT = 0x4,
+    /// A [`ModelAttachementWeaponComponent`] of the base class.
+    E_WEAPON_COMPONENT_MODEL_ATTACHEMENT = 0x5,
+    E_WEAPON_COMPONENT_FOW_CONTROLLER = 0x6,
+    E_WEAPON_COMPONENT_MAGNET = 0x7,
+    E_WEAPON_COMPONENT_WALL_PENETRATION = 0x8,
+    E_WEAPON_COMPONENT_SPOTLIGHT = 0x9,
+    E_WEAPON_COMPONENT_LIGHT = 0xA,
+    E_WEAPON_COMPONENT_VEHICLE_PART_REMOVER = 0xB,
+    E_WEAPON_COMPONENT_AIM_POI = 0xC,
+    E_WEAPON_COMPONENT_AIRPLANE_FLYBY = 0xD,
+    E_WEAPON_COMPONENT_INVALID = 0xE,
+}
+
+/// The fire inputs a weapon's user hands its per-tick update (`SWeaponInputs`), each `0..=1`. The
+/// base update ([`WeaponBase::UpdateFromUserPostSim_ParallelBase`]) copies them before passing them
+/// on to [`WeaponBase::UpdateWeapon_Parallel`].
+#[size(0x8), copyable]
+pub type WeaponInputs {
+    /// The primary trigger, compared against the tuning's
+    /// [`m_trigger_sensitivity`](WeaponTuning::m_trigger_sensitivity).
+    pub m_PrimaryFireInput: f32,
+    /// The secondary trigger, for weapons with a secondary action.
+    pub m_SecondaryFireInput: f32,
+}
+
 /// A weapon's tuning record (`SWeaponTuning`), an ADF resource shared by every instance of a weapon
 /// type and reached through [`WeaponBase::m_Tuning`]. Only the fields read by the mapped functions
 /// are bound.
-#[min_size(0x70)]
+#[min_size(0x88)]
 pub type WeaponTuning {
-    /// The magazine capacity. Negative means the weapon has no magazine limit.
+    /// The magazine capacity. Negative means the weapon has no magazine limit: it never reloads,
+    /// and [`WeaponBase::Reload`] and [`WeaponBase::CanReload`] refuse it.
     #[address(0x40)]
     pub m_magazine_size: i32,
 
@@ -57,10 +188,40 @@ pub type WeaponTuning {
     #[address(0x44)]
     pub m_max_range: f32,
 
+    /// The reload timing. For an
+    /// [`E_RELOAD_NO_ANIMATION`](ReloadType::E_RELOAD_NO_ANIMATION) weapon the ammunition check
+    /// loads it into [`WeaponBase::m_ReloadTimeLeft`] as the reload's duration in seconds.
+    #[address(0x48)]
+    pub m_reload_time_scale: f32,
+
+    /// The seconds between shots: [`WeaponBase::UpdateWeapon_Parallel`] starts a shot only once
+    /// [`WeaponBase::m_TimeSinceLastFire`] has reached it. The interval is weapon-wide, so the guns
+    /// of a multi-gun weapon share it.
+    #[address(0x50)]
+    pub m_fire_rate: f32,
+    /// The replacement for [`m_fire_rate`](Self::m_fire_rate) once the player owns the weapon's
+    /// fire-rate upgrade.
+    pub m_fire_rate_level_2: f32,
+
+    /// Whether a held trigger keeps firing. Otherwise a local player's weapon fires once per pull
+    /// ([`WeaponBase::m_FiredThisInput`]); other users always fire while the trigger is pulled.
+    #[address(0x60)]
+    pub m_fully_automatic: bool,
+
+    /// The trigger thresholds: index 0 is the value a released trigger must exceed to count as
+    /// pulled, index 1 the lower value a pulled trigger must stay above.
+    #[address(0x64)]
+    pub m_trigger_sensitivity: [f32; 2],
+
     /// A per-weapon replacement for the character's aim-timer refill value; non-negative values
     /// override the character's aim settings (see [`WeaponBase::GetAimTimerOverride`]).
     #[address(0x6C)]
     pub m_aim_timer_override: f32,
+
+    /// Whether the weapon type has unlimited ammunition: one of the conditions of
+    /// [`WeaponBase::HasUnlimitedAmmo`].
+    #[address(0x84)]
+    pub m_unlimited_ammo: bool,
 }
 
 /// One muzzle fire point of a weapon model (`CWeaponData::SInternalFireInformation`): the muzzle
@@ -102,6 +263,54 @@ pub type WeaponDataArray {
 /// gun in [`WeaponBase::m_lWeaponData`]; a dual-wield weapon holds two.
 #[min_size(0x2E8)]
 pub type WeaponData {
+    /// The `model_name_hash` (the hash of `no_magazine_model`) that makes
+    /// [`ThrowAwayMagazineObject`](Self::ThrowAwayMagazineObject) drop the spare magazine from the
+    /// gun's own transform without looking for a model part.
+    pub const NO_MAGAZINE_MODEL_NAME_HASH: u32 = 0x193737A9,
+    /// The [`m_MagazineUniqueTag`](Self::m_MagazineUniqueTag) of a gun without a magazine prop.
+    pub const NO_MAGAZINE_UNIQUE_TAG: i32 = -1,
+    /// The name hash (`hashlittle` of `Pump`) of the pump bone in a pump-action gun's own skeleton,
+    /// the U-Rys 96's: the skeleton's one bone besides its `Reference` root, which carries the pump
+    /// and which the gun's pump clip moves. Resolved to an index through the gun's animation
+    /// controller ([`AnimationController::GetBoneIndex`](character::character::AnimationController::GetBoneIndex)).
+    pub const PUMP_BONE_HASH: u32 = 0x964E9E67,
+    /// The name hash (`hashlittle` of `Slider`) of the bolt bone in a bolt-action rifle's own
+    /// skeleton, the CS111 Archangel's and the Final Argument's: the skeleton's one bone besides its
+    /// `Reference` root, which carries the bolt and which the rifle's bolt-action clip moves.
+    pub const SLIDER_BONE_HASH: u32 = 0x7B1541DB,
+    /// The name hash (`hashlittle` of `Chamber`) of the crane bone in a revolver's own skeleton, the
+    /// Peacekeeper's, which the Little General shares: a child of the `Reference` root at the
+    /// crane's pivot below the cylinder. The revolver's reload clips swing the cylinder out by
+    /// turning this bone a quarter turn about the model's Z axis, the barrel's line, one way for
+    /// the left-hand clip and the other for the right, with a few millimetres of slide along X, and
+    /// back. Resolved to an index through the gun's animation controller
+    /// ([`AnimationController::GetBoneIndex`](character::character::AnimationController::GetBoneIndex)).
+    pub const CHAMBER_BONE_HASH: u32 = 0x623E8884,
+    /// The name hash (`hashlittle` of `ChamberSpin`) of the cylinder bone in a revolver's own
+    /// skeleton: a child of the crane bone ([`CHAMBER_BONE_HASH`](Self::CHAMBER_BONE_HASH)) at the
+    /// cylinder's centre, about which the cylinder turns on the barrel's line. The reload clips
+    /// leave it still.
+    pub const CHAMBER_SPIN_BONE_HASH: u32 = 0x6D058CDF,
+    /// The hash of the usage a gun's effect file names `ReloadInsertAmmo` (`hashlittle` of the
+    /// name): the sound of one shell or grenade going in, which only the shell-fed shotgun's and the
+    /// Bildt Negotiator's effect files carry. No code names it; a reload clip's track message
+    /// plays it.
+    pub const RELOAD_INSERT_AMMO_USAGE: u32 = 0x8FABB82,
+    /// The hash of the usage `ReloadEnd` (`hashlittle` of the name): the sound of a reload
+    /// finishing. [`WeaponBase::CheckIfReloadShouldBeTriggeredBase`] plays it on every gun of a
+    /// weapon whose timed reload with no animation has run out.
+    pub const RELOAD_END_USAGE: u32 = 0xB32F5BFA,
+    /// The hash of the usage `OutOfAmmoFire` (`hashlittle` of the name): the click of a trigger
+    /// pulled on an empty gun, which [`WeaponBase::CheckIfReloadShouldBeTriggeredBase`] plays on the
+    /// firing gun of a player with nothing left to reload.
+    pub const OUT_OF_AMMO_FIRE_USAGE: u32 = 0x53A64A14,
+
+    /// The gun's attached effects and sounds (its `CAttachedEffectContainer` base), loaded from the
+    /// weapon's effect file. The weapon plays its one-off sounds on each gun's container: the reload
+    /// start and end, the dry-fire click, and the usages its clips' track messages name.
+    #[base]
+    pub m_AttachedEffects: AttachedEffectContainer,
+
     /// The weapon this gun belongs to.
     #[address(0xC0)]
     pub m_Owner: *mut WeaponBase,
@@ -122,14 +331,33 @@ pub type WeaponData {
     #[address(0x120)]
     pub m_InternalFirePositionCurrentIndex: i32,
 
-    /// The gun's animated model, when it has one; its skinning is updated in the render phase.
+    /// The gun's animated model, when it has one; its pose is computed in
+    /// [`UpdatePreSim`](Self::UpdatePreSim) and its skinning is updated in the render phase.
     #[address(0x128)]
     pub m_AnimatedModel: *mut AnimatedModel,
 
-    /// The gun's base model instance (an `NModelSystem::CModelInstance`). The render update pushes
-    /// the interpolated world matrix to it.
+    /// The gun's base model instance. The render update pushes the interpolated world matrix to
+    /// it ([`ModelInstance::UpdateMatrix`]), scaled by the holstered scale while holstered, so the
+    /// model's own space ([`ModelInstance::GetModelSpaceBoundingBox`]) is the frame of
+    /// [`m_WorldMatrixT1`](Self::m_WorldMatrixT1).
     #[address(0x130)]
-    pub m_BaseModelInstance: *mut void,
+    pub m_BaseModelInstance: *mut ModelInstance,
+
+    /// The gun's own rigid body. It is in the physics world only while the weapon's state keeps
+    /// the weapon's bodies there (dropped, mounted, or turret; see [`WeaponState`]), and its id
+    /// ([`PfxRigidBody::m_BodyId`](physics::PfxRigidBody::m_BodyId)) stays the same while it is out.
+    /// The weapon's drop virtual ([`OnDrop`](WeaponBase::OnDrop)) sets the first gun's velocity on
+    /// it, and gives every gun's a fresh collision system group when the holder was a vehicle.
+    #[address(0x138)]
+    pub m_PfxInstance: *mut PfxRigidBody,
+
+    /// The gun's spare magazine: a disabled [`RigidObject`] that
+    /// [`ThrowAwayMagazineObject`](Self::ThrowAwayMagazineObject) turns into the dropped magazine,
+    /// or null. [`SpawnMagazineObject`](Self::SpawnMagazineObject) requests it from the spawn
+    /// system, which fills it in asynchronously and disables it on arrival, so it stays null for a
+    /// while after each request and for good on a gun without a magazine prop.
+    #[address(0x148)]
+    pub m_MagazineObject: SharedPtr<RigidObject>,
 
     /// The gun's world matrix as of the previous simulation tick.
     #[address(0x158)]
@@ -142,13 +370,68 @@ pub type WeaponData {
     #[address(0x198)]
     pub m_WorldMatrixT1: Matrix4,
 
+    /// The gun's attach offset. [`UpdateAttachmentTransforms`](Self::UpdateAttachmentTransforms)
+    /// places a gun on a holster or back bone
+    /// ([`RIGHT_HOLSTER`](character::character::SafeBoneIndex::RIGHT_HOLSTER),
+    /// [`LEFT_HOLSTER`](character::character::SafeBoneIndex::LEFT_HOLSTER),
+    /// [`BACK_ATTACH`](character::character::SafeBoneIndex::BACK_ATTACH), or
+    /// [`BACK_ATTACH_2`](character::character::SafeBoneIndex::BACK_ATTACH_2)), when the weapon's
+    /// attach tuning asks for it, at this offset composed with the bone's model-space pose and the
+    /// holder's world matrix, rather than at the bone's world matrix as it is. Each gun carries
+    /// its own, so the offset follows the gun, not the bone it rides.
+    #[address(0x218)]
+    pub m_AttachOffset: Matrix4,
+
+    /// The gun's measured world velocity, metres per second.
+    /// [`ThrowAwayMagazineObject`](Self::ThrowAwayMagazineObject) gives it to the dropped magazine.
+    #[address(0x270)]
+    pub m_MeasuredWorldVelocity: Vector3,
+    /// The gun's measured angular velocity, which
+    /// [`ThrowAwayMagazineObject`](Self::ThrowAwayMagazineObject) gives to the dropped magazine.
+    pub m_MeasuredAngularVelocity: Vector3,
+
+    /// The spawn tag of the gun's magazine prop, from the weapon's properties, or
+    /// [`NO_MAGAZINE_UNIQUE_TAG`](Self::NO_MAGAZINE_UNIQUE_TAG) for a gun without one, for which
+    /// [`SpawnMagazineObject`](Self::SpawnMagazineObject) does nothing.
+    #[address(0x2A4)]
+    pub m_MagazineUniqueTag: i32,
+
     /// Seconds since this gun last fired; reset by [`WeaponBase::Fire_Projectile`].
     #[address(0x2A8)]
     pub m_TimeSinceLastFire: f32,
 
+    /// The gun's shot counter for tracers: the bullet weapons' shot
+    /// ([`BulletWeaponBase::Fire_Projectile`]) increments it per bullet and draws a tracer every
+    /// tuning-set number of bullets. [`WeaponBase::Fire_StartBase`] resets it at the first shot of
+    /// a pull, and [`WeaponBase::UpdateWeapon_Parallel`] resets it after a long enough pause in
+    /// fire.
+    #[address(0x2AC)]
+    pub m_TracerCounter: u16,
+
+    /// The gun's counter of tracers, which the bullet weapons' shot increments per tracer to give
+    /// every tuning-set number of tracers a smoke trail. Reset with
+    /// [`m_TracerCounter`](Self::m_TracerCounter).
+    #[address(0x2AE)]
+    pub m_SmokeTrailCounter: u16,
+
+    /// Shots of the gun's current burst still to fire. [`WeaponBase::Fire_StartBase`] loads it
+    /// from the tuning at the first shot of a pull, and while it is non-zero
+    /// [`WeaponBase::UpdateWeapon_Parallel`] tries to fire this gun whatever the trigger input.
+    #[address(0x2B0)]
+    pub m_BurstShotsLeft: u32,
+
     /// The uniform scale applied to the gun's world matrix while holstered.
     #[address(0x2DC)]
     pub m_HolsteredScaleValue: f32,
+
+    /// Whether the gun's next placement skips the render interpolation: when set, the gun's
+    /// attachment placement copies the new world matrix into
+    /// [`m_WorldMatrixT0`](Self::m_WorldMatrixT0) as well, so the render update draws the gun
+    /// at its new place without blending from the old. Set by
+    /// [`WeaponBase::SkipRenderInterpolationForOneFrame`] and cleared by
+    /// [`WeaponBase::UpdatePostFinalizePose`].
+    #[address(0x2E5)]
+    pub m_SkipRenderInterpolation: bool,
 
     /// Whether this gun leads a multi-gun first shot: [`WeaponBase::Fire_Projectile`] clears it on
     /// every gun and sets it on the firing one.
@@ -156,12 +439,122 @@ pub type WeaponData {
     pub m_IsLeadingWeaponFire: bool,
 }
 impl WeaponData {
+    /// Puts the gun's own body ([`m_PfxInstance`](Self::m_PfxInstance)) into the physics world
+    /// (`CWeaponData::AddToWorld`, which the disassembler names `CPfxVehicle::OnStoppedTrailing`).
+    /// It keeps the body's collision system group, or takes a fresh one when the group is zero,
+    /// sets its collision layer for the owning weapon's state, makes it dynamic, and places it at
+    /// the gun's world matrix ([`m_WorldMatrixT1`](Self::m_WorldMatrixT1)), so the body's frame is
+    /// the gun's model frame and its shape is in that frame. The weapon's own world addition
+    /// ([`WeaponBase::AddToWorld`]) calls it for each gun but the second and later guns of a
+    /// dual-wield-slot weapon.
+    #[address(0x140_959_570)]
+    pub fn AddToWorld(&mut self);
+
+    /// Plays the gun's fire effect (the muzzle flash and the shot sound) for one shot.
+    /// `first_shot` is the weapon's [`WeaponBase::m_IsFirstShot`] and `local_player` its
+    /// [`WeaponBase::m_IsUserLocalPlayer`], which picks the local-player variant of the effect.
+    /// [`WeaponBase::Fire_ProjectileBase`] calls it on every shot.
+    #[address(0x140_959_A40)]
+    pub fn PlayFireEffect(&mut self, first_shot: bool, local_player: bool);
+
     /// Returns [`m_WorldMatrixT1`](Self::m_WorldMatrixT1), scaled by
     /// [`m_HolsteredScaleValue`](Self::m_HolsteredScaleValue) when the owning weapon is
     /// [`E_WS_HOLSTERED`](WeaponState::E_WS_HOLSTERED). The result is written through `result`
     /// and returned.
     #[address(0x140_960_1E0)]
     pub fn GetWorldMatrixT1(&self, result: *mut Matrix4) -> *mut Matrix4;
+
+    /// The gun's pre-simulation update (`CWeaponData::UpdatePreSim`), run for each gun by the
+    /// weapon's own pre-simulation update (`CWeaponBase::UpdatePreSim`). When the gun has an
+    /// animated model ([`m_AnimatedModel`](Self::m_AnimatedModel)) and the weapon's LOD does not
+    /// switch its animation off, it advances the model's clips, track messages, rule systems, and
+    /// state tasks by the context's step, then computes the model-space pose
+    /// (`CPoseProducer::CalculateModelSpacePose`), which the joint accessors of the model's
+    /// animation controller
+    /// ([`AnimationController::GetJoint`](character::character::AnimationController::GetJoint) and
+    /// [`SetJoint`](character::character::AnimationController::SetJoint)) read and write and which
+    /// the render phase skins. It then measures the gun's velocities from its two cached world
+    /// matrices ([`m_MeasuredWorldVelocity`](Self::m_MeasuredWorldVelocity) and
+    /// [`m_MeasuredAngularVelocity`](Self::m_MeasuredAngularVelocity)). Returns whether the
+    /// animated model was updated. `context` is the game object update context, whose first field
+    /// is the step in seconds.
+    #[address(0x140_959_160)]
+    pub fn UpdatePreSim(&mut self, context: *mut void) -> bool;
+
+    /// Places the gun for `state` (`CWeaponData::UpdateAttachmentTransforms`), writing
+    /// [`m_WorldMatrixT1`](Self::m_WorldMatrixT1). With `update_type` 2 (advance) it first copies
+    /// the current matrix into [`m_WorldMatrixT0`](Self::m_WorldMatrixT0). Held by a vehicle, the
+    /// gun follows its anchor or part; while wingsuiting it is built from the holder's reference
+    /// and head bones and its flight direction; dropped, mounted, or on a turret it follows its own
+    /// rigid body when that is in the world; on a weapon rack it follows its placement rule.
+    /// Otherwise, held by a character, it takes the world matrix of the bone its attach-bone table
+    /// ([`m_lBoneAttachementPerWeaponState`](Self::m_lBoneAttachementPerWeaponState)) names for
+    /// `state`
+    /// ([`Character::GetWorldMatrixForBone`](character::character::Character::GetWorldMatrixForBone)):
+    /// a hand attach bone's matrix as it is, and a holster or back bone's composed with the gun's
+    /// attach offset ([`m_AttachOffset`](Self::m_AttachOffset)) when the weapon's attach tuning
+    /// asks for it. So a hand-held gun's pose in the
+    /// hand is the attach bone's pose relative to the wrist, which the animation sets. While
+    /// [`m_SkipRenderInterpolation`](Self::m_SkipRenderInterpolation) or
+    /// `skip_render_interpolation` is set, and for the initial placement (`update_type` 0), it
+    /// copies the new matrix into [`m_WorldMatrixT0`](Self::m_WorldMatrixT0) too. Each weapon's
+    /// placement calls it for every gun; the character's pose-finalization pass places the weapons
+    /// through
+    /// [`Inventory::UpdateAttachmentTransforms`](character::inventory::Inventory::UpdateAttachmentTransforms).
+    #[address(0x140_986_F80)]
+    pub fn UpdateAttachmentTransforms(&mut self, holder: *mut GameObject, snow_factor: f32, water_factor: f32, state: WeaponState, skip_render_interpolation: bool, update_type: u32);
+
+    /// Drops the gun's spare magazine ([`m_MagazineObject`](Self::m_MagazineObject)) as a physics
+    /// prop, for `character` holding the gun. `model_name_hash` picks where the magazine leaves
+    /// from:
+    ///
+    /// - zero, or [`NO_MAGAZINE_MODEL_NAME_HASH`](Self::NO_MAGAZINE_MODEL_NAME_HASH): from the gun's
+    ///   own [`m_WorldMatrixT1`](Self::m_WorldMatrixT1), touching no model part;
+    /// - any other hash: from the world matrix
+    ///   ([`ModelAttachementWeaponComponent::m_WorldMatrix`]) of the owner's model-attachment
+    ///   component whose [`m_NameHash`](ModelAttachementWeaponComponent::m_NameHash) matches. It
+    ///   walks a copy of the owner's [`m_WeaponComponents`](WeaponBase::m_WeaponComponents),
+    ///   taking only a component whose [`m_Type`](WeaponComponentBase::m_Type) is
+    ///   [`E_WEAPON_COMPONENT_MODEL_ATTACHEMENT`](WeaponComponentType::E_WEAPON_COMPONENT_MODEL_ATTACHEMENT)
+    ///   and that passes [`IsType`](WeaponComponentBase::IsType) for
+    ///   [`ModelAttachementWeaponComponent::TYPE_ID`], and hides that part with
+    ///   [`Enable`](WeaponComponentBase::Enable)`(false)`. With no matching part nothing is
+    ///   dropped or hidden, and it returns false.
+    ///
+    /// When there is a spare magazine and a place to drop it from, it makes the prop dynamic,
+    /// places it there, gives its body the character's collision system group (so it does not
+    /// collide with the character), the gun's
+    /// [`m_MeasuredWorldVelocity`](Self::m_MeasuredWorldVelocity) with any upward component
+    /// removed, and the gun's [`m_MeasuredAngularVelocity`](Self::m_MeasuredAngularVelocity), and
+    /// a body material, then enables it, adds it to the update, and releases the gun's reference,
+    /// so [`m_MagazineObject`](Self::m_MagazineObject) is null afterwards. It returns true when it
+    /// found a place to drop from, whether or not a spare magazine was there to drop.
+    ///
+    /// It writes physics-body state (velocities and the body material through the world), which
+    /// the physics system allows only on the thread holding the physics world's write mark. Its
+    /// only caller is the throw-away-magazine track message
+    /// ([`TRACK_MESSAGE_THROW_AWAY_MAGAZINE`](WeaponBase::TRACK_MESSAGE_THROW_AWAY_MAGAZINE)), which
+    /// runs in the holder's serial post-physics pass on the game update thread.
+    #[address(0x140_986_B60)]
+    pub fn ThrowAwayMagazineObject(&mut self, character: *mut Character, model_name_hash: u32) -> bool;
+
+    /// Requests the gun's next spare magazine: releases [`m_MagazineObject`](Self::m_MagazineObject)
+    /// and asks the spawn system to spawn the prop tagged
+    /// [`m_MagazineUniqueTag`](Self::m_MagazineUniqueTag) at the gun's
+    /// [`m_WorldMatrixT1`](Self::m_WorldMatrixT1). The spawn completes later; its callback stores
+    /// the prop in `m_MagazineObject` and disables it until it is thrown. Does nothing for a gun
+    /// without a magazine prop. The weapon's post-initialization calls it for the first spare, and
+    /// the throw-away-magazine track message after each throw.
+    #[address(0x140_97B_1D0)]
+    pub fn SpawnMagazineObject(&mut self);
+
+    /// Runs `act` (an event id, as [`Character::QueueAct`](character::character::Character::QueueAct)
+    /// takes) on the gun's own animated model ([`m_AnimatedModel`](Self::m_AnimatedModel)), on
+    /// its first layer, and returns whether the model took it; false for a gun without an
+    /// animated model. The do-act component ([`DoActWeaponComponent`]) plays a gun's own clips,
+    /// such as a pump, through it.
+    #[address(0x140_951_2F0)]
+    pub fn DoAct(&mut self, act: *const u32) -> bool;
 }
 
 /// The base class of every weapon (`CWeaponBase`, a `CPhysicsGameObject`): fire input and timing,
@@ -172,6 +565,39 @@ pub type WeaponBase {
     /// The seconds a blocked trigger pull stays buffered in
     /// [`m_InputBufferTimer`](Self::m_InputBufferTimer).
     pub const INPUT_BUFFER_TIME: f32 = 0.5,
+    /// The offset of the embedded `CGameObject` subobject, which the `CGameObject` overrides
+    /// ([`GetTransform`](Self::GetTransform), [`UpdateRender`](Self::UpdateRender)) receive as
+    /// their `game_object` in place of the weapon.
+    pub const GAME_OBJECT_BASE_OFFSET: u64 = 0x8,
+    /// The track message ([`HandleTrackMessage`](Self::HandleTrackMessage)) that drops the
+    /// magazine. Its arguments are the part name hash for
+    /// [`WeaponData::ThrowAwayMagazineObject`], the index of the gun in
+    /// [`m_lWeaponData`](Self::m_lWeaponData), and a flag that, when set, leaves
+    /// [`m_WeaponIsWithoutMagazine`](Self::m_WeaponIsWithoutMagazine) clear. It does nothing for a
+    /// gun index out of range or while the magazine is already out. When the throw succeeds it
+    /// requests the gun's next spare ([`WeaponData::SpawnMagazineObject`]) and, unless the flag is
+    /// set, sets [`m_WeaponIsWithoutMagazine`](Self::m_WeaponIsWithoutMagazine).
+    pub const TRACK_MESSAGE_THROW_AWAY_MAGAZINE: u32 = 0xA6E4C80,
+    /// The track message that refills the magazine: calls the [`Reload`](Self::Reload) virtual.
+    pub const TRACK_MESSAGE_RELOAD: u32 = 0xE3911080,
+    /// The track message that shows or hides a model part: for every one of
+    /// [`m_WeaponComponents`](Self::m_WeaponComponents) that passes
+    /// [`IsType`](WeaponComponentBase::IsType) for [`ModelAttachementWeaponComponent::TYPE_ID`]
+    /// and whose [`m_NameHash`](ModelAttachementWeaponComponent::m_NameHash) is the message's
+    /// first argument, it calls [`Enable`](WeaponComponentBase::Enable) with whether the second
+    /// argument is non-zero. Reload clips use it to show the magazine part again.
+    pub const TRACK_MESSAGE_ENABLE_MODEL_ATTACHEMENT: u32 = 0xA950A983,
+    /// The track message that asks the holder to start a reload
+    /// ([`Character::StartReloadingWieldingWeapon`](character::character::Character::StartReloadingWieldingWeapon)).
+    pub const TRACK_MESSAGE_START_RELOAD: u32 = 0xC650067B,
+    /// The track message that asks the holder to start a reload only while the magazine
+    /// ([`m_MagazineAmmo`](Self::m_MagazineAmmo)) is empty.
+    pub const TRACK_MESSAGE_START_RELOAD_IF_EMPTY: u32 = 0xC8E9497E,
+    /// The character blackboard value whose presence lets a non-player character dual-wield the
+    /// [`E_SLOT_DUAL_WIELD`](WeaponSlot::E_SLOT_DUAL_WIELD) slot: [`OnEquip`](Self::OnEquip)
+    /// then sets the dual-wielding state, and [`SetVisibleBase`](Self::SetVisibleBase) and
+    /// [`SetState`](Self::SetState) treat the character's weapons as a dual-wielder's.
+    pub const DUAL_WIELDER_BLACKBOARD_VALUE: u32 = 0x24011B8B,
 
     vftable {
         /// Writes the muzzle position for `weapon_data`: the gun's world matrix composed with its
@@ -180,11 +606,193 @@ pub type WeaponBase {
         #[index(25)]
         pub fn GetFireFromPosition(&self, result: *mut Vector3, weapon_data: *mut WeaponData) -> *mut Vector3;
 
+        /// Starts fire on one gun, `weapon_data`. The base implementation is
+        /// [`Fire_StartBase`](Self::Fire_StartBase).
+        #[index(26)]
+        pub fn Fire_Start(&mut self, weapon_data: *mut WeaponData);
+
+        /// Stops fire. The base implementation is [`Fire_StopBase`](Self::Fire_StopBase).
+        #[index(27)]
+        pub fn Fire_Stop(&mut self, weapon_data: *mut WeaponData);
+
         /// Fires one shot from `weapon_data`. The base implementation is
         /// [`Fire_ProjectileBase`](Self::Fire_ProjectileBase); subclasses such as
         /// `CBulletWeaponBase` spawn their projectile and then call it.
         #[index(28)]
         pub fn Fire_Projectile(&mut self, weapon_data: *mut WeaponData);
+
+        /// Takes the weapon into `holder`'s keeping (a character's or vehicle's `CGameObject`
+        /// subobject): sets the holder, and for a weapon outside the heavy slot sets the holstered
+        /// state (holstered-invisible for the hand grenade, the planted explosive, and the beacon),
+        /// which takes its bodies out of the physics world. Unless
+        /// [`m_InfinitePickup`](Self::m_InfinitePickup) is set it disables the weapon's pickup
+        /// interaction and its pickup hint, and for the locally controlled character it sets the
+        /// avatar's mental state to
+        /// [`E_READY_FOR_COMBAT`](character::avatar::MentalState::E_READY_FOR_COMBAT) and shows
+        /// the pickup on the HUD. The inventory's add
+        /// calls it when the weapon goes into a slot.
+        #[index(32)]
+        pub fn OnPickup(&mut self, holder: *mut GameObject);
+
+        /// Equips the weapon for `character`, which must hold it: shows it, runs its components'
+        /// equip, selects its slot, starts using it (the user becomes `character`), puts the
+        /// locally controlled character's avatar into
+        /// [`E_COMBAT`](character::avatar::MentalState::E_COMBAT) and shows the weapon on the HUD, and
+        /// sets the wielding state ([`SetState`](Self::SetState)), or dual-wielding for the
+        /// dual-wield slot of a player or of a character whose blackboard holds
+        /// [`DUAL_WIELDER_BLACKBOARD_VALUE`](Self::DUAL_WIELDER_BLACKBOARD_VALUE). Any other
+        /// character wields the dual-wield slot, firing and showing its first gun alone. It plays
+        /// no act: the draw animation comes from the character's draw, not from here. It does
+        /// nothing for a dead character. The base implementation is
+        /// [`OnEquipBase`](Self::OnEquipBase); the mortar, rocket launcher, planted explosive, and
+        /// fire-leech launcher override it.
+        ///
+        /// Every equip the game makes runs it: the inventory's add with an equipping mode
+        /// ([`Inventory::AddWeapon`](character::inventory::Inventory::AddWeapon)), the draw clip's
+        /// equip track message ([`HandleTrackMessage`](Self::HandleTrackMessage)), the instant
+        /// branch of the `NWeaponEquipTask` state task
+        /// ([`NWeaponEquipTask_OnEnter`](equipment::weapon_animation::NWeaponEquipTask_OnEnter)),
+        /// the exit of the weapon-state task
+        /// ([`NSetWeaponStateTask_OnExit`](equipment::weapon_animation::NSetWeaponStateTask_OnExit)),
+        /// and the deferred equip ([`EquipDeferred`](Self::EquipDeferred)), which only the AI
+        /// queues.
+        #[index(33)]
+        pub fn OnEquip(&mut self, character: *mut Character);
+
+        /// Unequips the weapon from its user: cancels the user's reload, sets the holstered state
+        /// (which takes its bodies out of the physics world) unless it is mounted, drops it through
+        /// the user's inventory instead when it is in the heavy slot, and then stops using it
+        /// ([`StopUsing`](Self::StopUsing)). It does nothing without a user. The base
+        /// implementation is [`OnUnequipBase`](Self::OnUnequipBase); the sun gun overrides it.
+        ///
+        /// Every unequip the game makes runs it: the `NWeaponUnequipTask` state task
+        /// ([`NWeaponUnequipTask_OnEnter`](equipment::weapon_animation::NWeaponUnequipTask_OnEnter)),
+        /// [`Character::ForceNeutralState`](character::character::Character::ForceNeutralState),
+        /// the holster clip's unequip track message
+        /// ([`HandleTrackMessage`](Self::HandleTrackMessage)), the inventory's add when it equips
+        /// another weapon, the pickup ([`PickupItem`](Self::PickupItem)), the respawn hand-over
+        /// ([`Inventory::WeaponSpawned`](character::inventory::Inventory::WeaponSpawned)),
+        /// [`Despawn`](Self::Despawn), the drop ([`OnDrop`](Self::OnDrop)), and the deferred unequip
+        /// ([`UnequipDeferred`](Self::UnequipDeferred)).
+        #[index(34)]
+        pub fn OnUnequip(&mut self);
+
+        /// Drops the weapon into the world, run by the deferred drop on the weapon's next
+        /// pre-simulation update and directly by a swimming character's pickup on the occupant of
+        /// the slot it picks into. A weapon still wielded or dual-wielded is unequipped first
+        /// ([`OnUnequip`](Self::OnUnequip)), leaving the player's precision aim. It then sets the
+        /// dropped state, adds the bodies to the physics world and wakes them, and sets the first
+        /// gun's body velocity ([`WeaponData::m_PfxInstance`]) from the state the weapon was in by
+        /// then: from holstered, with a character holder, the holder's velocity plus its forward
+        /// direction scaled by the slot (forward for the two-handed slot, backward for the special
+        /// slot, none for the others); from wielding or dual-wielding, the first gun's
+        /// [`m_MeasuredWorldVelocity`](WeaponData::m_MeasuredWorldVelocity) and
+        /// [`m_MeasuredAngularVelocity`](WeaponData::m_MeasuredAngularVelocity). A non-player
+        /// holder's weapon first gets stored ammunition from the holder's dropped-magazine range.
+        /// It clears the holder, enables the weapon's pickup interaction, and hides the models of
+        /// every gun past the first, so a dropped weapon of several guns, such as a dual-wield
+        /// weapon, shows its first gun alone, as it is one body ([`AddToWorld`](Self::AddToWorld)).
+        /// From the mounted or turret state it removes the attach constraint
+        /// ([`m_ConstraintAttach`](Self::m_ConstraintAttach)) from the physics world (a turret's
+        /// vertical hinges too), clears the constraint references, leaving a mounted weapon's
+        /// horizontal and vertical hinges in the world, and skips the pickup interaction
+        /// ([`PickupEnable`](Self::PickupEnable)).
+        #[index(35)]
+        pub fn OnDrop(&mut self);
+
+        /// Stops the user using the weapon: stops its fire, its effects, and its components, clears
+        /// the user, and, when the weapon is wielding or dual-wielding outside the heavy slot,
+        /// holsters it. A mounted gun also leaves its user's inventory, which then selects another
+        /// weapon. The base implementation is [`StopUsingBase`](Self::StopUsingBase).
+        #[index(36)]
+        pub fn StopUsing(&mut self);
+
+        /// The ammunition the weapon can still use: its magazine plus the holder's inventory stock
+        /// of its ammunition type. The thrown grenade weapon adds one while it holds a primed
+        /// grenade ([`ThrownGrenadeWeapon::m_PrimedGrenade`]).
+        #[index(38)]
+        pub fn GetTotalAmmo(&self) -> i32;
+
+        /// Sets [`m_MagazineAmmo`](Self::m_MagazineAmmo) to `ammo`. For the local player's
+        /// selected weapon outside the planted-explosive slot it also pushes the count to the HUD
+        /// (`CHUDUI::OnSetSelectedMagazineAmmo`), flagging an empty magazine; the HUD keeps no
+        /// other view of the count, so a write that bypasses this leaves the HUD stale. The base
+        /// implementation is [`SetMagazineAmmoBase`](Self::SetMagazineAmmoBase).
+        #[index(39)]
+        pub fn SetMagazineAmmo(&mut self, ammo: i32);
+
+        /// Starts the weapon side of a reload once the holder's reload act is accepted (the act's
+        /// callback calls it): resets the fire-input timers, plays each gun's reload effect,
+        /// clears the guns' bursts, sets [`m_KeepReloading`](Self::m_KeepReloading) for an
+        /// [`E_RELOAD_BULLET`](ReloadType::E_RELOAD_BULLET) weapon, and registers the weapon for
+        /// pre-simulation updates. It moves no ammunition.
+        #[index(40)]
+        pub fn StartReloadSequence(&mut self);
+
+        /// Whether the weapon can start a reload: its ammunition type is not
+        /// [`AMMO_UNLIMITED`](AmmunitionType::AMMO_UNLIMITED), it has a magazine limit, the
+        /// magazine is below it, and either [`HasUnlimitedAmmo`](Self::HasUnlimitedAmmo) holds or
+        /// its living holder has a reserve of its type (a holder in god mode,
+        /// [`GOD_MODE`](character::character::DamageStateFlags::GOD_MODE), always counts as
+        /// having one). A weapon whose magazine and reserve are both empty cannot.
+        /// [`Character::StartReloadingWieldingWeapon`](character::character::Character::StartReloadingWieldingWeapon)
+        /// queues the reload act only when it holds.
+        #[index(41)]
+        pub fn CanReload(&self) -> bool;
+
+        /// Refills the magazine from the holder's reserve and returns whether it did. The base
+        /// implementation ([`ReloadBase`](Self::ReloadBase)) does nothing and returns false
+        /// without a holder, for an [`AMMO_UNLIMITED`](AmmunitionType::AMMO_UNLIMITED) weapon, or
+        /// for one without a magazine limit. Otherwise it first clears
+        /// [`m_WeaponIsWithoutMagazine`](Self::m_WeaponIsWithoutMagazine), even when it then
+        /// refills nothing. With the magazine already full, or with no reserve
+        /// ([`Inventory::GetAmmoCount`](character::inventory::Inventory::GetAmmoCount)) and no
+        /// [`HasUnlimitedAmmo`](Self::HasUnlimitedAmmo), it clears
+        /// [`m_KeepReloading`](Self::m_KeepReloading) and returns false. Otherwise:
+        ///
+        /// - the new count is the magazine size, or the old count plus the reserve when that is
+        ///   less; with unlimited ammunition the reserve counts as a full magazine;
+        /// - for an [`E_RELOAD_BULLET`](ReloadType::E_RELOAD_BULLET) weapon the new count is the
+        ///   old count plus one instead, and [`m_KeepReloading`](Self::m_KeepReloading) is set
+        ///   while that is still short of full;
+        /// - it writes the count through [`SetMagazineAmmo`](Self::SetMagazineAmmo) (which pushes
+        ///   the HUD), records the reload statistic for the local player, resets the scatter
+        ///   balancer, and tells the HUD (`CHUDUI::OnReloadSelectedWeapon`) for the local player's
+        ///   selected weapon;
+        /// - it clears [`m_KeepReloading`](Self::m_KeepReloading) once the magazine is full;
+        /// - without unlimited ammunition it writes the reserve back as the old count plus the
+        ///   reserve minus the new count
+        ///   ([`Inventory::SetAmmoCount`](character::inventory::Inventory::SetAmmoCount), allowing
+        ///   an autosave), so the rounds left in the old magazine return to the reserve and nothing
+        ///   is lost;
+        /// - it clears [`m_IsReloading`](Self::m_IsReloading) and returns true.
+        ///
+        /// It never touches the weapon's model parts: a part hidden by the throw-away-magazine
+        /// message stays hidden until the
+        /// [`TRACK_MESSAGE_ENABLE_MODEL_ATTACHEMENT`](Self::TRACK_MESSAGE_ENABLE_MODEL_ATTACHEMENT)
+        /// message shows it. The rocket launcher's override ([`RPGWeapon::Reload`]) handles its
+        /// rocket model. It runs from the reload track message
+        /// ([`TRACK_MESSAGE_RELOAD`](Self::TRACK_MESSAGE_RELOAD)), in the holder's serial
+        /// post-physics pass, and for an
+        /// [`E_RELOAD_NO_ANIMATION`](ReloadType::E_RELOAD_NO_ANIMATION) weapon from the ammunition
+        /// check in the weapon's parallel update; a refill of the hand-grenade reserve from empty
+        /// also calls it on the hand-grenade weapon.
+        #[index(42)]
+        pub fn Reload(&mut self) -> bool;
+
+        /// The per-gun ammunition check, called by
+        /// [`UpdateWeapon_Parallel`](Self::UpdateWeapon_Parallel) for `weapon_data` with the
+        /// tick's fire decision in `should_try_to_fire` and whether the trigger was already pulled
+        /// before this tick. The base implementation is
+        /// [`CheckIfReloadShouldBeTriggeredBase`](Self::CheckIfReloadShouldBeTriggeredBase).
+        #[index(43)]
+        pub fn CheckIfReloadShouldBeTriggered(&mut self, weapon_data: *mut WeaponData, should_try_to_fire: *mut bool, was_trigger_pulled: bool);
+
+        /// Ends a reload: clears [`m_KeepReloading`](Self::m_KeepReloading) and
+        /// [`m_IsReloading`](Self::m_IsReloading). The reload state machine's
+        /// `NWeaponReloadFinishedTask` calls it on the wielded weapon when its state exits.
+        #[index(44)]
+        pub fn ReloadAnimationFinished(&mut self);
 
         /// Deducts `count` rounds of ammunition for `weapon_data`.
         #[index(45)]
@@ -198,8 +806,12 @@ pub type WeaponBase {
         #[index(47)]
         pub fn IsWeaponAiming(&self) -> bool;
 
-        /// Applies the holder's aim mode: normal or precision aim. `CPlayer::SetAimMode` calls it
-        /// after changing the player's aim mode.
+        /// Applies the holder's aim mode: normal or precision aim. The base implementation is
+        /// [`SetAimModeBase`](Self::SetAimModeBase); the sniper rifle
+        /// ([`SniperWeapon::SetAimMode`]) and the mortar override it.
+        /// [`StartUsing`](Self::StartUsing) calls it with the player's mode, and
+        /// [`Player::SetAimMode`](character::player::Player::SetAimMode) calls it after changing
+        /// the player's aim mode, on the selected weapon only.
         #[index(48)]
         pub fn SetAimMode(&mut self, aim_mode: AimMode);
 
@@ -208,13 +820,51 @@ pub type WeaponBase {
         /// fire inputs. The base implementation is
         /// [`UpdateFromUserPostSim_ParallelBase`](Self::UpdateFromUserPostSim_ParallelBase).
         #[index(54)]
-        pub fn UpdateFromUserPostSim_Parallel(&mut self, dt: f32, aim_position: *const Vector3, input: *const void);
+        pub fn UpdateFromUserPostSim_Parallel(&mut self, dt: f32, aim_position: *const Vector3, input: *const WeaponInputs);
+
+        /// The serial counterpart of
+        /// [`UpdateFromUserPostSim_Parallel`](Self::UpdateFromUserPostSim_Parallel), called with the
+        /// same arguments by
+        /// [`Inventory::UpdateWeapons_Serial`](character::inventory::Inventory::UpdateWeapons_Serial).
+        /// It does not write
+        /// [`m_AimTargetPosition`](Self::m_AimTargetPosition).
+        #[index(55)]
+        pub fn UpdateFromUserPostSim_Serial(&mut self, dt: f32, aim_position: *const Vector3, input: *const WeaponInputs);
 
         /// Returns the weapon type's tuning block (`SWeaponTuningBase`), from which the fire code
         /// reads recoil, scatter, and spread ranges.
         #[index(57)]
         pub fn GetTuningBase(&self) -> *const void;
+
+        /// Shows or hides the weapon's guns and their components. Showing with `fade` fades the
+        /// guns' models in. A weapon in the
+        /// [`E_WS_HOLSTERED_INVISIBLE`](WeaponState::E_WS_HOLSTERED_INVISIBLE) state is shown only
+        /// with `force`. Hiding takes effect at once. A hand grenade picked up hides itself this
+        /// way before it despawns, and a placement rule hides a weapon it places invisible. The
+        /// base implementation is [`SetVisibleBase`](Self::SetVisibleBase), which every weapon
+        /// class keeps.
+        #[index(59)]
+        pub fn SetVisible(&mut self, visible: bool, fade: bool, force: bool);
+
+        /// Places the weapon's guns for its state: the base implementation
+        /// (`CWeaponBase::UpdateAttachmentTransforms`) locks the holder
+        /// ([`m_Holder`](Self::m_Holder)) and runs
+        /// [`WeaponData::UpdateAttachmentTransforms`] for every gun with it, then places the
+        /// weapon's components. `p2` and `p3` are the snow and water factors the gun placement
+        /// takes, and `transform_type` its update type. The inventory's placement
+        /// ([`Inventory::UpdateAttachmentTransforms`](character::inventory::Inventory::UpdateAttachmentTransforms))
+        /// calls it for each slot's weapon.
+        #[index(61)]
+        pub fn UpdateAttachmentTransforms(&mut self, p2: f32, p3: f32, transform_type: u32);
     },
+
+    /// A weak reference to the weapon itself (`m_WeakThis` of its `CGameObject` subobject),
+    /// referring to that subobject. The spawn system's per-frame despawn ranking
+    /// ([`SpawnSystem::Update`](spawn_system::SpawnSystem::Update)) reads the strong count of its
+    /// control block, and the weapon hands out references to itself from it (the HUD's pickup
+    /// display, the pickup hint).
+    #[address(0x68)]
+    pub m_WeakThis: WeakPtrGameObject,
 
     /// Whether the current shot is the first of a trigger pull; first shots use the tuning's
     /// first-shot recoil scale.
@@ -250,7 +900,12 @@ pub type WeaponBase {
     /// The index into [`m_lWeaponData`](Self::m_lWeaponData) of the gun that fires next, which
     /// [`GetFireFromPositionBase`](Self::GetFireFromPositionBase) reads to pick the muzzle. The
     /// tail of [`Fire_ProjectileBase`](Self::Fire_ProjectileBase) (`MarkNextWeaponComponentForFire`,
-    /// inlined in this build) advances it modulo the gun count after each shot.
+    /// inlined in this build) advances it modulo the gun count after each shot, except that a
+    /// weapon of the [`E_SLOT_DUAL_WIELD`](WeaponSlot::E_SLOT_DUAL_WIELD) slot in the
+    /// [`E_WS_WIELDING`](WeaponState::E_WS_WIELDING) state is kept on the first gun, so a
+    /// dual-wield weapon wielded rather than dual-wielded fires its first gun alone. The
+    /// disassembler's `CWeaponBase::MarkNextWeaponComponentForFire` is
+    /// [`Vehicle::IsRocketBoat`](vehicle::vehicle::Vehicle::IsRocketBoat).
     #[address(0x160)]
     pub m_NextWeaponToFire: u8,
 
@@ -272,6 +927,13 @@ pub type WeaponBase {
     /// defers to it.
     #[address(0x16C)]
     pub m_ProjectileTempFireDirection: ProjectileFireDirectionMode,
+
+    /// A one-shot fire request: while set, the next
+    /// [`UpdateWeapon_Parallel`](Self::UpdateWeapon_Parallel) clears it and calls
+    /// [`Fire_Projectile`](Self::Fire_Projectile) once for each gun, whatever the fire input and the
+    /// aim angle. Animation track messages raise it at the release point of a throw.
+    #[address(0x178)]
+    pub m_ForceFireProjectile: bool,
 
     /// Seconds of forced fire remaining; the weapon fires regardless of input while positive.
     #[address(0x17C)]
@@ -301,6 +963,136 @@ pub type WeaponBase {
     #[address(0x1AC)]
     pub m_ProjectileOffsetFireCount: i32,
 
+    /// The character a deferred start-using names (a `boost::weak_ptr<CCharacter>`: object pointer
+    /// and weak control block), written by [`StartUsingDeferred`](Self::StartUsingDeferred) and
+    /// cleared when the pre-simulation update ([`UpdatePreSim`](Self::UpdatePreSim)) consumes or
+    /// cancels the request.
+    #[address(0x1F0)]
+    pub m_DeferredUser: [*mut void; 2],
+
+    /// The character a deferred equip names (a `boost::weak_ptr<CCharacter>`), written by
+    /// [`EquipDeferred`](Self::EquipDeferred) and cleared once the equip runs.
+    #[address(0x200)]
+    pub m_DeferredEquiper: [*mut void; 2],
+
+    /// A start-using queued by [`StartUsingDeferred`](Self::StartUsingDeferred) for the next
+    /// pre-simulation update.
+    #[address(0x210)]
+    pub m_DeferredStartUsing: bool,
+    /// A stop-using queued for the next pre-simulation update. Queued together with
+    /// [`m_DeferredStartUsing`](Self::m_DeferredStartUsing), the two cancel each other.
+    pub m_DeferredStopUsing: bool,
+    /// An equip queued by [`EquipDeferred`](Self::EquipDeferred) for the next pre-simulation
+    /// update.
+    pub m_DeferredEquip: bool,
+    /// An unequip queued by [`UnequipDeferred`](Self::UnequipDeferred) for the next pre-simulation
+    /// update.
+    pub m_DeferredUnequip: bool,
+    /// A drop queued by [`DropDeferred`](Self::DropDeferred) for the next pre-simulation update.
+    pub m_DeferredDrop: bool,
+    /// A physical recoil impulse on the user's body, set by a shot
+    /// ([`Fire_ProjectileBase`](Self::Fire_ProjectileBase)) when
+    /// [`m_PhysicalRecoilStrength`](Self::m_PhysicalRecoilStrength) is non-zero and applied by the
+    /// next pre-simulation update.
+    pub m_DeferredPhysicalRecoil: bool,
+    /// A weapon-fire awareness event for the AI, set by the first shot of a trigger pull
+    /// ([`Fire_ProjectileBase`](Self::Fire_ProjectileBase)) and broadcast by the next
+    /// pre-simulation update ([`UpdatePreSim`](Self::UpdatePreSim)) through
+    /// [`BroadcastAwarenessEvent`](ai::ai::BroadcastAwarenessEvent). It stays pending while
+    /// [`m_NoHeatOnFiring`](Self::m_NoHeatOnFiring) is set.
+    pub m_DeferredAwarenessBroadcast: bool,
+
+    /// Whether picking the weapon up gives the character a copy rather than the weapon itself.
+    /// [`PickupStart`](Self::PickupStart) then calls
+    /// [`Inventory::GivePlayerWeapon`](character::inventory::Inventory::GivePlayerWeapon) with the
+    /// weapon's spawn tag, and [`PickupItem`](Self::PickupItem) puts nothing into the inventory:
+    /// it only plays the pickup vocal and clears
+    /// [`m_StoredNonMagazineAmmo`](Self::m_StoredNonMagazineAmmo). The weapon's pickup handling
+    /// leaves its pickup interaction enabled while it is set.
+    #[address(0x217)]
+    pub m_InfinitePickup: bool,
+
+    /// Whether the magazine is out of the weapon. Only the throw-away-magazine track message
+    /// ([`TRACK_MESSAGE_THROW_AWAY_MAGAZINE`](Self::TRACK_MESSAGE_THROW_AWAY_MAGAZINE)) sets it,
+    /// and only [`Reload`](Self::Reload) clears it. While it is set the ammunition check
+    /// ([`CheckIfReloadShouldBeTriggeredBase`](Self::CheckIfReloadShouldBeTriggeredBase)) clears
+    /// the shot and calls
+    /// [`Character::StartReloadingWieldingWeapon`](character::character::Character::StartReloadingWieldingWeapon)
+    /// on every tick, the throw message does nothing, and the animation condition
+    /// `CWeaponHasMagazineInsertedCondition` (through `CWeaponBase::WeaponHasMagazineInserted`)
+    /// reads false.
+    #[address(0x221)]
+    pub m_WeaponIsWithoutMagazine: bool,
+
+    /// The weapon's kind of ammunition, set from the weapon's properties; it selects the reserve
+    /// in the holder's [`Inventory::m_Ammunition`](character::inventory::Inventory::m_Ammunition).
+    #[address(0x224)]
+    pub m_AmmunitionType: AmmunitionType,
+
+    /// The rounds in the magazine. A shot consumes from it; a reload refills it from the holder's
+    /// inventory stock of the weapon's ammunition type. The guns of a multi-gun weapon share it.
+    /// Write it through [`SetMagazineAmmo`](Self::SetMagazineAmmo), which also updates the HUD.
+    #[address(0x228)]
+    pub m_MagazineAmmo: i32,
+    /// The weapon's stored rounds outside the magazine (`CWeaponBase::GetStoredNonMagazineAmmo`).
+    pub m_StoredNonMagazineAmmo: i32,
+
+    /// How the weapon reloads, set from the weapon's `reload_type` property.
+    #[address(0x230)]
+    pub m_ReloadType: ReloadType,
+
+    /// Whether an [`E_RELOAD_BULLET`](ReloadType::E_RELOAD_BULLET) reload is to insert another
+    /// round. [`StartReloadSequence`](Self::StartReloadSequence) and each
+    /// [`Reload`](Self::Reload) that leaves the magazine short of full set it; `Reload` clears it
+    /// once the magazine is full or the reserve is empty, and
+    /// [`ReloadAnimationFinished`](Self::ReloadAnimationFinished) clears it. While it is clear,
+    /// the ammunition check cancels the holder's reload act for a weapon that does not reload by
+    /// magazine.
+    #[address(0x234)]
+    pub m_KeepReloading: bool,
+
+    /// Whether an [`E_RELOAD_NO_ANIMATION`](ReloadType::E_RELOAD_NO_ANIMATION) reload is timing:
+    /// set by the ammunition check when it starts one, and cleared by [`Reload`](Self::Reload) and
+    /// [`ReloadAnimationFinished`](Self::ReloadAnimationFinished). The ammunition check treats it
+    /// like the holder's reloading state.
+    #[address(0x235)]
+    pub m_IsReloading: bool,
+
+    /// The magazine count below which the local player's idle weapon reloads on its own (the
+    /// predicted reload of the ammunition check), set from the weapon's properties.
+    #[address(0x238)]
+    pub m_PredictedReloadAmmunitionLimit: i32,
+
+    /// The seconds without fire input after which the predicted reload may start; a negative
+    /// value lets it start even where the holder does not allow predicted reloads.
+    #[address(0x23C)]
+    pub m_PredictedReloadTime: f32,
+
+    /// The seconds left of an [`E_RELOAD_NO_ANIMATION`](ReloadType::E_RELOAD_NO_ANIMATION)
+    /// reload, counted down by [`UpdateWeapon_Parallel`](Self::UpdateWeapon_Parallel) while
+    /// [`m_IsReloading`](Self::m_IsReloading) is set.
+    #[address(0x240)]
+    pub m_ReloadTimeLeft: f32,
+
+    /// The animation modifier id (`ava::idstring<NAnimationSystem::SModifierIdTag>`) for holding
+    /// this weapon without aiming.
+    /// [`Character::SetCharacterModifiers`](character::character::Character::SetCharacterModifiers)
+    /// sets it for the wielded weapon while the holder is not trying to aim.
+    #[address(0x254)]
+    pub m_AnimationModifier: u32,
+
+    /// The animation modifier id for aiming this weapon, set by
+    /// [`Character::SetCharacterModifiers`](character::character::Character::SetCharacterModifiers)
+    /// in place of [`m_AnimationModifier`](Self::m_AnimationModifier) while the holder is trying
+    /// to aim.
+    #[address(0x258)]
+    pub m_AimAnimationModifier: u32,
+
+    /// The animation modifier id for having this weapon equipped, set alongside the held or aimed
+    /// modifier every tick the weapon is wielded.
+    #[address(0x25C)]
+    pub m_EquippedAnimationModifier: u32,
+
     /// The accumulated scatter, raised by each shot up to the tuning's maximum and scaling the
     /// shot's scatter rotation.
     #[address(0x268)]
@@ -315,13 +1107,69 @@ pub type WeaponBase {
     #[address(0x270)]
     pub m_PhysicalRecoilStrength: f32,
 
-    /// The accumulated recoil yaw, kicked left or right at random by each shot.
+    /// This tick's recoil yaw, radians: the base update
+    /// ([`UpdateFromUserPostSim_ParallelBase`](Self::UpdateFromUserPostSim_ParallelBase)) zeroes it
+    /// at the start of every tick, and each shot ([`Fire_ProjectileBase`](Self::Fire_ProjectileBase))
+    /// kicks it left or right at random. The weapon camera modifier
+    /// ([`WeaponCameraModifier::ProcessCameraContext`](camera::weapon_camera_modifier::WeaponCameraModifier::ProcessCameraContext))
+    /// turns the camera boom by it.
     #[address(0x274)]
     pub m_RecoilYaw: f32,
 
-    /// The accumulated recoil pitch, raised by each shot.
+    /// This tick's recoil pitch, radians: the base update zeroes it at the start of every tick and
+    /// then, while [`m_CurrentRecoilPitchValueToRecover`](Self::m_CurrentRecoilPitchValueToRecover)
+    /// is positive, sets it to the negated share recovered this tick; each shot raises it by the
+    /// shot's pitch kick. The weapon camera modifier pitches the camera boom by it.
     #[address(0x278)]
     pub m_RecoilPitch: f32,
+
+    /// The placement rule that spawned the weapon (a
+    /// [`WeaponPlacementRule`](weapon_placement_rule::WeaponPlacementRule)), as a weak reference
+    /// to the rule's `CGameObject` subobject; empty for a weapon no rule placed. The rule writes it
+    /// once its weapon has spawned (`CWeaponPlacementRule::OnPostSpawn`), with the weapon's
+    /// infinite-pickup setting and its picked-up events, before it puts a rack's weapon in the
+    /// rack state. It is not cleared when the weapon leaves the rule's spot.
+    #[address(0x288)]
+    pub m_SpawnedFromRule: WeakPtrGameObject,
+
+    /// The horizontal mount constraint (a `boost::weak_ptr<CConstraint>`): the hinge that limits a
+    /// mounted weapon's yaw. The mounted aim drives its motor, and
+    /// [`GetMountedHorizontalAngularLimits`](Self::GetMountedHorizontalAngularLimits) reads its
+    /// angular limits.
+    #[address(0x2C8)]
+    pub m_ConstraintHorizontal: WeakPtrGameObject,
+
+    /// The two vertical mount constraints (a `boost::weak_ptr<CConstraint>[2]`): the hinges that
+    /// limit a mounted weapon's pitch. The mounted aim drives their motors, and
+    /// [`GetMountedVerticalAngularLimits`](Self::GetMountedVerticalAngularLimits) reads the first
+    /// one's angular limits.
+    #[address(0x2D8)]
+    pub m_ConstraintVertical: [WeakPtrGameObject; 2],
+
+    /// The constraint that attaches a mounted or turret weapon to its holder (a
+    /// `boost::weak_ptr<CConstraint>`). [`OnDrop`](Self::OnDrop) from the mounted or turret state
+    /// removes it from the physics world, then clears it with the horizontal and vertical ones.
+    #[address(0x2F8)]
+    pub m_ConstraintAttach: WeakPtrGameObject,
+
+    /// Whether the mounted weapon may be torn off its mount.
+    /// [`Inventory::UpdateInventoryPermissions`](character::inventory::Inventory::UpdateInventoryPermissions)
+    /// reads it to decide whether the player may detach the mounted gun they are using.
+    #[address(0x330)]
+    pub m_MountedCanBeDetached: bool,
+
+    /// Whether the mounted aim leaves the mount's motors alone: set while the motors blend out.
+    /// [`UpdateMountedInput`](Self::UpdateMountedInput) reports the input as handled without
+    /// reading it while it is set.
+    #[address(0x333)]
+    pub m_BlendOutMotors: bool,
+
+    /// Whether a player user turns a vehicle mount with the look input rather than by aiming at
+    /// [`m_AimTargetPosition`](Self::m_AimTargetPosition) ([`UpdateMountedInput`](Self::UpdateMountedInput)),
+    /// read from the weapon's properties. The vehicle camera follows the turret while a manned gun
+    /// sets it.
+    #[address(0x384)]
+    pub m_MountedInputIsControlledByWeapon: bool,
 
     /// Whether the weapon overheats.
     #[address(0x38C)]
@@ -351,6 +1199,20 @@ pub type WeaponBase {
     #[address(0x40A)]
     pub m_IsAutoAimInPrecisionAimEnabled: bool,
 
+    /// The weapon's own aim mode, written by [`SetAimMode`](Self::SetAimMode). Each weapon keeps
+    /// its own: [`StartUsing`](Self::StartUsing) seeds it from the player's
+    /// [`Player::m_AimMode`](character::player::Player::m_AimMode), and later changes of the
+    /// player's mode reach only the selected weapon
+    /// ([`Player::SetAimMode`](character::player::Player::SetAimMode)).
+    #[address(0x414)]
+    pub m_AimMode: AimMode,
+
+    /// The weapon's kind: two weapons of the same kind share it. The pickup condition
+    /// [`InteractionGraphParentWeaponNotInInventory`](interaction::InteractionGraphParentWeaponNotInInventory)
+    /// compares it with the weapon in the character's slot.
+    #[address(0x41C)]
+    pub m_WeaponId: i16,
+
     /// The inventory slot the weapon is equipped in.
     #[address(0x420)]
     pub m_EquipSlot: WeaponSlot,
@@ -359,24 +1221,109 @@ pub type WeaponBase {
     #[address(0x424)]
     pub m_State: WeaponState,
 
+    /// The weapon's class, [`E_WEAPON_CLASS_NONE`](WeaponClass::E_WEAPON_CLASS_NONE) until the
+    /// weapon type's data sets it.
+    #[address(0x42C)]
+    pub m_Class: WeaponClass,
+
+    /// The hash of the weapon type's name, which identifies the weapon type (the damage messages
+    /// carry it, and type-specific code compares it against named hashes). The name is the weapon
+    /// entity's (`w011_pistol_u_pozhar_98`), hashed with `hashlittle`, and the localisation store
+    /// keys the weapon's display name by the same hash: the HUD shows
+    /// [`UIMenu::GetWeaponNameById`](ui::ui_menu::UIMenu::GetWeaponNameById) of it.
+    #[address(0x460)]
+    pub m_WeaponNameHash: u32,
+
     /// Whether precision aim is disabled for this weapon; the player's aim-input handling zeroes
     /// the aim timer while it is set.
     #[address(0x466)]
     pub m_IsPrecisionAimDisabled: bool,
+    /// Whether the weapon supports precision aim. The player's weapon handling
+    /// (`CInventory::UpdateWeaponHandling`) enters precision aim on the precision-aim input only
+    /// for a weapon that sets it.
+    pub m_SupportsPrecisionAim: bool,
 
-    /// Whether the weapon is registered for pre-simulation updates; the fire path sets it and
-    /// registers the weapon when a deferred action is queued.
+    /// The hash of the camera hint the weapon adds while a locally controlled character uses it:
+    /// [`StartUsing`](Self::StartUsing) adds it when it is not already active and
+    /// [`StopUsingBase`](Self::StopUsingBase) removes it. Camera hints are global and keyed by
+    /// this hash, so two weapons with the same hash share one hint.
+    #[address(0x46C)]
+    pub m_CameraHash: u32,
+    /// The camera hint used in place of [`m_CameraHash`](Self::m_CameraHash) while the weapon is
+    /// [`E_WS_MOUNTED`](WeaponState::E_WS_MOUNTED).
+    pub m_MountedCameraHash: u32,
+    /// The camera hint [`SetAimModeBase`](Self::SetAimModeBase) adds for a locally controlled user
+    /// entering precision aim, and removes on leaving it.
+    pub m_PrecisionCameraHash: u32,
+    /// The precision camera hint used in place of
+    /// [`m_PrecisionCameraHash`](Self::m_PrecisionCameraHash) while the user hangs from the grapple
+    /// ([`Character::IsGrappleHanging`](character::character::Character::IsGrappleHanging)).
+    pub m_ReeledHangPrecisionCameraHash: u32,
+
+    /// Whether the weapon is registered for pre-simulation updates
+    /// ([`UpdatePreSim`](Self::UpdatePreSim)). A shot, a reload's start, and each deferred-operation
+    /// request set it and register the weapon when it was clear.
     #[address(0x47C)]
     pub m_RequiresPreSimUpdates: bool,
+
+    /// Whether the weapon is registered for post-simulation updates
+    /// ([`UpdatePostSim`](Self::UpdatePostSim)). Its post-simulation update sets it while its guns
+    /// or components still have attached-effect work and registers the weapon through
+    /// [`GameObject::AddToUpdate`](game::GameObject::AddToUpdate) when the flag rises from clear.
+    #[address(0x47D)]
+    pub m_RequiresPostSimUpdates: bool,
 
     /// The weapon type's tuning, or null.
     #[address(0x490)]
     pub m_Tuning: *const WeaponTuning,
 
     /// The character using the weapon (a `boost::weak_ptr<CCharacter>`: object pointer and weak
-    /// control block).
+    /// control block), set by [`StartUsing`](Self::StartUsing) and cleared by
+    /// [`StopUsingBase`](Self::StopUsingBase). Every part of a shot keys off it rather than off
+    /// [`m_State`](Self::m_State) or the user's selected slot:
+    /// [`UpdateWeapon_Parallel`](Self::UpdateWeapon_Parallel) does nothing without a live user
+    /// (outside [`m_LieAboutUser`](Self::m_LieAboutUser) and the turret state), a shot adds heat to
+    /// it ([`Character::AddHeatPoints`](character::character::Character::AddHeatPoints)), the
+    /// weapon-fire awareness event names its AI entity, its precision aim scales the recoil, the
+    /// bullet weapons make it the bullet's owner, and the ammunition check reads its state bits.
     #[address(0x4F8)]
     pub m_User: [*mut void; 2],
+
+    /// The object holding the weapon (`m_Holder`, a weak reference to its `CGameObject`
+    /// subobject): a character or a vehicle. [`OnPickup`](Self::OnPickup) sets it and
+    /// [`OnDrop`](Self::OnDrop) clears it. The weapon's placement
+    /// ([`UpdateAttachmentTransforms`](Self::UpdateAttachmentTransforms)) places its guns on the
+    /// holder's bones.
+    #[address(0x508)]
+    pub m_Holder: WeakPtrGameObject,
+
+    /// Whether the weapon acts as though it had a user: while set,
+    /// [`UpdateWeapon_Parallel`](Self::UpdateWeapon_Parallel) runs without a live
+    /// [`m_User`](Self::m_User).
+    #[address(0x518)]
+    pub m_LieAboutUser: bool,
+
+    /// Whether the weapon's user is the local player. The trigger's semi-automatic rule, the fire
+    /// rumble ([`RumbleFire`](Self::RumbleFire)), and the fire camera shake apply only while it is
+    /// set, and it picks the local-player variant of the fire effect
+    /// ([`WeaponData::PlayFireEffect`]). [`StartUsing`](Self::StartUsing) sets it from
+    /// [`Character::IsLocalPlayerControlled`](character::character::Character::IsLocalPlayerControlled).
+    #[address(0x519)]
+    pub m_IsUserLocalPlayer: bool,
+    /// Whether the weapon's user is a player, local or remote. The sniper rifle's bolt lock
+    /// ([`SniperWeapon::m_HasFiredThisInput`]) and the barrel recoil's empty-magazine lock-back
+    /// apply only while it is set, and the rocket launcher's own reload request only while it is
+    /// clear. The bullet weapons ([`BulletWeaponBase::Fire_Projectile`]) pass it to each bullet and
+    /// tracer as the bullet's player flag.
+    pub m_IsUserPlayer: bool,
+
+    /// The weapon's components ([`WeaponComponentBase`]): its model parts
+    /// ([`ModelAttachementWeaponComponent`] and the barrel recoil and spin parts derived from it),
+    /// wall penetration, turret, and the rest. An entry's
+    /// [`m_Type`](WeaponComponentBase::m_Type) names its class, and
+    /// [`IsType`](WeaponComponentBase::IsType) tests its class or a base of it.
+    #[address(0x540)]
+    pub m_WeaponComponents: Vector<SharedPtr<WeaponComponentBase>>,
 
     /// Whether the weapon blocks firing while its barrel penetrates a wall in aim.
     #[address(0x560)]
@@ -397,9 +1344,423 @@ pub type WeaponBase {
     pub m_lWeaponData: WeaponDataArray,
 }
 impl WeaponBase {
-    /// Writes the grip transform for the given `hand` (a `E_WEAPON_GRIP_HAND_*` value).
+    /// `CWeaponBase::TYPE_ID`: the run-time type id of `CWeaponBase`, for
+    /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use. A weapon is a
+    /// physics game object of its own (not a rigid object): a weapon lying in the world has its own
+    /// body, and a physics query that hits it reports the weapon.
+    #[address(0x140_60F_2F0)]
+    pub fn TYPE_ID() -> *const u32;
+
+    /// The weapon's override of
+    /// [`PhysicsGameObject::GetGrapplingMode`](physics::PhysicsGameObject::GetGrapplingMode):
+    /// [`E_GM_ReelInNoAttach`](physics::GrapplingMode::E_GM_ReelInNoAttach), so the grapple counts
+    /// a weapon it hits as grapplable. Neither the player's aim ray nor a wire end's casts hit a
+    /// weapon's body, whose [`WEAPONS`](physics::PfxLayer::WEAPONS) layer does not collide with their
+    /// query layer.
+    #[address(0x140_8CE_F90)]
+    pub fn GetGrapplingModeWeapon(&self) -> GrapplingMode;
+
+    /// Whether the weapon's rounds come without limit. The holder is the weapon's user
+    /// ([`m_User`](Self::m_User)): true when
+    /// [`Character::HasUnlimitedAmmo`](character::character::Character::HasUnlimitedAmmo) holds
+    /// for it (its [`m_UnlimitedAmmo`](character::character::Character::m_UnlimitedAmmo), a holder
+    /// that is not a player, or the challenge-island game mode); otherwise, and with no user at
+    /// all, the tuning's [`m_unlimited_ammo`](WeaponTuning::m_unlimited_ammo), and false without a
+    /// tuning. [`Reload`](Self::Reload) then fills the magazine without drawing on the reserve, and
+    /// [`CanReload`](Self::CanReload) allows a reload with an empty reserve.
+    #[address(0x140_964_F90)]
+    pub fn HasUnlimitedAmmo(&self) -> bool;
+
+    /// Sets the weapon's state ([`m_State`](Self::m_State)) and moves its bodies into or out of
+    /// the physics world for it (`CWeaponBase::SetState`). It does nothing when the state is
+    /// unchanged. The bodies stay in the world ([`AddToWorld`](Self::AddToWorld), waking them for
+    /// [`E_WS_DROPPED`](WeaponState::E_WS_DROPPED)) for the dropped, mounted, and turret states,
+    /// unless `keep_out_of_world` is set or a turret becomes dropped; every other state takes
+    /// them out ([`RemoveFromWorld`](Self::RemoveFromWorld)). Entering
+    /// [`E_WS_HOLSTERED_INVISIBLE`](WeaponState::E_WS_HOLSTERED_INVISIBLE) hides the weapon and
+    /// leaving it shows the weapon again ([`SetVisible`](Self::SetVisible)); a weapon of a
+    /// non-player character with
+    /// [`DUAL_WIELDER_BLACKBOARD_VALUE`](Self::DUAL_WIELDER_BLACKBOARD_VALUE) is also shown again
+    /// on entering the wielding, dual-wielding, holstered, vehicle, picking-up, or wingsuit state
+    /// from any state but dropped. Entering the rack state reads the
+    /// player's maximum stock of the weapon's ammunition into its stored ammunition. A
+    /// dual-wield-slot weapon entering [`E_WS_WIELDING`](WeaponState::E_WS_WIELDING) has its next
+    /// gun reset to the first ([`m_NextWeaponToFire`](Self::m_NextWeaponToFire)). The equip
+    /// ([`OnEquip`](Self::OnEquip)), the pickup ([`OnPickup`](Self::OnPickup)), the placement
+    /// rules, and the animation's weapon-state and predefined-bone state tasks call it; the
+    /// weapon-state task sets a state from its data on entry and restores the old one on exit.
+    #[address(0x140_981_8C0)]
+    pub fn SetState(&mut self, state: WeaponState, keep_out_of_world: bool);
+
+    /// Puts the weapon's bodies into the physics world (`CWeaponBase::AddToWorld`, which the
+    /// disassembler names `CWeaponBase::RemoveFromWorld`): each gun's body through
+    /// [`WeaponData::AddToWorld`], except that a weapon of the
+    /// [`E_SLOT_DUAL_WIELD`](WeaponSlot::E_SLOT_DUAL_WIELD) slot puts only its first gun's body in
+    /// and takes the others' out, so a dual-wield weapon in the world is one body.
+    /// [`SetState`](Self::SetState) and the drop virtual ([`OnDrop`](Self::OnDrop)) call it.
+    #[address(0x140_95F_960)]
+    pub fn AddToWorld(&mut self);
+
+    /// Takes every gun's body out of the physics world
+    /// ([`PfxRigidBody::RemoveFromWorld`](physics::PfxRigidBody::RemoveFromWorld)) without
+    /// destroying it (`CWeaponBase::RemoveFromWorld`, which the disassembler names
+    /// `CWeaponBase::AddToWorld`). [`SetState`](Self::SetState), the pickup
+    /// ([`PickupStart`](Self::PickupStart), [`PickupItem`](Self::PickupItem), and
+    /// [`OnPickup`](Self::OnPickup)), the unequip, the drop, and the despawn call it.
+    #[address(0x140_95F_A20)]
+    pub fn RemoveFromWorld(&mut self);
+
+    /// The base implementation of the [`SetVisible`](Self::SetVisible) virtual. It shows or hides
+    /// each gun's model ([`WeaponData::m_BaseModelInstance`], through its
+    /// [`m_Flags`](graphics_engine::model_instance::ModelInstance::m_Flags)), writing only a gun
+    /// whose visibility differs, and then calls every component's
+    /// [`SetVisible`](WeaponComponentBase::SetVisible) with the weapon-wide value; a model part
+    /// follows its own gun's model, so the parts of a hidden gun stay hidden. Guns past the first
+    /// are hidden even when showing:
+    ///
+    /// - for a dual-wield-slot weapon in [`E_WS_WIELDING`](WeaponState::E_WS_WIELDING);
+    /// - for a dual-wield-slot weapon of a non-player character without
+    ///   [`DUAL_WIELDER_BLACKBOARD_VALUE`](Self::DUAL_WIELDER_BLACKBOARD_VALUE);
+    /// - for any weapon of a non-player character with that value while it is
+    ///   [`E_WS_HOLSTERED`](WeaponState::E_WS_HOLSTERED).
+    ///
+    /// A player's dual-wield weapon holstered or dual-wielded therefore shows both guns. A weapon
+    /// in [`E_WS_HOLSTERED_INVISIBLE`](WeaponState::E_WS_HOLSTERED_INVISIBLE) is shown only with
+    /// `force`. Showing with `fade` restarts each shown gun's fade from transparent; showing
+    /// without it makes the gun opaque at once. Nothing re-applies the rule between calls, so a
+    /// weapon whose state changes keeps the guns' visibility from its last call.
+    #[address(0x140_985_140)]
+    pub fn SetVisibleBase(&mut self, visible: bool, fade: bool, force: bool);
+
+    /// The base implementation of the [`SetMagazineAmmo`](Self::SetMagazineAmmo) virtual.
+    #[address(0x140_96E_520)]
+    pub fn SetMagazineAmmoBase(&mut self, ammo: i32);
+
+    /// The base implementation of the [`Reload`](Self::Reload) virtual, which the rocket
+    /// launcher's and the mortar's overrides call.
+    #[address(0x140_976_480)]
+    pub fn ReloadBase(&mut self) -> bool;
+
+    /// Handles a weapon message from an animation track, `data`, for `character` (the weapon's
+    /// override of the weapon track-message virtual, which the rocket launcher, the mortar, the
+    /// thrown grenade, the planted explosive, and the guitar case extend and then call). The
+    /// holder's track-message handling
+    /// ([`Character::HandleTrackMessage`](character::character::Character::HandleTrackMessage))
+    /// forwards the message, so it runs in the holder's serial post-physics pass on the game
+    /// update thread. It dispatches on the message's name hash. The reload messages are
+    /// [`TRACK_MESSAGE_THROW_AWAY_MAGAZINE`](Self::TRACK_MESSAGE_THROW_AWAY_MAGAZINE),
+    /// [`TRACK_MESSAGE_RELOAD`](Self::TRACK_MESSAGE_RELOAD),
+    /// [`TRACK_MESSAGE_ENABLE_MODEL_ATTACHEMENT`](Self::TRACK_MESSAGE_ENABLE_MODEL_ATTACHEMENT),
+    /// [`TRACK_MESSAGE_START_RELOAD`](Self::TRACK_MESSAGE_START_RELOAD), and
+    /// [`TRACK_MESSAGE_START_RELOAD_IF_EMPTY`](Self::TRACK_MESSAGE_START_RELOAD_IF_EMPTY). The
+    /// others raise [`m_ForceFireProjectile`](Self::m_ForceFireProjectile), complete a pickup
+    /// ([`PickupItem`](Self::PickupItem)), play an attached effect on a gun, show or hide the
+    /// weapon, equip, unequip, drop, or stop using it, and detach a mounted gun.
+    #[address(0x140_991_8B0)]
+    pub fn HandleTrackMessage(&mut self, data: *mut AnimationMessageData, character: *mut Character);
+
+    /// Detaches the mounted weapon from its rigid holder: disables the holder's child interaction
+    /// contexts, stops using the weapon ([`StopUsing`](Self::StopUsing)), and drops it
+    /// ([`OnDrop`](Self::OnDrop)). It removes no constraint of its own: the drop from the mounted
+    /// state removes only the attach constraint ([`m_ConstraintAttach`](Self::m_ConstraintAttach))
+    /// and clears the references to the horizontal and vertical hinges without disabling them, and
+    /// the dropped weapon goes back into the physics world, so the hinges keep it on its mount until
+    /// they are disabled. The game's own tear equips the weapon in the same animation message, which
+    /// takes it out of the physics world before the hinges act. It does not equip the detached
+    /// weapon. A holder that is not a
+    /// rigid object, such as a vehicle, has no contexts disabled, and nothing is done to the user's
+    /// vehicle seat: a user in a gunner seat is left in it.
+    #[address(0x140_982_3E0)]
+    pub fn DetachMountedGun(&mut self);
+
+    /// Starts picking the weapon up for `activator` (a character's `CGameObject` subobject; any
+    /// other object is ignored). A hand grenade is taken at once, whatever its
+    /// [`m_InfinitePickup`](Self::m_InfinitePickup): its stored ammunition
+    /// ([`m_StoredNonMagazineAmmo`](Self::m_StoredNonMagazineAmmo)) goes to the inventory's reserve
+    /// ([`Inventory::AddAmmo`](character::inventory::Inventory::AddAmmo), so a weapon with none
+    /// stored adds nothing), the HUD shows the grenade pickup when any was added, and the weapon
+    /// disables its pickup, leaves the update, hides ([`SetVisible`](Self::SetVisible)), leaves the
+    /// physics world ([`RemoveFromWorld`](Self::RemoveFromWorld)), and is handed to the spawn
+    /// system's despawn (`CSpawnSystem::Despawn`), which queues an object it spawned for removal
+    /// and lowers its resource's spawned count. Another weapon enters
+    /// [`E_WS_PICKING_UP`](WeaponState::E_WS_PICKING_UP) and leaves the physics world; the weapon's
+    /// pickup track message then completes the pickup through [`PickupItem`](Self::PickupItem).
+    /// A weapon with infinite pickups gives the character a copy instead. The weapon's pickup
+    /// interaction calls it when it executes, and on activation for a weapon that
+    /// [`ShouldAutoPickup`](Self::ShouldAutoPickup) takes without input. Every weapon, a hand
+    /// grenade included, then sends its picked-up event when it has one.
+    #[address(0x140_991_2B0)]
+    pub fn PickupStart(&mut self, activator: *mut GameObject);
+
+    /// Completes a pickup for `activator` (a character's `CGameObject` subobject): unequips the
+    /// wielded weapon, puts this one into the inventory and equips it, selects its slot, adds its
+    /// stored ammunition to the inventory, and plays the pickup vocal. It does not refill the
+    /// magazine. Putting the weapon into the inventory runs its pickup virtual (the holder is set,
+    /// the state becomes holstered, which takes its bodies out of the physics world, and its pickup
+    /// interaction is disabled) and its equip virtual (the state becomes wielding, or
+    /// dual-wielding for the player's dual-wield slot), with no animation act. A weapon already in
+    /// the slot is dropped or despawned by the inventory's add. A hand grenade is left to
+    /// [`PickupStart`](Self::PickupStart), and a weapon with
+    /// [`m_InfinitePickup`](Self::m_InfinitePickup) set is not put into the inventory at all; both
+    /// still lose their stored ammunition. Called by the weapon's pickup track message, and
+    /// directly by [`Inventory::UpdateWeaponHandling`](character::inventory::Inventory::UpdateWeaponHandling)
+    /// for a swimming character.
+    #[address(0x140_979_8C0)]
+    pub fn PickupItem(&mut self, activator: *mut GameObject);
+
+    /// Starts `character` using the weapon: registers it for pre-simulation updates, sets the user
+    /// ([`m_User`](Self::m_User)) and [`m_IsUserLocalPlayer`](Self::m_IsUserLocalPlayer) and
+    /// [`m_IsUserPlayer`](Self::m_IsUserPlayer), adds the weapon's camera hint
+    /// ([`m_CameraHash`](Self::m_CameraHash), or [`m_MountedCameraHash`](Self::m_MountedCameraHash)
+    /// while mounted) for the locally controlled character when that hint is not already active,
+    /// records the use in the statistics, and seeds
+    /// [`m_AimTargetPosition`](Self::m_AimTargetPosition) from the user's weapon aim target
+    /// ([`Character::m_AimTargetPositionWeapons`](character::character::Character::m_AimTargetPositionWeapons)).
+    /// A mounted gun is also put into the user's inventory. For the player it leaves precision aim
+    /// when the weapon does not support it ([`m_SupportsPrecisionAim`](Self::m_SupportsPrecisionAim)),
+    /// which forwards normal aim to the selected weapon, and hands the player's aim mode to the
+    /// weapon ([`SetAimMode`](Self::SetAimMode)). It does not change the weapon's state. The equip
+    /// virtual ([`OnEquip`](Self::OnEquip)) calls it, and the inventory's add calls it for the hand
+    /// grenade, the planted explosive, and the beacon, which are in use without being wielded.
+    #[address(0x140_982_600)]
+    pub fn StartUsing(&mut self, character: *mut Character);
+
+    /// The base implementation of the [`StopUsing`](Self::StopUsing) virtual. It stops fire on
+    /// every gun if firing, stops the components, clears every gun's burst and three of its
+    /// effects, and for a locally controlled user records the statistic, removes the use camera
+    /// hint ([`m_CameraHash`](Self::m_CameraHash), or
+    /// [`m_MountedCameraHash`](Self::m_MountedCameraHash) while mounted) by its hash, and returns
+    /// the weapon to normal aim through [`SetAimMode`](Self::SetAimMode), which removes its
+    /// precision hints. A mounted gun is torn down, which removes the user's heavy slot and selects
+    /// a valid weapon. It then clears [`m_User`](Self::m_User). A weapon wielding or dual-wielding
+    /// outside the [`E_SLOT_HEAVY`](WeaponSlot::E_SLOT_HEAVY) slot gets
+    /// [`E_WS_HOLSTERED`](WeaponState::E_WS_HOLSTERED) written to [`m_State`](Self::m_State)
+    /// directly rather than through [`SetState`](Self::SetState), so the state's physics-world and
+    /// visibility changes do not run. Last it clears
+    /// [`m_IsUserLocalPlayer`](Self::m_IsUserLocalPlayer),
+    /// [`m_IsUserPlayer`](Self::m_IsUserPlayer), and
+    /// [`m_InputBufferTimer`](Self::m_InputBufferTimer). Because camera hints are keyed by hash,
+    /// it removes a hint another weapon with the same hash still uses.
+    #[address(0x140_982_D80)]
+    pub fn StopUsingBase(&mut self);
+
+    /// The base implementation of the [`SetAimMode`](Self::SetAimMode) virtual. When `aim_mode`
+    /// differs from [`m_AimMode`](Self::m_AimMode) it plays the aim-in or aim-out attached-effect
+    /// usage on every gun; it stores the mode; and for a locally controlled user it adds the
+    /// precision camera hint on entering precision aim
+    /// ([`m_PrecisionCameraHash`](Self::m_PrecisionCameraHash), or
+    /// [`m_ReeledHangPrecisionCameraHash`](Self::m_ReeledHangPrecisionCameraHash) while the user
+    /// hangs from the grapple) and removes both on returning to normal aim.
+    #[address(0x140_966_E20)]
+    pub fn SetAimModeBase(&mut self, aim_mode: AimMode);
+
+    /// Whether `character` is the weapon's user ([`m_User`](Self::m_User)).
+    /// [`Player::SetAimMode`](character::player::Player::SetAimMode) forwards a mode change to the
+    /// selected weapon only while this holds for the player's character.
+    #[address(0x140_965_4C0)]
+    pub fn IsCharacterUsingWeapon(&self, character: *const Character) -> bool;
+
+    /// Whether a shot from `weapon_data` toward [`m_AimTargetPosition`](Self::m_AimTargetPosition)
+    /// lies within the weapon's fire angle of the gun's barrel.
+    /// [`UpdateWeapon_Parallel`](Self::UpdateWeapon_Parallel) consults it for every slot but the
+    /// hand grenade, the planted explosive, and the beacon, outside barrel fire-direction mode, and
+    /// a shot that fails it is cleared and buffered
+    /// ([`m_InputBufferTimer`](Self::m_InputBufferTimer)).
+    #[address(0x140_992_920)]
+    pub fn IsTargetWithinAimAngle(&mut self, weapon_data: *mut WeaponData) -> bool;
+
+    /// The holder's details for a shot, read from [`m_Holder`](Self::m_Holder). It also stores
+    /// the holder's velocity on the weapon, which the bullets take as their relative velocity.
+    ///
+    /// - A character holder writes its faction
+    ///   ([`Character::GetFaction`](character::character::Character::GetFaction)) to `faction`,
+    ///   its network peer to `peer_id`, and whether it is a player to `is_player`, and names
+    ///   itself in `ignore[0]`, leaving `ignore[1]` as the caller set it.
+    /// - A vehicle holder writes the vehicle's faction, sets `is_player` when the vehicle is the
+    ///   local player's, and names the vehicle in `ignore[0]` and its driver in `ignore[1]`.
+    /// - Otherwise a turret component gives its faction and clears `is_player`, and `ignore` is
+    ///   left as the caller set it.
+    ///
+    /// `ignore` holds the physics objects (`CPhysicsGameObject`) the shot's projectiles ignore: a
+    /// bullet's ray filter skips them until it first penetrates an object. The bullet weapons
+    /// ([`BulletWeaponBase::Fire_Projectile`]) call it before each shot with `ignore` cleared, as
+    /// do the anti-air gun's shot, the magnet's gravity field filter, and the laser's beam length.
+    #[address(0x140_985_5F0)]
+    pub fn GetHolderInformation(&mut self, faction: *mut i32, peer_id: *mut u8, is_player: *mut bool, ignore: *mut [*const void; 2]);
+
+    /// Queues a start-using by `character` for the next pre-simulation update
+    /// ([`UpdatePreSim`](Self::UpdatePreSim)): records [`m_DeferredUser`](Self::m_DeferredUser) and
+    /// sets [`m_DeferredStartUsing`](Self::m_DeferredStartUsing). The update skips it when the
+    /// weapon already has a user, and otherwise unequips the character's wielded weapon and calls
+    /// [`StartUsing`](Self::StartUsing). Its one caller is the mounted-weapon state task's entry.
+    #[address(0x140_965_2A0)]
+    pub fn StartUsingDeferred(&mut self, character: *mut Character);
+
+    /// Queues an equip by `character` for the next pre-simulation update, recording
+    /// [`m_DeferredEquiper`](Self::m_DeferredEquiper) and setting
+    /// [`m_DeferredEquip`](Self::m_DeferredEquip); not for a mounted weapon. Its one caller is
+    /// the AI's equip action, so the game never defers an equip of a player's weapon.
+    #[address(0x140_965_3B0)]
+    pub fn EquipDeferred(&mut self, character: *mut Character);
+
+    /// Queues an unequip for the next pre-simulation update
+    /// ([`m_DeferredUnequip`](Self::m_DeferredUnequip)). The AI's unequip and switch actions, the
+    /// non-player branch of the `NWeaponUnequipTask` state task, and the graph script's
+    /// `SpawnWeapons` node ([`NGSONodes_SpawnWeapons`](graph_script::NGSONodes_SpawnWeapons)) queue
+    /// it.
+    #[address(0x140_950_F00)]
+    pub fn UnequipDeferred(&mut self);
+
+    /// Queues a drop for the next pre-simulation update
+    /// ([`m_DeferredDrop`](Self::m_DeferredDrop)), for a weapon not already
+    /// [`E_WS_DROPPED`](WeaponState::E_WS_DROPPED). Its one caller is
+    /// [`Inventory::DropWeapon`](character::inventory::Inventory::DropWeapon).
+    #[address(0x140_950_F50)]
+    pub fn DropDeferred(&mut self);
+
+    /// The weapon's pre-simulation update, the `CGameObject::UpdatePreSim` override, run while the
+    /// weapon is registered ([`m_RequiresPreSimUpdates`](Self::m_RequiresPreSimUpdates)).
+    /// `game_object` is the weapon's `CGameObject` subobject
+    /// ([`GAME_OBJECT_BASE_OFFSET`](Self::GAME_OBJECT_BASE_OFFSET)), not the start of the weapon.
+    /// It runs each gun's pre-simulation update ([`WeaponData::UpdatePreSim`]) and the components',
+    /// applies a deferred physical recoil
+    /// ([`m_DeferredPhysicalRecoil`](Self::m_DeferredPhysicalRecoil)) to the user's body, and
+    /// broadcasts a pending weapon-fire awareness event
+    /// ([`m_DeferredAwarenessBroadcast`](Self::m_DeferredAwarenessBroadcast)) at the muzzle of the
+    /// gun that fired last ([`m_LastWeaponToFire`](Self::m_LastWeaponToFire)) with the user's AI
+    /// entity ([`Character::GetAiEntityHandle`](character::character::Character::GetAiEntityHandle))
+    /// as its source. With a user, the guns keep their full animation detail while the user's
+    /// [`m_LodFlags`](character::character::Character::m_LodFlags) are clear, and drop it beyond a
+    /// middle distance from the camera otherwise. Then the deferred operations run, in this order:
+    ///
+    /// - [`m_DeferredDrop`](Self::m_DeferredDrop): [`OnDrop`](Self::OnDrop);
+    /// - [`m_DeferredUnequip`](Self::m_DeferredUnequip): [`OnUnequip`](Self::OnUnequip), and
+    ///   [`SkipRenderInterpolationForOneFrame`](Self::SkipRenderInterpolationForOneFrame) for every
+    ///   gun;
+    /// - [`m_DeferredEquip`](Self::m_DeferredEquip): [`OnEquip`](Self::OnEquip) with
+    ///   [`m_DeferredEquiper`](Self::m_DeferredEquiper), which ends the update;
+    /// - [`m_DeferredStartUsing`](Self::m_DeferredStartUsing) together with
+    ///   [`m_DeferredStopUsing`](Self::m_DeferredStopUsing): both are cleared, with
+    ///   [`m_DeferredUser`](Self::m_DeferredUser);
+    /// - a start-using alone, for a weapon without a user: [`OnUnequip`](Self::OnUnequip) on the
+    ///   deferred user's wielded weapon, then [`StartUsing`](Self::StartUsing);
+    /// - a stop-using alone, for a weapon with a user: [`StopUsing`](Self::StopUsing).
+    #[address(0x140_993_2C0)]
+    pub fn UpdatePreSim(game_object: *mut void, context: *mut GameObjectUpdateContext);
+
+    /// The weapon's post-simulation update, the `CGameObject::UpdatePostSim` override, run while
+    /// the weapon is registered ([`m_RequiresPostSimUpdates`](Self::m_RequiresPostSimUpdates)).
+    /// `game_object` is the weapon's `CGameObject` subobject, not the start of the weapon. It runs
+    /// each gun's component update and attached-effect update, and clears the post-simulation flag
+    /// when nothing remains to update.
+    #[address(0x140_995_CB0)]
+    pub fn UpdatePostSim(game_object: *mut void, context: *mut GameObjectUpdateContext);
+
+    /// The weapon's pickup interaction context: the first [`InteractionContext`] child of the
+    /// weapon's game object, cached on the weapon. The mounted weapon's "use" prompt is this
+    /// context's.
+    #[address(0x140_983_750)]
+    pub fn GetPickupContext(&mut self) -> *mut InteractionContext;
+
+    /// The look-input half of a vehicle-mounted weapon's aim, called by the pre-simulation update
+    /// for each mounted gun with the yaw and pitch hinges' current targets. Returns true without
+    /// changing anything while [`m_BlendOutMotors`](Self::m_BlendOutMotors) is set. Returns false,
+    /// and the caller then aims the mount at [`m_AimTargetPosition`](Self::m_AimTargetPosition) seen
+    /// from the gun's mount point, unless
+    /// [`m_MountedInputIsControlledByWeapon`](Self::m_MountedInputIsControlledByWeapon) and
+    /// [`m_IsUserPlayer`](Self::m_IsUserPlayer) are both set. Otherwise it adds the look input's
+    /// rate, from the first gamepad or the mouse, whichever is larger per axis, times `dt` to
+    /// `horizontal_angle` and `vertical_angle`, and returns true. The caller aims nothing while the
+    /// aim target is within about a third of a metre of the mount point, and turns the hinges
+    /// toward the desired angles at the weapon's mounted turn speeds, within their limits.
+    #[address(0x140_984_760)]
+    pub fn UpdateMountedInput(&mut self, dt: f32, horizontal_angle: *mut f32, vertical_angle: *mut f32) -> bool;
+
+    /// Enables the weapon's pickup interaction context ([`GetPickupContext`](Self::GetPickupContext))
+    /// and registers its HUD pickup hint. The drop ([`OnDrop`](Self::OnDrop)) calls it for every
+    /// prior state but mounted and turret, so a weapon dropped off its mount offers no pickup.
+    #[address(0x140_992_8A0)]
+    pub fn PickupEnable(&mut self);
+
+    /// Wakes every gun's body in the physics world.
+    #[address(0x140_95F_AA0)]
+    pub fn ForceActivate(&mut self);
+
+    /// Reads the horizontal mount constraint's angular limits, from the vehicle part's powered
+    /// hinge controller when the holder is a vehicle, or from
+    /// [`m_ConstraintHorizontal`](Self::m_ConstraintHorizontal). Returns whether the limits were
+    /// found.
+    #[address(0x140_986_730)]
+    pub fn GetMountedHorizontalAngularLimits(&self, min: *mut f32, max: *mut f32) -> bool;
+
+    /// Reads the first vertical mount constraint's angular limits, from the vehicle part's powered
+    /// hinge controller when the holder is a vehicle, or from
+    /// [`m_ConstraintVertical`](Self::m_ConstraintVertical). Returns whether the limits were found.
+    #[address(0x140_986_2C0)]
+    pub fn GetMountedVerticalAngularLimits(&self, min: *mut f32, max: *mut f32) -> bool;
+
+    /// The base implementation of the [`OnEquip`](Self::OnEquip) virtual.
+    #[address(0x140_991_580)]
+    pub fn OnEquipBase(&mut self, character: *mut Character);
+
+    /// The base implementation of the [`OnDrop`](Self::OnDrop) virtual, which a weapon without an
+    /// override of its own, such as a thrown grenade weapon, runs. The inventory's drop
+    /// ([`Inventory::DropWeapon`](character::inventory::Inventory::DropWeapon)) reaches it through
+    /// the deferred drop on the weapon's next pre-simulation update. It leaves the weapon in
+    /// [`E_WS_DROPPED`](WeaponState::E_WS_DROPPED) with its holder cleared.
+    #[address(0x140_9A4_870)]
+    pub fn OnDropBase(&mut self);
+
+    /// The base implementation of the [`OnUnequip`](Self::OnUnequip) virtual.
+    #[address(0x140_982_040)]
+    pub fn OnUnequipBase(&mut self);
+
+    /// Despawns the weapon (the weapon's `CGameObject::Despawn` override): unequips it, hides it,
+    /// puts its bodies into the physics world, sets its spawn ranking so the spawn system's
+    /// despawn takes it, and stops its fire. The object itself lives on while another strong
+    /// reference holds it, hidden and in the world.
+    /// [`Inventory::DespawnWeapon`](character::inventory::Inventory::DespawnWeapon) calls it.
+    #[address(0x140_965_210)]
+    pub fn Despawn(&mut self);
+
+    /// The weapon pickup interaction's automatic ammunition credit, called on activation with the
+    /// activating object. A power-core weapon returns false. A hand grenade returns true while
+    /// the activator's grenade reserve is below its cap, and the interaction then starts the
+    /// pickup ([`PickupStart`](Self::PickupStart)). Any other weapon that carries stored rounds
+    /// ([`m_StoredNonMagazineAmmo`](Self::m_StoredNonMagazineAmmo)), when the activator's
+    /// inventory holds a weapon of the same ammunition type
+    /// ([`Inventory::HasWeaponWithAmmoType`](character::inventory::Inventory::HasWeaponWithAmmoType))
+    /// and neither the gun nor the character has unlimited ammunition, gives the rounds to the
+    /// reserve ([`Inventory::AddAmmo`](character::inventory::Inventory::AddAmmo)), shows the
+    /// ammunition pickup on the HUD, sends the picked-up-ammunition event, keeps what did not fit,
+    /// and returns false.
+    #[address(0x140_981_C10)]
+    pub fn ShouldAutoPickup(&mut self, activator: *mut GameObject) -> bool;
+
+    /// Whether the weapon's first gun sits on the left hand: its
+    /// [`WeaponData::m_lBoneAttachementPerWeaponState`] entry for the current
+    /// [`m_State`](Self::m_State) is the left-hand attach bone. A state task that moves the gun to
+    /// the left hand (`NSetWeaponPredefinedBoneTask`'s `clear_right_hand`) makes it true. It never
+    /// looks at a second gun. The animation condition
+    /// [`WeaponWieldedInLeftHand`](equipment::weapon_animation::WeaponWieldedInLeftHand) and the
+    /// vertical aim blend ([`VerticalAimBlendState::UpdateSamplers`](aim::aim::VerticalAimBlendState::UpdateSamplers))
+    /// read it.
+    #[address(0x140_958_F50)]
+    pub fn IsWieldedInLeftHand(&self) -> bool;
+
+    /// The number of recoil samplers the aim blend drives for the weapon: one per gun, and one for
+    /// a non-player's wielded heavy weapon.
+    #[address(0x140_856_EB0)]
+    pub fn GetNumRecoilAnimationNeeded(&self) -> i32;
+
+    /// Writes the world transform of the weapon's grip point for `hand` into `matrix`: the
+    /// weapon's grip-table entry for that hand (the entry for the mounted state while
+    /// [`m_State`](Self::m_State) is [`E_WS_MOUNTED`](WeaponState::E_WS_MOUNTED)), a translation in
+    /// the first gun's frame, composed with that gun's current world matrix. Returns false, writing
+    /// nothing, when the weapon has no entry for that hand. The secondary hand IK pass and the hand
+    /// IK tasks place a hand on a held weapon through it.
     #[address(0x140_966_840)]
-    pub fn GetGripPosition(&self, hand: i32, matrix: *mut Matrix4) -> bool;
+    pub fn GetGripPosition(&self, hand: WeaponGripHand, matrix: *mut Matrix4) -> bool;
 
     /// Builds the launch transform for a shot from `weapon_data` into `shot_matrix`. The origin is
     /// the muzzle ([`GetFireFromPosition`](Self::GetFireFromPosition)); the direction points at
@@ -420,24 +1781,195 @@ impl WeaponBase {
     /// ammunition, resets the fire timers, applies recoil, scatter, and heat, plays the fire effect
     /// on `weapon_data`, decrements the forced-fire and projectile-offset counts, and then advances
     /// the fire-point cursor of the gun at [`m_NextWeaponToFire`](Self::m_NextWeaponToFire) and the
-    /// gun index itself.
+    /// gun index itself (held on the first gun for a dual-wield-slot weapon in the wielding
+    /// state). None of it reads [`m_State`](Self::m_State) or the user's selected slot.
+    ///
+    /// In detail: it consumes a round ([`ConsumeAmmo`](Self::ConsumeAmmo)) when the weapon is
+    /// locally owned and registers the weapon for pre-simulation updates; it scales the recoil for
+    /// the first shot and, while the user's player is in precision aim
+    /// ([`Player::m_AimMode`](character::player::Player::m_AimMode)), by the precision factor; it
+    /// plays the fire effect ([`WeaponData::PlayFireEffect`]); for the local player it logs the
+    /// shot's statistics; it sets [`m_DeferredPhysicalRecoil`](Self::m_DeferredPhysicalRecoil)
+    /// when [`m_PhysicalRecoilStrength`](Self::m_PhysicalRecoilStrength) is non-zero and
+    /// [`m_DeferredAwarenessBroadcast`](Self::m_DeferredAwarenessBroadcast) on the first shot of a
+    /// pull; it runs [`RumbleFire`](Self::RumbleFire) and the fire camera shake; and, unless
+    /// [`m_NoHeatOnFiring`](Self::m_NoHeatOnFiring) is set, the user's faction is hostile
+    /// ([`GetRelation`](faction::GetRelation)) to the default faction, or the weapon is the
+    /// planted explosive, it adds heat to the user
+    /// ([`Character::AddHeatPoints`](character::character::Character::AddHeatPoints)) with the heat
+    /// manager's firing tuning ([`HeatManager::GetHeatPointData`](heat_manager::HeatManager::GetHeatPointData)).
+    /// In a restricted area a user in a vehicle a player drives also heats the local player.
     #[address(0x140_991_FF0)]
     pub fn Fire_ProjectileBase(&mut self, weapon_data: *mut WeaponData);
+
+    /// Spawns the fire rumble for a shot through [`RumbleManager::SpawnRumble`](rumble_manager::RumbleManager::SpawnRumble),
+    /// named `"WeaponFire"`, with the tuning's rumble strength and time, when the user is the local
+    /// player ([`m_IsUserLocalPlayer`](Self::m_IsUserLocalPlayer)) and the strength is positive. On
+    /// the dual-wield slot the gun about to fire ([`m_NextWeaponToFire`](Self::m_NextWeaponToFire))
+    /// picks the motor: gun 1 drives the left motor only, and any other gun the right motor only.
+    /// Called only from [`Fire_ProjectileBase`](Self::Fire_ProjectileBase), after the shot's recoil
+    /// is added to [`m_RecoilPitch`](Self::m_RecoilPitch) and [`m_RecoilYaw`](Self::m_RecoilYaw)
+    /// and before the gun index advances.
+    #[address(0x140_951_0C0)]
+    pub fn RumbleFire(&mut self);
+
+    /// The base implementation of the
+    /// [`CheckIfReloadShouldBeTriggered`](Self::CheckIfReloadShouldBeTriggered) virtual; the
+    /// rocket launcher's and the sniper rifle's overrides call it. It clears `should_try_to_fire`
+    /// while the holder reloads, draws, or holsters. For a player's weapon with limited
+    /// ammunition and an empty magazine ([`m_MagazineAmmo`](Self::m_MagazineAmmo); a weapon whose
+    /// tuning sets no magazine size counts as empty only while the holder has no stock of its
+    /// ammunition), while no reload is running, it starts a reload when
+    /// [`CanReload`](Self::CanReload) holds and the animation allows one, whether or not the
+    /// trigger is pulled. When the weapon cannot reload and the shot was requested, it:
+    ///
+    /// - except for the hand grenade and the planted explosive, calls
+    ///   [`Inventory::TryToSwitchToValidWeapon`](character::inventory::Inventory::TryToSwitchToValidWeapon),
+    ///   the automatic switch to a weapon with ammunition;
+    /// - at the pull's press edge (`was_trigger_pulled` clear) only, for the local player's weapon
+    ///   and when no switch happened, calls
+    ///   [`HUDUI::OnOutOfAmmoFire`](ui::hud_ui::HUDUI::OnOutOfAmmoFire) (or the grenade
+    ///   counterpart for the hand grenade), and, whether or not a switch happened, activates the
+    ///   gun's `OutOfAmmoFire` attached-effect usage on `weapon_data`;
+    ///
+    /// and in either case it clears `should_try_to_fire`, so an empty weapon never fires. The
+    /// switch is tried on every tick the shot is requested, while the out-of-ammo feedback plays
+    /// once per pull. It goes on to cancel a reload that should not continue, clear
+    /// `should_try_to_fire` while the holder may not fire, and start a predicted reload of a
+    /// partly empty magazine.
+    ///
+    /// It runs on every tick for the gun being updated, whatever the input, and its reads and
+    /// requests are the user's, not the weapon's:
+    ///
+    /// - the shot is cleared while the user reloads
+    ///   ([`Character::IsReloading`](character::character::Character::IsReloading)), draws or
+    ///   holsters
+    ///   ([`Character::IsDrawingOrHolsteringWeapon`](character::character::Character::IsDrawingOrHolsteringWeapon)),
+    ///   or has firing blocked
+    ///   ([`Character::IsNoFiringSet`](character::character::Character::IsNoFiringSet)), so the
+    ///   user's reload, draw, or holster of its wielded weapon blocks every weapon it uses;
+    /// - the reload it starts for an empty magazine, for a magazine that is out
+    ///   ([`m_WeaponIsWithoutMagazine`](Self::m_WeaponIsWithoutMagazine)), and for the predicted
+    ///   reload goes through
+    ///   [`Character::StartReloadingWieldingWeapon`](character::character::Character::StartReloadingWieldingWeapon),
+    ///   which reloads the user's wielded weapon rather than this one (an
+    ///   [`E_RELOAD_NO_ANIMATION`](ReloadType::E_RELOAD_NO_ANIMATION) weapon times its own reload
+    ///   instead);
+    /// - for a weapon whose [`m_ReloadType`](Self::m_ReloadType) is not
+    ///   [`E_RELOAD_MAGAZINE`](ReloadType::E_RELOAD_MAGAZINE), outside the hand-grenade,
+    ///   planted-explosive, and beacon slots, it calls
+    ///   [`Character::CancelReload`](character::character::Character::CancelReload) on the user on
+    ///   every tick [`m_KeepReloading`](Self::m_KeepReloading) is clear, which cancels whatever
+    ///   reload the user is playing;
+    /// - the predicted reload needs a local user, no fire, a magazine below
+    ///   [`m_PredictedReloadAmmunitionLimit`](Self::m_PredictedReloadAmmunitionLimit), more than
+    ///   [`m_PredictedReloadTime`](Self::m_PredictedReloadTime) without fire input,
+    ///   [`CanReload`](Self::CanReload), and
+    ///   [`Character::IsPredictedReloadingAllowed`](character::character::Character::IsPredictedReloadingAllowed).
+    #[address(0x140_965_CF0)]
+    pub fn CheckIfReloadShouldBeTriggeredBase(&mut self, weapon_data: *mut WeaponData, should_try_to_fire: *mut bool, was_trigger_pulled: bool);
+
+    /// The base implementation of [`ConsumeAmmo`](Self::ConsumeAmmo). A gun partway through a
+    /// counted run of shots counts `count` against that run first, and while the run has rounds
+    /// left it can return without touching the weapon's counts. Otherwise, for a weapon whose
+    /// tuning has a non-zero [`m_magazine_size`](WeaponTuning::m_magazine_size), it lowers the
+    /// magazine by `count` through [`SetMagazineAmmo`](Self::SetMagazineAmmo), never below zero; a
+    /// weapon with no magazine size draws `count` from its user's reserve instead, except in the
+    /// challenge-island game mode. An [`AMMO_UNLIMITED`](AmmunitionType::AMMO_UNLIMITED) weapon
+    /// draws from neither. [`HasUnlimitedAmmo`](Self::HasUnlimitedAmmo) plays no part: a weapon
+    /// with unlimited ammunition still empties its magazine, and only its reload is free.
+    #[address(0x140_966_220)]
+    pub fn ConsumeAmmoBase(&mut self, weapon_data: *mut WeaponData, count: i32);
 
     /// The base implementation of the [`IsWeaponAiming`](Self::IsWeaponAiming) virtual.
     #[address(0x140_950_F90)]
     pub fn IsWeaponAimingBase(&self) -> bool;
 
     /// The base implementation of the
-    /// [`UpdateFromUserPostSim_Parallel`](Self::UpdateFromUserPostSim_Parallel) virtual.
+    /// [`UpdateFromUserPostSim_Parallel`](Self::UpdateFromUserPostSim_Parallel) virtual. It returns
+    /// early, processing no input, when any gun's muzzle is within about 0.1 m of `aim_position`.
+    /// After the aim target, the recoil recovery, and the fire timer, it reads
+    /// [`m_NextWeaponToFire`](Self::m_NextWeaponToFire) once and walks
+    /// [`m_lWeaponData`](Self::m_lWeaponData): only the gun at that index gets
+    /// [`UpdateWeapon_Parallel`](Self::UpdateWeapon_Parallel), and so only that gun can start a
+    /// shot this tick, while every gun gets its attached-effect update. A weapon owned by a remote
+    /// peer skips the per-gun update and fires from its network component's fire flags instead.
     #[address(0x140_9A3_C50)]
-    pub fn UpdateFromUserPostSim_ParallelBase(&mut self, dt: f32, aim_position: *const Vector3, input: *const void);
+    pub fn UpdateFromUserPostSim_ParallelBase(&mut self, dt: f32, aim_position: *const Vector3, input: *const WeaponInputs);
 
     /// The per-gun fire-input update: cools heat, reads the trigger against the tuning's
     /// sensitivities, applies semi-automatic, forced-fire, wall-penetration, and aim-angle gating,
-    /// and starts or stops fire on `weapon_data`.
+    /// and starts or stops fire on `weapon_data`. The trigger, semi-automatic, cancel, and buffer
+    /// state it keeps ([`m_IsTriggerPulled`](Self::m_IsTriggerPulled),
+    /// [`m_FiredThisInput`](Self::m_FiredThisInput),
+    /// [`m_IsFiringCancelled`](Self::m_IsFiringCancelled), and
+    /// [`m_InputBufferTimer`](Self::m_InputBufferTimer)) and the fire interval
+    /// ([`m_TimeSinceLastFire`](Self::m_TimeSinceLastFire)) are the weapon's, shared by its guns;
+    /// only the burst counter ([`WeaponData::m_BurstShotsLeft`]) is the gun's. A shot it allows
+    /// calls [`Fire_Start`](Self::Fire_Start) once, on `weapon_data` alone; with no shot while
+    /// firing, it calls [`Fire_Stop`](Self::Fire_Stop) on every gun.
+    ///
+    /// It does nothing at all unless the weapon has a live user ([`m_User`](Self::m_User)),
+    /// [`m_LieAboutUser`](Self::m_LieAboutUser) is set, or the weapon is in the
+    /// [`E_WS_TURRET`](WeaponState::E_WS_TURRET) state; beyond that it reads neither
+    /// [`m_State`](Self::m_State) nor the user's selected slot, so a holstered weapon with a user
+    /// fires. The semi-automatic rule applies only while
+    /// [`m_IsUserLocalPlayer`](Self::m_IsUserLocalPlayer) is set. The wall block applies to the
+    /// dual-wield, two-handed, and special slots. The aim-angle check is
+    /// [`IsTargetWithinAimAngle`](Self::IsTargetWithinAimAngle), and the ammunition check
+    /// ([`CheckIfReloadShouldBeTriggered`](Self::CheckIfReloadShouldBeTriggered)) follows it.
     #[address(0x140_992_B00)]
-    pub fn UpdateWeapon_Parallel(&mut self, dt: f32, weapon_data: *mut WeaponData, input: *const void) -> bool;
+    pub fn UpdateWeapon_Parallel(&mut self, dt: f32, weapon_data: *mut WeaponData, input: *const WeaponInputs) -> bool;
+
+    /// The base implementation of the [`Fire_Start`](Self::Fire_Start) virtual. At the first shot
+    /// of a pull (the weapon not yet [`m_IsFiring`](Self::m_IsFiring)) it sets
+    /// [`m_IsFirstShot`](Self::m_IsFirstShot), resets the gun's tracer counters
+    /// ([`WeaponData::m_TracerCounter`]), and loads its burst
+    /// ([`WeaponData::m_BurstShotsLeft`]) from the tuning. It then sets `m_IsFiring`, runs the
+    /// enabled weapon components' fire start on `weapon_data`, and fires one shot from it through
+    /// [`Fire_Projectile`](Self::Fire_Projectile). The mech's magnet and machine-gun weapons skip
+    /// all of it under conditions on game-wide state.
+    #[address(0x140_965_620)]
+    pub fn Fire_StartBase(&mut self, weapon_data: *mut WeaponData);
+
+    /// The base implementation of the [`Fire_Stop`](Self::Fire_Stop) virtual: clears
+    /// [`m_IsFiring`](Self::m_IsFiring) and runs the enabled weapon components' fire stop on
+    /// `weapon_data`. The disassembler mislabels it `CEffectInstance::Release`.
+    #[address(0x140_965_820)]
+    pub fn Fire_StopBase(&mut self, weapon_data: *mut WeaponData);
+
+    /// The base implementation of the
+    /// [`UpdateFromUserPostSim_Serial`](Self::UpdateFromUserPostSim_Serial) virtual. Like the
+    /// parallel base, it reads [`m_NextWeaponToFire`](Self::m_NextWeaponToFire) once and calls
+    /// [`UpdateWeapon_Serial`](Self::UpdateWeapon_Serial) only for the gun at that index, and only
+    /// for a weapon owned locally.
+    #[address(0x140_96E_3B0)]
+    pub fn UpdateFromUserPostSim_SerialBase(&mut self, dt: f32, aim_position: *const Vector3, input: *const WeaponInputs);
+
+    /// The serial per-gun update: runs the enabled weapon components' serial update on
+    /// `weapon_data` and, for the local player's weapon, refreshes a readiness flag. It never
+    /// starts or stops fire.
+    #[address(0x140_965_BF0)]
+    pub fn UpdateWeapon_Serial(&mut self, dt: f32, weapon_data: *mut WeaponData, input: *const WeaponInputs);
+
+    /// Writes the start point of a projectile fired from `weapon_data` into `result` and returns
+    /// it: the gun's fire point at its current fire-point cursor
+    /// ([`WeaponData::m_InternalFirePositionCurrentIndex`]), composed with the gun's world matrix
+    /// of the previous simulation tick ([`WeaponData::m_WorldMatrixT0`]). In the
+    /// [`E_WS_WINGSUIT_WEAPON`](WeaponState::E_WS_WINGSUIT_WEAPON) state it is the translation of
+    /// the gun's current world matrix instead. The projectile weapons' shots read it after
+    /// [`Fire_ProjectileBase`](Self::Fire_ProjectileBase) has advanced the gun index and the
+    /// cursor.
+    #[address(0x140_966_B50)]
+    pub fn GetLastFireFromPosition(&self, result: *mut Vector3, weapon_data: *mut WeaponData) -> *mut Vector3;
+
+    /// The scatter a shot is given: [`m_CurrentScatterValue`](Self::m_CurrentScatterValue),
+    /// multiplied by a tuning factor while the player holding the weapon is in precision aim and
+    /// by another while the holder moves faster than a metre per second; zero without a holder.
+    /// [`GetShotMatrix`](Self::GetShotMatrix) multiplies the tuning's yaw and pitch scatter ranges
+    /// by it, unless asked to ignore the scatter.
+    #[address(0x140_981_EC0)]
+    pub fn GetCurrentScatterValue(&self) -> f32;
 
     /// Returns the tuning's aim-timer override
     /// ([`WeaponTuning::m_aim_timer_override`]), or zero without tuning.
@@ -445,7 +1977,9 @@ impl WeaponBase {
     pub fn GetAimTimerOverride(&self) -> f32;
 
     /// Returns the tuning's magazine size ([`WeaponTuning::m_magazine_size`]), or zero without
-    /// tuning.
+    /// tuning. [`Character::PickUpWeapon`](character::character::Character::PickUpWeapon) and
+    /// [`Inventory::WeaponSpawned`](character::inventory::Inventory::WeaponSpawned) fill the
+    /// magazine to it. The disassembler mislabels it `shared_ptr<CWeaponBase>::operator->`.
     #[address(0x140_958_690)]
     pub fn GetMagazineSize(&self) -> i32;
 
@@ -453,6 +1987,48 @@ impl WeaponBase {
     /// `NBone::ESafeBoneIndex`).
     #[address(0x140_958_AF0)]
     pub fn ChangeBoneAttachement(&mut self, bone: u32, weapon_index: i32);
+
+    /// Sets [`WeaponData::m_SkipRenderInterpolation`] on gun `weapon_data_index`, and makes the
+    /// weapon's model-attachment components for that gun skip theirs, so the gun's next
+    /// attachment placement is drawn without interpolation. `-1` does so for every gun and every
+    /// model-attachment component. The flag lasts until
+    /// [`UpdatePostFinalizePose`](Self::UpdatePostFinalizePose), so it acts on placements made
+    /// before the end of the holder's pose-finalization pass. The holster and predefined-bone
+    /// state tasks call it when they move a gun between bones.
+    #[address(0x140_982_240)]
+    pub fn SkipRenderInterpolationForOneFrame(&mut self, weapon_data_index: i32);
+
+    /// The weapon's post-pose-finalization update, run for every inventory weapon by
+    /// [`Inventory::UpdateInventoryPostFinalizePose`](character::inventory::Inventory::UpdateInventoryPostFinalizePose)
+    /// at the end of the holder's pose-finalization pass. It clears every gun's
+    /// [`WeaponData::m_SkipRenderInterpolation`], rewrites every gun's
+    /// [`WeaponData::m_lBoneAttachementPerWeaponState`] entries for the
+    /// [`E_WS_WIELDING`](WeaponState::E_WS_WIELDING) to
+    /// [`E_WS_HOLSTERED_INVISIBLE`](WeaponState::E_WS_HOLSTERED_INVISIBLE) states from
+    /// [`m_EquipSlot`](Self::m_EquipSlot) (the `SetupWeaponAttachementBones` table, inlined), and
+    /// runs the enabled weapon components' post-finalization hook. For the
+    /// [`E_SLOT_DUAL_WIELD`](WeaponSlot::E_SLOT_DUAL_WIELD) slot the table puts the first gun on
+    /// [`ATTACH_HAND_RIGHT`](character::character::SafeBoneIndex::ATTACH_HAND_RIGHT) when wielding
+    /// or dual-wielding and on
+    /// [`RIGHT_HOLSTER`](character::character::SafeBoneIndex::RIGHT_HOLSTER) when holstered, and
+    /// the second gun on
+    /// [`LEFT_HOLSTER`](character::character::SafeBoneIndex::LEFT_HOLSTER) except when
+    /// dual-wielding, where it rides
+    /// [`ATTACH_HAND_LEFT`](character::character::SafeBoneIndex::ATTACH_HAND_LEFT); with a single
+    /// gun wielded the second waits on its holster. For the
+    /// [`E_SLOT_TWO_HANDED`](WeaponSlot::E_SLOT_TWO_HANDED) and
+    /// [`E_SLOT_HEAVY`](WeaponSlot::E_SLOT_HEAVY) slots it puts the guns on
+    /// [`ATTACH_HAND_RIGHT`](character::character::SafeBoneIndex::ATTACH_HAND_RIGHT) when wielding
+    /// and on [`BACK_ATTACH`](character::character::SafeBoneIndex::BACK_ATTACH) when holstered; for
+    /// [`E_SLOT_TWO_HANDED_SPECIAL`](WeaponSlot::E_SLOT_TWO_HANDED_SPECIAL) the same, except that
+    /// the holstered guns ride
+    /// [`BACK_ATTACH_2`](character::character::SafeBoneIndex::BACK_ATTACH_2) while the holder is
+    /// the player (`CWeaponBase::IsHolderPlayer`). Nothing in the table follows the player's
+    /// handedness. A bone a state task moves a gun to lasts only
+    /// until the end of the pass it was written in. The
+    /// disassembler mislabels it `CWeaponBase::CalculateAttachOffsets`.
+    #[address(0x140_9A5_010)]
+    pub fn UpdatePostFinalizePose(&mut self);
 
     /// Returns the attach bone of gun `weapon_index` for the weapon's current
     /// [`m_State`](Self::m_State), or an invalid-bone value when the index is out of range.
@@ -469,18 +2045,104 @@ impl WeaponBase {
     /// [`WeaponData::m_WorldMatrixT0`] toward [`WeaponData::m_WorldMatrixT1`] by the render
     /// context's interpolation factor, applies the holstered scale when holstered, pushes the
     /// result to [`WeaponData::m_BaseModelInstance`], and updates the gun's animated-model
-    /// skinning; it then renders the weapon's components. `game_object` is the weapon's
-    /// `CGameObject` subobject, not the start of the weapon.
+    /// skinning; it then renders the weapon's components, among them the separate model parts of
+    /// its guns ([`ModelAttachementWeaponComponent::UpdateRender`]), which interpolate their own
+    /// cached matrices. `game_object` is the weapon's `CGameObject` subobject, not the start of
+    /// the weapon.
     #[address(0x140_966_380)]
-    pub fn UpdateRender(game_object: *mut void, context: *mut void);
+    pub fn UpdateRender(game_object: *mut void, context: *const GameObjectRenderContext);
+}
+
+/// A fired bullet (`CBullet`): a pooled ammunition object that sweeps a ray from its last position
+/// to its new one each update and handles what the ray hit ([`Bullet::HandleHit`]). Only some
+/// members are bound.
+#[min_size(0x260), align(8)]
+pub type Bullet {
+    /// Where the bullet's pending ray starts, the start of the segment its hit fraction
+    /// ([`CastRayInfoBase::m_HitDistance`](physics::CastRayInfoBase::m_HitDistance)) measures.
+    #[address(0xC0)]
+    pub m_RaySource: Vector3,
+    /// Where the bullet's pending ray ends.
+    pub m_RayTarget: Vector3,
+
+    /// The objects the bullet's ray filter ignores, the hit physics game objects
+    /// (`CPhysicsGameObject`): the shooter's own while the bullet has penetrated nothing, and the
+    /// object it last passed through after it has
+    /// ([`Bullet::m_HasPenetratedOneObject`]). The second entry is null after a penetration.
+    #[address(0x1B0)]
+    pub m_RayIgnoreList: [*mut void; 2],
+
+    /// The bullet's position: where its last ray ended, or where it hit.
+    #[address(0x1EC)]
+    pub m_Position: Vector3,
+    /// The bullet's direction of travel, unit length.
+    pub m_Direction: Vector3,
+    /// Where the bullet's next ray starts.
+    pub m_PreviousPosition: Vector3,
+
+    /// Whether the bullet still flies. A hit that neither penetrates nor ricochets clears it.
+    #[address(0x224)]
+    pub m_IsAlive: bool,
+
+    /// Whether the bullet has passed through an object. A hit on a game object passes through it
+    /// when a random roll exceeds the hit material's
+    /// [`GameMaterialDesc::m_BulletCollideFactor`](physics::GameMaterialDesc::m_BulletCollideFactor)
+    /// (or, with [`Bullet::m_OverridePenetrationBehaviour`], when the hit physics instance is of
+    /// certain kinds): the bullet's next ray starts at the hit, the object becomes the ray filter's
+    /// one ignored object ([`Bullet::m_RayIgnoreList`]), and this flag keeps the filter from taking
+    /// back the shooter's ignore list. The damage the bullet deals is not reduced by it.
+    #[address(0x259)]
+    pub m_HasPenetratedOneObject: bool,
+    /// Whether the bullet passes through physics instances of certain kinds whatever their
+    /// material.
+    pub m_OverridePenetrationBehaviour: bool,
+
+    /// Whether the bullet has hit anything.
+    #[address(0x25C)]
+    pub m_HasHit: bool,
+}
+impl Bullet {
+    /// `CBullet::HandleHit`: handles the hit `info` of the bullet's ray, when the hit fraction is
+    /// under one. It moves the bullet to the hit, calls
+    /// [`Bullet::OnBulletHitGlass`] for a hit on the glass material, then handles the hit as a hit
+    /// on a game object or on static geometry, which decides whether the bullet passes through
+    /// ([`Bullet::m_HasPenetratedOneObject`]) or stops ([`Bullet::m_IsAlive`]), and marks the
+    /// bullet as having hit ([`Bullet::m_HasHit`]). Whether or not it hit, it then checks the
+    /// bullet's segment against creatures and the water surface, and moves a fully controlled
+    /// trail to the bullet. Bullets update on worker threads, so it runs on one.
+    #[address(0x140_942_C10)]
+    pub fn HandleHit(&mut self, info: *mut CastRayInfoBase, dt: f32);
+
+    /// `CBullet::OnBulletHitGlass`: the bullet's handling of a hit on a shape of the glass material
+    /// ([`EGameMaterialId_Glass`](physics::GameMaterialId::EGameMaterialId_Glass)), which its hit
+    /// handler calls before handling the hit object. It collects the model instances the hit names
+    /// ([`GetModelInstancesHit`](physics::GetModelInstancesHit)), or, finding none, the world's
+    /// panes around the bullet ([`ModelCollection::GetIntersectingDecalModels`](graphics_engine::model_instance::ModelCollection::GetIntersectingDecalModels)).
+    /// For each one with window metadata it maps the bullet's position into the instance's own
+    /// space through the instance's matrix and queues, on the ammunition manager's deferred
+    /// render-update list ([`AmmunitionManagerHandleDeferredQueue`](equipment::explosive::AmmunitionManagerHandleDeferredQueue)),
+    /// a call that adds a damage point there of one fifth
+    /// ([`MetaWindow::AddWindowDamagePoint`](graphics_engine::window_damage::MetaWindow::AddWindowDamagePoint)).
+    /// It plays no effect or sound of its own.
+    #[address(0x140_90E_470)]
+    pub fn OnBulletHitGlass(&mut self, info: *mut CastRayInfoBase, dt: f32);
 }
 
 /// `CBulletWeaponBase`: the base of the fast-projectile weapons. Its layout is unmapped.
 pub type BulletWeaponBase;
 impl BulletWeaponBase {
-    /// The bullet weapons' [`WeaponBase::Fire_Projectile`] override: spawns the bullet projectile
-    /// and then calls [`WeaponBase::Fire_ProjectileBase`]. It is the only caller of
-    /// [`NWeaponUtil::Trajectory_GetAngleToHitPosition`].
+    /// The bullet weapons' [`WeaponBase::Fire_Projectile`] override: builds the shot matrix, takes
+    /// the holder's ignored bodies ([`WeaponBase::GetHolderInformation`]), calls
+    /// [`WeaponBase::Fire_ProjectileBase`], and spawns the bullet. The bullet's owner is the
+    /// weapon's [`WeaponBase::m_User`], or [`WeaponBase::m_Holder`] when it has no user, and its
+    /// damage-source state comes from that owner when it is a character
+    /// ([`Character::GetCurrentDamageSourceStateInfo`](character::character::Character::GetCurrentDamageSourceStateInfo)).
+    /// The bullet and its tracer carry [`WeaponBase::m_IsUserPlayer`] as their player flag, and
+    /// the first bullet of a shot also [`WeaponBase::m_IsUserLocalPlayer`]. For a locally
+    /// controlled user it sets the bullet's target point from the aim point along the shot
+    /// direction, led by the velocity of the player aim control's weapon target
+    /// ([`PlayerAimControl::m_Target`](aim::aim::PlayerAimControl::m_Target)) when there is one.
+    /// It is the only caller of [`NWeaponUtil::Trajectory_GetAngleToHitPosition`].
     #[address(0x140_927_550)]
     pub fn Fire_Projectile(&mut self, weapon_data: *mut WeaponData);
 
@@ -490,14 +2152,487 @@ impl BulletWeaponBase {
     pub fn GetTuning(&self) -> *const void;
 }
 
-/// `CSniperWeapon`: a precision-aim rifle. Its layout is unmapped.
-pub type SniperWeapon;
+/// `CSniperWeapon`: a precision-aim rifle, a bullet weapon. A bolt-action rifle
+/// ([`m_BoltAction`](Self::m_BoltAction)) locks after each shot
+/// ([`m_HasFiredThisInput`](Self::m_HasFiredThisInput)) until the holder has cycled the bolt: the
+/// rifle's per-tick update ([`UpdateFromUserPostSim_Parallel`](Self::UpdateFromUserPostSim_Parallel))
+/// queues the bolt act once the trigger is released, the bolt state of the animation graph raises
+/// [`SB_IS_RELOADING`](state::StateBitFlag::SB_IS_RELOADING), and the update clears the lock while
+/// the holder reloads. Only some members are mapped, at their offsets from the start of the
+/// weapon.
+#[min_size(0x670)]
+pub type SniperWeapon {
+    /// Whether the rifle is a bolt action, from the weapon's `BoltAction` property.
+    #[address(0x668)]
+    pub m_BoltAction: bool,
+    /// Whether the bolt cycle takes the local player out of precision aim and back, from the
+    /// weapon's properties.
+    pub m_BoltActionAutoZoomOut: bool,
+    /// The bolt lock: set by [`Fire_Projectile`](Self::Fire_Projectile) after each shot of a bolt
+    /// action for a player user ([`WeaponBase::m_IsUserPlayer`]), and cleared only by
+    /// [`UpdateFromUserPostSim_Parallel`](Self::UpdateFromUserPostSim_Parallel) while the holder
+    /// reloads ([`Character::IsReloading`](character::character::Character::IsReloading)) or has
+    /// no ammunition left at all. While it is set, [`Fire_Start`](Self::Fire_Start) and
+    /// [`CheckIfReloadShouldBeTriggered`](Self::CheckIfReloadShouldBeTriggered) do nothing, so
+    /// the rifle neither fires nor reloads on its own.
+    pub m_HasFiredThisInput: bool,
+    /// Whether the bolt cycle or a reload took the local player out of precision aim, to be
+    /// restored once it ends.
+    pub m_ShouldgoBackToPrecisionAim: bool,
+    /// The delay before the bolt cycle while the holder stays in precision aim: loaded by
+    /// [`Fire_Projectile`](Self::Fire_Projectile) at each shot and counted down by the per-tick
+    /// update.
+    pub m_BoltActionDelayer: f32,
+}
 impl SniperWeapon {
+    /// The [`WeaponBase::Fire_Projectile`] override: fires the bullet
+    /// ([`BulletWeaponBase::Fire_Projectile`]) and then, for a bolt action with a player user,
+    /// sets the bolt lock ([`m_HasFiredThisInput`](Self::m_HasFiredThisInput)) and loads
+    /// [`m_BoltActionDelayer`](Self::m_BoltActionDelayer).
+    #[address(0x140_950_950)]
+    pub fn Fire_Projectile(&mut self, weapon_data: *mut WeaponData);
+
+    /// The [`WeaponBase::Fire_Start`] override: does nothing while the bolt lock
+    /// ([`m_HasFiredThisInput`](Self::m_HasFiredThisInput)) is set, and otherwise runs the base
+    /// fire start.
+    #[address(0x140_96D_490)]
+    pub fn Fire_Start(&mut self, weapon_data: *mut WeaponData);
+
+    /// The [`WeaponBase::CheckIfReloadShouldBeTriggered`] override: does nothing while the bolt
+    /// lock ([`m_HasFiredThisInput`](Self::m_HasFiredThisInput)) is set, and otherwise runs
+    /// [`WeaponBase::CheckIfReloadShouldBeTriggeredBase`].
+    #[address(0x140_96D_4B0)]
+    pub fn CheckIfReloadShouldBeTriggered(&mut self, weapon_data: *mut WeaponData, should_try_to_fire: *mut bool, was_trigger_pulled: bool);
+
+    /// The [`WeaponBase::StartReloadSequence`] override: runs the base, and for the local player
+    /// in precision aim leaves precision aim and sets
+    /// [`m_ShouldgoBackToPrecisionAim`](Self::m_ShouldgoBackToPrecisionAim).
+    #[address(0x140_97F_030)]
+    pub fn StartReloadSequence(&mut self);
+
+    /// The rifle's per-tick update from its user (its override of
+    /// [`WeaponBase::UpdateFromUserPostSim_Parallel`]). After the base update, while the holder is
+    /// not reloading and has rounds in the magazine or the reserve, a set bolt lock on a bolt
+    /// action waits for the trigger to be released and, in precision aim, for
+    /// [`m_BoltActionDelayer`](Self::m_BoltActionDelayer) to run out. Then, with rounds left in the
+    /// magazine, it optionally leaves precision aim
+    /// ([`m_BoltActionAutoZoomOut`](Self::m_BoltActionAutoZoomOut)), plays each gun's bolt-action
+    /// effect, and queues the bolt act (`UB_ACT_SNIPER_BOLT_ACTION`) through
+    /// [`Character::QueueAct`](character::character::Character::QueueAct), on every tick until the
+    /// bolt state's [`SB_IS_RELOADING`](state::StateBitFlag::SB_IS_RELOADING) rises; with an empty
+    /// magazine it calls
+    /// [`Character::StartReloadingWieldingWeapon`](character::character::Character::StartReloadingWieldingWeapon)
+    /// instead. With no lock it returns the player to precision aim when
+    /// [`m_ShouldgoBackToPrecisionAim`](Self::m_ShouldgoBackToPrecisionAim) asks. While the holder
+    /// reloads or has no ammunition at all it clears the lock.
+    #[address(0x140_9A6_F20)]
+    pub fn UpdateFromUserPostSim_Parallel(&mut self, dt: f32, aim_position: *const Vector3, input: *const WeaponInputs);
+
+    /// Reads the rifle's properties after the bullet weapon's: the bolt-action and auto-zoom-out
+    /// flags. `game_object` is the weapon's `CGameObject` subobject
+    /// ([`WeaponBase::GAME_OBJECT_BASE_OFFSET`]), not the start of the weapon. The disassembler
+    /// mislabels it `CAntiAirWeapon::SetProperties`.
+    #[address(0x140_957_650)]
+    pub fn SetProperties(game_object: *mut void, properties: *const void, context: *mut void);
+
     /// The [`WeaponBase::SetAimMode`] override: in [`AIM_PRECISION`](AimMode::AIM_PRECISION) it
     /// shows the HUD sniper overlay and hides the holder, and in
     /// [`AIM_NORMAL`](AimMode::AIM_NORMAL) it reverses both.
     #[address(0x140_97F_120)]
     pub fn SetAimMode(&mut self, aim_mode: AimMode);
+}
+
+/// Where a rocket launcher's rocket model is (`CRPGWeapon::ERocketAttachState`), stored as
+/// [`RPGWeapon::m_AttachedState`].
+#[copyable]
+pub enum RocketAttachState: i32 {
+    /// Nowhere: the launcher is empty and the rocket model hidden.
+    E_ATTACHED_TO_NONE = 0x0,
+    /// In the holder's hand, during a reload.
+    E_ATTACHED_TO_HAND = 0x1,
+    /// Loaded in the launcher. The launcher fires only in this state.
+    E_ATTACHED_TO_WEAPON = 0x2,
+}
+
+/// `CRPGWeapon`: a rocket launcher, also the base of the mortar. Its loaded rocket is a model part
+/// ([`m_RPGModel`](Self::m_RPGModel)) that the reload and the per-tick update show and hide by
+/// [`m_AttachedState`](Self::m_AttachedState). Only some members are mapped, at their offsets
+/// from the start of the weapon.
+#[min_size(0x764)]
+pub type RPGWeapon {
+    /// The rocket model part, or null.
+    #[address(0x750)]
+    pub m_RPGModel: *mut ModelAttachementWeaponComponent,
+
+    /// Whether the rocket model hides once the launcher is empty: the per-tick update hides a
+    /// loaded rocket while the magazine is empty.
+    #[address(0x75D)]
+    pub m_RPGHideModelWhenOutOfAmmo: bool,
+
+    /// Where the rocket model is.
+    #[address(0x760)]
+    pub m_AttachedState: RocketAttachState,
+}
+impl RPGWeapon {
+    /// The [`WeaponBase::Reload`] override: runs [`WeaponBase::ReloadBase`] and, when it reloaded,
+    /// puts the rocket in the launcher
+    /// ([`E_ATTACHED_TO_WEAPON`](RocketAttachState::E_ATTACHED_TO_WEAPON)) when the magazine is
+    /// not empty, or otherwise hides and disables the rocket model and leaves it
+    /// [`E_ATTACHED_TO_NONE`](RocketAttachState::E_ATTACHED_TO_NONE).
+    #[address(0x140_976_AB0)]
+    pub fn Reload(&mut self) -> bool;
+
+    /// The [`WeaponBase::Fire_Start`] override: fires through the missile weapon's fire start
+    /// while the rocket is loaded, and otherwise asks the holder to reload
+    /// ([`Character::StartReloadingWieldingWeapon`](character::character::Character::StartReloadingWieldingWeapon)).
+    #[address(0x140_99C_B20)]
+    pub fn Fire_Start(&mut self, weapon_data: *mut WeaponData);
+
+    /// The [`WeaponBase::CheckIfReloadShouldBeTriggered`] override: for a holder that is not a
+    /// player, with the launcher wielded or dual-wielded and the rocket not loaded, it asks the
+    /// holder to reload; otherwise it runs
+    /// [`WeaponBase::CheckIfReloadShouldBeTriggeredBase`].
+    #[address(0x140_96D_3F0)]
+    pub fn CheckIfReloadShouldBeTriggered(&mut self, weapon_data: *mut WeaponData, should_try_to_fire: *mut bool, was_trigger_pulled: bool);
+
+    /// The [`WeaponBase::UpdateFromUserPostSim_Parallel`] override. After the missile weapon's
+    /// update, a launcher with rounds in the magazine and the rocket not loaded shows and enables
+    /// the rocket model and marks it loaded, so the rocket reappears on any refill; an empty
+    /// launcher with [`m_RPGHideModelWhenOutOfAmmo`](Self::m_RPGHideModelWhenOutOfAmmo) hides
+    /// its loaded rocket. A player's power-core launcher (`w210_powercore`) that runs out of
+    /// ammunition without unlimited ammunition is dropped from the inventory.
+    #[address(0x140_9A8_410)]
+    pub fn UpdateFromUserPostSim_Parallel(&mut self, dt: f32, aim_position: *const Vector3, input: *const WeaponInputs);
+}
+
+/// `CThrownGrenadeWeapon`: the hand grenade weapon, a [`WeaponBase`] held in the grenade slot. A
+/// throw primes a grenade (spawning it live and consuming one grenade), keeps it at the weapon's
+/// attachment while held, and releases it through [`WeaponBase::Fire_Projectile`], which launches
+/// it with [`Grenade::PropelToward`](equipment::explosive::Grenade::PropelToward). The throw
+/// animation's track messages drive both steps: one raises [`m_PrimeGrenade`](Self::m_PrimeGrenade)
+/// and a later one raises [`WeaponBase::m_ForceFireProjectile`]. Only some members are mapped, at
+/// their offsets from the start of the weapon.
+#[min_size(0x7CA)]
+pub type ThrownGrenadeWeapon {
+    /// The compiled-name hash of [`m_PhysicalProjectileModel`](Self::m_PhysicalProjectileModel)
+    /// (`CPhysicalProjectileWeapon::m_PhysicalProjectileModelHash`), or zero when the model did
+    /// not load.
+    #[address(0x600)]
+    pub m_PhysicalProjectileModelHash: u32,
+
+    /// The grenade's model (`CPhysicalProjectileWeapon::m_PhysicalProjectileModel`), loaded by the
+    /// physical-projectile weapon's `SetProperties` from the projectile model path in the
+    /// weapon's properties ([`ModelManager::GetModel`](graphics_engine::model_instance::ModelManager::GetModel)).
+    /// The weapon holds it for its lifetime, so the model stays cached while the weapon exists.
+    #[address(0x628)]
+    pub m_PhysicalProjectileModel: SharedPtr<Model>,
+
+    /// The trail effect a projectile launched by a player user carries (an effect resource),
+    /// loaded from the weapon's properties. The launch hands it to
+    /// [`Explosive::SetupEffects`](equipment::explosive::Explosive::SetupEffects) while
+    /// [`WeaponBase::m_IsUserPlayer`] is set, and [`m_TrailEffectAI`](Self::m_TrailEffectAI)
+    /// otherwise.
+    #[address(0x638)]
+    pub m_TrailEffectPlayer: SharedPtr<void>,
+
+    /// The trail sound (a sound resource) for a player user, as
+    /// [`m_TrailEffectPlayer`](Self::m_TrailEffectPlayer); it carries the fuse's
+    /// `detonation_timer` parameter.
+    #[address(0x648)]
+    pub m_TrailSoundPlayer: SharedPtr<void>,
+
+    /// The trail effect for a non-player user.
+    #[address(0x658)]
+    pub m_TrailEffectAI: SharedPtr<void>,
+
+    /// The trail sound for a non-player user.
+    #[address(0x668)]
+    pub m_TrailSoundAI: SharedPtr<void>,
+
+    /// The primed grenade: the live [`Grenade`](equipment::explosive::Grenade) spawned by
+    /// [`PrimeGrenade`](Self::PrimeGrenade) and not yet thrown, or null. `px` is the grenade's
+    /// `CGameObject` subobject
+    /// ([`Explosive::GAME_OBJECT_BASE_OFFSET`](equipment::explosive::Explosive::GAME_OBJECT_BASE_OFFSET)).
+    /// [`Fire_Projectile`](WeaponBase::Fire_Projectile) clears it when it launches the grenade.
+    #[address(0x708)]
+    pub m_PrimedGrenade: WeakPtrGameObject,
+
+    /// A pending prime request: [`UpdateFromUserPostSim_Parallel`](Self::UpdateFromUserPostSim_Parallel)
+    /// calls [`PrimeGrenade`](Self::PrimeGrenade) after the base weapon update when it is set, and
+    /// clears it.
+    #[address(0x7C9)]
+    pub m_PrimeGrenade: bool,
+}
+impl ThrownGrenadeWeapon {
+    /// The weapon's per-tick update from its user (its override of
+    /// [`WeaponBase::UpdateFromUserPostSim_Parallel`]): runs
+    /// [`UpdateFromUserPostSim_ParallelBase`](WeaponBase::UpdateFromUserPostSim_ParallelBase),
+    /// which consumes [`WeaponBase::m_ForceFireProjectile`] among the fire inputs, and then services
+    /// [`m_PrimeGrenade`](Self::m_PrimeGrenade). A throw released and a prime requested in the same
+    /// call therefore release nothing and prime afterwards.
+    #[address(0x140_9A7_770)]
+    pub fn UpdateFromUserPostSim_Parallel(&mut self, dt: f32, aim_position: *const Vector3, input: *const WeaponInputs);
+
+    /// Primes a grenade (`CreatePrimed<CGrenade>`): consumes one grenade, allocates a
+    /// [`Grenade`](equipment::explosive::Grenade) from the ammunition pool at the weapon's world
+    /// matrix, plays the priming effect, stores it in
+    /// [`m_PrimedGrenade`](Self::m_PrimedGrenade), and adds it to the update. Player holder
+    /// information enables reclamation in [`AllocateGrenade`](equipment::explosive::AllocateGrenade),
+    /// so a full pool can erase an existing entry before allocating. Failure returns null.
+    /// The grenade's
+    /// detonation timer runs from this point
+    /// ([`Explosive::m_DetonationTimer`](equipment::explosive::Explosive::m_DetonationTimer)), so a
+    /// grenade held for longer than its fuse explodes before it is thrown.
+    #[address(0x140_989_470)]
+    pub fn PrimeGrenade(&mut self, weapon_data: *mut WeaponData) -> *mut void;
+
+    /// Removes the primed grenade, if any, clears [`m_PrimedGrenade`](Self::m_PrimedGrenade), and
+    /// returns one grenade to the user's inventory. The disassembler mislabels it
+    /// `rtti_cast<CThrownGrenadeWeapon,CWeaponBase>`; the function it labels
+    /// `CThrownGrenadeWeapon::CancelPrimedGrenade` clears a hash table.
+    #[address(0x140_97F_A50)]
+    pub fn CancelPrimedGrenade(&mut self);
+
+    /// Places the weapon's attachments (its override of the `UpdateAttachmentTransforms` virtual):
+    /// after the base placement it sets the primed grenade's transform to the weapon's world
+    /// matrix, so a held grenade rides the weapon's attach bone.
+    #[address(0x140_99E_B70)]
+    pub fn UpdateAttachmentTransforms(&mut self, p2: f32, p3: f32, transform_type: u32);
+}
+
+/// `CBeaconWeapon`: the rebel-support beacon weapon, sharing the primed explosive slot and
+/// attachment placement of [`ThrownGrenadeWeapon`].
+pub type BeaconWeapon;
+impl BeaconWeapon {
+    /// Fires the primed beacon through the common thrown-projectile path, re-equips the hand
+    /// grenade, and requests the deferred rebel-support beacon event.
+    #[address(0x140_997_EA0)]
+    pub fn Fire_Projectile(&mut self, weapon_data: *mut WeaponData);
+}
+
+/// One placed charge on a [`PlantedExplosiveWeapon`]'s live list
+/// ([`m_ActiveExplosives`](PlantedExplosiveWeapon::m_ActiveExplosives)): the charge and the index of
+/// the weapon light component that lights it, or -1 for none.
+#[size(0x10), copyable]
+pub type ActiveExplosiveEntry {
+    /// The placed charge, at the start of the object (not its `CGameObject` subobject).
+    pub m_Explosive: *mut PlantedExplosive,
+    /// The index of the charge's light among the weapon's light components, or -1.
+    pub m_LightIndex: i32,
+}
+
+/// `CPlantedExplosiveWeapon`: the C4 weapon, a [`WeaponBase`] held in the
+/// [`E_SLOT_PLANTED_EXPLOSIVE`](character::inventory::WeaponSlot::E_SLOT_PLANTED_EXPLOSIVE) slot.
+/// It owns the charges the character has placed and their remote detonation.
+///
+/// Placing a charge runs through the planting mode, which equipping the weapon enters
+/// ([`m_IsInPlantingMode`](Self::m_IsInPlantingMode)): an animation track message primes a charge
+/// into [`m_PrimedExplosive`](Self::m_PrimedExplosive) with
+/// [`PrimeExplosive`](Self::PrimeExplosive), the fire input places it at the aimed surface
+/// (`CPlantedExplosive::PlaceExplosiveAtPosition`, outside a parachute) and queues the throw act,
+/// and a later track message calls [`Fire_Projectile`](Self::Fire_Projectile), which makes the
+/// charge live. The weapon refuses to place a charge once
+/// [`NumActiveExplosives`](Self::NumActiveExplosives) reaches
+/// [`MaxActiveExplosives`](Self::MaxActiveExplosives); placed charges do not consume an inventory
+/// stock.
+///
+/// Detonation does not need the planting mode: the inventory runs the weapon's
+/// [`UpdateFromUserPostSim_Serial`](Self::UpdateFromUserPostSim_Serial) every frame whatever is
+/// wielded, and it starts a detonation from the character's detonate input. Only some members
+/// are mapped, at their offsets from the start of the weapon.
+#[min_size(0x80D)]
+pub type PlantedExplosiveWeapon {
+    /// The compiled-name hash of [`m_PhysicalProjectileModel`](Self::m_PhysicalProjectileModel)
+    /// (`CPhysicalProjectileWeapon::m_PhysicalProjectileModelHash`), or zero when the model did
+    /// not load.
+    #[address(0x600)]
+    pub m_PhysicalProjectileModelHash: u32,
+
+    /// The live charge's model (`CPhysicalProjectileWeapon::m_PhysicalProjectileModel`), loaded by
+    /// the physical-projectile weapon's `SetProperties` from the projectile model path in the
+    /// weapon's properties ([`ModelManager::GetModel`](graphics_engine::model_instance::ModelManager::GetModel)).
+    /// The weapon holds it for its lifetime.
+    #[address(0x628)]
+    pub m_PhysicalProjectileModel: SharedPtr<Model>,
+
+    /// The placement preview: an instance of the ghost model named in the weapon's properties,
+    /// created by `SetProperties` (casting shadows, outside the world) and shown by
+    /// `SetPropertiesDeferred`
+    /// ([`ModelInstanceManager::ShowModelInstance`](graphics_engine::model_instance::ModelInstanceManager::ShowModelInstance)).
+    /// The weapon's `UpdateRender` moves it to the aimed placement with
+    /// [`ModelInstance::UpdateMatrix`](graphics_engine::model_instance::ModelInstance::UpdateMatrix)
+    /// and pulses its fade alpha while the target is shown; the destructor releases it
+    /// ([`ModelInstanceManager::AddToDeleteQueue`](graphics_engine::model_instance::ModelInstanceManager::AddToDeleteQueue)).
+    #[address(0x6F8)]
+    pub m_GhostModelInstance: *mut ModelInstance,
+
+    /// The in-hand charge's model: despite the name, the model itself rather than an instance of
+    /// it, loaded by `SetProperties` from the inactive model path in the weapon's properties and
+    /// held for the weapon's lifetime, which keeps it in the model manager's cache. A charge's
+    /// in-hand instance
+    /// ([`PlantedExplosive::m_InactiveModelInstance`](equipment::explosive::PlantedExplosive::m_InactiveModelInstance))
+    /// is created from the cache by hash.
+    #[address(0x700)]
+    pub m_InactiveModelInstance: SharedPtr<Model>,
+
+    /// The compiled-name hash of [`m_InactiveModelInstance`](Self::m_InactiveModelInstance).
+    #[address(0x710)]
+    pub m_InactiveModelHash: u32,
+
+    /// The placed charges, in the order they were made live: the live list that
+    /// [`Fire_Projectile`](Self::Fire_Projectile) appends to (up to
+    /// [`MaxActiveExplosives`](Self::MaxActiveExplosives)),
+    /// [`NumActiveExplosives`](Self::NumActiveExplosives) counts, the detonation walks, and
+    /// [`RemoveFromActiveList`](Self::RemoveFromActiveList) and
+    /// [`RemoveAllExplosives`](Self::RemoveAllExplosives) erase from.
+    #[address(0x718)]
+    pub m_ActiveExplosives: Vector<ActiveExplosiveEntry>,
+
+    /// The primed charge: the live [`PlantedExplosive`](equipment::explosive::PlantedExplosive)
+    /// spawned by [`PrimeExplosive`](Self::PrimeExplosive) and not yet placed, or null. `px` is
+    /// the charge's `CGameObject` subobject
+    /// ([`Explosive::GAME_OBJECT_BASE_OFFSET`](equipment::explosive::Explosive::GAME_OBJECT_BASE_OFFSET)).
+    /// [`Fire_Projectile`](Self::Fire_Projectile) moves it to
+    /// [`m_LastPlantedExplosive`](Self::m_LastPlantedExplosive) and clears it;
+    /// [`DespawnPrimedExplosive`](Self::DespawnPrimedExplosive) removes the charge and clears it.
+    #[address(0x738)]
+    pub m_PrimedExplosive: WeakPtrGameObject,
+
+    /// The charge [`Fire_Projectile`](Self::Fire_Projectile) made live most recently.
+    #[address(0x748)]
+    pub m_LastPlantedExplosive: WeakPtrGameObject,
+
+    /// The most charges that may be live at once, at each explosives-capacity upgrade level;
+    /// [`MaxActiveExplosives`](Self::MaxActiveExplosives) picks the entry for the player's
+    /// upgrades.
+    #[address(0x758)]
+    pub m_MaxActiveExplosivesAtLevel: [i32; 3],
+
+    /// Whether the weapon is in the planting mode: set when the weapon is equipped, and cleared by
+    /// the weapon's `StopUsing`, which also despawns a primed charge.
+    #[address(0x808)]
+    pub m_IsInPlantingMode: bool,
+
+    /// Set when [`UpdateFromUserPostSim_Serial`](Self::UpdateFromUserPostSim_Serial) starts a
+    /// detonation, and cleared by it once the character's detonate input
+    /// ([`E_INPUT_DETONATE_EXPLOSIVES`](character::character::WeaponInput::E_INPUT_DETONATE_EXPLOSIVES))
+    /// is zero, so a held input detonates once.
+    #[address(0x80B)]
+    pub m_AlreadyDetonatedOnThisInput: bool,
+}
+impl PlantedExplosiveWeapon {
+    /// `CPlantedExplosiveWeapon::TYPE_ID`: the run-time type id of the class, for
+    /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use. The game tests
+    /// the weapon in the [`E_SLOT_PLANTED_EXPLOSIVE`](character::inventory::WeaponSlot::E_SLOT_PLANTED_EXPLOSIVE)
+    /// slot against it before treating it as the C4 weapon.
+    #[address(0x140_7C8_2C0)]
+    pub fn TYPE_ID() -> *const u32;
+
+    /// The weapon's serial per-frame update from its user (its override of
+    /// [`WeaponBase::UpdateFromUserPostSim_Serial`]). The inventory runs it for the planted
+    /// explosive slot's weapon every frame, wielded or not
+    /// ([`Inventory::UpdateWeapons_Serial`](character::inventory::Inventory::UpdateWeapons_Serial)).
+    ///
+    /// Among the rest, it reads the holder's detonate input
+    /// ([`Character::m_WeaponInputs`](character::character::Character::m_WeaponInputs) at
+    /// [`E_INPUT_DETONATE_EXPLOSIVES`](character::character::WeaponInput::E_INPUT_DETONATE_EXPLOSIVES))
+    /// directly rather than through `input`. While the input is positive, the inventory allows
+    /// triggering explosives
+    /// ([`Inventory::GetAnimationAllowsTriggeringExplosives`](character::inventory::Inventory::GetAnimationAllowsTriggeringExplosives)),
+    /// the character is not already detonating
+    /// ([`Character::IsDetonatingExplosives`](character::character::Character::IsDetonatingExplosives)),
+    /// and [`m_AlreadyDetonatedOnThisInput`](Self::m_AlreadyDetonatedOnThisInput) is clear, it
+    /// queues the upper-body detonate act when the character can take it (cancelling a reload when
+    /// it cannot), adds heat when charges are live, and sets
+    /// [`m_AlreadyDetonatedOnThisInput`](Self::m_AlreadyDetonatedOnThisInput). The act's animation
+    /// sends the track message that schedules the live charges for detonation. Outside the
+    /// planting mode it neither primes nor despawns a charge.
+    #[address(0x140_98E_BE0)]
+    pub fn UpdateFromUserPostSim_Serial(&mut self, dt: f32, aim_position: *const Vector3, input: *const WeaponInputs);
+
+    /// Primes a charge: puts the weapon in the
+    /// [`E_WS_WIELDING`](WeaponState::E_WS_WIELDING) state when it is not (adding its models to
+    /// the world) and hides it, then allocates a
+    /// [`PlantedExplosive`](equipment::explosive::PlantedExplosive) from the ammunition pool at
+    /// the weapon's shot matrix ([`WeaponBase::GetShotMatrix`]), sets up its trail effect, adds it
+    /// to the update, and stores it in [`m_PrimedExplosive`](Self::m_PrimedExplosive). Nothing is
+    /// spawned when the shot matrix is unavailable or the pool is full. It consumes nothing and
+    /// does not check the planting mode; the planting mode's track message is its caller.
+    #[address(0x140_990_A40)]
+    pub fn PrimeExplosive(&mut self, weapon_data: *mut WeaponData);
+
+    /// Makes the primed charge live (its override of [`WeaponBase::Fire_Projectile`]). A charge
+    /// whose parent is a vehicle with an active bavarium shield is removed instead. Otherwise it
+    /// calls [`PlantedExplosive::Activate`](equipment::explosive::PlantedExplosive::Activate); under
+    /// a deployed parachute ([`Character::IsUsingParachute`](character::character::Character::IsUsingParachute))
+    /// it also moves the charge to the right-hand bone (the transform setter and
+    /// [`Explosive::SetPhysicsTransform`](equipment::explosive::Explosive::SetPhysicsTransform)),
+    /// drops it ([`PlantedExplosive::DropExplosive`](equipment::explosive::PlantedExplosive::DropExplosive)),
+    /// gives it the character's
+    /// [`m_MeasuredWorldVelocity`](character::character::Character::m_MeasuredWorldVelocity) with
+    /// one metre per second downward ([`PlantedExplosive::SetVelocity`](equipment::explosive::PlantedExplosive::SetVelocity)),
+    /// and plays its trail ([`Explosive::PlayTrailEffect`](equipment::explosive::Explosive::PlayTrailEffect)).
+    /// It then adds heat, runs [`Fire_ProjectileBase`](WeaponBase::Fire_ProjectileBase), adds the
+    /// charge to the live list (which the charge's detonation timer and HUD hint come from, and
+    /// which ignores a charge beyond [`MaxActiveExplosives`](Self::MaxActiveExplosives)), adds it
+    /// to the update, and moves [`m_PrimedExplosive`](Self::m_PrimedExplosive) to
+    /// [`m_LastPlantedExplosive`](Self::m_LastPlantedExplosive).
+    #[address(0x140_9A0_1E0)]
+    pub fn Fire_Projectile(&mut self, weapon_data: *mut WeaponData);
+
+    /// Removes the primed charge, if any, and clears
+    /// [`m_PrimedExplosive`](Self::m_PrimedExplosive).
+    #[address(0x140_980_EA0)]
+    pub fn DespawnPrimedExplosive(&mut self);
+
+    /// Removes every placed charge without detonating it: for each live charge it unregisters the
+    /// HUD's charge hint, removes the charge
+    /// ([`Explosive::RemoveSelf`](equipment::explosive::Explosive::RemoveSelf)), turns off the
+    /// charge's light component, and drops it from the live list, then refreshes the HUD's charge
+    /// count. It then queues a stop-using for the next pre-simulation update
+    /// ([`m_DeferredStopUsing`](WeaponBase::m_DeferredStopUsing), registering the weapon through
+    /// [`m_RequiresPreSimUpdates`](WeaponBase::m_RequiresPreSimUpdates)); the weapon's
+    /// `StopUsing` acts only in the planting mode, which it leaves, despawning a primed charge.
+    /// Outside the planting mode a primed charge is left alone. The game calls it when a character
+    /// is disabled, when a mission activates or resets, when a ROM starts, and from the player's
+    /// event handler.
+    #[address(0x140_990_6B0)]
+    pub fn RemoveAllExplosives(&mut self);
+
+    /// Takes one placed charge off the live list without detonating or removing it: unregisters
+    /// the HUD's charge hint for `explosive` (when it is not null), and when the charge is on
+    /// [`m_ActiveExplosives`](Self::m_ActiveExplosives), turns off its light component, erases its
+    /// entry, and refreshes the HUD's charge count. A charge not on the list changes nothing else.
+    /// The charge's destructor calls it unless the charge was removed with
+    /// [`Explosive::RemoveSelf`](equipment::explosive::Explosive::RemoveSelf) first, and so does a
+    /// charge's detonation.
+    #[address(0x140_990_590)]
+    pub fn RemoveFromActiveList(&mut self, explosive: *mut PlantedExplosive);
+
+    /// Places the weapon's attachments (its override of the `UpdateAttachmentTransforms` virtual):
+    /// after the base placement, while the weapon has a user, it puts the primed charge's
+    /// in-hand model on the user's right-hand bone
+    /// ([`PlantedExplosive::SetInactiveModelMatrix`](equipment::explosive::PlantedExplosive::SetInactiveModelMatrix)).
+    /// The inventory's attachment pass calls it for every slot weapon
+    /// ([`Inventory::UpdateAttachmentTransforms`](character::inventory::Inventory::UpdateAttachmentTransforms)).
+    #[address(0x140_99F_F80)]
+    pub fn UpdateAttachmentTransforms(&mut self, p2: f32, p3: f32, transform_type: u32);
+
+    /// How many placed charges are live.
+    #[address(0x140_957_F10)]
+    pub fn NumActiveExplosives(&self) -> i32;
+
+    /// The most charges that may be live at once: for the player, the entry of
+    /// [`m_MaxActiveExplosivesAtLevel`](Self::m_MaxActiveExplosivesAtLevel) for the highest
+    /// explosives-capacity upgrade bought and enabled; for any other holder, the first entry.
+    #[address(0x140_980_F70)]
+    pub fn MaxActiveExplosives(&self) -> i32;
+
+    /// Whether another charge may be placed:
+    /// [`NumActiveExplosives`](Self::NumActiveExplosives) is below
+    /// [`MaxActiveExplosives`](Self::MaxActiveExplosives).
+    #[address(0x140_990_2D0)]
+    pub fn CanPlantExplosive(&self) -> bool;
 }
 
 /// The weapon ballistics helpers (`NWeaponUtil`).
@@ -527,6 +2662,401 @@ impl WeapoIsTryingToFireCondition {
     /// planting.
     #[address(0x140_7F3_FF0)]
     pub fn Evaluate(&self, instance: *const void) -> bool;
+}
+
+/// `CWallPenetrationWeaponComponent`: the weapon component that detects a held weapon's barrel
+/// penetrating a wall or a character. Only the owner is bound.
+#[min_size(0xD8)]
+pub type WallPenetrationWeaponComponent {
+    /// The weapon the component belongs to (`CWeaponComponentBase::m_Owner`).
+    #[address(0xD0)]
+    pub m_Owner: *mut WeaponBase,
+}
+impl WallPenetrationWeaponComponent {
+    /// The component's serial weapon update. It acts only while the owner's
+    /// [`m_State`](WeaponBase::m_State) is [`E_WS_WIELDING`](WeaponState::E_WS_WIELDING) or
+    /// [`E_WS_DUAL_WIELDING`](WeaponState::E_WS_DUAL_WIELDING) and the owner is used by a player,
+    /// and it is the only writer of the owner's
+    /// [`m_IsWeaponPenetratingWallIfInAim`](WeaponBase::m_IsWeaponPenetratingWallIfInAim),
+    /// [`m_IsWeaponPenetratingCharacterIfInAim`](WeaponBase::m_IsWeaponPenetratingCharacterIfInAim),
+    /// and [`m_IsLeanOverFirePossible`](WeaponBase::m_IsLeanOverFirePossible). While the holder
+    /// is reeled in, drawing, holstering, or switching weapons, or is in a full-body pickup, it
+    /// clears both penetration flags and sets the lean-over and
+    /// [`m_AimingWeaponIsPossible`](WeaponBase::m_AimingWeaponIsPossible) flags. Otherwise it
+    /// collides a box, built from the holder's shoulders or hips toward the barrel, against the
+    /// world. A character hit sets the character flag and clears the wall flag. A world hit sets
+    /// the wall flag, clears lean-over, and clears `m_AimingWeaponIsPossible` unless the component
+    /// allows aiming while penetrating (`m_CanAimWhenPenetrating`). A clear result lasting long
+    /// enough clears both penetration flags and sets lean-over and `m_AimingWeaponIsPossible`
+    /// again. The box follows the holder's animated pose, not the weapon's own transform.
+    #[address(0x140_92F_930)]
+    pub fn UpdateWeapon_Serial(&mut self, dt: f32, weapon_data: *mut WeaponData, p3: f32);
+}
+
+/// `CWeaponComponentBase`: the base of a weapon's components, the entries of
+/// [`WeaponBase::m_WeaponComponents`]. A component is a `CGameObject` of its own, so its run-time
+/// type test is the game object's. Only some members are mapped, at their offsets from the start
+/// of the component; the derived component types repeat the ones they use.
+#[min_size(0xF8)]
+pub type WeaponComponentBase {
+    vftable {
+        /// `CRtti::IsType`: whether the component is of the class `type_id` names or derives from
+        /// it, as for [`GameObject::IsType`](game::GameObject::IsType). The weapon code tests a
+        /// component against [`ModelAttachementWeaponComponent::TYPE_ID`] before treating it as a
+        /// model part, and that test also accepts the barrel recoil and barrel spin parts.
+        #[index(2)]
+        pub fn IsType(&self, type_id: *const u32) -> bool;
+
+        /// Enables or disables the component, storing [`m_Enabled`](Self::m_Enabled). The
+        /// model-attachment component's override also shows or hides its model part through
+        /// [`SetVisible`](Self::SetVisible) when the value changes, so on a model part it is the
+        /// show and hide.
+        #[index(38)]
+        pub fn Enable(&mut self, enable: bool);
+
+        /// Shows or hides the component's models. The model part's override
+        /// ([`ModelAttachementWeaponComponent::SetVisible`]) shows its part only while the part is
+        /// enabled and its own gun's model ([`WeaponData::m_BaseModelInstance`]) is shown, so a
+        /// part hidden this way stays hidden until the next call after its gun is shown again.
+        /// `fade` fades a shown part in, as for the weapon's guns.
+        #[index(55)]
+        pub fn SetVisible(&mut self, visible: bool, fade: bool);
+    },
+
+    /// The weapon the component belongs to.
+    #[address(0xD0)]
+    pub m_Owner: *mut WeaponBase,
+
+    /// The component's kind.
+    #[address(0xD8)]
+    pub m_Type: WeaponComponentType,
+
+    /// Whether the component is enabled, written by [`Enable`](Self::Enable). The weapon runs the
+    /// per-shot, per-update, and post-finalization hooks of enabled components only.
+    #[address(0xF0)]
+    pub m_Enabled: bool,
+}
+
+/// `CModelAttachementWeaponComponent`: a weapon component that draws a separate model part of a
+/// gun, such as a magazine, at a fixed offset from the gun or on one of the holder's bones. The
+/// barrel recoil and barrel spin components (`CBarrelRecoilWeaponComponent`,
+/// `CBarrelSpinWeaponComponent`) derive from it: their attachment placement runs this one's and
+/// then moves the part, and their vtables share its render update.
+///
+/// The part keeps its own pair of cached world matrices, like a gun's
+/// ([`WeaponData::m_WorldMatrixT0`] and [`WeaponData::m_WorldMatrixT1`]):
+/// [`UpdateAttachmentTransforms`](Self::UpdateAttachmentTransforms) places it in the simulation,
+/// and [`UpdateRender`](Self::UpdateRender) interpolates between the two and pushes the result to
+/// its own model instance. Only some members are mapped, at their offsets from the start of the
+/// component.
+#[min_size(0x1D8)]
+pub type ModelAttachementWeaponComponent {
+    /// The value of [`m_CharacterBone`](Self::m_CharacterBone) while the part rides its gun rather
+    /// than a bone of the holder.
+    pub const NO_CHARACTER_BONE: u32 = 0xFFFFFFFF,
+    /// The [`m_NameHash`](Self::m_NameHash) of the `model.magazine` part, a gun's separate
+    /// magazine model: the hash of the name. The reload clips' throw-away-magazine and
+    /// enable-model messages carry it; the weapon code does not.
+    pub const MAGAZINE_NAME_HASH: u32 = 0x7E812228,
+    /// The [`m_NameHash`](Self::m_NameHash) of the `model.rpg` part, the rocket model of a rocket
+    /// launcher and the shell of the mortar: the hash of the name.
+    pub const RPG_NAME_HASH: u32 = 0xCF24E6D7,
+    /// The [`m_NameHash`](Self::m_NameHash) of the `model.rocket_pod` part, the Hydra's rocket
+    /// pod: the hash of the name.
+    pub const ROCKET_POD_NAME_HASH: u32 = 0xEE450BB2,
+    /// The [`m_NameHash`](Self::m_NameHash) of the UPU-210's `model.cartridge_full` part: the
+    /// hash of the name.
+    pub const CARTRIDGE_FULL_NAME_HASH: u32 = 0xB6BDC1C1,
+    /// The [`m_NameHash`](Self::m_NameHash) of the UPU-210's `model.cartridge_empty` part: the
+    /// hash of the name.
+    pub const CARTRIDGE_EMPTY_NAME_HASH: u32 = 0x32F0D47D,
+    /// The class's vtable, the value of the vtable pointer of a component of exactly this class.
+    /// A barrel recoil part carries [`BarrelRecoilWeaponComponent::VFTABLE`] and a barrel spin
+    /// part [`BarrelSpinWeaponComponent::VFTABLE`] instead.
+    pub const VFTABLE: u64 = 0x1423E20E8,
+
+    vftable {
+        /// The component base's [`IsType`](WeaponComponentBase::IsType).
+        #[index(2)]
+        pub fn IsType(&self, type_id: *const u32) -> bool;
+
+        /// Enables or disables the part: stores [`m_Enabled`](Self::m_Enabled) and, when the
+        /// value changes, shows or hides the part's model through
+        /// [`SetVisible`](Self::SetVisible). [`WeaponData::ThrowAwayMagazineObject`] hides the
+        /// magazine part with it, and the
+        /// [`TRACK_MESSAGE_ENABLE_MODEL_ATTACHEMENT`](WeaponBase::TRACK_MESSAGE_ENABLE_MODEL_ATTACHEMENT)
+        /// message shows it again.
+        #[index(38)]
+        pub fn Enable(&mut self, enable: bool);
+
+        /// Shows or hides the part's model: hidden while the part is disabled
+        /// ([`m_Enabled`](Self::m_Enabled)) or while the model of the part's gun
+        /// ([`m_WeaponDataIndex`](Self::m_WeaponDataIndex)) is hidden, whatever `visible` asks.
+        /// It writes the part's model flags only when they differ. The barrel recoil and barrel
+        /// spin parts share it.
+        #[index(55)]
+        pub fn SetVisible(&mut self, visible: bool, fade: bool);
+    },
+
+    /// The weapon the component belongs to (`CWeaponComponentBase::m_Owner`).
+    #[address(0xD0)]
+    pub m_Owner: *mut WeaponBase,
+
+    /// The component's kind (`CWeaponComponentBase::m_Type`):
+    /// [`E_WEAPON_COMPONENT_MODEL_ATTACHEMENT`](WeaponComponentType::E_WEAPON_COMPONENT_MODEL_ATTACHEMENT)
+    /// for this class, and the derived kind for the barrel recoil and barrel spin parts.
+    #[address(0xD8)]
+    pub m_Type: WeaponComponentType,
+
+    /// Whether the part is enabled (`CWeaponComponentBase::m_Enabled`), and so shown; written by
+    /// [`Enable`](Self::Enable).
+    #[address(0xF0)]
+    pub m_Enabled: bool,
+
+    /// The index into the owner's [`m_lWeaponData`](WeaponBase::m_lWeaponData) of the gun the part
+    /// belongs to.
+    #[address(0xF8)]
+    pub m_WeaponDataIndex: u32,
+
+    /// The hash of the part's name (such as [`MAGAZINE_NAME_HASH`](Self::MAGAZINE_NAME_HASH)),
+    /// from the component's properties. The magazine drop and the enable-model message find a
+    /// part by it.
+    #[address(0xFC)]
+    pub m_NameHash: u32,
+
+    /// Whether the next placement skips the render interpolation: when set,
+    /// [`UpdateAttachmentTransforms`](Self::UpdateAttachmentTransforms) copies
+    /// [`m_WorldMatrix`](Self::m_WorldMatrix) into
+    /// [`m_WorldMatrixSaved`](Self::m_WorldMatrixSaved) as well. Set through
+    /// [`WeaponBase::SkipRenderInterpolationForOneFrame`] and cleared by
+    /// [`UpdatePostFinalizePose`](Self::UpdatePostFinalizePose).
+    #[address(0x100)]
+    pub m_SkipRenderInterpolation: bool,
+
+    /// The snow cover written by the attachment placement, which the render update hands the
+    /// model's environmental metadata.
+    #[address(0x104)]
+    pub m_SnowFactor: f32,
+    /// The wetness written by the attachment placement, which the render update hands the model's
+    /// environmental metadata while the snow cover is zero.
+    pub m_WaterFactor: f32,
+
+    /// The holder's bone (an `NBone::ESafeBoneIndex`) the part rides instead of its gun, or
+    /// [`NO_CHARACTER_BONE`](Self::NO_CHARACTER_BONE). Set by
+    /// [`AttachToCharacterBone`](Self::AttachToCharacterBone), which the animation's
+    /// model-attachment bone task (`NWeaponModelAttachementSetBoneTask`) calls inside the holder's
+    /// pose-finalization pass, and reset by
+    /// [`UpdatePostFinalizePose`](Self::UpdatePostFinalizePose) at the end of that pass, so it is
+    /// set only between the task and the end of the pass that placed the part.
+    #[address(0x10C)]
+    pub m_CharacterBone: u32,
+
+    /// The part's transform relative to its gun.
+    #[address(0x110)]
+    pub m_Offset: Matrix4,
+
+    /// The part's world matrix as of the current placement:
+    /// [`m_Offset`](Self::m_Offset) composed with the gun's
+    /// [`GetWorldMatrixT1`](WeaponData::GetWorldMatrixT1) and orthonormalized, or the holder's bone
+    /// while [`m_CharacterBone`](Self::m_CharacterBone) names one.
+    #[address(0x150)]
+    pub m_WorldMatrix: Matrix4,
+
+    /// The part's world matrix as of the previous placement, which the render update interpolates
+    /// from toward [`m_WorldMatrix`](Self::m_WorldMatrix).
+    #[address(0x190)]
+    pub m_WorldMatrixSaved: Matrix4,
+
+    /// The part's model instance, or null.
+    #[address(0x1D0)]
+    pub m_BaseModelInstance: *mut ModelInstance,
+}
+impl ModelAttachementWeaponComponent {
+    /// `CModelAttachementWeaponComponent::TYPE_ID`: the run-time type id of the class, for
+    /// [`IsType`](WeaponComponentBase::IsType). Registers it on first use.
+    #[address(0x140_851_310)]
+    pub fn TYPE_ID() -> *const u32;
+
+    /// Places the part (the component's override of the `UpdateAttachmentTransforms` weapon
+    /// component virtual, which the weapon's attachment placement calls for each component). It
+    /// stores `snow_factor` and `water_factor`; for the advancing placement (`transform_type` 2)
+    /// it first copies [`m_WorldMatrix`](Self::m_WorldMatrix) into
+    /// [`m_WorldMatrixSaved`](Self::m_WorldMatrixSaved). It then writes
+    /// [`m_WorldMatrix`](Self::m_WorldMatrix) from the gun's world matrix and
+    /// [`m_Offset`](Self::m_Offset), or from the holder's bone while
+    /// [`m_CharacterBone`](Self::m_CharacterBone) names one. While
+    /// [`m_SkipRenderInterpolation`](Self::m_SkipRenderInterpolation) is set, and for the initial
+    /// placement (`transform_type` 0), it copies the new matrix into
+    /// [`m_WorldMatrixSaved`](Self::m_WorldMatrixSaved) as well.
+    #[address(0x140_92E_B80)]
+    pub fn UpdateAttachmentTransforms(&mut self, snow_factor: f32, water_factor: f32, transform_type: u32);
+
+    /// The render-phase update (the `CGameObject::UpdateRender` virtual), called for each of a
+    /// weapon's components from the weapon's render update ([`WeaponBase::UpdateRender`]). It
+    /// interpolates [`m_WorldMatrixSaved`](Self::m_WorldMatrixSaved) toward
+    /// [`m_WorldMatrix`](Self::m_WorldMatrix) by the render context's interpolation factor (the
+    /// engine's `CTransform::Lerp`), scales the result by the gun's holstered scale while the
+    /// owner is [`E_WS_HOLSTERED`](WeaponState::E_WS_HOLSTERED), pushes it to
+    /// [`m_BaseModelInstance`](Self::m_BaseModelInstance) with
+    /// [`ModelInstance::UpdateMatrix`](graphics_engine::model_instance::ModelInstance::UpdateMatrix),
+    /// and hands the model the snow and wetness. The disassembler mislabels it
+    /// `NInteractionGraphExitTasks::NAnimationDrivenOnlyMotion::Update`, and puts this function's
+    /// name on a function that reads a gun's ([`WeaponData`]) fields instead.
+    #[address(0x140_8E0_9F0)]
+    pub fn UpdateRender(&mut self, context: *const GameObjectRenderContext);
+
+    /// Rides the part on the holder's bone `bone` (an `NBone::ESafeBoneIndex`) for the rest of the
+    /// pose-finalization pass: sets [`m_CharacterBone`](Self::m_CharacterBone).
+    #[address(0x140_8BF_DA0)]
+    pub fn AttachToCharacterBone(&mut self, bone: u32);
+
+    /// The component's post-pose-finalization hook, run from [`WeaponBase::UpdatePostFinalizePose`]
+    /// for an enabled component: clears [`m_SkipRenderInterpolation`](Self::m_SkipRenderInterpolation)
+    /// and resets [`m_CharacterBone`](Self::m_CharacterBone) to
+    /// [`NO_CHARACTER_BONE`](Self::NO_CHARACTER_BONE). The disassembler leaves it unnamed.
+    #[address(0x140_8BF_D80)]
+    pub fn UpdatePostFinalizePose(&mut self);
+}
+
+/// `CBarrelRecoilWeaponComponent`: a model part that recoils with each shot, such as a pistol's
+/// slide or a rifle's ejection port. It is a [`ModelAttachementWeaponComponent`] (its kind is
+/// [`E_WEAPON_COMPONENT_BARREL_RECOIL`](WeaponComponentType::E_WEAPON_COMPONENT_BARREL_RECOIL)
+/// and it passes the model-attachment type test), so the same pointer reads as one; only the
+/// members it adds are mapped here, at their offsets from the start of the component.
+#[min_size(0x1E9)]
+pub type BarrelRecoilWeaponComponent {
+    /// The class's vtable, the value of the vtable pointer of a barrel recoil part. A consumer
+    /// holding a model part can tell a barrel recoil part by it, or by
+    /// [`m_Type`](ModelAttachementWeaponComponent::m_Type).
+    pub const VFTABLE: u64 = 0x1423E5C08,
+
+    /// The fire point of the gun ([`WeaponData::m_InternalFirePositions`]) whose time since its
+    /// last shot drives the recoil.
+    #[address(0x1D8)]
+    pub m_InternalFirePositionIndex: i32,
+    /// The recoil travel, in metres, along the part's own forward axis.
+    pub m_RecoilMaxLength: f32,
+    /// The seconds the part takes to travel back after a shot.
+    pub m_RecoilFireTime: f32,
+    /// The seconds the part takes to return after travelling back.
+    pub m_RecoilRecoverTime: f32,
+    /// Whether the part stays fully back while the magazine is empty (a slide that locks back),
+    /// for a player's wielded or dual-wielded weapon.
+    pub m_MaxRecoilOnEmptyAmmo: bool,
+}
+impl BarrelRecoilWeaponComponent {
+    /// `CBarrelRecoilWeaponComponent::TYPE_ID`: the run-time type id of the class, for
+    /// [`IsType`](WeaponComponentBase::IsType). Registers it on first use.
+    #[address(0x140_913_270)]
+    pub fn TYPE_ID() -> *const u32;
+
+    /// Places the part (its override of the weapon component's attachment placement): runs
+    /// [`ModelAttachementWeaponComponent::UpdateAttachmentTransforms`], then moves
+    /// [`m_WorldMatrix`](ModelAttachementWeaponComponent::m_WorldMatrix) along the part's own
+    /// forward axis by a fraction of [`m_RecoilMaxLength`](Self::m_RecoilMaxLength). The fraction
+    /// comes from the time since the fire point
+    /// [`m_InternalFirePositionIndex`](Self::m_InternalFirePositionIndex) last fired: it rises to
+    /// full over [`m_RecoilFireTime`](Self::m_RecoilFireTime) and falls back over
+    /// [`m_RecoilRecoverTime`](Self::m_RecoilRecoverTime). With
+    /// [`m_MaxRecoilOnEmptyAmmo`](Self::m_MaxRecoilOnEmptyAmmo), for a player's wielded or
+    /// dual-wielded weapon, it is full while the magazine is empty, and on a multi-gun weapon also
+    /// on the gun that will not fire the last round. It refreshes the saved matrix as the base
+    /// does.
+    #[address(0x140_93E_060)]
+    pub fn UpdateAttachmentTransforms(&mut self, snow_factor: f32, water_factor: f32, transform_type: u32);
+}
+
+/// `CBarrelSpinWeaponComponent`: a model part that spins while the weapon fires, such as a
+/// machine gun's barrel or ammunition belt. It is a [`ModelAttachementWeaponComponent`] (its
+/// kind is [`E_WEAPON_COMPONENT_BARREL_SPIN`](WeaponComponentType::E_WEAPON_COMPONENT_BARREL_SPIN)
+/// and it passes the model-attachment type test). Its own members are unmapped.
+pub type BarrelSpinWeaponComponent {
+    /// The class's vtable, the value of the vtable pointer of a barrel spin part.
+    pub const VFTABLE: u64 = 0x1423E5E38,
+}
+impl BarrelSpinWeaponComponent {
+    /// `CBarrelSpinWeaponComponent::TYPE_ID`: the run-time type id of the class, for
+    /// [`IsType`](WeaponComponentBase::IsType). Registers it on first use.
+    #[address(0x140_913_350)]
+    pub fn TYPE_ID() -> *const u32;
+}
+
+/// `CDoActWeaponComponent`: a weapon component that plays an act when its weapon starts or stops
+/// firing or is equipped, such as the pump shotgun's pump. Each act goes to the component's
+/// skeletal object when it has one; otherwise, with
+/// [`m_SendActToWeapon`](Self::m_SendActToWeapon), to every gun's own animated model
+/// ([`WeaponData::DoAct`]); otherwise to the holder
+/// ([`Character::QueueAct`](character::character::Character::QueueAct)). The acts are queued and
+/// gate nothing: no state of the act blocks the weapon's next shot. Only some members are mapped,
+/// at their offsets from the start of the component.
+#[min_size(0x10C)]
+pub type DoActWeaponComponent {
+    /// The [`m_WeaponDataIndex`](Self::m_WeaponDataIndex) that matches every gun.
+    pub const ANY_WEAPON_DATA_INDEX: i32 = -1,
+
+    /// The weapon the component belongs to (`CWeaponComponentBase::m_Owner`).
+    #[address(0xD0)]
+    pub m_Owner: *mut WeaponBase,
+
+    /// Whether the component is enabled (`CWeaponComponentBase::m_Enabled`). The weapon calls the
+    /// fire hooks of enabled components only.
+    #[address(0xF0)]
+    pub m_Enabled: bool,
+
+    /// The act (an event id) played at fire start, from the component's properties.
+    #[address(0xF8)]
+    pub m_FireStartAct: u32,
+    /// The act played at fire stop.
+    pub m_FireStopAct: u32,
+    /// The act played when the weapon is equipped.
+    pub m_EquipAct: u32,
+    /// The gun whose fire plays the acts, or
+    /// [`ANY_WEAPON_DATA_INDEX`](Self::ANY_WEAPON_DATA_INDEX).
+    pub m_WeaponDataIndex: i32,
+    /// Whether the fire acts play only when the gun's fire-point cursor
+    /// ([`WeaponData::m_InternalFirePositionCurrentIndex`]) is even.
+    pub m_ActivateOnEvenInternalFirePoint: bool,
+    /// Whether the fire acts play only when the gun's fire-point cursor is odd.
+    pub m_ActivateOnOddInternalFirePoint: bool,
+    /// Whether the acts go to the guns' own animated models rather than the holder.
+    pub m_SendActToWeapon: bool,
+    /// Whether the fire acts play only while the owner's magazine holds more than the round being
+    /// fired.
+    pub m_OnlyIfAmmoLeft: bool,
+}
+impl DoActWeaponComponent {
+    /// `CDoActWeaponComponent::TYPE_ID`: the run-time type id of the class, for
+    /// [`IsType`](WeaponComponentBase::IsType). Registers it on first use.
+    #[address(0x140_913_620)]
+    pub fn TYPE_ID() -> *const u32;
+
+    /// Plays [`m_FireStartAct`](Self::m_FireStartAct) when
+    /// [`ShouldActActivate`](Self::ShouldActActivate) allows it for `weapon_data` (the component's
+    /// fire-start virtual, which [`WeaponBase::Fire_StartBase`] calls for each shot).
+    #[address(0x140_928_A30)]
+    pub fn Fire_Start(&mut self, weapon_data: *mut WeaponData);
+
+    /// Plays [`m_FireStopAct`](Self::m_FireStopAct) when
+    /// [`ShouldActActivate`](Self::ShouldActActivate) allows it for `weapon_data` (the component's
+    /// fire-stop virtual).
+    #[address(0x140_928_BF0)]
+    pub fn Fire_Stop(&mut self, weapon_data: *mut WeaponData);
+
+    /// Plays [`m_EquipAct`](Self::m_EquipAct) when the weapon is equipped by `character`.
+    #[address(0x140_928_DB0)]
+    pub fn OnEquip(&mut self, character: *mut Character);
+
+    /// Whether a fire act plays for `weapon_data`: false under
+    /// [`m_OnlyIfAmmoLeft`](Self::m_OnlyIfAmmoLeft) with the owner's magazine at one round or
+    /// fewer; otherwise, with a [`m_WeaponDataIndex`](Self::m_WeaponDataIndex), whether the gun is
+    /// that one; otherwise the fire-point parity filters, and true without them.
+    #[address(0x140_8BF_200)]
+    pub fn ShouldActActivate(&self, weapon_data: *mut WeaponData) -> bool;
+
+    /// Reads the component's properties: the three acts (resolved through the event-id symbol
+    /// table), the gun index, the parity and routing flags, and the skeletal object.
+    #[address(0x140_913_700)]
+    pub fn SetProperties(&mut self, properties: *const void, context: *mut void);
 }
 
 /// `CTurretWeaponComponent`: a weapon component that rotates a turret toward its weapon's target.

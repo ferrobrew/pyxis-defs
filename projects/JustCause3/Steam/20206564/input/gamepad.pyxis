@@ -1,0 +1,23 @@
+use input::input_device_manager::InputDevice;
+
+/// A connected XInput gamepad (`Input::CGamepad`), as returned by
+/// [`InputDeviceManager::GetDevice`](input::input_device_manager::InputDeviceManager::GetDevice)
+/// with [`DeviceType::Gamepad`](input::input_device_manager::DeviceType::Gamepad). Its layout
+/// beyond the common device header is unmapped.
+#[min_size(0x38)]
+pub type Gamepad {
+    #[base]
+    pub base: InputDevice,
+}
+impl Gamepad {
+    /// Sets one vibration motor's strength (`0..=1`, scaled to the 16-bit XInput range) and pushes
+    /// the gamepad's full vibration state to XInput. `motor` 0 is the low-frequency motor and 1 is
+    /// the high-frequency motor; any other value is unsupported. Does nothing on a disconnected
+    /// gamepad.
+    ///
+    /// [`RumbleManager::Update`](rumble_manager::RumbleManager::Update) calls it once per motor
+    /// every frame with the manager's summed, clamped strength for that motor, so a frame with
+    /// nothing rumbling still calls it, with zero.
+    #[address(0x140_2EC_1C0)]
+    pub fn SetMotorValue(&mut self, motor: i32, value: f32);
+}

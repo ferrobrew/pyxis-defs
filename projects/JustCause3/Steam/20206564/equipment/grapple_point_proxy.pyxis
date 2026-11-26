@@ -1,0 +1,166 @@
+use character::character::Character;
+use game::GameObject;
+use types::math::{Matrix4, Vector3};
+use vehicle::vehicle::Vehicle;
+
+/// What a grapple attachment proxy is attached to (`CGrapplePointProxy::EAttachmentObjectInfo`),
+/// stored in [`GrapplePointProxy::m_AttachmentObjectInfo`]. The reel task picks its arrival test by
+/// it ([`NStateTask_ReelIn::Update`](equipment::grappling_hook::NStateTask_ReelIn::Update)).
+#[copyable]
+pub enum AttachmentObjectInfo: i32 {
+    AOI_Invalid = 0x0,
+    /// A character's bone ([`CharacterBoneAttachedPointProxy`]).
+    AOI_Character = 0x1,
+    /// A vehicle or one of its parts (`CVehicleGrapplePointProxy`).
+    AOI_Vehicle = 0x2,
+    /// Static world geometry.
+    AOI_Static = 0x3,
+    /// Any other physics object ([`GenericObjectPointProxy`]).
+    AOI_Generic = 0x4,
+}
+
+/// The base of every grapple attachment (`CGrapplePointProxy`): what a wire end
+/// ([`WireEnd::m_PointProxy`](equipment::wire_end::WireEnd::m_PointProxy)) is attached to. Its
+/// virtual interface answers for the attached thing whatever its kind: where the attach point is,
+/// how it moves, the body behind it, and its mass. Only some members are bound.
+pub type GrapplePointProxy {
+    vftable {
+        /// Writes the attach point's world position and normal, or returns false when the
+        /// attached thing is gone.
+        #[index(1)]
+        pub fn GetVisualPositionAndNormalWS(&self, position: *mut Vector3, normal: *mut Vector3) -> bool;
+
+        /// Whether the proxy and the thing it is attached to are live.
+        #[index(3)]
+        pub fn IsOk(&self) -> bool;
+
+        /// The attached object's mass, kilograms: its physics instance's mass for a dynamic
+        /// object, a vehicle's own mass for a vehicle, and a very large mass for an object that is
+        /// not dynamic.
+        #[index(4)]
+        pub fn GetObjectMass(&self) -> f32;
+
+        /// Writes the attach point's world velocity: for a physics object, its body's velocity at
+        /// the point (the linear velocity plus the angular velocity's part at the point), and zero
+        /// when the object is gone. The reel blends the character's carried velocity toward it
+        /// ([`NStateTask_ReelIn::UpdateReelVelocity`](equipment::grappling_hook::NStateTask_ReelIn::UpdateReelVelocity)).
+        #[index(5)]
+        pub fn GetObjectAttachPointVelocity(&self, velocity: *mut Vector3);
+
+        /// Writes the id of the body a wire constraint at this end would join, or the invalid id
+        /// ([`PfxCharacterInstance::INVALID_BODY_ID`](physics::PfxCharacterInstance::INVALID_BODY_ID))
+        /// without one: a physics object's own body while it is dynamic, a
+        /// character's proxy body or the ragdoll bone it is attached to.
+        /// [`GrapplingHookWire::CreateConstraint`](equipment::grappling_hook::GrapplingHookWire::CreateConstraint)
+        /// reads both ends' bodies through it.
+        #[index(16)]
+        pub fn GetRigidBodyForConstraint(&self, result: *mut u32) -> *mut u32;
+
+        /// The attached game object (its `CGameObject` subobject), or null.
+        #[index(22)]
+        pub fn GetGameObject(&self) -> *mut GameObject;
+    },
+
+    /// What the proxy is attached to; see [`AttachmentObjectInfo`].
+    #[address(0xC)]
+    pub m_AttachmentObjectInfo: AttachmentObjectInfo,
+}
+
+/// A grapple attachment fixed to a character bone (`CCharacterBoneAttachedPointProxy`), a
+/// [`GrapplePointProxy`]. Its visual getters multiply the local attachment transform by the bone
+/// and character transforms. A proxy built for a bone is virtual only: its constraint hint
+/// ([`GetConstraintHint`](Self::GetConstraintHint)) permits no wire constraint until the
+/// attachment is physicalized, and the device end of every wire
+/// ([`GrapplingHook::AttachLocalWireEndToDevice`](equipment::grappling_hook::GrapplingHook::AttachLocalWireEndToDevice))
+/// is such a proxy, so the active wire never holds a physics constraint.
+pub type CharacterBoneAttachedPointProxy;
+impl CharacterBoneAttachedPointProxy {
+    /// Writes the attachment's world position and normal, or returns false without a character.
+    #[address(0x140_8D8_180)]
+    pub fn GetVisualPositionAndNormalWS(&self, position: *mut Vector3, normal: *mut Vector3) -> bool;
+
+    /// Writes the attachment's world transform, or returns false without a character.
+    #[address(0x140_8D8_280)]
+    pub fn GetVisualTransformWS(&self, transform: *mut Matrix4) -> bool;
+
+    /// No constraint for a proxy that is not live, has no character, or is virtual only; an active
+    /// (physical) constraint otherwise.
+    #[address(0x140_8CA_4D0)]
+    pub fn GetConstraintHint(&self) -> i32;
+}
+
+/// What kind of vehicle a vehicle grapple attachment is on
+/// (`CVehicleGrapplePointProxy::EVehicleType`), from
+/// [`VehicleGrapplePointProxy::GetVehicleType`].
+#[copyable]
+pub enum VehicleGrappleType: i32 {
+    Car = 0x0,
+    Helicopter = 0x1,
+    Boat = 0x2,
+    MotorBike = 0x3,
+    AirPlane = 0x4,
+    /// No live vehicle, or another kind.
+    None = 0x5,
+}
+
+/// A grapple attachment to a vehicle or one of its physics parts (`CVehicleGrapplePointProxy`).
+/// While the character reels toward a vehicle it also holds the vehicle interaction-graph entry
+/// the reel will end in: the reel prefers any valid entry on the vehicle's door side and falls back
+/// to a hang entry, so a reel onto a helicopter ends at its door side when one validates.
+#[min_size(0xC4)]
+pub type VehicleGrapplePointProxy {
+    /// Where the reel's chosen entry starts, in the vehicle's interaction graph's space.
+    #[address(0xA8)]
+    pub m_ReelInEntryPositionGS: Vector3,
+    /// Where the reel's chosen entry ends, in the graph's space. Its sideways part is what the
+    /// reel's revalidation of the entry compares the character's with: the entry stays chosen
+    /// while either is near the graph's middle or both lie on one side.
+    pub m_ReelInGoalPositionGS: Vector3,
+    /// The index of the reel's chosen entry in the vehicle's interaction graph, or -1 for none.
+    /// While the reel runs, its update revalidates the chosen entry on every tick and, with none
+    /// chosen or the chosen one no longer valid, selects afresh from the character's position and
+    /// the reel's direction (`CVehicleGrapplePointProxy::ExtractReelInEntryInfo`): it prefers the
+    /// nearest valid entry on the door side and falls back to the nearest hang entry.
+    pub m_ReelInEntryIndex: i32,
+}
+impl VehicleGrapplePointProxy {
+    /// The kind of vehicle the attachment is on: [`VehicleGrappleType::None`] when the proxy is
+    /// not live or has no vehicle.
+    #[address(0x140_93C_B50)]
+    pub fn GetVehicleType(&self) -> VehicleGrappleType;
+
+    /// Whether the reel's chosen vehicle entry has the `reel_in_hang` use tag: the reel ends in the
+    /// vehicle's stunt hang rather than at its door side.
+    #[address(0x140_93B_050)]
+    pub fn IsCurrentEntryHangNode(&self) -> bool;
+
+    /// The vehicle the attachment is on, or null when it is gone.
+    #[address(0x140_925_6F0)]
+    pub fn GetVehiclePtr(&self) -> *mut Vehicle;
+
+    /// The reel's update of its chosen entry for `character`, reeling toward
+    /// `extension_position` along `direction`. With an entry chosen
+    /// ([`VehicleGrapplePointProxy::m_ReelInEntryIndex`]), the entry is offered to the character's
+    /// interaction user, its act checked from the character's state, and its side revalidated; a
+    /// valid entry has its start and goal recalculated. With none chosen, or the chosen one no
+    /// longer valid, an entry is selected afresh. Returns whether an entry stands chosen. Returns
+    /// false without choosing for a vehicle that is upside down or refuses reel entries.
+    #[address(0x140_944_120)]
+    pub fn UpdateVehicleReelInEntrySelection(&mut self, character: *mut Character, extension_position: *const Vector3, direction: *const Vector3) -> bool;
+
+    /// Moves the attachment to a new world-space position and normal, updating both its visual
+    /// local transform and its physics-local attachment while retaining the vehicle.
+    #[address(0x140_944_290)]
+    pub fn ReattachToNewPos(&mut self, position: *const Vector3, normal: *const Vector3);
+}
+
+/// A grapple attachment on a physics game object (`CGenericObjectPointProxy`), a
+/// [`GrapplePointProxy`].
+pub type GenericObjectPointProxy;
+impl GenericObjectPointProxy {
+    /// Returns no constraint for an invalid proxy or a weapon whose grappling mode reels without
+    /// attaching. Rigid objects request a virtual or physical constraint according to their motion
+    /// type; other valid objects request a physical constraint.
+    #[address(0x140_924_7D0)]
+    pub fn GetConstraintHint(&self) -> i32;
+}

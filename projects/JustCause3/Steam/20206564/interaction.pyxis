@@ -1,0 +1,206 @@
+use character::character::Character;
+use types::math::Matrix4;
+use types::shared_ptr::{SharedPtr, WeakPtrGameObject};
+
+/// A character's user side of the interaction system (`CInteractionUserProxy`), embedded in the
+/// character ([`Character::m_InteractionUserProxy`](character::character::Character::m_InteractionUserProxy)).
+/// It tracks the interaction graphs near the character and which of their entries the character
+/// could take. Only some members are mapped.
+#[min_size(0x240)]
+pub type InteractionUserProxy {
+    /// The character the proxy belongs to.
+    #[address(0x8)]
+    pub m_Character: *mut Character,
+
+    /// The interaction graph the character is a user of, or null.
+    #[address(0x10)]
+    pub m_Graph: *mut InteractionGraph,
+
+    /// Whether the character's own motion state runs, rather than the graph's: an attached
+    /// character's is off, and stepping off a vehicle's stunt area turns it back on.
+    #[address(0x44)]
+    pub m_MotionStateEnabled: bool,
+
+    /// The entries being validated on this update, which
+    /// [`ProcessPotentialEntries`](Self::ProcessPotentialEntries) works through and empties. An
+    /// entry whose graph's conditions pass becomes one of
+    /// [`m_ValidEntries`](Self::m_ValidEntries).
+    #[address(0x198)]
+    pub m_PotentialEntries: InteractionGraphEntryArray,
+
+    /// The entries of nearby interaction graphs that the character could enter now: those whose
+    /// conditions passed, such as
+    /// [`InteractionGraphParentWeaponNotInInventory`](InteractionGraphParentWeaponNotInInventory)
+    /// on a weapon pickup. The player's weapon readout and a swimming character's weapon pickup
+    /// ([`Inventory::UpdateWeaponHandling`](character::inventory::Inventory::UpdateWeaponHandling))
+    /// walk it for the weapon the first entry offers.
+    #[address(0x218)]
+    pub m_ValidEntries: InteractionGraphEntryArray,
+
+    /// Set while [`ProcessPotentialEntries`](Self::ProcessPotentialEntries) runs, so that a
+    /// condition evaluated meanwhile reads [`m_PotentialEntries`](Self::m_PotentialEntries) rather
+    /// than [`m_ValidEntries`](Self::m_ValidEntries).
+    /// The user's state in its graph (`EInteractionGraphUserState`): zero is inactive.
+    /// [`SetGraphUserState`](Self::SetGraphUserState) writes it.
+    #[address(0x238)]
+    pub m_GraphUserState: i32,
+
+    #[address(0x23C)]
+    pub m_IsValidatingEntry: bool,
+}
+impl InteractionUserProxy {
+    /// Sets the user's state in its graph ([`m_GraphUserState`](Self::m_GraphUserState)).
+    #[address(0x140_A38_400)]
+    pub fn SetGraphUserState(&mut self, state: i32);
+
+    /// Works through [`m_PotentialEntries`](Self::m_PotentialEntries) with
+    /// [`m_IsValidatingEntry`](Self::m_IsValidatingEntry) set, and empties it: an entry whose
+    /// interaction's act the character's animated model can take moves to
+    /// [`m_ValidEntries`](Self::m_ValidEntries), and any other has its interaction's components
+    /// deactivated. Returns whether an entry was moved.
+    #[address(0x140_A67_1F0)]
+    pub fn ProcessPotentialEntries(&mut self) -> bool;
+}
+
+/// The interaction graph entry condition `CInteractionGraphParentWeaponNotInInventory`, one of the
+/// pickup conditions: a pickup graph that uses it is not offered to a character that already
+/// carries a weapon of the same kind in the offered weapon's slot. Only its evaluation is mapped.
+#[min_size(0x8)]
+pub type InteractionGraphParentWeaponNotInInventory {
+}
+impl InteractionGraphParentWeaponNotInInventory {
+    /// Evaluates the condition for `user`. It reads the user's entries
+    /// ([`InteractionUserProxy::m_PotentialEntries`] while
+    /// [`InteractionUserProxy::m_IsValidatingEntry`] is set, otherwise
+    /// [`InteractionUserProxy::m_ValidEntries`]) and takes the weapon the first entry offers, found
+    /// as the weapon readout finds it: the entry's graph's context's parent when that is a weapon,
+    /// or the weapon spawned by the weapon placement rule the entry's node stands for. It fails
+    /// only when the user's character
+    /// ([`InteractionUserProxy::m_Character`]) holds a weapon in that weapon's slot
+    /// ([`WeaponBase::m_EquipSlot`](equipment::weapon::WeaponBase::m_EquipSlot)) with the same
+    /// [`WeaponBase::m_WeaponId`](equipment::weapon::WeaponBase::m_WeaponId); with no entries, no
+    /// weapon found, or an empty slot, it passes. A non-zero `evaluation_type` logs a warning that
+    /// the condition is meant for entries alone.
+    #[address(0x140_A5B_6C0)]
+    pub fn Evaluate(&mut self, user: *mut InteractionUserProxy, evaluation_type: u32) -> bool;
+}
+
+/// A `TArray<CInteractionGraphEntry *>`: the start and the end of its element array.
+#[min_size(0x10)]
+pub type InteractionGraphEntryArray {
+    pub m_Begin: *mut *mut InteractionGraphEntry,
+
+    #[address(0x8)]
+    pub m_End: *mut *mut InteractionGraphEntry,
+}
+
+/// One way into an interaction graph (`CInteractionGraphEntry`). Only some members are mapped.
+#[size(0x70), align(16)]
+pub type InteractionGraphEntry {
+    /// The index of the graph node the entry leads to, for
+    /// [`InteractionGraph::GetNodeByIndex`].
+    #[address(0x8)]
+    pub m_EntryNodeIndex: u64,
+
+    /// The act the entry queues on the character to take it.
+    #[address(0x20)]
+    pub m_EventId: i32,
+    /// The animation state the entry's act leads to.
+    pub m_StateId: u32,
+
+    /// The hash of the entry's use tag, which says what the entry is for: among others
+    /// [`INTERACTION_USE_TAG_REEL_IN_DOOR_SIDE`] and [`INTERACTION_USE_TAG_REEL_IN_HANG`], the
+    /// two a grapple reel onto a vehicle chooses between.
+    #[address(0x38)]
+    pub m_UseTagHash: u32,
+
+    /// Whether the entry is offered.
+    #[address(0x50)]
+    pub m_Enabled: bool,
+
+    /// The graph the entry belongs to.
+    #[address(0x60)]
+    pub m_Graph: *mut InteractionGraph,
+}
+
+/// The use tag of a vehicle entry a grapple reel ends at beside the vehicle, at its door side
+/// ([`InteractionGraphEntry::m_UseTagHash`]). The tag's source name is not known.
+pub const INTERACTION_USE_TAG_REEL_IN_DOOR_SIDE: u32 = 0xCBC5_E511;
+
+/// The use tag of a vehicle entry a grapple reel ends at in the vehicle's stunt hang
+/// ([`InteractionGraphEntry::m_UseTagHash`]): the hash of `reel_in_hang`.
+pub const INTERACTION_USE_TAG_REEL_IN_HANG: u32 = 0x69A6_6317;
+
+/// A graph of interaction nodes (`CInteractionGraph`), owned by an interaction context. Only some
+/// members are mapped.
+pub type InteractionGraph {
+    /// The context that owns the graph.
+    #[address(0x60)]
+    pub m_Context: *mut InteractionContext,
+
+    /// How many entries the graph has.
+    #[address(0x80)]
+    pub m_NofEntries: u32,
+
+    /// The graph's entries, [`InteractionGraph::m_NofEntries`] of them.
+    #[address(0xB0)]
+    pub m_Entries: *mut InteractionGraphEntry,
+}
+impl InteractionGraph {
+    /// Removes `user` from the graph: the character stops being attached to the graph's object.
+    /// With the user's motion state turned back on, its graph state set inactive, and the physics
+    /// input's game-controlled velocity cleared, it is what the stunting movement task does when a
+    /// character walks off a vehicle's stunt area. The disassembler mislabels it
+    /// `ClearVelocities`.
+    #[address(0x140_A49_660)]
+    pub fn RemoveUser(&mut self, user: *mut InteractionUserProxy) -> bool;
+
+    /// The graph's node at `index`, or null when the index is past the graph's last node.
+    #[address(0x140_A37_D60)]
+    pub fn GetNodeByIndex(&mut self, index: u64) -> *mut InteractionGraphNode;
+
+    /// The graph's entry at `index`, or null when the index is past the graph's last entry.
+    #[address(0x140_A37_E20)]
+    pub fn GetEntryByIndex(&mut self, index: i32) -> *mut InteractionGraphEntry;
+
+    /// Writes the graph's world transform into `result` and returns it: the graph's local
+    /// transform composed with its context's world transform.
+    #[address(0x140_A42_220)]
+    pub fn GetWorldTransform(&self, result: *mut Matrix4) -> *mut Matrix4;
+}
+
+/// The game object that holds a set of interaction graphs (`CInteractionContext`). Only some
+/// members are mapped.
+#[min_size(0x388)]
+pub type InteractionContext {
+    /// The game object the context belongs to (`CGameObject::m_Parent`), such as the weapon whose
+    /// pickup interaction the context carries.
+    #[address(0x70)]
+    pub m_Parent: WeakPtrGameObject,
+
+    /// The context's interaction graphs; a vehicle's graph of seats and entries is the first.
+    #[address(0x108)]
+    pub m_InteractionGraphs: [SharedPtr<InteractionGraph>; 16],
+
+    /// The context's state bits, including the `m_Enabled` bit its
+    /// [`GameObject::Enable`](game::GameObject::Enable) override reads and writes.
+    #[address(0x380)]
+    pub m_Flags: InteractionContextFlags,
+}
+
+/// The state bits of an interaction context (`CInteractionContext::m_Enabled` and its neighbours).
+#[copyable]
+pub bitflags InteractionContextFlags: u8 {
+    /// The context is enabled: its interactions are offered, and its `Enable` override tells the
+    /// user proxies when the bit changes.
+    ENABLED = 0x1,
+}
+
+/// One node of an interaction graph (`CInteractionGraphNode`). Only some members are mapped.
+#[size(0x70), align(16)]
+pub type InteractionGraphNode {
+    /// The game object the node stands for, such as the weapon placement rule of a weapon rack's
+    /// pickup, or null.
+    #[address(0x50)]
+    pub m_GameObject: WeakPtrGameObject,
+}

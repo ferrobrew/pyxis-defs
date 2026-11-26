@@ -14,3 +14,19 @@ pub fn send_event_msg(name: &std::ffi::CStr) {
     unsafe { send_event_msg_impl(name.as_ptr() as *const u8, std::ptr::null_mut()) }
 }
 "#;
+
+/// A sent event as its receivers see it (`NEvent::CEventImpl`). Opaque.
+pub type EventImpl;
+
+/// A subscription to a named event (`NEvent::CReceiveEvent`): the handle of the subscription's
+/// entry in the event system's registry, or zero when unsubscribed.
+#[size(0x4), copyable]
+pub type ReceiveEvent {
+    pub m_Handle: u32,
+}
+
+/// `NEvent::operator==(const CEventImpl*, const CReceiveEvent&)`: whether `event` is the event
+/// `receiver` subscribes to. An event handler that subscribes several events tells them apart
+/// with it. An unsubscribed receiver matches nothing.
+#[address(0x140_06D_A40)]
+pub fn EventMatches(event: *const EventImpl, receiver: *const ReceiveEvent) -> bool;

@@ -1,14 +1,143 @@
+use game::GameObjectRenderContext;
+use game::GameObjectUpdateContext;
+use game::UpdateContexts;
+use graphics_engine::model_instance::ModelInstance;
+use physics::Collision;
+use physics::PfxRigidBody;
 use types::math::Matrix4;
 use types::math::Vector3;
+use types::shared_ptr::SharedPtr;
+
+/// Reserves a grenade slot under the ammunition manager's critical section. When no slot remains,
+/// `reclaim` permits `FreePoolSoPlayerCanFire` to erase an existing entry before retrying.
+/// With `reclaim` false, exhaustion returns null without removing another object.
+#[address(0x140_963_0C0)]
+pub fn AllocateGrenade(manager: *mut void, allocation_type: u32, position: *const Vector3, reclaim: bool) -> *mut void;
+
+/// `CAmmunitionManager::UpdatePostSim`: unless the update context is paused, runs every pooled
+/// object's `UpdatePostSimFromManager` (an explosive's is
+/// [`Explosive::UpdatePostSimFromManager`]) and erases the objects whose call returns false, then
+/// erases the objects queued for removal. Pooled objects are reached through the manager's own
+/// pool, not the world update queue, so an object takes part from its allocation on.
+/// [`GameStateRun::Update`](game::GameStateRun::Update) calls it last in the tick, after the
+/// game world's post-simulation queue.
+#[address(0x140_8F2_8F0)]
+pub fn AmmunitionManagerUpdatePostSim(manager: *mut void, update_contexts: *const UpdateContexts);
+
+/// `CAmmunitionManager::HandleDeferredQueue`: runs, in order, the calls queued on the manager's
+/// deferred render-update list (`std::function<void ()>` entries that the bullets, which update on
+/// worker threads, queue for main-thread work such as their window damage,
+/// [`Bullet::OnBulletHitGlass`](equipment::weapon::Bullet::OnBulletHitGlass)), then empties the
+/// list. `CAmmunitionManager::UpdateRender` calls it first, on the main thread in the game's render
+/// update, and the loading state's update calls it too.
+#[address(0x140_90B_DC0)]
+pub fn AmmunitionManagerHandleDeferredQueue(manager: *mut void);
 
 /// A thrown or placed explosive object (`CExplosive`, a `CGameObjectAmmunition<CDamageable>`): its
 /// physics body, trail effect, detonation timers, and the deferred launch that
 /// [`PropelToward`](Self::PropelToward) sets up for the physics body to apply later.
 pub type Explosive {
+    /// The offset of the embedded `CGameObject` subobject. Weak references to the explosive (such
+    /// as [`ThrownGrenadeWeapon::m_PrimedGrenade`](equipment::weapon::ThrownGrenadeWeapon::m_PrimedGrenade))
+    /// point there rather than at the start of the explosive.
+    pub const GAME_OBJECT_BASE_OFFSET: u64 = 0x70,
+    /// The offset of the embedded `CPfxBodyListener` subobject, the `this` of the explosive's
+    /// collision handler ([`Grenade::OnCollision`]).
+    pub const PFX_BODY_LISTENER_OFFSET: u64 = 0x68,
+
+    /// The ammunition-pool slot. Awareness events pair it with
+    /// [`m_InstanceUniqueId`](Self::m_InstanceUniqueId) to reject recycled instances.
+    #[address(0x24)]
+    pub m_PoolIndex: u32,
+    /// The current allocation's identity within the ammunition pool.
+    pub m_InstanceUniqueId: u32,
+
+    /// The explosive's model instance, or null. [`UpdateRender`](Self::UpdateRender) pushes the
+    /// interpolated world matrix to it. The first
+    /// [`UpdatePostSimFromManager`](Self::UpdatePostSimFromManager) after the explosive spawns
+    /// creates it from [`m_ModelHash`](Self::m_ModelHash)
+    /// ([`ModelInstanceManager::CreateInstanceFromHash`](graphics_engine::model_instance::ModelInstanceManager::CreateInstanceFromHash),
+    /// at [`m_WorldMatrixT1`](Self::m_WorldMatrixT1), casting no shadow, added to the world),
+    /// clears its [`FLAG_CLIPONDISTANCE`](graphics_engine::model_instance::ModelInstanceFlags::FLAG_CLIPONDISTANCE),
+    /// and shows it; the destructor releases it.
+    #[address(0x4B0)]
+    pub m_ModelInstance: *mut ModelInstance,
+
+    /// The explosive's physics body (the pointer of a shared pointer), or null until the first
+    /// [`UpdatePostSimFromManager`](Self::UpdatePostSimFromManager) after the explosive spawns
+    /// creates it, which is at the end of a tick, after the world's post-simulation queue.
+    /// [`PropelToward`](Self::PropelToward) and [`SetPhysicsTransform`](Self::SetPhysicsTransform)
+    /// do nothing without it.
+    #[address(0x4B8)]
+    pub m_PfxInstance: *mut PfxRigidBody,
+
+    /// The trail effect resource (the pointer of a shared pointer), or null when the explosive has
+    /// none. The owning weapon sets it up when it spawns the explosive, and
+    /// [`PlayTrailEffect`](Self::PlayTrailEffect) plays it.
+    #[address(0x4C8)]
+    pub m_TrailEffect: *mut void,
+
+    /// The trail sound event (the pointer of a shared pointer), or null when the explosive has
+    /// none. The owning weapon sets it up when it spawns the explosive, and
+    /// [`PlayTrailEffect`](Self::PlayTrailEffect) plays it.
+    #[address(0x4D8)]
+    pub m_TrailSound: *mut void,
+
+    /// The playing trail effect's instance data, or null while no trail effect plays.
+    /// [`PlayTrailEffect`](Self::PlayTrailEffect) starts it, stopping a looping effect already
+    /// playing in it, and [`UpdatePostSim`](Self::UpdatePostSim) moves it to
+    /// [`m_WorldMatrixT1`](Self::m_WorldMatrixT1) every tick the explosive has a physics body.
+    #[address(0x4E8)]
+    pub m_TrailEffectInstance: *mut void,
+
+    /// The playing trail sound's instance data, or null while no trail sound plays.
+    /// [`PlayTrailEffect`](Self::PlayTrailEffect) starts it, stopping a sound already playing in
+    /// it, and [`UpdatePostSim`](Self::UpdatePostSim) moves it with the explosive and drives its
+    /// fuse parameter
+    /// ([`m_TrailSoundDetonationParameterIndex`](Self::m_TrailSoundDetonationParameterIndex)).
+    #[address(0x4F0)]
+    pub m_TrailSoundInstance: *mut void,
+
+    /// The index of the trail sound's `detonation_timer` parameter, or `0xFF` when the trail sound
+    /// has no such parameter. [`PlayTrailEffect`](Self::PlayTrailEffect) looks it up when it starts
+    /// the sound. Every [`UpdatePostSim`](Self::UpdatePostSim) after that, while the sound plays
+    /// and [`m_StartDetonationTimer`](Self::m_StartDetonationTimer) is not zero, sets the parameter
+    /// to how far the fuse has burnt: zero when [`m_DetonationTimer`](Self::m_DetonationTimer)
+    /// is at its start and one when it reaches zero. This is the engine's audible fuse.
+    #[address(0x4F8)]
+    pub m_TrailSoundDetonationParameterIndex: u8,
+
+    /// The explosive's world matrix as of the previous simulation tick, which
+    /// [`UpdateRender`](Self::UpdateRender) interpolates from toward
+    /// [`m_WorldMatrixT1`](Self::m_WorldMatrixT1).
+    #[address(0x500)]
+    pub m_WorldMatrixT0: Matrix4,
+
     /// The explosive's world matrix as of the current simulation tick. Its translation row is the
-    /// launch start position [`PropelToward`](Self::PropelToward) solves from.
+    /// launch start position [`PropelToward`](Self::PropelToward) solves from. The `CGameObject`
+    /// transform setter writes it, and the post-simulation update moves a physics body that is not
+    /// simulating to it.
     #[address(0x540)]
     pub m_WorldMatrixT1: Matrix4,
+
+    /// Whether [`m_DeferredPhysicsTransform`](Self::m_DeferredPhysicsTransform) is pending: set by
+    /// [`SetPhysicsTransform`](Self::SetPhysicsTransform) and applied to the physics body, then
+    /// cleared, by the next [`UpdatePostSimFromManager`](Self::UpdatePostSimFromManager), before a
+    /// pending launch.
+    #[address(0x580)]
+    pub m_DeferredSetPhysicsTransform: bool,
+
+    /// The transform awaiting application to the physics body.
+    #[address(0x584)]
+    pub m_DeferredPhysicsTransform: Matrix4,
+
+    /// The angular velocity, world axes, radians per second, that the pending launch
+    /// ([`m_DeferredPropelTowards`](Self::m_DeferredPropelTowards)) gives the physics body. The
+    /// launch's application in [`UpdatePostSimFromManager`](Self::UpdatePostSimFromManager) sets
+    /// it just before [`m_DeferredInitialVelocity`](Self::m_DeferredInitialVelocity); nothing in
+    /// [`PropelToward`](Self::PropelToward) writes it.
+    #[address(0x5C4)]
+    pub m_InitialAngularVelocity: Vector3,
 
     /// The velocity of the thrower when the explosive was launched, stored by
     /// [`PropelToward`](Self::PropelToward).
@@ -26,11 +155,53 @@ pub type Explosive {
     #[address(0x5EC)]
     pub m_DeferredInitialVelocity: Vector3,
 
+    /// The compiled-name hash of the explosive's model, from which
+    /// [`m_ModelInstance`](Self::m_ModelInstance) is created; no instance is created unless the
+    /// model is in the model manager's cache. Zero for an explosive without a model.
+    #[address(0x5FC)]
+    pub m_ModelHash: u32,
+
     /// Seconds since the explosive was thrown; [`PropelToward`](Self::PropelToward) resets it.
     #[address(0x604)]
     pub m_TimeSinceThrow: f32,
+
+    /// Seconds until the explosive detonates. The constructor sets it to the grenade weapon's
+    /// detonation time; [`UpdatePostSim`](Self::UpdatePostSim) counts it down by the tick delta
+    /// while the virtual `ShouldTickDetonationTimer` holds (a hand grenade's does from the moment it
+    /// spawns, primed or thrown) and calls the virtual `Detonate` once it is at or below zero, a
+    /// dispatch that does not consult that virtual again.
+    #[address(0x608)]
+    pub m_DetonationTimer: f32,
+
+    /// The detonation time [`m_DetonationTimer`](Self::m_DetonationTimer) started from.
+    #[address(0x60C)]
+    pub m_StartDetonationTimer: f32,
 }
 impl Explosive {
+    /// Sets the explosive's trail resources by shared-pointer assignment: `trail_effect` into
+    /// [`m_TrailEffect`](Self::m_TrailEffect) and `trail_sound` into
+    /// [`m_TrailSound`](Self::m_TrailSound). It plays nothing; [`PlayTrailEffect`](Self::PlayTrailEffect)
+    /// does. The weapons that spawn an explosive call it with their own trail resources
+    /// ([`ThrownGrenadeWeapon::m_TrailEffectPlayer`](equipment::weapon::ThrownGrenadeWeapon::m_TrailEffectPlayer)
+    /// and its siblings): the hand grenade's launch, the planted explosive's prime, and the balloon
+    /// and Namaste launches. The hand grenade's prime does not, so a primed grenade has no trail
+    /// resources until its launch.
+    #[address(0x140_8ED_7B0)]
+    pub fn SetupEffects(&mut self, trail_effect: *const SharedPtr<void>, trail_sound: *const SharedPtr<void>);
+
+    /// Marks the explosive removed and erases it from the ammunition manager's active objects.
+    /// This operation does not return ammunition to an inventory.
+    #[address(0x140_8F2_E50)]
+    pub fn RemoveSelf(&mut self);
+
+    /// Queues `transform` for the physics body: when the explosive has a
+    /// [`m_PfxInstance`](Self::m_PfxInstance), copies it to
+    /// [`m_DeferredPhysicsTransform`](Self::m_DeferredPhysicsTransform) and raises
+    /// [`m_DeferredSetPhysicsTransform`](Self::m_DeferredSetPhysicsTransform). A later call before
+    /// the body applies it replaces it.
+    #[address(0x140_8C8_180)]
+    pub fn SetPhysicsTransform(&mut self, transform: *const Matrix4);
+
     /// Launches the explosive toward `target_position`: when it has a physics body, stores
     /// `relative_velocity` in [`m_RelativeVelocity`](Self::m_RelativeVelocity), raises
     /// [`m_DeferredPropelTowards`](Self::m_DeferredPropelTowards), solves the launch velocity from
@@ -48,13 +219,150 @@ impl Explosive {
     /// under world gravity.
     #[address(0x140_91E_C50)]
     pub fn VelocityToHitTarget(&mut self, result: *mut Vector3, aim_pos: *const Vector3, start_pos: *const Vector3, max_range: f32, roof_target: bool, exact_target_aiming: bool) -> *mut Vector3;
+
+    /// The render-phase `CGameObject::UpdateRender` override: interpolates
+    /// [`m_WorldMatrixT0`](Self::m_WorldMatrixT0) toward [`m_WorldMatrixT1`](Self::m_WorldMatrixT1)
+    /// by the render context's interpolation factor (`CTransform::Lerp`) and pushes the result to
+    /// [`m_ModelInstance`](Self::m_ModelInstance) when there is one. `game_object` is the
+    /// explosive's `CGameObject` subobject
+    /// ([`GAME_OBJECT_BASE_OFFSET`](Self::GAME_OBJECT_BASE_OFFSET)), not the start of the
+    /// explosive. [`PlantedExplosive::UpdateRender`] calls it before drawing its in-hand model.
+    #[address(0x140_8C8_1B0)]
+    pub fn UpdateRender(game_object: *mut void, context: *const GameObjectRenderContext);
+
+    /// Starts the explosive's trail: plays the trail effect ([`m_TrailEffect`](Self::m_TrailEffect))
+    /// at [`m_WorldMatrixT1`](Self::m_WorldMatrixT1) into
+    /// [`m_TrailEffectInstance`](Self::m_TrailEffectInstance), and the trail sound
+    /// ([`m_TrailSound`](Self::m_TrailSound)) there into
+    /// [`m_TrailSoundInstance`](Self::m_TrailSoundInstance), recording the sound's
+    /// `detonation_timer` parameter in
+    /// [`m_TrailSoundDetonationParameterIndex`](Self::m_TrailSoundDetonationParameterIndex). Each
+    /// half is skipped when its resource is null. A call while a trail plays restarts it: the new
+    /// effect replaces the instance (a looping one is stopped softly) and the new sound stops the
+    /// old one. [`PropelToward`](Self::PropelToward) calls it, so a thrown explosive's trail and
+    /// its audible fuse start at the throw. It plays effects, so it runs on the game thread outside
+    /// the effect system's simulation and render updates.
+    #[address(0x140_8D6_E20)]
+    pub fn PlayTrailEffect(&mut self);
+
+    /// The explosive's post-simulation update (its override of the `CGameObject` virtual). It is
+    /// where the fuse runs: it counts [`m_DetonationTimer`](Self::m_DetonationTimer) down by the
+    /// context's tick delta while the virtual `ShouldTickDetonationTimer` returns true, and calls the
+    /// virtual `Detonate` once the timer is at or below zero, without consulting that virtual again.
+    /// Between the two it sets the trail sound's fuse parameter from the timers
+    /// ([`m_TrailSoundDetonationParameterIndex`](Self::m_TrailSoundDetonationParameterIndex)).
+    /// The rest of the update places a body attached to a parent object at the parent's transform,
+    /// moves the trail effect and the trail sound to [`m_WorldMatrixT1`](Self::m_WorldMatrixT1),
+    /// re-enables collisions that were disabled against the thrower once the explosive has been
+    /// loose for a moment, and drops the explosive from the update when it has no physics body. `game_object` is the explosive's `CGameObject` subobject
+    /// ([`GAME_OBJECT_BASE_OFFSET`](Self::GAME_OBJECT_BASE_OFFSET)), not the start of the explosive.
+    #[address(0x140_91D_B90)]
+    pub fn UpdatePostSim(game_object: *mut void, context: *mut GameObjectUpdateContext);
+
+    /// The explosive's update from the ammunition manager's post-simulation pass
+    /// ([`AmmunitionManagerUpdatePostSim`]), its override of the `CAmmunition` virtual. It creates
+    /// [`m_ModelInstance`](Self::m_ModelInstance) when there is none, creates
+    /// [`m_PfxInstance`](Self::m_PfxInstance) when the body is still pending and returns false
+    /// when that fails, applies a pending
+    /// [`m_DeferredPhysicsTransform`](Self::m_DeferredPhysicsTransform) and then a pending launch
+    /// ([`m_DeferredPropelTowards`](Self::m_DeferredPropelTowards)), and returns true. The body it
+    /// creates gets a high angular damping, so a spin dies out within a fraction of a second. The
+    /// launch sets the body's angular velocity from
+    /// [`m_InitialAngularVelocity`](Self::m_InitialAngularVelocity), puts the body into the
+    /// simulation, sets its linear velocity from
+    /// [`m_DeferredInitialVelocity`](Self::m_DeferredInitialVelocity), and disables collision
+    /// between it and a character thrower's body; the launch is applied at the end of the tick,
+    /// so the body first moves in the next tick's physics step.
+    #[address(0x140_936_A90)]
+    pub fn UpdatePostSimFromManager(&mut self, dt: f32) -> bool;
+}
+
+/// A C4 charge (`CPlantedExplosive`, a [`Explosive`]), spawned and owned by the
+/// [`PlantedExplosiveWeapon`](equipment::weapon::PlantedExplosiveWeapon). It has two models: the
+/// in-hand model, shown while the charge is primed and placed at
+/// [`m_InactiveModelWorldMatrixT1`](Self::m_InactiveModelWorldMatrixT1), and the live model at
+/// the explosive's own transform, which [`Activate`](Self::Activate) shows in its place.
+///
+/// The charge keeps the base explosive's collision handler (the grenade overrides it): on a
+/// collision it moves the charge to the contact point, oriented by the
+/// contact normal, and attaches itself to the object it hit (or plays its stick effect against the
+/// world), so a charge that is dropped
+/// ([`DropExplosive`](Self::DropExplosive)) sticks where it lands.
+#[min_size(0x6B5)]
+pub type PlantedExplosive {
+    /// The compiled-name hash of the in-hand model, from which
+    /// [`m_InactiveModelInstance`](Self::m_InactiveModelInstance) is created.
+    #[address(0x624)]
+    pub m_InactiveModelHash: u32,
+
+    /// The in-hand model's world matrix as of the previous simulation tick, which
+    /// [`UpdateRender`](Self::UpdateRender) interpolates from toward
+    /// [`m_InactiveModelWorldMatrixT1`](Self::m_InactiveModelWorldMatrixT1).
+    #[address(0x628)]
+    pub m_InactiveModelWorldMatrixT0: Matrix4,
+
+    /// The in-hand model's world matrix, written by
+    /// [`SetInactiveModelMatrix`](Self::SetInactiveModelMatrix). The pre-simulation update copies
+    /// it to the previous frame's matrix, and the render update draws the in-hand model between
+    /// the two.
+    #[address(0x668)]
+    pub m_InactiveModelWorldMatrixT1: Matrix4,
+
+    /// The in-hand model's instance, or null. The charge's `UpdatePostSimFromManager` creates it
+    /// from [`m_InactiveModelHash`](Self::m_InactiveModelHash) in the same update that creates
+    /// the live model's [`Explosive::m_ModelInstance`], hiding the live one and showing this one
+    /// with [`FLAG_CLIPONDISTANCE`](graphics_engine::model_instance::ModelInstanceFlags::FLAG_CLIPONDISTANCE)
+    /// cleared.
+    #[address(0x6A8)]
+    pub m_InactiveModelInstance: *mut ModelInstance,
+
+    /// Whether the charge is live, set by [`Activate`](Self::Activate).
+    #[address(0x6B4)]
+    pub m_ExplosiveIsPlanted: bool,
+}
+impl PlantedExplosive {
+    /// Makes the charge live: sets [`m_ExplosiveIsPlanted`](Self::m_ExplosiveIsPlanted), plays the
+    /// stick effect, shows the live model, and hides the in-hand model.
+    #[address(0x140_922_BE0)]
+    pub fn Activate(&mut self);
+
+    /// Drops the charge into the simulation: makes its physics body dynamic in the world, disables
+    /// collision between it and the thrower's character body, and, under a parachute, moves the body
+    /// into the thrower's collision group. The body must exist
+    /// ([`Explosive::m_PfxInstance`]).
+    #[address(0x140_922_CD0)]
+    pub fn DropExplosive(&mut self);
+
+    /// Sets the physics body's linear velocity, world axes, metres per second. The body must exist
+    /// ([`Explosive::m_PfxInstance`]); the call dereferences it unchecked. The velocity is a
+    /// by-value `CVector3f`, which the calling convention passes by address.
+    #[address(0x140_8C8_870)]
+    pub fn SetVelocity(&mut self, velocity: *const Vector3);
+
+    /// The render-phase `CGameObject::UpdateRender` override: runs [`Explosive::UpdateRender`]
+    /// for the live model, then interpolates
+    /// [`m_InactiveModelWorldMatrixT0`](Self::m_InactiveModelWorldMatrixT0) toward
+    /// [`m_InactiveModelWorldMatrixT1`](Self::m_InactiveModelWorldMatrixT1) by the render
+    /// context's interpolation factor and pushes the result to
+    /// [`m_InactiveModelInstance`](Self::m_InactiveModelInstance) when there is one.
+    /// `game_object` is the charge's `CGameObject` subobject
+    /// ([`Explosive::GAME_OBJECT_BASE_OFFSET`]), not the start of the charge.
+    #[address(0x140_8C8_920)]
+    pub fn UpdateRender(game_object: *mut void, context: *const GameObjectRenderContext);
+
+    /// Copies `world_matrix` to [`m_InactiveModelWorldMatrixT1`](Self::m_InactiveModelWorldMatrixT1).
+    #[address(0x140_8BC_C40)]
+    pub fn SetInactiveModelMatrix(&mut self, world_matrix: *const Matrix4);
 }
 
 /// A hand grenade (`CGrenade`, a [`Explosive`]): adds bounce counting, homing and smart-fuse
 /// targets, extra trail effects, and the landing position.
 #[min_size(0x730)]
 pub type Grenade {
-    /// Whether the grenade applies the thrower's grenade upgrades (homing and similar).
+    /// Whether the grenade applies the thrower's grenade upgrades. The collision handler gates
+    /// the contact, hostile-contact, and character-or-vehicle contact upgrades on this field.
+    /// Those upgrades can zero [`Explosive::m_DetonationTimer`] without consulting
+    /// [`m_ShouldTickDetonationTimer`](Self::m_ShouldTickDetonationTimer).
     #[address(0x620)]
     pub m_CanUseUpgrades: bool,
 
@@ -62,8 +370,44 @@ pub type Grenade {
     /// [`PropelToward`](Self::PropelToward).
     #[address(0x720)]
     pub m_InitialLandingPos: Vector3,
+
+    /// What the grenade's override of the virtual `ShouldTickDetonationTimer` returns, so whether
+    /// its post-simulation update counts [`Explosive::m_DetonationTimer`] down. The constructor
+    /// sets it, so a hand grenade's fuse runs from the moment it spawns, primed in the hand or
+    /// thrown; the beacon weapon clears it on the beacon it primes, whose timer then never runs.
+    #[address(0x72E)]
+    pub m_ShouldTickDetonationTimer: bool,
 }
 impl Grenade {
+    /// `CGrenade::TYPE_ID`: the run-time type id of `CGrenade`, for
+    /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use. The thrown
+    /// grenade weapon checks its primed object against it before treating it as a grenade.
+    #[address(0x140_60F_D60)]
+    pub fn TYPE_ID() -> *const u32;
+
+    /// The grenade's collision handler (`CGrenade::OnCollision`, its override of the
+    /// `CPfxBodyListener` virtual). It reads the profile's contact upgrades, gated on
+    /// [`m_CanUseUpgrades`](Self::m_CanUseUpgrades) and on a flag of the grenade's ammunition
+    /// entry, as every upgrade check of the grenade is: explode on contact, explode on hostile
+    /// contact, and explode on characters and vehicles only. For a contact with an object it
+    /// classifies the object by its physics instance's type and sets
+    /// [`Explosive::m_DetonationTimer`] to zero when the enabled upgrade accepts it; a contact with
+    /// the static world ([`Collision::m_GB`] null) zeroes the timer only under explode on contact
+    /// alone. The zeroed timer makes the next [`Explosive::UpdatePostSim`] detonate the grenade.
+    /// The handler also plays the impact effects and the first-bounce sound, counts bounces,
+    /// redirects the first bounce's velocity under the upgrades, and records the contact normal.
+    /// `listener` is the grenade's `CPfxBodyListener` subobject
+    /// ([`Explosive::PFX_BODY_LISTENER_OFFSET`]), not the start of the grenade.
+    #[address(0x140_937_4B0)]
+    pub fn OnCollision(listener: *mut void, collision: *const Collision);
+
+    /// The grenade's override of the virtual `Detonate`: runs the explosive's detonation (the
+    /// blast and the explosive's removal), then tells a thrown grenade weapon that owns the grenade
+    /// that the grenade is gone. [`Explosive::UpdatePostSim`] calls the virtual once
+    /// [`Explosive::m_DetonationTimer`] is at or below zero; `dt` is the tick's delta.
+    #[address(0x140_91F_560)]
+    pub fn Detonate(&mut self, dt: f32);
+
     /// The [`Explosive::PropelToward`] override: calls it, records `target_position` in
     /// [`m_InitialLandingPos`](Self::m_InitialLandingPos), plays the extra trail effects, and, with
     /// upgrades enabled and the homing upgrade owned, starts the homing-target search.
@@ -74,4 +418,19 @@ impl Grenade {
     /// velocity unless the grenade has a homing target or `exact_target_aiming` is set.
     #[address(0x140_91F_780)]
     pub fn VelocityToHitTarget(&mut self, result: *mut Vector3, aim_pos: *const Vector3, start_pos: *const Vector3, max_range: f32, roof_target: bool, exact_target_aiming: bool) -> *mut Vector3;
+
+    /// The grenade's post-simulation update (its override of the `CGameObject` virtual): steps the
+    /// homing and smart-fuse upgrades, runs [`Explosive::UpdatePostSim`], then reads the physics
+    /// body's velocity for the trail sounds without checking that the body exists. The base update
+    /// only drops a grenade without a body from the update queue, so a grenade whose
+    /// post-simulation update runs before its first
+    /// [`Explosive::UpdatePostSimFromManager`] faults here. That is a grenade spawned before the
+    /// update queue's commit at the top of the world's pre-simulation update
+    /// ([`GameWorld::UpdatePreSimImpl`](game_world::GameWorld::UpdatePreSimImpl)), whose
+    /// registration that commit makes live in the same tick; one spawned from inside the world's
+    /// update, as the grenade weapon's own priming is, is first run in the next tick, after the
+    /// ammunition manager's pass has made its body. `game_object` is the grenade's `CGameObject` subobject
+    /// ([`Explosive::GAME_OBJECT_BASE_OFFSET`]), not the start of the grenade.
+    #[address(0x140_91F_890)]
+    pub fn UpdatePostSim(game_object: *mut void, context: *mut GameObjectUpdateContext);
 }

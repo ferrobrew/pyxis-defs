@@ -108,6 +108,36 @@ pub fn Dispatch(ctx: *mut HContext_t, x: u32, y: u32, z: u32);
 #[address(0x141_962_B60)]
 pub fn DispatchIndirect(a1: *mut void, a2: *mut void, a3: *mut void, a4: *mut void, a5: *mut void, a6: *mut void);
 
+// The context lock, and the per-draw state binds the render blocks issue through it.
+
+/// Enters the context's critical section, if it has one. The wrappers without `NoMutex` in their
+/// name take and leave it around their one call into Direct3D; a render block that issues several
+/// calls in a row takes it once here and uses the `NoMutex` variants.
+#[address(0x141_954_CD0)]
+pub fn AcquireThreadOwnership(ctx: *mut HContext_t);
+
+/// Leaves the context's critical section that [`AcquireThreadOwnership`] entered.
+#[address(0x141_954_CF0)]
+pub fn ReleaseThreadOwnership(ctx: *mut HContext_t);
+
+/// Binds a constant buffer to a vertex-program slot without the context mutex: issues
+/// `ID3D11DeviceContext::VSSetConstantBuffers` (vtable slot 7) for the one slot, and for the first
+/// four slots clears the context's record of the staged constants for that slot.
+#[address(0x141_963_DF0)]
+pub fn SetVertexProgramConstantBufferNoMutex(ctx: *mut HContext_t, slot: i32, buffer: *mut void);
+
+/// Binds a vertex buffer to a stream without the context mutex: issues
+/// `ID3D11DeviceContext::IASetVertexBuffers` (vtable slot 18) for the one stream, with the buffer's
+/// current Direct3D buffer and the given offset and stride.
+#[address(0x141_963_260)]
+pub fn SetVertexStreamNoMutex(ctx: *mut HContext_t, buffer: *mut void, stream: i32, offset: i32, stride: i32);
+
+/// Maps a constant buffer for writing without the context mutex: issues `ID3D11DeviceContext::Map`
+/// (vtable slot 14) on the buffer's resource with `D3D11_MAP_WRITE_DISCARD`, whatever `lock_type`
+/// asks, and returns the mapped pointer.
+#[address(0x141_963_C00)]
+pub fn LockConstantBufferNoMutex(ctx: *mut HContext_t, buffer: *mut void, lock_type: i32) -> *mut void;
+
 // Render-target binding, clearing, copying, and MSAA-resolve wrappers.
 
 /// Binds a render setup, the render-target configuration a pass draws into.
@@ -194,6 +224,21 @@ pub fn GetDSVFromSurface(surface: *mut void) -> *mut void;
 
 // Shader creation.
 
+#[size(8), align(8), cpp_header = "<d3d11.h>", cpp_name = "::ID3D11PixelShader*"]
+extern type PixelShaderPtr;
+
+#[cfg(backend = "rust")]
+prologue r#"
+pub type PixelShaderPtr = Option<windows::Win32::Graphics::Direct3D11::ID3D11PixelShader>;
+"#;
+
+/// The fragment program returned by [`CreateFragmentProgram`].
+#[size(8), align(8)]
+pub type HFragmentProgram_t {
+    /// The pixel shader written by `ID3D11Device::CreatePixelShader`, or null without a program.
+    pub m_Program: PixelShaderPtr,
+}
+
 /// Parameters to [`CreateFragmentProgram`]: the compiled DXBC bytecode (`m_Code`) and its byte length
 /// (`m_Size`), passed straight through to `ID3D11Device::CreatePixelShader`. `m_Size` is read as a
 /// pointer-width value (the bytecode length argument to `CreatePixelShader`).
@@ -209,7 +254,7 @@ pub type CreateFragmentProgramParams {
 /// not remain valid past the call, and the returned holder retains no bytecode of its own. Static (no
 /// `this`); the first argument is the graphics device.
 #[address(0x141_953_470)]
-pub fn CreateFragmentProgram(device: *mut HDevice_t, params: *mut CreateFragmentProgramParams) -> *mut void;
+pub fn CreateFragmentProgram(device: *mut HDevice_t, params: *mut CreateFragmentProgramParams) -> *mut HFragmentProgram_t;
 
 /// Parameters to [`CreateVertexProgram`]: the compiled DXBC bytecode, its byte length, and a debug
 /// name (attached to the D3D object and used to size the retained bytecode copy).
@@ -231,6 +276,32 @@ pub type CreateVertexProgramParams {
 #[address(0x141_953_320)]
 pub fn CreateVertexProgram(device: *mut HDevice_t, params: *const CreateVertexProgramParams) -> *mut void;
 
+#[size(8), align(8), cpp_header = "<d3d11.h>", cpp_name = "::ID3D11HullShader*"]
+extern type HullShaderPtr;
+
+#[cfg(backend = "rust")]
+prologue r#"
+pub type HullShaderPtr = Option<windows::Win32::Graphics::Direct3D11::ID3D11HullShader>;
+"#;
+
+#[size(8), align(8)]
+pub type HHullProgram_t {
+    pub m_Program: HullShaderPtr,
+}
+
+#[size(8), align(8), cpp_header = "<d3d11.h>", cpp_name = "::ID3D11DomainShader*"]
+extern type DomainShaderPtr;
+
+#[cfg(backend = "rust")]
+prologue r#"
+pub type DomainShaderPtr = Option<windows::Win32::Graphics::Direct3D11::ID3D11DomainShader>;
+"#;
+
+#[size(8), align(8)]
+pub type HDomainProgram_t {
+    pub m_Program: DomainShaderPtr,
+}
+
 /// Parameters to [`CreateHullProgram`]: the compiled DXBC bytecode, its byte length, and a debug name.
 /// Same layout as [`CreateVertexProgramParams`].
 pub type CreateHullProgramParams {
@@ -245,11 +316,11 @@ pub type CreateHullProgramParams {
 
 /// The leaf hull-program creator: it wraps `ID3D11Device::CreateHullShader` (vtable slot 16) over
 /// `params.m_Code`/`params.m_Size`. `CreateHullShader` copies the bytecode, so `params.m_Code` need not
-/// remain valid past the call; unlike [`CreateVertexProgram`], the returned holder is a bare shader
+/// remain valid past the call; unlike [`CreateVertexProgram`], the returned holder contains only the shader
 /// pointer with no retained bytecode copy. Static (no `this`); the first argument is the graphics
 /// device.
 #[address(0x141_953_690)]
-pub fn CreateHullProgram(device: *mut HDevice_t, params: *const CreateHullProgramParams) -> *mut void;
+pub fn CreateHullProgram(device: *mut HDevice_t, params: *const CreateHullProgramParams) -> *mut HHullProgram_t;
 
 /// Parameters to [`CreateDomainProgram`]: the compiled DXBC bytecode, its byte length, and a debug
 /// name. Same layout as [`CreateVertexProgramParams`].
@@ -265,11 +336,11 @@ pub type CreateDomainProgramParams {
 
 /// The leaf domain-program creator: it wraps `ID3D11Device::CreateDomainShader` (vtable slot 17) over
 /// `params.m_Code`/`params.m_Size`. `CreateDomainShader` copies the bytecode, so `params.m_Code` need
-/// not remain valid past the call; like [`CreateHullProgram`], the returned holder is a bare shader
+/// not remain valid past the call; like [`CreateHullProgram`], the returned holder contains only the shader
 /// pointer with no retained bytecode copy. Static (no `this`); the first argument is the graphics
 /// device.
 #[address(0x141_953_7A0)]
-pub fn CreateDomainProgram(device: *mut HDevice_t, params: *const CreateDomainProgramParams) -> *mut void;
+pub fn CreateDomainProgram(device: *mut HDevice_t, params: *const CreateDomainProgramParams) -> *mut HDomainProgram_t;
 
 /// Stages `count` float4 constants into the given fragment constant buffer slot, starting at
 /// `start_offset`, writing to the context's per-slot staging buffer and setting the dirty flag. The

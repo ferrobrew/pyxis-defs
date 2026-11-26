@@ -1,5 +1,14 @@
 use character::character::Character;
+use equipment::weapon::WeaponBase;
+use game::GameObjectUpdateContext;
+use input::input_action_map::Action;
+use interaction::{InteractionContext, InteractionUserProxy};
+use state::StateContext;
 use types::math::{Matrix4, Vector3};
+use types::shared_ptr::SharedPtr;
+use types::std_vector::Vector;
+use vehicle::parts::{PartInstance, PfxBreakable};
+use vehicle::stunt_areas::StuntAreas;
 
 /// The engine's vehicle classification (`NVehicle::EVehicleType`), stored on a vehicle as
 /// `CVehicle::m_VehicleType` and returned by `CVehicle::GetVehicleType`, which is inlined at every
@@ -40,10 +49,43 @@ pub type VehicleSeat {
 /// offset as a character does
 /// ([`Character::GAME_OBJECT_BASE_OFFSET`](character::character::Character::GAME_OBJECT_BASE_OFFSET)),
 /// and the vtable there serves RTTI and the transform virtuals. Only some members are bound.
-#[min_size(0x53A4)]
+#[min_size(0x54EC)]
 pub type Vehicle {
     /// The number of entries in [`m_Seats`](Self::m_Seats).
     pub const MAX_SEATS: u64 = 42,
+
+    /// The damageable object's general invulnerability. Vehicle damage admission refuses part
+    /// damage while set, independently of each part's own protection.
+    #[address(0x22F)]
+    pub m_Invulnerable: bool,
+
+    /// The signed throttle the vehicle's input reader last applied (`m_SteeringValues.Acceleration`).
+    /// A plane's reader ([`AirPlane::UpdateVehicleInputsFromActionMap`]) sets it to the
+    /// `PLANE_INC_TRUST` value less the `PLANE_DEC_TRUST` value, so it is negative while braking.
+    /// [`UpdateLandingGearVariables`](Self::UpdateLandingGearVariables) reads it.
+    #[address(0x440)]
+    pub m_SteeringAcceleration: f32,
+    /// The brake the vehicle's input reader last applied (`m_SteeringValues.Brake`), `0..=1`: a
+    /// plane's is the `PLANE_DEC_TRUST` value.
+    pub m_SteeringBrake: f32,
+
+    /// The signed steering amount the vehicle's controller last applied
+    /// (`m_SteeringValues.Turn`). It is the value of the vehicle's `steering_turn` variable, which
+    /// value-driven effects and hinged parts can be driven by.
+    #[address(0x454)]
+    pub m_SteeringTurn: f32,
+
+    /// The vehicle's world transform at the start of the current simulation step, as the engine's
+    /// row-major matrix.
+    #[address(0x478)]
+    pub m_WorldMatrixT0: Matrix4,
+    /// The vehicle's world transform at the end of the current simulation step.
+    pub m_WorldMatrixT1: Matrix4,
+    /// The render transform: [`m_WorldMatrixT0`](Self::m_WorldMatrixT0) and
+    /// [`m_WorldMatrixT1`](Self::m_WorldMatrixT1) interpolated by the render update's frame
+    /// fraction. `CVehicle::UpdateRender_Parallel` hands it to
+    /// [`UpdateRender_ModelMatrices`](Self::UpdateRender_ModelMatrices).
+    pub m_InterpolatedWorldMatrix: Matrix4,
 
     /// The vehicle's seats, indexed by [`Seat`].
     #[address(0xB28)]
@@ -54,10 +96,64 @@ pub type Vehicle {
     #[address(0x1_5DC)]
     pub m_LocalPlayerSeat: Seat,
 
+    /// The interaction context that holds the vehicle's graph of seats and entries
+    /// ([`InteractionContext::m_InteractionGraphs`]), or null.
+    #[address(0x1_5F0)]
+    pub m_InteractionContext: *mut InteractionContext,
+
+    /// The vehicle's doors, hood, trunk, hatches, and other opening parts, and their state.
+    #[address(0x1_668)]
+    pub m_VehicleDoorController: VehicleDoorController,
+
+    /// Whether the landing gear should be down. While the local player drives,
+    /// [`UpdateLandingGearVariables`](Self::UpdateLandingGearVariables) rewrites it on every update;
+    /// otherwise it keeps the value the AI steering last set.
+    #[address(0x1_81D)]
+    pub m_DesiredLandingGearState: bool,
+
+    /// The vehicle's stunt areas: where a character in a stunt position stands on it. A
+    /// helicopter's stunt position is a hang from the airframe instead, entered through the
+    /// vehicle's interaction context rather than an area.
+    #[address(0x1_830)]
+    pub m_StuntAreas: StuntAreas,
+
+    /// The vehicle's damage-immune mode. Vehicle damage admission suppresses part damage while set.
+    #[address(0x4_B60)]
+    pub m_InJesusMode: bool,
+
+    /// Whether the holstered weapons of the characters seated in the vehicle are hidden: the
+    /// seat states' hide task
+    /// ([`NWeaponHideInVehicleTask_OnEnter`](equipment::weapon_animation::NWeaponHideInVehicleTask_OnEnter))
+    /// makes a holstered slot weapon holstered-invisible while it is set.
+    #[address(0x4_C02)]
+    pub m_HideCharacterWeapons: bool,
+
     /// The world-space point the vehicle's weapons aim at, written by
     /// [`SetAimTargetPosition`](Self::SetAimTargetPosition).
     #[address(0x4_C34)]
     pub m_AimingTargetPosition: Vector3,
+
+    /// The vehicle's built-in weapons, which aim from
+    /// [`m_AimingTargetPosition`](Self::m_AimingTargetPosition).
+    /// [`UpdatePostParts_WeaponsAttachment_Parallel`](Self::UpdatePostParts_WeaponsAttachment_Parallel)
+    /// places each on the vehicle every update.
+    #[address(0x4_C50)]
+    pub m_BuiltInWeapons: Vector<SharedPtr<WeaponBase>>,
+
+    /// The mounted weapons the vehicle carries, such as a turret's machine gun, each a strong
+    /// reference whose weapon has the vehicle as its holder. A gunner seat's user mans one of them.
+    /// [`UpdatePostParts_WeaponsAttachment_Parallel`](Self::UpdatePostParts_WeaponsAttachment_Parallel)
+    /// places every non-null entry on its mount part each update. When the vehicle explodes, it
+    /// drops each through the weapon's drop virtual
+    /// ([`WeaponBase::OnDrop`](equipment::weapon::WeaponBase::OnDrop)) and then clears the entry,
+    /// releasing its reference, so the weapon is no longer placed and falls free.
+    #[address(0x4_C70)]
+    pub m_MountedWeapon: Vector<SharedPtr<WeaponBase>>,
+
+    /// The nitrous input, `0..=1`: a plane's input reader raises it to the thrust input while that
+    /// is above [`AirPlane::NITROUS_THRUST_THRESHOLD`].
+    #[address(0x4_CCC)]
+    pub m_NitrousInput: f32,
 
     /// How long, in seconds, AI-controlled vehicle weapons keep an externally supplied aim target.
     /// [`SetAimTargetPosition`](Self::SetAimTargetPosition) sets it to `-1` when the local player
@@ -65,17 +161,54 @@ pub type Vehicle {
     #[address(0x4_D48)]
     pub m_AIVehicleWeaponAimTimeout: f32,
 
-    /// The vehicle's physics body (`CPfxVehicle*`). [`IsMech`](Self::IsMech) tests its strafing
-    /// wheel-steering controller.
+    /// The vehicle's physics body (`CPfxVehicle*`), whose breakable base, with the vehicle's
+    /// parts, is at offset zero. [`IsMech`](Self::IsMech) tests its strafing wheel-steering
+    /// controller.
     #[address(0x4_DD0)]
-    pub m_PfxVehicle: *mut u8,
+    pub m_PfxVehicle: *mut PfxBreakable,
 
     /// The hash of the vehicle's type name (`HashString` of names such as
     /// `v1706_boat_na_rocketboat`), compared by [`IsRocketBoat`](Self::IsRocketBoat).
     #[address(0x5_3A0)]
     pub m_VehicleTypeNameHash: u32,
+
+    /// Positive while the vehicle runs a parallel update phase. Calls that change the vehicle's
+    /// state, such as the explosion, run at once only while it is zero or below, and are queued
+    /// for later otherwise.
+    #[address(0x5_4E8)]
+    pub m_InParallelUpdatePhaseCounter: i32,
 }
 impl Vehicle {
+    /// `CVehicle::TYPE_ID`: the run-time type id of `CVehicle`, for
+    /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use.
+    #[address(0x140_60F_3F0)]
+    pub fn TYPE_ID() -> *const u32;
+
+    /// Asks every door of `slot` to open: makes sure the vehicle's physics body is in the world
+    /// and the vehicle is in the update, then sets each [`DoorInfo`] of the slot's
+    /// [`m_PendingState`](DoorInfo::m_PendingState) to [`DoorState::DOOR_OPENING`] and clears its
+    /// [`m_Flags`](DoorInfo::m_Flags). With `keep_open`, the door is held open at least
+    /// `keep_open_angle_deg` below its hinge's largest angle and reopens when pushed back
+    /// ([`DoorInfo::FLAG_KEEP_OPEN`]). The door controller acts on the request in the vehicle's
+    /// post-simulation update (`CVehicle::UpdatePostSim_Doors`), which loosens the part onto its
+    /// hinge ([`PfxBreakable::EnablePart`](vehicle::parts::PfxBreakable::EnablePart)) and turns
+    /// the hinge with a motor to the open angle.
+    #[address(0x140_FC7_320)]
+    pub fn OpenDoor(&mut self, slot: DoorSlot, keep_open: bool, keep_open_angle_deg: f32);
+
+    /// Asks every door of `slot` to close, the same way [`OpenDoor`](Self::OpenDoor) asks it to
+    /// open: the door controller turns the hinge's motor back to its smallest angle and merges the
+    /// part into the body there.
+    #[address(0x140_FC7_2B0)]
+    pub fn CloseDoor(&mut self, slot: DoorSlot);
+
+    /// Notes that the doors of `slot` finished closing: queues the slot's door-closed effect usage
+    /// (the folding wing, the cargo bay door, and the missile hatch have their own), and for the
+    /// folding wing refreshes the stunt area edges. The door controller calls it after merging a
+    /// door, from its latch and at the end of a motor close.
+    #[address(0x141_01A_020)]
+    pub fn OnFinishedClosingDoor(&mut self, slot: DoorSlot);
+
     /// Sets [`m_AimingTargetPosition`](Self::m_AimingTargetPosition) and refreshes
     /// [`m_AIVehicleWeaponAimTimeout`](Self::m_AIVehicleWeaponAimTimeout).
     #[address(0x140_F24_B00)]
@@ -85,6 +218,18 @@ impl Vehicle {
     /// character's current interaction-graph node, or [`Seat::ENoSeatIdentifier`].
     #[address(0x140_F24_FB0)]
     pub fn GetSeat(&self, character: *const Character) -> Seat;
+
+    /// Writes to `velocity` the world velocity of the vehicle's physics body
+    /// ([`m_PfxVehicle`](Self::m_PfxVehicle)) at the world point `point`, less the velocity of
+    /// what its wheels stand on at that point, so a vehicle carried on a moving body reads its
+    /// speed over that body. With no wheel on the ground, a physics body that keeps its last
+    /// ground velocity (behind a flag of the body that is not mapped) takes that off instead. Always returns `true`. The animation graph's parent-vehicle
+    /// speed condition (`CGraphParentVehicleSpeedCondition`) compares the squared length of the
+    /// result at the seated character's position (the translation of
+    /// [`Character::m_WorldMatrixT1`](character::character::Character::m_WorldMatrixT1)) against
+    /// its squared minimum and maximum speeds.
+    #[address(0x140_F26_270)]
+    pub fn GetGroundRelativePointVelocity(&self, point: *const Vector3, velocity: *mut Vector3) -> bool;
 
     /// Whether the vehicle is a mech: its physics body has a strafing wheel-steering controller.
     #[address(0x140_F23_990)]
@@ -96,10 +241,28 @@ impl Vehicle {
     #[address(0x140_F4F_C60)]
     pub fn TeleportVehicle(&mut self, transform: *const Matrix4, p2: f32);
 
+    /// Places each of the vehicle's weapons on it: calls each built-in weapon's
+    /// attachment-transform virtual, and each non-null entry of
+    /// [`m_MountedWeapon`](Self::m_MountedWeapon)'s, every update after the parts move.
+    #[address(0x140_F92_FD0)]
+    pub fn UpdatePostParts_WeaponsAttachment_Parallel(&mut self, context: *mut GameObjectUpdateContext);
+
     /// The current yaw angle of the vehicle's weapon turret, read from the powered hinge controller
     /// of the turret part; `0` when the vehicle has no turret.
     #[address(0x140_F90_FC0)]
     pub fn GetWeaponTurretCurrentYawAngle(&self) -> f32;
+
+    /// Sets the model matrix of every valid, unbroken part with a model to the part's
+    /// [`m_RootSpaceTransform`](vehicle::parts::PartInstance::m_RootSpaceTransform) times
+    /// `transform` (through `NPfxBreakable::ForEachValidRenderablePart`), then copies the root-space
+    /// transforms of the parts that attached objects hang from into those attachments. A zero
+    /// `dtf`, or a vehicle flagged to snap, initialises each model matrix instead of updating it.
+    /// Called from
+    /// `CVehicle::UpdateRender_Parallel` with
+    /// [`m_InterpolatedWorldMatrix`](Self::m_InterpolatedWorldMatrix) on the parallel render update,
+    /// and from `CVehicle::InitTransform`.
+    #[address(0x140_F90_740)]
+    pub fn UpdateRender_ModelMatrices(&mut self, transform: *const Matrix4, dtf: f32);
 
     /// Whether the vehicle is the rocket boat: [`m_VehicleTypeNameHash`](Self::m_VehicleTypeNameHash)
     /// equals the hash of `v1706_boat_na_rocketboat` (computed once and cached). The sea-vehicle
@@ -108,6 +271,61 @@ impl Vehicle {
     /// here is descriptive.
     #[address(0x140_F6F_8F0)]
     pub fn IsRocketBoat(&self) -> bool;
+
+    /// The vehicle's effective nitrous upgrade level (`NVehicle::EVehicleModUpgradeLevel`): `-1`
+    /// when it has no nitrous, `0` for the base nitrous, and `1` for the improved one. A vehicle
+    /// that can use mods and whose physics body has the nitrous physical action takes its level
+    /// from the player profile's upgrades for its class (land for cars, motorcycles, and trains;
+    /// sea for boats and submarines; air for helicopters and planes): the unlock upgrade gives the
+    /// base level and the better upgrade the improved one. The vehicle's own minimum nitrous
+    /// upgrade raises the result. The HUD shows the nitrous meter only above `-1`, and the
+    /// vehicle's nitrous update burns nitrous only then.
+    #[address(0x140_F25_AA0)]
+    pub fn GetCurrentEffectiveNitrousUpgradeLevel(&self) -> i32;
+
+    /// Moves the landing gear and its hatches toward
+    /// [`m_DesiredLandingGearState`](Self::m_DesiredLandingGearState), and plays the gear's attached
+    /// effects as they open, close, and lock. While the local player drives, it first chooses the
+    /// desired state itself: down while the vehicle is low over the ground, slower than a deploy
+    /// speed that the throttle in [`m_SteeringAcceleration`](Self::m_SteeringAcceleration) moves
+    /// between the vehicle's take-off and landing speeds, and not tilted past the vehicle's landing
+    /// tilt in the air; up otherwise while airborne. There is no player input for the gear.
+    #[address(0x140_F6F_1D0)]
+    pub fn UpdateLandingGearVariables(&mut self, context: *const GameObjectUpdateContext);
+}
+
+/// A helicopter (`CHelicopter`): a [`Vehicle`] flown by its rotors. Only its run-time type is bound.
+pub type Helicopter;
+impl Helicopter {
+    /// `CHelicopter::TYPE_ID`: the run-time type id of `CHelicopter`, for
+    /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use.
+    #[address(0x140_610_050)]
+    pub fn TYPE_ID() -> *const u32;
+}
+
+/// A plane (`CAirPlane`): a [`Vehicle`] with fixed wings. Only some members are bound.
+#[min_size(0x53A4)]
+pub type AirPlane {
+    /// The thrust input above which a plane's input reader feeds the nitrous
+    /// ([`Vehicle::m_NitrousInput`]): the plane's nitrous is a full `PLANE_INC_TRUST` rather than an
+    /// input of its own.
+    pub const NITROUS_THRUST_THRESHOLD: f32 = 0.9,
+
+    /// The plane's vehicle base.
+    pub vehicle: Vehicle,
+}
+impl AirPlane {
+    /// The plane's per-tick input reader, on top of the vehicle's own. Unless the plane is
+    /// destroyed, its driver is knocked out or dead, an AI's input is stale, or it is under an EMP,
+    /// it reads `action_map` (a `CActionMap`): the turn from `PLANE_TURN_LEFT` and
+    /// `PLANE_TURN_RIGHT`, the roll from `PLANE_ROLL_LEFT` and `PLANE_ROLL_RIGHT`, the pitch from
+    /// `PLANE_PITCH_UP` and `PLANE_PITCH_DOWN`, and the throttle into
+    /// [`Vehicle::m_SteeringAcceleration`] and [`Vehicle::m_SteeringBrake`] (no acceleration while
+    /// the movement is locked). With a living driver and the plane in control, a `PLANE_INC_TRUST`
+    /// value above [`NITROUS_THRUST_THRESHOLD`](Self::NITROUS_THRUST_THRESHOLD) raises
+    /// [`Vehicle::m_NitrousInput`] to it; otherwise the nitrous input is kept.
+    #[address(0x141_060_950)]
+    pub fn UpdateVehicleInputsFromActionMap(&mut self, action_map: *mut void);
 }
 
 /// `NStateTask_InputVehicleExitTask::TeleportUpwards`, run from the vehicle-exit animation event
@@ -116,3 +334,217 @@ impl Vehicle {
 /// the physics proxy (the placement itself is inferred from the call shape).
 #[address(0x140_81A_3C0)]
 pub fn NStateTask_InputVehicleExitTask_TeleportUpwards(character: *mut Character);
+
+/// The per-instance loaded properties of [`NStateTask_InputVehicleExitTask`]
+/// (`NStateTask_InputVehicleExitTask::SProperties`).
+#[size(0xC), align(4)]
+pub type InputVehicleExitTaskProperties {
+    /// The act the task queues to leave the seat (the runtime `idstring` value of an `ACT_*` id).
+    pub m_Act: u32,
+    /// The action whose release leaves the seat.
+    pub m_Button: Action,
+    /// The longest the action may have been pressed before its release for the release to leave
+    /// the seat, seconds.
+    pub m_Time: f32,
+}
+
+/// The input state task of a seated player that leaves the vehicle
+/// (`NStateTask_InputVehicleExitTask`). The exit is a tap: the task reads the release of
+/// [`InputVehicleExitTaskProperties::m_Button`], and a press held longer than
+/// [`InputVehicleExitTaskProperties::m_Time`] before its release leaves nothing behind.
+pub type NStateTask_InputVehicleExitTask;
+impl NStateTask_InputVehicleExitTask {
+    /// The per-frame update, skipped while the `CROMManager` shows either of its availability
+    /// notices. For the local player, when another occupant of the interaction graph is on the
+    /// player's node, it queues [`InputVehicleExitTaskProperties::m_Act`]. For a character with an
+    /// avatar, it queues the act on the frame the avatar's action map reports
+    /// [`InputVehicleExitTaskProperties::m_Button`] released with its time pressed before the
+    /// release at most [`InputVehicleExitTaskProperties::m_Time`]. Both queue the act with a
+    /// callback that runs [`NStateTask_InputVehicleExitTask_TeleportUpwards`] when the queued
+    /// action reports that it did not exit.
+    #[address(0x140_824_990)]
+    pub fn Update(ctx: *mut StateContext, properties: *const InputVehicleExitTaskProperties, instance: *mut void);
+}
+
+/// The per-instance loaded properties of [`NStateTask_InputVehicleEnterTask`]
+/// (`NStateTask_InputVehicleEnterTask::SProperties`).
+#[size(0xC), align(4)]
+pub type InputVehicleEnterTaskProperties {
+    /// The action read.
+    pub m_Button: Action,
+    /// How long the action must be held to move to another seat rather than enter, seconds.
+    pub m_Holdtime: f32,
+    /// How long an entry requested through the character's blackboard stays honoured, seconds.
+    pub m_Buffertime: f32,
+}
+
+/// The input state task that enters a vehicle and changes seat in it
+/// (`NStateTask_InputVehicleEnterTask`), for the local player outside cinematic mode.
+pub type NStateTask_InputVehicleEnterTask;
+impl NStateTask_InputVehicleEnterTask {
+    /// The per-frame update. With no seat change available, a press of
+    /// [`InputVehicleEnterTaskProperties::m_Button`] queues `ACT_ENTER_VEHICLE` on every pressed
+    /// frame. A seat change is available when the player's interaction node has a transition to a
+    /// gunner seat ([`HasAvailableGunnerDestination`](Self::HasAvailableGunnerDestination)), when
+    /// the player is in a gunner seat (the change is back to the driver's seat), or when the player
+    /// is in the driver's seat of a vehicle with a reachable cargo bay. Then a press held for
+    /// [`InputVehicleEnterTaskProperties::m_Holdtime`] targets that seat and queues
+    /// `ACT_ENTER_VEHICLE_MOUNTED_WEAPON` (or `ACT_ENTER_VEHICLE_CARGO_BAY` for the cargo bay),
+    /// once per press, and a release sooner than that queues `ACT_ENTER_VEHICLE`.
+    #[address(0x140_824_690)]
+    pub fn Update(ctx: *mut StateContext, properties: *const InputVehicleEnterTaskProperties, instance: *mut void);
+
+    /// Whether the user's current interaction node has a transition to a gunner seat node, or, off
+    /// a node, whether any available graph entry leads to one. [`Update`](Self::Update) passes the
+    /// local player's own proxy
+    /// ([`Character::m_InteractionUserProxy`](character::character::Character::m_InteractionUserProxy)).
+    #[address(0x140_81A_200)]
+    pub fn HasAvailableGunnerDestination(user: *const InteractionUserProxy) -> bool;
+}
+
+/// The door slots of a vehicle (`NVehicle::EDoorSlot`): which opening a [`DoorInfo`] is. A slot
+/// may hold several door parts that open together.
+#[copyable]
+pub enum DoorSlot: i32 {
+    FRONT_LEFT = 0x0,
+    FRONT_RIGHT = 0x1,
+    REAR_LEFT = 0x2,
+    REAR_RIGHT = 0x3,
+    CENTER_LEFT = 0x4,
+    CENTER_RIGHT = 0x5,
+    TURRET_DOOR = 0x6,
+    TRUNK = 0x7,
+    HOOD = 0x8,
+    REAR_DOOR = 0x9,
+    CARGO_BAY_DOOR = 0xA,
+    FOLDING_WING = 0xB,
+    MISSILE_HATCH = 0xC,
+}
+
+/// A door's state (`NVehicle::EDoorState`), as [`DoorInfo::m_State`] and
+/// [`DoorInfo::m_PendingState`] hold it.
+#[copyable]
+pub enum DoorState: i32 {
+    /// Open: the part is loose on its hinge, swinging freely or held open by the hinge's motor.
+    DOOR_OPEN = 0x0,
+    /// Being turned open by the hinge's motor.
+    DOOR_OPENING = 0x1,
+    /// Being turned shut by the hinge's motor.
+    DOOR_CLOSING = 0x2,
+    /// The part broke off.
+    DOOR_MISSING = 0x3,
+    /// Closed: the part is merged into the vehicle's body. As a pending state, it means that no
+    /// request is pending.
+    DOOR_CLOSED = 0x4,
+}
+
+/// `CDoorInfo`: one door part of a vehicle's [`VehicleDoorController`] and its state. A closed door
+/// is merged into the vehicle's body; opening it loosens the part onto the hinge constraint of the
+/// vehicle's physics prototype, as a body of its own
+/// ([`PartInstance::GetPfxVehiclePartIfAny`](vehicle::parts::PartInstance::GetPfxVehiclePartIfAny))
+/// owned by a [`VehiclePartGameObject`](vehicle::parts::VehiclePartGameObject).
+///
+/// Each post-simulation update, the controller acts on [`m_PendingState`](Self::m_PendingState).
+/// An opening request loosens the part
+/// ([`PfxBreakable::EnablePart`](vehicle::parts::PfxBreakable::EnablePart) with
+/// [`PartEventReason::EPER_PartOperated`](vehicle::parts::PartEventReason::EPER_PartOperated)),
+/// and both requests convert the hinge to a powered one whose motor turns it toward the open or the
+/// closed angle. A door that has opened stops its motor, unless it is kept open, and then swings
+/// freely on its hinge. A freely swinging door whose hinge angle above its minimum
+/// ([`PfxBreakable::GetHingeAngleAboveMin`](vehicle::parts::PfxBreakable::GetHingeAngleAboveMin))
+/// falls below [`LATCH_ANGLE_DEG`](Self::LATCH_ANGLE_DEG) while it swings shut faster than
+/// [`LATCH_SPEED_DEG_S`](Self::LATCH_SPEED_DEG_S) is merged back into the body
+/// ([`PartInstance::MergePart`](vehicle::parts::PartInstance::MergePart), then
+/// [`Vehicle::OnFinishedClosingDoor`]): a door swung shut hard latches. The speed is the change of
+/// the angle since [`m_PreviousAngle_Deg`](Self::m_PreviousAngle_Deg) over the update's step. A door
+/// the motor closes is merged once it reaches its smallest angle.
+///
+/// The latch is skipped for a door with [`FLAG_KEEP_OPEN`](Self::FLAG_KEEP_OPEN). Such a door that
+/// is [`DoorState::DOOR_OPEN`] and touching nothing is asked to open again (a pending
+/// [`DoorState::DOOR_OPENING`], so the motor turns it back) once the hinge's largest angle exceeds
+/// its angle above the smallest plus [`m_KeepOpenMinAngle_Rad`](Self::m_KeepOpenMinAngle_Rad) by
+/// more than [`KEEP_OPEN_REOPEN_RAD`](Self::KEEP_OPEN_REOPEN_RAD). With the kept angle at the
+/// hinge's largest, that never holds, so the door swings freely and never latches. Only some
+/// members are bound.
+#[size(0x50)]
+pub type DoorInfo {
+    /// The flag of [`m_Flags`](Self::m_Flags) an opening request that keeps the door open sets.
+    pub const FLAG_KEEP_OPEN: u32 = 0x2,
+    /// The angle above the hinge's smallest below which a free door swinging shut latches, degrees.
+    /// A static of the controller's update.
+    pub const LATCH_ANGLE_DEG: f32 = 2.0,
+    /// The closing speed above which a free door within [`LATCH_ANGLE_DEG`](Self::LATCH_ANGLE_DEG)
+    /// latches, degrees per second. A static of the controller's update.
+    pub const LATCH_SPEED_DEG_S: f32 = 10.0,
+    /// How far a kept-open door must fall short of its kept angle before it is asked to open again,
+    /// radians. A static of the controller's update.
+    pub const KEEP_OPEN_REOPEN_RAD: f32 = 0.0017453292,
+
+    /// The state the controller moves the door to on its next update, or
+    /// [`DoorState::DOOR_CLOSED`] when nothing is pending.
+    pub m_PendingState: DoorState,
+    /// The current state. Successful `CVehicle::SpawnPhysicalPart` stores the spawned door
+    /// object's weak reference in this entry and sets this to [`DoorState::DOOR_OPEN`]
+    /// before the part's loosened event. The next post-simulation update replaces it with
+    /// an opening or closing state only when a matching pending request starts an animation.
+    pub m_State: DoorState,
+    pub m_DoorSlot: DoorSlot,
+
+    /// The door's part instance in the vehicle's physics body.
+    #[address(0x10)]
+    pub m_PartInstance: *mut PartInstance,
+
+    /// The hinge's smallest angle, radians.
+    #[address(0x1C)]
+    pub m_HingeMinAngle_Rad: f32,
+    /// The hinge's largest angle, radians.
+    pub m_HingeMaxAngle_Rad: f32,
+
+    /// The smallest angle a door kept open is held at, radians. An opening request sets it a given
+    /// angle below the hinge's largest (no lower than the smallest) when it keeps the door open, and
+    /// to the hinge's smallest otherwise.
+    #[address(0x28)]
+    pub m_KeepOpenMinAngle_Rad: f32,
+    /// A freely swinging door's hinge angle above its minimum on the controller's last update,
+    /// degrees, from which it measures how fast the door swings shut.
+    pub m_PreviousAngle_Deg: f32,
+
+    #[address(0x3C)]
+    pub m_Flags: u32,
+}
+
+/// `CVehicleDoorController`: a vehicle's doors ([`DoorInfo`]), kept in a
+/// `std::map<NVehicle::EDoorSlot, std::vector<CDoorInfo>>` keyed by [`DoorSlot`], and updated from
+/// the vehicle's post-simulation update. Only some members are bound.
+#[min_size(0x28)]
+pub type VehicleDoorController {
+    /// The map's head node (`_Myhead`): its [`m_Parent`](DoorMapNode::m_Parent) is the tree's
+    /// root, and the tree's leaf links point back at it.
+    #[address(0x8)]
+    pub m_DoorMapHead: *mut DoorMapNode,
+
+    /// The vehicle the doors belong to.
+    #[address(0x20)]
+    pub m_Vehicle: *mut Vehicle,
+}
+
+/// One node of the red-black tree behind [`VehicleDoorController`]'s door map
+/// (`std::_Tree_nod<...>::_Node`): a slot and its doors.
+#[min_size(0x42)]
+pub type DoorMapNode {
+    pub m_Left: *mut DoorMapNode,
+    pub m_Parent: *mut DoorMapNode,
+    pub m_Right: *mut DoorMapNode,
+    /// The slot this node holds.
+    pub m_DoorSlot: DoorSlot,
+
+    /// The first of the slot's doors (the vector's `_Myfirst`).
+    #[address(0x20)]
+    pub m_DoorsBegin: *mut DoorInfo,
+    /// One past the last of the slot's doors (`_Mylast`).
+    pub m_DoorsEnd: *mut DoorInfo,
+
+    /// Whether the node is the head, the tree's sentinel, rather than a slot (`_Isnil`).
+    #[address(0x41)]
+    pub m_IsNil: bool,
+}

@@ -1,0 +1,261 @@
+use graphics_engine::model_instance::ModelInstance;
+use physics::PfxRigidBody;
+use types::math::Matrix4;
+use vehicle::vehicle::Vehicle;
+
+/// `SHashString` as the ADF resources store it: a pointer to the string and its `hashlittle`
+/// hash, both resolved when the resource is loaded.
+#[size(0x10)]
+pub type AdfHashString {
+    /// The NUL-terminated string.
+    pub m_string: *const u8,
+    /// The `hashlittle` hash of [`m_string`](Self::m_string).
+    pub m_hash: u32,
+}
+
+/// `SPart`: one entry of a vehicle's `VehicleParts` ADF resource (the `<model>_vehicle_parts.vmodc`
+/// in the vehicle's entity), describing a breakable, separately modelled piece of the vehicle such
+/// as a door, a wheel, a mirror, or the steering wheel. Only the leading members are bound.
+///
+/// A part's mesh is authored in its own space, whose origin is the pivot that
+/// [`m_parent_space_offset`](Self::m_parent_space_offset) places in the parent part's space. Most
+/// parts, the steering wheel among them, have an identity offset under the body, so their mesh is
+/// authored in the vehicle's own space (+X right, +Y up, -Z forward). A hinged part, such as a
+/// motorcycle's or jetski's steering fork, has its hinge pivot as its offset.
+#[min_size(0xB8)]
+pub type Part {
+    /// The part's name, `<model>_<piece>`, such as `modernsuv_steeringwheel`,
+    /// `atv_upper_steering`, or `modernmini_mirror_l`.
+    pub m_name: AdfHashString,
+    /// The name of the part's damage type, such as `Land_Steering_Wheel`. The damage type is chosen
+    /// for the damage the part takes, not for what the part is: some steering wheels use a generic
+    /// type, and some mirrors use the steering wheel's.
+    pub m_damage_type: AdfHashString,
+    /// The name of the part's behaviour, `None` for most parts. A hinged part's behaviour names its
+    /// entry in the vehicle-common hinged-part properties: `SteeringFork` is a motorcycle's, ATV's,
+    /// or jetski's handlebars, turned by the steering. The steering wheels of a few cars carry
+    /// `SteeringWheel`, but none of them is listed as a hinged part, so it drives nothing.
+    pub m_behavior: AdfHashString,
+    /// The name of the part's model.
+    pub m_model: AdfHashString,
+    /// The name of the model the part swaps to when damaged.
+    pub m_model_swap: AdfHashString,
+    /// The part's index in the vehicle's part array.
+    pub m_part_index: i8,
+    /// The index of the part this one hangs from.
+    pub m_parent_part_index: i8,
+
+    /// The part's pivot in its parent part's space, as the engine's row-major matrix.
+    #[address(0x54)]
+    pub m_parent_space_offset: Matrix4,
+
+    /// Whether the part may break off. Root parts cannot break off regardless of this property.
+    #[address(0xA9)]
+    pub m_should_break: u8,
+
+    /// Whether ordinary damage keeps the part attached until its body or an ancestor breaks.
+    #[address(0xAC)]
+    pub m_prevent_breaking_while_alive: u8,
+
+    /// Whether breaking destroys the visual part instead of retaining its physical body.
+    #[address(0xB0)]
+    pub m_disappears_when_broken: u8,
+
+    /// Whether the part has an authored world-collision shape.
+    #[address(0xB6)]
+    pub m_has_world_collision_shape: u8,
+}
+
+/// `CPartInstance`: the live state of one [`Part`] of a breakable physics body
+/// ([`PfxBreakable`]). The instances are stored contiguously, indexed by the part index. Only some
+/// members are bound.
+#[size(0x190)]
+pub type PartInstance {
+    /// The part this one hangs from, or null for the root part.
+    pub m_ParentPart: *mut PartInstance,
+
+    /// The breakable body whose resource and phase govern this part.
+    #[address(0x18)]
+    pub m_Breakable: *mut PfxBreakable,
+
+    /// The part's index in its body's part instances, the same as its [`Part::m_part_index`].
+    #[address(0x20)]
+    pub m_PartInstanceIndex: u32,
+
+    /// Whether the part has been deleted from its owner's active parts.
+    #[address(0x2C)]
+    pub m_Deleted: bool,
+    /// Whether the resource entry supplies a valid part instance, checked by restoration.
+    pub m_IsValid: bool,
+
+    /// The owner the part reports damage to (`IDamagePartOwner*`). For a vehicle's part this is
+    /// the vehicle's damage-part-owner interface; the vehicle's render update only draws parts
+    /// whose owner it is.
+    #[address(0x30)]
+    pub m_DamagePartOwner: *mut void,
+    /// The resolved damage-type tuning used for damaged, loosened, and broken health transitions.
+    pub m_PartDamageType: *const void,
+
+    /// Remaining part health. Negative health is not processed by the break-off damage helper.
+    #[address(0x40)]
+    pub m_Health: i32,
+    /// Blocks ordinary damage admission and the final instant break operation, including forced
+    /// break damage.
+    pub m_Invulnerable: bool,
+    /// Ordinary damage must be attributed to the player while set.
+    pub m_IsOnlyVulnerableToPlayerDamage: bool,
+
+    /// Whether the part has broken off the body. A part also counts as broken off when any ancestor
+    /// has ([`BrokeOffOrAncestorBrokeOff`](Self::BrokeOffOrAncestorBrokeOff)).
+    #[address(0x46)]
+    pub m_BrokeOff: bool,
+
+    /// The part's transform from its own space into the body's root space, as the engine's
+    /// row-major matrix. It is the parent space offset composed with the parent's root-space
+    /// transform, further moved by a hinge's angle, a loosened part's swing, or deformation.
+    /// [`Vehicle::UpdateRender_ModelMatrices`](vehicle::vehicle::Vehicle::UpdateRender_ModelMatrices)
+    /// draws the part at this transform times the vehicle's render transform.
+    /// `CPartInstance::SetRootSpaceTransform_NoNotification` writes it without notifying the part's
+    /// listeners.
+    #[address(0xC0)]
+    pub m_RootSpaceTransform: Matrix4,
+
+    /// The part's model instance, null for a part without a model.
+    #[address(0x118)]
+    pub m_PartModelInstance: *mut ModelInstance,
+
+    /// The part's [`Part`] entry in the vehicle's parts resource.
+    #[address(0x140)]
+    pub m_PartProperties: *const Part,
+}
+impl PartInstance {
+    /// Applies enough player-attributed or unattributed damage to pass below zero health. Uses
+    /// neutral damage flags. Forced damage bypasses ordinary invulnerability admission and the
+    /// prevent-breaking-while-alive property, but still requires an authored breakable non-root
+    /// part. The final break operation independently refuses an invulnerable part and defers while
+    /// its breakable is in a parallel update phase.
+    #[address(0x140_22F_AF0)]
+    pub fn DamagePart_ToBreakOff(&mut self, is_player_doing_damage: bool, force_damage: bool);
+
+    /// Whether authored breakability and the body's current life state permit breaking off.
+    /// Forced damage ignores the prevent-breaking-while-alive property, not authored breakability.
+    #[address(0x140_1D0_740)]
+    pub fn IsAllowedToBreakOffNow(&self, force_damage: bool) -> bool;
+
+    /// Whether the part or any of its ancestors has broken off ([`m_BrokeOff`](Self::m_BrokeOff)),
+    /// walking [`m_ParentPart`](Self::m_ParentPart) to the root.
+    #[address(0x140_1D0_670)]
+    pub fn BrokeOffOrAncestorBrokeOff(&self) -> bool;
+
+    /// Whether the part hangs from its parent by its own constraint: the part's constraint id is
+    /// valid and the world's constraint is enabled. A loosened part, such as an open door, does; a
+    /// part merged into the body, or one that broke off, does not.
+    #[address(0x140_1DF_050)]
+    pub fn IsConstraintActive(&self) -> bool;
+
+    /// Merges a loosened part back into its parent's body: it re-enables the part's merged
+    /// world-collision shapes, hands the part's physical body back to its owner to destroy,
+    /// reattaches its children, and destroys the part's constraint. The door controller merges a
+    /// door this way when its latch catches it or its motor closes it
+    /// ([`DoorInfo`](vehicle::vehicle::DoorInfo)).
+    #[address(0x140_221_E10)]
+    pub fn MergePart(&mut self);
+
+    /// The part's own body, a `CPfxVehiclePart` (a [`PfxRigidBody`](physics::PfxRigidBody)), when
+    /// the part has been loosened or broken off into one; null while the part is merged into its
+    /// body's own rigid body. It reads the part's world-collision rigid body and keeps it only when
+    /// its type test says it is a vehicle part.
+    #[address(0x140_1F0_810)]
+    pub fn GetPfxVehiclePartIfAny(&mut self) -> *mut PfxRigidBody;
+}
+
+/// `CPfxBreakable`: a rigid body made of [`PartInstance`]s that can deform, loosen, and break
+/// apart. A vehicle's physics body (`CPfxVehicle`) derives from it with the breakable at offset
+/// zero ([`Vehicle::m_PfxVehicle`](vehicle::vehicle::Vehicle::m_PfxVehicle)). Only some members
+/// are bound.
+#[min_size(0x134)]
+pub type PfxBreakable {
+    /// Positive while part transitions must defer their non-thread-safe work.
+    #[address(0xCC)]
+    pub m_InParallelUpdatePhaseCounter: i32,
+
+    /// The part instances, one per entry of the parts resource, indexed by part index.
+    #[address(0x120)]
+    pub m_PartInstances: *mut PartInstance,
+    /// The indices of the valid part instances, [`m_NumberOfValidParts`](Self::m_NumberOfValidParts)
+    /// of them. The render and update passes over the parts walk this list.
+    pub m_ValidPartIndices: *mut u32,
+    /// The number of entries in [`m_ValidPartIndices`](Self::m_ValidPartIndices).
+    pub m_NumberOfValidParts: u32,
+}
+
+/// The authored limited hinge's local frame, axis, and signed angular limits.
+#[size(0x4C), align(4)]
+pub type ConstraintInfo {
+    pub m_TransformLocal: Matrix4,
+    pub m_AxisIndex: i32,
+    pub m_MinAngle: f32,
+    pub m_MaxAngle: f32,
+}
+impl PfxBreakable {
+    /// Reads a part's limited hinge from the physics prototype, found by its part-name hash.
+    /// Returns false for an absent part, an absent constraint, or a constraint other than a limited hinge.
+    #[address(0x140_24C_000)]
+    pub fn GetConstraintInfoFromPrototype(&mut self, part_name_hash: u32, info: *mut ConstraintInfo) -> bool;
+
+    /// The part instance at `index`, or null when `index` is not below the parts resource's part
+    /// count.
+    #[address(0x140_237_A60)]
+    pub fn GetPartByIndex(&mut self, index: u32) -> *mut PartInstance;
+
+    /// Loosens the merged part `part` into a body of its own (`CPartInstance::EnablePart`): the
+    /// part's owner spawns its physical part (for a vehicle, `CVehicle::SpawnPhysicalPart`, which
+    /// makes a [`VehiclePartGameObject`] and its body), and with `keep_constraint` the part's
+    /// constraint from the physics prototype is cloned to hang it from its parent, such as a door
+    /// on its hinge; otherwise the part breaks off. A part already hanging by its constraint
+    /// ([`PartInstance::IsConstraintActive`]) is left alone with `keep_constraint`, and broken off
+    /// without it. Runs synchronously on the calling thread, outside the physics step.
+    /// On successful vehicle-part creation, `CVehicle::SpawnPhysicalPart` retains the new
+    /// object in the vehicle's part collection and stores a weak reference in the matching
+    /// [`DoorInfo`](vehicle::vehicle::DoorInfo), setting its state to
+    /// [`DOOR_OPEN`](vehicle::vehicle::DoorState::DOOR_OPEN) before returning. This publication
+    /// precedes constraint cloning and the loosened event; it does not depend on that event.
+    /// The part then disables its merged world-collision and raycast shapes in favor of its
+    /// newly created bodies. No door animation starts unless the door controller processes
+    /// a pending opening or closing request.
+    #[address(0x140_237_DE0)]
+    pub fn EnablePart(&mut self, part: *mut PartInstance, reason: PartEventReason, keep_constraint: bool);
+
+    /// The hinge angle of the part at index `index` above the hinge's smallest angle, radians, from
+    /// the world's constraint of a part that hangs by an enabled hinge; zero for a part without one.
+    #[address(0x140_24C_170)]
+    pub fn GetHingeAngleAboveMin(&mut self, index: i32) -> f32;
+}
+
+/// Why a breakable body's part changed (`NPfxBreakable::EPartEventReason`), passed to
+/// [`PfxBreakable::EnablePart`] and on to the part's loosened and broken-off events.
+#[copyable]
+pub enum PartEventReason: i32 {
+    /// The part took damage.
+    EPER_PartDamaged = 0x0,
+    /// The part was worked on purpose, as a door the door controller opens.
+    EPER_PartOperated = 0x1,
+    /// The part starts in this state when the body is made.
+    EPER_PartInitialState = 0x2,
+}
+
+/// `CVehiclePartGameObject`: the rigid object (`CRigidObject`) a vehicle spawns for a part that
+/// loosens or breaks off (`CVehicle::SpawnPhysicalPart`), such as an open door: it owns the part's
+/// own body and draws the part. Only some members are bound.
+pub type VehiclePartGameObject;
+impl VehiclePartGameObject {
+    /// `CVehiclePartGameObject::TYPE_ID`: the run-time type id of `CVehiclePartGameObject`, for
+    /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use.
+    #[address(0x140_733_650)]
+    pub fn TYPE_ID() -> *const u32;
+
+    /// The vehicle the part came from, through the object's weak reference to it; null once the
+    /// vehicle is gone.
+    #[address(0x140_C54_4F0)]
+    pub fn GetVehicle(&mut self) -> *mut Vehicle;
+}

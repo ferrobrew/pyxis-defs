@@ -1,3 +1,4 @@
+use game::{GameObject, ResourceHandle};
 use hash::HashString;
 use types::shared_ptr::SharedPtr;
 
@@ -15,16 +16,109 @@ pub type State {
 /// A running animation state machine (`NAnimationSystem::CStateMachineInstance`): tracks the current
 /// [`State`] for one [`AnimationRuleSystem`].
 pub type StateMachineInstance {
+    /// The resource handle for the state machine definition that supplies the states and global transitions.
+    #[address(0x10)]
+    pub m_StateMachine: *mut ResourceHandle,
+
     /// The state the machine is currently in.
     #[address(0x18)]
     pub m_CurrentState: *mut State,
+
+    /// The game object the machine animates (`CStateMachineInstance::GetUserData`): for a
+    /// character's machines, its [`Character::GAME_OBJECT_BASE_OFFSET`](character::character::Character::GAME_OBJECT_BASE_OFFSET)
+    /// subobject. The graph's conditions read their character through it.
+    #[address(0x20)]
+    pub m_UserData: *mut GameObject,
+}
+impl StateMachineInstance {
+    /// Tests whether an event has an eligible transition, evaluating the current state's transitions before the global transitions. Evaluates transition conditions, but does not enqueue the event, change the current state, or execute state tasks.
+    #[address(0x140_3DD_5E0)]
+    pub fn TryEvent(&self, event: *const u32) -> bool;
+
+    /// Moves the machine to `new_state`: leaves the current state (its state tasks' exits run),
+    /// makes `new_state` current, enters it (its state tasks' entries run), and calls the
+    /// instance's transition callback with the old and new states, which for a character's rule
+    /// system starts the new state's animation. Every state change goes through it: an event's
+    /// transition, an external event's, and a state set by id
+    /// ([`AnimationRuleSystem::SetStateById`]).
+    #[address(0x140_3C7_F00)]
+    pub fn SetStateInternal(&mut self, new_state: *mut State);
 }
 
 /// An animation rule system (`CAnimationRuleSystem`): drives one afsmb state machine for a character.
 /// A character's [`AnimatedModel`](character::character::AnimatedModel) holds one per animated model,
 /// the first being the body's.
 pub type AnimationRuleSystem {
+    /// The character's height over the ground or the water surface, whichever is nearer, metres.
+    /// Written for the character's first rule system by
+    /// [`CalculateHeightOverGround`](character::character::Character::CalculateHeightOverGround),
+    /// and zeroed by [`DoGroundInfoRaycasts`](character::character::Character::DoGroundInfoRaycasts)
+    /// while the proxy is supported or sliding with no ray cast. The graph's
+    /// `CHeightOverGroundCondition` reads it or
+    /// [`m_HeightOverGroundExcludingWater`](Self::m_HeightOverGroundExcludingWater) by its flag
+    /// (unverified).
+    #[address(0x34)]
+    pub m_HeightOverGround: f32,
+    /// The character's height over the ground alone, ignoring water, metres. Written and zeroed
+    /// alongside [`m_HeightOverGround`](Self::m_HeightOverGround); a cast that hits nothing within
+    /// its 200 metres leaves the full length less the cast's lift.
+    pub m_HeightOverGroundExcludingWater: f32,
+
     /// The running state machine instance this rule system drives.
     #[address(0x48)]
     pub m_StateMachineInstance: SharedPtr<StateMachineInstance>,
+}
+impl AnimationRuleSystem {
+    /// Marks an animation modifier (`ava::idstring<NAnimationSystem::SModifierIdTag>`, passed as a
+    /// pointer to its id) active on this rule system: it sets the bit for `modifier_type` in the
+    /// rule system's modifier-to-type-mask map. The animation set's nodes select their variant clips
+    /// by the active modifiers (an `ANIM_*` node lists one variant per modifier combination, such as
+    /// a weapon's held or aimed stance). [`Character::SetModifier`](character::character::Character::SetModifier)
+    /// forwards to this for every rule system of the character's animated model.
+    #[address(0x140_479_A10)]
+    pub fn SetModifier(&mut self, modifier: *const u32, modifier_type: AnimationModifierType);
+
+    /// Looks the state named by `state_id` up in the running machine's definition and, when it
+    /// exists, moves the machine to it through
+    /// [`StateMachineInstance::SetStateInternal`] whatever the current state's transitions allow.
+    /// Returns whether the state was found. The character's own forced and layered state sets
+    /// reach the machines through it.
+    #[address(0x140_44A_D50)]
+    pub fn SetStateById(&mut self, state_id: *const HashString) -> bool;
+}
+
+/// How long a modifier set through [`AnimationRuleSystem::SetModifier`] stays active
+/// (`CAnimationRuleSystem::EAnimationModifierType`). Each value is a bit index in the rule system's
+/// per-modifier type mask.
+#[copyable]
+pub enum AnimationModifierType: i32 {
+    /// Active for the current frame; [`Character::SetCharacterModifiers`](character::character::Character::SetCharacterModifiers)
+    /// re-sets every modifier it owns each tick with this type.
+    FRAME_BOUND = 0x0,
+    /// Active for the current state; the ragdoll get-up task's entry sets a modifier from its
+    /// properties with this type.
+    STATE_BOUND = 0x1,
+}
+
+/// A state-machine transition (`NAnimationSystem::CTransition`). Only its destination is mapped.
+pub type Transition;
+impl Transition {
+    /// The state the transition leads to.
+    #[address(0x140_3BC_310)]
+    pub fn GetDestination(&self) -> *const State;
+}
+
+/// The state-machine condition `CValidateStuntPositionCondition`: whether the character can take
+/// the stunt position of a vehicle graph node with a given identifier. A helicopter's door-side
+/// arrival drops into the helicopter's stunt hang through it once its clip ends; without that
+/// transition the door-side state has no way out at the clip's end, and the character stays
+/// attached on the skid by the door. Only its evaluation is mapped.
+pub type ValidateStuntPositionCondition;
+impl ValidateStuntPositionCondition {
+    /// Finds the node with the condition's identifier in the graph the character uses or, failing
+    /// that, through the available entry whose state is `transition`'s destination; needs the
+    /// character's grappling hook, and an attached active wire on the node's graph object; true
+    /// when the node's best point is not blocked.
+    #[address(0x140_7D0_D80)]
+    pub fn Evaluate(&self, machine: *const StateMachineInstance, transition: *const Transition) -> bool;
 }

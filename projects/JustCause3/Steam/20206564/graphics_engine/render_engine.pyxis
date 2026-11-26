@@ -157,9 +157,13 @@ pub enum RenderPassId: i32 {
     RP_APPLY_CLOUDS = 0x73,
     RP_VEGETATION_TRANSPARENT_AOIT = 0x74,
     /// Fog-volume generation. The first of `CFogManager`'s two `CRenderBlockFogVolume` passes; the
-    /// block draws viewport-covering geometry, not a world-space volume.
+    /// block draws viewport-covering geometry, not a world-space volume, reconstructing world
+    /// positions from depth into its half-resolution fog target (see
+    /// [`RenderBlockFogVolume::Draw`](graphics_engine::render_block::RenderBlockFogVolume::Draw)).
     RP_FOG_VOLUME_GENERATE = 0x75,
-    /// Fog-volume upsampling. The second `CRenderBlockFogVolume` pass; likewise viewport-covering.
+    /// Fog-volume upsampling. The second `CRenderBlockFogVolume` pass; likewise viewport-covering. It
+    /// bilaterally upsamples the generated fog against the full-resolution depth (see
+    /// [`RenderBlockFogVolume::Draw`](graphics_engine::render_block::RenderBlockFogVolume::Draw)).
     RP_FOG_VOLUME_UPSAMPLE = 0x76,
     /// The fog-volume composite. `CFogManager::m_RenderPassAddFogVolume`, drawing one
     /// `CRenderBlockAddFogVolume` over the viewport.
@@ -425,7 +429,12 @@ pub type RenderEngine {
     /// 14--24, and [`SetAllGlobalShaderProgramConstants`](Self::SetAllGlobalShaderProgramConstants)
     /// uploads the whole block to the GPU. Row layout (row = float4 index): 0--3 the full
     /// (translation-bearing) view-projection, 4 the camera world position, 5 the camera forward
-    /// axis, 9 the camera world position with `w = 1`, 14--24 fog and atmospheric scattering,
+    /// axis, 9 the render camera's world position with `w = 1` (written only by
+    /// [`SetGlobalShaderConstants`](Self::SetGlobalShaderConstants), from
+    /// `CCameraManager::GetRenderCamera`, so a pass whose context carries another camera keeps the
+    /// render camera's position here while rows 4 and 5 follow the pass; the road surfaces and the
+    /// `roadbias` model permutations subtract this row, not row 4, before the offset
+    /// view-projection), 14--24 fog and atmospheric scattering,
     /// 29--32 the translation-free
     /// [`m_OffsetViewProjection`](graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection)
     /// (the matrix camera-relative opaque geometry multiplies by), 33--36 the previous
@@ -510,13 +519,17 @@ impl RenderEngine {
 
     /// Uploads the global per-view constant buffer for the frame: lighting, fog, wetness, and the
     /// render camera's full (translation-bearing) view-projection and world position. This drives
-    /// screen-space and non-geometry work, not opaque-geometry vertex placement.
+    /// screen-space and non-geometry work, not opaque-geometry vertex placement. It first rebuilds the
+    /// lighting frame constant buffer relative to the render camera position
+    /// ([`LightManager::ApplyDynamicLights`](graphics_engine::light_manager::LightManager::ApplyDynamicLights))
+    /// and copies the light manager's per-frame resources into `ctx`
+    /// ([`LightManager::UpdateRenderContext`](graphics_engine::light_manager::LightManager::UpdateRenderContext)).
     #[address(0x140_185_740)]
     pub fn SetGlobalShaderConstants(&mut self, ctx: *mut RenderContext);
 
     /// Refreshes the per-view rows of [`m_VPGlobalConstData`](Self::m_VPGlobalConstData)
     /// from a [`RenderContext`]: the full view-projection (rows 0--3), the camera world position
-    /// and forward axis (rows 4, 5, 9), the offset view-projection (rows 29--32), the previous
+    /// and forward axis (rows 4 and 5; row 9 is not among them), the offset view-projection (rows 29--32), the previous
     /// view-projection (rows 33--36), the frustum planes (rows 38--43), the previous offset
     /// view-projection (rows 44--47), and the previous camera position (row 48), then falls
     /// through to `SetFog`. Called by [`RenderPass::Draw`](graphics_engine::render_pass::RenderPass::Draw)
@@ -563,6 +576,12 @@ impl RenderEngine {
 
 /// The opaque texture cache (`STextureCache`).
 pub type TextureCache;
+
+/// Looks a texture up in `cache` by its path's name hash and binds it to `holder` (a
+/// `CTextureHolder`), creating the resource from the archive when it is not cached yet and falling
+/// back to the cache's fail texture when it cannot be loaded. Returns the `ETextureCacheResult`.
+#[address(0x141_969_4F0)]
+pub fn TextureCacheGetTexture(cache: *mut TextureCache, holder: *mut void, path: *const u8, texture_type: i32) -> i32;
 
 /// The opaque shader cache (`SShaderCache`), the name-hash-keyed store the `ShaderCacheGet*Program`
 /// family resolves shader holders from.

@@ -271,10 +271,20 @@ pub type RenderPass {
     #[address(0x9E)]
     pub m_Index: i16,
 
+    /// The camera supplied to the pass. [`SaveRenderFrameData`](Self::SaveRenderFrameData) copies
+    /// it into [`ExternalRenderCamera`](Self::ExternalRenderCamera) before drawing.
+    #[address(0x840)]
+    pub ExternalCamera: *mut Camera,
+
     /// The spinlock serializing [`SortList`](Self::SortList) against concurrent callers
     /// (the render-engine sort task and the lazy sort in [`DoDraw`](Self::DoDraw)).
     #[address(0x858)]
     pub m_SortLock: *mut void,
+
+    /// The pass-owned snapshot that [`Draw`](Self::Draw) converts to a render camera and uses to
+    /// populate the render context.
+    #[address(0x870)]
+    pub ExternalRenderCamera: *mut Camera,
 
     /// How [`SortList`](Self::SortList) orders the draw list. Most passes leave the
     /// constructor default (`Auto`); passes that opt out set `None`.
@@ -348,6 +358,12 @@ impl RenderPass {
     /// [`DoDraw`](Self::DoDraw)).
     #[address(0x140_194_540)]
     pub fn Draw(&mut self);
+
+    /// The camera the pass's draw list is sorted against: the pass's external camera, set up with
+    /// [`Camera::SetupRenderCamera`](camera::camera::Camera::SetupRenderCamera) without the TAA
+    /// jitter, or the camera manager's render camera when the pass has none.
+    #[address(0x140_174_360)]
+    pub fn GetSortCamera(&self) -> *const Camera;
 
     /// The per-pass pre-draw (a pass vtable entry): resolves the back buffer and depth buffer when the pass
     /// asks for them, binds the pass's render setup, applies its stencil state (see

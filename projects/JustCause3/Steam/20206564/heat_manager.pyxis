@@ -71,4 +71,12 @@ impl HeatManager {
     /// The current heat target (the character carrying the heat), or null when none.
     #[address(0x140_A44_B80)]
     pub fn GetHeatTarget(&self) -> *mut Character;
+
+    /// The heat-point tuning (`SHeatPointTuning`): the heat points each kind of offence adds, and
+    /// the ranges they apply within. A weapon's shot
+    /// ([`WeaponBase::Fire_ProjectileBase`](equipment::weapon::WeaponBase::Fire_ProjectileBase))
+    /// reads its firing entry and passes it to
+    /// [`Character::AddHeatPoints`](character::character::Character::AddHeatPoints).
+    #[address(0x140_A40_6A0)]
+    pub fn GetHeatPointData(&self) -> *const void;
 }

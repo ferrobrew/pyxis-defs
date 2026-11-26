@@ -1,0 +1,103 @@
+use types::math::{Matrix4, Vector2};
+use types::shared_ptr::SharedPtr;
+
+/// A point of interest (`CPOI`, a `CGameObject`): a world-anchored HUD marker. Mission objectives,
+/// waypoints, enemy and vehicle health markers, weapon pickup hints, active explosives, and the
+/// detector target are all POIs. Each registered POI has a record in
+/// [`HUDUI::m_POIListHead`](ui::hud_ui::HUDUI::m_POIListHead), which
+/// [`HUDUI::UpdatePOIs`](ui::hud_ui::HUDUI::UpdatePOIs) projects to the screen every frame. Only the
+/// fields that update reads are mapped.
+#[min_size(0x200)]
+pub type POI {
+    /// The [`m_DisplayType`](Self::m_DisplayType) of the user-placed map waypoint: removing a POI
+    /// of this type clears the comm-link map's user waypoint.
+    pub const DISPLAY_TYPE_USER_WAYPOINT: u32 = 10,
+    /// The [`m_DisplayType`](Self::m_DisplayType) of a weapon pickup hint: the HUD sets the
+    /// marker's weapon icon from the attached weapon, and fades and scales it over its own range
+    /// instead of the generic distance falloff.
+    pub const DISPLAY_TYPE_WEAPON_PICKUP: u32 = 22,
+
+    vftable {
+        /// `CPOI::UpdatePOI`: counts down the lifetime, rebuilds
+        /// [`m_Transform`](Self::m_Transform) from the attached object (`CPOI::UpdateTransform`),
+        /// and refreshes the health or destruction-disable state. `dt` is the frame time, `dtf`
+        /// the sub-frame interpolation fraction. [`HUDUI::UpdatePOIs`](ui::hud_ui::HUDUI::UpdatePOIs)
+        /// calls it on each live POI just before it projects the POI.
+        #[index(46)]
+        pub fn UpdatePOI(&mut self, dt: f32, dtf: f32);
+    },
+
+    /// The POI's id. The HUD keeps the id of the POI whose label it shows in
+    /// [`HUDUI::m_ShowingLabelPOIId`](ui::hud_ui::HUDUI::m_ShowingLabelPOIId).
+    #[address(0x108)]
+    pub m_ID: u32,
+
+    /// A screen-space offset, in stage pixels, added to the projected position
+    /// (the `offset` argument of [`UIManager::Get2DInfo`](ui::ui_manager::UIManager::Get2DInfo)).
+    #[address(0x138)]
+    pub m_Attach2DOffset: Vector2,
+
+    /// `CPOI::EDisplayType`: which marker clip variant the HUD shows, and some type-specific
+    /// behaviour (`DISPLAY_TYPE_*`). Left as a raw integer because only some values are confirmed.
+    #[address(0x140)]
+    pub m_DisplayType: u32,
+
+    /// When set, [`HUDUI::UpdatePOIs`](ui::hud_ui::HUDUI::UpdatePOIs) skips the POI entirely: its
+    /// marker is neither created, moved, shown, nor hidden.
+    #[address(0x171)]
+    pub m_IsInvisible: bool,
+
+    /// The marker's progress bar value (the health bar of enemy and vehicle markers).
+    #[address(0x178)]
+    pub m_ProgressBar: f32,
+    /// The progress bar's maximum.
+    pub m_ProgressBarMax: f32,
+
+    /// The nearest distance from the player character, in metres, at which the marker shows.
+    #[address(0x18C)]
+    pub m_MinDistance: f32,
+    /// The farthest distance from the player character, in metres, at which the marker shows.
+    pub m_MaxDistance: f32,
+
+    /// Whether the marker is clamped to the screen edge (as a directional arrow) when its point is
+    /// off-screen, rather than hidden (the `clamp_to_screen` argument of
+    /// [`UIManager::Get2DInfo`](ui::ui_manager::UIManager::Get2DInfo)).
+    #[address(0x19E)]
+    pub m_ClampToScreen: bool,
+    /// Whether the marker's icon scale shrinks with distance.
+    pub m_ScaleBasedOnDistance: bool,
+
+    /// The world transform of the marker's anchor. `CPOI::UpdateTransform` rebuilds it from the
+    /// attached object (a fixed offset, the attached object's bounding-box centre or top, or a local
+    /// transform) on every [`UpdatePOI`](Self::UpdatePOI); its translation row is the world point
+    /// the HUD projects.
+    #[address(0x1B8)]
+    pub m_Transform: Matrix4,
+}
+
+/// A `boost::weak_ptr<CPOI>`: the object pointer (`px`) and the shared control block (`pn`). `px`
+/// may dangle once the POI is destroyed; take a reference through [`lock`](Self::lock) before
+/// reading it.
+#[size(0x10), align(8)]
+pub type WeakPtrPOI {
+    /// The POI (`px`); only meaningful while the control block's use count is non-zero.
+    pub px: *mut POI,
+
+    /// The shared reference-count control block (`pn`), or null.
+    #[address(0x8)]
+    pub pn: *mut void,
+}
+impl WeakPtrPOI {
+    /// `boost::weak_ptr<CPOI>::lock`: writes into `result` a strong reference to the POI (taking
+    /// one use count with a compare-and-swap that fails once the count is zero), or a null pointer
+    /// when the POI is already destroyed. Returns `result`. Release the reference with
+    /// [`ResetSharedPtrPOI`].
+    #[address(0x140_E34_A70)]
+    pub fn lock(&self, result: *mut SharedPtr<POI>) -> *mut SharedPtr<POI>;
+}
+
+/// `boost::shared_ptr<CPOI>::reset`: nulls `ptr` and releases its use count, disposing of the POI
+/// when it was the last strong reference and destroying the control block when no weak references
+/// remain.
+#[address(0x140_8EA_4A0)]
+pub fn ResetSharedPtrPOI(ptr: *mut SharedPtr<POI>);

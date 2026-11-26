@@ -1,0 +1,38 @@
+use animation::pose_producer::PoseProducer;
+use physics::{hknpRagdoll, hknpWorld};
+use types::math::Matrix4;
+
+/// A character's ragdoll instance (`NAnimationSystem::CRagdollInstanceImpl`): the Havok ragdoll
+/// built from the character's ragdoll resource, its bodies in the physics world, and the
+/// controllers that drive them toward the animated pose. While its owner controls its displacement
+/// the bodies follow the animation; otherwise they simulate freely and the character follows them.
+/// Only some members are bound.
+#[min_size(0x18)]
+pub type RagdollInstance {
+    /// The physics world the ragdoll's bodies live in.
+    #[address(0x8)]
+    pub m_World: *mut hknpWorld,
+
+    /// The Havok ragdoll: the ragdoll's bodies and constraints, and its skeleton.
+    #[address(0x10)]
+    pub m_Ragdoll: *mut hknpRagdoll,
+
+    /// How much of the simulated pose the post-physics update writes into the animated pose, 0 to
+    /// 1, over the animation's own pose from the hips out. A new instance starts at 0 and nothing in
+    /// the preset's sync raises it: the canopy's ragdoll update, the get-up, and the animation
+    /// graph's ragdoll blending tasks do.
+    #[address(0xB4)]
+    pub m_BlendWeight: f32,
+}
+impl RagdollInstance {
+    /// The ragdoll's step before the physics: does nothing for a zero `dt`, a disabled instance,
+    /// or one not yet in the world. Otherwise it applies the preset's parameters, takes
+    /// `wanted_world_matrix` as the ragdoll's wanted transform, maps the current pose of `pose`
+    /// ([`PoseProducer::m_PoseT1`]) onto the ragdoll's skeleton through the skeleton mapper, reading
+    /// it through the pose's synced model-space (or, for a local-space mapping, local-space)
+    /// transforms, and drives the keyframed bodies and the constraint motors toward the mapped
+    /// pose. It reads nothing else of `pose`. Called by the ragdoll's owner with its character's
+    /// pose producer from `CCharacter::PrePhysicsUpdateRagdoll`.
+    #[address(0x140_40E_F50)]
+    pub fn PrePhysicsUpdate(&mut self, wanted_world_matrix: *const Matrix4, pose: *mut PoseProducer, dt: f32);
+}

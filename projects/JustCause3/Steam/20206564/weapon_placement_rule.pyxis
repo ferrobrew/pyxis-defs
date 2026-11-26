@@ -1,0 +1,27 @@
+use game::GameObject;
+use types::shared_ptr::SharedPtr;
+
+/// A spawn rule that places a weapon in the world (`CWeaponPlacementRule`): a weapon at a spot, a
+/// weapon in a rack, or a mounted gun, optionally manned. Its `CGameObject` subobject is at its
+/// start. Once its weapon has spawned, the rule hands the weapon its own infinite-pickup setting
+/// ([`WeaponBase::m_InfinitePickup`](equipment::weapon::WeaponBase::m_InfinitePickup)); a rack's
+/// weapon is put in the [`E_WS_WEAPON_RACK`](equipment::weapon::WeaponState::E_WS_WEAPON_RACK)
+/// state, with its own pickup interaction disabled unless the rack uses the ordinary pickup, so
+/// that it is picked up through the rule's interaction node instead. Only its type id and one
+/// virtual are bound.
+pub type WeaponPlacementRule {
+    vftable {
+        /// `CSpawnRule::GetSpawnedObject`: writes into `result` a strong reference to the
+        /// `index`th live object the rule spawned that is of the class `type_id` names (see
+        /// [`GameObject::IsType`](game::GameObject::IsType)), or a null reference when there is
+        /// none, and returns `result`.
+        #[index(50)]
+        pub fn GetSpawnedObject(&self, result: *mut SharedPtr<GameObject>, type_id: *const u32, index: i32) -> *mut SharedPtr<GameObject>;
+    },
+}
+impl WeaponPlacementRule {
+    /// `CWeaponPlacementRule::TYPE_ID`: the run-time type id of `CWeaponPlacementRule`, for
+    /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use.
+    #[address(0x140_7C8_540)]
+    pub fn TYPE_ID() -> *const u32;
+}

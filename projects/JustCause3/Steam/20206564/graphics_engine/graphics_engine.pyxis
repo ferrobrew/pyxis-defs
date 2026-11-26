@@ -1,5 +1,5 @@
 use camera::camera::Camera;
-use graphics_engine::device::{Device, DeviceInfo};
+use graphics_engine::device::{Device, DeviceInfo, ID3D11InputLayout};
 use graphics_engine::render_pass::RenderStatus;
 use graphics_engine::shadow_manager::ShadowManager;
 use graphics_engine::texture::Texture;
@@ -42,7 +42,14 @@ pub type EffectInfo {
     /// [`FRAME_INDEX_FREE`](Self::FRAME_INDEX_FREE).
     pub const FRAME_INDEX_PICKED: u8 = 3,
 
-    /// The reflection-proxy depth texture.
+    /// The reflection-proxy depth texture: the destination of the `CopyEffectTextures` stage's
+    /// [`CopySurfaceToTexture`](graphics_engine::draw::CopySurfaceToTexture) of the
+    /// reflection-proxy depth surface, a whole-surface copy at the render size.
+    ///
+    /// Nothing reads it. Its two accessors, `GetEffectDepthTexture` and `GetEffectTransformRef`, have
+    /// no callers and no references in the image, and the passes that use the reflection-proxy depth
+    /// sample the live surface rather than a history slot. Skipping the copy leaves the rendered frame
+    /// unchanged.
     pub m_DepthTexture: *mut HTexture_t,
     pub m_Transform: Matrix4,
     /// The lifecycle counter, one of the `FRAME_INDEX_*` constants on this type. Any other non-free
@@ -324,7 +331,91 @@ pub type GraphicsEngine {
 // Opaque graphics handles, used behind pointers.
 /// A vertex-declaration handle: the input layout a render block binds before its draws, passed to the
 /// render block types' `Setup` and on to `Graphics::SetVertexDeclaration`.
-pub type HVertexDeclaration_t;
+///
+/// [`CreateVertexDeclarationInstanced`] and its non-instanced sibling build it from an element array
+/// that the creating code assembles on its stack (each render block type's `Create` does so once,
+/// at registration). The handle keeps only the D3D layout and each stream's byte size, and D3D11 offers
+/// no way to read a layout's elements back.
+#[size(0x18)]
+pub type HVertexDeclaration_t {
+    /// The D3D input layout `Graphics::SetVertexDeclaration` binds.
+    pub m_Layout: ID3D11InputLayout,
+    /// Each vertex stream's byte size: the sum of the sizes of the elements the declaration placed on
+    /// that stream, in declaration order, which is also how each element's byte offset was assigned.
+    pub m_element_bytesize: [u32; 4],
+}
+
+/// A vertex program handle: the D3D vertex shader and the bytecode it was created from, which an
+/// input layout is validated against at creation.
+#[min_size(0x18)]
+pub type HVertexProgram_t {
+    #[address(0x8)]
+    pub m_Code: *const u8,
+    pub m_CodeSize: u64,
+}
+
+/// One per-vertex element of a vertex declaration, as [`CreateVertexDeclarationInstanced`] takes it.
+/// The type and size select the element's DXGI format and byte size through the engine's format
+/// tables; the usage selects its semantic name, and one usage value marks padding that occupies bytes
+/// on its stream but emits no input element.
+#[copyable, size(0x14), align(4)]
+pub type SVertexElement {
+    /// The vertex stream (input slot), below four.
+    pub m_Stream: i32,
+    /// The component count.
+    pub m_Size: i32,
+    /// The component type (`Graphics::EType`).
+    pub m_Type: i32,
+    /// The semantic (`Graphics::EVertexDeclarationUsage`).
+    pub m_Usage: i32,
+    /// The semantic index.
+    pub m_UsageIndex: i32,
+}
+
+/// One per-instance element of a vertex declaration: an [`SVertexElement`] whose semantic comes from
+/// the instanced-semantic table (the `INST_`-prefixed names) and which advances once every
+/// [`m_StepRate`](Self::m_StepRate) instances.
+#[copyable, size(0x18), align(4)]
+pub type SInstancedVertexElement {
+    pub m_Stream: i32,
+    pub m_Size: i32,
+    pub m_Type: i32,
+    pub m_Usage: i32,
+    pub m_UsageIndex: i32,
+    /// The D3D `InstanceDataStepRate` of the element.
+    pub m_StepRate: i32,
+}
+
+/// Creates a vertex declaration with per-instance elements. Converts `parameters` into per-vertex
+/// D3D input elements and then `inst_parameters` into per-instance ones (`D3D11_INPUT_PER_INSTANCE_DATA`
+/// with each element's [`m_StepRate`](SInstancedVertexElement::m_StepRate)), assigning each element
+/// the running byte offset of its stream, creates the D3D input layout against `program`'s bytecode
+/// (raising the graphics critical-error path on failure), and records the streams' byte sizes in the
+/// returned handle. The element arrays are not retained. Nothing is cached: every call allocates a
+/// new handle from the device's allocator and creates a new D3D layout.
+/// [`RenderBlockTypeGeneralMkIII::Create`](graphics_engine::render_block::RenderBlockTypeGeneralMkIII::Create)
+/// calls it once per hardware-instanced layout of the type, and the bark, foliage, and occluder types'
+/// `Create` call it for theirs.
+#[address(0x141_953_0A0)]
+pub fn CreateVertexDeclarationInstanced(device: *mut HDevice_t, parameters: *const SVertexElement, parameters_count: i32, inst_parameters: *const SInstancedVertexElement, inst_parameters_count: i32, program: *mut HVertexProgram_t) -> *mut HVertexDeclaration_t;
+
+/// Creates a vertex declaration with per-vertex elements only: the conversion
+/// [`CreateVertexDeclarationInstanced`] applies to its `parameters`, the same allocation, and the same
+/// critical-error path on failure.
+#[address(0x141_952_F00)]
+pub fn CreateVertexDeclaration(device: *mut HDevice_t, parameters: *const SVertexElement, parameters_count: i32, program: *mut HVertexProgram_t) -> *mut HVertexDeclaration_t;
+
+/// Destroys a vertex declaration: releases its D3D input layout and returns the handle to the
+/// device's allocator.
+#[address(0x141_953_2D0)]
+pub fn DestroyVertexDeclaration(device: *mut HDevice_t, declaration: *mut HVertexDeclaration_t);
+
+/// Creates a constant buffer of `register_count` 16-byte registers with the given usage
+/// (`Graphics::EUsageType`; the dynamic usage adds CPU write access), initialised from `data` when it
+/// is non-null. Allocates the handle from the device's allocator and raises the graphics
+/// critical-error path when the D3D creation fails.
+#[address(0x141_952_DC0)]
+pub fn CreateConstantBuffer(device: *mut HDevice_t, register_count: i32, usage: i32, data: *const void, tag: bool) -> *mut void;
 
 /// A GPU context handle: the engine's wrapper over the D3D11 immediate context, carrying the deferred,
 /// dirty-tracked pipeline state that [`SetupRenderStates`] flushes to D3D before each draw. Partial:

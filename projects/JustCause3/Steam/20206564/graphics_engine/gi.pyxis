@@ -1,4 +1,4 @@
-use types::math::Vector3;
+use types::math::{Matrix4, Vector3};
 
 /// The light-propagation-volume solver: RSM inject + LPV propagation for the global-illumination pass.
 /// `CGISolver::Execute` refreshes one of the two LPV cascades each dispatch and toggles
@@ -33,4 +33,15 @@ pub type LightManager {
     /// The global-illumination render pass.
     #[address(0x1BE_908)]
     pub m_GIPass: *mut GIPass,
+}
+impl LightManager {
+    /// Places the light-propagation volume around a camera: hands `camera_transform` (a camera's
+    /// world transform) to the [`m_GIPass`](Self::m_GIPass), which keeps it and repositions the
+    /// cascade [`GISolver::m_CascadeToUpdate`] names at the camera's position, rotated to its
+    /// forward axis. `CGameCameraManager::UpdateRender` calls it once per frame with the game
+    /// camera's render context (or a special camera's, when one is the lighting reference), not
+    /// with the render camera, so the volume follows the game camera rather than the camera a
+    /// pass renders from.
+    #[address(0x140_0D0_250)]
+    pub fn UpdatePlayerLightingTransforms(&mut self, camera_transform: *const Matrix4);
 }

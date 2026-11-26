@@ -22,6 +22,14 @@ impl NStateTask_InputSurfaceSwimTask {
     /// base/target direction pair in the character's swim action parameters for the actuator's
     /// segment-gated slerp. Also handles the surface-to-underwater dive transition (camera pitched
     /// down, sufficient depth, facing within 65 degrees of the move direction).
+    ///
+    /// The stick's magnitude only picks acts: at or above
+    /// [`CharacterSwimSettings::m_SurfaceSwimFullDeflection`](input::locomotion::CharacterSwimSettings::m_SurfaceSwimFullDeflection)
+    /// a character that is not already starting or crawling gets the start act; otherwise the
+    /// task queues the crawl act until the stick has stayed below a tenth of full deflection for
+    /// [`CharacterSwimSettings::m_SurfaceSwimNoInputToStopTime`](input::locomotion::CharacterSwimSettings::m_SurfaceSwimNoInputToStopTime),
+    /// then the idle act. Weapon input, a grenade throw, or a planted explosive held past that
+    /// time divert to the idle and quick-turn acts.
     #[address(0x140_830_BA0)]
     pub fn Update(ctx: *mut StateContext, p1: *mut void, p2: *mut void);
 }
@@ -63,6 +71,16 @@ impl NStateTask_MovementUnderWaterSwimTask {
 /// act-sized steps rather than continuously. `warping_seg_id` drives the position warp toward a
 /// grapple or planted-explosive target. The segment ids are the task's loaded properties, passed
 /// as `idstring<SSegmentIdTag>` references.
+///
+/// The swim speed is the horizontal magnitude of the animation's raw root velocity
+/// ([`AnimationController::GetRawRootVelocity`](character::character::AnimationController::GetRawRootVelocity));
+/// the stick contributes only its direction, normalized, so how fast the swimmer goes is set by
+/// the act the input task queued and the clip it plays. With the stick at rest the speed is kept
+/// along the measured world velocity's direction. The velocity, with buoyancy, wave push, and the
+/// transition speed added, is rotated into the frame of the orientation passed to
+/// [`PfxCharacterInstance::SetOrientation`] (the transpose of that orientation applied to it) and
+/// written to the proxy's [`CharacterInput::wantedVelocity`](physics::CharacterInput::wantedVelocity)
+/// just before that call.
 #[address(0x140_7E9_440)]
 pub fn UpdateSurfaceMovement(character: *mut Character, dt: f32, target_angle_offset: f32, ang_corr_seg_id: *const u32, steering_seg_id: *const u32, warping_seg_id: *const u32);
 
@@ -70,7 +88,7 @@ pub fn UpdateSurfaceMovement(character: *mut Character, dt: f32, target_angle_of
 /// [`NStateTask_MovementUnderWaterSwimTask::Update`]. Same orientation structure as
 /// [`UpdateSurfaceMovement`] -- segment-gated animated-turn slerp applied through
 /// [`PfxCharacterInstance::SetOrientation`] -- with the pitch following the three-dimensional swim
-/// direction instead of the surface plane.
+/// direction instead of the surface plane. Its speed is likewise the animation's root speed.
 #[address(0x140_7A5_DC0)]
 pub fn UpdateUnderwaterMovement(character: *mut Character, dt: f32, target_angle_offset: f32, ang_corr_seg_id: *const u32, steering_seg_id: *const u32, p6: bool);
 

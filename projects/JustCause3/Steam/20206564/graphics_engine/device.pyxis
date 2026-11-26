@@ -10,6 +10,9 @@ extern type ID3D11Device;
 #[size(8), align(8), rust_name = "windows::Win32::Graphics::Direct3D11::ID3D11DeviceContext", cpp_header = "<d3d11.h>", cpp_name = "::ID3D11DeviceContext*"]
 extern type ID3D11DeviceContext;
 
+#[size(8), align(8), rust_name = "windows::Win32::Graphics::Direct3D11::ID3D11InputLayout", cpp_header = "<d3d11.h>", cpp_name = "::ID3D11InputLayout*"]
+extern type ID3D11InputLayout;
+
 #[size(8), align(8), rust_name = "windows::Win32::Graphics::Dxgi::IDXGISwapChain", cpp_header = "<dxgi.h>", cpp_name = "::IDXGISwapChain*"]
 extern type IDXGISwapChain;
 

@@ -1,0 +1,41 @@
+/// `CLocator::ELocale`: a game language, indexing the per-language blocks of each loaded string
+/// table. `CGame::SetGameLanguage` maps the two-letter language code onto it, falling back to
+/// [`LOCALE_ENGLISH`](Self::LOCALE_ENGLISH) for a code it does not know.
+#[copyable]
+pub enum Locale: u32 {
+    LOCALE_ENGLISH = 0x0,
+    LOCALE_FRENCH = 0x1,
+    LOCALE_GERMAN = 0x2,
+    LOCALE_ITALIAN = 0x3,
+    LOCALE_SPANISH = 0x4,
+    LOCALE_RUSSIAN = 0x5,
+    LOCALE_POLISH = 0x6,
+    LOCALE_JAPANESE = 0x7,
+    /// Brazilian Portuguese.
+    LOCALE_BRAZILIAN = 0x8,
+    /// Latin American Spanish.
+    LOCALE_MEXICAN = 0x9,
+    LOCALE_ARABIC = 0xA,
+}
+
+/// The localisation string store (`CLocator`, a `Base::CSingle` singleton): owns the loaded string
+/// lookup tables (`.stringlookup` resources), each holding a sorted array of `(hash, offset)`
+/// pairs per language over one UTF-8 string blob, plus a map of dynamically registered strings.
+/// Strings are keyed by the `hashlittle` hash of their key name (`HashString`, as
+/// [`HashString`](hash::HashString) stores it); the UI resolves its `buttonhint_*` and other
+/// labels through [`GetLocalizedStringRaw`](Self::GetLocalizedStringRaw).
+#[singleton(0x142_E5B_4F8), min_size(0xE8)]
+pub type Locator {
+    /// The language whose block every lookup reads. `CGame::SetGameLanguage` writes it from the
+    /// language code before switching the UI's language.
+    #[address(0xE0)]
+    pub m_CurrentLocale: Locale,
+}
+impl Locator {
+    /// Looks up the string for a key hash in the [current language](Self::m_CurrentLocale):
+    /// under the lookups' reader lock it binary-searches each loaded table's block for that
+    /// language, then falls back to the dynamic map. Returns a null-terminated UTF-8 string owned
+    /// by the table, or null when no table has the key.
+    #[address(0x140_076_E00)]
+    pub fn GetLocalizedStringRaw(&self, hash: u32) -> *const u8;
+}

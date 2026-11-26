@@ -1,20 +1,110 @@
+use animation::skeleton::HkArray;
 use character::character::Character;
+use damage::DamageMsg;
+use game::{GameObject, GameObjectRenderContext};
+use graphics_engine::model_instance::{Model, ModelInstance, ModelInstanceArray};
+use havok::{hkAabb, hkAabb16, hkContainerHeapAllocator, hkIntSpaceUtil, hkReferencedObject, hkSimdFloat32, hkTransformf, hknpBodyCinfo, hknpConstraintCinfo, hknpContactImpulseEvent, hknpMotionCinfo, hknpShape};
 use types::math::{Matrix4, Vector3};
+use types::shared_ptr::SharedPtr;
+use types::vector_math::{AlignedQuat, AlignedVector3};
 
 /// The physics system (`CPhysicsSystem`), a `Base::CSingle` singleton that owns the Havok world and
 /// serves the engine's scene queries. The queries are sim-phase calls against the live Havok world.
 /// Only some members are bound.
-#[singleton(0x142_EDC_120), min_size(0x38)]
+#[singleton(0x142_EDC_120), min_size(0x138218)]
 pub type PhysicsSystem {
     /// The collision layer [`CastRaySimple`](Self::CastRaySimple) hardcodes, and the one the
     /// player's direct-aim query passes to [`CastRay`](Self::CastRay).
     pub const QUERY_LAYER: i32 = 21,
+    /// The simulation step, seconds. [`Update`](Self::Update) steps the world once per call by
+    /// exactly this, whatever time it is given. The value is stored once in the image and shared:
+    /// [`Update`](Self::Update) loads it to pin its step, and the vehicles' parallel post-solve
+    /// update reads it too.
+    pub const STEP_SECONDS: f32 = 0.033333335,
+    /// The intra-[`Update`](Self::Update) site of the step pin: after comparing the time it was
+    /// given with [`STEP_SECONDS`](Self::STEP_SECONDS) and skipping ahead when they are equal, a
+    /// `movaps` copies the constant over the time, so every step uses the constant. Without the
+    /// copy the world steps by the time it was given, and the step global the pre-collision
+    /// handler reads carries that time too.
+    pub const UPDATE_STEP_PIN_OFFSET: u64 = 0xC3,
+    /// The length in bytes of the `movaps` at [`UPDATE_STEP_PIN_OFFSET`](Self::UPDATE_STEP_PIN_OFFSET).
+    pub const UPDATE_STEP_PIN_LENGTH: u64 = 3,
 
     /// The Havok world.
     #[address(0x30)]
     pub m_World: *mut hknpWorld,
+
+    /// The world-origin shift: the Havok world is simulated about a moving origin, and a Havok-space
+    /// position plus this offset is the game-space position. [`CastRay`](Self::CastRay) subtracts it
+    /// from its game-space ray before the Havok query, and the engine adds it back to the positions
+    /// a query reports. [`hknpWorld::applyBodyImpulseAt`] takes a Havok-space position.
+    #[address(0x138_1C4)]
+    pub m_AccumulatedShift: Vector3,
+
+    /// The reference-counted body-pair exclusion filter shared with the constraint filter.
+    /// The game materials' descriptions ([`MaterialSystem::GetMaterialDesc`]).
+    #[address(0x138_1E0)]
+    pub m_MaterialManager: *mut MaterialSystem,
+
+    #[address(0x138_210)]
+    pub m_PairCollisionFilter: *mut hknpPairCollisionFilter,
 }
+
+/// The body's pair-exclusion filter. Each unordered body pair has a reference count, so
+/// independent callers can disable the same pair without releasing another caller's exclusion.
+pub type hknpPairCollisionFilter;
+impl hknpPairCollisionFilter {
+    /// Adds one exclusion reference for the unordered body pair, rebuilds the affected collision
+    /// caches, and returns the new reference count. The disassembler mislabels this function
+    /// `NHavokCollisionFilter::SetSystemGroup`.
+    #[address(0x141_525_AE0)]
+    pub fn disableCollisionsBetween(&mut self, world: *mut hknpWorld, body_a: u32, body_b: u32) -> i32;
+
+    /// Removes one exclusion reference and returns the remaining count. Removing the final
+    /// reference requests collision regeneration when both body slots are valid.
+    #[address(0x141_525_BB0)]
+    pub fn enableCollisionsBetween(&mut self, world: *mut hknpWorld, body_a: u32, body_b: u32) -> i32;
+}
+
 impl PhysicsSystem {
+    /// Advances the physics by one step. It fires the pre-update signal, clears the collision
+    /// array, and updates the bodies that do not simulate; then, unless one of its two suspend
+    /// flags is set (`CGameStateRun::Update` sets one from its update context's pause), and when
+    /// the world exists and `dt` is above a small threshold, it fires the pre-simulation callbacks
+    /// ([`FirePreSimulationCallbacks`](Self::FirePreSimulationCallbacks)) with the world and `dt`
+    /// as given, then replaces `dt` with [`STEP_SECONDS`](Self::STEP_SECONDS) when they differ
+    /// (the pin at [`UPDATE_STEP_PIN_OFFSET`](Self::UPDATE_STEP_PIN_OFFSET)), and steps the world
+    /// once by it on the physics thread pool, joining the pool before it returns. The game states'
+    /// updates (`CGameStateRun::Update` and the loading and front-end states' updates) call it
+    /// inline on the thread that runs them, through the physics update
+    /// ([`GameState::UpdatePhysics`](game::GameState::UpdatePhysics) in the run state), which
+    /// dispatches the queued collisions and the damage listeners' events after it.
+    #[address(0x140_2D1_B40)]
+    pub fn Update(&mut self, dt: f32);
+
+    /// Calls every pre-simulation callback's
+    /// [`preSimulationCallback`](PfxPreSimulationCallback::preSimulationCallback) with `world` and
+    /// `dt`, in the order they were added, compacting away the entries
+    /// [`RemovePreSimulationCallback`](Self::RemovePreSimulationCallback) cleared as it walks.
+    /// [`Update`](Self::Update) calls it before the step with the time it was given, before that
+    /// time is pinned to [`STEP_SECONDS`](Self::STEP_SECONDS).
+    #[address(0x140_29C_9C0)]
+    pub fn FirePreSimulationCallbacks(&mut self, world: *mut hknpWorld, dt: f32);
+
+    /// Appends `callback` to the pre-simulation callbacks [`Update`](Self::Update) fires before
+    /// each step, a plain `std::vector` push. The ragdolls, the grappling hook's wire, and the AI
+    /// world register themselves this way. A callback added while the callbacks fire would
+    /// invalidate the walk over them.
+    #[address(0x140_2BE_A00)]
+    pub fn AddPreSimulationCallback(&mut self, callback: *mut PfxPreSimulationCallback);
+
+    /// Clears every entry of the pre-simulation callbacks that is `callback`. The entry is not
+    /// erased at once: the next walk over the callbacks (before a step, or on a world shift)
+    /// compacts the cleared entries away, so a callback may remove itself, or another, while they
+    /// fire.
+    #[address(0x140_286_FC0)]
+    pub fn RemovePreSimulationCallback(&mut self, callback: *mut PfxPreSimulationCallback);
+
     /// The general ray query: casts `ray` (world space, normalized direction) from `min_fraction`
     /// out to `max_distance` along its direction against collision `layer`, returning whether it
     /// hit. `info`, when non-null, receives the closest hit; `filter`, when non-null, replaces the
@@ -37,6 +127,17 @@ impl PhysicsSystem {
     /// to `hit` and returning whether there was one.
     #[address(0x140_23C_150)]
     pub fn CastRayWaterSurface(&mut self, start: *const Vector3, end: *const Vector3, hit: *mut Vector3) -> bool;
+
+    /// Collects every body overlapping a box of half extents `half_extents` placed by `transform`
+    /// (game space), on collision `layer`, ignoring the bodies of collision system group
+    /// `system_group`, into `collector` (an `hknpCollisionQueryCollector`); returns whether any
+    /// overlapped. Each collected `hknpCollisionResult` carries the Havok-space position and the
+    /// body id of one overlapping body. The player's melee hit message
+    /// ([`Character::HandleTrackMessage`](character::character::Character::HandleTrackMessage))
+    /// runs it with an `hknpAllHitsCollector` to find the objects in front of the character when no
+    /// character is the target, then damages each hit object and pushes its body.
+    #[address(0x140_29A_120)]
+    pub fn CollideBox(&mut self, half_extents: *const Vector3, transform: *const Matrix4, system_group: u32, layer: u32, collector: *mut void) -> bool;
 
     /// Sweeps a sphere of `radius` from `start` to `end`, reporting hits to `collector` (an
     /// `hknpCollisionQueryCollector`).
@@ -134,11 +235,48 @@ impl IgnoreMaterialFlagFilter {
     pub fn SetIgnoreCameraPass(&mut self, ignore: bool);
 }
 
-/// The result of a ray query (`CCastRayInfoBase`): the hit position, normal, and fraction, the hit
-/// body and instance, and the hit material's pass flags. Only the methods are bound.
-pub type CastRayInfoBase;
+/// The result of a ray query (`CCastRayInfoBase`): the hit normal and fraction, and the hit object
+/// and body. [`PhysicsSystem::CastRay`] fills it from the query's closest hit, and on a miss sets the
+/// fraction to one and clears the object. Engine callers construct it on the stack: the
+/// [`VFTABLE`](Self::VFTABLE) pointer, a null [`m_HitObjectId`](Self::m_HitObjectId), then
+/// [`Reset`](Self::Reset).
+///
+/// The class is abstract: its virtual hit-object setter is the runtime's pure-call stub, and
+/// [`PhysicsSystem::CastRay`] calls that setter with null on a miss, so a query given an info
+/// that still carries the base table aborts the process on its first miss. Callers pass a derived
+/// info such as [`CastRayInfo`], switching the table after [`Reset`](Self::Reset).
+#[size(0x38), align(8)]
+pub type CastRayInfoBase {
+    /// The address of the `CCastRayInfoBase` virtual table.
+    pub const VFTABLE: u64 = 0x142343F08,
+
+    pub __vftable: u64,
+
+    /// The surface normal at the hit.
+    #[address(0x8)]
+    pub m_Normal: Vector3,
+
+    /// The hit's position along the queried segment, as a fraction of the segment from the query's
+    /// start distance to its end distance; one on a miss.
+    #[address(0x14)]
+    pub m_HitDistance: f32,
+
+    /// The object id (`SObjectID`) of the hit object, or null for world geometry.
+    #[address(0x18)]
+    pub m_HitObjectId: u64,
+
+    /// The hit shape's key within the hit body's shape.
+    #[address(0x28)]
+    pub m_ShapeKey: u32,
+
+    /// The Havok body id of the hit body.
+    #[address(0x30)]
+    pub m_BodyId: u32,
+}
 impl CastRayInfoBase {
-    /// Clears the result for reuse.
+    /// Clears the result for reuse: a unit normal and fraction, a null object, an invalid body,
+    /// then a second virtual setter with null, which is empty in the base class and which
+    /// [`CastRayInfo`] overrides. It calls through the virtual table, which must already be set.
     #[address(0x140_255_8C0)]
     pub fn Reset(&mut self);
 
@@ -148,13 +286,198 @@ impl CastRayInfoBase {
     pub fn DidHitBulletPassMaterial(&self) -> bool;
 }
 
-/// A [`CastRayInfoBase`] that resolves the hit material on demand (`CCastRayInfo`).
-pub type CastRayInfo;
+/// A [`CastRayInfoBase`] that records the hit object and resolves the hit material on demand
+/// (`CCastRayInfo`). Engine callers construct the base first and then switch the virtual table to
+/// [`VFTABLE`](Self::VFTABLE) and clear [`m_GameObject`](Self::m_GameObject).
+#[size(0x48), align(8)]
+pub type CastRayInfo {
+    /// The address of the `CCastRayInfo` virtual table.
+    pub const VFTABLE: u64 = 0x1423452C8,
+
+    #[base]
+    pub base: CastRayInfoBase,
+
+    /// The hit object: the [`PhysicsGameObject`] that owns the hit physics instance (for a
+    /// character, the `CCharacter`), written by the virtual hit-object setter [`PhysicsSystem::CastRay`] calls. Null
+    /// for world geometry and on a miss.
+    #[address(0x38)]
+    pub m_GameObject: *mut void,
+}
 impl CastRayInfo {
     /// `CCastRayInfo::GetHitMaterial` (a virtual): the hit shape's game material
     /// (`EGameMaterialId`), looked up through the physics system's world.
     #[address(0x140_2B3_BA0)]
     pub fn GetHitMaterial(&self) -> i32;
+}
+
+/// `NRayCastUtility::GetModelInstancesHit`: appends to `out` the model instance a ray query's hit
+/// names, when `out` has room and the instance is not queued for deletion. The hit object is
+/// `hit_object` (a `CGameObject` subobject), or, when that is null, the object
+/// [`m_HitObjectId`](CastRayInfoBase::m_HitObjectId) names. A breakable tree patch gives the
+/// instance of the hit shape key; any physics game object is asked for the instance of the hit
+/// shape, [`m_ShapeKey`](CastRayInfoBase::m_ShapeKey), and [`m_BodyId`](CastRayInfoBase::m_BodyId)
+/// through its virtual function. `info` must be a complete cast info, since
+/// the call reads the hit shape through its virtual table.
+#[address(0x140_BFA_C40)]
+pub fn GetModelInstancesHit(info: *mut CastRayInfoBase, out: *mut ModelInstanceArray, hit_object: *mut GameObject);
+
+/// The game materials' table (`CMaterialSystem`), held by
+/// [`PhysicsSystem::m_MaterialManager`]. Only some members are bound.
+pub type MaterialSystem;
+impl MaterialSystem {
+    /// The description of the game material `id`.
+    #[address(0x140_9AF_350)]
+    pub fn GetMaterialDesc(&self, id: GameMaterialId) -> *const GameMaterialDesc;
+}
+
+/// One game material's description (`CMaterialSystem::SGameMaterialDesc`), loaded from the game's
+/// material data. Only some members are bound.
+#[min_size(0x80)]
+pub type GameMaterialDesc {
+    /// The chance, from zero to one, that a bullet hitting a game object of this material stops
+    /// there rather than passing through it ([`Bullet::m_HasPenetratedOneObject`](equipment::weapon::Bullet::m_HasPenetratedOneObject)):
+    /// the bullet passes when a uniform random roll exceeds it. One unless the data sets it.
+    #[address(0x78)]
+    pub m_BulletCollideFactor: f32,
+}
+
+/// A game material (`EGameMaterialId`): the surface kind a physics shape is tagged with, which
+/// picks the impact effects and sounds played against it. Only the values the melee hit's impact
+/// lookup uses are bound.
+#[copyable]
+pub enum GameMaterialId: u32 {
+    /// Glass. A bullet whose ray hits a shape of this material damages the windows the hit names
+    /// ([`Bullet::OnBulletHitGlass`](equipment::weapon::Bullet::OnBulletHitGlass)). Vehicle window
+    /// shapes carry it.
+    EGameMaterialId_Glass = 0x10,
+    /// A character's body, the material a melee hit on a character plays its impact against.
+    EGameMaterialId_Flesh = 0x19,
+    /// The fallback material: a lookup with no entry for a material uses this one's.
+    EGameMaterialId_Default = 0x1F,
+}
+
+/// A contact report (`SCollision`), passed to a physics game object's collision handler (such as
+/// [`Grenade::OnCollision`](equipment::explosive::Grenade::OnCollision)). The handler's owner is
+/// the report's first object, and [`m_GB`](Self::m_GB) is the one it touched.
+#[min_size(0x58)]
+pub type Collision {
+    /// The object the handler's owner touched, or null for the static world.
+    #[address(0x8)]
+    pub m_GB: *mut PhysicsGameObject,
+
+    /// The touched surface's game material (`EGameMaterialId`; see [`GameMaterialId`]).
+    #[address(0x14)]
+    pub m_MatB: u32,
+
+    /// The contact point, world space.
+    #[address(0x18)]
+    pub m_Position: Vector3,
+
+    /// The contact normal, world space.
+    #[address(0x24)]
+    pub m_Normal: Vector3,
+
+    /// The contact's impulse. A grenade's handler compares it against its bounce count to decide
+    /// whether a contact plays an impact.
+    #[address(0x30)]
+    pub m_Impulse: f32,
+
+    /// The two bodies' separation velocity at the contact, along the normal.
+    #[address(0x40)]
+    pub m_SeparationVelocity: f32,
+
+    /// The touched body. An explosive's handler attaches to the touched object at this body.
+    #[address(0x54)]
+    pub m_bodyIdB: u32,
+}
+
+/// The physics system's global collision listener. Contact impulse dispatch resolves both body
+/// instances and calls each instance's event virtual when its subscription flag is active.
+pub type HavokCollisionListener;
+impl HavokCollisionListener {
+    /// Dispatches a contact impulse event without modifying the contact's solver impulses.
+    #[address(0x140_1CE_500)]
+    pub fn onContactImpulseEvent(&mut self, input: *const void, event: *const hknpContactImpulseEvent);
+}
+
+impl hknpWorld {
+    /// Replaces the body's complete collision-filter word, rebuilds its collision caches when
+    /// `rebuild_mode` is [`REBUILD_COLLISION_CACHES`](Self::REBUILD_COLLISION_CACHES), and emits the
+    /// body's change signal. An unchanged word does nothing. The disassembler labels this function
+    /// as `CPfxRigidBody::SetCollisionFilterInfo`.
+    #[address(0x141_4CE_460)]
+    pub fn setBodyCollisionFilterInfo(&mut self, body: u32, filter_info: u32, rebuild_mode: i32);
+
+    /// Adds collision flags and rebuilds collision caches when `rebuild_mode` selects rebuilding.
+    /// The disassembler labels this function as a rigid-body constructor.
+    #[address(0x141_4CE_4C0)]
+    pub fn enableBodyFlags(&mut self, body: u32, flags: u32, rebuild_mode: i32);
+
+    /// Removes collision flags and rebuilds collision caches when `rebuild_mode` selects rebuilding.
+    /// The disassembler labels this function as a signal subscription.
+    #[address(0x141_4CE_550)]
+    pub fn disableBodyFlags(&mut self, body: u32, flags: u32, rebuild_mode: i32);
+}
+
+/// A physics game object (`CPhysicsGameObject`): a game object with a physics instance, the owner a
+/// physics query reports for a hit body ([`CastRayInfo::m_GameObject`]). Characters, vehicles,
+/// and rigid props are physics game objects. Its `CGameObject` subobject sits at
+/// [`GAME_OBJECT_BASE_OFFSET`](Self::GAME_OBJECT_BASE_OFFSET), and its run-time type test goes
+/// through that subobject ([`GameObject::IsType`](game::GameObject::IsType)). Only one virtual is
+/// bound.
+pub type PhysicsGameObject {
+    /// The offset of the `CGameObject` subobject.
+    pub const GAME_OBJECT_BASE_OFFSET: u64 = 0x8,
+
+    vftable {
+        /// The object's engine physics instance, or null. A rigid object
+        /// ([`RigidObject`]) returns its one body's wrapper, a [`PfxRigidBody`], whose
+        /// [`PfxInstance::m_GameObject`] is the object.
+        #[index(1)]
+        pub fn GetIPfxInstance(&mut self) -> *mut PfxInstance;
+
+        /// How the grapple treats the object; see [`GrapplingMode`]. The player aim reads it for
+        /// the grapple slot's direct hit
+        /// ([`PlayerAimControl::m_DirectGrapplePosIsGrapplable`](aim::aim::PlayerAimControl::m_DirectGrapplePosIsGrapplable)),
+        /// and a wire end's attach refuses an ungrapplable object
+        /// ([`WireEnd::SetupProxyForAttachment`](equipment::wire_end::WireEnd::SetupProxyForAttachment)).
+        #[index(13)]
+        pub fn GetGrapplingMode(&self) -> GrapplingMode;
+
+        /// Takes the damage in `msg` and returns the damage dealt. Each kind of object overrides
+        /// it: a character (`CCharacter::OnDamage`) takes the health, sends the hit effects, and
+        /// runs its hit reaction from the message's impulse, position, and direction; a rigid
+        /// object (`CRigidObject::OnDamage`) takes the health of its damage controller.
+        #[index(20)]
+        pub fn OnDamage(&mut self, msg: *mut DamageMsg) -> i16;
+    },
+}
+
+/// Native collision-hit reaction data (`SHitReactInfo`).
+pub type HitReactInfo;
+impl PhysicsGameObject {
+    /// `CPhysicsGameObject::TYPE_ID`: the run-time type id of `CPhysicsGameObject`, for
+    /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use. Characters,
+    /// vehicles, their parts, rigid objects, and weapons derive from it, so a test against it
+    /// tells whether a game object owns a physics instance.
+    #[address(0x140_4C9_880)]
+    pub fn TYPE_ID() -> *const u32;
+
+    /// Converts collision-hit data into an impact damage message and dispatches it to the object.
+    #[address(0x140_4F2_040)]
+    pub fn DoReactToHit(&mut self, info: *const HitReactInfo);
+}
+
+/// How the grapple treats a physics game object (`CPhysicsGameObject::EGrapplingMode`), from
+/// [`PhysicsGameObject::GetGrapplingMode`].
+#[copyable]
+pub enum GrapplingMode: i32 {
+    E_GM_Normal = 0x0,
+    /// Grapplable, without attaching at the end of a reel. A weapon's mode
+    /// ([`WeaponBase::GetGrapplingModeWeapon`](equipment::weapon::WeaponBase::GetGrapplingModeWeapon)).
+    E_GM_ReelInNoAttach = 0x1,
+    /// Not grapplable: the aim does not count it, and a wire end does not attach to it.
+    E_GM_UnGrappable = 0x2,
 }
 
 /// The ragdoll's proxy phantom (`CRagdollProxyPhantom`), the shape set that stands in for a
@@ -168,17 +491,534 @@ impl RagdollProxyPhantom {
     pub fn GetHitNameHash(&mut self, info: *const CastRayInfoBase) -> u32;
 }
 
-/// The Havok physics world (`hknpWorld`). Only some members are bound.
-pub type hknpWorld;
+/// A Havok ragdoll (`hknpRagdoll`, an `hknpPhysicsSystem`): the bodies and constraints of one
+/// ragdoll in the world, and the skeleton they map to. Only some members are bound.
+#[min_size(0x48)]
+pub type hknpRagdoll {
+    /// An invalid entry of [`m_bodyIds`](Self::m_bodyIds).
+    pub const INVALID_BODY_ID: u32 = 0x7FFFFFFF,
+
+    /// The ragdoll's bodies, one per ragdoll bone in the order of the ragdoll's skeleton.
+    #[address(0x20)]
+    pub m_bodyIds: HkArray<u32>,
+}
+
+/// The Havok physics world (`hknpWorld`, Havok Physics 2014.1). Its body manager is embedded at
+/// the start; bodies and motions live in arrays indexed by body id and motion id. Only some members
+/// are bound.
+#[min_size(0x1C0), align(16)]
+pub type hknpWorld {
+    /// Rebuild the body's collision caches after changing flags.
+    pub const REBUILD_COLLISION_CACHES: i32 = 0,
+    /// The body property that holds a body's engine instance ([`PfxInstance`]), as the physics
+    /// queries read it to report the body's owner.
+    pub const BODY_PROPERTY_PFX_INSTANCE: u16 = 1,
+
+    /// The body manager's body array, indexed by body id. A body id below or at
+    /// [`m_peakBodyIndex`](Self::m_peakBodyIndex) has a slot; a freed slot's
+    /// [`hknpBody::m_motionId`] is [`hknpBody::INVALID_MOTION_ID`]. Body 0 is the world's fixed
+    /// body, which the body manager's constructor sets up as static and with no shape, so a live
+    /// body without a shape is not by itself a sign of a body still being built.
+    #[address(0x20)]
+    pub m_bodies: *mut hknpBody,
+
+    /// The body manager's property buffers: per-property arrays indexed by body id, looked up by
+    /// property key ([`hknpBodyPropertyMap::getWithDefault`]).
+    #[address(0x58)]
+    pub m_bodyProperties: hknpBodyPropertyMap,
+
+    /// The highest body id the body manager has allocated.
+    #[address(0x70)]
+    pub m_peakBodyIndex: u32,
+
+    /// The motion manager's motion array, indexed by [`hknpBody::m_motionId`].
+    #[address(0xE0)]
+    pub m_motions: *mut hknpMotion,
+
+    /// The world's constraints.
+    #[address(0x120)]
+    pub m_constraintManager: hknpConstraintManager,
+
+    /// The mapping between Havok space and the integer space the broad phase keeps the bodies'
+    /// boxes in ([`hknpBody::m_aabb`]).
+    #[address(0x180)]
+    pub m_intSpaceUtil: hkIntSpaceUtil,
+}
 impl hknpWorld {
+    /// Removes the bodies from the simulation, notifies the world's body-destroyed listeners,
+    /// detaches their motions, releases their shape references, and schedules their slots for
+    /// deletion. `activation_mode` is forwarded to the removal of the bodies.
+    #[address(0x141_4EA_080)]
+    pub fn destroyBodies(&mut self, ids: *const u32, count: i32, activation_mode: i32);
+
+    /// Wakes the body `body_id` and the bodies around it through the world's deactivation
+    /// manager, when the body is in the broad phase. It changes no body's motion type, so a static
+    /// or keyframed body stays as it is. [`PfxRigidBody::ForceActivate`] and
+    /// [`WireEnd::SetupProxyForAttachment`](equipment::wire_end::WireEnd::SetupProxyForAttachment)
+    /// call it. The disassembler mislabels it `hknpWorld::activateBodiesInAabb`.
+    #[address(0x141_4E4_650)]
+    pub fn activateBody(&mut self, body_id: u32);
+
+    /// Creates a constraint from `cinfo`, writes its id to `out`, and returns `out`. A constraint
+    /// whose two bodies are the same, or whose data is of a type the world does not support, is
+    /// created disabled; otherwise it is enabled at once. The constraint takes a reference of its
+    /// own to the data (`hknpConstraint::init`, which the disassembler names
+    /// `hknpWorldEx::handleConstraintActivationMode`), so the engine's callers, which allocate the
+    /// data from the Havok heap, release their own reference once the constraint exists. The
+    /// world's constraint collision filter keeps the two bodies of an enabled constraint from
+    /// colliding. The engine's own users destroy their constraints before they replace or destroy
+    /// the constrained bodies.
+    #[address(0x141_4E7_200)]
+    pub fn createConstraint(&mut self, out: *mut u32, cinfo: *const hknpConstraintCinfo) -> *mut u32;
+
+    /// Destroys the `count` constraints whose ids are at `ids`, firing the world's
+    /// constraint-disabled signal for those that were enabled and a second signal for each. Each
+    /// constraint releases its reference to its data, which destroys data no one else holds, and
+    /// its slot goes onto the manager's destroyed list with its first body set to
+    /// [`hknpConstraint::INVALID_BODY_ID`]; the manager reuses destroyed ids once its free ones
+    /// run out.
+    #[address(0x141_4E7_370)]
+    pub fn destroyConstraints(&mut self, ids: *const u32, count: i32);
+
+    /// The solve half of a step (`*solver_data` from the collide half, `hknpSolverData`): it
+    /// generates the solve's task graphs, runs a graph of one task on the calling thread and any
+    /// other on `task_queue` (`hkTaskQueue`), joining it, and repeats until no task remains. The
+    /// last graph is the post-solve phase alone, which dispatches the step's events, so the
+    /// world's event listeners run on the calling thread, inside the step.
+    /// [`PhysicsSystem::Update`] calls it on the game thread.
+    #[address(0x141_4ED_B40)]
+    pub fn stepSolve(&mut self, solver_data: *mut *mut void, task_queue: *mut void);
+
+    /// Creates a dynamic body from `cinfo` with a new motion from `motion_cinfo`, writes the new
+    /// body id to `out`, and returns `out`. The body takes its own reference to the shape. With
+    /// [`DO_NOT_ADD`](hknpAdditionMode::DO_NOT_ADD) the body exists but is not in the simulation
+    /// until it is added; any other `mode` adds it through the world's body addition with `flags`.
+    /// The disassembler names the body creation it calls `hknpWorld::setBodyShape`.
+    #[address(0x140_1E9_B20)]
+    pub fn createDynamicBody(&mut self, out: *mut u32, cinfo: *const hknpBodyCinfo, motion_cinfo: *const hknpMotionCinfo, mode: hknpAdditionMode, flags: u8) -> *mut u32;
+
     /// Casts a ray query (`hknpRayCastQuery`) and reports hits to `collector`
     /// (`hknpCollisionQueryCollector`).
     #[address(0x141_500_BE0)]
     pub fn castRay(&self, query: *const void, collector: *mut void);
 
+    /// Applies the linear impulse `impulse` to the body `body_id` at the Havok-space point
+    /// `position` (the game-space point less [`PhysicsSystem::m_AccumulatedShift`]), changing both
+    /// its linear and angular velocity, and wakes the body if it sleeps. It acts only on a dynamic
+    /// body: a static or keyframed body is left alone. The linear velocity gains the impulse times
+    /// the inverse mass; the angular velocity gains the impulse's moment about the centre of mass,
+    /// turned into the motion's frame and scaled axis by axis by the inverse inertia
+    /// ([`hknpMotion::m_inverseInertia`]).
+    #[address(0x141_4CC_B30)]
+    pub fn applyBodyImpulseAt(&mut self, body_id: u32, impulse: *const AlignedVector3, position: *const AlignedVector3);
+
+    /// Sets the linear and angular velocity (world space, the angular one rotated into the
+    /// motion's frame) of the dynamic body `body_id`'s motion, waking the body if it sleeps. A body
+    /// that is not dynamic is left alone, and so is a call that changes neither velocity. The
+    /// disassembler mislabels it `hknpWorld::getBodyVelocity`.
+    #[address(0x141_4CC_540)]
+    pub fn setBodyVelocity(&mut self, body_id: u32, linear: *const AlignedVector3, angular: *const AlignedVector3);
+
+    /// Sets the linear velocity (world space) of the dynamic body `body_id`'s motion, waking the
+    /// body if it sleeps; as [`setBodyVelocity`](Self::setBodyVelocity) for the linear part.
+    #[address(0x141_4CC_710)]
+    pub fn setBodyLinearVelocity(&mut self, body_id: u32, linear: *const AlignedVector3);
+
+    /// Sets the angular velocity (world space) of the dynamic body `body_id`'s motion, waking the
+    /// body if it sleeps; as [`setBodyVelocity`](Self::setBodyVelocity) for the angular part.
+    #[address(0x141_4CC_7D0)]
+    pub fn setBodyAngularVelocity(&mut self, body_id: u32, angular: *const AlignedVector3);
+
     /// Replaces the shape (`hknpShape*`) of the body `body_id` on the live world.
     #[address(0x141_4CF_370)]
     pub fn setBodyShape(&mut self, body_id: u32, shape: *const void);
+
+    /// Appends to `hits` the id of every body in the broad phase whose box overlaps the query's
+    /// box ([`hknpAabbQuery::m_aabb`], Havok space), on every broad-phase layer. The query box is
+    /// quantized outwards into [`m_intSpaceUtil`](Self::m_intSpaceUtil) and compared with each
+    /// body's [`hknpBody::m_aabb`], so the hits can include bodies whose real boxes only come close;
+    /// a body is never tested against its shape. A query with a [`m_filter`](hknpAabbQuery::m_filter)
+    /// asks it per layer and per body; a null filter keeps every hit. A body not in the broad phase
+    /// is never a hit. `hits` grows from [`hkContainerHeapAllocator::s_alloc`], and the caller frees
+    /// what it grew.
+    #[address(0x141_501_2D0)]
+    pub fn queryAabb(&self, query: *const hknpAabbQuery, hits: *mut HkArray<u32>);
+
+    /// Writes the body `body_id`'s box as the broad phase holds it to `aabb`, Havok space: its
+    /// [`hknpBody::m_aabb`] restored through [`m_intSpaceUtil`](Self::m_intSpaceUtil), each corner
+    /// as the integer corner times the inverse scale less the low offset.
+    #[address(0x141_4CC_220)]
+    pub fn getBodyAabb(&self, body_id: u32, aabb: *mut hkAabb);
+}
+
+/// A box query against a world's bodies (`hknpAabbQuery`), as
+/// [`hknpWorld::queryAabb`] takes it. The engine's callers zero it, with the material
+/// `0xFFFF`, and fill in the box.
+#[size(0x40), align(16)]
+pub type hknpAabbQuery {
+    /// The collision filter that decides which layers and bodies the query sees
+    /// (`hknpCollisionFilter*`), or null for all of them.
+    pub m_filter: *mut void,
+
+    /// The query's material (`hknpQueryFilterData::m_materialId`), for the filter.
+    #[address(0x8)]
+    pub m_materialId: u16,
+
+    /// The query's collision filter info, for the filter.
+    #[address(0xC)]
+    pub m_collisionFilterInfo: u32,
+
+    /// The query's user data, for the filter.
+    #[address(0x10)]
+    pub m_userData: u64,
+
+    /// The shape level of detail the query asks for.
+    #[address(0x18)]
+    pub m_levelOfDetail: u8,
+
+    /// The box, Havok space.
+    #[address(0x20)]
+    pub m_aabb: hkAabb,
+}
+
+/// A Havok body (`hknpBody`): its transform, collision data, and the motion that moves it. Only
+/// some members are bound.
+#[size(0x90), align(16)]
+pub type hknpBody {
+    /// The [`m_flags`](Self::m_flags) bit of a static body. A slot with neither this nor
+    /// [`IS_DYNAMIC`](Self::IS_DYNAMIC) holds no valid body, which is how
+    /// [`PfxCharacterInstance::IsGroundBodyValid`] tells a body from an empty slot.
+    pub const IS_STATIC: u32 = 0x1,
+    /// The [`m_flags`](Self::m_flags) bit of a dynamic body, the only kind the velocity and impulse
+    /// setters ([`hknpWorld::setBodyVelocity`], [`hknpWorld::applyBodyImpulseAt`]) act on.
+    pub const IS_DYNAMIC: u32 = 0x2,
+    /// The [`m_flags`](Self::m_flags) bit that has the solver raise a
+    /// [`hknpContactImpulseEvent`](havok::hknpContactImpulseEvent) for the body's contacts.
+    /// [`PfxRigidBody::SetContactImpulseEventActive`] sets and clears it.
+    pub const RAISE_CONTACT_IMPULSE_EVENTS: u32 = 0x80,
+    /// The [`m_flags`](Self::m_flags) bit of a keyframed body: one moved along a set path that
+    /// collisions do not push. `CPfxCharacterInstance::IsGroundBodyStaticOrKeyFramed` tests it with
+    /// [`IS_STATIC`](Self::IS_STATIC).
+    pub const IS_KEYFRAMED: u32 = 0x4,
+    /// The [`m_motionId`](Self::m_motionId) of a freed body slot. `hknpWorld::destroyBodies`
+    /// clears the slot's [`IS_STATIC`](Self::IS_STATIC) and [`IS_DYNAMIC`](Self::IS_DYNAMIC) bits
+    /// and releases its shape reference at once, but frees the slot later
+    /// (`hknpBodyManager::freeDestroyedBodyIds`), which writes this id and links the slot into the
+    /// free list. Neither step clears [`m_shape`](Self::m_shape), so a destroyed or freed slot keeps
+    /// pointing at the shape it last had until the slot is reused.
+    pub const INVALID_MOTION_ID: u32 = 0x7FFFFFFF,
+    /// The [`m_broadPhaseId`](Self::m_broadPhaseId) of a body that is not in the broad phase: one
+    /// created but not added to the simulation, or removed from it.
+    pub const INVALID_BROAD_PHASE_ID: u32 = 0xFFFFFFFF,
+
+    /// The body's transform, Havok space: the frame a constraint's pivots are given in
+    /// ([`hkpFixedConstraintData::setInBodySpace`](havok::hkpFixedConstraintData::setInBodySpace)).
+    #[address(0x0)]
+    pub m_transform: hkTransformf,
+
+    /// The body's flags; see [`IS_DYNAMIC`](Self::IS_DYNAMIC).
+    #[address(0x40)]
+    pub m_flags: u32,
+    /// The body's collision-filter word, read by the world's collision filter; see
+    /// [`CustomGroupCollisionFilter`] for its fields.
+    pub m_collisionFilterInfo: u32,
+    /// The body's collision shape, in body space. The body holds a reference of its own to it,
+    /// taken from the construction info's shape
+    /// ([`hknpBodyCinfo::m_shape`](havok::hknpBodyCinfo::m_shape)) when the body is created
+    /// and released when it is destroyed, so several bodies may share one shape.
+    pub m_shape: *mut hknpShape,
+    /// The body's box in the broad phase, quantized into the world's integer space
+    /// ([`hknpWorld::m_intSpaceUtil`]); [`hknpWorld::getBodyAabb`] restores it.
+    pub m_aabb: hkAabb16,
+
+    /// The body's motion in [`hknpWorld::m_motions`]; bodies attached to one another share it.
+    #[address(0x68)]
+    pub m_motionId: u32,
+    /// The body's entry in the broad phase, or
+    /// [`INVALID_BROAD_PHASE_ID`](Self::INVALID_BROAD_PHASE_ID) while it is not in the simulation.
+    /// The engine's body wrapper reports a body as added to the world
+    /// ([`PfxRigidBody::IsAddedToWorld`]) when it has an entry, or an addition pending.
+    pub m_broadPhaseId: u32,
+}
+
+/// A Havok world's constraint manager (`hknpConstraintManager`): a buffer of constraint slots
+/// indexed by constraint id. Only some members are bound.
+#[size(0x30), align(8)]
+pub type hknpConstraintManager {
+    /// The id the manager hands [`hknpWorld::createConstraint`] when every slot is in use.
+    pub const INVALID_CONSTRAINT_ID: u32 = 0x7FFFFFFF,
+
+    /// The constraint slots, [`m_capacity`](Self::m_capacity) of them.
+    #[address(0x8)]
+    pub m_constraintBuffer: *mut hknpConstraint,
+    /// The number of slots.
+    pub m_capacity: u32,
+}
+
+/// A constraint slot (`hknpConstraint`) of a world's [`hknpConstraintManager`]. A slot whose
+/// constraint was destroyed has [`INVALID_BODY_ID`](Self::INVALID_BODY_ID) as its first body. Only
+/// some members are bound.
+#[size(0x38), align(8)]
+pub type hknpConstraint {
+    /// The [`m_bodyIdA`](Self::m_bodyIdA) of a destroyed constraint's slot.
+    pub const INVALID_BODY_ID: u32 = 0x7FFFFFFF,
+    /// The [`m_flags`](Self::m_flags) bit of a disabled constraint.
+    pub const IS_DISABLED: u8 = 0x4,
+
+    /// The constraint's first body.
+    pub m_bodyIdA: u32,
+    /// The constraint's second body.
+    pub m_bodyIdB: u32,
+    /// The constraint's data (`hkRefPtr<hkpConstraintData>`), which the constraint holds a
+    /// reference to.
+    pub m_data: *mut hkReferencedObject,
+    /// The constraint's id.
+    pub m_id: u32,
+
+    /// The constraint's flags; see [`IS_DISABLED`](Self::IS_DISABLED).
+    #[address(0x16)]
+    pub m_flags: u8,
+}
+
+/// A Havok motion (`hknpMotion`): the mass properties and velocities that move one body or a set
+/// of attached bodies. Positions are Havok space: the game-space position less
+/// [`PhysicsSystem::m_AccumulatedShift`]. Only some members are bound.
+#[size(0x80), align(16)]
+pub type hknpMotion {
+    /// The centre of mass.
+    pub m_centerOfMass: AlignedVector3,
+    /// The orientation of the motion's frame, a unit quaternion `(x, y, z, w)`.
+    pub m_orientation: AlignedQuat,
+    /// The inverse inertia about the motion frame's axes and the inverse mass, as four `hkHalf`s
+    /// (each the upper 16 bits of an `f32`): `x`, `y`, `z`, then the inverse mass. A zero inverse
+    /// mass is infinite mass. The motion's frame is the body's principal frame, so the inertia is
+    /// diagonal in it: the world-space inverse inertia is this diagonal turned by
+    /// [`m_orientation`](Self::m_orientation).
+    pub m_inverseInertia: [u16; 4],
+
+    /// The linear velocity, world space.
+    #[address(0x40)]
+    pub m_linearVelocity: AlignedVector3,
+    /// The angular velocity, in the motion's frame.
+    pub m_angularVelocity: AlignedVector3,
+}
+
+/// The body manager's map from body property key to [`hknpBodyPropertyBuffer`]
+/// (`hkMap<hkUint16, hknpBodyManager::PropertyBuffer*>`), an open-addressed hash map. Only its
+/// lookup is bound.
+#[size(0x10), align(8)]
+pub type hknpBodyPropertyMap;
+impl hknpBodyPropertyMap {
+    /// The property buffer for property `key`, or `default` when there is none.
+    #[address(0x140_1E8_7D0)]
+    pub fn getWithDefault(&self, key: u16, default: *mut hknpBodyPropertyBuffer) -> *mut hknpBodyPropertyBuffer;
+}
+
+/// One body property's values (`hknpBodyManager::PropertyBuffer`), indexed by body id: a body has
+/// the property when its bit is set in [`m_occupancy`](Self::m_occupancy), and its value is at
+/// that index of [`m_data`](Self::m_data), whose element size is the property's. Only some members
+/// are bound.
+pub type hknpBodyPropertyBuffer {
+    /// One bit per body id, 32 to a word.
+    #[address(0x8)]
+    pub m_occupancy: *const u32,
+
+    /// The number of body ids the buffer covers.
+    #[address(0x18)]
+    pub m_capacity: u32,
+
+    /// The values.
+    #[address(0x20)]
+    pub m_data: *mut u8,
+}
+
+/// An engine physics instance (`IPfxInstance`), the object behind a body's
+/// [`BODY_PROPERTY_PFX_INSTANCE`](hknpWorld::BODY_PROPERTY_PFX_INSTANCE) property. The physics
+/// system's collision listener (`CHavokCollisionListener`) subscribes to the world's
+/// manifold-processed and contact-impulse events; for each event it looks up both bodies'
+/// instances and calls the matching event virtual on each instance whose switch for that event is
+/// set, with the other body's instance (possibly null) and whether the instance is the event's
+/// first body. Only some members are bound.
+#[min_size(0x38)]
+pub type PfxInstance {
+    vftable {
+        /// Called for a manifold-processed event between one of the instance's bodies and
+        /// another while [`m_IsManifoldProcessedEventActive`](Self::m_IsManifoldProcessedEventActive)
+        /// is set. `input` is the event handler input (`hknpEventHandlerInput`) and `event` the
+        /// event (`hknpManifoldProcessedEvent`).
+        #[index(20)]
+        pub fn OnManifoldProcessedEvent(&mut self, input: *const void, event: *const void, other: *mut PfxInstance, is_body_a: bool);
+
+        /// Called for a contact-impulse event between one of the instance's bodies and another
+        /// while [`m_IsContactImpulseEventActive`](Self::m_IsContactImpulseEventActive) is set.
+        /// `input` is the event handler input (`hknpEventHandlerInput`). The listener calls it from
+        /// the world's event dispatch, inside [`hknpWorld::stepSolve`].
+        #[index(21)]
+        pub fn OnContactImpulseEvent(&mut self, input: *const void, event: *const hknpContactImpulseEvent, other: *mut PfxInstance, is_body_a: bool);
+    },
+
+    /// The instance's owner (`IPfxGameObject*`): the [`PhysicsGameObject`] a physics query reports
+    /// for a hit on the instance's bodies ([`CastRayInfo::m_GameObject`]).
+    #[address(0x28)]
+    pub m_GameObject: *mut void,
+    /// Whether the collision listener calls
+    /// [`OnManifoldProcessedEvent`](Self::OnManifoldProcessedEvent). Clear on a new instance.
+    pub m_IsManifoldProcessedEventActive: bool,
+    /// Whether the collision listener calls
+    /// [`OnContactImpulseEvent`](Self::OnContactImpulseEvent). Clear on a new instance.
+    pub m_IsContactImpulseEventActive: bool,
+}
+
+/// A rigid object (`CRigidObject`): a [`PhysicsGameObject`] with one rigid body, such as a crate,
+/// a barrel, a gas canister, or a piece of debris. Its type ([`RigidObjectType`], in
+/// [`m_Flags`](Self::m_Flags)) says whether its body is static, fixed, keyframed, or dynamic.
+/// Characters, vehicles, and weapons are not rigid objects. Only some members are mapped.
+///
+/// The body is created from the object's collision resource with the mass that resource gives it,
+/// and `CRigidObject::CreatePhysics` then sets its motion by the type: a static or fixed object's
+/// body is made static and a keyframed object's keyframed
+/// ([`PfxRigidBody::SetMotionType`]), which keeps the mass in the wrapper's saved motion
+/// ([`PfxRigidBody::m_SavedMotionId`]); a dynamic object's body is left as created. A fixed or
+/// keyframed object becomes dynamic through [`MakeDynamic`](Self::MakeDynamic). Damage does not do
+/// it: `CRigidObject::OnDamage` applies the hit's impulse only to a dynamic object, and the force
+/// pulse of an explosion skips static and fixed objects. What makes one dynamic is its events (its
+/// own make-dynamic and stop-keyframe receive events, wired in its data to other objects' send
+/// events, such as its damage controller's), a script call (`CRigidObjectModule::MakeDynamic`), or
+/// the code that drops a held or attached object.
+#[min_size(0x4F8)]
+pub type RigidObject {
+    /// The mask of the object's [`RigidObjectType`] in [`m_Flags`](Self::m_Flags).
+    pub const TYPE_MASK: u16 = 0x3,
+    /// The bit of [`m_Flags`](Self::m_Flags) that has the object inherit its parent's transform,
+    /// and on [`MakeDynamic`](Self::MakeDynamic) its parent's velocity at its centre of mass.
+    pub const INHERIT_PARENT_TRANSFORM: u16 = 0x80,
+
+    /// The object's body wrapper, or null while its physics is not created. It is what
+    /// [`PhysicsGameObject::GetIPfxInstance`] returns for a rigid object.
+    #[address(0x360)]
+    pub m_PfxInstance: SharedPtr<PfxRigidBody>,
+
+    /// The object's model instance, or null while its graphics are not loaded. Created from
+    /// [`m_Model`](Self::m_Model) (`CRigidObject::CreateModelInstance`); `UnloadGraphics` releases
+    /// it with a deferred
+    /// [`ModelInstanceManager::AddToDeleteQueue`](graphics_engine::model_instance::ModelInstanceManager::AddToDeleteQueue).
+    #[address(0x418)]
+    pub m_ModelInstance: *mut ModelInstance,
+
+    /// The object's model, set by `CRigidObject::CacheModel` from a name
+    /// ([`ModelManager::GetModel`](graphics_engine::model_instance::ModelManager::GetModel)) or
+    /// a compiled-name hash (the cache) and released by `UnloadGraphics`. The object holds it
+    /// whether or not it is in the world or has a model instance.
+    #[address(0x420)]
+    pub m_Model: SharedPtr<Model>,
+
+    /// The body's collision layer as the object last set it (a [`PfxLayer`]): the static layer for
+    /// a static or fixed object at setup, and the dynamic layer once it is dynamic.
+    #[address(0x4F0)]
+    pub m_CollisionLayer: u32,
+    /// The object's packed settings: its [`RigidObjectType`] under
+    /// [`TYPE_MASK`](Self::TYPE_MASK), then its enabled, cast-shadow, daytime-emissive,
+    /// clip-on-distance, and reflect-in-water switches,
+    /// [`INHERIT_PARENT_TRANSFORM`](Self::INHERIT_PARENT_TRANSFORM), and its grappling mode in the
+    /// next two bits.
+    pub m_Flags: u16,
+}
+impl RigidObject {
+    /// `CRigidObject::MakeDynamic`: makes the object dynamic as the game does when it is shaken
+    /// loose. With a body wrapper, it sets the object's type to
+    /// [`DYNAMIC_RIGIDOBJECT`](RigidObjectType::DYNAMIC_RIGIDOBJECT), and when the body is not yet
+    /// dynamic it moves the body to the [`DYNAMIC`](PfxLayer::DYNAMIC) collision layer, with
+    /// `new_system_group` also into a new collision system group of its own, and changes its motion
+    /// to dynamic ([`PfxRigidBody::SetMotionType`]), which restores the mass and inertia kept in the
+    /// wrapper's saved motion. With
+    /// [`INHERIT_PARENT_TRANSFORM`](Self::INHERIT_PARENT_TRANSFORM) and a parent whose physics
+    /// instance is a rigid body, the body takes the parent's velocity at the body's centre of mass
+    /// and the parent's angular velocity. It then wakes the body
+    /// ([`PfxRigidBody::ForceActivate`]) and runs the object's activation handler, which turns off
+    /// its model's static shadow. The body keeps its id. The changes are made at once, on the world,
+    /// so the call belongs on the game thread outside the simulation step, as the object's event
+    /// handler and the script call make it. The disassembler mislabels it
+    /// `CPhysicsSystem::CreateMaterialFromTemplate`, and gives the name `CRigidObject::MakeDynamic`
+    /// to the magnet weapon's gravity-field body creation
+    /// (`CMagnetWeaponComponent::CreateGravityFieldBody`).
+    #[address(0x140_CDD_5B0)]
+    pub fn MakeDynamic(&mut self, new_system_group: bool);
+
+    /// `CRigidObject::TYPE_ID`: the run-time type id of `CRigidObject`, for
+    /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use.
+    #[address(0x140_60F_1F0)]
+    pub fn TYPE_ID() -> *const u32;
+
+    /// The render-phase `CGameObject::UpdateRender` override. While the object is enabled and has
+    /// a model instance, it marks the instance's dynamic bit by whether the body is active (a
+    /// keyframed or dynamic object without a body counts by its type) and pushes the object's
+    /// transform to the instance ([`ModelInstance::UpdateMatrix`]):
+    /// its render transform at the context's interpolation fraction, or its current world matrix
+    /// for the first few renders after it is placed. An object that rides a parent (the grappling
+    /// hook's mesh, under the hook's world transform) is drawn from the transforms its simulation
+    /// updates left. `game_object` is the object's `CGameObject` subobject, 8 bytes into the
+    /// object. The disassembler names it `CHavokDestructionObject::UpdateRender`, and gives
+    /// `CRigidObject::UpdateRender` to the destruction object's.
+    #[address(0x140_C26_AC0)]
+    pub fn UpdateRender(game_object: *mut void, context: *const GameObjectRenderContext);
+}
+
+/// A rigid object's type (`CRigidObject::RigidObject_Type`), the low bits of
+/// [`RigidObject::m_Flags`].
+#[copyable]
+pub enum RigidObjectType: u16 {
+    /// Part of the static world: a static body that nothing makes dynamic. The grappling hook
+    /// treats a hit on it as a hit on the world.
+    STATIC_RIGIDOBJECT = 0x0,
+    /// A placed object at rest: a static body that keeps its mass in its wrapper's saved motion
+    /// until [`RigidObject::MakeDynamic`]. The grappling hook attaches to it as a loose object.
+    FIXED_RIGIDOBJECT = 0x1,
+    /// A keyframed body, with its mass kept the same way.
+    KEYFRAMED_RIGIDOBJECT = 0x2,
+    /// A dynamic body.
+    DYNAMIC_RIGIDOBJECT = 0x3,
+}
+
+/// A physics constraint placed in the world (`CConstraint`): a game object that joins two objects'
+/// bodies with a Havok constraint, made from its data's kind (fixed, deformable fixed, ball and
+/// socket, stiff spring, hinge, limited hinge, ragdoll, wheel, or prismatic), optionally motored
+/// (position, spring-damper, or velocity motors) and breakable. It names the two objects by object
+/// id and connects them once both exist; the physics step then resolves the constraint with the
+/// bodies' other contacts. Only some members are mapped.
+#[min_size(0x190)]
+pub type Constraint {
+    /// The constraint's state bits (`CConstraint::m_Flags`). The engine clears and sets
+    /// [`MOTOR_ENABLED`](ConstraintFlags::MOTOR_ENABLED) through
+    /// [`DisableMotor`](Self::DisableMotor) and [`EnableMotor`](Self::EnableMotor).
+    #[address(0x188)]
+    pub m_Flags: ConstraintFlags,
+}
+impl Constraint {
+    /// `CConstraint::TYPE_ID`: the run-time type id of `CConstraint`, for
+    /// [`GameObject::IsType`](game::GameObject::IsType). Registers it on first use.
+    #[address(0x140_977_BC0)]
+    pub fn TYPE_ID() -> *const u32;
+
+    /// `CConstraint::DisableMotor`: clears [`MOTOR_ENABLED`](ConstraintFlags::MOTOR_ENABLED) and,
+    /// when the constraint is in the physics world, tells its Havok constraint to stop driving its
+    /// motor, then reactivates its members.
+    #[address(0x140_BA2_CD0)]
+    pub fn DisableMotor(&mut self);
+
+    /// `CConstraint::EnableMotor`: sets [`MOTOR_ENABLED`](ConstraintFlags::MOTOR_ENABLED) and,
+    /// when the constraint is in the physics world, tells its Havok constraint to drive its motor
+    /// again, then reactivates its members.
+    #[address(0x140_BA2_C60)]
+    pub fn EnableMotor(&mut self);
+}
+
+/// The state bits of a constraint (`CConstraint::m_Flags`).
+#[copyable]
+pub bitflags ConstraintFlags: u8 {
+    /// The constraint is enabled.
+    ENABLED = 0x1,
+    /// The constraint's motor is enabled.
+    MOTOR_ENABLED = 0x2,
 }
 
 /// The Havok-facing input of a character proxy (`CPfxCharacterInstance::CCharacterInput`), read by
@@ -187,20 +1027,76 @@ impl hknpWorld {
 pub type CharacterInput {
     pub jump: bool,
     /// Whether [`wantedVelocity`](Self::wantedVelocity) is game-controlled. The on-foot locomotion
-    /// task sets it when it takes its velocity from the blackboard's code-driven path and clears it
-    /// otherwise.
+    /// task sets it while the proxy is supported on stairs
+    /// ([`PfxCharacterInstance::m_IsSupportedOnStairs`]) and the character's blackboard carries a
+    /// slope direction, and clears it otherwise. The proxy update rotates the wanted velocity by
+    /// the proxy's rotation only while it is set; otherwise it hands the vector to the character
+    /// state as it stands.
     pub gameControledVelocity: bool,
 
-    /// The velocity the proxy should move at (world space). The on-foot locomotion task
+    /// The velocity the proxy should move at, metres per second, in the character's local frame
+    /// (not world space). The on-foot locomotion task
     /// (`NStateTask_MovementLocomotionTask::Update`) writes its solved velocity here every tick,
-    /// including standing idle.
+    /// including standing idle, and returns without writing while the character is attached to a
+    /// vehicle. [`Character::SetWantedWorldVelocity`](character::character::Character::SetWantedWorldVelocity)
+    /// and [`Character::GetWantedWorldVelocity`](character::character::Character::GetWantedWorldVelocity)
+    /// convert it from and to world space.
     #[address(0x4)]
     pub wantedVelocity: Vector3,
 }
 
+/// `CPfxCharacterInstance::EProxyState`: the character proxy's state, each with its own pre-built
+/// collision shape. Every character has the shape of every state. The crouching shape is a
+/// shortened capsule with the non-player standing radius; the player stands in
+/// [`PLAYER_STANDING`](Self::PLAYER_STANDING), whose capsule has the player's own radius.
+pub enum ProxyState: i32 {
+    STANDING = 0x0,
+    CROUCHING = 0x1,
+    SWIMMING = 0x2,
+    ROTATED_AND_OFFSETTED = 0x3,
+    ROTATING_CROUCHING = 0x4,
+    QUADRUPED_LARGE = 0x5,
+    QUADRUPED_SMALL = 0x6,
+    QUADRUPED_TINY = 0x7,
+    PLAYER_STANDING = 0x8,
+    WINGSUITING = 0x9,
+}
+
+/// The character proxy's shared shape settings (`CPfxCharacterSettings`): a shape for each
+/// [`ProxyState`], shared by the character proxies that use these settings. Only the shape table and
+/// its corresponding flags are mapped.
+#[size(0x60), align(8)]
+pub type SharedPfxCharacterSettings {
+    /// The collision shape selected by each [`ProxyState`].
+    #[address(0x0)]
+    pub m_CapsuleShape: [*mut hknpShape; 10],
+
+    /// Per-state fake-contact flags corresponding to [`m_CapsuleShape`](Self::m_CapsuleShape).
+    #[address(0x50)]
+    pub m_FakeContact: [bool; 10],
+}
+impl SharedPfxCharacterSettings {
+    /// `CPfxCharacterSettings::CPfxCharacterSettings`: initializes the shared settings.
+    #[address(0x140_2B0_420)]
+    pub fn Construct(&mut self) -> *mut SharedPfxCharacterSettings;
+
+    /// `CPfxCharacterSettings::~CPfxCharacterSettings`: releases the settings' owned resources.
+    #[address(0x140_24D_300)]
+    pub fn Destruct(&mut self);
+}
+
+/// The character-side interface that exposes shared character settings (`IPfxCharacter`).
+pub type PfxCharacterOwner {
+    vftable {
+        /// Returns the character's shared proxy settings.
+        #[index(2)]
+        pub fn GetSharedPfxCharacterSettings(&mut self) -> *mut SharedPfxCharacterSettings;
+    },
+}
+
 /// `CPfxCharacterInstance`: the character's physics-side body instance (the Havok character proxy),
 /// owned by `CCharacter` through a `boost::shared_ptr`. Only some members are bound.
-#[min_size(0xF8)]
+#[min_size(0x100), align(16)]
 pub type PfxCharacterInstance {
     /// Havok's invalid body id, which [`GetCharacterRigidBodyId`](Self::GetCharacterRigidBodyId)
     /// reports when there is no body.
@@ -210,22 +1106,45 @@ pub type PfxCharacterInstance {
     #[address(0x38)]
     pub m_Input: CharacterInput,
 
-    /// The current proxy state (`CPfxCharacterInstance::EProxyState`), which selects the proxy's
-    /// collision shape. Written by [`SetProxyState`](Self::SetProxyState).
+    /// What the proxy stands on, as [`CheckSupportCustom`](Self::CheckSupportCustom) last found
+    /// it: whether it is supported, sliding, or unsupported, and the surface's normal and
+    /// velocity. Written at the start of each proxy update ([`UpdateContext`](Self::UpdateContext)),
+    /// before the physics step, and read until the next: the state machines' ground-contact
+    /// condition and [`IsSupported`](Self::IsSupported) read its supported state.
+    #[address(0x70)]
+    pub m_GroundInformation: hknpCharacterSurfaceInfo,
+    /// The game material of the surface the proxy stands on; cleared with the ground body when
+    /// the proxy has no support.
+    pub m_ContactMaterialId: i32,
+    /// The body the proxy stands on, or [`INVALID_BODY_ID`](Self::INVALID_BODY_ID) without
+    /// support. [`IsGroundBodyValid`](Self::IsGroundBodyValid) checks it names a body, and the
+    /// ground raycasts (`CCharacter::DoGroundInfoRaycasts`) look up its owner to tell a vehicle
+    /// underfoot.
+    pub m_GroundBodyId: u32,
+    /// The last valid [`m_GroundBodyId`](Self::m_GroundBodyId), kept across ticks without support.
+    pub m_LastValidGroundBodyId: u32,
+
+    /// Whether the proxy is standing on stairs. The on-foot locomotion task takes its velocity
+    /// along the blackboard's slope direction while it is set.
+    #[address(0xC4)]
+    pub m_IsSupportedOnStairs: bool,
+
+    /// The current proxy state, a [`ProxyState`] value, which selects the proxy's collision shape.
+    /// Written by [`SetProxyState`](Self::SetProxyState).
     #[address(0xC8)]
     pub m_ProxyState: i32,
 
-    /// The Havok character rigid body (`hknpCharacterRigidBody*`), which holds the body id that
+    /// The Havok character rigid body, which holds the body id that
     /// [`GetCharacterRigidBodyId`](Self::GetCharacterRigidBodyId) reads.
     #[address(0xD0)]
-    pub m_CharacterRigidBody: *mut void,
+    pub m_CharacterRigidBody: *mut hknpCharacterRigidBody,
 
     /// The character rigid-body listener (`CCustomCharacterRBListener*`).
     #[address(0xE8)]
     pub m_CharacterRBListener: *mut void,
-    /// The owning character (`IPfxCharacter*`). Its `GetSharedPfxCharacterSettings` virtual returns
-    /// the shared settings that hold the per-state shape table.
-    pub m_Owner: *mut void,
+    /// The owning character, whose [`GetSharedPfxCharacterSettings`](PfxCharacterOwner::GetSharedPfxCharacterSettings)
+    /// virtual returns the shared settings that hold the per-state shape table.
+    pub m_Owner: *mut PfxCharacterOwner,
 }
 impl PfxCharacterInstance {
     /// Sets the physics body's rotation from the rotation part of `m` (via a quaternion
@@ -235,6 +1154,15 @@ impl PfxCharacterInstance {
     /// body orientation through this each update.
     #[address(0x140_239_100)]
     pub fn SetOrientation(&mut self, m: *const Matrix4);
+
+    /// Writes the physics body's transform to `out`, read from the world's body array: the body's
+    /// rotation in the rows and its Havok-space position plus
+    /// [`PhysicsSystem::m_AccumulatedShift`] in the translation. A rotation set through
+    /// [`SetOrientation`](Self::SetOrientation) reads back at once.
+    /// [`Character::SetWantedWorldVelocity`](character::character::Character::SetWantedWorldVelocity)
+    /// converts a world velocity into the proxy's local frame with this rotation's transpose.
+    #[address(0x140_24D_6A0)]
+    pub fn GetTransform(&self, out: *mut Matrix4);
 
     /// Returns the physics body's current linear velocity (world space, 3 floats) via the body's
     /// Havok transform/velocity chain.
@@ -259,6 +1187,352 @@ impl PfxCharacterInstance {
     /// on-ground, in-air, and jumping states registered. It does not set the capsule dimensions.
     #[address(0x140_24D_370)]
     pub fn BuildDefaultCharacterContext(&mut self);
+
+    /// Whether the proxy is supported: the supported state of
+    /// [`m_GroundInformation`](Self::m_GroundInformation) is
+    /// [`SUPPORTED`](hknpCharacterSurfaceInfo::SUPPORTED). The state machines' ground-contact
+    /// condition (`CSuperGroundContactCondition`) is this call, and `CCharacter::UpdateFalling`,
+    /// the ground raycasts, and [`Character::IsInAir`](character::character::Character::IsInAir)
+    /// read it.
+    #[address(0x140_24D_770)]
+    pub fn IsSupported(&self) -> bool;
+
+    /// Whether [`m_GroundBodyId`](Self::m_GroundBodyId) names a body of the world: an id below the
+    /// body array's capacity whose slot holds a static or dynamic body. The disassembler mislabels
+    /// it `CPfxCharacterInstance::GetSurfaceNormal`.
+    #[address(0x140_24D_930)]
+    pub fn IsGroundBodyValid(&self) -> bool;
+
+    /// Finds the proxy's support from the character rigid body's contacts and writes it to
+    /// [`m_GroundInformation`](Self::m_GroundInformation), with the ground body; without support it
+    /// sets [`m_GroundBodyId`](Self::m_GroundBodyId) to
+    /// [`INVALID_BODY_ID`](Self::INVALID_BODY_ID) and clears the contact material. A valid ground
+    /// body is also kept in [`m_LastValidGroundBodyId`](Self::m_LastValidGroundBodyId).
+    #[address(0x140_2B1_150)]
+    pub fn CheckSupportCustom(&mut self, dt: f32);
+
+    /// The proxy's update before the physics step, from the character's integrating-physics
+    /// update in its pre-physics pass: it finds the support
+    /// ([`CheckSupportCustom`](Self::CheckSupportCustom)), runs the Havok character context on
+    /// the support and [`m_Input`](Self::m_Input), and sets the character rigid body's velocity to
+    /// the context's output ([`hknpCharacterRigidBody::setLinearVelocity`]). A proxy whose body is
+    /// not active is left unsupported.
+    #[address(0x140_2BB_DA0)]
+    pub fn UpdateContext(&mut self, dt: f32, input: *mut CharacterInput);
+}
+
+/// What a Havok character stands on (`hknpCharacterSurfaceInfo`), as its support check finds it.
+#[size(0x30), align(16)]
+pub type hknpCharacterSurfaceInfo {
+    /// [`m_supportedState`](Self::m_supportedState): no support.
+    pub const UNSUPPORTED: u8 = 0x0,
+    /// [`m_supportedState`](Self::m_supportedState): on a surface too steep to stand on.
+    pub const SLIDING: u8 = 0x1,
+    /// [`m_supportedState`](Self::m_supportedState): standing on a surface.
+    pub const SUPPORTED: u8 = 0x2,
+
+    /// Whether the surface is a dynamic body.
+    pub m_isSurfaceDynamic: bool,
+    /// The support: [`UNSUPPORTED`](Self::UNSUPPORTED), [`SLIDING`](Self::SLIDING), or
+    /// [`SUPPORTED`](Self::SUPPORTED).
+    pub m_supportedState: u8,
+
+    /// How far the character is above the surface beyond the support distance, metres.
+    #[address(0x4)]
+    pub m_surfaceDistanceExcess: f32,
+
+    /// The surface's normal, Havok space.
+    #[address(0x10)]
+    pub m_surfaceNormal: AlignedVector3,
+    /// The surface's velocity, world space. A supported proxy's update carries it into the
+    /// velocity the proxy inherits from its ground.
+    pub m_surfaceVelocity: AlignedVector3,
+}
+
+/// A Havok character rigid body (`hknpCharacterRigidBody`): the dynamic body of a character proxy
+/// ([`PfxCharacterInstance::m_CharacterRigidBody`]), whose velocity the character context sets
+/// before each step. Only some members are bound.
+#[min_size(0x28), align(16)]
+pub type hknpCharacterRigidBody {
+    /// The body's id in [`m_world`](Self::m_world).
+    #[address(0x10)]
+    pub m_bodyId: u32,
+
+    /// The world the body is in.
+    #[address(0x20)]
+    pub m_world: *mut hknpWorld,
+}
+impl hknpCharacterRigidBody {
+    /// Sets the body's linear velocity to `velocity` (world space), keeping its angular velocity
+    /// ([`hknpWorld::setBodyVelocity`]), and keeps the change over `timestep` as the body's
+    /// acceleration. A change too small to matter only activates the body, and only with
+    /// `force_activate`. The proxy's update
+    /// ([`PfxCharacterInstance::UpdateContext`]) calls it with the character context's output. The
+    /// disassembler mislabels it `CPfxCharacterInstance::CCharacterInput::SetWantedVelocity`, and
+    /// gives this function's name to an unrelated lookup.
+    #[address(0x141_521_600)]
+    pub fn setLinearVelocity(&mut self, velocity: *const AlignedVector3, timestep: *const hkSimdFloat32, force_activate: bool);
+}
+
+/// `CPfxRigidBody`: the engine's wrapper around a Havok rigid body in the physics system's world,
+/// an engine physics instance ([`PfxInstance`]) for one body. It is allocated with the engine's
+/// [`OperatorNew`](memory::OperatorNew) and destroyed through its deleting destructor
+/// ([`Destruct`](Self::Destruct)), which removes the body from the world and destroys it. Only some
+/// members are bound.
+#[size(0xC0), align(16)]
+pub type PfxRigidBody {
+    /// The [`Destruct`](Self::Destruct) flag that frees the wrapper's memory.
+    pub const DESTRUCT_FREE: u8 = 0x1,
+    /// The address of the `CPfxRigidBody` virtual table, which
+    /// [`Construct`](Self::Construct) installs. It has as many slots as the vftable below.
+    pub const VFTABLE: u64 = 0x142350E38,
+
+    #[size(44)]
+    vftable {
+        /// The deleting destructor: removes the body from the world when it is in it, clears the
+        /// body's instance property, destroys the body, releases the wrapper's own references, and
+        /// with [`DESTRUCT_FREE`](Self::DESTRUCT_FREE) in `flags` frees the wrapper's memory to the
+        /// engine allocator. The disassembler mislabels it `CPfxRagdollProxyPhantom::Destruct`.
+        #[index(0)]
+        pub fn Destruct(&mut self, flags: u8) -> *mut PfxRigidBody;
+
+        /// Whether the body is in the simulation.
+        #[index(9)]
+        pub fn IsAddedToWorld(&self) -> bool;
+
+        /// Adds the body, and any body attached to it, to the simulation at once
+        /// (`hknpWorld::addBodies`) when it is not already in it. The disassembler mislabels it
+        /// `CRagdollProxyPhantom::AddToWorld`.
+        #[index(10)]
+        pub fn AddToWorld(&mut self);
+
+        /// Removes the body, and any body attached to it, from the simulation
+        /// (`hknpWorld::removeBodies`); the body still exists and can be added again. Bit 0 of
+        /// `flags` selects the activation mode of the removal.
+        #[index(12)]
+        pub fn RemoveFromWorld(&mut self, flags: u8);
+
+        /// Writes the body's transform to `out`, game space: the body's rotation in the rows and
+        /// its Havok-space position plus [`PhysicsSystem::m_AccumulatedShift`] in the translation.
+        #[index(14)]
+        pub fn GetTransform(&self, out: *mut Matrix4);
+
+        /// Places the body at `transform`, game space, through `hknpWorld::setBodyTransform`. The
+        /// velocities are kept. The disassembler mislabels it `CPartInstance::ClearWindowDamage`.
+        #[index(15)]
+        pub fn SetTransform(&mut self, transform: *const Matrix4);
+
+        /// [`PfxInstance::OnContactImpulseEvent`]; the wrapper's own does nothing.
+        #[index(21)]
+        pub fn OnContactImpulseEvent(&mut self, input: *const void, event: *const hknpContactImpulseEvent, other: *mut PfxInstance, is_body_a: bool);
+
+        /// Sets [`PfxInstance::m_IsContactImpulseEventActive`] to `active`, and sets or clears the
+        /// body's [`RAISE_CONTACT_IMPULSE_EVENTS`](hknpBody::RAISE_CONTACT_IMPULSE_EVENTS) flag
+        /// through the world's body flag setters (`hknpWorld::enableBodyFlags` and
+        /// `disableBodyFlags`, which the disassembler mislabels `CPfxRigidBody::CPfxRigidBody` and
+        /// a `hkSignal2::subscribe`), which rebuild the body's collision caches.
+        #[index(24)]
+        pub fn SetContactImpulseEventActive(&mut self, active: bool);
+
+        /// Wakes the body ([`hknpWorld::activateBody`]) when it is valid, in the broad phase, and a
+        /// virtual of the wrapper's own does not veto it, then notifies the wrapper's activation
+        /// listener, if it has one.
+        #[index(34)]
+        pub fn ForceActivate(&mut self);
+    },
+
+    /// The body's id in the physics system's world.
+    #[address(0x40)]
+    pub m_BodyId: u32,
+    /// The motion the body had before [`SetMotionType`](Self::SetMotionType) made it static or
+    /// keyframed, or [`hknpBody::INVALID_MOTION_ID`] when there is none. It is a motion of its own
+    /// in [`hknpWorld::m_motions`] that no body uses, made from the body's motion at the change, so
+    /// it keeps the body's mass and inertia while the body itself has the world's static motion or
+    /// an infinite-mass keyframed one. [`SetMotionType`](Self::SetMotionType) rebuilds the dynamic
+    /// motion from it and destroys it.
+    pub m_SavedMotionId: u32,
+}
+impl PfxRigidBody {
+    /// `CPfxRigidBody::GetMotionType`: the body's [`PfxMotionType`], from its flags:
+    /// [`KEYFRAMED`](PfxMotionType::KEYFRAMED) when it has
+    /// [`IS_KEYFRAMED`](hknpBody::IS_KEYFRAMED), [`STATIC`](PfxMotionType::STATIC) when it has
+    /// [`IS_STATIC`](hknpBody::IS_STATIC), and [`DYNAMIC`](PfxMotionType::DYNAMIC) otherwise. It
+    /// does not check the body id. The disassembler mislabels it `CSoundInstance::IsActive`.
+    #[address(0x140_24E_FB0)]
+    pub fn GetMotionType(&self) -> PfxMotionType;
+
+    /// `CPfxRigidBody::SetMotionType`: changes the body's motion type to `motion_type` (a
+    /// [`PfxMotionType`]) and returns the type it had; it does nothing for a type out of range or
+    /// equal to the current one. The body keeps its id throughout; only its motion is replaced
+    /// ([`hknpBody::m_motionId`]), at once, through `hknpWorld::setBodyMotion`, so it needs the world
+    /// open for writing, outside the simulation step.
+    ///
+    /// To static, it saves a copy of the body's motion in
+    /// [`m_SavedMotionId`](Self::m_SavedMotionId) and gives the body the world's static motion. To
+    /// keyframed, it saves a copy the same way, gives the body a second copy, and sets that one's
+    /// mass to infinite. To dynamic, it reads the mass from the saved motion's inverse mass
+    /// ([`hknpMotion::m_inverseInertia`]): a positive mass initializes a new motion with that mass,
+    /// a negative one with its magnitude as a density, and zero as keyframed; the new motion then
+    /// takes the saved motion's inverse inertia, so the body gets back the mass properties it had.
+    /// It gives the body the new motion, destroys the saved one, clears
+    /// [`m_SavedMotionId`](Self::m_SavedMotionId), and pushes the wrapper's motion properties to the
+    /// new motion.
+    ///
+    /// A body with the static motion and no saved motion (a body created without mass) cannot leave
+    /// the static type, and the call does nothing. A keyframed body without a saved motion is not
+    /// guarded: the change to dynamic reads the saved motion at the invalid id. `activate` is passed
+    /// by every caller as `true`; the function does not read it.
+    #[address(0x140_294_D90)]
+    pub fn SetMotionType(&mut self, motion_type: PfxMotionType, activate: bool) -> PfxMotionType;
+
+    /// `CPfxRigidBody::CPfxRigidBody`: wraps the existing body `*body_id` of the physics system's
+    /// world. It sets the body's instance property
+    /// ([`BODY_PROPERTY_PFX_INSTANCE`](hknpWorld::BODY_PROPERTY_PFX_INSTANCE)) to the wrapper, sets
+    /// a body flag, and writes the body's collision-filter word to
+    /// [`NO_COLLISION`](PfxLayer::NO_COLLISION). `data` is a `boost::shared_ptr<CDataCacheWrapper>`
+    /// the wrapper keeps; the grappling hook's hang proxy passes an empty one (two null words) and
+    /// `false` for `add_flag`, which the wrapper passes as the flags of its later body additions.
+    /// The instance's owner ([`PfxInstance::m_GameObject`]) starts null.
+    #[address(0x140_294_0D0)]
+    pub fn Construct(&mut self, body_id: *const u32, data: *const [u64; 2], add_flag: bool) -> *mut PfxRigidBody;
+
+    /// Replaces the collision layer of the body's collision-filter word with `layer` (a
+    /// [`PfxLayer`]), keeping its other fields, and refreshes the body's collision state in the
+    /// world. The disassembler mislabels it `boost::shared_ptr<CAnimationRuleSystem>::operator->`.
+    #[address(0x140_24F_4A0)]
+    pub fn SetCollisionLayer(&mut self, layer: u32);
+
+    /// Replaces the system group of the body's collision-filter word with `group`, keeping its
+    /// other fields; see [`CustomGroupCollisionFilter`].
+    #[address(0x140_24F_410)]
+    pub fn SetCollisionSystemGroup(&mut self, group: u32);
+
+    /// Sets the factor of gravity on the body's motion: copies the motion's current motion
+    /// properties into the wrapper, sets their gravity factor, and gives the motion the properties
+    /// so changed. It acts only on a body that is neither static nor keyframed.
+    #[address(0x140_27F_E60)]
+    pub fn SetGravityFactor(&mut self, factor: f32);
+
+    /// Applies the linear impulse `impulse` (world space) to the body at the world point
+    /// `position`, through `hknpWorld::applyBodyImpulseAt`, and then notifies the body's own
+    /// impulse virtual. The last argument only scales the debug display of the impulse.
+    #[address(0x140_24E_D80)]
+    pub fn ApplyImpulse(&mut self, impulse: *const Vector3, position: *const Vector3, debug_scale: f32);
+}
+
+/// A body's motion type as the engine wrapper sees it (`CPfxRigidBody::GetMotionType` and
+/// [`SetMotionType`](PfxRigidBody::SetMotionType)).
+#[copyable]
+pub enum PfxMotionType: u32 {
+    /// The body has the world's static motion and [`IS_STATIC`](hknpBody::IS_STATIC).
+    STATIC = 0x0,
+    /// The body has a motion of its own with finite mass.
+    DYNAMIC = 0x1,
+    /// The body has a motion of its own with infinite mass, moved along a set path;
+    /// [`IS_KEYFRAMED`](hknpBody::IS_KEYFRAMED).
+    KEYFRAMED = 0x2,
+}
+
+/// The engine's collision layers (`EPfxLayer`), the low field of a body's collision-filter word
+/// ([`CustomGroupCollisionFilter`]). The physics system's constructor fills the filter's layer table
+/// with the pairs of layers that collide; only the layers in it collide at all. The query layers
+/// (the raycast and shape-query layers) are what a query passes as its own layer.
+pub enum PfxLayer: u32 {
+    /// Collides with everything.
+    FULL_COLLISION = 0x0,
+    /// Collides with nothing. [`PfxRigidBody::Construct`] gives a new wrapper's body this layer.
+    NO_COLLISION = 0x1,
+    STATIC = 0x2,
+    TERRAIN = 0x3,
+    DYNAMIC = 0x4,
+    DESTRUCTION = 0x5,
+    /// The character proxies, the player's included.
+    CHARACTER_COLLISION = 0x6,
+    CHARACTER_GHOST_MODE = 0x7,
+    CHARACTER_RAGDOLL = 0x8,
+    CHARACTER_RAGDOLL_KEYFRAMED = 0x9,
+    CHARACTER_ATTACHED_DYNAMIC_RB = 0xA,
+    CHARACTER_RAGDOLL_PROXIES = 0xB,
+    PARTICLE = 0xC,
+    EXPLOSIVE = 0xD,
+    PROJECTILE = 0xE,
+    /// Weapons. It collides with the static, terrain, dynamic, destruction, character collision,
+    /// character ragdoll, and character-attached dynamic layers, the vehicle collision layers, the
+    /// vehicle raycast layer, and the listener-effects layer, and with nothing else: not with
+    /// itself, and not with the raycast or shape-query layers.
+    WEAPONS = 0xF,
+    VEHICLE_COLLISION_WHEEL = 0x10,
+    VEHICLE_COLLISION_DYNAMIC_ONLY = 0x11,
+    VEHICLE_COLLISION = 0x12,
+    VEHICLE_RAYCAST = 0x13,
+    RAYCAST_DEFAULT = 0x14,
+    /// The layer of [`PhysicsSystem::QUERY_LAYER`].
+    RAYCAST_EVERYTHING_PHYSICAL = 0x15,
+    RAYCAST_WHEELS = 0x16,
+    SHAPEQUERY_DEFAULT = 0x17,
+    SHAPEQUERY_TRIGGER = 0x18,
+    SHAPEQUERY_EXPLOSION = 0x19,
+    SHAPEQUERY_VEHICLES = 0x1A,
+    STATIC_AND_DESTRUCTION = 0x1B,
+    ALL_DYNAMIC_OBJECTS = 0x1C,
+    LISTENER_EFFECTS = 0x1D,
+}
+
+/// The world's collision filter (`CCustomGroupCollisionFilter`), behind the constraint collision
+/// filter that also keeps constrained bodies apart. It reads each body's collision-filter word
+/// ([`hknpBody::m_collisionFilterInfo`]), whose fields are the layer
+/// ([`LAYER_MASK`](Self::LAYER_MASK), a [`PfxLayer`]), the subsystem id and the no-collide id (each
+/// [`FIELD_MASK`](Self::FIELD_MASK) wide, from [`SUBSYSTEM_SHIFT`](Self::SUBSYSTEM_SHIFT) and
+/// [`NO_COLLIDE_SHIFT`](Self::NO_COLLIDE_SHIFT)), and the system group (from
+/// [`SYSTEM_GROUP_SHIFT`](Self::SYSTEM_GROUP_SHIFT)). Two bodies in different system groups, or in
+/// system group zero, collide when the layer table says their layers do. Two bodies in the same
+/// non-zero system group collide only when their layers are equal, at least one has a non-zero
+/// subsystem id, and neither's subsystem id is the other's no-collide id. Only the word's layout is
+/// bound.
+pub type CustomGroupCollisionFilter {
+    /// The layer field of a collision-filter word.
+    pub const LAYER_MASK: u32 = 0x1F,
+    /// The width of the subsystem-id and no-collide-id fields.
+    pub const FIELD_MASK: u32 = 0x1F,
+    /// Where the subsystem-id field begins.
+    pub const SUBSYSTEM_SHIFT: u32 = 5,
+    /// Where the no-collide-id field begins.
+    pub const NO_COLLIDE_SHIFT: u32 = 10,
+    /// Where the system-group field, the word's high half, begins.
+    pub const SYSTEM_GROUP_SHIFT: u32 = 16,
+}
+
+/// `hknpWorld::AdditionMode`: whether [`hknpWorld::createDynamicBody`] adds the new body to the
+/// simulation. Only the value that leaves it out is bound.
+pub enum hknpAdditionMode: i32 {
+    /// The body is created but not added; it is added later, as [`PfxRigidBody::AddToWorld`]
+    /// does.
+    DO_NOT_ADD = 0x0,
+}
+
+/// A pre-simulation callback (`CPfxPreSimulationCallback`), an object the physics system calls
+/// before each step ([`PhysicsSystem::AddPreSimulationCallback`]). The engine never deletes one;
+/// its owner removes it ([`PhysicsSystem::RemovePreSimulationCallback`]) and frees it.
+pub type PfxPreSimulationCallback {
+    vftable {
+        /// The destructor.
+        #[index(0)]
+        pub fn Destructor(&mut self, flags: u8);
+
+        /// Called by [`PhysicsSystem::Update`] before each step, on the thread that runs it, with
+        /// the world and the time the update was given (not the step it takes, which is pinned to
+        /// [`PhysicsSystem::STEP_SECONDS`] after the callbacks), outside the step: the world may be changed
+        /// here, and the step that follows integrates the velocities set here. The callbacks fire
+        /// in the order they were added.
+        #[index(1)]
+        pub fn preSimulationCallback(&mut self, world: *mut hknpWorld, dt: f32);
+
+        /// Called when the world's origin moves (`CPhysicsSystem::RecenterWorld`), after every
+        /// body has been moved, with the shift added to every Havok-space position. A callback
+        /// that keeps Havok-space positions of its own moves them here.
+        #[index(2)]
+        pub fn onWorldShiftCallback(&mut self, shift: *const AlignedVector3);
+    },
 }
 
 /// `SweptSphereCast`: a free-function sphere sweep that fills `result` (`CCastResult`). The

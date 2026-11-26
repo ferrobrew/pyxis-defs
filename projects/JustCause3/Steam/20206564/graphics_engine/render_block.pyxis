@@ -1,4 +1,4 @@
-use graphics_engine::graphics_engine::{HContext_t, HTexture_t, HVertexDeclaration_t, RenderContext};
+use graphics_engine::graphics_engine::{HContext_t, HDevice_t, HTexture_t, HVertexDeclaration_t, RenderContext};
 use graphics_engine::render_engine::{RenderBlockTypeBase, ResourceContext};
 use graphics_engine::texture::Texture;
 use types::math::{Matrix4, Vector3};
@@ -266,6 +266,35 @@ pub type RenderBlockTypeTerrain {
     /// forward vector falls beyond this value.
     #[address(0x4BC)]
     pub m_BackPatchCullThreshold: f32,
+}
+impl RenderBlockTypeTerrain {
+    /// Binds the type-level constant buffers for a tessellating base-terrain pass and, once per frame
+    /// per constant-buffer slot (the slot comes from the render status and active pass; the stamp is
+    /// [`m_WasCBApplied`](Self::m_WasCBApplied)), bakes the hull/domain constants the base-terrain
+    /// hull and domain programs read at `cb1` into that slot's
+    /// [`m_HDTypeConstants`](Self::m_HDTypeConstants) buffer:
+    ///
+    /// - `float4` 0: `xyz` = the normalized forward vector of the camera manager's *render* camera,
+    ///   `w` = `1.0` when the pass carries
+    ///   [`RENDERSTATUS_REFLECTIONS`](graphics_engine::render_pass::RenderStatus::RENDERSTATUS_REFLECTIONS)
+    ///   and [`m_EnableBackPatchCulling`](Self::m_EnableBackPatchCulling) is set, else `0.0`.
+    /// - `float4` 1..4: the dispatch's
+    ///   [`RenderContext::m_OffsetViewProjection`](graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection),
+    ///   which the domain program projects through and the hull program's frustum test projects
+    ///   each patch through.
+    /// - `float4` 5..8: the camera position, the shadow manager's tessellation origin, the
+    ///   tessellation factors, and the frustum-cull flag: `1.0` when
+    ///   [`m_EnableFrustumPatchCulling`](Self::m_EnableFrustumPatchCulling) is set and the active
+    ///   pass is neither a shadow cascade nor
+    ///   [`RP_TERRAIN_APPLY_NEAR`](graphics_engine::render_engine::RenderPassId::RP_TERRAIN_APPLY_NEAR)
+    ///   or
+    ///   [`RP_TERRAIN_APPLY_FAR`](graphics_engine::render_engine::RenderPassId::RP_TERRAIN_APPLY_FAR),
+    ///   else `0.0`.
+    ///
+    /// The buffer is then bound at hull and domain `cb1`, and the global constants at vertex and
+    /// fragment `cb0`.
+    #[address(0x140_32A_4C0)]
+    pub fn SetupConstantBuffers(&mut self, render_context: *mut RenderContext);
 }
 
 /// The hull-clip variant a [`RenderBlockTerrain`] draws with
@@ -593,6 +622,24 @@ impl RenderBlockBark {
     /// kind.
     #[address(0x140_136_A90)]
     pub fn DrawZ(&self, render_context: *mut RenderContext, info: *const RBIInfo);
+
+    /// The per-block setup (`IRenderBlock::Setup`) for the passes [`Draw`](Self::Draw) issues. The
+    /// draw kind is in `sort_id`: plain, GPU-indirect, or CPU-instanced. When `change` says the kind
+    /// changed since the previous block, it binds the type's vertex program for that kind and the
+    /// matching vertex declaration (the instanced declaration for the CPU-instanced kind), selecting
+    /// the shadow programs and declarations under the
+    /// [`RENDERSTATUS_SHADOWMAP`](graphics_engine::render_pass::RenderStatus::RENDERSTATUS_SHADOWMAP)
+    /// bits. It then binds the block's fragment program, textures, samplers, vertex streams, and
+    /// index buffer. `Draw` binds no vertex program of its own except on the billboard path.
+    #[address(0x140_103_130)]
+    pub fn Setup(&self, render_context: *mut RenderContext, sort_id: u64, change: u64);
+
+    /// The per-block setup for the passes [`DrawZ`](Self::DrawZ) issues: binds the depth or the
+    /// depth-and-velocity vertex program for the draw kind in `sort_id`, with the depth vertex
+    /// declaration, when `change` says the kind changed, then the block's vertex streams (the
+    /// per-instance stream too for the CPU-instanced kind) and index buffer.
+    #[address(0x140_103_020)]
+    pub fn SetupZ(&self, render_context: *mut RenderContext, sort_id: u64, change: u64);
 }
 
 /// The bark render block *type* (`NGraphicsEngine::CRenderBlockBark::CRenderBlockBarkType`).
@@ -644,6 +691,27 @@ impl RenderBlockTypeWindow {
     pub fn Setup(&self, render_context: *mut RenderContext);
 }
 
+/// The window render block (`NGraphicsEngine::CRenderBlockWindow`): alpha-blended glass, the
+/// vehicles' windows and the world's panes, drawn with the window shader, and with its damage when
+/// the instance carries window metadata
+/// ([`MetaWindow`](graphics_engine::window_damage::MetaWindow)).
+pub type RenderBlockWindow {
+    /// The address of the `CRenderBlockWindow` virtual table, by which a render block is told to be
+    /// a window.
+    pub const VFTABLE: u64 = 0x1423352D8,
+}
+impl RenderBlockWindow {
+    /// Draws the block for the current pass. Nothing is drawn while the instance's colour alpha
+    /// (the byte [`ModelInstance::m_FadeAlpha`](graphics_engine::model_instance::ModelInstance::m_FadeAlpha)
+    /// holds) is zero, nor in the two outline-effect passes. Otherwise it sets the world and
+    /// world-view-projection constants and the damage weights and the alpha for the window shader,
+    /// binds the damage points of the instance's window metadata, when it has some, through the
+    /// list's constant buffer, and draws the glass: back faces then front faces, or front faces only
+    /// for a single-sided block.
+    #[address(0x140_1A2_C70)]
+    pub fn Draw(&self, render_context: *mut RenderContext, info: *const RBIInfo);
+}
+
 /// The grass/foliage render block (`NGraphicsEngine::CRenderBlockFoliage`, registered name
 /// `"VegetationFoliage"`): forward-lit ground cover and small plants, drawn in `RP_VEGETATION_OPAQUE`.
 /// The bulk is grass drawn GPU-indirect.
@@ -679,6 +747,12 @@ impl RenderBlockFoliage {
     /// [`DrawIndexedNoMutex`](graphics_engine::draw::DrawIndexedNoMutex), on the same instance-data flags [`Draw`](Self::Draw) routes on.
     #[address(0x140_12D_9B0)]
     pub fn DrawZ(&self, render_context: *mut RenderContext, info: *const RBIInfo);
+
+    /// The per-block setup for the passes [`DrawZ`](Self::DrawZ) issues: binds the depth or the
+    /// depth-and-velocity vertex program for the draw kind in `sort_id`, with the depth vertex
+    /// declaration, on every call, then the block's stream, texture, and index buffer.
+    #[address(0x140_10D_450)]
+    pub fn SetupZ(&self, render_context: *mut RenderContext, sort_id: u64, change: u64);
 }
 
 /// The tree-impostor render block (`CTreeImpostorRB`): far-distance flat billboard cards that replace
@@ -707,6 +781,20 @@ impl TreeImpostorRBType {
     /// index buffer the impostor cards draw from and loads the program permutations.
     #[address(0x140_34E_BD0)]
     pub fn Create(&mut self, resource_context: *const ResourceContext);
+
+    /// Binds the state every impostor draw in the pass shares: blend, alpha test, cull, the atlas
+    /// textures and sampler, the quad index buffer, and the per-pass vertex `cb1` scalars. Outside
+    /// the shadow passes (the
+    /// [`RENDERSTATUS_SHADOWMAP`](graphics_engine::render_pass::RenderStatus::RENDERSTATUS_SHADOWMAP)
+    /// bits of [`RenderContext::m_RenderStatus`](graphics_engine::graphics_engine::RenderContext::m_RenderStatus))
+    /// it stages the vertex shader's `PixelSize` in `cb1` register 3 as one over
+    /// [`RenderContext::m_DisplayWidth`](graphics_engine::graphics_engine::RenderContext::m_DisplayWidth)
+    /// and [`m_DisplayHeight`](graphics_engine::graphics_engine::RenderContext::m_DisplayHeight). The
+    /// vertex shader divides the clip-space extent of each card by it to get the card's footprint in
+    /// pixels, which the pixel shader scales its atlas-coordinate derivatives by. In the shadow passes
+    /// the same register carries a light-space axis instead.
+    #[address(0x140_34E_EF0)]
+    pub fn Setup(&mut self, render_context: *mut RenderContext);
 }
 
 /// The occluder render block (`NGraphicsEngine::CRenderBlockOccluder`, registered name `"Occluder"`): a
@@ -746,10 +834,37 @@ impl RenderBlockLightGlow {
     pub fn Draw(&self, render_context: *mut RenderContext, info: *const RBIInfo);
 }
 
+/// The static light-sprite render block *type* (`NGraphicsEngine::CRenderBlockLights::CRenderBlockTypeLights`,
+/// registered name `"StaticLights"`): the point-light sprites `CLightManager` builds for the world's
+/// static lights, drawn as additive camera-facing quads. Each block draws its lights with one
+/// non-indexed `Draw` over a vertex stream of six vertices per light. The vertex programs
+/// (`Lightsource` and `Lightsource_FakeLight`) project each light's world position through the
+/// translation-bearing view-projection in the global vertex constants and expand the quad around it
+/// in clip space by a pixel size scaled by the clip `w`, so a sprite keeps a screen-space size set by
+/// its distance. The block draws in the sky-tail lens-flare pass, in the planar reflection's
+/// distant-light pass, and, through the fake-light permutation, in
+/// [`RP_DEFERRED_LIGHTS`](graphics_engine::render_engine::RenderPassId::RP_DEFERRED_LIGHTS).
+pub type RenderBlockTypeLights;
+impl RenderBlockTypeLights {
+    /// Binds the state every light-sprite draw in the pass shares and stages the vertex program's
+    /// constants in vertex `cb1`. In [`RP_DEFERRED_LIGHTS`](graphics_engine::render_engine::RenderPassId::RP_DEFERRED_LIGHTS)
+    /// it selects the fake-light program pair, binds the depth texture its pixel program fades
+    /// against, and applies the distant-light size and intensity scales; elsewhere both scales are
+    /// one. The sprite size scale is derived from the render context's projection and the height of
+    /// [`RenderContext::m_BackBufferTexture`](graphics_engine::graphics_engine::RenderContext::m_BackBufferTexture),
+    /// and the inverse screen width and height that convert the pixel size to clip units are one over
+    /// that texture's width and height. The constants also carry the intensity, the distance fade, the
+    /// size-distance curve, and an animation time from the render context's accumulated frame time.
+    #[address(0x140_17C_E90)]
+    pub fn Setup(&self, render_context: *mut RenderContext);
+}
+
 /// The fog-volume render block *type* (the
 /// `NGraphicsEngine::CRenderBlockFogVolume::CRenderBlockTypeFogVolume` singleton): owns the froxel
-/// volumetric-fog textures and recreates them when the scene render resolution changes.
-#[min_size(0x130)]
+/// volumetric-fog textures and recreates them when the scene render resolution changes. It also holds
+/// the shaders, render setups, samplers, and tweak attributes that
+/// [`RenderBlockFogVolume::Draw`](RenderBlockFogVolume::Draw) reads.
+#[singleton(0x142_ED7_480), min_size(0x130)]
 pub type RenderBlockTypeFogVolume {
     /// The full-resolution fog target width, in pixels, latched from the last
     /// [`ResizeTextures`](Self::ResizeTextures) call.
@@ -769,6 +884,54 @@ impl RenderBlockTypeFogVolume {
     /// recreated (a resolution change), not per frame.
     #[address(0x140_10C_5A0)]
     pub fn ResizeTextures(&mut self, width: u32, height: u32) -> bool;
+}
+
+/// The volumetric fog render block (`NGraphicsEngine::CRenderBlockFogVolume`). `CFogManager` draws
+/// it in two passes, and its `Draw` branches on the render context's
+/// [`m_ActiveRenderPass`](graphics_engine::graphics_engine::RenderContext::m_ActiveRenderPass).
+pub type RenderBlockFogVolume;
+impl RenderBlockFogVolume {
+    /// Draws one fog-volume pass, doing nothing when the block type is disabled.
+    ///
+    /// Common to both passes, it saves the bound render setup and binds the type's half-resolution
+    /// bilateral-upsample fog render setup, then stages the shared constants. Vertex `cb1` registers
+    /// 0..3 receive the instance's world matrix, made relative to
+    /// [`m_CameraPosition`](graphics_engine::graphics_engine::RenderContext::m_CameraPosition) and
+    /// multiplied by
+    /// [`m_OffsetViewProjection`](graphics_engine::graphics_engine::RenderContext::m_OffsetViewProjection).
+    /// The block's fullscreen vertex shader reads none of `cb1`; it passes the viewport-covering
+    /// triangle through and emits a texture UV spanning the whole bound target. The half-resolution
+    /// scene depth, the noise volume, and the two horizon maps are bound. Fragment `cb1` registers
+    /// 0..3 (`InvViewProj`) receive a texture-UV-to-world matrix: the scale and offset taking UV to
+    /// NDC composed with `Inverse(`[`m_ViewProjectionF`](graphics_engine::graphics_engine::RenderContext::m_ViewProjectionF)`)`.
+    /// The same inverse also goes to vertex `cb1` registers 4..7. Fragment `cb1` registers 4, 5, 8, 9,
+    /// and 10 carry the distribution, noise, cloud-shadow, and depth parameters. The cloud-shadow
+    /// blend reads the height of
+    /// [`m_RenderCameraPosition`](graphics_engine::graphics_engine::RenderContext::m_RenderCameraPosition),
+    /// and the depth parameters derive from
+    /// [`CameraNear`](graphics_engine::graphics_engine::RenderContext::CameraNear) and
+    /// [`CameraFar`](graphics_engine::graphics_engine::RenderContext::CameraFar).
+    ///
+    /// In
+    /// [`RP_FOG_VOLUME_GENERATE`](graphics_engine::render_engine::RenderPassId::RP_FOG_VOLUME_GENERATE)
+    /// it binds one of the `fogvolumeapply*` fragment programs (chosen by the noise and colour tweak
+    /// attributes, or the optimized one) and draws additively into the bilateral-upsample fog target.
+    /// Each pixel samples depth at its UV, reconstructs the world position through `InvViewProj`, and
+    /// ray-marches from the fragment GlobalConstants camera position towards it, sampling the sun
+    /// shadow cascade and cloud shadow map along the way.
+    ///
+    /// In
+    /// [`RP_FOG_VOLUME_UPSAMPLE`](graphics_engine::render_engine::RenderPassId::RP_FOG_VOLUME_UPSAMPLE)
+    /// it bilaterally upsamples that result against the full-resolution depth and the reflection
+    /// proxy depth. When compute upsampling is enabled it restores the saved render setup and issues
+    /// one compute dispatch sized from
+    /// [`m_HiResTextureWidth`](RenderBlockTypeFogVolume::m_HiResTextureWidth) and
+    /// [`m_HiResTextureHeight`](RenderBlockTypeFogVolume::m_HiResTextureHeight). Otherwise it binds
+    /// the volume-depth render setup and draws `fogvolumebilateralupsample`. That pass reconstructs no
+    /// positions; it reads only the depth parameters. After either pass's draw it restores the saved
+    /// render setup. In any other pass it returns before drawing, leaving the fog render setup bound.
+    #[address(0x140_13F_AF0)]
+    pub fn Draw(&self, render_context: *mut RenderContext, info: *const RBIInfo);
 }
 
 /// The additive fog-volume render block *type* (the
@@ -913,7 +1076,9 @@ impl RenderBlockSSAO {
     ///    is on its first frame it is preceded by a second separable blur pair, over the previous
     ///    history slot.
     /// 5. The composite into the alpha channel of the scene target (colour mask 8, depth test on),
-    ///    followed by the inlined history advance.
+    ///    outside the temporal branch: with the temporal filter on it samples the history slot the
+    ///    resolve just wrote and is followed by the inlined history advance, and with it off it
+    ///    samples the blurred occlusion target and nothing advances.
     #[address(0x140_190_E80)]
     pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
 }
@@ -1092,6 +1257,19 @@ impl WaterHighEndRenderBlock {
     /// [`WaterHighEndRenderBlockType::Setup`](WaterHighEndRenderBlockType::Setup) staged for the pass;
     /// nothing here restages it.
     #[address(0x140_356_CC0)]
+    pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
+}
+
+/// The water-plane proxy that supplies depth to the screen-space reflection pass.
+#[min_size(0x58)]
+pub type RenderBlockWaterReflectionPlane {
+    /// The world transform of the proxy quad.
+    #[address(0x18)]
+    pub m_WorldTransform: Matrix4,
+}
+impl RenderBlockWaterReflectionPlane {
+    /// Uploads the offset world-view-projection matrix to the WaterMask vertex program and draws the quad against the downsampled scene depth.
+    #[address(0x140_184_540)]
     pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
 }
 
@@ -1396,6 +1574,29 @@ impl RenderBlockSSDecal {
     pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
 }
 
+/// The ambient-occlusion volume render block (`NGraphicsEngine::CRenderBlockAOBox`): a box or a
+/// sphere, drawn in `RP_AO_VOLUMES`, that darkens the scene inside it with a falloff from its centre.
+pub type RenderBlockAOBox;
+impl RenderBlockAOBox {
+    /// Stages the volume's constants and issues its box geometry as a single `DrawIndexed`.
+    ///
+    /// On the vertex side it stages the instance's world matrix at slot 1 registers 0..3, the
+    /// half-extents at register 4, and the render context's
+    /// [`m_UVScale`](graphics_engine::graphics_engine::RenderContext::m_UVScale) at register 5; the
+    /// `aobox` vertex shader projects the corners through the full view-projection of the vertex
+    /// `GlobalConstants` and hands the pixel shader a projective screen UV, scaled by that UV scale.
+    /// On the fragment side it stages the falloff and the shadow floor at slot 1 register 0, and at
+    /// registers 1..4 `ScreenToLocal`: the map from the screen UV and the sampled scene depth to the
+    /// volume's unit space, composed from the UV-to-NDC flip, the inverse of the rotation-only
+    /// [`m_View`](graphics_engine::graphics_engine::RenderContext::m_View) times
+    /// [`m_ProjectionF`](graphics_engine::graphics_engine::RenderContext::m_ProjectionF), the inverse
+    /// of the world matrix made relative to the camera position, and the inverse half-extents. The pixel shader (`aobox` or
+    /// `aosphere`) samples the scene depth and the reflective water planes' depth at the UV, maps
+    /// both through the matrix, and multiplies the target by the occlusion.
+    #[address(0x140_136_4B0)]
+    pub fn Draw(&self, rc: *mut RenderContext, info: *const RBIInfo);
+}
+
 /// The `RenderBlockBavariumShield` render block *type* (`NGraphicsEngine::CRenderBlockBavariumShield::CRenderBlockTypeBavariumShield`).
 pub type RenderBlockTypeBavariumShield;
 impl RenderBlockTypeBavariumShield {
@@ -1476,9 +1677,56 @@ impl RenderBlockTypeLayered {
     pub fn Setup(&self, render_context: *mut RenderContext);
 }
 
-/// The `RenderBlockGeneralMkIII` render block *type* (`NGraphicsEngine::CRenderBlockGeneralMkIII::CRenderBlockTypeGeneralMkIII`).
-pub type RenderBlockTypeGeneralMkIII;
+/// The `RenderBlockGeneralMkIII` render block *type* (`NGraphicsEngine::CRenderBlockGeneralMkIII::CRenderBlockTypeGeneralMkIII`,
+/// type name `GeneralMkIII`): the static and dynamic model block of most buildings and props.
+/// `CRenderBlockGeneralMkIII::InitType` allocates it, stores it in the singleton, calls its
+/// [`Create`](Self::Create), and registers it. It derives from
+/// [`RenderBlockTypeBase`](graphics_engine::render_engine::RenderBlockTypeBase), whose vtable slots it
+/// overrides with the functions bound here; the base is not mapped as a region so that those can be
+/// called directly.
+///
+/// The vertex declarations are indexed by vertex permutation (the `HW_INSTANCED` permutations among
+/// them take theirs from [`CreateVertexDeclarationInstanced`](graphics_engine::graphics_engine::CreateVertexDeclarationInstanced));
+/// several entries alias another entry's handle rather than owning one.
+#[singleton(0x142_ED7_4C8), size(0x18F8)]
+pub type RenderBlockTypeGeneralMkIII {
+    /// The colour passes' declarations.
+    #[address(0x1_6A0)]
+    pub m_VertexDeclaration: [*mut HVertexDeclaration_t; 6],
+    /// The hardware-instanced declarations of the depth-and-velocity pass.
+    pub m_VertexDeclarationHWInstancingVelocity: [[*mut HVertexDeclaration_t; 2]; 2],
+    /// The depth-only passes' declarations.
+    pub m_VertexDeclarationDepth: [*mut HVertexDeclaration_t; 6],
+    /// The alpha-tested depth-only passes' declarations.
+    pub m_VertexDeclarationDepthAlphaTest: [*mut HVertexDeclaration_t; 6],
+}
 impl RenderBlockTypeGeneralMkIII {
+    /// Creates the type's GPU resources ([`RenderBlockTypeBase::Create`](graphics_engine::render_engine::RenderBlockTypeBase::Create)),
+    /// in this order and with no other side effects: binds the wind noise texture through
+    /// [`TextureCacheGetTexture`](graphics_engine::render_engine::TextureCacheGetTexture), resets the
+    /// tuning fields, reads the video card info, acquires the shader holders through
+    /// [`LoadShaders`](Self::LoadShaders), builds every vertex declaration from element arrays it
+    /// assembles on its stack (reading each declaration's vertex program from the holders) through
+    /// [`CreateVertexDeclaration`](graphics_engine::graphics_engine::CreateVertexDeclaration) and
+    /// [`CreateVertexDeclarationInstanced`](graphics_engine::graphics_engine::CreateVertexDeclarationInstanced),
+    /// creates the sampler states through [`CreateSamplerStates`](Self::CreateSamplerStates), and
+    /// creates the identity skinning palette through
+    /// [`CreateConstantBuffer`](graphics_engine::graphics_engine::CreateConstantBuffer). Every result is
+    /// stored in `self`.
+    #[address(0x140_158_C40)]
+    pub fn Create(&mut self, resource_context: *const ResourceContext);
+
+    /// Acquires every vertex and fragment program holder of the type from the resource context's
+    /// shader cache.
+    #[address(0x140_156_AD0)]
+    pub fn LoadShaders(&mut self, resource_context: *const ResourceContext);
+
+    /// Creates the type's sampler states (the regular and normal-map samplers, with and without the
+    /// type's anisotropy, and the wind noise sampler). `Recreate` destroys and re-creates them; it is
+    /// the only thing `Recreate` rebuilds.
+    #[address(0x140_110_9B0)]
+    pub fn CreateSamplerStates(&mut self, device: *mut HDevice_t);
+
     /// The type-level per-pass setup (the `IRenderBlockType::Setup` override). Binds the forward lighting
     /// resources through
     /// [`LightManager::SetupForwardLightingResources`](graphics_engine::light_manager::LightManager::SetupForwardLightingResources).

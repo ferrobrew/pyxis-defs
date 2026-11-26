@@ -1,6 +1,19 @@
-/// The opaque per-task state-machine context passed to character and task update functions. Used only
-/// behind pointers; the layout is not yet mapped.
-pub type StateContext;
+/// The per-task state-machine context (`SStateContext`) passed to character and task update
+/// functions. Only the leading members are bound.
+#[min_size(0x1C)]
+pub type StateContext {
+    /// The object the state machine runs for: the `CGameObject` base subobject of a character,
+    /// which sits [`Character::GAME_OBJECT_BASE_OFFSET`](character::character::Character::GAME_OBJECT_BASE_OFFSET)
+    /// bytes into the character.
+    pub m_User: *mut void,
+
+    /// The sub-frame interpolation fraction of the update.
+    #[address(0x14)]
+    pub m_Dtf: f32,
+    /// The simulation time step of the update, seconds. The movement tasks integrate their
+    /// orientation steps and speed blends with it.
+    pub m_Dt: f32,
+}
 
 /// `SUserVM::EStateBitFlag`: the index of a bit in the character's animation state-bit words, which
 /// state tasks in the animation graph set and clear and which game code and graph conditions read.
@@ -11,7 +24,7 @@ pub type StateContext;
 /// [`Character`](character::character::Character) (wingsuit, parachute, free fall, fast fall,
 /// reeling in, motorbike, swimming, attached parachute, pre-reel, pre-hang), the grapple bits of
 /// `IsReeledIn` and `IsGrappleHanging`, the aim, drawing, holstering, and pause-aim-timer bits
-/// `HandleAimingInputNPC` tests, and `SB_DISABLE_SHOOT`. The other values are unconfirmed.
+/// `HandleAimingInputPlayer` tests, and `SB_DISABLE_SHOOT`. The other values are unconfirmed.
 #[copyable]
 pub enum StateBitFlag: u32 {
     /// Flying the wingsuit; read by [`Character::IsUsingWingsuit`](character::character::Character::IsUsingWingsuit).
@@ -69,7 +82,12 @@ pub enum StateBitFlag: u32 {
     /// Hanging upside down from a grapple; read by [`Character::IsReeledIn`](character::character::Character::IsReeledIn) and [`Character::IsGrappleHanging`](character::character::Character::IsGrappleHanging).
     SB_IS_GRAPPLE_UPSIDEDOWN = 0x2A,
     SB_IN_RAGDOLL_GRAPPLE_FIRE = 0x2B,
-    /// Forces the character's weapon-aim bit off.
+    /// Forces the character's weapon-aim bit off: the aim-input updates
+    /// ([`Character::HandleAimingInputPlayer`](character::character::Character::HandleAimingInputPlayer)
+    /// and [`Character::HandleAimingInputNPC`](character::character::Character::HandleAimingInputNPC))
+    /// are the only code that reads it, and it does not clear the grapple-aim bit. Like the other
+    /// state bits it persists until written; the graph's state-bit scope tasks set it on entering a
+    /// state (or a named animation segment) and clear it on leaving.
     SB_NO_WEAPON_AIM = 0x2C,
     SB_IS_LOCO_ONE_OFF = 0x2D,
     SB_IS_LOOK_AT = 0x2E,
@@ -114,10 +132,20 @@ pub enum StateBitFlag: u32 {
     SB_ALLOW_STATIONARY_HITREACTION = 0x53,
     /// Holds the character's aim timer (set by `NPauseAimTimerTask`): it is not decremented and is kept at no less than 0.5 s.
     SB_PAUSE_AIM_TIMER = 0x54,
-    /// Suppresses the automatic weapon draw on entering combat.
+    /// Suppresses the automatic weapon draw on entering combat. One of the inventory permission
+    /// bits: `NSetInventoryPermissions` tasks set it, and
+    /// [`Inventory::UpdateInventoryPermissions`](character::inventory::Inventory::UpdateInventoryPermissions)
+    /// latches it into the inventory and clears it every tick. The combat draw in
+    /// [`Inventory::UpdateWeaponHandling`](character::inventory::Inventory::UpdateWeaponHandling)
+    /// tests both the latch and the live bit.
     SB_DISABLE_MENTAL_STATE_DRAW_WEAPON = 0x55,
+    /// Stands the weapon off-hand IK task down
+    /// ([`NWeaponOffhandIKTask_Update`](animation::arm_aim_ik::NWeaponOffhandIKTask_Update)): while
+    /// set, the task writes no off-hand grip keys and clears both hand bits.
     SB_DISABLE_WEAPON_OFFHAND_IK = 0x56,
+    /// The weapon off-hand IK task is placing the left hand on the weapon's grip this frame.
     SB_WEAPON_OFFHAND_IK_LEFT = 0x57,
+    /// The weapon off-hand IK task is placing the right hand on the weapon's grip this frame.
     SB_WEAPON_OFFHAND_IK_RIGHT = 0x58,
     SB_IN_TRANSITION_TO_WINGSUIT = 0x59,
     /// Hanging from a vehicle-attached parachute; read by [`Character::IsInAttachedToParachute`](character::character::Character::IsInAttachedToParachute).
