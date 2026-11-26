@@ -98,7 +98,6 @@ pub type HkaPose {
 
 /// The [`HkaPose::m_BoneFlags`] flag of a bone whose local-space transform is stale.
 pub const HKA_POSE_F_BONE_LOCAL_DIRTY: u32 = 0x1;
-
 /// The [`HkaPose::m_BoneFlags`] flag of a bone whose model-space transform is stale.
 pub const HKA_POSE_F_BONE_MODEL_DIRTY: u32 = 0x2;
 

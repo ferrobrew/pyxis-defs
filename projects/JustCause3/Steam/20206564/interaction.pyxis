@@ -125,11 +125,10 @@ pub type InteractionGraphEntry {
 
 /// The use tag of a vehicle entry a grapple reel ends at beside the vehicle, at its door side
 /// ([`InteractionGraphEntry::m_UseTagHash`]). The tag's source name is not known.
-pub const INTERACTION_USE_TAG_REEL_IN_DOOR_SIDE: u32 = 0xCBC5_E511;
-
+pub const INTERACTION_USE_TAG_REEL_IN_DOOR_SIDE: u32 = 0xCBC5E511;
 /// The use tag of a vehicle entry a grapple reel ends at in the vehicle's stunt hang
 /// ([`InteractionGraphEntry::m_UseTagHash`]): the hash of `reel_in_hang`.
-pub const INTERACTION_USE_TAG_REEL_IN_HANG: u32 = 0x69A6_6317;
+pub const INTERACTION_USE_TAG_REEL_IN_HANG: u32 = 0x69A66317;
 
 /// A graph of interaction nodes (`CInteractionGraph`), owned by an interaction context. Only some
 /// members are mapped.

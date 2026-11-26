@@ -422,14 +422,17 @@ impl hkpFixedConstraintData {
 pub type hkpBallAndSocketConstraintData {
     #[base]
     pub base: hkReferencedObject,
+
     /// The pivot in the first body's space.
     #[address(0x30)]
     pub m_translationA: AlignedVector3,
     /// The pivot in the second body's space.
     pub m_translationB: AlignedVector3,
+
     /// Whether the stabilisation atom is enabled: on for the stabilized solving method.
     #[address(0x52)]
     pub m_setupStabilizationEnabled: bool,
+
     /// The ball-socket atom's solving method: 0 stabilized, 1 the older method, which the
     /// constructor sets.
     #[address(0x62)]
