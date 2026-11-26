@@ -304,6 +304,38 @@ pub type WeaponData {
     /// pulled on an empty gun, which [`WeaponBase::CheckIfReloadShouldBeTriggeredBase`] plays on the
     /// firing gun of a player with nothing left to reload.
     pub const OUT_OF_AMMO_FIRE_USAGE: u32 = 0x53A64A14,
+    /// The hash of the usage `ReloadStart` (`hashlittle` of the name):
+    /// [`WeaponBase::StartReloadSequence`] plays it on every gun of the weapon. A gun's effect file
+    /// that carries it names the whole reload's sound for it: the magazine out, the magazine in,
+    /// and the action, as one event. The assault rifles carry none and play the same kind of sound
+    /// from [`RELOAD_REMOVE_MAGAZINE_USAGE`](Self::RELOAD_REMOVE_MAGAZINE_USAGE) instead.
+    pub const RELOAD_START_USAGE: u32 = 0xFD864177,
+    /// The hash of the usage `ReloadRemoveMagazine` (`hashlittle` of the name), which only the
+    /// assault rifles' effect files carry: the whole reload's sound, played by the reload clip's
+    /// track message where the magazine comes out. No code names it.
+    pub const RELOAD_REMOVE_MAGAZINE_USAGE: u32 = 0x59A158E5,
+    /// The hash of the usage `DrawWeapon` (`hashlittle` of the name): the sound of the gun being
+    /// drawn, which every hand-held gun's effect file carries under an entry named `Draw` or
+    /// `DrawWeapon`. No code names it; the draw clip's track message plays it.
+    pub const DRAW_WEAPON_USAGE: u32 = 0xCFA4FEFF,
+    /// The hash of the usage `HolsterWeapon` (`hashlittle` of the name): the sound of the gun being
+    /// put away, which every hand-held gun's effect file carries under an entry named `Holster` or
+    /// `HolsterWeapon`. No code names it; the holster clip's track message plays it.
+    pub const HOLSTER_WEAPON_USAGE: u32 = 0xDD7079FF,
+    /// The hash of the usage `CockBack` (`hashlittle` of the name): the sound of the action pulled
+    /// back, which the U-Rys 96's effect file carries as its pump going back and the CS111
+    /// Archangel's and the Final Argument's carry as their bolt's cock. No code names it; the
+    /// pump and bolt clips' track messages play it.
+    pub const COCK_BACK_USAGE: u32 = 0x57EFD49B,
+    /// The hash of the usage `CockForward` (`hashlittle` of the name): the sound of the action run
+    /// forward, which only the U-Rys 96's effect file carries, as its pump going forward. No code
+    /// names it; the pump clip's track message plays it.
+    pub const COCK_FORWARD_USAGE: u32 = 0x8D774294,
+    /// The hash of the usage `BoltAction` (`hashlittle` of the name):
+    /// [`SniperWeapon::UpdateFromUserPostSim_Parallel`] plays it on every gun of a bolt-action
+    /// rifle as it starts the bolt act. The CS111 Archangel's and the Final Argument's effect files
+    /// carry it as their casing ejection, a particle effect with no sound.
+    pub const BOLT_ACTION_USAGE: u32 = 0xBE97B421,
 
     /// The gun's attached effects and sounds (its `CAttachedEffectContainer` base), loaded from the
     /// weapon's effect file. The weapon plays its one-off sounds on each gun's container: the reload
